@@ -797,7 +797,6 @@ export default class TaskReportTable extends Component {
                                 let handleKey = child.No.split('-');
                                 let childNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
                                 let childSection = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-                                debugger;
                                 if (thinNo.indexOf(childNo) !== -1 && childSection === section) {
                                 // 找到符合条件的数据的name
                                     let name = child.Name;

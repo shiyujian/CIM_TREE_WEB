@@ -98,13 +98,13 @@ export default class RiskDetail extends Component {
      */
 
     render () {
-        const { risk } = this.props;
+        const { riskMess } = this.props;
         // 隐患照片
-        let beforeImgs = this._onImgClick(risk.Pics);
-        let afterImgs = this._onImgClick(risk.ReorganizePics);
-        let flow = this._handleFlow(risk.Flows);
-        let status = this._handleRiskStatus(risk.Status);
-        let location = this._handleSection(risk.Section);
+        let beforeImgs = this._onImgClick(riskMess.Pics);
+        let afterImgs = this._onImgClick(riskMess.ReorganizePics);
+        let flow = this._handleFlow(riskMess.Flows);
+        let status = this._handleRiskStatus(riskMess.Status);
+        let location = this._handleSection(riskMess.Section);
         return (
             <Row gutter={28}>
                 <Input
@@ -114,7 +114,7 @@ export default class RiskDetail extends Component {
                     }}
                     size='large'
                     addonBefore='隐患内容'
-                    value={risk.ProblemType}
+                    value={riskMess.ProblemType}
                 />
                 <Input
                     readOnly
@@ -123,7 +123,7 @@ export default class RiskDetail extends Component {
                     }}
                     size='large'
                     addonBefore='隐患描述'
-                    value={risk.Problem}
+                    value={riskMess.Problem}
                 />
                 <Input
                     readOnly
@@ -141,8 +141,8 @@ export default class RiskDetail extends Component {
                     }}
                     size='large'
                     addonBefore='隐患位置'
-                    value={`${risk.X} , ${
-                        risk.Y
+                    value={`${riskMess.X} , ${
+                        riskMess.Y
                     }`}
                 />
                 <Input

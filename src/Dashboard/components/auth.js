@@ -1,5 +1,5 @@
 import './OnSite.less';
-
+import { PROJECT_UNITS, FOREST_API } from '_platform/api';
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
     // 将小班的code获取到，进行去重
@@ -126,16 +126,24 @@ export const computeSignedArea = (path, type) => {
 export const genPopUpContent = (geo) => {
     const { properties = {} } = geo;
     switch (geo.type) {
+        case 'people': {
+            return `<div class="popupBox">
+						<h2><span>姓名：</span>${properties.name}</h2>
+						<h2><span>所属单位：</span>${properties.organization}</h2>
+						<h2><span>联系方式：</span>${properties.person_telephone}</h2>
+						<h2><span>标段：</span>${properties.sectionName}</h2>
+					</div>`;
+        }
         case 'danger': {
             return `<div>
-                    <h2><span>隐患内容：</span>${properties.name}</h2>
-                    <h2><span>隐患类型：</span>${properties.riskType}</h2>
-                    <h2><span>隐患描述：</span>${properties.Problem}</h2>
-                    <h2><span>整改状态：</span>${properties.status}</h2>
-                    <h2 class="btnRow">
-                        <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                    </h2>
-                </div>`;
+						<h2><span>隐患内容：</span>${properties.name}</h2>
+                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
+                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
+						<h2><span>整改状态：</span>${properties.status}</h2>
+                        <h2 class="btnRow">
+                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
+                        </h2>
+					</div>`;
         }
         default: {
             return null;
@@ -161,4 +169,44 @@ export const getIconType = (type) => {
 export const fillAreaColor = (index) => {
     let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
     return colors[index % 5];
+};
+
+// 获取标段名称
+export const getSectionName = (section) => {
+    let sectionName = '';
+    try {
+        let arr = section.split('-');
+        if (arr && arr.length === 3) {
+            PROJECT_UNITS.map(project => {
+                if (project.code === arr[0]) {
+                    let units = project.units;
+                    sectionName = project.value;
+                    units.map(unit => {
+                        if (unit.code === section) {
+                            sectionName =
+                            sectionName + unit.value;
+                        }
+                    });
+                }
+            });
+        }
+    } catch (e) {
+        console.log('e', e);
+    }
+    return sectionName;
+};
+// 树节点信息查看图片时格式转换
+export const onImgClick = (data) => {
+    let srcs = [];
+    try {
+        let arr = data.split(',');
+        arr.map(rst => {
+            let src = rst.replace(/\/\//g, '/');
+            src = `${FOREST_API}/${src}`;
+            srcs.push(src);
+        });
+    } catch (e) {
+        console.log('处理图片', e);
+    }
+    return srcs;
 };

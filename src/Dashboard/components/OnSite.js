@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-03 14:52:42
+ * @Last Modified time: 2018-08-04 17:51:27
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -20,8 +20,6 @@ import {
     Modal,
     Collapse,
     Form,
-    Input,
-    Tabs,
     Row,
     DatePicker,
     Radio
@@ -32,8 +30,10 @@ import DashPanel from './DashPanel';
 import RiskDetail from './RiskDetail';
 import moment from 'moment';
 import PkCodeTree from './PkCodeTree';
-import {getThinClass, getSmallClass, fillAreaColor, computeSignedArea} from './auth';
-const TabPane = Tabs.TabPane;
+import TreeMessModal from './TreeMessModal';
+import CuringTaskTree from './CuringTaskTree';
+import {getThinClass, getSmallClass, genPopUpContent, computeSignedArea, getIconType, getSectionName, onImgClick} from './auth';
+import { getUser } from '_platform/auth';
 const RadioGroup = Radio.Group;
 const { RangePicker } = DatePicker;
 
@@ -54,56 +54,57 @@ class OnSite extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            treeLists: [],
-            leftkeycode: '',
-            tree: '',
-            mapLayerBtnType: true,
-            isNotThree: true,
-            seeVisible: false,
-            markers: null,
-            // leafletCenter: [22.516818, 113.868495],
-            leafletCenter: [38.92, 115.98], // 雄安
-            toggle: true,
-            areaJson: [], // 区域地块
-            users: [], // 人员树
-            safetys: [], // 安全监测
-            hazards: [], // 安全隐患
-            userCheckedKeys: [], // 用户被选中键值
-            isShowTrack: false,
-            trackId: null,
-            trackUser: null,
             menuIsExtend: true /* 菜单是否展开 */,
             menuWidth: 260 /* 菜单宽度 */,
-            risk: {},
             selectedMenu: '1',
-            isVisibleMapBtn: true,
-            treeType: [],
-            projectList: [],
-            unitProjectList: [],
+            isVisibleMapBtn: true, // 是否显示卫星图和地图切换按钮
+            mapLayerBtnType: true, // 切换卫星图和地图
+            isNotThree: true,
+            // leafletCenter: [22.516818, 113.868495],
+            leafletCenter: [38.92, 115.98], // 雄安
+            // 树木详情弹窗数据
+            seeVisible: false,
             seedlingMess: '',
             treeMess: '',
             flowMess: '',
-            mapList: {}, // 轨迹列表
-            isShowRisk: false,
-            treeTypes: [],
-            treeLayerList: {}, // 树种图层list
-            areaLayerList: {}, // 区域地块图层list
-            eventTitle: '',
+            markers: null,
+            // 区域地块
+            areaTreeData: [],
+            leftkeycode: '',
+            areaEventTitle: '', // 区域地块选中节点的name
+            // 地图圈选
             radioValue: '全部细班',
-            thinClassLayerList: {},
             coordinates: [],
             createBtnVisible: false,
             polygonData: '', // 圈选地图图层
-            areaMeasure: 0,
-            areaMeasureVisible: false
+            areaMeasure: 0, // 圈选区域面积
+            areaMeasureVisible: false,
+            // 巡检轨迹
+            trackUsersTreeData: [], // 人员树
+            // 安全隐患
+            riskTreeData: [], // 安全隐患
+            riskMess: {}, // 隐患详情
+            isShowRisk: false, // 是否显示隐患详情弹窗
+            // 树种筛选
+            treeTypesTreeData: [], // 树种筛选树数据
+            // 养护任务
+            TaskTreeData: [], // 养护任务数据
+            curingTypes: [], // 养护类型
+            // 图层数据List
+            areaLayerList: {}, // 区域地块图层list
+            realThinClassLayerList: {}, // 实际细班种植图层
+            trackLayerList: {}, // 轨迹图层List
+            trackMarkerLayerList: {}, // 轨迹图标图层List
+            treeTypesLayerList: {}, // 树种图层list
+            riskMarkerLayerList: {}, // // 安全隐患图标图层List
+            curingTaskLayerList: {}, // 养护任务图层List
+            curingMarkerLayerList: {} // 养护任务图标图层List
         };
-        this.checkMarkers = [];
         this.tileLayer = null;
         this.tileLayer2 = null;
         this.tileLayer3 = null;
         this.map = null;
-        this.track = null;
-        this.orgs = null;
+        this.totalThinClass = [];
         /* 菜单宽度调整 */
         this.menu = {
             startPos: 0,
@@ -113,23 +114,19 @@ class OnSite extends Component {
             minWidth: 260,
             maxWidth: 500
         };
-        /* 现场人员 */
-        this.user = {
-            orgs: {},
-            userList: {}
-        };
     }
 
     async componentDidMount () {
-        this.loadAreaData();
-        this.initMap();
+        await this.initMap();
+        await this.loadAreaData();
         // 巡检路线
-        this.getMapRouter();
+        await this.getMapRouter();
         // 安全隐患
-        this.getArea();
-        this.getRisk();
+        await this.getRisk();
         // 树种筛选
-        this.getTreeType();
+        await this.getTreeType();
+        // 养护任务
+        await this.getCuringTasks();
     }
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -148,13 +145,13 @@ class OnSite extends Component {
         },
         {
             label: '巡检路线',
-            value: 'geojsonFeature_people',
+            value: 'geojsonFeature_track',
             IconUrl: require('./ImageIcon/people.png'),
             IconName: 'universal-access'
         },
         {
             label: '安全隐患',
-            value: 'geojsonFeature_hazard',
+            value: 'geojsonFeature_risk',
             IconUrl: require('./ImageIcon/danger.png'),
             IconName: 'warning'
         },
@@ -162,6 +159,11 @@ class OnSite extends Component {
             label: '树种筛选',
             value: 'geojsonFeature_treetype',
             IconName: 'square'
+        },
+        {
+            label: '养护任务',
+            value: 'geojsonFeature_curingTask',
+            IconName: 'curingTask'
         }
     ];
 
@@ -186,7 +188,7 @@ class OnSite extends Component {
                         </div>
                     );
                 // 巡检路线
-                case 'geojsonFeature_people':
+                case 'geojsonFeature_track':
                     return (
                         <div>
                             <DashPanel
@@ -194,27 +196,25 @@ class OnSite extends Component {
                                 onCheck={this.handleTrackCheck.bind(this)}
                                 onSelect={this.handleTrackSelect.bind(this)}
                                 content={content}
-                                userCheckKeys={this.state.userCheckedKeys}
                                 featureName={option.value}
                             />
-                            <RangePicker
+                            {/* <RangePicker
                                 style={{
                                     verticalAlign: 'middle',
                                     width: '100%'
                                 }}
                                 showTime={{ format: 'HH:mm:ss' }}
                                 format={'YYYY/MM/DD HH:mm:ss'}
-                            />
+                            /> */}
                         </div>
                     );
                 // 安全隐患
-                case 'geojsonFeature_hazard':
+                case 'geojsonFeature_risk':
                     return (
                         <DashPanel
                             onCheck={this.handleRiskCheck.bind(this)}
                             onSelect={this.handleRiskSelect.bind(this)}
                             content={content}
-                            userCheckKeys={this.state.userCheckedKeys}
                             featureName={option.value}
                         />
                     );
@@ -225,8 +225,15 @@ class OnSite extends Component {
                             onCheck={this.handleTreeTypeCheck.bind(this)}
                             onSelect={this.handleTreeTypeSelect.bind(this)}
                             content={content}
-                            // userCheckKeys={this.state.userCheckedKeys}
                             featureName={option.value}
+                        />
+                    );
+                // 树种筛选
+                case 'geojsonFeature_curingTask':
+                    return (
+                        <CuringTaskTree
+                            onSelect={this.handleCuringTaskSelect.bind(this)}
+                            content={content}
                         />
                     );
             }
@@ -236,110 +243,23 @@ class OnSite extends Component {
     getPanelData (featureName) {
         var content = {};
         switch (featureName) {
-            case 'geojsonFeature_people':
-                content = this.state.users;
+            case 'geojsonFeature_track':
+                content = this.state.trackUsersTreeData;
                 break;
-            case 'geojsonFeature_hazard':
-                content = this.state.hazards;
+            case 'geojsonFeature_risk':
+                content = this.state.riskTreeData;
                 break;
             case 'geojsonFeature_area':
-                content = this.state.treeLists;
+                content = this.state.areaTreeData;
                 break;
             case 'geojsonFeature_treetype':
-                content = this.state.treeTypes;
+                content = this.state.treeTypesTreeData;
+                break;
+            case 'geojsonFeature_curingTask':
+                content = this.state.TaskTreeData;
                 break;
         }
         return content;
-    }
-    genPopUpContent (geo) {
-        const { properties = {} } = geo;
-        switch (geo.type) {
-            case 'people': {
-                return `<div class="popupBox">
-						<h2><span>姓名：</span>${properties.name}</h2>
-						<h2><span>所属单位：</span>${properties.organization}</h2>
-						<h2><span>联系方式：</span>${properties.person_telephone}</h2>
-						<h2><span>标段：</span>${properties.sectionName}</h2>
-					</div>`;
-            }
-            case 'danger': {
-                return `<div>
-						<h2><span>隐患内容：</span>${properties.name}</h2>
-                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
-                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
-						<h2><span>整改状态：</span>${properties.status}</h2>
-                        <h2 class="btnRow">
-                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                        </h2>
-					</div>`;
-            }
-            default: {
-                return null;
-            }
-        }
-    }
-    /* 在地图上添加marker和polygan */
-    createMarker (geo, oldMarker) {
-        if (geo.properties.type !== 'area') {
-            if (!oldMarker) {
-                if (
-                    !geo.geometry.coordinates[0] ||
-                    !geo.geometry.coordinates[1]
-                ) {
-                    return;
-                }
-                let iconType = L.divIcon({
-                    className: this.getIconType(geo.type)
-                });
-                console.log('geo.geometry.coordinates', geo.geometry.coordinates);
-                let marker = L.marker(geo.geometry.coordinates, {
-                    icon: iconType,
-                    title: geo.properties.name
-                });
-                marker.bindPopup(
-                    L.popup({ maxWidth: 240 }).setContent(
-                        this.genPopUpContent(geo)
-                    )
-                );
-                marker.addTo(this.map);
-                return marker;
-            }
-            return oldMarker;
-        } else {
-            // 创建区域图形
-            if (!oldMarker) {
-                let area = L.geoJson(geo, {
-                    style: {
-                        fillColor: this.fillAreaColor(geo.key),
-                        weight: 1,
-                        opacity: 1,
-                        color: '#201ffd',
-                        fillOpacity: 0.3
-                    },
-                    title: geo.properties.name
-                }).addTo(this.map);
-                // 地块标注
-                this.map.fitBounds(area.getBounds());
-
-                return area;
-            }
-            return oldMarker;
-        }
-    }
-    // 获取对应的ICON
-    getIconType (type) {
-        switch (type) {
-            case 'people':
-                return 'peopleIcon';
-            case 'safety':
-                return 'cameraIcon';
-            case 'danger':
-                return 'dangerIcon';
-            case 'tree':
-                return 'treeIcon';
-            default:
-                break;
-        }
     }
     /* 初始化地图 */
     initMap () {
@@ -385,7 +305,7 @@ class OnSite extends Component {
                 if (target.getAttribute('class') === 'btnViewRisk') {
                     let idRisk = target.getAttribute('data-id');
                     let risk = null;
-                    me.state.hazards.forEach(v => {
+                    me.state.riskTreeData.forEach(v => {
                         if (!risk) {
                             risk = v.children.find(v1 => v1.key === idRisk);
                         }
@@ -396,21 +316,11 @@ class OnSite extends Component {
                         let contact = await getRiskContactSheet({ ID: idRisk });
                         if (contact && contact.ID) {
                             me.setState({
-                                risk: contact,
+                                riskMess: contact,
                                 isShowRisk: true
                             });
                         }
                     }
-                }
-                // 绑定轨迹查看点击事件
-                if (target.getAttribute('class') === 'btnViewTrack') {
-                    let id = target.getAttribute('data-id');
-                    // 开始显示轨迹
-                    me.setState({
-                        isShowTrack: true,
-                        trackId: id,
-                        trackUser: name
-                    });
                 }
             });
 
@@ -476,26 +386,30 @@ class OnSite extends Component {
                         });
                     }
                 });
-                this.setState({
-                    projectList,
-                    unitProjectList
-                });
                 for (let i = 0; i < projectList.length; i++) {
                     projectList[i].children = unitProjectList.filter(node => {
                         return node.Parent === projectList[i].No;
                     });
                 }
             }
-            unitProjectList.map(async section => {
-                let list = await getLittleBan({ no: section.No });
+            for (let i = 0; i < unitProjectList.length; i++) {
+                let unitProject = unitProjectList[i];
+                let list = await getLittleBan({ no: unitProject.No });
                 let smallClassList = getSmallClass(list);
+                let unitProjectThinArr = [];
                 smallClassList.map(smallClass => {
                     let thinClassList = getThinClass(smallClass, list);
+
+                    unitProjectThinArr = unitProjectThinArr.concat(thinClassList);
                     smallClass.children = thinClassList;
                 });
-                section.children = smallClassList;
-                this.setState({ treeLists: projectList });
-            });
+                this.totalThinClass.push({
+                    unitProject: unitProject.No,
+                    thinClass: unitProjectThinArr
+                });
+                unitProject.children = smallClassList;
+            }
+            this.setState({ areaTreeData: projectList });
         } catch (e) {
             console.log('获取地块树数据', e);
         }
@@ -506,7 +420,7 @@ class OnSite extends Component {
         try {
             let treeData = await getTreeTypeAction();
             let arrData = [];
-            let treeTypes = [
+            let treeTypesTreeData = [
                 {
                     key: Math.random.toString(),
                     properties: {
@@ -535,9 +449,9 @@ class OnSite extends Component {
                     });
                 }
             });
-            treeTypes[0].children = arrData;
+            treeTypesTreeData[0].children = arrData;
             this.setState({
-                treeTypes
+                treeTypesTreeData
             });
         } catch (e) {
             console.log('树种', e);
@@ -568,30 +482,7 @@ class OnSite extends Component {
                     });
                 }
             });
-            me.setState({ users: orgArr });
-        });
-    }
-    /* 获取区域数据 */
-    getArea () {
-        let me = this;
-        const { getArea } = this.props.actions;
-        // 获取区域数据
-        getArea({}).then((rst = {}) => {
-            let areaData = rst.children || [];
-            var resAreas = me.loop(areaData, []);
-            resAreas.forEach((v, index) => {
-                v.key = index;
-            });
-            let areas = [
-                {
-                    key: 'ALL',
-                    properties: {
-                        name: '区域地块'
-                    },
-                    children: resAreas
-                }
-            ];
-            me.setState({ areaJson: areas });
+            me.setState({ trackUsersTreeData: orgArr });
         });
     }
     /* 获取安全隐患点 */
@@ -668,352 +559,57 @@ class OnSite extends Component {
             for (let i in riskObj) {
                 risks.push(riskObj[i]);
             }
-            me.setState({ hazards: risks });
+            me.setState({ riskTreeData: risks });
         });
     }
-    // 解构得到的区域数据
-    loop (data = [], resAreas = []) {
-        let me = this;
-        data.map(item => {
-            if (item.children && item.children.length) {
-                me.loop(item.children, resAreas);
-            } else if (item.extra_params.coordinates) {
-                let areaData = item.extra_params.coordinates;
-                let coordinates = [];
-                areaData.map(LatLng => {
-                    let LngLat = [LatLng.Lng, LatLng.Lat];
-                    coordinates.push(LngLat);
-                });
-                resAreas.push({
-                    key: 0,
-                    type: 'Feature',
-                    properties: {
-                        name: item.name,
-                        type: 'area'
-                    },
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [coordinates]
-                    },
-                    file_info: item.extra_params.file_info
-                });
+    // 获取养护任务
+    getCuringTasks = async () => {
+        const {
+            actions: {
+                getCuring,
+                getcCuringTypes
             }
-        });
-        return resAreas;
-    }
-    // 巡检路线多选树节点
-    async handleTrackCheck (keys, featureName, info) {
-        const { getMapList, getUserDetail } = this.props.actions;
-        const { mapList } = this.state;
-        let me = this;
-        var content = this.getPanelData(featureName);
-        // 获取所有key对应的数据对象
-        this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
-        let checkItems = this.checkMarkers[featureName];
-        // 当前选中的节点
-        let selectKey = info.node.props.eventKey;
-        // 当前的选中状态
-        let checked = info.checked;
-        if (checked) {
-            try {
-                let routes = await getMapList({ routeID: selectKey });
-                // getMapList({ routeID: selectKey }).then(async routes => {
-                let set = {};
-                routes.forEach(item => {
-                    set[item.RouteID] = [];
-                });
-                routes.forEach(item => {
-                    if (set[item.RouteID]) {
-                        set[item.RouteID].push({
-                            GPSTime: item.GPSTime,
-                            ID: item.ID,
-                            Patroler: item.Patroler,
-                            X: item.X,
-                            Y: item.Y
-                        });
-                    }
-                });
-                let arr1 = [];
-                for (var t in set) {
-                    arr1.push(set[t]);
-                }
-                let latlngs = [];
-                if (arr1 && arr1 instanceof Array && arr1.length > 0) {
-                    arr1[0].map(rst => {
-                        if (rst && rst.X && rst.Y) {
-                            latlngs.push([rst.Y, rst.X]);
-                        }
-                    });
-                }
-                // 选中节点的数据
-                let selectData = '';
-                content.map(data => {
-                    if (data.key === selectKey) {
-                        selectData = data;
-                    }
-                });
-                if (
-                    selectData &&
-                    selectData.properties &&
-                    selectData.properties.PK
-                ) {
-                    let user = await getUserDetail({
-                        pk: selectData.properties.PK
-                    });
-                    let sectionName = '';
-                    if (
-                        user &&
-                        user.account &&
-                        user.account.sections &&
-                        user.account.sections.length > 0
-                    ) {
-                        try {
-                            let section = user.account.sections[0];
-                            let arr = section.split('-');
-                            if (arr && arr.length === 3) {
-                                PROJECT_UNITS.map(project => {
-                                    if (project.code === arr[0]) {
-                                        let units = project.units;
-                                        sectionName = project.value;
-                                        units.map(unit => {
-                                            if (unit.code === section) {
-                                                sectionName =
-                                                    sectionName + unit.value;
-                                            }
-                                        });
-                                    }
+        } = this.props;
+        let curingTypesData = await getcCuringTypes();
+        let curingTypes = curingTypesData && curingTypesData.content;
+        if (curingTypes && curingTypes.length > 0) {
+            let curingTaskData = await getCuring();
+            let curingTasks = curingTaskData.content;
+            let TaskTreeData = [];
+            curingTasks.map((task) => {
+                if (task && task.ID) {
+                    curingTypes.map((type) => {
+                        if (type.ID === task.CuringType) {
+                            let exist = false;
+                            let childData = [];
+                            // 查看TreeData里有无这个类型的数据，有的话，push
+                            TaskTreeData.map((treeNode) => {
+                                if (treeNode.ID === type.ID) {
+                                    exist = true;
+                                    childData = treeNode.children;
+                                    childData.push((task));
+                                }
+                            });
+                            // 没有的话，创建
+                            if (!exist) {
+                                childData.push(task);
+                                TaskTreeData.push({
+                                    ID: type.ID,
+                                    Name: type.Base_Name,
+                                    children: childData
                                 });
                             }
-                        } catch (e) {
-                            console.log('获取标段', e);
                         }
-                    }
-                    let iconData = {
-                        geometry: {
-                            coordinates: [latlngs[0][0], latlngs[0][1]],
-                            type: 'Point'
-                        },
-                        key: selectKey,
-                        properties: {
-                            name: user.account.person_name
-                                ? user.account.person_name
-                                : user.username,
-                            organization: user.account.organization
-                                ? user.account.organization
-                                : '',
-                            person_telephone: user.account.person_telephone
-                                ? user.account.person_telephone
-                                : '',
-                            sectionName: sectionName
-                        },
-                        type: 'people'
-                    };
-                    checkItems[selectKey] = me.createMarker(
-                        iconData,
-                        checkItems[selectKey]
-                    );
-                }
-
-                let polyline = L.polyline(latlngs, { color: 'blue' }).addTo(
-                    this.map
-                );
-                mapList[selectKey] = polyline;
-                this.map.fitBounds(polyline.getBounds());
-                this.setState({
-                    mapList
-                });
-            } catch (e) {
-                console.log('e', e);
-            }
-        } else {
-            // 如果取消选中 则将数据删除
-            // 移除未选中的
-            checkItems[selectKey]._icon.remove();
-            delete checkItems[selectKey];
-            this.map.removeLayer(mapList[selectKey]);
-            // mapList[selectKey]._bounds.remove();
-            delete mapList[selectKey];
-        }
-    }
-    // 巡检路线点击树节点
-    handleTrackSelect (keys, featureName) {
-    }
-    /* 安全隐患多选树节点 */
-    handleRiskCheck (keys, featureName, info) {
-        var content = this.getPanelData(featureName);
-        // 获取所有key对应的数据对象
-        this.checkMarkers[featureName] = this.checkMarkers[featureName] || {};
-        let checkItems = this.checkMarkers[featureName];
-        // 移除未选中的
-        for (var c in checkItems) {
-            let k = keys.find(k => k === c);
-            if (!k && checkItems[c]) {
-                checkItems[c]._icon.remove();
-                delete checkItems[c];
-            }
-        }
-        let me = this;
-        content.forEach(c => {
-            if (!c.children) {
-                let kkkk = keys.find(k => k === c.key);
-                if (kkkk) {
-                    checkItems[kkkk] = me.createMarker(c, checkItems[kkkk]);
-                }
-            } else {
-                c.children.forEach(cc => {
-                    let kk = keys.find(k => k === cc.key);
-                    if (kk) {
-                        checkItems[kk] = me.createMarker(cc, checkItems[kk]);
-                        if (featureName === 'geojsonFeature_hazard') {
-                            this.map.panTo(cc.geometry.coordinates);
-                        }
-                    }
-                });
-            }
-        });
-        this.checkMarkers[featureName] = checkItems;
-    }
-    /* 安全隐患点击树节点 */
-    handleRiskSelect (keys, featureName) {
-    }
-    /* 树种筛选多选树节点 */
-    handleTreeTypeCheck (keys, featureName, info) {
-        const {
-            treeLayerList
-        } = this.state;
-        let me = this;
-        var content = this.getPanelData(featureName);
-        // 当前选中的节点
-        let selectKey = info.node.props.eventKey;
-        // 当前的选中状态
-        let checked = info.checked;
-        let allTreeKey = '';
-        if (content && content.length > 0) {
-            allTreeKey = content[0].key;
-        }
-        let queryData = '';
-        for (let i = 0; i < keys.length; i++) {
-            queryData = queryData + keys[i];
-            if (i < keys.length - 1) {
-                queryData = queryData + ',';
-            }
-        }
-        console.log('keys', keys);
-        console.log('info', info);
-        console.log('selectKey', selectKey);
-
-        // 如果是选中节点，首先看是否是选中全部，如果是，就加载所有树种的图层
-
-        if (allTreeKey === selectKey && checked) {
-            if (this.tileLayer2) {
-                this.tileLayer2.addTo(this.map);
-            } else {
-                this.tileLayer2 = L.tileLayer(
-                    window.config.DASHBOARD_ONSITE +
-                            '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                    {
-                        opacity: 1.0,
-                        subdomains: [1, 2, 3],
-                        minZoom: 11,
-                        maxZoom: 21,
-                        storagetype: 0,
-                        tiletype: 'wtms'
-                    }
-                ).addTo(this.map);
-            }
-        } else if (keys && keys.length === 0) {
-            // 如果是取消选中，首先看是否是取消全部，如果是，直接把所有图层去除
-            try {
-                if (this.tileLayer2) {
-                    this.map.removeLayer(this.tileLayer2);
-                }
-                if (this.tileLayer3) {
-                    this.map.removeLayer(this.tileLayer3);
-                    this.tileLayer3 = null;
-                }
-                // 去除掉选中某个节点所产生的图层
-                for (let i in treeLayerList) {
-                    console.log('treeLayerList[i]', treeLayerList[i]);
-                    this.map.removeLayer(treeLayerList[i]);
-                }
-            } catch (e) {
-                console.log('去除全部树种', e);
-            }
-        } else {
-            if (checked) {
-                // 不是选中全部，一定是选中某个节点，将这个节点添加就可以
-                // 首先看之前选中过没有，选中过的话，直接添加该图层就好
-                if (treeLayerList[selectKey]) {
-                    treeLayerList[selectKey].addTo(this.map);
-                } else {
-                    // 没选中的话，需要重新请求，然后添加到state里面
-                    var url = window.config.DASHBOARD_TREETYPE +
-                    `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${selectKey})`;
-                    let checkedTreeLayer = L.tileLayer.wms(url,
-                        {
-                            layers: 'xatree:treelocation',
-                            crs: L.CRS.EPSG4326,
-                            format: 'image/png',
-                            maxZoom: 22,
-                            transparent: true
-                        }
-                    ).addTo(this.map);
-                    treeLayerList[selectKey] = checkedTreeLayer;
-                    me.setState({
-                        treeLayerList
                     });
                 }
-            } else {
-                // 不是取消选中全部，首先看之前的列表中有没有点击过这个节点，点击过，取消，未点击过，就重新获取数据
-                if (treeLayerList[selectKey]) {
-                    this.map.removeLayer(treeLayerList[selectKey]);
-                    // delete treeLayerList[selectKey];
-                } else {
-                    if (this.tileLayer2) {
-                        this.map.removeLayer(this.tileLayer2);
-                    }
-                    if (this.tileLayer3) {
-                        this.map.removeLayer(this.tileLayer3);
-                        this.tileLayer3 = null;
-                    }
-                    var url = window.config.DASHBOARD_TREETYPE +
-                        `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${queryData})`;
-                    // this.tileLayer3指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
-                    this.tileLayer3 = L.tileLayer.wms(url,
-                        {
-                            layers: 'xatree:treelocation',
-                            crs: L.CRS.EPSG4326,
-                            format: 'image/png',
-                            maxZoom: 22,
-                            transparent: true
-                        }
-                    ).addTo(this.map);
-                }
-            }
+            });
+            this.setState({
+                TaskTreeData,
+                curingTypes
+            });
         }
     }
-    /* 树种筛选点击树节点 */
-    handleTreeTypeSelect (keys, featureName) {}
-    // 切换为2D
-    toggleTileLayer (index) {
-        this.tileLayer.setUrl(this.tileUrls[index]);
-        this.setState({
-            TileLayerUrl: this.tileUrls[index],
-            mapLayerBtnType: !this.state.mapLayerBtnType
-        });
-    }
-    // 图例的显示与否
-    toggleIcon1 () {
-        this.setState({
-            seeVisible: !this.state.seeVisible
-        });
-    }
-    handleRadioChange = async (e) => {
-        console.log('radio checked', e.target.value);
-        this.setState({
-            radioValue: e.target.value
-        });
-    }
+    // 切换全部细班时，将其余图层去除，加载最初始图层
     componentDidUpdate = async (prevState, prevProps) => {
         const {
             radioValue
@@ -1024,20 +620,7 @@ class OnSite extends Component {
     }
     // 添加全部植树图层
     addTotalMapLayer = () => {
-        const {
-            thinClassLayerList,
-            treeLayerList
-        } = this.state;
-        if (this.tileLayer3) {
-            this.map.removeLayer(this.tileLayer3);
-            this.tileLayer3 = null;
-        }
-        for (let i in treeLayerList) {
-            this.map.removeLayer(treeLayerList[i]);
-        }
-        for (let i in thinClassLayerList) {
-            this.map.removeLayer(thinClassLayerList[i]);
-        }
+        this.removeAllLayer();
         if (this.tileLayer2) {
             this.tileLayer2.addTo(this.map);
         } else {
@@ -1055,212 +638,31 @@ class OnSite extends Component {
             ).addTo(this.map);
         }
     }
-    /* 弹出信息框 */
-    handleAreaSelect = async (keys, info) => {
+    // 去除除初始化数据以外的全部图层
+    removeAllLayer () {
         const {
-            areaLayerList,
-            radioValue,
-            treeLayerList,
-            thinClassLayerList
+            realThinClassLayerList,
+            treeTypesLayerList
         } = this.state;
-        let me = this;
-        console.log('info', info);
-        console.log('keys', keys);
-        // 当前选中的节点
-        let eventTitle = info.node.props.title;
-        let selected = info.selected;
-        console.log('selected', selected);
-        this.setState({
-            leftkeycode: keys[0],
-            eventTitle
-        });
         try {
-            const eventKey = keys[0];
-            for (let v in areaLayerList) {
-                me.map.removeLayer(areaLayerList[v]);
+            if (this.tileLayer3) {
+                this.map.removeLayer(this.tileLayer3);
+                this.tileLayer3 = null;
             }
-            if (eventKey) {
-                // 细班的key加入了标段，首先对key进行处理
-                let handleKey = eventKey.split('-');
-                // 如果选中的是细班，则直接添加图层
-                if (handleKey.length === 5) {
-                    const treeNodeName = info && info.node && info.node.props && info.node.props.title;
-                    // 如果之前添加过，直接将添加过的再次添加，不用再次请求
+            for (let i in treeTypesLayerList) {
+                this.map.removeLayer(treeTypesLayerList[i]);
+            }
+            for (let i in realThinClassLayerList) {
+                this.map.removeLayer(realThinClassLayerList[i]);
+            }
+        } catch (e) {
 
-                    if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].addTo(me.map);
-                        me.map.fitBounds(areaLayerList[eventKey].getBounds());
-                    } else {
-                    // 如果不是添加过，需要请求数据
-                        await me._addAreaLayer(eventKey, treeNodeName);
-                    }
-                }
-                if (radioValue === '实际定位') {
-                    let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-                    if (me.tileLayer2) {
-                        me.map.removeLayer(me.tileLayer2);
-                    }
-                    if (me.tileLayer3) {
-                        me.map.removeLayer(me.tileLayer3);
-                        me.tileLayer3 = null;
-                    }
-                    for (let i in treeLayerList) {
-                        me.map.removeLayer(treeLayerList[i]);
-                    }
-                    for (let i in thinClassLayerList) {
-                        me.map.removeLayer(thinClassLayerList[i]);
-                    }
-                    if (thinClassLayerList[eventKey]) {
-                        thinClassLayerList[eventKey].addTo(me.map);
-                    } else {
-                        var url = window.config.DASHBOARD_TREETYPE +
-                        `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27`;
-                        let thinClassLayer = L.tileLayer.wms(url,
-                            {
-                                layers: 'xatree:treelocation',
-                                crs: L.CRS.EPSG4326,
-                                format: 'image/png',
-                                maxZoom: 22,
-                                transparent: true
-                            }
-                        ).addTo(this.map);
-                        thinClassLayerList[eventKey] = thinClassLayer;
-                        this.setState({
-                            thinClassLayerList
-                        });
-                    }
-                }
-            }
-        } catch (e) {
-            console.log('处理选中节点', e);
         }
     }
-    // 选中细班，则在地图上加载细班图层
-    _addAreaLayer = async (eventKey, treeNodeName) => {
-        const {
-            areaLayerList
-        } = this.state;
-        const {
-            actions: { getTreearea }
-        } = this.props;
-        try {
-            let handleKey = eventKey.split('-');
-            let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-            let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-            let me = this;
-            let treearea = [];
-            try {
-                let rst = await getTreearea({}, { no: no });
-                if (
-                    !(
-                        rst &&
-                        rst.content &&
-                        rst.content instanceof Array &&
-                        rst.content.length > 0
-                    )
-                ) {
-                    return;
-                }
 
-                let contents = rst.content;
-                let data = contents.find(content => content.Section === section);
-                let str = data.coords;
-                var target1 = str
-                    .slice(str.indexOf('(') + 3, str.indexOf(')'))
-                    .split(',')
-                    .map(item => {
-                        return item.split(' ').map(_item => _item - 0);
-                    });
-                treearea.push(target1);
-                let message = {
-                    key: 3,
-                    type: 'Feature',
-                    properties: { name: treeNodeName, type: 'area' },
-                    geometry: { type: 'Polygon', coordinates: treearea }
-                };
-                // console.log('treearea', treearea);
-                // let num = computeSignedArea(target1, 1);
-                // console.log('num', num);
-                let layer = this.createMarker(message);
-                areaLayerList[eventKey] = layer;
-                me.setState({
-                    areaLayerList
-                });
-            } catch (e) {
-                console.log('await', e);
-            }
-        } catch (e) {
-            console.log('加载细班图层', e);
-        }
-    }
-    _handleCreateTaskOk = async () => {
-        const {
-            coordinates
-        } = this.state;
-        try {
-            let areaMeasure = computeSignedArea(coordinates, 2);
-            console.log('areaMeasure', areaMeasure);
-            areaMeasure = areaMeasure * 0.0015;
-            console.log('areaMeasure', areaMeasure);
-            this.setState({
-                areaMeasure,
-                areaMeasureVisible: true
-            });
-        } catch (e) {
-            console.log('e', e);
-        }
-    }
-    _handleCreateTaskCancel = async () => {
-        const {
-            polygonData
-        } = this.state;
-        if (polygonData) {
-            this.map.removeLayer(polygonData);
-        }
-        this.setState({
-            areaMeasureVisible: false
-        });
-        this.resetButState();
-    }
-    _handleCreateTaskRetreat = async () => {
-        const {
-            coordinates
-        } = this.state;
-        let me = this;
-        if (me.state.polygonData) {
-            me.map.removeLayer(me.state.polygonData);
-        }
-        this.setState({
-            areaMeasureVisible: false
-        });
-        coordinates.pop();
-        if (coordinates.length === 0) {
-            this.resetButState();
-            return;
-        }
-        let polygonData = L.polygon(coordinates, {
-            color: 'white',
-            fillColor: '#93B9F2',
-            fillOpacity: 0.2
-        }).addTo(me.map);
-        me.setState({
-            coordinates,
-            polygonData: polygonData
-        });
-    }
-    // 取消圈选和按钮的功能
-    resetButState = () => {
-        this.setState({
-            createBtnVisible: false,
-            polygonData: '',
-            coordinates: []
-        });
-    }
     render () {
         const {
-            seedlingMess,
-            treeMess,
-            flowMess,
+            seeVisible,
             createBtnVisible,
             coordinates,
             areaMeasure,
@@ -1314,7 +716,6 @@ class OnSite extends Component {
                                     );
                                 })}
                             </Collapse>
-                            {/* <div style={{ height: '20px' }} /> */}
                         </aside>
                         {/* <div
                             className='resizeSenseArea'
@@ -1385,887 +786,20 @@ class OnSite extends Component {
                     ) : (
                         ''
                     )}
-                    <div
-                        style={this.state.isNotThree ? {} : { display: 'none' }}
-                    >
-                        <div
-                            className='iconList'
-                            style={
-                                this.state.seeVisible
-                                    ? { width: '290px' }
-                                    : { width: '0' }
-                            }
-                        >
-                            <Modal
-                                visible={this.state.seeVisible}
-                                onOk={this.toggleIcon1.bind(this)}
-                                onCancel={this.toggleIcon1.bind(this)}
-                            >
-                                <Tabs
-                                    defaultActiveKey='1'
-                                    onChange={this.tabChange.bind(this)}
-                                    size='large'
-                                >
-                                    <TabPane tab='苗木信息' key='1'>
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='顺序码'
-                                            value={
-                                                seedlingMess.sxm
-                                                    ? seedlingMess.sxm
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='打包车牌'
-                                            value={
-                                                seedlingMess.car
-                                                    ? seedlingMess.car
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='树种'
-                                            value={
-                                                seedlingMess.TreeTypeName
-                                                    ? seedlingMess.TreeTypeName
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='产地'
-                                            value={
-                                                seedlingMess.TreePlace
-                                                    ? seedlingMess.TreePlace
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='供应商'
-                                            value={
-                                                seedlingMess.Factory
-                                                    ? seedlingMess.Factory
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='苗圃名称'
-                                            value={
-                                                seedlingMess.NurseryName
-                                                    ? seedlingMess.NurseryName
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='起苗时间'
-                                            value={
-                                                seedlingMess.LifterTime
-                                                    ? seedlingMess.LifterTime
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='起苗地点'
-                                            value={
-                                                seedlingMess.location
-                                                    ? seedlingMess.location
-                                                    : ''
-                                            }
-                                        />
-                                        {seedlingMess.GD ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='高度(cm)'
-                                                    value={seedlingMess.GD}
-                                                />
-                                                {seedlingMess.GDFJ
-                                                    ? seedlingMess.GDFJ.map(
-                                                        src => {
-                                                            return (
-                                                                <div>
-                                                                    <img
-                                                                        style={{
-                                                                            width:
-                                                                                  '150px',
-                                                                            height:
-                                                                                  '150px',
-                                                                            display:
-                                                                                  'block',
-                                                                            marginTop:
-                                                                                  '10px'
-                                                                        }}
-                                                                        src={
-                                                                            src
-                                                                        }
-                                                                        alt='图片'
-                                                                    />
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {seedlingMess.GF ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='冠幅(cm)'
-                                                    value={seedlingMess.GF}
-                                                />
-                                                {seedlingMess.GFFJ
-                                                    ? seedlingMess.GFFJ.map(
-                                                        src => {
-                                                            return (
-                                                                <div>
-                                                                    <img
-                                                                        style={{
-                                                                            width:
-                                                                                  '150px',
-                                                                            height:
-                                                                                  '150px',
-                                                                            display:
-                                                                                  'block',
-                                                                            marginTop:
-                                                                                  '10px'
-                                                                        }}
-                                                                        src={
-                                                                            src
-                                                                        }
-                                                                        alt='图片'
-                                                                    />
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {seedlingMess.XJ ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='胸径(cm)'
-                                                    value={seedlingMess.XJ}
-                                                />
-                                                {seedlingMess.XJFJ
-                                                    ? seedlingMess.XJFJ.map(
-                                                        src => {
-                                                            return (
-                                                                <div>
-                                                                    <img
-                                                                        style={{
-                                                                            width:
-                                                                                  '150px',
-                                                                            height:
-                                                                                  '150px',
-                                                                            display:
-                                                                                  'block',
-                                                                            marginTop:
-                                                                                  '10px'
-                                                                        }}
-                                                                        src={
-                                                                            src
-                                                                        }
-                                                                        alt='图片'
-                                                                    />
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {seedlingMess.DJ ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='地径(cm)'
-                                                    value={seedlingMess.DJ}
-                                                />
-                                                {seedlingMess.DJFJ
-                                                    ? seedlingMess.DJFJ.map(
-                                                        src => {
-                                                            return (
-                                                                <div>
-                                                                    <img
-                                                                        style={{
-                                                                            width:
-                                                                                  '150px',
-                                                                            height:
-                                                                                  '150px',
-                                                                            display:
-                                                                                  'block',
-                                                                            marginTop:
-                                                                                  '10px'
-                                                                        }}
-                                                                        src={
-                                                                            src
-                                                                        }
-                                                                        alt='图片'
-                                                                    />
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {seedlingMess.TQHD ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='土球厚度(cm)'
-                                                    value={seedlingMess.TQHD}
-                                                />
-                                                {seedlingMess.TQHDFJ
-                                                    ? seedlingMess.TQHDFJ.map(
-                                                        src => {
-                                                            return (
-                                                                <div>
-                                                                    <img
-                                                                        style={{
-                                                                            width:
-                                                                                  '150px',
-                                                                            height:
-                                                                                  '150px',
-                                                                            display:
-                                                                                  'block',
-                                                                            marginTop:
-                                                                                  '10px'
-                                                                        }}
-                                                                        src={
-                                                                            src
-                                                                        }
-                                                                        alt='图片'
-                                                                    />
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {seedlingMess.TQZJ ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='土球直径(cm)'
-                                                    value={seedlingMess.TQZJ}
-                                                />
-                                                {seedlingMess.TQZJFJ
-                                                    ? seedlingMess.TQZJFJ.map(
-                                                        src => {
-                                                            return (
-                                                                <div>
-                                                                    <img
-                                                                        style={{
-                                                                            width:
-                                                                                  '150px',
-                                                                            height:
-                                                                                  '150px',
-                                                                            display:
-                                                                                  'block',
-                                                                            marginTop:
-                                                                                  '10px'
-                                                                        }}
-                                                                        src={
-                                                                            src
-                                                                        }
-                                                                        alt='图片'
-                                                                    />
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                    </TabPane>
-                                    <TabPane tab='树木信息' key='2'>
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='顺序码'
-                                            value={
-                                                treeMess.sxm ? treeMess.sxm : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='地块'
-                                            value={
-                                                treeMess.landName
-                                                    ? treeMess.landName
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='标段'
-                                            value={
-                                                treeMess.sectionName
-                                                    ? treeMess.sectionName
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='小班'
-                                            value={
-                                                treeMess.SmallClass
-                                                    ? treeMess.SmallClass
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='细班'
-                                            value={
-                                                treeMess.ThinClass
-                                                    ? treeMess.ThinClass
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='树种'
-                                            value={
-                                                treeMess.TreeTypeName
-                                                    ? treeMess.TreeTypeName
-                                                    : ''
-                                            }
-                                        />
-                                        <Input
-                                            readOnly
-                                            style={{ marginTop: '10px' }}
-                                            size='large'
-                                            addonBefore='位置'
-                                            value={
-                                                treeMess.Location
-                                                    ? `${treeMess.LocationX},${
-                                                        treeMess.LocationY
-                                                    }`
-                                                    : ''
-                                            }
-                                        />
-                                        {treeMess.GD ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='高度(cm)'
-                                                    value={treeMess.GD}
-                                                />
-                                                {treeMess.GDFJ
-                                                    ? treeMess.GDFJ.map(src => {
-                                                        return (
-                                                            <div>
-                                                                <img
-                                                                    style={{
-                                                                        width:
-                                                                              '150px',
-                                                                        height:
-                                                                              '150px',
-                                                                        display:
-                                                                              'block',
-                                                                        marginTop:
-                                                                              '10px'
-                                                                    }}
-                                                                    src={src}
-                                                                    alt='图片'
-                                                                />
-                                                            </div>
-                                                        );
-                                                    })
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {treeMess.GF ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='冠幅(cm)'
-                                                    value={treeMess.GF}
-                                                />
-                                                {treeMess.GFFJ
-                                                    ? treeMess.GFFJ.map(src => {
-                                                        return (
-                                                            <div>
-                                                                <img
-                                                                    style={{
-                                                                        width:
-                                                                              '150px',
-                                                                        height:
-                                                                              '150px',
-                                                                        display:
-                                                                              'block',
-                                                                        marginTop:
-                                                                              '10px'
-                                                                    }}
-                                                                    src={src}
-                                                                    alt='图片'
-                                                                />
-                                                            </div>
-                                                        );
-                                                    })
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {treeMess.XJ ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='胸径(cm)'
-                                                    value={treeMess.XJ}
-                                                />
-                                                {treeMess.XJFJ
-                                                    ? treeMess.XJFJ.map(src => {
-                                                        return (
-                                                            <div>
-                                                                <img
-                                                                    style={{
-                                                                        width:
-                                                                              '150px',
-                                                                        height:
-                                                                              '150px',
-                                                                        display:
-                                                                              'block',
-                                                                        marginTop:
-                                                                              '10px'
-                                                                    }}
-                                                                    src={src}
-                                                                    alt='图片'
-                                                                />
-                                                            </div>
-                                                        );
-                                                    })
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {treeMess.DJ ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='地径(cm)'
-                                                    value={treeMess.DJ}
-                                                />
-                                                {treeMess.DJFJ
-                                                    ? treeMess.DJFJ.map(src => {
-                                                        return (
-                                                            <div>
-                                                                <img
-                                                                    style={{
-                                                                        width:
-                                                                              '150px',
-                                                                        height:
-                                                                              '150px',
-                                                                        display:
-                                                                              'block',
-                                                                        marginTop:
-                                                                              '10px'
-                                                                    }}
-                                                                    src={src}
-                                                                    alt='图片'
-                                                                />
-                                                            </div>
-                                                        );
-                                                    })
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {treeMess.MD ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='密度(棵/m^3)'
-                                                    value={treeMess.MD}
-                                                />
-                                                {treeMess.MDFJ
-                                                    ? treeMess.MDFJ.map(src => {
-                                                        return (
-                                                            <div>
-                                                                <img
-                                                                    style={{
-                                                                        width:
-                                                                              '150px',
-                                                                        height:
-                                                                              '150px',
-                                                                        display:
-                                                                              'block',
-                                                                        marginTop:
-                                                                              '10px'
-                                                                    }}
-                                                                    src={src}
-                                                                    alt='图片'
-                                                                />
-                                                            </div>
-                                                        );
-                                                    })
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {treeMess.MJ ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='面积(m^2)'
-                                                    value={treeMess.MJ}
-                                                />
-                                                {treeMess.MJFJ
-                                                    ? treeMess.MJFJ.map(src => {
-                                                        return (
-                                                            <div>
-                                                                <img
-                                                                    style={{
-                                                                        width:
-                                                                              '150px',
-                                                                        height:
-                                                                              '150px',
-                                                                        display:
-                                                                              'block',
-                                                                        marginTop:
-                                                                              '10px'
-                                                                    }}
-                                                                    src={src}
-                                                                    alt='图片'
-                                                                />
-                                                            </div>
-                                                        );
-                                                    })
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {treeMess.TQHD ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='土球厚度(cm)'
-                                                    value={treeMess.TQHD}
-                                                />
-                                                {treeMess.TQHDFJ
-                                                    ? treeMess.TQHDFJ.map(
-                                                        src => {
-                                                            return (
-                                                                <div>
-                                                                    <img
-                                                                        style={{
-                                                                            width:
-                                                                                  '150px',
-                                                                            height:
-                                                                                  '150px',
-                                                                            display:
-                                                                                  'block',
-                                                                            marginTop:
-                                                                                  '10px'
-                                                                        }}
-                                                                        src={
-                                                                            src
-                                                                        }
-                                                                        alt='图片'
-                                                                    />
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                        {treeMess.TQZJ ? (
-                                            <div>
-                                                <Input
-                                                    readOnly
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                    size='large'
-                                                    addonBefore='土球直径(cm)'
-                                                    value={treeMess.TQZJ}
-                                                />
-                                                {treeMess.TQZJFJ
-                                                    ? treeMess.TQZJFJ.map(
-                                                        src => {
-                                                            return (
-                                                                <div>
-                                                                    <img
-                                                                        style={{
-                                                                            width:
-                                                                                  '150px',
-                                                                            height:
-                                                                                  '150px',
-                                                                            display:
-                                                                                  'block',
-                                                                            marginTop:
-                                                                                  '10px'
-                                                                        }}
-                                                                        src={
-                                                                            src
-                                                                        }
-                                                                        alt='图片'
-                                                                    />
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                    : ''}
-                                            </div>
-                                        ) : (
-                                            ''
-                                        )}
-                                    </TabPane>
-                                    <TabPane tab='审批流程' key='3'>
-                                        <div>
-                                            {flowMess.length > 0
-                                                ? flowMess.map(flow => {
-                                                    let flowName = '';
-                                                    if (flow.Node) {
-                                                        if (
-                                                            flow.Node ===
-                                                              '种树'
-                                                        ) {
-                                                            flowName =
-                                                                  '施工提交';
-                                                        } else if (
-                                                            flow.Node ===
-                                                              '监理'
-                                                        ) {
-                                                            if (
-                                                                flow.Status ===
-                                                                  1
-                                                            ) {
-                                                                flowName =
-                                                                      '监理通过';
-                                                            } else {
-                                                                flowName =
-                                                                      '监理拒绝';
-                                                            }
-                                                        } else if (
-                                                            flow.Node ===
-                                                              '业主'
-                                                        ) {
-                                                            if (
-                                                                flow.Status ===
-                                                                  2
-                                                            ) {
-                                                                flowName =
-                                                                      '业主抽查通过';
-                                                            } else {
-                                                                flowName =
-                                                                      '业主抽查拒绝';
-                                                            }
-                                                        } else if (
-                                                            flow.Node ===
-                                                              '补种'
-                                                        ) {
-                                                            flowName =
-                                                                  '施工补录扫码';
-                                                        }
-                                                    }
-                                                    return (
-                                                        <div>
-                                                            <Row
-                                                                style={{
-                                                                    marginTop:
-                                                                          '10px'
-                                                                }}
-                                                            >
-                                                                <h3
-                                                                    style={{
-                                                                        float:
-                                                                              'left'
-                                                                    }}
-                                                                >
-                                                                    {`${flowName}:`}
-                                                                </h3>
-                                                                <div
-                                                                    style={{
-                                                                        float:
-                                                                              'right'
-                                                                    }}
-                                                                >
-                                                                    {flow.CreateTime
-                                                                        ? flow.CreateTime
-                                                                        : ''}
-                                                                </div>
-                                                            </Row>
-                                                            <Row
-                                                                style={{
-                                                                    marginTop:
-                                                                          '10px'
-                                                                }}
-                                                            >
-                                                                {`${
-                                                                    flow.FromUserObj
-                                                                        ? flow
-                                                                            .FromUserObj
-                                                                            .Full_Name
-                                                                        : ''
-                                                                }:${
-                                                                    flow.Info
-                                                                        ? flow.Info
-                                                                        : ''
-                                                                }`}
-                                                            </Row>
-                                                            <hr
-                                                                className='hrstyle'
-                                                                style={{
-                                                                    marginTop:
-                                                                          '10px'
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    );
-                                                })
-                                                : ''}
-                                            <div>
-                                                <div
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                >
-                                                    <h3>{'苗圃提交'}</h3>
-                                                </div>
-                                                <div
-                                                    style={{
-                                                        marginTop: '10px'
-                                                    }}
-                                                >
-                                                    {`${
-                                                        seedlingMess.InputerObj
-                                                            ? seedlingMess
-                                                                .InputerObj
-                                                                .Full_Name
-                                                            : ''
-                                                    }:${
-                                                        seedlingMess.Factory
-                                                            ? seedlingMess.Factory
-                                                            : ''
-                                                    }`}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </TabPane>
-                                </Tabs>
-                            </Modal>
-                        </div>
-                    </div>
+                    {
+                        seeVisible
+                            ? (
+                                <TreeMessModal
+                                    {...this.props}
+                                    {...this.state}
+                                    onCancel={this.toggleIcon1.bind(this)}
+                                />
+                            ) : ''
+                    }
                     <Modal
                         title='隐患详情'
                         width={800}
                         visible={this.state.isShowRisk}
-                        onOk={this._handleOkVisible.bind(this)}
                         onCancel={this._handleCancelVisible.bind(this)}
                         footer={null}
                     >
@@ -2274,7 +808,7 @@ class OnSite extends Component {
                                 <RiskDetail
                                     {...this.props}
                                     map={this.map}
-                                    risk={this.state.risk}
+                                    riskMess={this.state.riskMess}
                                     isShowRisk={this.state.isShowRisk}
                                     close={this.exitRiskDetail.bind(this)}
                                 />
@@ -2318,6 +852,785 @@ class OnSite extends Component {
             </div>
         );
     }
+
+    // 巡检路线多选树节点
+    async handleTrackCheck (keys, info) {
+        const { getMapList, getUserDetail } = this.props.actions;
+        const {
+            trackLayerList,
+            trackMarkerLayerList,
+            trackUsersTreeData
+        } = this.state;
+        let me = this;
+        // 当前选中的节点
+        let selectKey = info.node.props.eventKey;
+        // 当前的选中状态
+        let checked = info.checked;
+        if (checked) {
+            try {
+                if (trackLayerList[selectKey]) {
+                    trackLayerList[selectKey].addTo(me.map);
+                    if (trackMarkerLayerList[selectKey]) {
+                        trackMarkerLayerList[selectKey].addTo(me.map);
+                    }
+                    me.map.fitBounds(trackLayerList[selectKey].getBounds());
+                } else {
+                    let routes = await getMapList({ routeID: selectKey });
+                    if (!(routes && routes instanceof Array && routes.length > 0)) {
+                        return;
+                    }
+                    let set = {};
+                    routes.forEach(item => {
+                        set[item.RouteID] = [];
+                    });
+                    routes.forEach(item => {
+                        if (set[item.RouteID]) {
+                            set[item.RouteID].push({
+                                GPSTime: item.GPSTime,
+                                ID: item.ID,
+                                Patroler: item.Patroler,
+                                X: item.X,
+                                Y: item.Y
+                            });
+                        }
+                    });
+                    let arr1 = [];
+                    for (var t in set) {
+                        arr1.push(set[t]);
+                    }
+                    let latlngs = [];
+                    if (arr1 && arr1 instanceof Array && arr1.length > 0) {
+                        arr1[0].map(rst => {
+                            if (rst && rst.X && rst.Y) {
+                                latlngs.push([rst.Y, rst.X]);
+                            }
+                        });
+                    }
+                    // 选中节点的数据
+                    let selectData = '';
+                    trackUsersTreeData.map(data => {
+                        if (data.key === selectKey) {
+                            selectData = data;
+                        }
+                    });
+                    if (selectData && selectData.properties && selectData.properties.PK) {
+                        let user = await getUserDetail({
+                            pk: selectData.properties.PK
+                        });
+                        let sectionName = '';
+                        if (user && user.account && user.account.sections && user.account.sections.length > 0) {
+                            try {
+                                let section = user.account.sections[0];
+                                let arr = section.split('-');
+                                if (arr && arr instanceof Array && arr.length === 3) {
+                                    PROJECT_UNITS.map(project => {
+                                        if (project.code === arr[0]) {
+                                            let units = project.units;
+                                            sectionName = project.value;
+                                            units.map(unit => {
+                                                if (unit.code === section) {
+                                                    sectionName =
+                                                    sectionName + unit.value;
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            } catch (e) {
+                                console.log('获取标段', e);
+                            }
+                        }
+                        let iconData = {
+                            geometry: {
+                                coordinates: [latlngs[0][0], latlngs[0][1]],
+                                type: 'Point'
+                            },
+                            key: selectKey,
+                            properties: {
+                                name: user.account.person_name
+                                    ? user.account.person_name
+                                    : user.username,
+                                organization: user.account.organization
+                                    ? user.account.organization
+                                    : '',
+                                person_telephone: user.account.person_telephone
+                                    ? user.account.person_telephone
+                                    : '',
+                                sectionName: sectionName
+                            },
+                            type: 'people'
+                        };
+                        let trackMarkerLayer = me.createMarker(iconData);
+                        trackMarkerLayerList[selectKey] = trackMarkerLayer;
+                    }
+
+                    let polyline = L.polyline(latlngs, { color: 'blue' }).addTo(
+                        this.map
+                    );
+                    trackLayerList[selectKey] = polyline;
+                    this.map.fitBounds(polyline.getBounds());
+                    this.setState({
+                        trackLayerList,
+                        trackMarkerLayerList
+                    });
+                }
+            } catch (e) {
+                console.log('e', e);
+            }
+        } else {
+            // 如果取消选中 则将数据删除
+            // 移除未选中的
+            if (trackMarkerLayerList[selectKey]) {
+                this.map.removeLayer(trackMarkerLayerList[selectKey]);
+            }
+            if (trackLayerList[selectKey]) {
+                this.map.removeLayer(trackLayerList[selectKey]);
+            }
+        }
+    }
+    // 巡检路线点击树节点
+    handleTrackSelect (keys, info) {
+    }
+    /* 安全隐患多选树节点 */
+    handleRiskCheck (keys, info) {
+        const {
+            riskTreeData,
+            riskMarkerLayerList
+        } = this.state;
+        // 移除未选中的
+        for (var i in riskMarkerLayerList) {
+            let k = keys.find(k => k === i);
+            if (!k && riskMarkerLayerList[c]) {
+                this.map.removeLayer(riskMarkerLayerList[c]);
+            }
+        }
+
+        let me = this;
+        riskTreeData.forEach(risk => {
+            if (!risk.children) {
+                let checkedKey = keys.find(key => key === risk.key);
+                if (checkedKey) {
+                    if (riskMarkerLayerList[checkedKey]) {
+                        riskMarkerLayerList[checkedKey].addTo(me.map);
+                    } else {
+                        let riskMarkerLayer = me.createMarker(risk);
+                        riskMarkerLayerList[checkedKey] = riskMarkerLayer;
+                    }
+                }
+            } else {
+                risk.children.forEach(riskData => {
+                    let checkedKey = keys.find(k => k === riskData.key);
+                    if (checkedKey) {
+                        if (riskMarkerLayerList[checkedKey]) {
+                            riskMarkerLayerList[checkedKey].addTo(me.map);
+                        } else {
+                            riskMarkerLayerList[checkedKey] = me.createMarker(riskData);
+                        }
+                        me.map.panTo(riskData.geometry.coordinates);
+                    }
+                });
+            }
+            me.setState({
+                riskMarkerLayerList
+            });
+        });
+    }
+    /* 安全隐患点击树节点 */
+    handleRiskSelect (keys, info) {
+    }
+    /* 树种筛选多选树节点 */
+    handleTreeTypeCheck (keys, info) {
+        const {
+            treeTypesLayerList,
+            treeTypesTreeData
+        } = this.state;
+        let me = this;
+        // 当前选中的节点
+        let selectKey = info.node.props.eventKey;
+        // 当前的选中状态
+        let checked = info.checked;
+        // 所有树种的Key
+        let allTreeKey = '';
+        if (treeTypesTreeData && treeTypesTreeData.length > 0) {
+            allTreeKey = treeTypesTreeData[0].key;
+        }
+        let queryData = '';
+        for (let i = 0; i < keys.length; i++) {
+            queryData = queryData + keys[i];
+            if (i < keys.length - 1) {
+                queryData = queryData + ',';
+            }
+        }
+
+        // 如果是选中节点，首先看是否是选中全部，如果是，就加载所有树种的图层
+
+        if (allTreeKey === selectKey && checked) {
+            if (this.tileLayer2) {
+                this.tileLayer2.addTo(this.map);
+            } else {
+                this.tileLayer2 = L.tileLayer(
+                    window.config.DASHBOARD_ONSITE +
+                            '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    {
+                        opacity: 1.0,
+                        subdomains: [1, 2, 3],
+                        minZoom: 11,
+                        maxZoom: 21,
+                        storagetype: 0,
+                        tiletype: 'wtms'
+                    }
+                ).addTo(this.map);
+            }
+        } else if (keys && keys.length === 0) {
+            // 如果是取消选中，首先看是否是取消全部，如果是，直接把所有图层去除
+            try {
+                if (this.tileLayer2) {
+                    this.map.removeLayer(this.tileLayer2);
+                }
+                this.removeAllLayer();
+            } catch (e) {
+                console.log('去除全部树种', e);
+            }
+        } else {
+            if (checked) {
+                // 不是选中全部，一定是选中某个节点，将这个节点添加就可以
+                // 首先看之前选中过没有，选中过的话，直接添加该图层就好
+                if (treeTypesLayerList[selectKey]) {
+                    treeTypesLayerList[selectKey].addTo(this.map);
+                } else {
+                    // 没选中的话，需要重新请求，然后添加到state里面
+                    var url = window.config.DASHBOARD_TREETYPE +
+                    `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${selectKey})`;
+                    let checkedTreeLayer = L.tileLayer.wms(url,
+                        {
+                            layers: 'xatree:treelocation',
+                            crs: L.CRS.EPSG4326,
+                            format: 'image/png',
+                            maxZoom: 22,
+                            transparent: true
+                        }
+                    ).addTo(this.map);
+                    treeTypesLayerList[selectKey] = checkedTreeLayer;
+                    me.setState({
+                        treeTypesLayerList
+                    });
+                }
+            } else {
+                // 不是取消选中全部，首先看之前的列表中有没有点击过这个节点，点击过，取消，未点击过，就重新获取数据
+                if (treeTypesLayerList[selectKey]) {
+                    this.map.removeLayer(treeTypesLayerList[selectKey]);
+                    // delete treeTypesLayerList[selectKey];
+                } else {
+                    if (this.tileLayer2) {
+                        this.map.removeLayer(this.tileLayer2);
+                    }
+                    if (this.tileLayer3) {
+                        this.map.removeLayer(this.tileLayer3);
+                        this.tileLayer3 = null;
+                    }
+                    var url = window.config.DASHBOARD_TREETYPE +
+                        `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${queryData})`;
+                    // this.tileLayer3指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
+                    this.tileLayer3 = L.tileLayer.wms(url,
+                        {
+                            layers: 'xatree:treelocation',
+                            crs: L.CRS.EPSG4326,
+                            format: 'image/png',
+                            maxZoom: 22,
+                            transparent: true
+                        }
+                    ).addTo(this.map);
+                }
+            }
+        }
+    }
+    /* 树种筛选点击树节点 */
+    handleTreeTypeSelect (keys, info) {}
+    // 养护任务点击
+    handleCuringTaskSelect (keys, info) {
+        const {
+            curingTaskLayerList,
+            curingMarkerLayerList
+        } = this.state;
+        let me = this;
+        // 当前选中的节点
+        let eventKey = keys[0];
+        // 当前的选中状态
+        let selected = info.selected;
+        this.setState({
+            taskEventKey: eventKey
+        });
+        try {
+            // 单选，需要先全部去除图层
+            for (let i in curingTaskLayerList) {
+                curingTaskLayerList[i].map((layer) => {
+                    this.map.removeLayer(layer);
+                });
+            }
+            for (let i in curingMarkerLayerList) {
+                this.map.removeLayer(curingMarkerLayerList[i]);
+            }
+            // 选中加载图层
+            if (selected) {
+                if (curingTaskLayerList[eventKey]) {
+                    curingTaskLayerList[eventKey].map((layer) => {
+                        layer.addTo(me.map);
+                        me.map.fitBounds(layer.getBounds());
+                    });
+                    if (curingMarkerLayerList[eventKey]) {
+                        curingMarkerLayerList[eventKey].addTo(me.map);
+                    }
+                    this.setState({
+                        selected
+                    });
+                } else {
+                    // 如果不是添加过，需要请求数据
+                    me._addCuringTaskLayer(eventKey);
+                }
+            }
+        } catch (e) {
+            console.log('任务选中', e);
+        }
+    }
+    // 处理养护任务坐标数据
+    _addCuringTaskLayer = async (eventKey) => {
+        const {
+            actions: {
+                getCuringMessage
+            }
+        } = this.props;
+        let postData = {
+            id: eventKey
+        };
+        let taskMess = await getCuringMessage(postData);
+        let planWkt = taskMess.PlanWKT;
+        let str = '';
+        try {
+            if (planWkt.indexOf('MULTIPOLYGON') !== -1) {
+                let data = planWkt.slice(planWkt.indexOf('(') + 2, planWkt.indexOf('))') + 1);
+                let arr = data.split('),(');
+                arr.map((a, index) => {
+                    if (index === 0) {
+                        str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                    } else if (index === arr.length - 1) {
+                        str = a.slice(0, a.indexOf(')'));
+                    } else {
+                        str = a;
+                    }
+                    // 将图标设置在最后一个图形中，因为最后会聚焦到该位置
+                    if (index === arr.length - 1) {
+                        this._handleCoordLayer(str, taskMess, eventKey, index);
+                    } else {
+                        // 其他图形中不设置图标
+                        this._handleCoordLayer(str, taskMess, eventKey);
+                    }
+                });
+            } else {
+                str = planWkt.slice(planWkt.indexOf('(') + 3, planWkt.indexOf(')'));
+                // 只有一个图形，必须要设置图标
+                this._handleCoordLayer(str, taskMess, eventKey, 1);
+            }
+        } catch (e) {
+            console.log('处理wkt', e);
+        }
+    }
+    // 加载养护任务图层
+    _handleCoordLayer (str, taskMess, eventKey, index) {
+        const {
+            taskLayerList,
+            curingTypes,
+            markerLayerList,
+            taskMessList
+        } = this.state;
+        try {
+            let target = str.split(',').map(item => {
+                return item.split(' ').map(_item => _item - 0);
+            });
+            let treeNodeName = taskMess.CuringMans;
+            let typeName = '';
+            curingTypes.map((type) => {
+                if (type.ID === taskMess.CuringType) {
+                    typeName = type.Base_Name;
+                }
+            });
+            let treearea = [];
+            let status = '未完成';
+            if (taskMess.StartTime && taskMess.EndTime) {
+                status = '已完成';
+            }
+            let regionData = this.getCuringTaskThinClassName(taskMess);
+            let sectionName = regionData.regionSectionName;
+            let thinClassName = regionData.regionThinName;
+            taskMess.sectionName = sectionName;
+            taskMess.thinClassName = thinClassName;
+            taskMess.status = status;
+            taskMess.typeName = typeName;
+            taskMessList[eventKey] = taskMess;
+            this.setState({
+                taskMessList
+            });
+            let arr = [];
+            target.map((data, index) => {
+                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+                    arr.push([data[1], data[0]]);
+                }
+            });
+            treearea.push(arr);
+            let message = {
+                key: 3,
+                type: 'task',
+                properties: {
+                    ID: taskMess.ID,
+                    name: treeNodeName,
+                    type: 'task',
+                    typeName: typeName || '',
+                    status: status || '',
+                    CuringMans: taskMess.CuringMans || '',
+                    CreateTime: taskMess.CreateTime || '',
+                    PlanStartTime: taskMess.PlanStartTime || '',
+                    PlanEndTime: taskMess.PlanEndTime || '',
+                    StartTime: taskMess.StartTime || '',
+                    EndTime: taskMess.EndTime || ''
+                },
+                geometry: { type: 'Polygon', coordinates: treearea }
+            };
+            let layer = this.createMarker(message);
+            // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
+            if (taskLayerList[eventKey]) {
+                taskLayerList[eventKey].push(layer);
+            } else {
+                taskLayerList[eventKey] = [layer];
+            }
+            this.setState({
+                taskLayerList
+            });
+            if (!index) {
+                return;
+            }
+            // 设置任务中间的图标
+            let centerData = layer.getCenter();
+            let iconType = L.divIcon({
+                className: this.getIconType(message.properties.type)
+            });
+            let marker = L.marker([centerData.lat, centerData.lng], {
+                icon: iconType,
+                title: message.properties.name
+            });
+            marker.bindPopup(
+                L.popup({ maxWidth: 240 }).setContent(
+                    genPopUpContent(message)
+                )
+            );
+            marker.addTo(this.map);
+            markerLayerList[eventKey] = marker;
+            this.setState({
+                markerLayerList,
+                selected: true
+            });
+        } catch (e) {
+            console.log('处理str', e);
+        }
+    }
+    // 获取养护任务标段细班名称
+    getCuringTaskThinClassName = (task) => {
+        try {
+            let thinClass = task.ThinClass;
+            let section = task.Section;
+            let thinClassList = thinClass.split(',');
+            let regionSectionName = '';
+            let regionThinName = '';
+            if (thinClassList && thinClassList instanceof Array && thinClassList.length > 0) {
+                thinClassList.map((thinNo, index) => {
+                    this.totalThinClass.map((unitProjectData) => {
+                        let unitProject = unitProjectData.unitProject;
+                        // 首先根据区块找到对应的细班list
+                        if (section.indexOf(unitProject) !== -1) {
+                            let children = unitProjectData.thinClass;
+                            children.map((child) => {
+                            // tree结构的数据经过了处理，需要和api获取的数据调整一致
+                                let handleKey = child.No.split('-');
+                                let childNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                                let childSection = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+                                if (thinNo.indexOf(childNo) !== -1 && childSection === section) {
+                                // 找到符合条件的数据的name
+                                    let name = child.Name;
+                                    let sectionName = getSectionName(section);
+                                    regionSectionName = sectionName;
+                                    if (index === 0) {
+                                        regionThinName = regionThinName + name;
+                                    } else {
+                                        regionThinName = regionThinName + ' ,' + name;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            let regionData = {
+                regionThinName: regionThinName,
+                regionSectionName: regionSectionName
+            };
+            return regionData;
+        } catch (e) {
+            console.log('getCuringTaskThinClassName', e);
+        }
+    }
+    // 切换为2D
+    toggleTileLayer (index) {
+        this.tileLayer.setUrl(this.tileUrls[index]);
+        this.setState({
+            TileLayerUrl: this.tileUrls[index],
+            mapLayerBtnType: !this.state.mapLayerBtnType
+        });
+    }
+    // 苗木信息Modal关闭
+    toggleIcon1 () {
+        this.setState({
+            seeVisible: !this.state.seeVisible
+        });
+    }
+    handleRadioChange = async (e) => {
+        this.setState({
+            radioValue: e.target.value
+        });
+    }
+    /* 弹出信息框 */
+    handleAreaSelect = async (keys, info) => {
+        const {
+            areaLayerList,
+            radioValue,
+            treeTypesLayerList,
+            realThinClassLayerList
+        } = this.state;
+        let me = this;
+        // 当前选中的节点
+        let areaEventTitle = info.node.props.title;
+        let selected = info.selected;
+        this.setState({
+            leftkeycode: keys[0],
+            areaEventTitle
+        });
+        try {
+            const eventKey = keys[0];
+            for (let v in areaLayerList) {
+                me.map.removeLayer(areaLayerList[v]);
+            }
+            if (eventKey) {
+                // 细班的key加入了标段，首先对key进行处理
+                let handleKey = eventKey.split('-');
+                // 如果选中的是细班，则直接添加图层
+                if (handleKey.length === 5) {
+                    const treeNodeName = info && info.node && info.node.props && info.node.props.title;
+                    // 如果之前添加过，直接将添加过的再次添加，不用再次请求
+
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].addTo(me.map);
+                        me.map.fitBounds(areaLayerList[eventKey].getBounds());
+                    } else {
+                    // 如果不是添加过，需要请求数据
+                        await me._addAreaLayer(eventKey, treeNodeName);
+                    }
+                }
+                if (radioValue === '实际定位') {
+                    let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                    if (me.tileLayer2) {
+                        me.map.removeLayer(me.tileLayer2);
+                    }
+                    if (me.tileLayer3) {
+                        me.map.removeLayer(me.tileLayer3);
+                        me.tileLayer3 = null;
+                    }
+                    for (let i in treeTypesLayerList) {
+                        me.map.removeLayer(treeTypesLayerList[i]);
+                    }
+                    for (let i in realThinClassLayerList) {
+                        me.map.removeLayer(realThinClassLayerList[i]);
+                    }
+                    if (realThinClassLayerList[eventKey]) {
+                        realThinClassLayerList[eventKey].addTo(me.map);
+                    } else {
+                        var url = window.config.DASHBOARD_TREETYPE +
+                        `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27`;
+                        let thinClassLayer = L.tileLayer.wms(url,
+                            {
+                                layers: 'xatree:treelocation',
+                                crs: L.CRS.EPSG4326,
+                                format: 'image/png',
+                                maxZoom: 22,
+                                transparent: true
+                            }
+                        ).addTo(this.map);
+                        realThinClassLayerList[eventKey] = thinClassLayer;
+                        this.setState({
+                            realThinClassLayerList
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('处理选中节点', e);
+        }
+    }
+    // 选中细班，则在地图上加载细班图层
+    _addAreaLayer = async (eventKey, treeNodeName) => {
+        const {
+            areaLayerList
+        } = this.state;
+        const {
+            actions: { getTreearea }
+        } = this.props;
+        try {
+            let handleKey = eventKey.split('-');
+            let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+            let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+            let me = this;
+            let treearea = [];
+            try {
+                let rst = await getTreearea({}, { no: no });
+                if (
+                    !(
+                        rst &&
+                        rst.content &&
+                        rst.content instanceof Array &&
+                        rst.content.length > 0
+                    )
+                ) {
+                    return;
+                }
+
+                let contents = rst.content;
+                let data = contents.find(content => content.Section === section);
+                let str = data.coords;
+                var target1 = str
+                    .slice(str.indexOf('(') + 3, str.indexOf(')'))
+                    .split(',')
+                    .map(item => {
+                        return item.split(' ').map(_item => _item - 0);
+                    });
+                treearea.push(target1);
+                let message = {
+                    key: 3,
+                    type: 'Feature',
+                    properties: { name: treeNodeName, type: 'area' },
+                    geometry: { type: 'Polygon', coordinates: treearea }
+                };
+                // let num = computeSignedArea(target1, 1);
+                let layer = this.createMarker(message);
+                areaLayerList[eventKey] = layer;
+                me.setState({
+                    areaLayerList
+                });
+            } catch (e) {
+                console.log('await', e);
+            }
+        } catch (e) {
+            console.log('加载细班图层', e);
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    createMarker (geo) {
+        if (geo.properties.type !== 'area') {
+            if (
+                !geo.geometry.coordinates[0] ||
+                    !geo.geometry.coordinates[1]
+            ) {
+                return;
+            }
+            let iconType = L.divIcon({
+                className: getIconType(geo.type)
+            });
+            let marker = L.marker(geo.geometry.coordinates, {
+                icon: iconType,
+                title: geo.properties.name
+            });
+            marker.bindPopup(
+                L.popup({ maxWidth: 240 }).setContent(
+                    genPopUpContent(geo)
+                )
+            );
+            marker.addTo(this.map);
+            return marker;
+        } else {
+            // 创建区域图形
+            let area = L.geoJson(geo, {
+                style: {
+                    fillColor: this.fillAreaColor(geo.key),
+                    weight: 1,
+                    opacity: 1,
+                    color: '#201ffd',
+                    fillOpacity: 0.3
+                },
+                title: geo.properties.name
+            }).addTo(this.map);
+                // 地块标注
+            this.map.fitBounds(area.getBounds());
+            return area;
+        }
+    }
+    _handleCreateTaskOk = async () => {
+        const {
+            coordinates
+        } = this.state;
+        try {
+            let areaMeasure = computeSignedArea(coordinates, 2);
+            areaMeasure = areaMeasure * 0.0015;
+            this.setState({
+                areaMeasure,
+                areaMeasureVisible: true
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+    _handleCreateTaskCancel = async () => {
+        const {
+            polygonData
+        } = this.state;
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        this.setState({
+            areaMeasureVisible: false
+        });
+        this.resetButState();
+    }
+    _handleCreateTaskRetreat = async () => {
+        const {
+            coordinates
+        } = this.state;
+        let me = this;
+        if (me.state.polygonData) {
+            me.map.removeLayer(me.state.polygonData);
+        }
+        this.setState({
+            areaMeasureVisible: false
+        });
+        coordinates.pop();
+        if (coordinates.length === 0) {
+            this.resetButState();
+            return;
+        }
+        let polygonData = L.polygon(coordinates, {
+            color: 'white',
+            fillColor: '#93B9F2',
+            fillOpacity: 0.2
+        }).addTo(me.map);
+        me.setState({
+            coordinates,
+            polygonData: polygonData
+        });
+    }
+    // 取消圈选和按钮的功能
+    resetButState = () => {
+        this.setState({
+            createBtnVisible: false,
+            polygonData: '',
+            coordinates: []
+        });
+    }
+
     /* 菜单展开收起 */
     extendAndFold () {
         this.setState({ menuIsExtend: !this.state.menuIsExtend });
@@ -2352,11 +1665,6 @@ class OnSite extends Component {
     // 退出隐患详情查看
     exitRiskDetail () {
         this.setState({ isShowRisk: false });
-    }
-    _handleOkVisible () {
-        this.setState({
-            isShowRisk: false
-        });
     }
     _handleCancelVisible () {
         this.setState({
@@ -2527,27 +1835,27 @@ class OnSite extends Component {
                         : '',
                     GD: nurserysData.GD ? nurserysData.GD : '',
                     GDFJ: nurserysData.GDFJ
-                        ? me.onImgClick(nurserysData.GDFJ)
+                        ? onImgClick(nurserysData.GDFJ)
                         : '',
                     GF: nurserysData.GF ? nurserysData.GF : '',
                     GFFJ: nurserysData.GFFJ
-                        ? me.onImgClick(nurserysData.GFFJ)
+                        ? onImgClick(nurserysData.GFFJ)
                         : '',
                     TQZJ: nurserysData.TQZJ ? nurserysData.TQZJ : '',
                     TQZJFJ: nurserysData.TQZJFJ
-                        ? me.onImgClick(nurserysData.TQZJFJ)
+                        ? onImgClick(nurserysData.TQZJFJ)
                         : '',
                     TQHD: nurserysData.TQHD ? nurserysData.TQHD : '',
                     TQHDFJ: nurserysData.TQHDFJ
-                        ? me.onImgClick(nurserysData.TQHDFJ)
+                        ? onImgClick(nurserysData.TQHDFJ)
                         : '',
                     DJ: nurserysData.DJ ? nurserysData.DJ : '',
                     DJFJ: nurserysData.DJFJ
-                        ? me.onImgClick(nurserysData.DJFJ)
+                        ? onImgClick(nurserysData.DJFJ)
                         : '',
                     XJ: nurserysData.XJ ? nurserysData.XJ : '',
                     XJFJ: nurserysData.XJFJ
-                        ? me.onImgClick(nurserysData.XJFJ)
+                        ? onImgClick(nurserysData.XJFJ)
                         : ''
                 };
 
@@ -2596,35 +1904,35 @@ class OnSite extends Component {
                         : '',
                     DJ: queryTreeData.DJ ? queryTreeData.DJ : '',
                     DJFJ: queryTreeData.DJFJ
-                        ? me.onImgClick(queryTreeData.DJFJ)
+                        ? onImgClick(queryTreeData.DJFJ)
                         : '',
                     GD: queryTreeData.GD ? queryTreeData.GD : '',
                     GDFJ: queryTreeData.GDFJ
-                        ? me.onImgClick(queryTreeData.GDFJ)
+                        ? onImgClick(queryTreeData.GDFJ)
                         : '',
                     GF: queryTreeData.GF ? queryTreeData.GF : '',
                     GFFJ: queryTreeData.GFFJ
-                        ? me.onImgClick(queryTreeData.GFFJ)
+                        ? onImgClick(queryTreeData.GFFJ)
                         : '',
                     MD: queryTreeData.MD ? queryTreeData.MD : '',
                     MDFJ: queryTreeData.MDFJ
-                        ? me.onImgClick(queryTreeData.MDFJ)
+                        ? onImgClick(queryTreeData.MDFJ)
                         : '',
                     MJ: queryTreeData.MJ ? queryTreeData.MJ : '',
                     MJFJ: queryTreeData.MJFJ
-                        ? me.onImgClick(queryTreeData.MJFJ)
+                        ? onImgClick(queryTreeData.MJFJ)
                         : '',
                     TQHD: queryTreeData.TQHD ? queryTreeData.TQHD : '',
                     TQHDFJ: queryTreeData.TQHDFJ
-                        ? me.onImgClick(queryTreeData.TQHDFJ)
+                        ? onImgClick(queryTreeData.TQHDFJ)
                         : '',
                     TQZJ: queryTreeData.TQZJ ? queryTreeData.TQZJ : '',
                     TQZJFJ: queryTreeData.TQZJFJ
-                        ? me.onImgClick(queryTreeData.TQZJFJ)
+                        ? onImgClick(queryTreeData.TQZJFJ)
                         : '',
                     XJ: queryTreeData.XJ ? queryTreeData.XJ : '',
                     XJFJ: queryTreeData.XJFJ
-                        ? me.onImgClick(queryTreeData.XJFJ)
+                        ? onImgClick(queryTreeData.XJFJ)
                         : ''
                 };
                 let flowMess = treeflowData;
@@ -2640,21 +1948,6 @@ class OnSite extends Component {
                 }
             }
         });
-    }
-    // 树节点信息查看图片时格式转换
-    onImgClick (data) {
-        let srcs = [];
-        try {
-            let arr = data.split(',');
-            arr.map(rst => {
-                let src = rst.replace(/\/\//g, '/');
-                src = `${FOREST_API}/${src}`;
-                srcs.push(src);
-            });
-        } catch (e) {
-            console.log('处理图片', e);
-        }
-        return srcs;
     }
 }
 export default Form.create()(OnSite);

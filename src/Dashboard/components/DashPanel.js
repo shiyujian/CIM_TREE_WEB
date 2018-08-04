@@ -11,11 +11,11 @@ export default class DashPanel extends Component {
     }
 
     onCheck (keys, info) {
-        this.originOnCheck(keys, this.featureName, info);
+        this.originOnCheck(keys, info);
     }
 
-    onSelect (keys) {
-        this.originOnSelect(keys, this.featureName);
+    onSelect (keys, info) {
+        this.originOnSelect(keys, info);
     }
 
     genIconClass () {
@@ -23,10 +23,10 @@ export default class DashPanel extends Component {
         let featureName = this.featureName;
         // console.log("featureName",featureName)
         switch (featureName) {
-            case 'geojsonFeature_people':
+            case 'geojsonFeature_track':
                 icClass = 'tr-people';
                 break;
-            case 'geojsonFeature_hazard':
+            case 'geojsonFeature_risk':
                 icClass = 'tr-hazard';
                 break;
             case 'geojsonFeature_treetype':
@@ -89,7 +89,7 @@ export default class DashPanel extends Component {
         }
         return (
             <div className={this.genIconClass()}>
-                {this.featureName === 'geojsonFeature_people' ? (
+                {this.featureName === 'geojsonFeature_track' ? (
                     <Tree
                         style={{ height: '200px' }}
                         checkable
