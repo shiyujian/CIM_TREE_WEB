@@ -126,7 +126,7 @@ export const computeSignedArea = (path, type) => {
 export const genPopUpContent = (geo) => {
     const { properties = {} } = geo;
     switch (geo.type) {
-        case 'people': {
+        case 'track': {
             return `<div class="popupBox">
 						<h2><span>姓名：</span>${properties.name}</h2>
 						<h2><span>所属单位：</span>${properties.organization}</h2>
@@ -134,7 +134,7 @@ export const genPopUpContent = (geo) => {
 						<h2><span>标段：</span>${properties.sectionName}</h2>
 					</div>`;
         }
-        case 'danger': {
+        case 'risk': {
             return `<div>
 						<h2><span>隐患内容：</span>${properties.name}</h2>
                         <h2><span>隐患类型：</span>${properties.riskType}</h2>
@@ -145,6 +145,21 @@ export const genPopUpContent = (geo) => {
                         </h2>
 					</div>`;
         }
+        case 'curingTask': {
+            return `<div class="popupBox">
+                    <h2><span>养护类型：</span>${properties.typeName}</h2>
+                    <h2><span>状态：</span>${properties.status}</h2>
+                    <h2><span>养护人：</span>${properties.CuringMans}</h2>
+                    <h2><span>创建时间：</span>${properties.CreateTime}</h2>
+                    <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
+                    <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
+                    <h2><span>实际开始时间：</span>${properties.StartTime}</h2>
+                    <h2><span>实际结束时间：</span>${properties.EndTime}</h2>
+                </div>`;
+            // <h2 class="btnRow">
+            //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
+            // </h2>
+        }
         default: {
             return null;
         }
@@ -153,14 +168,16 @@ export const genPopUpContent = (geo) => {
 // 获取对应的ICON
 export const getIconType = (type) => {
     switch (type) {
-        case 'people':
+        case 'track':
             return 'peopleIcon';
         case 'safety':
             return 'cameraIcon';
-        case 'danger':
-            return 'dangerIcon';
+        case 'risk':
+            return 'riskIcon';
         case 'tree':
             return 'treeIcon';
+        case 'curingTask':
+            return 'curingTaskIcon';
         default:
             break;
     }

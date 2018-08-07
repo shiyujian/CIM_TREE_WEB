@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-04 17:51:27
+ * @Last Modified time: 2018-08-06 15:45:54
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -32,7 +32,7 @@ import moment from 'moment';
 import PkCodeTree from './PkCodeTree';
 import TreeMessModal from './TreeMessModal';
 import CuringTaskTree from './CuringTaskTree';
-import {getThinClass, getSmallClass, genPopUpContent, computeSignedArea, getIconType, getSectionName, onImgClick} from './auth';
+import {getThinClass, getSmallClass, genPopUpContent, computeSignedArea, getIconType, getSectionName, onImgClick, fillAreaColor} from './auth';
 import { getUser } from '_platform/auth';
 const RadioGroup = Radio.Group;
 const { RangePicker } = DatePicker;
@@ -98,7 +98,8 @@ class OnSite extends Component {
             treeTypesLayerList: {}, // 树种图层list
             riskMarkerLayerList: {}, // // 安全隐患图标图层List
             curingTaskLayerList: {}, // 养护任务图层List
-            curingMarkerLayerList: {} // 养护任务图标图层List
+            curingMarkerLayerList: {}, // 养护任务图标图层List
+            curingTaskMessList: {} // 养护任务信息List
         };
         this.tileLayer = null;
         this.tileLayer2 = null;
@@ -152,7 +153,7 @@ class OnSite extends Component {
         {
             label: '安全隐患',
             value: 'geojsonFeature_risk',
-            IconUrl: require('./ImageIcon/danger.png'),
+            IconUrl: require('./ImageIcon/risk.png'),
             IconName: 'warning'
         },
         {
@@ -228,7 +229,7 @@ class OnSite extends Component {
                             featureName={option.value}
                         />
                     );
-                // 树种筛选
+                // 养护任务
                 case 'geojsonFeature_curingTask':
                     return (
                         <CuringTaskTree
@@ -534,7 +535,7 @@ class OnSite extends Component {
                     status = '确认完成';
                 }
                 riskObj[level].children.push({
-                    type: 'danger',
+                    type: 'risk',
                     key: v.ID,
                     properties: {
                         riskType: riskType,
@@ -547,7 +548,8 @@ class OnSite extends Component {
                         CreateTime: v.CreateTime,
                         ID: v.ID,
                         InputerObj: v.InputerObj,
-                        Supervisor: v.Supervisor
+                        Supervisor: v.Supervisor,
+                        type: 'risk'
                     },
                     geometry: {
                         type: 'Point',
@@ -956,9 +958,10 @@ class OnSite extends Component {
                                 person_telephone: user.account.person_telephone
                                     ? user.account.person_telephone
                                     : '',
-                                sectionName: sectionName
+                                sectionName: sectionName,
+                                type: 'track'
                             },
-                            type: 'people'
+                            type: 'track'
                         };
                         let trackMarkerLayer = me.createMarker(iconData);
                         trackMarkerLayerList[selectKey] = trackMarkerLayer;
@@ -1237,10 +1240,10 @@ class OnSite extends Component {
     // 加载养护任务图层
     _handleCoordLayer (str, taskMess, eventKey, index) {
         const {
-            taskLayerList,
+            curingTaskLayerList,
             curingTypes,
-            markerLayerList,
-            taskMessList
+            curingMarkerLayerList,
+            curingTaskMessList
         } = this.state;
         try {
             let target = str.split(',').map(item => {
@@ -1265,9 +1268,10 @@ class OnSite extends Component {
             taskMess.thinClassName = thinClassName;
             taskMess.status = status;
             taskMess.typeName = typeName;
-            taskMessList[eventKey] = taskMess;
+            console.log('taskMess', taskMess);
+            curingTaskMessList[eventKey] = taskMess;
             this.setState({
-                taskMessList
+                curingTaskMessList
             });
             let arr = [];
             target.map((data, index) => {
@@ -1278,11 +1282,11 @@ class OnSite extends Component {
             treearea.push(arr);
             let message = {
                 key: 3,
-                type: 'task',
+                type: 'curingTask',
                 properties: {
                     ID: taskMess.ID,
                     name: treeNodeName,
-                    type: 'task',
+                    type: 'curingTask',
                     typeName: typeName || '',
                     status: status || '',
                     CuringMans: taskMess.CuringMans || '',
@@ -1296,13 +1300,13 @@ class OnSite extends Component {
             };
             let layer = this.createMarker(message);
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
-            if (taskLayerList[eventKey]) {
-                taskLayerList[eventKey].push(layer);
+            if (curingTaskLayerList[eventKey]) {
+                curingTaskLayerList[eventKey].push(layer);
             } else {
-                taskLayerList[eventKey] = [layer];
+                curingTaskLayerList[eventKey] = [layer];
             }
             this.setState({
-                taskLayerList
+                curingTaskLayerList
             });
             if (!index) {
                 return;
@@ -1310,7 +1314,7 @@ class OnSite extends Component {
             // 设置任务中间的图标
             let centerData = layer.getCenter();
             let iconType = L.divIcon({
-                className: this.getIconType(message.properties.type)
+                className: getIconType(message.properties.type)
             });
             let marker = L.marker([centerData.lat, centerData.lng], {
                 icon: iconType,
@@ -1322,9 +1326,9 @@ class OnSite extends Component {
                 )
             );
             marker.addTo(this.map);
-            markerLayerList[eventKey] = marker;
+            curingMarkerLayerList[eventKey] = marker;
             this.setState({
-                markerLayerList,
+                curingMarkerLayerList,
                 selected: true
             });
         } catch (e) {
@@ -1396,7 +1400,7 @@ class OnSite extends Component {
             radioValue: e.target.value
         });
     }
-    /* 弹出信息框 */
+    /* 细班选择处理 */
     handleAreaSelect = async (keys, info) => {
         const {
             areaLayerList,
@@ -1531,42 +1535,53 @@ class OnSite extends Component {
     }
     /* 在地图上添加marker和polygan */
     createMarker (geo) {
-        if (geo.properties.type !== 'area') {
-            if (
-                !geo.geometry.coordinates[0] ||
-                    !geo.geometry.coordinates[1]
-            ) {
-                return;
+        try {
+            if (geo.properties.type === 'area') {
+                // 创建区域图形
+                let area = L.geoJson(geo, {
+                    style: {
+                        fillColor: fillAreaColor(geo.key),
+                        weight: 1,
+                        opacity: 1,
+                        color: '#201ffd',
+                        fillOpacity: 0.3
+                    },
+                    title: geo.properties.name
+                }).addTo(this.map);
+                this.map.fitBounds(area.getBounds());
+                return area;
+            } else if (geo.properties.type === 'curingTask') {
+                let layer = L.polygon(geo.geometry.coordinates, {
+                    color: 'white',
+                    fillColor: '#93B9F2',
+                    fillOpacity: 0.2
+                }).addTo(this.map);
+                this.map.fitBounds(layer.getBounds());
+                return layer;
+            } else {
+                if (
+                    !geo.geometry.coordinates[0] ||
+                        !geo.geometry.coordinates[1]
+                ) {
+                    return;
+                }
+                let iconType = L.divIcon({
+                    className: getIconType(geo.type)
+                });
+                let marker = L.marker(geo.geometry.coordinates, {
+                    icon: iconType,
+                    title: geo.properties.name
+                });
+                marker.bindPopup(
+                    L.popup({ maxWidth: 240 }).setContent(
+                        genPopUpContent(geo)
+                    )
+                );
+                marker.addTo(this.map);
+                return marker;
             }
-            let iconType = L.divIcon({
-                className: getIconType(geo.type)
-            });
-            let marker = L.marker(geo.geometry.coordinates, {
-                icon: iconType,
-                title: geo.properties.name
-            });
-            marker.bindPopup(
-                L.popup({ maxWidth: 240 }).setContent(
-                    genPopUpContent(geo)
-                )
-            );
-            marker.addTo(this.map);
-            return marker;
-        } else {
-            // 创建区域图形
-            let area = L.geoJson(geo, {
-                style: {
-                    fillColor: this.fillAreaColor(geo.key),
-                    weight: 1,
-                    opacity: 1,
-                    color: '#201ffd',
-                    fillOpacity: 0.3
-                },
-                title: geo.properties.name
-            }).addTo(this.map);
-                // 地块标注
-            this.map.fitBounds(area.getBounds());
-            return area;
+        } catch (e) {
+            console.log('e', e);
         }
     }
     _handleCreateTaskOk = async () => {
@@ -1630,7 +1645,6 @@ class OnSite extends Component {
             coordinates: []
         });
     }
-
     /* 菜单展开收起 */
     extendAndFold () {
         this.setState({ menuIsExtend: !this.state.menuIsExtend });
@@ -1670,11 +1684,6 @@ class OnSite extends Component {
         this.setState({
             isShowRisk: false
         });
-    }
-
-    fillAreaColor (index) {
-        let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
-        return colors[index % 5];
     }
     // 点击树节点获取树节点信息
     async getTreeInfo (x, y, that) {

@@ -17,7 +17,6 @@ export default class CuringTaskTree extends Component {
     }
 
     onSelect (keys, info) {
-        console.log('sssssssssssssssss');
         this.originOnSelect(keys, info);
     }
 
