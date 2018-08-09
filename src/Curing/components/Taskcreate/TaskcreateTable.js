@@ -130,7 +130,7 @@ export default class TaskCreateTable extends Component {
             // 初始化地图
             await this._initMap();
             // 获取地块树数据
-            // await this._loadAreaData();
+            await this._loadAreaData();
             // 获取任务树数据
             await this._loadTaskData();
         } catch (e) {
