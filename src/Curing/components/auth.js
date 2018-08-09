@@ -185,6 +185,8 @@ export const getIconType = (type) => {
             return 'dangerIcon';
         case 'tree':
             return 'treeIcon';
+        case 'task':
+            return 'taskIcon';
         default:
             break;
     }

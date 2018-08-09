@@ -55,7 +55,10 @@ export default class CuringTaskTree extends Component {
     }
 
     render () {
-        let { content = [] } = this.props;
+        let { 
+            content = [],
+            curingTaskTreeKeys = []
+        } = this.props;
         const that = this;
         let contents = [];
         for (let j = 0; j < content.length; j++) {
@@ -69,9 +72,10 @@ export default class CuringTaskTree extends Component {
                 <Tree
                     // checkable
                     // onCheck={this.onCheck.bind(that)}
+                    defaultSelectedKeys={curingTaskTreeKeys}
+                    defaultExpandedKeys={curingTaskTreeKeys}
                     showLine
                     onSelect={this.onSelect.bind(this)}
-                    defaultExpandAll
                 >
                     {contents.map(p => {
                         return that.loop(p);

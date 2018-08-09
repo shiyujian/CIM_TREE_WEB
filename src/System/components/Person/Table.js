@@ -1059,7 +1059,7 @@ export default class Users extends Component {
         const {
             sidebar: { node } = {},
             platform: { users = [] },
-            actions: { deleteUser, getUsers, getTablePage }
+            actions: { deleteUser, getUsers, getTablePage, getAllUsersData }
         } = this.props;
         const codes = Users.collect(node);
         // 		const usera = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -1082,6 +1082,17 @@ export default class Users extends Component {
             );
             deleteUser({ userID: user.id }).then(as => {
                 console.log('as', as);
+                getAllUsersData().then((userData) => {
+                    console.log('userData', userData);
+                    if (userData && userData.content) {
+                        window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
+                        let content = userData.content;
+                        window.localStorage.setItem(
+                            'LZ_TOTAL_USER_DATA',
+                            JSON.stringify(content)
+                        );
+                    }
+                });
                 if (this.props.getIsBtns) {
                     getUsers({}, { org_code: codes, page: pages }).then(es => {
                         console.log('es', es);

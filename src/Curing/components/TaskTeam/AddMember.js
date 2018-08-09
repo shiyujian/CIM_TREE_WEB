@@ -37,6 +37,7 @@ export default class AddMember extends Component {
         }
         let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
         totalUserData = JSON.parse(totalUserData);
+        console.log('totalUserData', totalUserData);
         if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
 
         } else {

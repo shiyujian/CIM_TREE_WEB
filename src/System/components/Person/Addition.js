@@ -1277,7 +1277,8 @@ class Addition extends Component {
                 getImgNumBtn,
                 getSwitch,
                 postUploadAutograph,
-                putUserBlackList
+                putUserBlackList,
+                getAllUsersData
             }
         } = this.props;
         const roles = addition.roles || [];
@@ -1587,6 +1588,17 @@ class Addition extends Component {
                                     return;
                                 } else {
                                     message.info('新增人员成功');
+                                    getAllUsersData().then((userData) => {
+                                        console.log('userData', userData);
+                                        if (userData && userData.content) {
+                                            window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
+                                            let content = userData.content;
+                                            window.localStorage.setItem(
+                                                'LZ_TOTAL_USER_DATA',
+                                                JSON.stringify(content)
+                                            );
+                                        }
+                                    });
                                 }
                                 let sectiona = [];
                                 getSection(sectiona);

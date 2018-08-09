@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import { Tree } from 'antd';
 const TreeNode = Tree.TreeNode;
 
-export default class TaskTree extends Component {
+export default class TaskCheckTree extends Component {
     constructor (props) {
         super(props);
         this.originOnCheck = this.props.onCheck;
-        this.originOnSelect = this.props.onSelect;
         this.state = {
             checkkeys: []
         };
@@ -14,10 +13,6 @@ export default class TaskTree extends Component {
 
     onCheck (keys, info) {
         this.originOnCheck(keys, info);
-    }
-
-    onSelect (keys, info) {
-        this.originOnSelect(keys, info);
     }
 
     loop (p, loopTime) {
@@ -46,6 +41,7 @@ export default class TaskTree extends Component {
             if (p) {
                 return (
                     <TreeNode
+                        selectable={false}
                         title={`${p.CreateTime}-${p.CuringMans}`}
                         key={p.ID}
                     />
@@ -55,7 +51,7 @@ export default class TaskTree extends Component {
     }
 
     render () {
-        let { 
+        let {
             content = []
         } = this.props;
         const that = this;
@@ -69,11 +65,10 @@ export default class TaskTree extends Component {
         return (
             <div>
                 <Tree
-                    // checkable
+                    checkable
                     // showIcon
                     onCheck={this.onCheck.bind(that)}
                     showLine
-                    onSelect={this.onSelect.bind(this)}
                     defaultExpandAll
                 >
                     {contents.map(p => {

@@ -170,8 +170,6 @@ export const getIconType = (type) => {
     switch (type) {
         case 'track':
             return 'peopleIcon';
-        case 'safety':
-            return 'cameraIcon';
         case 'risk':
             return 'riskIcon';
         case 'tree':

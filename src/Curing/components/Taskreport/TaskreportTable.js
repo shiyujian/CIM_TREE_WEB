@@ -65,8 +65,9 @@ export default class TaskReportTable extends Component {
     }
 
     options = [
-        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' },
-        { label: '养护任务', value: 'geojsonFeature_task', IconName: 'task' }
+        { label: '养护任务', value: 'geojsonFeature_task', IconName: 'task' },
+        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' }
+
     ];
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -91,61 +92,70 @@ export default class TaskReportTable extends Component {
         // 获取任务数据
         await this._loadTaskData();
     }
-    // 获取任务数据
-    async _loadTaskData () {
-        const {
-            actions: {
-                getCuring,
-                getcCuringTypes
+    /* 初始化地图 */
+    _initMap () {
+        let me = this;
+        this.map = L.map('mapid', window.config.initLeaflet);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+
+        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+
+        this.tileLayer2 = L.tileLayer(
+            window.config.DASHBOARD_ONSITE +
+                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+            {
+                opacity: 1.0,
+                subdomains: [1, 2, 3],
+                minZoom: 11,
+                maxZoom: 21,
+                storagetype: 0,
+                tiletype: 'wtms'
             }
-        } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
-            let postData = {
-                section: section
-            };
-            let curingTypesData = await getcCuringTypes();
-            let curingTypes = curingTypesData && curingTypesData.content;
-            if (curingTypes && curingTypes.length > 0) {
-                let curingTaskData = await getCuring({}, postData);
-                let curingTasks = curingTaskData.content;
-                let TaskTreeData = [];
-                curingTasks.map((task) => {
-                    if (task && task.ID) {
-                        curingTypes.map((type) => {
-                            if (type.ID === task.CuringType) {
-                                let exist = false;
-                                let childData = [];
-                                // 查看TreeData里有无这个类型的数据，有的话，push
-                                TaskTreeData.map((treeNode) => {
-                                    if (treeNode.ID === type.ID) {
-                                        exist = true;
-                                        childData = treeNode.children;
-                                        childData.push((task));
-                                    }
-                                });
-                                // 没有的话，创建
-                                if (!exist) {
-                                    childData.push(task);
-                                    TaskTreeData.push({
-                                        ID: type.ID,
-                                        Name: type.Base_Name,
-                                        children: childData
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });
-                this.setState({
-                    TaskTreeData,
-                    curingTypes
+        ).addTo(this.map);
+        this.map.on('click', function (e) {
+            const {
+                coordinates,
+                createBtnVisible,
+                selected
+            } = me.state;
+            if (!selected) {
+                return;
+            }
+            coordinates.push([e.latlng.lat, e.latlng.lng]);
+            if (coordinates.length > 0 && !createBtnVisible) {
+                me.setState({
+                    createBtnVisible: true
                 });
             }
-        }
+            if (me.state.polygonData) {
+                me.map.removeLayer(me.state.polygonData);
+            }
+            let polygonData = L.polygon(coordinates, {
+                color: 'white',
+                fillColor: '#93B9F2',
+                fillOpacity: 0.5
+            }).addTo(me.map);
+            me.setState({
+                coordinates,
+                polygonData: polygonData
+            });
+        });
+        // 任务详情点击事件
+        document
+            .querySelector('.leaflet-popup-pane')
+            .addEventListener('click', async function (e) {
+                let target = e.target;
+                // 绑定隐患详情点击事件
+                if (target.getAttribute('class') === 'btnViewTask') {
+                    me._handleCreateTaskOk();
+                }
+            });
     }
     // 获取地块树数据
     async _loadAreaData () {
@@ -227,95 +237,65 @@ export default class TaskReportTable extends Component {
                 treeLists: projectList,
                 treeLoading: false
             });
-
-            // unitProjectList.map(async unitProject => {
-            //     let list = await getLittleBan({ no: unitProject.No });
-            //     let smallClassList = getSmallClass(list);
-            //     let unitProjectThinArr = [];
-            //     smallClassList.map(smallClass => {
-            //         let thinClassList = getThinClass(smallClass, list);
-
-            //         unitProjectThinArr = unitProjectThinArr.concat(thinClassList);
-            //         smallClass.children = thinClassList;
-            //     });
-            //     totalThinClass.push({
-            //         unitProject: unitProject.No,
-            //         thinClass: unitProjectThinArr
-            //     });
-            //     unitProject.children = smallClassList;
-            //     this.setState({
-            //         treeLists: projectList,
-            //         totalThinClass
-            //     });
-            // });
         } catch (e) {
             console.log(e);
         }
     }
-    /* 初始化地图 */
-    _initMap () {
-        let me = this;
-        this.map = L.map('mapid', window.config.initLeaflet);
-
-        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
-
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 17,
-            storagetype: 0
-        }).addTo(this.map);
-
-        this.tileLayer2 = L.tileLayer(
-            window.config.DASHBOARD_ONSITE +
-                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-            {
-                opacity: 1.0,
-                subdomains: [1, 2, 3],
-                minZoom: 11,
-                maxZoom: 21,
-                storagetype: 0,
-                tiletype: 'wtms'
+    // 获取任务数据
+    async _loadTaskData () {
+        const {
+            actions: {
+                getCuring,
+                getcCuringTypes
             }
-        ).addTo(this.map);
-        this.map.on('click', function (e) {
-            const {
-                coordinates,
-                createBtnVisible,
-                selected
-            } = me.state;
-            if (!selected) {
-                return;
-            }
-            coordinates.push([e.latlng.lat, e.latlng.lng]);
-            if (coordinates.length > 0 && !createBtnVisible) {
-                me.setState({
-                    createBtnVisible: true
+        } = this.props;
+        this.user = getUser();
+        let sections = this.user.sections;
+        sections = JSON.parse(sections);
+        if (sections && sections instanceof Array && sections.length > 0) {
+            let section = sections[0];
+            let postData = {
+                section: section
+            };
+            let curingTypesData = await getcCuringTypes();
+            let curingTypes = curingTypesData && curingTypesData.content;
+            if (curingTypes && curingTypes.length > 0) {
+                let curingTaskData = await getCuring({}, postData);
+                let curingTasks = curingTaskData.content;
+                let TaskTreeData = [];
+                curingTasks.map((task) => {
+                    if (task && task.ID) {
+                        curingTypes.map((type) => {
+                            if (type.ID === task.CuringType) {
+                                let exist = false;
+                                let childData = [];
+                                // 查看TreeData里有无这个类型的数据，有的话，push
+                                TaskTreeData.map((treeNode) => {
+                                    if (treeNode.ID === type.ID) {
+                                        exist = true;
+                                        childData = treeNode.children;
+                                        childData.push((task));
+                                    }
+                                });
+                                // 没有的话，创建
+                                if (!exist) {
+                                    childData.push(task);
+                                    TaskTreeData.push({
+                                        ID: type.ID,
+                                        Name: type.Base_Name,
+                                        children: childData
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+                this.setState({
+                    TaskTreeData,
+                    curingTypes
                 });
             }
-            if (me.state.polygonData) {
-                me.map.removeLayer(me.state.polygonData);
-            }
-            let polygonData = L.polygon(coordinates, {
-                color: 'blue',
-                fillColor: '#93B9F2',
-                fillOpacity: 0.2
-            }).addTo(me.map);
-            me.setState({
-                coordinates,
-                polygonData: polygonData
-            });
-        });
-        // 任务详情点击事件
-        document
-            .querySelector('.leaflet-popup-pane')
-            .addEventListener('click', async function (e) {
-                let target = e.target;
-                // 绑定隐患详情点击事件
-                if (target.getAttribute('class') === 'btnViewTask') {
-                    me._handleCreateTaskOk();
-                }
-            });
+        }
     }
     render () {
         const {
@@ -417,7 +397,7 @@ export default class TaskReportTable extends Component {
                         <div className='buttonStyle'>
                             {
                                 selected
-                                    ? <Button type='primary' style={{marginRight: 10}} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
+                                    ? <Button type='primary' style={{marginRight: 10}} onClick={this._handleCreateTaskOk.bind(this)}>上报</Button>
                                     : ''
                             }
                             {
@@ -836,9 +816,9 @@ export default class TaskReportTable extends Component {
     _createMarker (geo) {
         if (geo.properties.type === 'task') {
             let layer = L.polygon(geo.geometry.coordinates, {
-                color: 'white',
+                color: 'blue',
                 fillColor: '#93B9F2',
-                fillOpacity: 0.2
+                fillOpacity: 0.1
             }).addTo(this.map);
             this.map.fitBounds(layer.getBounds());
             return layer;
@@ -1059,9 +1039,9 @@ export default class TaskReportTable extends Component {
             return;
         }
         let polygonData = L.polygon(coordinates, {
-            color: 'blue',
+            color: 'white',
             fillColor: '#93B9F2',
-            fillOpacity: 0.2
+            fillOpacity: 0.5
         }).addTo(me.map);
         me.setState({
             coordinates,

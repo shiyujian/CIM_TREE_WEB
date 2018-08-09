@@ -33,7 +33,7 @@ export default class PkCodeTree extends Component {
     }
 
     render () {
-        const { treeData = [] } = this.props;
+        const { treeData = [], areaTreeKeys } = this.props;
         return (
             <div>
                 {treeData.length ? (
@@ -41,7 +41,8 @@ export default class PkCodeTree extends Component {
                         showLine
                         selectedKeys={[this.props.selectedKeys]}
                         onSelect={this.props.onSelect}
-                        // defaultExpandedKeys={['P009', 'P010', 'P999']}
+                        defaultExpandedKeys={areaTreeKeys}
+                        defaultSelectedKeys={areaTreeKeys}
                     >
                         {treeData.map(p => {
                             return this.loop(p);

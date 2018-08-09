@@ -41,6 +41,8 @@ export const getImgNegative = createAction('控制只能上传一张身份证反
 export const getImgArr = createAction('编辑时如果有照片就显示照片');
 // 黑名单控制开关
 export const getSwitch = createAction('黑名单控制开关');
+// 获取林总数据库中的全部人员
+export const getAllUsersData = createFetchAction(`${FOREST_API}/system/users`, [], 'GET');
 
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 
@@ -74,7 +76,8 @@ export const actions = {
     getAutographBtn,
     postUploadNegative,
     getImgNegative,
-    getOrgTreeSelect
+    getOrgTreeSelect,
+    getAllUsersData
 };
 
 export default handleActions({

@@ -1,98 +1,39 @@
-.l-map {
+.dashboard-map {
     position:relative;
     .leaflet-popup-content h2 {
       font-weight: 400 !important;
       font-size: 12px !important;
     }
   
-    .menuPanel {
+    .dashboard-menuPanel {
       position: absolute;
-      // right: 0;
-      top: 0;
-      height: 100%;
+      left: 126px;
+      top: 16px;
+      height: 90%;
       width: 260px;
       transition: all .3s;
       z-index: 980;
   
-      .aside {
+      .dashboard-aside {
         position: absolute;
         left: 0;
         width: 100%;
         top: 0;
         bottom: 0;
-        background-color: #e6e6e6;
+        background-color: #fff;
         color: #333;
         z-index: 999;
-        overflow: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        .dashboard-asideTree {
+          margin-top: 20px;
+          margin-left: 20px;
+        }
       }
-    }
-    .drawer {
-      height: 36px;
-      line-height: 36px;
-      text-align: center;
-      font-size: 12px;
-      background-color: #bdbbbb;
-      color: #ffffff;
-      border-bottom: 1px solid #e6e6e6;
-    }
-  
-    .nav {
-      height: 40px;
-      line-height: 40px;
-      text-align: center;
-      cursor: pointer;
-      background-color: #e6e6e6;
-      color: #333;
-    }
-  
-    .active {
-      height: 40px;
-      line-height: 40px;
-      text-align: center;
-      cursor: pointer;
-      background-color: #f2f2f4;
-      color: #0080e6;
-    }
-  
-    .label-text {
-      color: #000 !important;
-      font-weight: bold;
-    }
-  
-    /*图例的样式*/
-    .iconList {
-      position: fixed;
-      right: 0;
-      top: 40%;
-      width: 100px;
-      z-index: 970;
-      background-color: #fff;
     }
     #mapid{
       cursor: pointer;
-    }
-  
-    .imageControll {
-      width: 26px;
-      height: auto;
-      position: absolute;
-      top: 0;
-      left: -26px;
-      cursor: pointer;
-    }
-  
-    .imgIcon {
-      padding: 10px 8px;
-      height: 42px;
-      position: relative;
-    }
-  
-    .imgIcon p {
-      display: inline-block;
-      position: absolute;
-      top: 12px;
-      left: 36px;
-      color: #0080e6;
     }
   
     /*现场人员*/
@@ -113,37 +54,14 @@
         background-size: 100% 100%;
     }
   
-    /*危险源*/
+    /*安全隐患*/
     .riskIcon {
       width: 21px !important;
       height: 26px !important;
       background-image: url("./ImageIcon/risk.png");
       background-size: 100% 100%;
     }
-  
-    /*360全景*/
-    .allViewIcon {
-      width: 26px !important;
-      height: 26px !important;
-      background-image: url("./ImageIcon/360.png");
-      background-size: 100% 100%;
-    }
-  
-    /*安全监控*/
-    .cameraIcon {
-      width: 21px !important;
-      height: 26px !important;
-      background-image: url("./ImageIcon/camera.png");
-      background-size: 100% 100%;
-    }
-  
-    /*视频监控*/
-    .videoIcon {
-      width: 21px !important;
-      height: 26px !important;
-      background-image: url("./ImageIcon/video.png");
-      background-size: 100% 100%;
-    }
+
     /*养护任务*/
     .curingTaskIcon {
       width: 26px !important;
@@ -173,7 +91,26 @@
       top: 6px;
       right: calc(~'50% + 50px');
     }
-    .treeControl4 {
+
+    .menuButton {
+      position: absolute;
+      z-index: 960;
+      top: 15px;
+      left: 15px;
+    }
+
+    .menuButtonLayout {
+      margin-bottom: 10px;
+    }
+
+    .menuTree {
+      position: absolute;
+      z-index: 960;
+      top: 15px;
+      left: 126px;
+    }
+
+    .editPolygonLayout {
       position: absolute;
       z-index: 960;
       top: 6px;
@@ -187,39 +124,6 @@
       font-size: 20px;
       color: white;
       background-color: #000
-    }
-  
-    .cardControl {
-      margin-top: 80px;
-    }
-  
-    .btnCtro {
-      position: fixed;
-      top: 80px;
-      right: 161px;
-      width: 178px;
-      height: 28px;
-      border: none;
-    }
-  
-    .DisplayNone {
-      display: none !important;
-    }
-  
-    .VideoList {
-      position: fixed;
-      top: 100px;
-      left: 200px;
-      z-index: 9999;
-    }
-  
-    .OneVideoList {
-      width: 90%;
-      height: 20px;
-      line-height: 20px;
-      text-align: center;
-      margin-bottom: 4px;
-      cursor: pointer;
     }
   
     .ant-tree li .ant-tree-iconEle{
@@ -236,84 +140,12 @@
       background-image: url("./ImageIcon/people.png");
     }
   
-    .tr-safety .ant-tree-iconEle {
-      background-image: url("./ImageIcon/camera.png");
-    }
-  
     .tr-hazard .ant-tree-iconEle {
       background-image: url("./ImageIcon/risk.png");
     }
   
-    .tr-monitor .ant-tree-iconEle {
-      background-image: url("./ImageIcon/video.png");
-    }
-  
     .tr-area .ant-tree-iconEle {
       background-image: url("./ImageIcon/area.png");
-    }
-  
-    .tr-allview .ant-tree-iconEle {
-      background-image: url("./ImageIcon/360.png");
-    }
-  
-  
-    /*轨迹回放*/
-    .trackPanel {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      z-index: 1001;
-      margin-left: -340px;
-    }
-  
-    .track {
-      border: 1px solid #EEE;
-      border-radius: 3px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-      background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
-      width: 680px;
-      margin: 0 auto;
-      display: flex;
-    }
-  
-    .btnCtronl {
-      display: inline-block;
-      width: 32px;
-      height: 32px;
-      flex: 0 0 32px;
-      font-size: 20px;
-      text-align: center;
-      line-height: 32px;
-      cursor: pointer;
-    }
-  
-    .slider {
-      display: inline-block;
-      flex: 1 1 auto;
-    }
-  
-    .isShow {
-      flex: 0 0 90px;
-      text-align: center;
-      line-height: 32px;
-    }
-  
-    .timeRange {
-      padding-top: 2px;
-      padding-left: 5px;
-      display: inline-block;
-      flex: 0 0 300px;
-    }
-  
-    .trackClose {
-      flex: 0 0 20px;
-      font-size: 14px;
-      line-height: 32px;
-      display: inline-block;
-    }
-  
-    .trackClose a {
-      color: #666;
     }
   
     /*弹出框样式*/
@@ -379,68 +211,6 @@
       display: none;
     }
   
-    .resizeSenseArea {
-      position: absolute;
-      right: -3px;
-      top: 0;
-      width: 12px;
-      height: 100%;
-      background: #00A1CB;
-      cursor: e-resize;
-      z-index: 1000;
-      background: rgba(0, 0, 0, 0);
-    }
-  
-    /*隐患详情*/
-    .riskDetail .ant-modal-footer {
-      display: none;
-    }
-  
-    .riskDetail img {
-      display: block;
-      width: 305px;
-      height: 200px;
-    }
-  
-    .riskDetail h3 {
-      font-weight: 300;
-      font-size: 14px;
-      margin: 0 0 10px;
-    }
-  
-    .riskDetail .mb {
-      margin-bottom: 10px;
-    }
-  
-    .riskDetail .divLine {
-      border-top: 1px dotted #DDD;
-    }
-  
-    .riskDetail .ant-carousel .slick-slide {
-      min-height: 200px;
-      max-height: 300px;
-    }
-  
-    .riskDetail .noImg {
-      width: 200px;
-      height: 200px;
-      margin: 20px auto;
-      background-image: url('./ImageIcon/noImg.png');
-      background-size: cover;
-    }
-  
-    .vedioModal .ant-modal-content {
-      height: 90%;
-    }
-  
-    .vedioModal .ant-modal-body {
-      height: calc(100% - 50px);
-    }
-  
-    .vedioModal .ant-modal-footer {
-      display: none;
-    }
-  
   }
   
   .map-container{
@@ -486,68 +256,3 @@
       
     }
   }
-  
-  
-  @keyframes extend {
-    from {
-      transform: translateX(-200px)
-    }
-    to {
-      transform: translateX(0)
-    }
-  }
-  
-  @keyframes fold {
-    from {
-      transform: translateX(0)
-    }
-    to {
-      transform: translateX(-200px)
-    }
-  }
-  
-  @-ms-keyframes extend {
-    from {
-      transform: translateX(-200px)
-    }
-    to {
-      transform: translateX(0)
-    }
-  }
-  
-  @-ms-keyframes fold {
-    from {
-      transform: translateX(0)
-    }
-    to {
-      transform: translateX(-200px)
-    }
-  }
-  
-  @-webkit-keyframes extend {
-    from {
-      transform: translateX(-200px)
-    }
-    to {
-      transform: translateX(0)
-    }
-  }
-  
-  @-webkit-keyframes fold {
-    from {
-      transform: translateX(0)
-    }
-    to {
-      transform: translateX(-200px)
-    }
-  }
-.tr-people{
-  height: 300px;
-  overflow: scroll;
-}
-
-.hrstyle {
-  border: 0;
-  border-bottom: 1px dashed #ccc;
-  background: #999;
-}

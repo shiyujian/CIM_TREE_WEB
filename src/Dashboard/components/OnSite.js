@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-06 15:45:54
+ * @Last Modified time: 2018-08-09 14:12:29
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -22,11 +22,13 @@ import {
     Form,
     Row,
     DatePicker,
-    Radio
+    Radio,
+    Spin
 } from 'antd';
 import { PROJECT_UNITS, FOREST_API } from '_platform/api';
 import './OnSite.less';
 import DashPanel from './DashPanel';
+import TreeTypeTree from './TreeTypeTree';
 import RiskDetail from './RiskDetail';
 import moment from 'moment';
 import PkCodeTree from './PkCodeTree';
@@ -99,7 +101,27 @@ class OnSite extends Component {
             riskMarkerLayerList: {}, // // 安全隐患图标图层List
             curingTaskLayerList: {}, // 养护任务图层List
             curingMarkerLayerList: {}, // 养护任务图标图层List
-            curingTaskMessList: {} // 养护任务信息List
+            curingTaskMessList: {}, // 养护任务信息List
+            // 左侧菜单按钮是否选中
+            geojsonFeature_area: false,
+            geojsonFeature_track: false,
+            geojsonFeature_risk: false,
+            geojsonFeature_treetype: false,
+            geojsonFeature_curingTask: false,
+            // 树加载loading
+            areaTreeLoading: true,
+            trackTreeLoading: true,
+            riskTreeLoading: true,
+            treetypeTreeLoading: true,
+            curingTaskTreeLoading: true,
+            // 各个树的默认选中节点，因为各个树点开都是重新渲染，所以需要保存之前点击的节点
+            areaTreeKeys: [],
+            trackTreeKeys: [],
+            riskTreeKeys: [],
+            treetypeTreeKeys: [],
+            treetypeTreeIsDefault: 0,
+            curingTaskTreeKeys: []
+            
         };
         this.tileLayer = null;
         this.tileLayer2 = null;
@@ -168,15 +190,44 @@ class OnSite extends Component {
         }
     ];
 
+    handleMenuButton (e) {
+        let target = e.target;
+        let buttonID = target.getAttribute('id');
+        this.options.map((option)=>{
+            if (option.value === buttonID) {
+                this.setState({
+                    [option.value]:!this.state[option.value]
+                })
+            } else {
+                this.setState({
+                    [option.value]:false
+                })
+            }
+        })
+        
+    }
     /* 渲染菜单panel */
     renderPanel (option) {
+        const {
+            areaTreeLoading,
+            trackTreeLoading,
+            riskTreeLoading,
+            treetypeTreeLoading,
+            curingTaskTreeLoading,
+            areaTreeKeys,
+            trackTreeKeys,
+            riskTreeKeys,
+            treetypeTreeKeys,
+            treetypeTreeIsDefault,
+            curingTaskTreeKeys,
+        } = this.state
         let content = this.getPanelData(option.value);
         if (option && option.value) {
             switch (option.value) {
                 // 区域地块
                 case 'geojsonFeature_area':
                     return (
-                        <div>
+                        <Spin spinning={areaTreeLoading}>
                             <RadioGroup onChange={this.handleRadioChange.bind(this)} value={this.state.radioValue} style={{marginBottom: 10}}>
                                 <Radio value={'全部细班'}>全部细班</Radio>
                                 <Radio value={'实际定位'}>实际定位</Radio>
@@ -185,19 +236,19 @@ class OnSite extends Component {
                                 treeData={content}
                                 selectedKeys={this.state.leftkeycode}
                                 onSelect={this.handleAreaSelect.bind(this)}
+                                areaTreeKeys={areaTreeKeys}
                             />
-                        </div>
-                    );
+                        </Spin>
+                    )
                 // 巡检路线
                 case 'geojsonFeature_track':
                     return (
-                        <div>
+                        <Spin spinning={trackTreeLoading}>
                             <DashPanel
-                                style={{ height: '200px' }}
                                 onCheck={this.handleTrackCheck.bind(this)}
-                                onSelect={this.handleTrackSelect.bind(this)}
                                 content={content}
                                 featureName={option.value}
+                                trackTreeKeys={trackTreeKeys}
                             />
                             {/* <RangePicker
                                 style={{
@@ -207,35 +258,43 @@ class OnSite extends Component {
                                 showTime={{ format: 'HH:mm:ss' }}
                                 format={'YYYY/MM/DD HH:mm:ss'}
                             /> */}
-                        </div>
+                        </Spin>
                     );
                 // 安全隐患
                 case 'geojsonFeature_risk':
                     return (
-                        <DashPanel
-                            onCheck={this.handleRiskCheck.bind(this)}
-                            onSelect={this.handleRiskSelect.bind(this)}
-                            content={content}
-                            featureName={option.value}
-                        />
+                        <Spin spinning={riskTreeLoading}>
+                            <DashPanel
+                                onCheck={this.handleRiskCheck.bind(this)}
+                                content={content}
+                                featureName={option.value}
+                                riskTreeKeys={riskTreeKeys}
+                            />
+                        </Spin>
                     );
                 // 树种筛选
                 case 'geojsonFeature_treetype':
                     return (
-                        <DashPanel
-                            onCheck={this.handleTreeTypeCheck.bind(this)}
-                            onSelect={this.handleTreeTypeSelect.bind(this)}
-                            content={content}
-                            featureName={option.value}
-                        />
+                        <Spin spinning={treetypeTreeLoading}>
+                            <TreeTypeTree
+                                onCheck={this.handleTreeTypeCheck.bind(this)}
+                                content={content}
+                                featureName={option.value}
+                                treetypeTreeKeys={treetypeTreeKeys}
+                                treetypeTreeIsDefault={treetypeTreeIsDefault}
+                            />
+                        </Spin>
                     );
                 // 养护任务
                 case 'geojsonFeature_curingTask':
                     return (
-                        <CuringTaskTree
-                            onSelect={this.handleCuringTaskSelect.bind(this)}
-                            content={content}
-                        />
+                        <Spin spinning={curingTaskTreeLoading}>
+                            <CuringTaskTree
+                                onSelect={this.handleCuringTaskSelect.bind(this)}
+                                content={content}
+                                curingTaskTreeKeys={curingTaskTreeKeys}
+                            />
+                        </Spin>
                     );
             }
         }
@@ -367,6 +426,11 @@ class OnSite extends Component {
                 rst.forEach((item, index) => {
                     rst[index].children = [];
                 });
+            } else {
+                this.setState({
+                    areaTreeLoading: false
+                });
+                return;
             }
             // 项目级
             let projectList = [];
@@ -410,16 +474,137 @@ class OnSite extends Component {
                 });
                 unitProject.children = smallClassList;
             }
-            this.setState({ areaTreeData: projectList });
+            this.setState({ 
+                areaTreeData: projectList,
+                areaTreeLoading: false
+            });
         } catch (e) {
             console.log('获取地块树数据', e);
+        }
+    }
+    /* 查询巡检路线 */
+    getMapRouter () {
+        let me = this;
+        const { getMapRouter } = this.props.actions;
+        getMapRouter().then(orgs => {
+            let orgArr = [];
+            if (orgs && orgs instanceof Array && orgs.length > 0) {
+                orgs.map(or => {
+                    if (
+                        or &&
+                        or.ID &&
+                        or.PatrolerUser !== undefined &&
+                        or.PatrolerUser !== null
+                    ) {
+                        orgArr.push({
+                            key: or.ID,
+                            properties: {
+                                name: or.PatrolerUser.Full_Name,
+                                ID: or.PatrolerUser.ID,
+                                User_Name: or.PatrolerUser.User_Name,
+                                PK: or.PatrolerUser.PK,
+                                Phone: or.PatrolerUser.Phone
+                            }
+                        });
+                    }
+                });
+            }
+            me.setState({ 
+                trackUsersTreeData: orgArr,
+                trackTreeLoading: false
+            });
+        });
+    }
+    /* 获取安全隐患点 */
+    getRisk = async () => {
+        const { getRisk } = this.props.actions;
+        let me = this;
+        try {
+            let data = await getRisk();
+            let riskObj = {};
+            let risks = [];
+            // 安全隐患数据处理
+            if (data && data.content) {
+                let datas = data.content;
+                datas.forEach((v, index) => {
+                    // 去除坐标为0的点  和  名称为空的点（名称为空的点   type类型也不一样）
+                    if (v['X'] === 0 || v['Y'] === 0 || v['ProblemType'] === '') {
+                        return;
+                    }
+                    let level = v['EventType'];
+                    let name = v['ProblemType'];
+                    let ResponseOrg = v['ReorganizerObj'];
+                    // 位置
+                    let locationX = v['X'];
+                    let locationY = v['Y'];
+                    let coordinates = [locationY, locationX];
+                    // 隐患类型
+                    let riskType = '';
+                    if (v.EventType === 0) {
+                        riskType = '质量缺陷';
+                    } else if (v.EventType === 1) {
+                        riskType = '安全隐患';
+                    } else if (v.EventType === 2) {
+                        riskType = '其他';
+                    }
+                    riskObj[level] = riskObj[level] || {
+                        key: riskType,
+                        properties: {
+                            name: riskType
+                        },
+                        children: []
+                    };
+                    let status = '';
+                    if (v.Status === -1) {
+                        status = '已提交';
+                    } else if (v.Status === 0) {
+                        status = '未审核通过';
+                    } else if (v.Status === 1) {
+                        status = '（审核通过）整改中';
+                    } else if (v.Status === 2) {
+                        status = '整改完成';
+                    } else if (v.Status === 3) {
+                        status = '确认完成';
+                    }
+                    riskObj[level].children.push({
+                        type: 'risk',
+                        key: v.ID,
+                        properties: {
+                            riskType: riskType,
+                            measure: '',
+                            name: name,
+                            Problem: v.Problem,
+                            response_org: ResponseOrg ? ResponseOrg.Full_Name : '',
+                            status: status,
+                            RouteID: v.RouteID,
+                            CreateTime: v.CreateTime,
+                            ID: v.ID,
+                            InputerObj: v.InputerObj,
+                            Supervisor: v.Supervisor,
+                            type: 'risk'
+                        },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: coordinates
+                        }
+                    });
+                });
+            }
+            for (let i in riskObj) {
+                risks.push(riskObj[i]);
+            }
+            me.setState({ 
+                riskTreeData: risks,
+                riskTreeLoading: false
+            });
+        } catch (e) {
+
         }
     }
     // 获取树种数据
     async getTreeType () {
         const { getTreeTypeAction } = this.props.actions;
         try {
-            let treeData = await getTreeTypeAction();
             let arrData = [];
             let treeTypesTreeData = [
                 {
@@ -430,6 +615,14 @@ class OnSite extends Component {
                     children: []
                 }
             ];
+            let treeData = await getTreeTypeAction();
+            if (!(treeData && treeData instanceof Array && treeData.length > 0)) {
+                this.setState({
+                    treeTypesTreeData,
+                    treetypeTreeLoading: false
+                })
+                return;
+            }
             treeData.map(tree => {
                 if (tree && tree.ID) {
                     arrData.push({
@@ -452,117 +645,12 @@ class OnSite extends Component {
             });
             treeTypesTreeData[0].children = arrData;
             this.setState({
-                treeTypesTreeData
+                treeTypesTreeData,
+                treetypeTreeLoading: false
             });
         } catch (e) {
             console.log('树种', e);
         }
-    }
-    /* 查询巡检路线 */
-    getMapRouter () {
-        let me = this;
-        const { getMapRouter } = this.props.actions;
-        getMapRouter().then(orgs => {
-            let orgArr = [];
-            orgs.map(or => {
-                if (
-                    or &&
-                    or.ID &&
-                    or.PatrolerUser !== undefined &&
-                    or.PatrolerUser !== null
-                ) {
-                    orgArr.push({
-                        key: or.ID,
-                        properties: {
-                            name: or.PatrolerUser.Full_Name,
-                            ID: or.PatrolerUser.ID,
-                            User_Name: or.PatrolerUser.User_Name,
-                            PK: or.PatrolerUser.PK,
-                            Phone: or.PatrolerUser.Phone
-                        }
-                    });
-                }
-            });
-            me.setState({ trackUsersTreeData: orgArr });
-        });
-    }
-    /* 获取安全隐患点 */
-    getRisk () {
-        const { getRisk } = this.props.actions;
-        let me = this;
-        getRisk().then(data => {
-            // 安全隐患数据处理
-            let datas = data.content;
-            let riskObj = {};
-            datas.forEach((v, index) => {
-                // 去除坐标为0的点  和  名称为空的点（名称为空的点   type类型也不一样）
-                if (v['X'] === 0 || v['Y'] === 0 || v['ProblemType'] === '') {
-                    return;
-                }
-                let level = v['EventType'];
-                let name = v['ProblemType'];
-                let ResponseOrg = v['ReorganizerObj'];
-                // 位置
-                let locationX = v['X'];
-                let locationY = v['Y'];
-                let coordinates = [locationY, locationX];
-                // 隐患类型
-                let riskType = '';
-                if (v.EventType === 0) {
-                    riskType = '质量缺陷';
-                } else if (v.EventType === 1) {
-                    riskType = '安全隐患';
-                } else if (v.EventType === 2) {
-                    riskType = '其他';
-                }
-                riskObj[level] = riskObj[level] || {
-                    key: riskType,
-                    properties: {
-                        name: riskType
-                    },
-                    children: []
-                };
-                let status = '';
-                if (v.Status === -1) {
-                    status = '已提交';
-                } else if (v.Status === 0) {
-                    status = '未审核通过';
-                } else if (v.Status === 1) {
-                    status = '（审核通过）整改中';
-                } else if (v.Status === 2) {
-                    status = '整改完成';
-                } else if (v.Status === 3) {
-                    status = '确认完成';
-                }
-                riskObj[level].children.push({
-                    type: 'risk',
-                    key: v.ID,
-                    properties: {
-                        riskType: riskType,
-                        measure: '',
-                        name: name,
-                        Problem: v.Problem,
-                        response_org: ResponseOrg ? ResponseOrg.Full_Name : '',
-                        status: status,
-                        RouteID: v.RouteID,
-                        CreateTime: v.CreateTime,
-                        ID: v.ID,
-                        InputerObj: v.InputerObj,
-                        Supervisor: v.Supervisor,
-                        type: 'risk'
-                    },
-                    geometry: {
-                        type: 'Point',
-                        coordinates: coordinates
-                    }
-                });
-            });
-            let risks = [];
-            for (let i in riskObj) {
-                risks.push(riskObj[i]);
-            }
-            me.setState({ riskTreeData: risks });
-        });
     }
     // 获取养护任务
     getCuringTasks = async () => {
@@ -574,10 +662,10 @@ class OnSite extends Component {
         } = this.props;
         let curingTypesData = await getcCuringTypes();
         let curingTypes = curingTypesData && curingTypesData.content;
+        let TaskTreeData = [];
         if (curingTypes && curingTypes.length > 0) {
             let curingTaskData = await getCuring();
             let curingTasks = curingTaskData.content;
-            let TaskTreeData = [];
             curingTasks.map((task) => {
                 if (task && task.ID) {
                     curingTypes.map((type) => {
@@ -605,18 +693,20 @@ class OnSite extends Component {
                     });
                 }
             });
-            this.setState({
-                TaskTreeData,
-                curingTypes
-            });
         }
+        this.setState({
+            TaskTreeData,
+            curingTypes,
+            curingTaskTreeLoading: false
+        });
     }
     // 切换全部细班时，将其余图层去除，加载最初始图层
     componentDidUpdate = async (prevState, prevProps) => {
         const {
-            radioValue
+            radioValue,
+            geojsonFeature_area
         } = this.state;
-        if (radioValue === '全部细班' && radioValue !== prevState.radioValue) {
+        if (radioValue === '全部细班' && radioValue !== prevState.radioValue && geojsonFeature_area) {
             this.addTotalMapLayer();
         }
     }
@@ -678,72 +768,40 @@ class OnSite extends Component {
             <div className='map-container'>
                 <div
                     ref='appendBody'
-                    className='l-map r-main'
+                    className='dashboard-map r-main'
                     onMouseUp={this.onEndResize.bind(this)}
                     onMouseMove={this.onResizingMenu.bind(this)}
                 >
-                    <div
-                        className={`menuPanel ${
-                            this.state.isNotThree ? '' : 'hide'
-                        } ${
-                            this.state.menuIsExtend ? 'animExtend' : 'animFold'
-                        }`}
-                        style={
-                            this.state.menuIsExtend
-                                ? {
-                                    transform: 'translateX(0)',
-                                    width: this.state.menuWidth
-                                }
-                                : {
-                                    transform: `translateX(-${
-                                        this.state.menuWidth
-                                    }px)`,
-                                    width: this.state.menuWidth
-                                }
-                        }
-                    >
-                        <aside className='aside' draggable='false'>
-                            <Collapse
-                                defaultActiveKey={[this.options[0].value]}
-                                accordion
-                            >
-                                {this.options.map(option => {
-                                    return (
-                                        <Panel
-                                            key={option.value}
-                                            header={option.label}
-                                        >
-                                            {this.renderPanel(option)}
-                                        </Panel>
-                                    );
-                                })}
-                            </Collapse>
-                        </aside>
-                        {/* <div
-                            className='resizeSenseArea'
-                            onMouseDown={this.onStartResizeMenu.bind(this)}
-                        /> */}
-                        {this.state.menuIsExtend ? (
-                            <div
-                                className='foldBtn'
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this.extendAndFold.bind(this)}
-                            >
-                                收起
-                            </div>
-                        ) : (
-                            <div
-                                className='foldBtn'
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this.extendAndFold.bind(this)}
-                            >
-                                展开
-                            </div>
-                        )}
+                    <div className='menuButton'>
+                        {this.options.map(option => {
+                            return (
+                                <div className='menuButtonLayout'>
+                                    <Button type={this.state[option.value]?'primary':'info'} size='large' id={option.value} onClick={this.handleMenuButton.bind(this)}>{option.label}</Button>
+                                </div>
+                            );
+                        })}
                     </div>
                     {
+                        this.options.map(option => {
+                            if (this.state[option.value]) {
+                                return (
+                                    <div className='dashboard-menuPanel'>
+                                        <aside className='dashboard-aside' draggable='false'>
+                                            <div className='dashboard-asideTree'>
+                                                {this.renderPanel(option)}
+                                            </div>
+                                            
+                                        </aside>
+                                    </div>
+                                )
+                            } else {
+                                return ''
+                            }
+                        })
+                    }
+                    {
                         createBtnVisible ? (
-                            <div className='treeControl4'>
+                            <div className='editPolygonLayout'>
                                 <div>
                                     <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
                                     <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
@@ -761,7 +819,6 @@ class OnSite extends Component {
                     }
                     {this.state.isVisibleMapBtn ? (
                         <div className='treeControl'>
-                            {/* <iframe allowTransparency={true} className={styles.btnCtro}/> */}
                             <div>
                                 <Button
                                     type={
@@ -864,6 +921,9 @@ class OnSite extends Component {
             trackUsersTreeData
         } = this.state;
         let me = this;
+        this.setState({
+            trackTreeKeys: keys
+        });
         // 当前选中的节点
         let selectKey = info.node.props.eventKey;
         // 当前的选中状态
@@ -991,9 +1051,6 @@ class OnSite extends Component {
             }
         }
     }
-    // 巡检路线点击树节点
-    handleTrackSelect (keys, info) {
-    }
     /* 安全隐患多选树节点 */
     handleRiskCheck (keys, info) {
         const {
@@ -1003,10 +1060,13 @@ class OnSite extends Component {
         // 移除未选中的
         for (var i in riskMarkerLayerList) {
             let k = keys.find(k => k === i);
-            if (!k && riskMarkerLayerList[c]) {
-                this.map.removeLayer(riskMarkerLayerList[c]);
+            if (!k && riskMarkerLayerList[i]) {
+                this.map.removeLayer(riskMarkerLayerList[i]);
             }
         }
+        this.setState({
+            riskTreeKeys: keys
+        })
 
         let me = this;
         riskTreeData.forEach(risk => {
@@ -1038,15 +1098,17 @@ class OnSite extends Component {
             });
         });
     }
-    /* 安全隐患点击树节点 */
-    handleRiskSelect (keys, info) {
-    }
     /* 树种筛选多选树节点 */
     handleTreeTypeCheck (keys, info) {
         const {
             treeTypesLayerList,
-            treeTypesTreeData
+            treeTypesTreeData,
+            treetypeTreeIsDefault
         } = this.state;
+        this.setState({
+            treetypeTreeKeys: keys,
+            treetypeTreeIsDefault: treetypeTreeIsDefault + 1
+        })
         let me = this;
         // 当前选中的节点
         let selectKey = info.node.props.eventKey;
@@ -1147,8 +1209,6 @@ class OnSite extends Component {
             }
         }
     }
-    /* 树种筛选点击树节点 */
-    handleTreeTypeSelect (keys, info) {}
     // 养护任务点击
     handleCuringTaskSelect (keys, info) {
         const {
@@ -1161,7 +1221,8 @@ class OnSite extends Component {
         // 当前的选中状态
         let selected = info.selected;
         this.setState({
-            taskEventKey: eventKey
+            taskEventKey: eventKey,
+            curingTaskTreeKeys: keys
         });
         try {
             // 单选，需要先全部去除图层
@@ -1414,7 +1475,8 @@ class OnSite extends Component {
         let selected = info.selected;
         this.setState({
             leftkeycode: keys[0],
-            areaEventTitle
+            areaEventTitle,
+            areaTreeKeys: keys
         });
         try {
             const eventKey = keys[0];
