@@ -61,14 +61,14 @@ export default class TaskStatisEcharts extends Component {
                     type: 'value',
                     name: '',
                     axisLabel: {
-                        formatter: '{value} 平方米'
+                        formatter: '{value} 亩'
                     }
                 },
                 {
                     type: 'value',
                     name: '',
                     axisLabel: {
-                        formatter: '{value} 平方米'
+                        formatter: '{value} 亩'
                     }
                 }
             ],

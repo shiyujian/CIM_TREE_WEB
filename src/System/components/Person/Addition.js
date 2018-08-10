@@ -86,6 +86,10 @@ class Addition extends Component {
                             name: '施工角色',
                             value: roles.filter(role => role.grouptype === 1)
                         });
+                        systemRoles.push({
+                            name: '养护角色',
+                            value: roles.filter(role => role.grouptype === 4)
+                        });
                         break;
                     case 2:
                         systemRoles.push({

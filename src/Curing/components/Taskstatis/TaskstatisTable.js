@@ -191,31 +191,6 @@ export default class TaskStatisTable extends Component {
                     loading: false,
                     echartsChange: moment().unix()
                 });
-                // curingTasks.map(async (task) => {
-                //     if (task && task.ID) {
-                //         await curingTypes.map(async (type) => {
-                //             if (type.ID === task.CuringType) {
-                //                 // 获取task的养护类型
-                //                 console.log('type.Base_Name', type.Base_Name);
-                //                 task.typeName = type.Base_Name;
-                //                 // 获取task的细班和标段名称
-                //                 let regionData = await this.getThinClassName(task);
-                //                 let sectionName = regionData.regionSectionName;
-                //                 let thinClassName = regionData.regionThinName;
-                //                 task.sectionName = sectionName;
-                //                 task.thinClassName = thinClassName;
-                //                 taskTotalData.push(task);
-                //                 console.log('taskTotalData', taskTotalData);
-                //                 this.setState({
-                //                     taskTotalData,
-                //                     taskSearchData: taskTotalData,
-                //                     loading: false,
-                //                     echartsChange: moment().unix()
-                //                 });
-                //             }
-                //         });
-                //     }
-                // });
             } else {
                 this.reSetState();
             }
@@ -469,7 +444,7 @@ export default class TaskStatisTable extends Component {
             render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
         },
         {
-            title: '面积(m^2)',
+            title: '面积(亩)',
             dataIndex: 'Area'
         },
         {

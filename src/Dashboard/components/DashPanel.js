@@ -51,16 +51,15 @@ export default class DashPanel extends Component {
                         })}
                 </TreeNode>
             );
-            
         }
     }
 
     render () {
-        let { 
-            content = [], 
+        let {
+            content = [],
             trackTreeKeys = [],
             riskTreeKeys = []
-         } = this.props;
+        } = this.props;
         let contents = [];
         for (let j = 0; j < content.length; j++) {
             const element = content[j];
@@ -71,37 +70,37 @@ export default class DashPanel extends Component {
         return (
             <div className={this.genIconClass()}>
                 {
-                    this.featureName === 'geojsonFeature_track' ?
-                    (
-                        <Tree
-                            checkable
-                            showIcon
-                            onCheck={this.onCheck.bind(this)}
-                            showLine
-                            // onSelect={this.onSelect.bind(this)}
-                            defaultExpandAll
-                            defaultCheckedKeys={trackTreeKeys}
-                        >
-                            {contents.map(p => {
-                                return this.loop(p);
-                            })}
-                        </Tree>
-                    ) : 
-                    (
-                        <Tree
-                            checkable
-                            showIcon
-                            onCheck={this.onCheck.bind(this)}
-                            showLine
-                            // onSelect={this.onSelect.bind(this)}
-                            defaultExpandAll
-                            defaultCheckedKeys={riskTreeKeys}
-                        >
-                            {contents.map(p => {
-                                return this.loop(p);
-                            })}
-                        </Tree>
-                    )
+                    this.featureName === 'geojsonFeature_track'
+                        ? (
+                            <Tree
+                                checkable
+                                showIcon
+                                onCheck={this.onCheck.bind(this)}
+                                showLine
+                                // onSelect={this.onSelect.bind(this)}
+                                defaultExpandAll
+                                defaultCheckedKeys={trackTreeKeys}
+                            >
+                                {contents.map(p => {
+                                    return this.loop(p);
+                                })}
+                            </Tree>
+                        )
+                        : (
+                            <Tree
+                                checkable
+                                showIcon
+                                onCheck={this.onCheck.bind(this)}
+                                showLine
+                                // onSelect={this.onSelect.bind(this)}
+                                defaultExpandAll
+                                defaultCheckedKeys={riskTreeKeys}
+                            >
+                                {contents.map(p => {
+                                    return this.loop(p);
+                                })}
+                            </Tree>
+                        )
                 }
             </div>
         );

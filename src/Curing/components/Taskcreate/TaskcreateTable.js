@@ -36,7 +36,7 @@ export default class TaskCreateTable extends Component {
             createBtnVisible: false, // 先建任务Modal的可视
             polygonData: '', // 圈选地图图层
             // 框选地图内的数据
-            treeNum: 0, // 圈选地图内的树木数量
+            // treeNum: 0, // 圈选地图内的树木数量
             regionThinClass: [], // 圈选地图内的细班
             regionThinName: '', // 圈选区域内的细班名称
             regionThinNo: '', // 圈选区域内的细班code
@@ -301,33 +301,36 @@ export default class TaskCreateTable extends Component {
             if (curingTypes && curingTypes.length > 0) {
                 let curingTaskData = await getCuring({}, postData);
                 let curingTasks = curingTaskData.content;
-                curingTasks.map((task) => {
-                    if (task && task.ID) {
-                        curingTypes.map((type) => {
-                            if (type.ID === task.CuringType) {
-                                let exist = false;
-                                let childData = [];
-                                // 查看TreeData里有无这个类型的数据，有的话，push
-                                taskTreeData.map((treeNode) => {
-                                    if (treeNode.ID === type.ID) {
-                                        exist = true;
-                                        childData = treeNode.children;
-                                        childData.push((task));
-                                    }
-                                });
-                                // 没有的话，创建
-                                if (!exist) {
-                                    childData.push(task);
-                                    taskTreeData.push({
-                                        ID: type.ID,
-                                        Name: type.Base_Name,
-                                        children: childData
+                if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
+                    for (let i = 0; i < curingTasks.length; i++) {
+                        let task = curingTasks[i];
+                        if (task && task.ID) {
+                            curingTypes.map((type) => {
+                                if (type.ID === task.CuringType) {
+                                    let exist = false;
+                                    let childData = [];
+                                    // 查看TreeData里有无这个类型的数据，有的话，push
+                                    taskTreeData.map((treeNode) => {
+                                        if (treeNode.ID === type.ID) {
+                                            exist = true;
+                                            childData = treeNode.children;
+                                            childData.push((task));
+                                        }
                                     });
+                                    // 没有的话，创建
+                                    if (!exist) {
+                                        childData.push(task);
+                                        taskTreeData.push({
+                                            ID: type.ID,
+                                            Name: type.Base_Name,
+                                            children: childData
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
-                });
+                }
             }
             console.log('taskTreeData', taskTreeData);
             this.setState({
@@ -957,6 +960,7 @@ export default class TaskCreateTable extends Component {
                 wkt = wkt + getWktData(coords);
                 wkt = wkt + ')';
             }
+            regionArea = regionArea * 0.0015;
             // 包括的细班号
             let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
             let regionData = await this._getThinClassName(regionThinClass);
@@ -978,11 +982,11 @@ export default class TaskCreateTable extends Component {
             let regionSectionNo = regionData.regionSectionNo;
             let regionSectionName = regionData.regionSectionName;
             // 区域内树木数量
-            let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
+            // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
             this.setState({
                 wkt,
                 regionArea,
-                treeNum,
+                // treeNum,
                 regionData,
                 regionThinName,
                 regionThinNo,
@@ -1137,7 +1141,7 @@ export default class TaskCreateTable extends Component {
         this.setState({
             taskModalVisible: false,
             noLoading: false,
-            treeNum: 0,
+            // treeNum: 0,
             regionThinClass: [],
             regionThinName: '',
             regionThinNo: '',

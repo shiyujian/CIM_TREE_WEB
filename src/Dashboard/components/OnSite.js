@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-09 14:12:29
+ * @Last Modified time: 2018-08-09 20:32:30
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -90,7 +90,7 @@ class OnSite extends Component {
             // 树种筛选
             treeTypesTreeData: [], // 树种筛选树数据
             // 养护任务
-            TaskTreeData: [], // 养护任务数据
+            curingTaskTreeData: [], // 养护任务数据
             curingTypes: [], // 养护类型
             // 图层数据List
             areaLayerList: {}, // 区域地块图层list
@@ -121,7 +121,7 @@ class OnSite extends Component {
             treetypeTreeKeys: [],
             treetypeTreeIsDefault: 0,
             curingTaskTreeKeys: []
-            
+
         };
         this.tileLayer = null;
         this.tileLayer2 = null;
@@ -193,18 +193,17 @@ class OnSite extends Component {
     handleMenuButton (e) {
         let target = e.target;
         let buttonID = target.getAttribute('id');
-        this.options.map((option)=>{
+        this.options.map((option) => {
             if (option.value === buttonID) {
                 this.setState({
-                    [option.value]:!this.state[option.value]
-                })
+                    [option.value]: !this.state[option.value]
+                });
             } else {
                 this.setState({
-                    [option.value]:false
-                })
+                    [option.value]: false
+                });
             }
-        })
-        
+        });
     }
     /* 渲染菜单panel */
     renderPanel (option) {
@@ -219,8 +218,8 @@ class OnSite extends Component {
             riskTreeKeys,
             treetypeTreeKeys,
             treetypeTreeIsDefault,
-            curingTaskTreeKeys,
-        } = this.state
+            curingTaskTreeKeys
+        } = this.state;
         let content = this.getPanelData(option.value);
         if (option && option.value) {
             switch (option.value) {
@@ -239,7 +238,7 @@ class OnSite extends Component {
                                 areaTreeKeys={areaTreeKeys}
                             />
                         </Spin>
-                    )
+                    );
                 // 巡检路线
                 case 'geojsonFeature_track':
                     return (
@@ -316,7 +315,7 @@ class OnSite extends Component {
                 content = this.state.treeTypesTreeData;
                 break;
             case 'geojsonFeature_curingTask':
-                content = this.state.TaskTreeData;
+                content = this.state.curingTaskTreeData;
                 break;
         }
         return content;
@@ -474,7 +473,7 @@ class OnSite extends Component {
                 });
                 unitProject.children = smallClassList;
             }
-            this.setState({ 
+            this.setState({
                 areaTreeData: projectList,
                 areaTreeLoading: false
             });
@@ -509,7 +508,7 @@ class OnSite extends Component {
                     }
                 });
             }
-            me.setState({ 
+            me.setState({
                 trackUsersTreeData: orgArr,
                 trackTreeLoading: false
             });
@@ -593,7 +592,7 @@ class OnSite extends Component {
             for (let i in riskObj) {
                 risks.push(riskObj[i]);
             }
-            me.setState({ 
+            me.setState({
                 riskTreeData: risks,
                 riskTreeLoading: false
             });
@@ -620,7 +619,7 @@ class OnSite extends Component {
                 this.setState({
                     treeTypesTreeData,
                     treetypeTreeLoading: false
-                })
+                });
                 return;
             }
             treeData.map(tree => {
@@ -662,40 +661,43 @@ class OnSite extends Component {
         } = this.props;
         let curingTypesData = await getcCuringTypes();
         let curingTypes = curingTypesData && curingTypesData.content;
-        let TaskTreeData = [];
+        let curingTaskTreeData = [];
         if (curingTypes && curingTypes.length > 0) {
             let curingTaskData = await getCuring();
             let curingTasks = curingTaskData.content;
-            curingTasks.map((task) => {
-                if (task && task.ID) {
-                    curingTypes.map((type) => {
-                        if (type.ID === task.CuringType) {
-                            let exist = false;
-                            let childData = [];
-                            // 查看TreeData里有无这个类型的数据，有的话，push
-                            TaskTreeData.map((treeNode) => {
-                                if (treeNode.ID === type.ID) {
-                                    exist = true;
-                                    childData = treeNode.children;
-                                    childData.push((task));
-                                }
-                            });
-                            // 没有的话，创建
-                            if (!exist) {
-                                childData.push(task);
-                                TaskTreeData.push({
-                                    ID: type.ID,
-                                    Name: type.Base_Name,
-                                    children: childData
+            if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
+                for (let i = 0; i < curingTasks.length; i++) {
+                    let task = curingTasks[i];
+                    if (task && task.ID) {
+                        curingTypes.map((type) => {
+                            if (type.ID === task.CuringType) {
+                                let exist = false;
+                                let childData = [];
+                                // 查看TreeData里有无这个类型的数据，有的话，push
+                                curingTaskTreeData.map((treeNode) => {
+                                    if (treeNode.ID === type.ID) {
+                                        exist = true;
+                                        childData = treeNode.children;
+                                        childData.push((task));
+                                    }
                                 });
+                                // 没有的话，创建
+                                if (!exist) {
+                                    childData.push(task);
+                                    curingTaskTreeData.push({
+                                        ID: type.ID,
+                                        Name: type.Base_Name,
+                                        children: childData
+                                    });
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
-            });
+            }
         }
         this.setState({
-            TaskTreeData,
+            curingTaskTreeData,
             curingTypes,
             curingTaskTreeLoading: false
         });
@@ -776,7 +778,7 @@ class OnSite extends Component {
                         {this.options.map(option => {
                             return (
                                 <div className='menuButtonLayout'>
-                                    <Button type={this.state[option.value]?'primary':'info'} size='large' id={option.value} onClick={this.handleMenuButton.bind(this)}>{option.label}</Button>
+                                    <Button type={this.state[option.value] ? 'primary' : 'info'} size='large' id={option.value} onClick={this.handleMenuButton.bind(this)}>{option.label}</Button>
                                 </div>
                             );
                         })}
@@ -790,12 +792,12 @@ class OnSite extends Component {
                                             <div className='dashboard-asideTree'>
                                                 {this.renderPanel(option)}
                                             </div>
-                                            
+
                                         </aside>
                                     </div>
-                                )
+                                );
                             } else {
-                                return ''
+                                return '';
                             }
                         })
                     }
@@ -803,9 +805,9 @@ class OnSite extends Component {
                         createBtnVisible ? (
                             <div className='editPolygonLayout'>
                                 <div>
-                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
-                                    <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
-                                    <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
+                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateMeasureOk.bind(this)}>确定</Button>
+                                    <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateMeasureRetreat.bind(this)}>上一步</Button>}
+                                    <Button type='danger' onClick={this._handleCreateMeasureCancel.bind(this)}>撤销</Button>
                                 </div>
                             </div>
                         ) : ''
@@ -1027,7 +1029,7 @@ class OnSite extends Component {
                         trackMarkerLayerList[selectKey] = trackMarkerLayer;
                     }
 
-                    let polyline = L.polyline(latlngs, { color: 'blue' }).addTo(
+                    let polyline = L.polyline(latlngs, { color: 'red' }).addTo(
                         this.map
                     );
                     trackLayerList[selectKey] = polyline;
@@ -1066,7 +1068,7 @@ class OnSite extends Component {
         }
         this.setState({
             riskTreeKeys: keys
-        })
+        });
 
         let me = this;
         riskTreeData.forEach(risk => {
@@ -1108,7 +1110,7 @@ class OnSite extends Component {
         this.setState({
             treetypeTreeKeys: keys,
             treetypeTreeIsDefault: treetypeTreeIsDefault + 1
-        })
+        });
         let me = this;
         // 当前选中的节点
         let selectKey = info.node.props.eventKey;
@@ -1614,7 +1616,7 @@ class OnSite extends Component {
                 return area;
             } else if (geo.properties.type === 'curingTask') {
                 let layer = L.polygon(geo.geometry.coordinates, {
-                    color: 'white',
+                    color: 'blue',
                     fillColor: '#93B9F2',
                     fillOpacity: 0.2
                 }).addTo(this.map);
@@ -1646,7 +1648,7 @@ class OnSite extends Component {
             console.log('e', e);
         }
     }
-    _handleCreateTaskOk = async () => {
+    _handleCreateMeasureOk = async () => {
         const {
             coordinates
         } = this.state;
@@ -1661,7 +1663,7 @@ class OnSite extends Component {
             console.log('e', e);
         }
     }
-    _handleCreateTaskCancel = async () => {
+    _handleCreateMeasureCancel = async () => {
         const {
             polygonData
         } = this.state;
@@ -1673,7 +1675,7 @@ class OnSite extends Component {
         });
         this.resetButState();
     }
-    _handleCreateTaskRetreat = async () => {
+    _handleCreateMeasureRetreat = async () => {
         const {
             coordinates
         } = this.state;

@@ -40,10 +40,11 @@ class TaskReportModal extends Component {
             taskMess,
             polygonData,
             regionArea,
-            treeNum,
+            // treeNum,
             regionThinName,
             regionSectionName
         } = this.props;
+        console.log('taskMess', taskMess);
         if (taskMess) {
             if (polygonData) {
                 setFieldsValue({
@@ -54,7 +55,7 @@ class TaskReportModal extends Component {
                     taskStatus: taskMess.status ? taskMess.status : '',
                     taskSection: regionSectionName || '',
                     taskThinClass: regionThinName || '',
-                    taskNum: treeNum || 0,
+                    // taskNum: treeNum || 0,
                     taskCuringMans: taskMess.CuringMans ? taskMess.CuringMans : '',
                     taskTreeArea: regionArea || 0,
                     attachment: undefined
@@ -68,7 +69,7 @@ class TaskReportModal extends Component {
                     taskStatus: taskMess.status ? taskMess.status : '',
                     taskSection: taskMess.sectionName ? taskMess.sectionName : '',
                     taskThinClass: taskMess.thinClassName ? taskMess.thinClassName : '',
-                    taskNum: taskMess.Num ? taskMess.Num : 0,
+                    // taskNum: taskMess.Num ? taskMess.Num : 0,
                     taskCuringMans: taskMess.CuringMans ? taskMess.CuringMans : '',
                     taskTreeArea: taskMess.Area ? taskMess.Area : 0,
                     attachment: undefined
@@ -277,7 +278,7 @@ class TaskReportModal extends Component {
                             </FormItem>
                         </Row>
                         <Row>
-                            <FormItem {...FormItemLayout} label='面积(m^2)'>
+                            <FormItem {...FormItemLayout} label='面积(亩)'>
                                 {getFieldDecorator('taskTreeArea', {
                                     rules: [
                                         { required: true, message: '请输入面积' }
@@ -287,7 +288,7 @@ class TaskReportModal extends Component {
                                 )}
                             </FormItem>
                         </Row>
-                        <Row>
+                        {/* <Row>
                             <FormItem {...FormItemLayout} label='树木数量(棵)'>
                                 {getFieldDecorator('taskNum', {
                                     rules: [
@@ -297,7 +298,7 @@ class TaskReportModal extends Component {
                                     <Input readOnly />
                                 )}
                             </FormItem>
-                        </Row>
+                        </Row> */}
                         <Row>
                             <FormItem {...FormItemLayout} label='细班'>
                                 {getFieldDecorator('taskThinClass', {
@@ -379,8 +380,8 @@ class TaskReportModal extends Component {
             wkt,
             polygonData,
             regionThinNo,
-            regionArea,
-            treeNum
+            regionArea
+            // treeNum
         } = this.props;
         const {
             fileList
@@ -409,7 +410,8 @@ class TaskReportModal extends Component {
                 if (polygonData) {
                     postData = {
                         'ID': taskMess.ID,
-                        'Num': treeNum || 0,
+                        // 'Num': treeNum || 0,
+                        'Num': 0,
                         'ThinClass': regionThinNo,
                         'Area': regionArea || 0,
                         'WKT': wkt,
@@ -451,7 +453,7 @@ class TaskReportModal extends Component {
             taskStatus: '',
             taskSection: '',
             taskThinClass: '',
-            taskNum: '',
+            // taskNum: '',
             taskCuringMans: '',
             taskTreeArea: ''
         });

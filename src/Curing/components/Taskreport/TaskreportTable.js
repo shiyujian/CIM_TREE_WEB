@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal, Collapse, Notification, Spin
+    Button, Modal, Collapse, Notification, Spin, Checkbox
 } from 'antd';
 import PanelTree from '../PanelTree';
 import TaskTree from '../TaskTree';
@@ -18,33 +18,40 @@ export default class TaskReportTable extends Component {
             isNotThree: true,
             menuIsExtend: true /* 菜单是否展开 */,
             menuWidth: 260 /* 菜单宽度 */,
-            isVisibleMapBtn: true,
             mapLayerBtnType: true,
             selectedMenu: '1',
+            // 区域地块树
+            areaTreeData: [],
             areaLayerList: {}, // 细班选择图层list
-            TaskTreeData: [], // 养护任务tree数据
+            areaTreeLoading: true,
+            // 养护任务树
+            taskTreeData: [], // 养护任务tree数据
+            taskTreeLoading: true,
             taskLayerList: {}, // 任务图层list
-            markerLayerList: {}, // 任务图标图层list
+            taskMarkerLayerList: {}, // 任务图标图层list
             curingTypes: [], // 养护类型
             taskMessList: {}, // 养护任务详情list
-            isShowTaskModal: false,
-            taskMess: '',
+            taskEventKey: '',
+            taskTrackLayerList: {}, // 养护轨迹list
+            taskCuringManList: {}, // 养护人员list
+            // 手动框选
             createBtnVisible: false,
             coordinates: [],
             polygonData: '', // 圈选地图图层
-            treeNum: 0, // 圈选地图内的树木数量
+            // 养护任务Modal
+            selected: false,
+            isShowTaskModal: false,
+            taskMess: '',
+            // treeNum: 0, // 圈选地图内的树木数量
             regionThinClass: [], // 圈选地图内的细班
-            totalThinClass: [], // 全部细班
             regionThinName: '', // 圈选区域内的细班名称
             regionThinNo: '', // 圈选区域内的细班code
             regionSectionNo: '', // 圈选区域内的标段code
             regionSectionName: '', // 圈选区域内的标段名称
             regionArea: 0, // 圈选区域内面积
             wkt: '',
-            selected: false,
             noLoading: false,
-            taskEventKey: '',
-            treeLoading: false
+            treeLayerChecked: true
         };
         this.checkMarkers = [];
         this.tileLayer = null;
@@ -88,7 +95,7 @@ export default class TaskReportTable extends Component {
         // 初始化地图
         await this._initMap();
         // 获取地块树数据
-        await this._loadAreaData();
+        // await this._loadAreaData();
         // 获取任务数据
         await this._loadTaskData();
     }
@@ -163,9 +170,6 @@ export default class TaskReportTable extends Component {
             actions: { getTreeNodeList, getLittleBan }
         } = this.props;
         try {
-            this.setState({
-                treeLoading: true
-            });
             let rst = await getTreeNodeList();
             if (rst instanceof Array && rst.length > 0) {
                 rst.forEach((item, index) => {
@@ -234,8 +238,8 @@ export default class TaskReportTable extends Component {
                 unitProject.children = smallClassList;
             }
             this.setState({
-                treeLists: projectList,
-                treeLoading: false
+                areaTreeData: projectList,
+                areaTreeLoading: false
             });
         } catch (e) {
             console.log(e);
@@ -252,50 +256,55 @@ export default class TaskReportTable extends Component {
         this.user = getUser();
         let sections = this.user.sections;
         sections = JSON.parse(sections);
+        let taskTreeData = [];
+        let curingTypes = [];
         if (sections && sections instanceof Array && sections.length > 0) {
             let section = sections[0];
             let postData = {
                 section: section
             };
             let curingTypesData = await getcCuringTypes();
-            let curingTypes = curingTypesData && curingTypesData.content;
+            curingTypes = curingTypesData && curingTypesData.content;
             if (curingTypes && curingTypes.length > 0) {
                 let curingTaskData = await getCuring({}, postData);
-                let curingTasks = curingTaskData.content;
-                let TaskTreeData = [];
-                curingTasks.map((task) => {
-                    if (task && task.ID) {
-                        curingTypes.map((type) => {
-                            if (type.ID === task.CuringType) {
-                                let exist = false;
-                                let childData = [];
-                                // 查看TreeData里有无这个类型的数据，有的话，push
-                                TaskTreeData.map((treeNode) => {
-                                    if (treeNode.ID === type.ID) {
-                                        exist = true;
-                                        childData = treeNode.children;
-                                        childData.push((task));
-                                    }
-                                });
-                                // 没有的话，创建
-                                if (!exist) {
-                                    childData.push(task);
-                                    TaskTreeData.push({
-                                        ID: type.ID,
-                                        Name: type.Base_Name,
-                                        children: childData
+                let curingTasks = curingTaskData && curingTaskData.content;
+                if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
+                    for (let i = 0; i < curingTasks.length; i++) {
+                        let task = curingTasks[i];
+                        if (task && task.ID) {
+                            curingTypes.map((type) => {
+                                if (type.ID === task.CuringType) {
+                                    let exist = false;
+                                    let childData = [];
+                                    // 查看TreeData里有无这个类型的数据，有的话，push
+                                    taskTreeData.map((treeNode) => {
+                                        if (treeNode.ID === type.ID) {
+                                            exist = true;
+                                            childData = treeNode.children;
+                                            childData.push((task));
+                                        }
                                     });
+                                    // 没有的话，创建
+                                    if (!exist) {
+                                        childData.push(task);
+                                        taskTreeData.push({
+                                            ID: type.ID,
+                                            Name: type.Base_Name,
+                                            children: childData
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
-                });
-                this.setState({
-                    TaskTreeData,
-                    curingTypes
-                });
+                }
             }
         }
+        this.setState({
+            taskTreeData,
+            curingTypes,
+            taskTreeLoading: false
+        });
     }
     render () {
         const {
@@ -331,6 +340,9 @@ export default class TaskReportTable extends Component {
                         }
                     >
                         <aside className='aside' draggable='false'>
+                            <div style={{margin: 10}}>
+                                <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
+                            </div>
                             <Collapse
                                 defaultActiveKey={[this.options[0].value]}
                                 accordion
@@ -365,34 +377,30 @@ export default class TaskReportTable extends Component {
                             </div>
                         )}
                     </div>
-                    {this.state.isVisibleMapBtn ? (
-                        <div className='treeControl'>
-                            <div>
-                                <Button
-                                    type={
-                                        this.state.mapLayerBtnType
-                                            ? 'primary'
-                                            : 'info'
-                                    }
-                                    onClick={this._toggleTileLayer.bind(this, 1)}
-                                >
-                                    卫星图
-                                </Button>
-                                <Button
-                                    type={
-                                        this.state.mapLayerBtnType
-                                            ? 'info'
-                                            : 'primary'
-                                    }
-                                    onClick={this._toggleTileLayer.bind(this, 2)}
-                                >
-                                    地图
-                                </Button>
-                            </div>
+                    <div className='treeControl'>
+                        <div>
+                            <Button
+                                type={
+                                    this.state.mapLayerBtnType
+                                        ? 'primary'
+                                        : 'info'
+                                }
+                                onClick={this._toggleTileLayer.bind(this, 1)}
+                            >
+                                卫星图
+                            </Button>
+                            <Button
+                                type={
+                                    this.state.mapLayerBtnType
+                                        ? 'info'
+                                        : 'primary'
+                                }
+                                onClick={this._toggleTileLayer.bind(this, 2)}
+                            >
+                                地图
+                            </Button>
                         </div>
-                    ) : (
-                        ''
-                    )}
+                    </div>
                     <div className='treeControl2'>
                         <div className='buttonStyle'>
                             {
@@ -443,36 +451,70 @@ export default class TaskReportTable extends Component {
                 </div>
             </div>);
     }
+    treeLayerChange = () => {
+        const {
+            treeLayerChecked
+        } = this.state;
+        console.log('treeLayerChecked', treeLayerChecked);
+        if (treeLayerChecked) {
+            if (this.tileLayer2) {
+                this.map.removeLayer(this.tileLayer2);
+            }
+        } else {
+            if (this.tileLayer2) {
+                this.tileLayer2.addTo(this.map);
+            } else {
+                this.tileLayer2 = L.tileLayer(
+                    window.config.DASHBOARD_ONSITE +
+                                '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    {
+                        opacity: 1.0,
+                        subdomains: [1, 2, 3],
+                        minZoom: 11,
+                        maxZoom: 21,
+                        storagetype: 0,
+                        tiletype: 'wtms'
+                    }
+                ).addTo(this.map);
+            }
+        }
+        this.setState({
+            treeLayerChecked: !treeLayerChecked
+        });
+    }
     /* 渲染菜单panel */
     renderPanel (option) {
         const {
-            treeLists,
-            TaskTreeData,
-            treeLoading
+            areaTreeData,
+            taskTreeData,
+            areaTreeLoading,
+            taskTreeLoading
         } = this.state;
         if (option && option.value) {
             switch (option.value) {
                 // 区域地块
                 case 'geojsonFeature_area':
                     return (
-                        <Spin spinning={treeLoading}>
+                        <Spin spinning={areaTreeLoading}>
                             <PanelTree
                                 {...this.props}
                                 style={{ height: '200px' }}
                                 onCheck={this._handleAreaCheck.bind(this)}
                                 onSelect={this._handleAreaSelect.bind(this)}
-                                content={treeLists}
+                                content={areaTreeData}
                             />
                         </Spin>
                     );
                     // 养护任务
                 case 'geojsonFeature_task':
                     return (
-                        <TaskTree
-                            onCheck={this.handleTaskCheck.bind(this)}
-                            onSelect={this.handleTaskSelect.bind(this)}
-                            content={TaskTreeData}
-                        />
+                        <Spin spinning={taskTreeLoading}>
+                            <TaskTree
+                                onCheck={this.handleTaskCheck.bind(this)}
+                                onSelect={this.handleTaskSelect.bind(this)}
+                                content={taskTreeData}
+                            />
+                        </Spin>
                     );
             }
         }
@@ -569,7 +611,7 @@ export default class TaskReportTable extends Component {
     handleTaskSelect = async (keys, info) => {
         const {
             taskLayerList,
-            markerLayerList
+            taskMarkerLayerList
         } = this.state;
         let me = this;
         // 当前选中的节点
@@ -593,8 +635,8 @@ export default class TaskReportTable extends Component {
                     this.map.removeLayer(layer);
                 });
             }
-            for (let i in markerLayerList) {
-                this.map.removeLayer(markerLayerList[i]);
+            for (let i in taskMarkerLayerList) {
+                this.map.removeLayer(taskMarkerLayerList[i]);
             }
             // 选中加载图层
             if (selected) {
@@ -603,8 +645,8 @@ export default class TaskReportTable extends Component {
                         layer.addTo(me.map);
                         me.map.fitBounds(layer.getBounds());
                     });
-                    if (markerLayerList[eventKey]) {
-                        markerLayerList[eventKey].addTo(me.map);
+                    if (taskMarkerLayerList[eventKey]) {
+                        taskMarkerLayerList[eventKey].addTo(me.map);
                     }
                     this.setState({
                         selected
@@ -624,16 +666,26 @@ export default class TaskReportTable extends Component {
     _addTaskLayer = async (eventKey) => {
         const {
             actions: {
-                getCuringMessage
+                getCuringMessage,
+                getCuringPositions
             }
         } = this.props;
-        let postData = {
-            id: eventKey
-        };
-        let taskMess = await getCuringMessage(postData);
-        let planWkt = taskMess.PlanWKT;
-        let str = '';
         try {
+            let taskMessPostData = {
+                id: eventKey
+            };
+            let positionPostData = {
+                curingid: eventKey
+            };
+            let taskMess = await getCuringMessage(taskMessPostData);
+            let taskPositionMess = await getCuringPositions({}, positionPostData);
+            console.log('taskPositionMess', taskPositionMess);
+            let taskTracks = taskPositionMess && taskPositionMess.content;
+            if (taskTracks && taskTracks instanceof Array && taskTracks.length > 0) {
+                this._addTrackLayer(taskTracks, eventKey);
+            }
+            let planWkt = taskMess.PlanWKT;
+            let str = '';
             if (planWkt.indexOf('MULTIPOLYGON') !== -1) {
                 let data = planWkt.slice(planWkt.indexOf('(') + 2, planWkt.indexOf('))') + 1);
                 let arr = data.split('),(');
@@ -666,7 +718,7 @@ export default class TaskReportTable extends Component {
         const {
             taskLayerList,
             curingTypes,
-            markerLayerList,
+            taskMarkerLayerList,
             taskMessList
         } = this.state;
         try {
@@ -749,13 +801,62 @@ export default class TaskReportTable extends Component {
                 )
             );
             marker.addTo(this.map);
-            markerLayerList[eventKey] = marker;
+            taskMarkerLayerList[eventKey] = marker;
             this.setState({
-                markerLayerList,
+                taskMarkerLayerList,
                 selected: true
             });
         } catch (e) {
             console.log('处理str', e);
+        }
+    }
+    _addTrackLayer (taskTracks, eventKey) {
+        const {
+            taskTrackLayerList,
+            taskCuringManList
+        } = this.state;
+        try {
+            for (let i in taskTrackLayerList) {
+                taskTrackLayerList[i].map((layer) => {
+                    this.map.removeLayer(layer);
+                });
+            }
+            if (taskTrackLayerList[eventKey]) {
+                taskTrackLayerList[eventKey].map((layer) => {
+                    layer.addTo(this.map);
+                });
+            } else {
+                let tracksList = [];
+                tracksList[0] = [];
+                let CuringManList = [];
+                let CuringManTimes = 0;
+                let CuringMan = taskTracks[0].CuringMan;
+                CuringManList.push(CuringMan);
+                taskTracks.map((track) => {
+                    if (CuringMan !== track.CuringMan) {
+                        CuringManList.push(CuringMan);
+                        CuringManTimes = CuringManTimes + 1;
+                    }
+                    tracksList[CuringManTimes].push([track.Y, track.X]);
+                });
+                console.log('tracksList', tracksList);
+                console.log('CuringManList', CuringManList);
+                let layerList = [];
+                tracksList.map((track) => {
+                    let polylineData = L.polyline(track, { color: 'yellow' }).addTo(
+                        this.map
+                    );
+                    layerList.push(polylineData);
+                });
+                taskTrackLayerList[eventKey] = layerList;
+                taskCuringManList[eventKey] = CuringManList;
+                this.setState({
+                    taskTrackLayerList,
+                    taskCuringManList
+                });
+            };
+        } catch (e) {
+            console.log('_addTrackLayer', e);
         }
     }
     getTaskThinClassName = (task) => {
@@ -888,6 +989,7 @@ export default class TaskReportTable extends Component {
                 wkt = wkt + getHandleWktData(coordinates);
                 wkt = wkt + ')';
                 regionArea = computeSignedArea(coordinates, 2);
+                regionArea = regionArea * 0.0015;
                 // 包括的细班号
                 let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
                 let regionData = await this._getThinClassName(regionThinClass);
@@ -907,11 +1009,11 @@ export default class TaskReportTable extends Component {
                 let regionSectionNo = regionData.regionSectionNo;
                 let regionSectionName = regionData.regionSectionName;
                 // 区域内树木数量
-                let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
+                // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
                 this.setState({
                     wkt,
                     regionArea,
-                    treeNum,
+                    // treeNum,
                     regionData,
                     regionThinName,
                     regionThinNo,

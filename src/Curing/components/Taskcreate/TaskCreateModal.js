@@ -157,7 +157,7 @@ class TaskCreateModal extends Component {
                             </FormItem>
                         </Row>
                         <Row>
-                            <FormItem {...FormItemLayout} label='面积(m^2)'>
+                            <FormItem {...FormItemLayout} label='面积(亩)'>
                                 {getFieldDecorator('taskTreeArea', {
                                     initialValue: `${regionArea}`,
                                     rules: [
@@ -192,7 +192,7 @@ class TaskCreateModal extends Component {
                                 )}
                             </FormItem>
                         </Row>
-                        <Row>
+                        {/* <Row>
                             <FormItem {...FormItemLayout} label='树木数量(棵)'>
                                 {getFieldDecorator('taskTreeNum', {
                                     initialValue: `${treeNum}`,
@@ -203,7 +203,7 @@ class TaskCreateModal extends Component {
                                     <Input readOnly />
                                 )}
                             </FormItem>
-                        </Row>
+                        </Row> */}
                         {/* <Row>
                         <FormItem {...FormItemLayout} label='备注'>
                             {getFieldDecorator('taskRemark', {
@@ -287,7 +287,6 @@ class TaskCreateModal extends Component {
                 try {
                     let CuringMans = '';
                     teamPerson.map((person, index) => {
-                        debugger;
                         if (index === 0) {
                             CuringMans = CuringMans + `${person.User}`;
                         } else {
@@ -303,7 +302,8 @@ class TaskCreateModal extends Component {
                         'CuringMans': CuringMans,
                         'CuringMode': 0,
                         'CuringType': values.taskType,
-                        'Num': Number(values.taskTreeNum),
+                        // 'Num': Number(values.taskTreeNum),
+                        'Num': 0,
                         'PlanEndTime': moment(values.taskTime[1]._d).format('YYYY-MM-DD HH:mm:ss'),
                         'PlanStartTime': moment(values.taskTime[0]._d).format('YYYY-MM-DD HH:mm:ss'),
                         'PlanWKT': wkt,
