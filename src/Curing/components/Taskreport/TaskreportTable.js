@@ -95,7 +95,7 @@ export default class TaskReportTable extends Component {
         // 初始化地图
         await this._initMap();
         // 获取地块树数据
-        // await this._loadAreaData();
+        await this._loadAreaData();
         // 获取任务数据
         await this._loadTaskData();
     }
@@ -836,13 +836,15 @@ export default class TaskReportTable extends Component {
                     if (CuringMan !== track.CuringMan) {
                         CuringManList.push(CuringMan);
                         CuringManTimes = CuringManTimes + 1;
+                        tracksList[CuringManTimes] = [];
+                        CuringMan = track.CuringMan;
                     }
                     tracksList[CuringManTimes].push([track.Y, track.X]);
                 });
                 console.log('tracksList', tracksList);
                 console.log('CuringManList', CuringManList);
                 let layerList = [];
-                tracksList.map((track) => {
+                tracksList.map((track, index) => {
                     let polylineData = L.polyline(track, { color: 'yellow' }).addTo(
                         this.map
                     );
