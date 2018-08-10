@@ -1,1 +1,0 @@
-export FaithTable from './FaithTable';

@@ -1,1 +1,0 @@
-export EnterTable from './EnterTable';

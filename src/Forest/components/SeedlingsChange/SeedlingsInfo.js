@@ -528,35 +528,36 @@ export default class SeedlingsChange extends Component {
         ];
         header = (
             <div>
-                <Row>
-                    <Col xl={3} lg={4} md={5} className='mrg10'>
-                        <span>顺序码：</span>
-                        <Input className='forestcalcw2 mxw100' id='sxmID' />
-                    </Col>
-                    <Col xl={3} lg={4} md={5} className='mrg10'>
-                        <span>备注关键字：</span>
+                <Row className='forest-search-layout'>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>顺序码：</span>
+                        <Input className='forest-forestcalcw4' id='sxmID' />
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>备注关键字：</span>
                         <Input
-                            className='forestcalcw2 mxw100'
+                            className='forest-forestcalcw4'
                             id='remarkValueID'
                         />
-                    </Col>
-                    <Col xl={10} lg={12} md={14} className='mrg10'>
-                        <span>时间选择：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>时间选择：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
                             defaultValue={[
                                 moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),
                                 moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')
                             ]}
+                            className='forest-forestcalcw4'
                             showTime={{ format: 'HH:mm:ss' }}
                             format={'YYYY/MM/DD HH:mm:ss'}
                             onChange={this.datepick.bind(this)}
                             onOk={this.datepick.bind(this)}
                         />
-                    </Col>
+                    </div>
                 </Row>
                 <Row>
-                    <Col span={2} className='mrg10'>
+                    <Col span={2}>
                         <Button
                             type='primary'
                             onClick={this.handleTableChange.bind(this, {
@@ -566,8 +567,8 @@ export default class SeedlingsChange extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={20} className='quryrstcnt mrg10' />
-                    <Col span={2} className='mrg10'>
+                    <Col span={20} className='forest-quryrstcnt' />
+                    <Col span={2}>
                         <Button
                             type='primary'
                             onClick={this.resetinput.bind(this)}

@@ -7,8 +7,15 @@ import { PROJECT_UNITS } from '_platform/api';
 import { PkCodeTree } from '../components';
 import { ContrastTable } from '../components/Contrastinfo';
 import { actions as platformActions } from '_platform/store/global';
-import { Main, Aside, Body, Sidebar, Content, DynamicTitle } from '_platform/components/layout';
-import { getUser } from '_platform/auth'
+import {
+    Main,
+    Aside,
+    Body,
+    Sidebar,
+    Content,
+    DynamicTitle
+} from '_platform/components/layout';
+import { getUser } from '_platform/auth';
 const Option = Select.Option;
 @connect(
     state => {
@@ -16,13 +23,16 @@ const Option = Select.Option;
         return { ...forest, platform };
     },
     dispatch => ({
-        actions: bindActionCreators({ ...actions, ...platformActions }, dispatch),
-    }),
+        actions: bindActionCreators(
+            { ...actions, ...platformActions },
+            dispatch
+        )
+    })
 )
 export default class Contrastinfo extends Component {
     biaoduan = [];
-    constructor(props) {
-        super(props)
+    constructor (props) {
+        super(props);
         this.state = {
             treeLists: [],
             treetypeoption: [],
@@ -32,64 +42,93 @@ export default class Contrastinfo extends Component {
             standardoption: [],
             leftkeycode: '',
             resetkey: 0,
-            bigType: '',
-        }
+            bigType: ''
+        };
     }
-    getbigTypeName(type) {
+    getbigTypeName (type) {
         switch (type) {
             case '1':
-                return '常绿乔木'
+                return '常绿乔木';
             case '2':
-                return '落叶乔木'
+                return '落叶乔木';
             case '3':
-                return '亚乔木'
+                return '亚乔木';
             case '4':
-                return '灌木'
+                return '灌木';
             case '5':
-                return '草本'
+                return '草本';
             default:
-                return ''
+                return '';
         }
     }
-    componentDidMount() {
-        const { actions: { getTree, getTreeList, getTreeNodeList,getLittleBanAll,setkeycode }, treetypes,littleBanAll, platform: { tree = {} } } = this.props;
+    componentDidMount () {
+        const {
+            actions: {
+                getTree,
+                getTreeList,
+                getTreeNodeList,
+                getLittleBanAll,
+                setkeycode
+            },
+            treetypes,
+            littleBanAll,
+            platform: { tree = {} }
+        } = this.props;
         this.biaoduan = [];
-        for(let i=0;i<PROJECT_UNITS.length;i++){
+        for (let i = 0; i < PROJECT_UNITS.length; i++) {
             PROJECT_UNITS[i].units.map(item => {
                 this.biaoduan.push(item);
-            })
+            });
         }
-        setkeycode('')
+        setkeycode('');
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
         if (!tree.bigTreeList) {
-            getTreeNodeList()
+            getTreeNodeList();
         }
-        if(!littleBanAll){
-            getLittleBanAll()
+        if (!littleBanAll) {
+            getLittleBanAll();
         }
-        //类型
+        // 类型
         let typeoption = [
-            <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={'1'}>常绿乔木</Option>,
-            <Option key={'2'} value={'2'}>落叶乔木</Option>,
-            <Option key={'3'} value={'3'}>亚乔木</Option>,
-            <Option key={'4'} value={'4'}>灌木</Option>,
-            <Option key={'5'} value={'5'}>地被</Option>,
+            <Option key={'-1'} value={''} title={'全部'}>
+                全部
+            </Option>,
+            <Option key={'1'} value={'1'} title={'常绿乔木'}>
+                常绿乔木
+            </Option>,
+            <Option key={'2'} value={'2'} title={'落叶乔木'}>
+                落叶乔木
+            </Option>,
+            <Option key={'3'} value={'3'} title={'亚乔木'}>
+                亚乔木
+            </Option>,
+            <Option key={'4'} value={'4'} title={'灌木'}>
+                灌木
+            </Option>,
+            <Option key={'5'} value={'5'} title={'地被'}>
+                地被
+            </Option>
         ];
-        this.setState({ typeoption })
-        //合标
+        this.setState({ typeoption });
+        // 合标
         let standardoption = [
-            <Option key={'-1'} value={''}>全部</Option>,
-            <Option key={'1'} value={'1'}>合标</Option>,
-            <Option key={'2'} value={'0'}>不合标</Option>,
-        ]
-        this.setState({ standardoption })
+            <Option key={'-1'} value={''} title={'全部'}>
+                全部
+            </Option>,
+            <Option key={'1'} value={'1'} title={'合标'}>
+                合标
+            </Option>,
+            <Option key={'2'} value={'0'} title={'不合标'}>
+                不合标
+            </Option>
+        ];
+        this.setState({ standardoption });
     }
 
-    render() {
+    render () {
         const { keycode } = this.props;
         const {
             leftkeycode,
@@ -99,19 +138,22 @@ export default class Contrastinfo extends Component {
             typeoption,
             bigType,
             standardoption,
-            resetkey,
+            resetkey
         } = this.state;
-        const { platform: { tree = {} } } = this.props;
+        const {
+            platform: { tree = {} }
+        } = this.props;
         let treeList = [];
         if (tree.bigTreeList) {
-            treeList = tree.bigTreeList
+            treeList = tree.bigTreeList;
         }
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title="苗木对比信息" {...this.props} />
+                    <DynamicTitle title='苗木对比信息' {...this.props} />
                     <Sidebar width={190}>
-                        <PkCodeTree treeData={treeList}
+                        <PkCodeTree
+                            treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
@@ -134,19 +176,22 @@ export default class Contrastinfo extends Component {
                         />
                     </Content>
                 </Main>
-            </Body>);
+            </Body>
+        );
     }
-    //标段选择, 重新获取: 树种
-    sectionselect(value) {
-        const { actions: { setkeycode } } = this.props;
+    // 标段选择, 重新获取: 树种
+    sectionselect (value) {
+        const {
+            actions: { setkeycode }
+        } = this.props;
         const { leftkeycode } = this.state;
-        setkeycode(leftkeycode)
-        //树种
+        setkeycode(leftkeycode);
+        // 树种
         this.typeselect('');
     }
 
-    //设置标段选项
-    setSectionOption(rst) {
+    // 设置标段选项
+    setSectionOption (rst) {
         let user = getUser();
         let section = JSON.parse(user.sections);
         if (rst instanceof Array) {
@@ -154,84 +199,100 @@ export default class Contrastinfo extends Component {
             let sectionOptions = [];
             let sectionoption = rst.map((item, index) => {
                 sectionList.push(item);
-            })
+            });
             let sectionData = [...new Set(sectionList)];
             sectionData.sort();
             sectionData.map(sec => {
-                sectionOptions.push(<Option key={sec.code} value={sec.code}>{sec.value}</Option>)
-            })
+                sectionOptions.push(
+                    <Option key={sec.code} value={sec.code} title={sec.value}>
+                        {sec.value}
+                    </Option>
+                );
+            });
             // if (section.length === 0) {   //admin用户赋给全部的查阅权限
             //     sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
             // }
-            this.setState({ sectionoption: sectionOptions })
+            this.setState({ sectionoption: sectionOptions });
         }
     }
 
-    //类型选择, 重新获取: 树种
-    typeselect(value) {
+    // 类型选择, 重新获取: 树种
+    typeselect (value) {
         const { treetypes } = this.props;
         this.setState({ bigType: value });
         let selectTreeType = [];
         treetypes.map(item => {
-           
-            if(item.TreeTypeNo == null){
+            if (item.TreeTypeNo == null) {
                 // console.log('itemitemitemitemitem',item)
             }
-            if(item.TreeTypeNo){
-                try{
+            if (item.TreeTypeNo) {
+                try {
                     let code = item.TreeTypeNo.substr(0, 1);
                     if (code === value) {
                         selectTreeType.push(item);
                     }
-                }catch(e){
-
-                }
-                
+                } catch (e) {}
             }
-            
-        })
+        });
         this.setTreeTypeOption(selectTreeType);
     }
 
-    //设置树种选项
-    setTreeTypeOption(rst) {
+    // 设置树种选项
+    setTreeTypeOption (rst) {
         if (rst instanceof Array) {
             let treetypeoption = rst.map(item => {
-                return <Option key={item.id} value={item.ID}>{item.TreeTypeName}</Option>
-            })
-            treetypeoption.unshift(<Option key={-1} value={''}>全部</Option>)
-            this.setState({ treetypeoption, treetypelist: rst })
+                return (
+                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                        {item.TreeTypeName}
+                    </Option>
+                );
+            });
+            treetypeoption.unshift(
+                <Option key={-1} value={''} title={'全部'}>
+                    全部
+                </Option>
+            );
+            this.setState({ treetypeoption, treetypelist: rst });
         }
     }
 
-    //重置
-    resetinput(leftkeycode) {
+    // 重置
+    resetinput (leftkeycode) {
         this.setState({ resetkey: ++this.state.resetkey }, () => {
-            this.onSelect([leftkeycode])
-        })
+            this.onSelect([leftkeycode]);
+        });
     }
 
-    //树选择, 重新获取: 标段、小班、细班、树种并置空
-    onSelect(value = []) {
-        let user = getUser()
+    // 树选择, 重新获取: 标段、小班、细班、树种并置空
+    onSelect (value = []) {
+        let user = getUser();
         let keycode = value[0] || '';
-        const { actions: { setkeycode, gettreetype, getTree, getLittleBan } } = this.props;
+        const {
+            actions: { setkeycode, gettreetype, getTree, getLittleBan }
+        } = this.props;
         setkeycode(keycode);
-        this.setState({ leftkeycode: keycode, resetkey: ++this.state.resetkey })
+        this.setState({
+            leftkeycode: keycode,
+            resetkey: ++this.state.resetkey
+        });
         let sections = JSON.parse(user.sections);
-        //标段
+        // 标段
         let rst = [];
-        if (sections.length === 0) {   //是admin
+        if (sections.length === 0) {
+            // 是admin
             rst = this.biaoduan.filter(item => {
                 return item.code.indexOf(keycode) !== -1;
-            })
+            });
         } else {
             rst = this.biaoduan.filter(item => {
-                return item.code.indexOf(keycode) !== -1 && sections.indexOf(item.code) !== -1;
-            })
+                return (
+                    item.code.indexOf(keycode) !== -1 &&
+                    sections.indexOf(item.code) !== -1
+                );
+            });
         }
-        this.setSectionOption(rst)
-        //树种
+        this.setSectionOption(rst);
+        // 树种
         this.typeselect('');
     }
 }

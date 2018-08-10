@@ -462,137 +462,139 @@ export default class LocmeasureTable extends Component {
 
         header = (
             <div>
-                <Row>
-                    <Col xl={3} className='mrg10'>
-                        <span>顺序码：</span>
+                <Row className='forest-search-layout'>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>顺序码：</span>
                         <Input
                             suffix={suffix1}
                             value={sxm}
-                            className='forestcalcw2 mxw50'
+                            className='forest-forestcalcw4'
                             onChange={this.sxmchange.bind(this)}
                         />
-                    </Col>
-                    <Col xl={3} className='mrg10'>
-                        <span>标段：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>标段：</span>
                         <Select
                             allowClear
-                            className='forestcalcw2 mxw100'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
                             onChange={this.onsectionchange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
-                    </Col>
-                    <Col xl={3} className='mrg10'>
-                        <span>小班：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>小班：</span>
                         <Select
                             allowClear
-                            className='forestcalcw2 mxw100'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
                             onChange={this.onsmallclasschange.bind(this)}
                         >
                             {smallclassoption}
                         </Select>
-                    </Col>
-                    <Col xl={4} className='mrg10'>
-                        <span>细班：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>细班：</span>
                         <Select
                             allowClear
-                            className='forestcalcw2 mxw170'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
                             onChange={this.onthinclasschange.bind(this)}
                         >
                             {thinclassoption}
                         </Select>
-                    </Col>
-                    <Col xl={3} className='mrg10'>
-                        <span>类型：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>类型：</span>
                         <Select
                             allowClear
-                            className='forestcalcw2 mxw100'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
                             onChange={this.ontypechange.bind(this)}
                         >
                             {typeoption}
                         </Select>
-                    </Col>
-                    <Col xl={3} className='mrg10'>
-                        <span>树种：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>树种：</span>
                         <Select
                             allowClear
                             showSearch
-                            className='forestcalcw2 mxw100'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
                             onChange={this.ontreetypechange.bind(this)}
                         >
                             {treetypeoption}
                         </Select>
-                    </Col>
-                    <Col xl={3} className='mrg10'>
-                        <span>状态：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>状态：</span>
                         <Select
                             allowClear
-                            className='forestcalcw2 mxw150'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={status}
                             onChange={this.onstatuschange.bind(this)}
                         >
                             {statusoption}
                         </Select>
-                    </Col>
-                    <Col xl={3} className='mrg10'>
-                        <span>定位：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>定位：</span>
                         <Select
                             allowClear
-                            className='forestcalcw2 mxw100'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={islocation}
                             onChange={this.onlocationchange.bind(this)}
                         >
                             {locationoption}
                         </Select>
-                    </Col>
-                    <Col xl={3} className='mrg10'>
-                        <span>测量人：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>测量人：</span>
                         <Input
                             suffix={suffix2}
                             value={rolename}
-                            className='forestcalcw3 mxw100'
+                            className='forest-forestcalcw4'
                             onChange={this.onrolenamechange.bind(this)}
                         />
-                    </Col>
-                    <Col xl={7} className='mrg10'>
-                        <span>测量时间：</span>
+                    </div>
+                    <div className='forest-mrg-datePicker'>
+                        <span className='forest-search-span'>测量时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
                             defaultValue={[
                                 moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),
                                 moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')
                             ]}
+                            className='forest-forestcalcw4'
                             showTime={{ format: 'HH:mm:ss' }}
                             format={'YYYY/MM/DD HH:mm:ss'}
                             onChange={this.datepick.bind(this)}
                             onOk={this.datepick.bind(this)}
                         />
-                    </Col>
-                    <Col xl={7} className='mrg10'>
-                        <span>定位时间：</span>
+                    </div>
+                    <div className='forest-mrg-datePicker'>
+                        <span className='forest-search-span'>定位时间：</span>
                         <RangePicker
+                            className='forest-forestcalcw4'
                             style={{ verticalAlign: 'middle' }}
                             showTime={{ format: 'HH:mm:ss' }}
                             format={'YYYY/MM/DD HH:mm:ss'}
                             onChange={this.datepick1.bind(this)}
                             onOk={this.datepick1.bind(this)}
                         />
-                    </Col>
+                    </div>
                 </Row>
-                <Row>
-                    <Col span={2} className='mrg10'>
+                <Row style={{marginTop: 10, marginBottom: 10}}>
+                    <Col span={2} >
                         <Button
                             type='primary'
                             onClick={this.handleTableChange.bind(this, {
@@ -602,23 +604,23 @@ export default class LocmeasureTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={18} className='quryrstcnt mrg10'>
+                    <Col span={18} className='forest-quryrstcnt'>
                         <span>此次查询共有苗木：{this.state.totalNum}棵</span>
                     </Col>
-                    <Col span={2} className='mrg10'>
-                        <Button
-                            type='primary'
-                            onClick={this.resetinput.bind(this)}
-                        >
-                            重置
-                        </Button>
-                    </Col>
-                    <Col span={2} className='mrg10'>
+                    <Col span={2} >
                         <Button
                             type='primary'
                             onClick={this.exportexcel.bind(this)}
                         >
                             导出
+                        </Button>
+                    </Col>
+                    <Col span={2} >
+                        <Button
+                            type='primary'
+                            onClick={this.resetinput.bind(this)}
+                        >
+                            重置
                         </Button>
                     </Col>
                 </Row>

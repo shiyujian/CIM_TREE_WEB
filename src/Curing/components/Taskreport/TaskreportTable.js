@@ -548,7 +548,9 @@ export default class TaskReportTable extends Component {
                         me._addAreaLayer(eventKey, treeNodeName);
                     }
                 } else {
-                    me.map.removeLayer(areaLayerList[eventKey]);
+                    if (areaLayerList[eventKey]) {
+                        me.map.removeLayer(areaLayerList[eventKey]);
+                    }
                 }
             }
         } catch (e) {
@@ -611,7 +613,8 @@ export default class TaskReportTable extends Component {
     handleTaskSelect = async (keys, info) => {
         const {
             taskLayerList,
-            taskMarkerLayerList
+            taskMarkerLayerList,
+            taskTrackLayerList
         } = this.state;
         let me = this;
         // 当前选中的节点
@@ -638,6 +641,12 @@ export default class TaskReportTable extends Component {
             for (let i in taskMarkerLayerList) {
                 this.map.removeLayer(taskMarkerLayerList[i]);
             }
+            // 去除轨迹图层
+            for (let i in taskTrackLayerList) {
+                taskTrackLayerList[i].map((layer) => {
+                    this.map.removeLayer(layer);
+                });
+            }
             // 选中加载图层
             if (selected) {
                 if (taskLayerList[eventKey]) {
@@ -655,6 +664,13 @@ export default class TaskReportTable extends Component {
                     // 如果不是添加过，需要请求数据
                     me._addTaskLayer(eventKey);
                 }
+                if (taskTrackLayerList[eventKey]) {
+                    taskTrackLayerList[eventKey].map((layer) => {
+                        layer.addTo(this.map);
+                    });
+                } else {
+                    this.getTaskTracks(eventKey);
+                }
             }
         } catch (e) {
             console.log('任务选中', e);
@@ -666,24 +682,14 @@ export default class TaskReportTable extends Component {
     _addTaskLayer = async (eventKey) => {
         const {
             actions: {
-                getCuringMessage,
-                getCuringPositions
+                getCuringMessage
             }
         } = this.props;
         try {
             let taskMessPostData = {
                 id: eventKey
             };
-            let positionPostData = {
-                curingid: eventKey
-            };
             let taskMess = await getCuringMessage(taskMessPostData);
-            let taskPositionMess = await getCuringPositions({}, positionPostData);
-            console.log('taskPositionMess', taskPositionMess);
-            let taskTracks = taskPositionMess && taskPositionMess.content;
-            if (taskTracks && taskTracks instanceof Array && taskTracks.length > 0) {
-                this._addTrackLayer(taskTracks, eventKey);
-            }
             let planWkt = taskMess.PlanWKT;
             let str = '';
             if (planWkt.indexOf('MULTIPOLYGON') !== -1) {
@@ -810,53 +816,58 @@ export default class TaskReportTable extends Component {
             console.log('处理str', e);
         }
     }
+    getTaskTracks = async (eventKey) => {
+        const {
+            actions: {
+                getCuringPositions
+            }
+        } = this.props;
+        let positionPostData = {
+            curingid: eventKey
+        };
+        let taskPositionMess = await getCuringPositions({}, positionPostData);
+        console.log('taskPositionMess', taskPositionMess);
+        let taskTracks = taskPositionMess && taskPositionMess.content;
+        if (taskTracks && taskTracks instanceof Array && taskTracks.length > 0) {
+            this._addTrackLayer(taskTracks, eventKey);
+        }
+    }
     _addTrackLayer (taskTracks, eventKey) {
         const {
             taskTrackLayerList,
             taskCuringManList
         } = this.state;
         try {
-            for (let i in taskTrackLayerList) {
-                taskTrackLayerList[i].map((layer) => {
-                    this.map.removeLayer(layer);
-                });
-            }
-            if (taskTrackLayerList[eventKey]) {
-                taskTrackLayerList[eventKey].map((layer) => {
-                    layer.addTo(this.map);
-                });
-            } else {
-                let tracksList = [];
-                tracksList[0] = [];
-                let CuringManList = [];
-                let CuringManTimes = 0;
-                let CuringMan = taskTracks[0].CuringMan;
-                CuringManList.push(CuringMan);
-                taskTracks.map((track) => {
-                    if (CuringMan !== track.CuringMan) {
-                        CuringManList.push(CuringMan);
-                        CuringManTimes = CuringManTimes + 1;
-                        tracksList[CuringManTimes] = [];
-                        CuringMan = track.CuringMan;
-                    }
-                    tracksList[CuringManTimes].push([track.Y, track.X]);
-                });
-                console.log('tracksList', tracksList);
-                console.log('CuringManList', CuringManList);
-                let layerList = [];
-                tracksList.map((track, index) => {
-                    let polylineData = L.polyline(track, { color: 'yellow' }).addTo(
-                        this.map
-                    );
-                    layerList.push(polylineData);
-                });
-                taskTrackLayerList[eventKey] = layerList;
-                taskCuringManList[eventKey] = CuringManList;
-                this.setState({
-                    taskTrackLayerList,
-                    taskCuringManList
-                });
-            };
+            let tracksList = [];
+            tracksList[0] = [];
+            let CuringManList = [];
+            let CuringManTimes = 0;
+            let CuringMan = taskTracks[0].CuringMan;
+            CuringManList.push(CuringMan);
+            taskTracks.map((track) => {
+                if (CuringMan !== track.CuringMan) {
+                    CuringManList.push(CuringMan);
+                    CuringManTimes = CuringManTimes + 1;
+                    tracksList[CuringManTimes] = [];
+                    CuringMan = track.CuringMan;
+                }
+                tracksList[CuringManTimes].push([track.Y, track.X]);
+            });
+            console.log('tracksList', tracksList);
+            console.log('CuringManList', CuringManList);
+            let layerList = [];
+            tracksList.map((track, index) => {
+                let polylineData = L.polyline(track, { color: 'yellow' }).addTo(
+                    this.map
+                );
+                layerList.push(polylineData);
+            });
+            taskTrackLayerList[eventKey] = layerList;
+            taskCuringManList[eventKey] = CuringManList;
+            this.setState({
+                taskTrackLayerList,
+                taskCuringManList
+            });
         } catch (e) {
             console.log('_addTrackLayer', e);
         }
@@ -952,7 +963,7 @@ export default class TaskReportTable extends Component {
     _handleCreateTaskOk = async () => {
         const {
             actions: {
-                postTreeLocationNumByRegion, // 查询圈选地图内的树木数量
+                // postTreeLocationNumByRegion, // 查询圈选地图内的树木数量
                 postThinClassesByRegion // 查询圈选地图内的细班
             }
         } = this.props;
@@ -971,7 +982,6 @@ export default class TaskReportTable extends Component {
             return;
         }
         try {
-            let signSection = this.section;
             let taskMess = taskMessList[taskEventKey];
             if (polygonData) {
                 if (coordinates && coordinates.length <= 2) {

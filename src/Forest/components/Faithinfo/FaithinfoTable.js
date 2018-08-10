@@ -119,49 +119,43 @@ export default class FaithinfoTable extends Component {
         ];
         header = (
             <div>
-                <Row>
-                    <Col xl={3} lg={4} md={5} className='mrg10'>
-                        <span>标段：</span>
+                <Row className='forest-search-layout'>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>标段：</span>
                         <Select
                             allowClear
-                            className='forestcalcw2 mxw100'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
                             onChange={this.onsectionchange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
-                    </Col>
-                    <Col xl={3} lg={4} md={5} className='mrg10'>
-                        <span>类型：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>类型：</span>
                         <Select
                             allowClear
-                            className='forestcalcw2 mxw100'
+                            className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
                             onChange={this.ontypechange.bind(this)}
                         >
                             {typeoption}
                         </Select>
-                    </Col>
-                    {/* <Col xl={3} lg={4} md={5} className='mrg10'>
-							<span>树种：</span>
-							<Select allowClear showSearch className='forestcalcw2 mxw100' defaultValue='全部' value={treetypename} onChange={this.ontreetypechange.bind(this)}>
-								{treetypeoption}
-							</Select>
-						</Col> */}
-                    <Col xl={5} lg={6} md={7} className='mrg10'>
-                        <span>供应商：</span>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>供应商：</span>
                         <Input
                             suffix={suffix}
                             value={factory}
-                            className='forestcalcw3 mxw200'
+                            className='forest-forestcalcw4'
                             onChange={this.factorychange.bind(this)}
                         />
-                    </Col>
+                    </div>
                 </Row>
                 <Row>
-                    <Col span={2} className='mrg10'>
+                    <Col span={2}>
                         <Button
                             type='primary'
                             onClick={this.handleTableChange.bind(this, {
@@ -171,7 +165,7 @@ export default class FaithinfoTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={18} className='mrg10'>
+                    <Col span={20}>
                         <Button
                             type='primary'
                             style={{ display: 'none' }}
@@ -180,7 +174,7 @@ export default class FaithinfoTable extends Component {
                             导出
                         </Button>
                     </Col>
-                    <Col span={2} className='mrg10'>
+                    <Col span={2}>
                         <Button
                             type='primary'
                             onClick={this.resetinput.bind(this)}
