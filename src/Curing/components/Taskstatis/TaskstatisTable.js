@@ -46,7 +46,7 @@ export default class TaskStatisTable extends Component {
             }
             let groups = text.groups || [];
             groups.map((group) => {
-                if (group.name.indexOf('业主')) {
+                if (group.name.indexOf('业主') !== -1) {
                     this.totalDataPer = true;
                 }
             });
@@ -266,12 +266,13 @@ export default class TaskStatisTable extends Component {
         if (taskStatisGisVisible) {
             display = 'none';
         }
+        console.log('taskSearchData', taskSearchData);
         return (
             <div className='taskPage-container' style={{display: display}}>
                 <Spin spinning={loading}>
                     <div className='taskSelect-container'>
                         <div className='Search-style'>
-                            <span style={{width: 70}}>养护班组：</span>
+                            <span style={{width: 70}}>养护类型：</span>
                             <Select
                                 className='Select-width'
                                 placeholder={'请选择养护类型'}

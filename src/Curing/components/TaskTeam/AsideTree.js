@@ -136,45 +136,48 @@ class AsideTree extends Component {
         };
         return (
             <div className='total-main'>
-                <Button
-                    style={{marginRight: 10, marginBottom: 10}}
-                    type='primary'
-                    onClick={this._handleModalVisible.bind(this)}
-                    disabled={addDisabled}
-                >
-                    新增班组
-                </Button>
-                <Popconfirm
-                    onConfirm={this._handleDelDoc.bind(this)}
-                    title='确定要删除该班组么'
-                    okText='确定'
-                    cancelText='取消' >
+                <div className='test'>
                     <Button
-                        style={{marginBottom: 10}}
-                        type='danger'
-                        disabled={!selected}
+                        className='buttonStyle'
+                        // style={{marginRight: 10, marginBottom: 10, left: 10}}
+                        type='primary'
+                        onClick={this._handleModalVisible.bind(this)}
+                        disabled={addDisabled}
                     >
-                    删除班组
+                    新增班组
                     </Button>
-                </Popconfirm>
-                <div className='aside-main'>
-                    <div className='aside'>
-                        {teamsTree.length ? (
-                            <Tree
-                                showLine
-                                defaultExpandAll
-                                onSelect={this._handleTreeSelect.bind(this)}
-                            >
-                                {teamsTree.map(p => {
-                                    return AsideTree.loop(p);
-                                })}
-                            </Tree>
-                        ) : (
-                            ''
-                        )}
+                    <Popconfirm
+                        onConfirm={this._handleDelDoc.bind(this)}
+                        title='确定要删除该班组么'
+                        okText='确定'
+                        cancelText='取消' >
+                        <Button
+                            // style={{marginBottom: 10, left: 10}}
+                            className='buttonStyle'
+                            type='danger'
+                            disabled={!selected}
+                        >
+                    删除班组
+                        </Button>
+                    </Popconfirm>
+                    <div className='aside-main'>
+                        <div className='aside'>
+                            {teamsTree.length ? (
+                                <Tree
+                                    showLine
+                                    defaultExpandAll
+                                    onSelect={this._handleTreeSelect.bind(this)}
+                                >
+                                    {teamsTree.map(p => {
+                                        return AsideTree.loop(p);
+                                    })}
+                                </Tree>
+                            ) : (
+                                ''
+                            )}
+                        </div>
                     </div>
                 </div>
-
                 {
                     teamVisible
                         ? (<Modal

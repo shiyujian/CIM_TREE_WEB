@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Button, Collapse, Notification, Spin
+    Button, Collapse, Notification, Spin, Checkbox
 } from 'antd';
 import DashPanel from '../DashPanel';
 import TaskCheckTree from '../TaskCheckTree';
@@ -21,6 +21,7 @@ export default class TaskCreateTable extends Component {
             menuWidth: 260 /* 菜单宽度 */,
             mapLayerBtnType: true,
             selectedMenu: '1',
+            treeLayerChecked: true,
             // 细班树
             areaTreeData: [],
             areaTreeLoading: false,
@@ -384,6 +385,9 @@ export default class TaskCreateTable extends Component {
                         }
                     >
                         <aside className='aside' draggable='false'>
+                            <div style={{margin: 10}}>
+                                <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
+                            </div>
                             <Collapse
                                 defaultActiveKey={[this.options[0].value]}
                                 accordion
@@ -487,6 +491,37 @@ export default class TaskCreateTable extends Component {
                     </div>
                 </div>
             </div>);
+    }
+    treeLayerChange = () => {
+        const {
+            treeLayerChecked
+        } = this.state;
+        console.log('treeLayerChecked', treeLayerChecked);
+        if (treeLayerChecked) {
+            if (this.tileLayer2) {
+                this.map.removeLayer(this.tileLayer2);
+            }
+        } else {
+            if (this.tileLayer2) {
+                this.tileLayer2.addTo(this.map);
+            } else {
+                this.tileLayer2 = L.tileLayer(
+                    window.config.DASHBOARD_ONSITE +
+                                '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    {
+                        opacity: 1.0,
+                        subdomains: [1, 2, 3],
+                        minZoom: 11,
+                        maxZoom: 21,
+                        storagetype: 0,
+                        tiletype: 'wtms'
+                    }
+                ).addTo(this.map);
+            }
+        }
+        this.setState({
+            treeLayerChecked: !treeLayerChecked
+        });
     }
     /* 选中节点 */
     async handleAreaSelect (keys, info) {
