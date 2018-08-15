@@ -172,10 +172,6 @@ class TaskReportModal extends Component {
             labelCol: { span: 6 },
             wrapperCol: { span: 18 }
         };
-        const FormItemLayout1 = {
-            labelCol: { span: 0 },
-            wrapperCol: { span: 24 }
-        };
         let okFooter = [
             <Button key='back' size='large' onClick={this._handleTaskModalCancel.bind(this)}>
                 关闭
@@ -195,7 +191,7 @@ class TaskReportModal extends Component {
             </Button>
         ];
         let status = false;
-        if (taskMess && taskMess.status === '已完成' && taskMess.Status === 1) {
+        if (taskMess && taskMess.status === '已完成且未上报' && taskMess.Status === 1) {
             status = true;
         }
 
@@ -321,28 +317,33 @@ class TaskReportModal extends Component {
                                 )}
                             </FormItem>
                         </Row>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='图片上传'>
-                                {getFieldDecorator('attachment', {
-                                    rules: [
-                                        { required: false, message: '请上传图片' }
-                                    ],
-                                    getValueFromEvent: this.normFile
-                                })(
-                                    <Dragger {...uploadProps}>
-                                        <p className='ant-upload-drag-icon'>
-                                            <Icon type='inbox' />
-                                        </p>
-                                        <p className='ant-upload-text'>
+                        {
+                            status
+                                ? (
+                                    <Row>
+                                        <FormItem {...FormItemLayout} label='图片上传'>
+                                            {getFieldDecorator('attachment', {
+                                                rules: [
+                                                    { required: false, message: '请上传图片' }
+                                                ],
+                                                getValueFromEvent: this.normFile
+                                            })(
+                                                <Dragger {...uploadProps}>
+                                                    <p className='ant-upload-drag-icon'>
+                                                        <Icon type='inbox' />
+                                                    </p>
+                                                    <p className='ant-upload-text'>
                                             点击或者拖拽开始上传
-                                        </p>
-                                        <p className='ant-upload-hint'>
+                                                    </p>
+                                                    <p className='ant-upload-hint'>
                                             支持 jpg,jpeg,png 文件
-                                        </p>
-                                    </Dragger>
-                                )}
-                            </FormItem>
-                        </Row>
+                                                    </p>
+                                                </Dragger>
+                                            )}
+                                        </FormItem>
+                                    </Row>
+                                ) : ''
+                        }
                     </Form>
                 </Spin>
             </Modal>

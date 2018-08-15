@@ -1,7 +1,7 @@
 import './Curing.less';
 import { PROJECT_UNITS } from '_platform/api';
 import { getUser } from '_platform/auth';
-
+// import { getSectionName } from './auth';
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
     let user = getUser();
@@ -15,50 +15,49 @@ export const getSmallClass = (smallClassList) => {
     let uniqueSmallClass = [];
     // 进行数组去重的数组
     let array = [];
-
-    let test = [];
     try {
         smallClassList.map(list => {
-            // 加入项目，地块的code，使No不重复，如果重复，点击某个节点，No重复的节点也会选择中
-            let codeName =
-                    list.LandNo +
-                    '#' +
-                    list.RegionNo +
-                    '#' +
-                    list.SmallClass +
-                    '#' +
-                    list.SmallClassName;
-
             let noArr = list.No.split('-');
-            // 为了让各个细班的code都不一样   把各个细班的code全部加入
-            // let No = noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
             // 如果小于5 说明没有标段  不符合规则
             if (noArr.length < 5) {
                 console.log('rst', list);
                 return;
             }
+            // 项目 + 区块 + 标段 + 小班
+            let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2];
             // 项目 + 区块 + 标段
             let sectionNo = noArr[0] + '-' + noArr[1] + '-' + noArr[4];
-            if (user.username === 'admin') {
+
+            // 管理员可以查看所有数据，其他人员只能查看符合自己标段的数据
+            let userMess = window.localStorage.getItem('QH_USER_DATA');
+            userMess = JSON.parse(userMess);
+            let permission = false;
+            if (userMess.username === 'admin') {
+                permission = true;
+            }
+            let groups = userMess.groups || [];
+            groups.map((group) => {
+                if (group.name.indexOf('业主') !== -1) {
+                    permission = true;
+                }
+            });
+            // permission为true说明是管理员或者业主
+            if (permission) {
                 // console.log('wwwww', sectionNo);
             } else if (section) {
                 if (sectionNo !== section) {
                     return;
                 }
             }
-            if (list.SmallClass && array.indexOf(codeName) === -1) {
+            // 之前没有存入过该小班，则push进数组
+            if (list.SmallClass && array.indexOf(No) === -1) {
                 uniqueSmallClass.push({
                     Name: list.SmallClassName
                         ? list.SmallClassName + '小班'
                         : list.SmallClass + '小班',
-                    No: codeName
+                    No: No
                 });
-                array.push(codeName);
-            } else {
-                test.push({
-                    SmallClassName: list.SmallClassName,
-                    SmallClass: list.SmallClass
-                });
+                array.push(No);
             }
         });
     } catch (e) {
@@ -74,26 +73,23 @@ export const getThinClass = (smallClass, list) => {
     let nameArray = [];
     try {
         list.map(rst => {
-            let codeName = smallClass.No.split('#');
-            let code = codeName[2];
-            let name = codeName[3];
-            if (name === 'null') {
-                name = null;
+            let smallClassCode = smallClass.No.split('-');
+            let projectNo = smallClassCode[0];
+            let unitProjectNo = smallClassCode[1];
+            let sectionNo = smallClassCode[2];
+            let smallClassNo = smallClassCode[3];
+
+            let noArr = rst.No.split('-');
+            // 如果小于5 说明没有标段  不符合规则
+            if (noArr.length < 5) {
+                console.log('rst', rst);
+                return;
             }
             // 暂时去掉重复的节点
             if (
-                rst.ThinClass &&
-                    rst.SmallClass === code &&
-                    rst.SmallClassName === name
+                noArr[0] === projectNo && noArr[1] === unitProjectNo && noArr[4] === sectionNo &&
+                noArr[2] === smallClassNo
             ) {
-                let noArr = rst.No.split('-');
-                // 为了让各个细班的code都不一样   把各个细班的code全部加入
-                // let No = noArr[0] + '-' + noArr[1] + '-' + noArr[2] + '-' + noArr[3];
-                // 如果小于5 说明没有标段  不符合规则
-                if (noArr.length < 5) {
-                    console.log('rst', rst);
-                    return;
-                }
                 // 项目 + 区块 + 标段 + 小班 + 细班
                 let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
                 if (codeArray.indexOf(No) === -1) {
@@ -114,7 +110,6 @@ export const getThinClass = (smallClass, list) => {
 
     return thinClassList;
 };
-
 // 获取标段名称
 export const getSectionName = (section) => {
     let sectionName = '';
@@ -159,6 +154,9 @@ export const genPopUpContent = (geo) => {
                     <h2><span>养护类型：</span>${properties.typeName}</h2>
                     <h2><span>状态：</span>${properties.status}</h2>
                     <h2><span>养护人：</span>${properties.CuringMans}</h2>
+                    <h2><span>标段：</span>${properties.sectionName}</h2>
+                    <h2><span>小班：</span>${properties.smallClassName}</h2>
+                    <h2><span>细班：</span>${properties.thinClassName}</h2>
                     <h2><span>创建时间：</span>${properties.CreateTime}</h2>
                     <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
                     <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
@@ -196,7 +194,6 @@ export const fillAreaColor = (index) => {
     let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
     return colors[index % 5];
 };
-
 // 获取手动框选坐标wkt
 export const getHandleWktData = (coords) => {
     let wkt = '';
@@ -212,7 +209,6 @@ export const getHandleWktData = (coords) => {
     }
     return wkt;
 };
-
 // 获取细班选择坐标wkt
 export const getWktData = (coords) => {
     let wkt = '';
@@ -228,7 +224,6 @@ export const getWktData = (coords) => {
     }
     return wkt;
 };
-
 // 查找区域面积
 export const computeSignedArea = (path, type) => {
     let radius = 6371009;
@@ -261,9 +256,195 @@ export const computeSignedArea = (path, type) => {
     }
     return Math.abs(total * (radius * radius));
 };
-
 export const polarTriangleArea = (tanLat, lng, prevTanLat, prevLng) => {
     let deltaLng = lng - prevLng;
     let t = tanLat * prevTanLat;
     return 2 * Math.atan2(t * Math.sin(deltaLng), 1 + t * Math.cos(deltaLng));
+};
+// 获取任务中的标段，小班，细班名称
+export const getTaskThinClassName = (task, totalThinClass) => {
+    try {
+        let thinClass = task.ThinClass;
+        let section = task.Section;
+        let thinClassList = thinClass.split(',');
+        let regionSectionName = '';
+        let regionSmallName = '';
+        let regionSmallNo = '';
+        let regionThinName = '';
+        let smallNoList = [];
+        if (thinClassList && thinClassList instanceof Array && thinClassList.length > 0) {
+            thinClassList.map((thinNo, index) => {
+                totalThinClass.map((unitProjectData) => {
+                    let unitProject = unitProjectData.unitProject;
+                    // 首先根据区块找到对应的细班list
+                    if (section.indexOf(unitProject) !== -1) {
+                        let smallClassList = unitProjectData.smallClassList;
+                        smallClassList.map((smallClass) => {
+                        // tree结构的数据经过了处理，需要和api获取的数据调整一致
+                            let smallClassHandleKey = smallClass.No.split('-');
+                            let smallClassNo = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[3];
+                            let childSection = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[2];
+                            if (thinNo.indexOf(smallClassNo) !== -1 && childSection === section) {
+                                // 找到符合条件的数据的name
+                                let thinClassList = smallClass.children;
+                                thinClassList.map((thinClass) => {
+                                    let thinClassHandleKey = thinClass.No.split('-');
+                                    let thinClassNo = thinClassHandleKey[0] + '-' + thinClassHandleKey[1] + '-' + thinClassHandleKey[3] + '-' + thinClassHandleKey[4];
+                                    if (thinNo.indexOf(thinClassNo) !== -1) {
+                                        // 是否小班重复
+                                        let isUniqueSmall = true;
+                                        smallNoList.map((smallData) => {
+                                            if (smallData === smallClassNo) {
+                                                isUniqueSmall = false;
+                                            }
+                                        });
+                                        if (isUniqueSmall) {
+                                            if (!regionSmallName) {
+                                                regionSmallName = smallClass.Name;
+                                                regionSmallNo = smallClass.No;
+                                            } else {
+                                                regionSmallName = regionSmallName + ' ,' + smallClass.Name;
+                                                regionSmallNo = regionSmallNo + ' ,' + smallClass.No;
+                                            }
+                                            smallNoList.push(smallClassNo);
+                                        }
+                                        // 找到符合条件的数据的name
+                                        let thinName = thinClass.Name;
+                                        let sectionName = getSectionName(section);
+                                        regionSectionName = sectionName;
+                                        if (index === 0) {
+                                            regionThinName = regionThinName + thinName;
+                                        } else {
+                                            regionThinName = regionThinName + ' ,' + thinName;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        let regionData = {
+            regionThinName: regionThinName,
+            regionSmallName: regionSmallName,
+            regionSmallNo: regionSmallNo,
+            regionSectionName: regionSectionName
+        };
+        return regionData;
+    } catch (e) {
+        console.log('getTaskThinClassName', e);
+    }
+};
+// 查找区域内的细班的名称
+export const getThinClassName = (regionThinClass, totalThinClass, sections) => {
+    // 经过筛选后的细班No
+    let regionThinNo = '';
+    // 经过筛选后的细班Name
+    let regionThinName = '';
+    // 经过筛选后的小班
+    let regionSmallNo = '';
+    let regionSmallName = '';
+    // 经过筛选后的标段No
+    let regionSectionNo = '';
+    // 经过筛选后的标段Name
+    let regionSectionName = '';
+    // 标段是否是登陆用户所在标段
+    let sectionBool = true;
+    let signSection = sections[0];
+
+    // 细班数组，查看细班是否重复，重复不再查询
+    let thinNoList = [];
+    let smallNoList = [];
+    try {
+        regionThinClass.map((thinData, index) => {
+            let section = thinData.Section;
+            // 如果圈选的区域不在登录用户的标段内，则不能下发任务
+            if (signSection !== section) {
+                sectionBool = false;
+                return;
+            }
+            // 如果圈选的区域不在登录用户的标段内，不需要循环获取数据
+            if (!sectionBool) {
+                return;
+            }
+            let thinNo = thinData.no;
+            let pushState = true;
+            // 获取的thinNo可能又会重复的，需要进行处理
+            thinNoList.map((data) => {
+                if (data === thinNo) {
+                    pushState = false;
+                }
+            });
+            if (!pushState) {
+                return;
+            }
+            thinNoList.push(thinNo);
+            console.log('thinNo', thinNo);
+            totalThinClass.map((unitProjectData) => {
+                let unitProject = unitProjectData.unitProject;
+                // 首先根据区块找到对应的细班list
+                if (section.indexOf(unitProject) !== -1) {
+                    let smallClassList = unitProjectData.smallClassList;
+                    smallClassList.map((smallClass) => {
+                        // tree结构的数据经过了处理，需要和api获取的数据调整一致
+                        let smallClassHandleKey = smallClass.No.split('-');
+                        let smallClassNo = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[3];
+                        let childSection = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[2];
+                        if (thinNo.indexOf(smallClassNo) !== -1 && childSection === section) {
+                            // 找到符合条件的数据的name
+                            let thinClassList = smallClass.children;
+                            thinClassList.map((thinClass) => {
+                                let thinClassHandleKey = thinClass.No.split('-');
+                                let thinClassNo = thinClassHandleKey[0] + '-' + thinClassHandleKey[1] + '-' + thinClassHandleKey[3] + '-' + thinClassHandleKey[4];
+                                if (thinNo.indexOf(thinClassNo) !== -1) {
+                                    // 是否小班重复
+                                    let isUniqueSmall = true;
+                                    smallNoList.map((smallData) => {
+                                        if (smallData === smallClassNo) {
+                                            isUniqueSmall = false;
+                                        }
+                                    });
+                                    if (isUniqueSmall) {
+                                        if (!regionSmallNo) {
+                                            regionSmallNo = smallClassNo;
+                                            regionSmallName = smallClass.Name;
+                                        } else {
+                                            regionSmallNo = regionSmallNo + ' ,' + smallClassNo;
+                                            regionSmallName = regionSmallName + ' ,' + smallClass.Name;
+                                        }
+                                        smallNoList.push(smallClassNo);
+                                    }
+                                    let thinClassName = thinClass.Name;
+                                    let sectionName = getSectionName(section);
+                                    regionSectionNo = section;
+                                    regionSectionName = sectionName;
+                                    if (index === 0) {
+                                        regionThinName = regionThinName + thinClassName;
+                                        regionThinNo = regionThinNo + thinNo;
+                                    } else {
+                                        regionThinName = regionThinName + ' ,' + thinClassName;
+                                        regionThinNo = regionThinNo + ' ,' + thinNo;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    } catch (e) {
+        console.log('细班名称', e);
+    }
+    let regionData = {
+        regionThinName: regionThinName,
+        regionThinNo: regionThinNo,
+        regionSectionNo: regionSectionNo,
+        regionSectionName: regionSectionName,
+        sectionBool: sectionBool,
+        regionSmallName: regionSmallName,
+        regionSmallNo: regionSmallNo
+    };
+    return regionData;
 };

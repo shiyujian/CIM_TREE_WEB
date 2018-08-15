@@ -342,7 +342,10 @@ export default class TaskStatisGis extends Component {
                     PlanStartTime: task.PlanStartTime || '',
                     PlanEndTime: task.PlanEndTime || '',
                     StartTime: task.StartTime || '',
-                    EndTime: task.EndTime || ''
+                    EndTime: task.EndTime || '',
+                    sectionName: task.sectionName || '',
+                    smallClassName: task.smallClassName || '',
+                    thinClassName: task.thinClassName || ''
                 },
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
@@ -464,7 +467,7 @@ export default class TaskStatisGis extends Component {
             console.log('CuringManList', CuringManList);
             let layerList = [];
             tracksList.map((track, index) => {
-                let polylineData = L.polyline(track, { color: 'yellow' }).addTo(
+                let polylineData = L.polyline(track, { color: 'black' }).addTo(
                     this.map
                 );
                 layerList.push(polylineData);
@@ -483,7 +486,7 @@ export default class TaskStatisGis extends Component {
     _createMarker (geo) {
         if (geo.properties.type === 'task') {
             let layer = L.polygon(geo.geometry.coordinates, {
-                color: 'white',
+                color: 'blue',
                 fillColor: '#93B9F2',
                 fillOpacity: 0.2
             }).addTo(this.map);
@@ -491,8 +494,8 @@ export default class TaskStatisGis extends Component {
             return layer;
         } else if (geo.properties.type === 'realTask') {
             let layer = L.polygon(geo.geometry.coordinates, {
-                color: 'blue',
-                fillColor: '#93B9F2',
+                color: 'yellow',
+                fillColor: 'yellow',
                 fillOpacity: 0.5
             }).addTo(this.map);
             this.map.fitBounds(layer.getBounds());

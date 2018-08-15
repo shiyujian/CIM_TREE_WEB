@@ -1,46 +1,19 @@
 import React, { Component } from 'react';
-import { Tree, Radio } from 'antd';
+import { Tree } from 'antd';
 const TreeNode = Tree.TreeNode;
-const RadioGroup = Radio.Group;
 
-export default class DashPanel extends Component {
+export default class AreaTreeReport extends Component {
     constructor (props) {
         super(props);
         this.originOnCheck = this.props.onCheck;
-        this.originOnSelect = this.props.onSelect;
         this.state = {
-            checkkeys: [],
-            radioValue: '细班选择'
+            checkkeys: []
         };
     }
 
-    componentDidMount = async () => {
-        const {
-            actions: {
-                changeSelectMap
-            }
-        } = this.props;
-        try {
-            // await changeSelectMap('细班选择');
-        } catch (e) {
-
-        }
-    }
-
     onCheck (keys, info) {
-        const {
-            actions: {
-                changeCheckedKeys
-            }
-        } = this.props;
-        changeCheckedKeys(keys);
         this.originOnCheck(keys, info);
     }
-
-    onSelect (keys, info) {
-        this.originOnSelect(keys, info);
-    }
-
     loop (p, loopTime) {
         let me = this;
         const that = this;
@@ -59,7 +32,6 @@ export default class DashPanel extends Component {
                     title={p.Name}
                     key={p.No}
                     disableCheckbox={disableCheckbox}
-                    selectable={false}
                 >
                     {p.children &&
                         p.children.map(m => {
@@ -82,18 +54,10 @@ export default class DashPanel extends Component {
         }
         return (
             <div>
-                <RadioGroup onChange={this.handleRadioChange.bind(this)} value={this.state.radioValue} style={{marginBottom: 10}}>
-                    <Radio value={'细班选择'}>细班选择</Radio>
-                    <Radio value={'手动框选'}>手动框选</Radio>
-                </RadioGroup>
                 <Tree
                     checkable
-                    // showIcon
-                    checkedKeys={this.props.checkedKeys}
                     onCheck={this.onCheck.bind(that)}
                     showLine
-                    onSelect={this.onSelect.bind(this)}
-                    defaultExpandAll
                 >
                     {contents.map(p => {
                         return that.loop(p);
@@ -102,18 +66,5 @@ export default class DashPanel extends Component {
 
             </div>
         );
-    }
-
-    handleRadioChange = async (e) => {
-        const {
-            actions: {
-                changeSelectMap
-            }
-        } = this.props;
-        console.log('radio checked', e.target.value);
-        await changeSelectMap(e.target.value);
-        this.setState({
-            radioValue: e.target.value
-        });
     }
 }
