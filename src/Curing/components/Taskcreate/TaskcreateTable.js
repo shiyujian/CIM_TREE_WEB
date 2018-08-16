@@ -594,17 +594,9 @@ export default class TaskCreateTable extends Component {
         let treearea = [];
         try {
             let rst = await getTreearea({}, { no: no });
-            if (
-                !(
-                    rst &&
-                        rst.content &&
-                        rst.content instanceof Array &&
-                        rst.content.length > 0
-                )
-            ) {
+            if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
                 return;
             }
-
             let contents = rst.content;
             let data = contents.find(content => content.Section === section);
             let str = data.coords;

@@ -818,6 +818,11 @@ export default class TaskStatisTable extends Component {
             dataIndex: 'typeName'
         },
         {
+            title: '标段',
+            dataIndex: 'sectionName',
+            render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
+        },
+        {
             title: '细班',
             dataIndex: 'thinClassName',
             render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
