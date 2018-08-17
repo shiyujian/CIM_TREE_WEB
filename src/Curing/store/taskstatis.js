@@ -29,6 +29,8 @@ export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curing
 export const changeTaskStatisGisVisible = createAction(`${ID}_changeTaskStatisTableVisible`);
 // 修改选择地图的方式
 export const changeTaskStatisSelectTask = createAction(`${ID}_changeTaskStatisSelectTask`);
+// 获获取任务统计
+export const getcCuringStat = createFetchAction(`${FOREST_API}/curing/curingstat`, [], 'GET');
 
 export const actions = {
     getTreearea,
@@ -42,7 +44,8 @@ export const actions = {
     getcCuringTypes,
     getCuringGroupMans,
     changeTaskStatisGisVisible,
-    changeTaskStatisSelectTask
+    changeTaskStatisSelectTask,
+    getcCuringStat
 };
 export default handleActions({
     [changeTaskStatisGisVisible]: (state, {payload}) => ({

@@ -98,7 +98,7 @@ export default class TaskStatisEcharts extends Component {
     async query () {
         const {
             curingTypes,
-            taskSearchData = []
+            statisData = []
         } = this.props;
         const {
             etime,
@@ -107,7 +107,7 @@ export default class TaskStatisEcharts extends Component {
         this.setState({
             loading: true
         });
-        console.log('ssssssssssssssssssssssssss', taskSearchData);
+        console.log('ssssssssssssssssssssssssss', statisData);
         let postdata = {};
         this.setState({
             loading: true
@@ -130,7 +130,7 @@ export default class TaskStatisEcharts extends Component {
                 if (!data[index]) {
                     data[index] = 0;
                 }
-                taskSearchData.map((task) => {
+                statisData.map((task) => {
                     if (task.CuringType === no) {
                         data[index] += parseInt(task.Area);
                     }

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-17 10:38:57
+ * @Last Modified time: 2018-08-17 14:24:35
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -245,7 +245,7 @@ class OnSite extends Component {
                             <PkCodeTree
                                 treeData={content}
                                 selectedKeys={this.state.leftkeycode}
-                                onSelect={this.handleAreaSelect.bind(this)}
+                                onSelect={this._handleAreaSelect.bind(this)}
                                 areaTreeKeys={areaTreeKeys}
                             />
                         </Spin>
@@ -1033,7 +1033,7 @@ class OnSite extends Component {
                             },
                             type: 'track'
                         };
-                        let trackMarkerLayer = me.createMarker(iconData);
+                        let trackMarkerLayer = me._createMarker(iconData);
                         trackMarkerLayerList[selectKey] = trackMarkerLayer;
                     }
 
@@ -1086,7 +1086,7 @@ class OnSite extends Component {
                     if (riskMarkerLayerList[checkedKey]) {
                         riskMarkerLayerList[checkedKey].addTo(me.map);
                     } else {
-                        let riskMarkerLayer = me.createMarker(risk);
+                        let riskMarkerLayer = me._createMarker(risk);
                         riskMarkerLayerList[checkedKey] = riskMarkerLayer;
                     }
                 }
@@ -1097,7 +1097,7 @@ class OnSite extends Component {
                         if (riskMarkerLayerList[checkedKey]) {
                             riskMarkerLayerList[checkedKey].addTo(me.map);
                         } else {
-                            riskMarkerLayerList[checkedKey] = me.createMarker(riskData);
+                            riskMarkerLayerList[checkedKey] = me._createMarker(riskData);
                         }
                         me.map.panTo(riskData.geometry.coordinates);
                     }
@@ -1221,15 +1221,8 @@ class OnSite extends Component {
     }
     // 养护任务点击
     handleCuringTaskCheck (keys, info) {
-        const {
-            curingTaskLayerList,
-            curingMarkerLayerList
-        } = this.state;
-        let me = this;
         // 当前选中的节点
-        let eventKey = keys[0];
         this.setState({
-            taskEventKey: eventKey,
             curingTaskTreeKeys: keys
         });
 
@@ -1450,7 +1443,7 @@ class OnSite extends Component {
                 },
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
-            let layer = this.createMarker(message);
+            let layer = this._createMarker(message);
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
             if (curingTaskPlanLayerList[eventKey]) {
                 curingTaskPlanLayerList[eventKey].push(layer);
@@ -1515,7 +1508,7 @@ class OnSite extends Component {
                 },
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
-            let layer = this.createMarker(message);
+            let layer = this._createMarker(message);
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
             if (curingTaskRealLayerList[eventKey]) {
                 curingTaskRealLayerList[eventKey].push(layer);
@@ -1550,7 +1543,7 @@ class OnSite extends Component {
         });
     }
     /* 细班选择处理 */
-    handleAreaSelect = async (keys, info) => {
+    _handleAreaSelect = async (keys, info) => {
         const {
             areaLayerList,
             radioValue,
@@ -1671,7 +1664,7 @@ class OnSite extends Component {
                     geometry: { type: 'Polygon', coordinates: treearea }
                 };
                 // let num = computeSignedArea(target1, 1);
-                let layer = this.createMarker(message);
+                let layer = this._createMarker(message);
                 areaLayerList[eventKey] = layer;
                 me.setState({
                     areaLayerList
@@ -1684,7 +1677,7 @@ class OnSite extends Component {
         }
     }
     /* 在地图上添加marker和polygan */
-    createMarker (geo) {
+    _createMarker (geo) {
         try {
             if (geo.properties.type === 'area') {
                 // 创建区域图形
@@ -1765,7 +1758,7 @@ class OnSite extends Component {
         this.setState({
             areaMeasureVisible: false
         });
-        this.resetButState();
+        this._resetRegionState();
     }
     _handleCreateMeasureRetreat = async () => {
         const {
@@ -1780,7 +1773,7 @@ class OnSite extends Component {
         });
         coordinates.pop();
         if (coordinates.length === 0) {
-            this.resetButState();
+            this._resetRegionState();
             return;
         }
         let polygonData = L.polygon(coordinates, {
@@ -1794,7 +1787,7 @@ class OnSite extends Component {
         });
     }
     // 取消圈选和按钮的功能
-    resetButState = () => {
+    _resetRegionState = () => {
         this.setState({
             createBtnVisible: false,
             polygonData: '',

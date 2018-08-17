@@ -7,7 +7,7 @@ import TaskStatisEcharts from './TaskStatisEcharts';
 import PicViewModal from './PicViewModal';
 import { getUser } from '_platform/auth';
 import { FOREST_API } from '_platform/api';
-import {getSmallClass, getThinClass, getSectionName, getTaskThinClassName} from '../auth';
+import {getSmallClass, getThinClass, getTaskThinClassName, getTaskStatus} from '../auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const Option = Select.Option;
@@ -42,8 +42,9 @@ export default class TaskStatisTable extends Component {
             sectionSelect: '',
             smallClassSelect: '',
             thinClassSelect: '',
-
-            smallClassSelectList: []
+            smallClassSelectList: [],
+            pagination: {},
+            statisData: []
         };
         this.totalThinClass = [];
         this.sections = [];
@@ -212,14 +213,20 @@ export default class TaskStatisTable extends Component {
         let postData = {};
         if (this.section) {
             postData = {
-                section: this.section
+                section: this.section,
+                page: 1,
+                size: 5
             };
         } else if (this.totalDataPer) {
-            postData = {};
+            postData = {
+                page: 1,
+                size: 5
+            };
         } else {
             this.reSetState();
             return;
         }
+        this.handleQueryStat(postData);
         if (curingTypes && curingTypes.length > 0) {
             let curingTaskData = await getCuring({}, postData);
             let curingTasks = curingTaskData.content;
@@ -233,23 +240,22 @@ export default class TaskStatisTable extends Component {
                             if (type.ID === task.CuringType) {
                                 // 获取task的养护类型
                                 task.typeName = type.Base_Name;
-                                // 获取task的细班和标段名称
-                                let regionData = getTaskThinClassName(task, this.totalThinClass);
-                                console.log('regionData', regionData);
-                                task.sectionName = regionData.regionSectionName || '';
-                                task.regionSmallName = regionData.regionSmallName || '';
-                                task.regionSmallNo = regionData.regionSmallNo || '';
-                                task.thinClassName = regionData.regionThinName || '';
+                                task = this.handleTaskProperty(task);
                                 taskTotalData.push(task);
                             }
                         }
                     }
                 }
+                const pagination = { ...this.state.pagination };
+                pagination.total = curingTaskData.pageinfo.total;
+                pagination.pageSize = 5;
+                console.log('pagination', pagination);
                 this.setState({
                     taskTotalData,
                     taskSearchData: taskTotalData,
                     loading: false,
-                    echartsChange: moment().unix()
+                    echartsChange: moment().unix(),
+                    pagination
                 });
             } else {
                 this.reSetState();
@@ -263,7 +269,12 @@ export default class TaskStatisTable extends Component {
         this.setState({
             taskSearchData: [],
             loading: false,
-            echartsChange: moment().unix()
+            echartsChange: moment().unix(),
+            pagination: {
+                pageSize: 5,
+                total: 0,
+                current: 1
+            }
         });
     }
 
@@ -283,7 +294,8 @@ export default class TaskStatisTable extends Component {
             projectSelect,
             sectionSelect,
             smallClassSelect,
-            thinClassSelect
+            thinClassSelect,
+            pagination
         } = this.state;
         const {
             taskStatisGisVisible
@@ -330,7 +342,7 @@ export default class TaskStatisTable extends Component {
                             </Select>
                         </div>
                         <div>
-                            <Button type='primary' style={{marginRight: 20}} onClick={this.handleQuery.bind(this)}>查询</Button>
+                            <Button type='primary' style={{marginRight: 20}} onClick={this.handleTableChange.bind(this, {current: 1})}>查询</Button>
                         </div>
                     </div>
                     <div className='taskSelect-container'>
@@ -390,9 +402,8 @@ export default class TaskStatisTable extends Component {
                         columns={this.columns}
                         dataSource={taskSearchData}
                         rowKey='ID'
-                        pagination={{
-                            pageSize: 5
-                        }}
+                        onChange={this.handleTableChange.bind(this)}
+                        pagination={pagination}
                     />
                     {
                         picViewVisible
@@ -445,7 +456,6 @@ export default class TaskStatisTable extends Component {
             this.setSectionOption(sections);
         }
     }
-
     // 设置标段选项
     setSectionOption (sections) {
         if (sections instanceof Array) {
@@ -561,13 +571,13 @@ export default class TaskStatisTable extends Component {
             thinClassSelect: value
         });
     }
-
+    // 养护类型选择
     _handleTypeSelect = (value) => {
         this.setState({
             typeSelect: value
         });
     }
-
+    // 计划日期选择
     datepick (value) {
         let me = this;
         this.setState({
@@ -576,7 +586,7 @@ export default class TaskStatisTable extends Component {
             etime: value[1] ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss') : ''
         });
     }
-
+    // 重置搜索条件
     handleResetSearch = () => {
         if (this.totalDataPer) {
             this.setState({
@@ -595,7 +605,7 @@ export default class TaskStatisTable extends Component {
                 typeSelect: '',
                 timePicker: ['', '']
             }, () => {
-                this.handleQuery();
+                this.handleTableChange({current: 1});
             });
         } else {
             this.setState({
@@ -609,12 +619,20 @@ export default class TaskStatisTable extends Component {
                 typeSelect: '',
                 timePicker: ['', '']
             }, () => {
-                this.handleQuery();
+                this.handleTableChange({current: 1});
             });
         }
     }
-
-    handleQuery = async () => {
+    handleTableChange (pagination) {
+        const pager = { ...this.state.pagination };
+        pager.current = pagination.current;
+        this.setState({
+            pagination: pager
+        });
+        this.handleQuery(pagination.current);
+    }
+    // 搜索
+    handleQuery = async (page) => {
         const {
             actions: {
                 getCuring
@@ -631,11 +649,23 @@ export default class TaskStatisTable extends Component {
             thinClassSelect
         } = this.state;
         try {
+            if (projectSelect && !sectionSelect && !smallClassSelect && !thinClassSelect) {
+                Notification.error({
+                    message: '请选择标段进行查询',
+                    duration: 3
+                });
+                return;
+            } else if (smallClassSelect && !thinClassSelect) {
+                Notification.error({
+                    message: '请选择细班进行查询',
+                    duration: 3
+                });
+                return;
+            }
             let thinclass = '';
             if (thinClassSelect) {
                 let handleKeys = thinClassSelect.split('-');
                 console.log('handleKeys', handleKeys);
-
                 if (handleKeys && handleKeys instanceof Array && handleKeys.length === 5) {
                     thinclass = handleKeys[0] + '-' + handleKeys[1] + '-' + handleKeys[3] + '-' + handleKeys[4];
                 }
@@ -644,12 +674,13 @@ export default class TaskStatisTable extends Component {
             console.log('thinclass', thinclass);
             if (this.section) {
                 postData = {
-                    section: this.section,
                     stime: stime,
                     etime: etime,
                     curingtype: typeSelect,
                     section: sectionSelect,
-                    thinclass: thinclass
+                    thinclass: thinclass,
+                    page: page,
+                    size: 5
                 };
             } else if (this.totalDataPer) {
                 postData = {
@@ -657,7 +688,9 @@ export default class TaskStatisTable extends Component {
                     etime: etime,
                     curingtype: typeSelect,
                     section: sectionSelect,
-                    thinclass: thinclass
+                    thinclass: thinclass,
+                    page: page,
+                    size: 5
                 };
             } else {
                 Notification.error({
@@ -669,6 +702,7 @@ export default class TaskStatisTable extends Component {
             this.setState({
                 loading: true
             });
+            this.handleQueryStat(postData);
             let taskSearchData = [];
             if (curingTypes && curingTypes.length > 0) {
                 let curingTaskData = await getCuring({}, postData);
@@ -679,38 +713,62 @@ export default class TaskStatisTable extends Component {
                         if (task && task.ID) {
                             for (let t = 0; t < curingTypes.length; t++) {
                                 let type = curingTypes[t];
+                                console.log('type', type);
                                 if (type.ID === task.CuringType) {
                                     // 获取task的养护类型
                                     task.typeName = type.Base_Name;
-                                    // 获取task的细班和标段名称
-                                    let regionData = getTaskThinClassName(task, this.totalThinClass);
-                                    console.log('regionData', regionData);
-                                    task.sectionName = regionData.regionSectionName || '';
-                                    task.regionSmallName = regionData.regionSmallName || '';
-                                    task.regionSmallNo = regionData.regionSmallNo || '';
-                                    task.thinClassName = regionData.regionThinName || '';
+                                    task = this.handleTaskProperty(task);
                                     taskSearchData.push(task);
                                 }
                             }
                         }
                     }
-                    if (projectSelect && !sectionSelect && !smallClassSelect && !thinClassSelect) {
-                        this.handleTaskProjectFilter(taskSearchData);
-                    } else if (smallClassSelect && !thinClassSelect) {
-                        this.handleTaskSmallFilter(taskSearchData);
-                    } else {
-                        this.setState({
-                            taskSearchData,
-                            loading: false,
-                            echartsChange: moment().unix()
-                        });
-                    }
+                    const pagination = { ...this.state.pagination };
+                    pagination.total = curingTaskData.pageinfo.total;
+                    pagination.pageSize = 5;
+                    console.log('pagination', pagination);
+                    // if (projectSelect && !sectionSelect && !smallClassSelect && !thinClassSelect) {
+                    //     this.handleTaskProjectFilter(taskSearchData);
+                    // } else if (smallClassSelect && !thinClassSelect) {
+                    //     this.handleTaskSmallFilter(taskSearchData);
+                    // } else {
+                    //     this.setState({
+                    //         taskSearchData,
+                    //         loading: false,
+                    //         echartsChange: moment().unix()
+                    //     });
+                    // }
+                    console.log('taskSearchData', taskSearchData);
+                    this.setState({
+                        taskSearchData,
+                        loading: false,
+                        echartsChange: moment().unix(),
+                        pagination
+                    });
                 } else {
                     this.reSetState();
                 }
             } else {
                 this.reSetState();
             }
+        } catch (e) {
+
+        }
+    }
+    // 获取任务统计
+    handleQueryStat = async (postData) => {
+        try {
+            const {
+                actions: {
+                    getcCuringStat
+                }
+            } = this.props;
+            postData.status = 2;
+            let statisData = await getcCuringStat({}, postData);
+            console.log('statisData', statisData);
+            this.setState({
+                statisData
+            });
         } catch (e) {
 
         }
@@ -802,6 +860,22 @@ export default class TaskStatisTable extends Component {
             });
         } catch (e) {
             console.log('处理图片', e);
+        }
+    }
+    // 处理任务的属性信息
+    handleTaskProperty = (task) => {
+        try {
+            let regionData = getTaskThinClassName(task, this.totalThinClass);
+            console.log('regionData', regionData);
+            task.sectionName = regionData.regionSectionName || '';
+            task.smallClassName = regionData.regionSmallName || '';
+            task.regionSmallNo = regionData.regionSmallNo || '';
+            task.thinClassName = regionData.regionThinName || '';
+            let statusName = getTaskStatus(task);
+            task.statusName = statusName;
+            return task;
+        } catch (e) {
+            console.log('处理任务状态', e);
         }
     }
 
@@ -954,6 +1028,11 @@ export default class TaskStatisTable extends Component {
                     return null;
                 }
             }
+        },
+        {
+            title: '状态',
+            dataIndex: 'statusName',
+            render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
         },
         {
             title: '图片',

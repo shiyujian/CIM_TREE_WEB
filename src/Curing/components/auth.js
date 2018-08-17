@@ -448,3 +448,13 @@ export const getThinClassName = (regionThinClass, totalThinClass, sections) => {
     };
     return regionData;
 };
+// 计算养护任务的状态
+export const getTaskStatus = (task) => {
+    let status = '未完成';
+    if (task.Status === 2) {
+        status = '已上报';
+    } else if (task.StartTime && task.EndTime) {
+        status = '已完成且未上报';
+    }
+    return status;
+};

@@ -15,7 +15,8 @@ import {
     genPopUpContent,
     getIconType,
     getTaskThinClassName,
-    getThinClassName
+    getThinClassName,
+    getTaskStatus
 } from '../auth';
 import TaskCreateModal from './TaskCreateModal';
 import '../Curing.less';
@@ -803,12 +804,7 @@ export default class TaskCreateTable extends Component {
                 }
             });
             let treearea = [];
-            let status = '未完成';
-            if (taskMess.Status === 2) {
-                status = '已上报';
-            } else if (taskMess.StartTime && taskMess.EndTime) {
-                status = '已完成且未上报';
-            }
+            let status = getTaskStatus(taskMess);
             let regionData = getTaskThinClassName(taskMess, this.totalThinClass);
             console.log('regionData', regionData);
             // let regionData = this.getTaskThinClassName(taskMess);

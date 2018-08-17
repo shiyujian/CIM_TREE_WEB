@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     Button, Modal, Collapse, Checkbox
 } from 'antd';
-import {genPopUpContent, fillAreaColor, getIconType} from '../auth';
+import {genPopUpContent, fillAreaColor, getIconType, getTaskStatus} from '../auth';
 import '../Curing.less';
 window.config = window.config || {};
 
@@ -312,10 +312,7 @@ export default class TaskStatisGis extends Component {
                 return item.split(' ').map(_item => _item - 0);
             });
             let treearea = [];
-            let status = '未完成';
-            if (task.StartTime && task.EndTime) {
-                status = '已完成';
-            }
+            let status = getTaskStatus(task);
             task.status = status;
             taskMessList[eventKey] = task;
             this.setState({
