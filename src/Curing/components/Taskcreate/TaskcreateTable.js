@@ -713,7 +713,6 @@ export default class TaskCreateTable extends Component {
         } else {
             // 如果不是添加过，需要请求数据
             this.getTaskWkt(eventKey, isFocus);
-            this._handleTaskWkt(eventKey, isFocus);
         }
     }
     // 获取养护任务的计划和实际区域

@@ -69,7 +69,7 @@ export default class TaskCheckTree extends Component {
                     // showIcon
                     onCheck={this.onCheck.bind(that)}
                     showLine
-                    defaultExpandAll
+                    // defaultExpandAll
                 >
                     {contents.map(p => {
                         return that.loop(p);

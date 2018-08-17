@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-16 11:22:51
+ * @Last Modified time: 2018-08-17 10:38:57
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -34,7 +34,17 @@ import moment from 'moment';
 import PkCodeTree from './PkCodeTree';
 import TreeMessModal from './TreeMessModal';
 import CuringTaskTree from './CuringTaskTree';
-import {getThinClass, getSmallClass, genPopUpContent, computeSignedArea, getIconType, getSectionName, onImgClick, fillAreaColor} from './auth';
+import {
+    getThinClass,
+    getSmallClass,
+    genPopUpContent,
+    computeSignedArea,
+    getIconType,
+    getSectionName,
+    onImgClick,
+    fillAreaColor,
+    getTaskThinClassName
+} from './auth';
 import { getUser } from '_platform/auth';
 const RadioGroup = Radio.Group;
 const { RangePicker } = DatePicker;
@@ -99,8 +109,9 @@ class OnSite extends Component {
             trackMarkerLayerList: {}, // 轨迹图标图层List
             treeTypesLayerList: {}, // 树种图层list
             riskMarkerLayerList: {}, // // 安全隐患图标图层List
-            curingTaskLayerList: {}, // 养护任务图层List
-            curingMarkerLayerList: {}, // 养护任务图标图层List
+            curingTaskPlanLayerList: {},
+            curingTaskMarkerLayerList: {},
+            curingTaskRealLayerList: {},
             curingTaskMessList: {}, // 养护任务信息List
             // 左侧菜单按钮是否选中
             geojsonFeature_area: false,
@@ -289,7 +300,7 @@ class OnSite extends Component {
                     return (
                         <Spin spinning={curingTaskTreeLoading}>
                             <CuringTaskTree
-                                onSelect={this.handleCuringTaskSelect.bind(this)}
+                                onCheck={this.handleCuringTaskCheck.bind(this)}
                                 content={content}
                                 curingTaskTreeKeys={curingTaskTreeKeys}
                             />
@@ -460,16 +471,13 @@ class OnSite extends Component {
                 let unitProject = unitProjectList[i];
                 let list = await getLittleBan({ no: unitProject.No });
                 let smallClassList = getSmallClass(list);
-                let unitProjectThinArr = [];
                 smallClassList.map(smallClass => {
                     let thinClassList = getThinClass(smallClass, list);
-
-                    unitProjectThinArr = unitProjectThinArr.concat(thinClassList);
                     smallClass.children = thinClassList;
                 });
                 this.totalThinClass.push({
                     unitProject: unitProject.No,
-                    thinClass: unitProjectThinArr
+                    smallClassList: smallClassList
                 });
                 unitProject.children = smallClassList;
             }
@@ -1212,7 +1220,7 @@ class OnSite extends Component {
         }
     }
     // 养护任务点击
-    handleCuringTaskSelect (keys, info) {
+    handleCuringTaskCheck (keys, info) {
         const {
             curingTaskLayerList,
             curingMarkerLayerList
@@ -1220,60 +1228,120 @@ class OnSite extends Component {
         let me = this;
         // 当前选中的节点
         let eventKey = keys[0];
-        // 当前的选中状态
-        let selected = info.selected;
         this.setState({
             taskEventKey: eventKey,
             curingTaskTreeKeys: keys
         });
+
+        console.log('keys', keys);
+        console.log('info', info);
         try {
-            // 单选，需要先全部去除图层
-            for (let i in curingTaskLayerList) {
-                curingTaskLayerList[i].map((layer) => {
-                    this.map.removeLayer(layer);
-                });
-            }
-            for (let i in curingMarkerLayerList) {
-                this.map.removeLayer(curingMarkerLayerList[i]);
-            }
-            // 选中加载图层
-            if (selected) {
-                if (curingTaskLayerList[eventKey]) {
-                    curingTaskLayerList[eventKey].map((layer) => {
-                        layer.addTo(me.map);
-                        me.map.fitBounds(layer.getBounds());
-                    });
-                    if (curingMarkerLayerList[eventKey]) {
-                        curingMarkerLayerList[eventKey].addTo(me.map);
+            let eventKey = info.node.props.eventKey;
+            // 当前的选中状态
+            let checked = info.checked;
+            if (info && info.node && info.node.props && info.node.props.children) {
+                let children = info.node.props.children;
+                children.map((child, index) => {
+                    eventKey = child.key;
+                    if (checked) {
+                        if (index === children.length - 1) {
+                            this.handleCuringTaskAddLayer(eventKey, true);
+                        } else {
+                            this.handleCuringTaskAddLayer(eventKey, false);
+                        }
+                    } else {
+                        this.handleCuringTaskDelLayer(eventKey);
                     }
-                    this.setState({
-                        selected
-                    });
+                });
+            } else {
+                if (checked) {
+                    this.handleCuringTaskAddLayer(eventKey, true);
                 } else {
-                    // 如果不是添加过，需要请求数据
-                    me._addCuringTaskLayer(eventKey);
+                    this.handleCuringTaskDelLayer(eventKey);
                 }
             }
         } catch (e) {
-            console.log('任务选中', e);
+            console.log('handleCuringTaskCheck', e);
         }
     }
-    // 处理养护任务坐标数据
-    _addCuringTaskLayer = async (eventKey) => {
+    // 去除任务图层
+    handleCuringTaskDelLayer = async (eventKey) => {
+        const {
+            curingTaskPlanLayerList,
+            curingTaskMarkerLayerList,
+            curingTaskRealLayerList
+        } = this.state;
+        if (curingTaskPlanLayerList[eventKey]) {
+            curingTaskPlanLayerList[eventKey].map((layer) => {
+                this.map.removeLayer(layer);
+            });
+        }
+        if (curingTaskMarkerLayerList[eventKey]) {
+            this.map.removeLayer(curingTaskMarkerLayerList[eventKey]);
+        }
+        if (curingTaskRealLayerList[eventKey]) {
+            curingTaskRealLayerList[eventKey].map((layer) => {
+                this.map.removeLayer(layer);
+            });
+        }
+    }
+    // 处理每个check的任务如何加载图层
+    handleCuringTaskAddLayer = async (eventKey, isFocus) => {
+        const {
+            curingTaskPlanLayerList,
+            curingTaskMarkerLayerList,
+            curingTaskRealLayerList
+        } = this.state;
+        if (curingTaskPlanLayerList[eventKey]) {
+            curingTaskPlanLayerList[eventKey].map((layer) => {
+                layer.addTo(this.map);
+                if (isFocus) {
+                    this.map.fitBounds(layer.getBounds());
+                }
+            });
+            if (curingTaskMarkerLayerList[eventKey]) {
+                curingTaskMarkerLayerList[eventKey].addTo(this.map);
+            }
+            if (curingTaskRealLayerList[eventKey]) {
+                curingTaskRealLayerList[eventKey].map((layer) => {
+                    layer.addTo(this.map);
+                });
+            }
+        } else {
+            // 如果不是添加过，需要请求数据
+            this.getCuringTaskWkt(eventKey, isFocus);
+        }
+    }
+    // 获取养护任务的计划和实际区域
+    getCuringTaskWkt = async (eventKey, isFocus) => {
         const {
             actions: {
                 getCuringMessage
             }
         } = this.props;
-        let postData = {
-            id: eventKey
-        };
-        let taskMess = await getCuringMessage(postData);
-        let planWkt = taskMess.PlanWKT;
+        try {
+            let postData = {
+                id: eventKey
+            };
+            let taskMess = await getCuringMessage(postData);
+            let planWkt = taskMess.PlanWKT;
+            let realWkt = taskMess.WKT || '';
+            if (planWkt) {
+                this._handleCuringTaskWkt(planWkt, eventKey, taskMess, 'plan', isFocus);
+            }
+            if (realWkt) {
+                this._handleCuringTaskWkt(realWkt, eventKey, taskMess, 'real', isFocus);
+            }
+        } catch (e) {
+            console.log('handleWKT', e);
+        }
+    }
+    // 处理养护区域的数据，将字符串改为数组
+    _handleCuringTaskWkt = async (wkt, eventKey, task, type, isFocus) => {
         let str = '';
         try {
-            if (planWkt.indexOf('MULTIPOLYGON') !== -1) {
-                let data = planWkt.slice(planWkt.indexOf('(') + 2, planWkt.indexOf('))') + 1);
+            if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+                let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
                 let arr = data.split('),(');
                 arr.map((a, index) => {
                     if (index === 0) {
@@ -1285,27 +1353,39 @@ class OnSite extends Component {
                     }
                     // 将图标设置在最后一个图形中，因为最后会聚焦到该位置
                     if (index === arr.length - 1) {
-                        this._handleCoordLayer(str, taskMess, eventKey, index);
+                        if (type === 'plan') {
+                            this._handleCuringPlanCoordLayer(str, task, eventKey, index, isFocus);
+                        } else if (type === 'real') {
+                            this._handleCuringRealCoordLayer(str, task, eventKey, index);
+                        }
                     } else {
-                        // 其他图形中不设置图标
-                        this._handleCoordLayer(str, taskMess, eventKey);
+                        if (type === 'plan') {
+                            // 其他图形中不设置图标
+                            this._handleCuringPlanCoordLayer(str, task, eventKey);
+                        } else if (type === 'real') {
+                            this._handleCuringRealCoordLayer(str, task, eventKey);
+                        }
                     }
                 });
-            } else {
-                str = planWkt.slice(planWkt.indexOf('(') + 3, planWkt.indexOf(')'));
-                // 只有一个图形，必须要设置图标
-                this._handleCoordLayer(str, taskMess, eventKey, 1);
+            } else if (wkt.indexOf('POLYGON') !== -1) {
+                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                if (type === 'plan') {
+                    // 只有一个图形，必须要设置图标
+                    this._handleCuringPlanCoordLayer(str, task, eventKey, 1, isFocus);
+                } else if (type === 'real') {
+                    this._handleCuringRealCoordLayer(str, task, eventKey, 1);
+                }
             }
         } catch (e) {
             console.log('处理wkt', e);
         }
     }
-    // 加载养护任务图层
-    _handleCoordLayer (str, taskMess, eventKey, index) {
+    // 养护任务计划区域加载图层
+    _handleCuringPlanCoordLayer (str, taskMess, eventKey, index, isFocus) {
         const {
-            curingTaskLayerList,
+            curingTaskPlanLayerList,
             curingTypes,
-            curingMarkerLayerList,
+            curingTaskMarkerLayerList,
             curingTaskMessList
         } = this.state;
         try {
@@ -1321,17 +1401,23 @@ class OnSite extends Component {
             });
             let treearea = [];
             let status = '未完成';
-            if (taskMess.StartTime && taskMess.EndTime) {
-                status = '已完成';
+            if (taskMess.Status === 2) {
+                status = '已上报';
+            } else if (taskMess.StartTime && taskMess.EndTime) {
+                status = '已完成且未上报';
             }
-            let regionData = this.getCuringTaskThinClassName(taskMess);
+            console.log('taskMess', taskMess);
+            console.log('this.totalThinClass', this.totalThinClass);
+            let regionData = getTaskThinClassName(taskMess, this.totalThinClass);
+            console.log('regionData', regionData);
             let sectionName = regionData.regionSectionName;
+            let smallClassName = regionData.regionSmallName;
             let thinClassName = regionData.regionThinName;
             taskMess.sectionName = sectionName;
+            taskMess.smallClassName = smallClassName;
             taskMess.thinClassName = thinClassName;
             taskMess.status = status;
             taskMess.typeName = typeName;
-            console.log('taskMess', taskMess);
             curingTaskMessList[eventKey] = taskMess;
             this.setState({
                 curingTaskMessList
@@ -1357,20 +1443,27 @@ class OnSite extends Component {
                     PlanStartTime: taskMess.PlanStartTime || '',
                     PlanEndTime: taskMess.PlanEndTime || '',
                     StartTime: taskMess.StartTime || '',
-                    EndTime: taskMess.EndTime || ''
+                    EndTime: taskMess.EndTime || '',
+                    sectionName: taskMess.sectionName || '',
+                    smallClassName: taskMess.smallClassName || '',
+                    thinClassName: taskMess.thinClassName || ''
                 },
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
             let layer = this.createMarker(message);
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
-            if (curingTaskLayerList[eventKey]) {
-                curingTaskLayerList[eventKey].push(layer);
+            if (curingTaskPlanLayerList[eventKey]) {
+                curingTaskPlanLayerList[eventKey].push(layer);
             } else {
-                curingTaskLayerList[eventKey] = [layer];
+                curingTaskPlanLayerList[eventKey] = [layer];
             }
             this.setState({
-                curingTaskLayerList
+                curingTaskPlanLayerList
             });
+            // 多选的话，只需要聚焦最后一个
+            if (isFocus) {
+                this.map.fitBounds(layer.getBounds());
+            }
             if (!index) {
                 return;
             }
@@ -1389,61 +1482,54 @@ class OnSite extends Component {
                 )
             );
             marker.addTo(this.map);
-            curingMarkerLayerList[eventKey] = marker;
+            curingTaskMarkerLayerList[eventKey] = marker;
             this.setState({
-                curingMarkerLayerList,
-                selected: true
+                curingTaskMarkerLayerList
             });
         } catch (e) {
             console.log('处理str', e);
         }
     }
-    // 获取养护任务标段细班名称
-    getCuringTaskThinClassName = (task) => {
+    // 添加实际养护区域图层
+    _handleCuringRealCoordLayer (str, task, eventKey, index) {
+        const {
+            curingTaskRealLayerList
+        } = this.state;
         try {
-            let thinClass = task.ThinClass;
-            let section = task.Section;
-            let thinClassList = thinClass.split(',');
-            let regionSectionName = '';
-            let regionThinName = '';
-            if (thinClassList && thinClassList instanceof Array && thinClassList.length > 0) {
-                thinClassList.map((thinNo, index) => {
-                    this.totalThinClass.map((unitProjectData) => {
-                        let unitProject = unitProjectData.unitProject;
-                        // 首先根据区块找到对应的细班list
-                        if (section.indexOf(unitProject) !== -1) {
-                            let children = unitProjectData.thinClass;
-                            children.map((child) => {
-                            // tree结构的数据经过了处理，需要和api获取的数据调整一致
-                                let handleKey = child.No.split('-');
-                                let childNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-                                let childSection = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-                                if (thinNo.indexOf(childNo) !== -1 && childSection === section) {
-                                // 找到符合条件的数据的name
-                                    let name = child.Name;
-                                    let sectionName = getSectionName(section);
-                                    regionSectionName = sectionName;
-                                    if (index === 0) {
-                                        regionThinName = regionThinName + name;
-                                    } else {
-                                        regionThinName = regionThinName + ' ,' + name;
-                                    }
-                                }
-                            });
-                        }
-                    });
-                });
-            }
-
-            let regionData = {
-                regionThinName: regionThinName,
-                regionSectionName: regionSectionName
+            let target = str.split(',').map(item => {
+                return item.split(' ').map(_item => _item - 0);
+            });
+            let treearea = [];
+            let arr = [];
+            target.map((data, index) => {
+                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+                    arr.push([data[1], data[0]]);
+                }
+            });
+            treearea.push(arr);
+            let message = {
+                key: 3,
+                type: 'realCuringTask',
+                properties: {
+                    type: 'realCuringTask'
+                },
+                geometry: { type: 'Polygon', coordinates: treearea }
             };
-            return regionData;
+            let layer = this.createMarker(message);
+            // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
+            if (curingTaskRealLayerList[eventKey]) {
+                curingTaskRealLayerList[eventKey].push(layer);
+            } else {
+                curingTaskRealLayerList[eventKey] = [layer];
+            }
+            this.setState({
+                curingTaskRealLayerList
+            });
         } catch (e) {
-            console.log('getCuringTaskThinClassName', e);
+            console.log('Realstr', e);
         }
     }
+
     // 切换为2D
     toggleTileLayer (index) {
         this.tileLayer.setUrl(this.tileUrls[index]);
@@ -1620,7 +1706,13 @@ class OnSite extends Component {
                     fillColor: '#93B9F2',
                     fillOpacity: 0.2
                 }).addTo(this.map);
-                this.map.fitBounds(layer.getBounds());
+                return layer;
+            } else if (geo.properties.type === 'realCuringTask') {
+                let layer = L.polygon(geo.geometry.coordinates, {
+                    color: 'yellow',
+                    fillColor: 'yellow',
+                    fillOpacity: 0.3
+                }).addTo(this.map);
                 return layer;
             } else {
                 if (

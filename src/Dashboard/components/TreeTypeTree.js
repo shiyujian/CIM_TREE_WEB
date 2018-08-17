@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree } from 'antd';
 const TreeNode = Tree.TreeNode;
 
-export default class  extends Component {
+export default class extends Component {
     constructor (props) {
         super(props);
         this.featureName = this.props.featureName;
@@ -55,7 +55,7 @@ export default class  extends Component {
     }
 
     render () {
-        let { 
+        let {
             content = [],
             treetypeTreeIsDefault,
             treetypeTreeKeys
@@ -77,18 +77,18 @@ export default class  extends Component {
         }
         return (
             <div className={this.genIconClass()}>
-                    <Tree
-                        checkable
-                        showIcon
-                        onCheck={this.onCheck.bind(this)}
-                        showLine
-                        defaultExpandAll
-                        defaultCheckedKeys={defaultCheckedKeys}
-                    >
-                        {contents.map(p => {
-                            return this.loop(p);
-                        })}
-                    </Tree>
+                <Tree
+                    checkable
+                    showIcon
+                    onCheck={this.onCheck.bind(this)}
+                    showLine
+                    defaultExpandAll
+                    defaultCheckedKeys={defaultCheckedKeys}
+                >
+                    {contents.map(p => {
+                        return this.loop(p);
+                    })}
+                </Tree>
             </div>
         );
     }

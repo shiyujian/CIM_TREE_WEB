@@ -949,7 +949,7 @@ export default class TaskReportTable extends Component {
             console.log('CuringManList', CuringManList);
             let layerList = [];
             tracksList.map((track, index) => {
-                let polylineData = L.polyline(track, { color: 'black' }).addTo(
+                let polylineData = L.polyline(track, { color: 'pink' }).addTo(
                     this.map
                 );
                 layerList.push(polylineData);

@@ -46,6 +46,7 @@ export default class CuringTaskTree extends Component {
             if (p) {
                 return (
                     <TreeNode
+                        selectable={false}
                         title={`${p.CreateTime}-${p.CuringMans}`}
                         key={p.ID}
                     />
@@ -55,7 +56,7 @@ export default class CuringTaskTree extends Component {
     }
 
     render () {
-        let { 
+        let {
             content = [],
             curingTaskTreeKeys = []
         } = this.props;
@@ -70,12 +71,12 @@ export default class CuringTaskTree extends Component {
         return (
             <div>
                 <Tree
-                    // checkable
-                    // onCheck={this.onCheck.bind(that)}
+                    checkable
+                    onCheck={this.onCheck.bind(this)}
                     defaultSelectedKeys={curingTaskTreeKeys}
                     defaultExpandedKeys={curingTaskTreeKeys}
                     showLine
-                    onSelect={this.onSelect.bind(this)}
+                    // onSelect={this.onSelect.bind(this)}
                 >
                     {contents.map(p => {
                         return that.loop(p);
