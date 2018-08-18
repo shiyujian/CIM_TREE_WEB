@@ -213,20 +213,16 @@ export default class TaskStatisTable extends Component {
         let postData = {};
         if (this.section) {
             postData = {
-                section: this.section,
-                page: 1,
-                size: 5
+                section: this.section
             };
         } else if (this.totalDataPer) {
-            postData = {
-                page: 1,
-                size: 5
-            };
         } else {
             this.reSetState();
             return;
         }
-        this.handleQueryStat(postData);
+        postData.page = 1;
+        postData.size = 5;
+        this.handleQueryStat();
         if (curingTypes && curingTypes.length > 0) {
             let curingTaskData = await getCuring({}, postData);
             let curingTasks = curingTaskData.content;
@@ -285,8 +281,6 @@ export default class TaskStatisTable extends Component {
             typeOption,
             picViewVisible,
             typeSelect,
-            stime,
-            etime,
             projectOption,
             sectionOption,
             smallClassOption,
@@ -579,7 +573,6 @@ export default class TaskStatisTable extends Component {
     }
     // 计划日期选择
     datepick (value) {
-        let me = this;
         this.setState({
             timePicker: value,
             stime: value[0] ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss') : '',
@@ -623,6 +616,7 @@ export default class TaskStatisTable extends Component {
             });
         }
     }
+    // 切换表格的页数
     handleTableChange (pagination) {
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
@@ -672,17 +666,7 @@ export default class TaskStatisTable extends Component {
             }
             let postData = {};
             console.log('thinclass', thinclass);
-            if (this.section) {
-                postData = {
-                    stime: stime,
-                    etime: etime,
-                    curingtype: typeSelect,
-                    section: sectionSelect,
-                    thinclass: thinclass,
-                    page: page,
-                    size: 5
-                };
-            } else if (this.totalDataPer) {
+            if (this.section || this.totalDataPer) {
                 postData = {
                     stime: stime,
                     etime: etime,
@@ -702,7 +686,7 @@ export default class TaskStatisTable extends Component {
             this.setState({
                 loading: true
             });
-            this.handleQueryStat(postData);
+            this.handleQueryStat();
             let taskSearchData = [];
             if (curingTypes && curingTypes.length > 0) {
                 let curingTaskData = await getCuring({}, postData);
@@ -756,14 +740,36 @@ export default class TaskStatisTable extends Component {
         }
     }
     // 获取任务统计
-    handleQueryStat = async (postData) => {
+    handleQueryStat = async () => {
         try {
             const {
                 actions: {
                     getcCuringStat
                 }
             } = this.props;
-            postData.status = 2;
+            const {
+                stime,
+                etime,
+                typeSelect,
+                sectionSelect,
+                thinClassSelect
+            } = this.state;
+            let thinclass = '';
+            if (thinClassSelect) {
+                let handleKeys = thinClassSelect.split('-');
+                console.log('handleKeys', handleKeys);
+                if (handleKeys && handleKeys instanceof Array && handleKeys.length === 5) {
+                    thinclass = handleKeys[0] + '-' + handleKeys[1] + '-' + handleKeys[3] + '-' + handleKeys[4];
+                }
+            }
+            let postData = {
+                stime: stime,
+                etime: etime,
+                curingtype: typeSelect,
+                section: sectionSelect,
+                thinclass: thinclass,
+                status: 2
+            };
             let statisData = await getcCuringStat({}, postData);
             console.log('statisData', statisData);
             this.setState({
@@ -824,7 +830,7 @@ export default class TaskStatisTable extends Component {
 
         }
     }
-
+    // 点击查看任务按钮
     handleGisView = (record) => {
         const {
             actions: {
@@ -835,14 +841,14 @@ export default class TaskStatisTable extends Component {
         changeTaskStatisSelectTask(record);
         changeTaskStatisGisVisible(true);
     }
-
+    // 关闭查看图片弹窗
     handlePicCancel = () => {
         this.setState({
             imgSrcs: [],
             picViewVisible: false
         });
     }
-
+    // 处理图片数据，并弹出图片弹窗
     handlePicView = (record) => {
         console.log('record', record);
         try {
