@@ -757,7 +757,6 @@ export default class TaskStatisTable extends Component {
             let thinclass = '';
             if (thinClassSelect) {
                 let handleKeys = thinClassSelect.split('-');
-                console.log('handleKeys', handleKeys);
                 if (handleKeys && handleKeys instanceof Array && handleKeys.length === 5) {
                     thinclass = handleKeys[0] + '-' + handleKeys[1] + '-' + handleKeys[3] + '-' + handleKeys[4];
                 }
@@ -771,7 +770,6 @@ export default class TaskStatisTable extends Component {
                 status: 2
             };
             let statisData = await getcCuringStat({}, postData);
-            console.log('statisData', statisData);
             this.setState({
                 statisData
             });

@@ -9,12 +9,12 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-17 14:24:35
+ * @Last Modified time: 2018-08-19 16:01:04
  */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { actions } from '../store';
+import { actions } from '../../store';
 import {
     Button,
     Modal,
@@ -34,6 +34,7 @@ import moment from 'moment';
 import PkCodeTree from './PkCodeTree';
 import TreeMessModal from './TreeMessModal';
 import CuringTaskTree from './CuringTaskTree';
+import MenuSwitch from '../MenuSwitch';
 import {
     getThinClass,
     getSmallClass,
@@ -44,7 +45,7 @@ import {
     onImgClick,
     fillAreaColor,
     getTaskThinClassName
-} from './auth';
+} from '../auth';
 import { getUser } from '_platform/auth';
 const RadioGroup = Radio.Group;
 const { RangePicker } = DatePicker;
@@ -54,8 +55,8 @@ const Panel = Collapse.Panel;
 window.config = window.config || {};
 @connect(
     state => {
-        const { map = {} } = state.dashboard || {};
-        return map;
+        const { dashboard, platform } = state;
+        return { ...dashboard, platform };
     },
     dispatch => ({
         actions: bindActionCreators(actions, dispatch)
@@ -180,13 +181,13 @@ class OnSite extends Component {
         {
             label: '巡检路线',
             value: 'geojsonFeature_track',
-            IconUrl: require('./ImageIcon/people.png'),
+            IconUrl: require('../ImageIcon/people.png'),
             IconName: 'universal-access'
         },
         {
             label: '安全隐患',
             value: 'geojsonFeature_risk',
-            IconUrl: require('./ImageIcon/risk.png'),
+            IconUrl: require('../ImageIcon/risk.png'),
             IconName: 'warning'
         },
         {
@@ -770,9 +771,16 @@ class OnSite extends Component {
             areaMeasure,
             areaMeasureVisible
         } = this.state;
+        const {
+            dashboardCompomentMenu
+        } = this.props;
         let okDisplay = false;
         if (coordinates.length <= 2) {
             okDisplay = true;
+        }
+        let menuSwitchButtonDisplay = 'none';
+        if (dashboardCompomentMenu === '二维展示') {
+            menuSwitchButtonDisplay = 'block';
         }
         return (
             <div className='map-container'>
@@ -782,10 +790,11 @@ class OnSite extends Component {
                     onMouseUp={this.onEndResize.bind(this)}
                     onMouseMove={this.onResizingMenu.bind(this)}
                 >
-                    <div className='menuButton'>
+                    <MenuSwitch {...this.props} {...this.state} />
+                    <div className='dashboard-menuSwitchButton' style={{display: menuSwitchButtonDisplay}}>
                         {this.options.map(option => {
                             return (
-                                <div className='menuButtonLayout'>
+                                <div className='dashboard-menuButtonLayout'>
                                     <Button type={this.state[option.value] ? 'primary' : 'info'} size='large' id={option.value} onClick={this.handleMenuButton.bind(this)}>{option.label}</Button>
                                 </div>
                             );
@@ -811,7 +820,7 @@ class OnSite extends Component {
                     }
                     {
                         createBtnVisible ? (
-                            <div className='editPolygonLayout'>
+                            <div className='dashboard-editPolygonLayout'>
                                 <div>
                                     <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateMeasureOk.bind(this)}>确定</Button>
                                     <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateMeasureRetreat.bind(this)}>上一步</Button>}
@@ -822,13 +831,13 @@ class OnSite extends Component {
                     }
                     {
                         areaMeasureVisible ? (
-                            <div className='areaMeasureLayout'>
+                            <div className='dashboard-areaMeasureLayout'>
                                 <span>{`面积：${areaMeasure} 亩`}</span>
                             </div>
                         ) : ''
                     }
                     {this.state.isVisibleMapBtn ? (
-                        <div className='treeControl'>
+                        <div className='dashboard-gisTypeBut'>
                             <div>
                                 <Button
                                     type={

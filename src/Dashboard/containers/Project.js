@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store';
 import { actions as platformActions } from '_platform/store/global';
-import ProjectCom from '../components/Project';
+import ProjectCom from '../components/Project/Project';
 
 @connect(
     state => {

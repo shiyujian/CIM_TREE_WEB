@@ -32,6 +32,8 @@ export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], '
 export const getcCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
 // 苗木养护计划详情
 export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
+
+export const switchDashboardCompoment = createAction(`切换二维展示和工程影响`);
 export const actions = {
     getTreearea,
     getRisk,
@@ -49,7 +51,8 @@ export const actions = {
     getTreeTypeAction,
     getCuring,
     getcCuringTypes,
-    getCuringMessage
+    getCuringMessage,
+    switchDashboardCompoment
 };
 export default handleActions(
     {
@@ -57,6 +60,12 @@ export default handleActions(
             return {
                 ...state,
                 RiskLists: [payload]
+            };
+        },
+        [switchDashboardCompoment]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardCompomentMenu: payload
             };
         }
     },

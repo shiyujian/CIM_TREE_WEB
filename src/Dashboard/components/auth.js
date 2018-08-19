@@ -1,4 +1,4 @@
-import './OnSite.less';
+import './OnSite/OnSite.less';
 import { PROJECT_UNITS, FOREST_API } from '_platform/api';
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
@@ -161,13 +161,13 @@ export const genPopUpContent = (geo) => {
 export const getIconType = (type) => {
     switch (type) {
         case 'track':
-            return 'peopleIcon';
+            return 'dashboard-peopleIcon';
         case 'risk':
-            return 'riskIcon';
+            return 'dashboard-riskIcon';
         case 'tree':
-            return 'treeIcon';
+            return 'dashboard-treeIcon';
         case 'curingTask':
-            return 'curingTaskIcon';
+            return 'dashboard-curingTaskIcon';
         default:
             break;
     }

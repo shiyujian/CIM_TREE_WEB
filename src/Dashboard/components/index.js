@@ -1,4 +1,3 @@
-export OnSite from './OnSite';
-export RiskDetail from './RiskDetail';
-export Project from './Project';
-export CuringTaskTree from './CuringTaskTree';
+export OnSite from './OnSite/OnSite';
+export Project from './Project/Project';
+export DashboardPage from './DashboardPage';

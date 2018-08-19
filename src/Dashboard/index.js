@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-07-04 14:32:29
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-07-10 20:04:48
+ * @Last Modified time: 2018-08-18 17:04:14
  */
 /**
  *
@@ -64,40 +64,44 @@ export default class Dashboard extends Component {
         });
     }
 
-    render () {
-        const { OnSite, Project, Plan, Danger } = this.state || {};
-        return (
-            <div style={{ display: 'flex' }}>
-                <Aside style={{ overflow: 'hidden' }}>
-                    <Submenu
-                        {...this.props}
-                        menus={Dashboard.menus}
-                        defaultOpenKeys={Dashboard.defaultOpenKeys}
-                    />
-                </Aside>
-                <Main>
-                    <Switch>
-                        {OnSite && (
-                            <Route exact path='/dashboard' component={OnSite} />
-                        )}
-                        {OnSite && (
-                            <Route
-                                path='/dashboard/onsite'
-                                component={OnSite}
-                            />
-                        )}
-                        {Project && (
-                            <Route
-                                path='/dashboard/project'
-                                component={Project}
-                            />
-                        )}
-                    </Switch>
-                </Main>
-            </div>
-        );
-    }
+    // render () {
+    //     const { OnSite, Project, Plan, Danger } = this.state || {};
+    //     return (
+    //         <div style={{ display: 'flex' }}>
+    //             <Aside style={{ overflow: 'hidden' }}>
+    //                 <Submenu
+    //                     {...this.props}
+    //                     menus={Dashboard.menus}
+    //                     defaultOpenKeys={Dashboard.defaultOpenKeys}
+    //                 />
+    //             </Aside>
+    //             <Main>
+    //                 <Switch>
+    //                     {OnSite && (
+    //                         <Route exact path='/dashboard' component={OnSite} />
+    //                     )}
+    //                     {OnSite && (
+    //                         <Route
+    //                             path='/dashboard/onsite'
+    //                             component={OnSite}
+    //                         />
+    //                     )}
+    //                     {Project && (
+    //                         <Route
+    //                             path='/dashboard/project'
+    //                             component={Project}
+    //                         />
+    //                     )}
+    //                 </Switch>
+    //             </Main>
+    //         </div>
+    //     );
+    // }
 
+    render () {
+        const {OnSite = null} = this.state || {};
+        return (OnSite && <OnSite {...this.props} />);
+    }
     static menus = [
         {
             key: 'ONSITE',
@@ -106,20 +110,6 @@ export default class Dashboard extends Component {
             name: '二维展示',
             icon: <Icon name='map-o' />
         },
-        // {
-        //     key: 'PLAN',
-        //     id: 'DASHBOARD.PLAN',
-        //     path: '/dashboard/plan',
-        //     name: '巡检路线',
-        //     icon: <Icon name='line-chart' />
-        // },
-        // {
-        //     key: 'danger',
-        //     id: 'DASHBOARD.DANGER',
-        //     path: '/dashboard/danger',
-        //     name: '安全隐患',
-        //     icon: <Icon name='exclamation-triangle' />
-        // },
         {
             key: 'PROJECT',
             id: 'DASHBOARD.PROJECT',

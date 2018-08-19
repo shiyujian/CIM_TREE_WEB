@@ -3,11 +3,12 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store';
 import { actions as platformActions } from '_platform/store/global';
-import OnSiteCom from '../components/OnSite';
+// import OnSiteCom from '../components/OnSite';
+import DashboardPage from '../components/DashboardPage';
 @connect(
     state => {
-        const { platform } = state;
-        return { platform };
+        const { dashboard, platform } = state;
+        return { ...dashboard, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -18,6 +19,6 @@ import OnSiteCom from '../components/OnSite';
 )
 export default class OnSite extends Component {
     render () {
-        return <OnSiteCom {...this.props} />;
+        return <DashboardPage {...this.props} />;
     }
 }
