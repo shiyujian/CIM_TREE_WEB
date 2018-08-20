@@ -5,7 +5,7 @@ import {
     USER_API,
     FOREST_API
 } from '_platform/api';
-
+const ID = 'dashboard';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getRiskOK = createAction(`获取安全隐患`);
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`, [getRiskOK]);
@@ -33,7 +33,15 @@ export const getcCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtyp
 // 苗木养护计划详情
 export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
 
-export const switchDashboardCompoment = createAction(`切换二维展示和工程影响`);
+export const switchDashboardCompoment = createAction(`${ID}切换二维展示和工程影响`);
+export const getAreaTree = createAction(`${ID}区域地块树`);
+export const getRiskTree = createAction(`${ID}安全隐患树`);
+export const getTrackTree = createAction(`${ID}巡检路线树`);
+export const getTreetypesTree = createAction(`${ID}树种筛选树`);
+export const getCuringTaskTree = createAction(`${ID}养护任务树`);
+export const getSurvivalRateTree = createAction(`${ID}成活率树`);
+export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
+export const getCuringTypes = createAction(`${ID}养护类型`);
 export const actions = {
     getTreearea,
     getRisk,
@@ -52,7 +60,15 @@ export const actions = {
     getCuring,
     getcCuringTypes,
     getCuringMessage,
-    switchDashboardCompoment
+    switchDashboardCompoment,
+    getAreaTree,
+    getRiskTree,
+    getTrackTree,
+    getTreetypesTree,
+    getCuringTaskTree,
+    getSurvivalRateTree,
+    getTotalThinClass,
+    getCuringTypes
 };
 export default handleActions(
     {
@@ -66,6 +82,54 @@ export default handleActions(
             return {
                 ...state,
                 dashboardCompomentMenu: payload
+            };
+        },
+        [getAreaTree]: (state, { payload }) => {
+            return {
+                ...state,
+                areaTree: payload
+            };
+        },
+        [getRiskTree]: (state, { payload }) => {
+            return {
+                ...state,
+                riskTree: payload
+            };
+        },
+        [getTrackTree]: (state, { payload }) => {
+            return {
+                ...state,
+                trackTree: payload
+            };
+        },
+        [getTreetypesTree]: (state, { payload }) => {
+            return {
+                ...state,
+                treetypesTree: payload
+            };
+        },
+        [getCuringTaskTree]: (state, { payload }) => {
+            return {
+                ...state,
+                curingTaskTree: payload
+            };
+        },
+        [getSurvivalRateTree]: (state, { payload }) => {
+            return {
+                ...state,
+                survivalRateTree: payload
+            };
+        },
+        [getTotalThinClass]: (state, { payload }) => {
+            return {
+                ...state,
+                totalThinClass: payload
+            };
+        },
+        [getCuringTypes]: (state, { payload }) => {
+            return {
+                ...state,
+                curingTypes: payload
             };
         }
     },

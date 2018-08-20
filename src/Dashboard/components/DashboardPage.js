@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
 import Project from './Project/Project';
 import OnSite from './OnSite/OnSite';
-import './index.less';
-import {
-    Button
-} from 'antd';
-window.config = window.config || {};
 
 export default class DashboardPage extends Component {
     constructor (props) {
@@ -31,7 +26,7 @@ export default class DashboardPage extends Component {
         return (
             <div >
                 {
-                    dashboardCompomentMenu === '工程影像'
+                    dashboardCompomentMenu === 'geojsonFeature_projectPic'
                         ? (
                             <Project
                                 {...this.props}
@@ -44,6 +39,7 @@ export default class DashboardPage extends Component {
                                 {...this.state}
                             />
                         )
+
                 }
             </div>);
     }

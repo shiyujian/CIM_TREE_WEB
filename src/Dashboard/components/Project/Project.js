@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../store';
-import { Radio } from 'antd';
+import { Radio, Button } from 'antd';
 // import { CUS_TILEMAP } from '_platform/api';
 import './Project.less';
-import MenuSwitch from '../MenuSwitch';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const $ = window.$;
@@ -42,6 +41,44 @@ export default class Project extends Component {
             maxWidth: 500
         };
     }
+
+    options = [
+        {
+            label: '区域地块',
+            value: 'geojsonFeature_area',
+            IconName: 'square'
+        },
+        {
+            label: '巡检路线',
+            value: 'geojsonFeature_track',
+            IconUrl: require('../ImageIcon/people.png'),
+            IconName: 'universal-access'
+        },
+        {
+            label: '安全隐患',
+            value: 'geojsonFeature_risk',
+            IconUrl: require('../ImageIcon/risk.png'),
+            IconName: 'warning'
+        },
+        {
+            label: '树种筛选',
+            value: 'geojsonFeature_treetype',
+            IconName: 'square'
+        },
+        {
+            label: '养护任务',
+            value: 'geojsonFeature_curingTask',
+            IconName: 'curingTask'
+        },
+        {
+            label: '成活率',
+            value: 'geojsonFeature_survivalRate'
+        },
+        {
+            label: '工程影像',
+            value: 'geojsonFeature_projectPic'
+        }
+    ];
 
     async componentDidMount () {
         this.initMap();
@@ -170,7 +207,22 @@ export default class Project extends Component {
             this.setState({ menuWidth: menuWidth });
         }
     }
+    handleMenuButton (e) {
+        const {
+            actions: {
+                switchDashboardCompoment
+            }
+        } = this.props;
+        let target = e.target;
+        let buttonID = target.getAttribute('id');
+        if (buttonID !== 'geojsonFeature_projectPic') {
+            switchDashboardCompoment(buttonID);
+        }
+    }
     render () {
+        const {
+            dashboardCompomentMenu
+        } = this.props;
         return (
             <div className='project_map-container'>
                 <div
@@ -179,7 +231,21 @@ export default class Project extends Component {
                     onMouseUp={this.onEndResize.bind(this)}
                     onMouseMove={this.onResizingMenu.bind(this)}
                 >
-                    <MenuSwitch {...this.props} {...this.state} />
+                    {/* <MenuSwitch {...this.props} {...this.state} /> */}
+                    <div className='dashboard-menuSwitchButton'>
+                        {this.options.map(option => {
+                            return (
+                                <div className='dashboard-menuButtonLayout'>
+                                    <Button
+                                        type={dashboardCompomentMenu === option.value ? 'primary' : 'info'}
+                                        size='large' id={option.value}
+                                        onClick={this.handleMenuButton.bind(this)}>
+                                        {option.label}
+                                    </Button>
+                                </div>
+                            );
+                        })}
+                    </div>
                     <div className='project_treeControl3' style={{ zIndex: 888 }}>
                         <div>
                             <RadioGroup

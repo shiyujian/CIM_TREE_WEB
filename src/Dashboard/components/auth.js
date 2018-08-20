@@ -152,6 +152,18 @@ export const genPopUpContent = (geo) => {
             //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
             // </h2>
         }
+        case 'survivalRate': {
+            return `<div class="popupBox">
+                    <h2><span>标段：</span>${properties.sectionName}</h2>
+                    <h2><span>小班：</span>${properties.smallClassName}</h2>
+                    <h2><span>细班：</span>${properties.thinClassName}</h2>
+                    <h2><span>树种：</span>${properties.treetype}</h2>
+                    <h2><span>成活率：</span>${properties.SurvivalRate}</h2>
+                </div>`;
+            // <h2 class="btnRow">
+            //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
+            // </h2>
+        }
         default: {
             return null;
         }
@@ -168,6 +180,8 @@ export const getIconType = (type) => {
             return 'dashboard-treeIcon';
         case 'curingTask':
             return 'dashboard-curingTaskIcon';
+        case 'survivalRate':
+            return 'dashboard-treeIcon';
         default:
             break;
     }
@@ -288,6 +302,81 @@ export const getTaskThinClassName = (task, totalThinClass) => {
             regionSmallName: regionSmallName,
             regionSmallNo: regionSmallNo,
             regionSectionName: regionSectionName
+        };
+        return regionData;
+    } catch (e) {
+        console.log('getTaskThinClassName', e);
+    }
+};
+
+// 获取任务中的标段，小班，细班名称
+export const getThinClassName = (thinClass, section, totalThinClass) => {
+    try {
+        let thinClassList = thinClass.split(',');
+        let SectionName = '';
+        let SmallName = '';
+        let SmallNo = '';
+        let ThinName = '';
+        let smallNoList = [];
+        if (thinClassList && thinClassList instanceof Array && thinClassList.length > 0) {
+            thinClassList.map((thinNo, index) => {
+                totalThinClass.map((unitProjectData) => {
+                    let unitProject = unitProjectData.unitProject;
+                    // 首先根据区块找到对应的细班list
+                    if (section.indexOf(unitProject) !== -1) {
+                        let smallClassList = unitProjectData.smallClassList;
+                        smallClassList.map((smallClass) => {
+                        // tree结构的数据经过了处理，需要和api获取的数据调整一致
+                            let smallClassHandleKey = smallClass.No.split('-');
+                            let smallClassNo = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[3];
+                            let childSection = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[2];
+                            if (thinNo.indexOf(smallClassNo) !== -1 && childSection === section) {
+                                // 找到符合条件的数据的name
+                                let thinClassList = smallClass.children;
+                                thinClassList.map((thinClass) => {
+                                    let thinClassHandleKey = thinClass.No.split('-');
+                                    let thinClassNo = thinClassHandleKey[0] + '-' + thinClassHandleKey[1] + '-' + thinClassHandleKey[3] + '-' + thinClassHandleKey[4];
+                                    if (thinNo.indexOf(thinClassNo) !== -1) {
+                                        // 是否小班重复
+                                        let isUniqueSmall = true;
+                                        smallNoList.map((smallData) => {
+                                            if (smallData === smallClassNo) {
+                                                isUniqueSmall = false;
+                                            }
+                                        });
+                                        if (isUniqueSmall) {
+                                            if (!SmallName) {
+                                                SmallName = smallClass.Name;
+                                                SmallNo = smallClass.No;
+                                            } else {
+                                                SmallName = SmallName + ' ,' + smallClass.Name;
+                                                SmallNo = SmallNo + ' ,' + smallClass.No;
+                                            }
+                                            smallNoList.push(smallClassNo);
+                                        }
+                                        // 找到符合条件的数据的name
+                                        let thinName = thinClass.Name;
+                                        let sectionName = getSectionName(section);
+                                        SectionName = sectionName;
+                                        if (index === 0) {
+                                            ThinName = ThinName + thinName;
+                                        } else {
+                                            ThinName = ThinName + ' ,' + thinName;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        let regionData = {
+            ThinName: ThinName,
+            SmallName: SmallName,
+            SmallNo: SmallNo,
+            SectionName: SectionName
         };
         return regionData;
     } catch (e) {
