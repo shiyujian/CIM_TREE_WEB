@@ -3,7 +3,7 @@ import {
     Button, Modal, Collapse, Notification, Spin, Checkbox
 } from 'antd';
 import AreaTreeReport from '../AreaTreeReport';
-import TaskTree from '../TaskTree';
+import TaskSelectTree from '../TaskSelectTree';
 import {
     fillAreaColor,
     getHandleWktData,
@@ -412,7 +412,7 @@ export default class TaskReportTable extends Component {
                 case 'geojsonFeature_task':
                     return (
                         <Spin spinning={taskTreeLoading}>
-                            <TaskTree
+                            <TaskSelectTree
                                 onSelect={this.handleTaskSelect.bind(this)}
                                 content={taskTreeData}
                             />

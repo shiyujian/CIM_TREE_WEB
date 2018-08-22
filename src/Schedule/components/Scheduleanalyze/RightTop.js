@@ -1,39 +1,38 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
+import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
 import { PROJECT_UNITS } from '../../../_platform/api';
-import {Cards, SumTotal, DateImg} from '../../components';
+import { Cards, SumTotal, DateImg } from '../../components';
+import moment from 'moment';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
-import moment from 'moment';
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 
 export default class RightTop extends Component {
-
     static propTypes = {};
-    constructor(props){
+    constructor (props) {
         super(props);
-        this.state={
-            loading:false,
+        this.state = {
+            loading: false,
             stime: moment().format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             section: 'P009-01-01',
-            sectionoption:[]
-        }
+            sectionoption: []
+        };
     }
 
-    componentDidMount(){
+    componentDidMount () {
         var myChart3 = echarts.init(document.getElementById('rightTop'));
         myChart3.on('click', function (params) {
-            that.smallclasschange(params.name)
+            that.smallclasschange(params.name);
         });
         let option3 = {
-            tooltip : {
+            tooltip: {
                 trigger: 'axis',
-                axisPointer : {            
-                    type : 'shadow'        
+                axisPointer: {
+                    type: 'shadow'
                 }
             },
             grid: {
@@ -43,81 +42,76 @@ export default class RightTop extends Component {
                 containLabel: true
             },
             toolbox: {
-                    show : true,
-                    feature : {
-                        saveAsImage : {show: true}
-                    }
-                },
-            xAxis : [
+                show: true,
+                feature: {
+                    saveAsImage: { show: true }
+                }
+            },
+            xAxis: [
                 {
-                    type : 'category',
+                    type: 'category'
                 }
             ],
-            yAxis : [
+            yAxis: [
                 {
-                    type : 'value',
+                    type: 'value',
                     name: '种植数',
                     axisLabel: {
                         formatter: '{value} 棵'
                     }
                 }
-            ],  
-            series : []
+            ],
+            series: []
         };
         myChart3.setOption(option3);
-        this.getSectionoption()
-        this.query()
+        this.getSectionoption();
+        this.query();
     }
 
-    getSectionoption(){
-        const {
-            leftkeycode
-        } = this.props
-        let sectionoption=[]
+    getSectionoption () {
+        const { leftkeycode } = this.props;
+        let sectionoption = [];
 
-        PROJECT_UNITS.map((project)=>{
-            //获取正确的项目    
-            if(leftkeycode.indexOf(project.code)>-1){
-                 //获取项目下的标段
-                let sections = project.units
-                sections.map((section,index)=>{
-                    sectionoption.push(<Option key={section.code} value={section.code}>{section.value}</Option>)
-                })
+        PROJECT_UNITS.map(project => {
+            // 获取正确的项目
+            if (leftkeycode.indexOf(project.code) > -1) {
+                // 获取项目下的标段
+                let sections = project.units;
+                sections.map((section, index) => {
+                    sectionoption.push(
+                        <Option key={section.code} value={section.code}>
+                            {section.value}
+                        </Option>
+                    );
+                });
                 this.setState({
-                    section:sections && sections[0] && sections[0].code
-                })
+                    section: sections && sections[0] && sections[0].code
+                });
             }
-        })
+        });
         this.setState({
             sectionoption
-        })
+        });
     }
 
-    componentDidUpdate(prevProps, prevState){
-        const {
-            etime,
-            section,
-            stime
-        } = this.state
-        const {
-            leftkeycode
-        }=this.props
-        if(leftkeycode != prevProps.leftkeycode ){
-            this.getSectionoption()
+    componentDidUpdate (prevProps, prevState) {
+        const { etime, section, stime } = this.state;
+        const { leftkeycode } = this.props;
+        if (leftkeycode != prevProps.leftkeycode) {
+            this.getSectionoption();
         }
-        if(section != prevState.section){
-            this.query()
+        if (section != prevState.section) {
+            this.query();
         }
-        if(etime != prevState.etime || stime != prevState.stime){
-            console.log('RightTopRightTopsection',section)
-            console.log('RightTopRightTopetime',etime)
-            console.log('RightTopRightTopetime',leftkeycode)
-            this.query()
+        if (etime != prevState.etime || stime != prevState.stime) {
+            console.log('RightTopRightTopsection', section);
+            console.log('RightTopRightTopetime', etime);
+            console.log('RightTopRightTopetime', leftkeycode);
+            this.query();
         }
     }
 
-    async query() {
-        
+    async query () {
         const {
             actions: {
                 gettreetypeAll,
@@ -127,48 +121,44 @@ export default class RightTop extends Component {
             },
             leftkeycode
         } = this.props;
-        const {
-            stime,
-            etime,
-            section
-        } = this.state
-        let param = {}
+        const { stime, etime, section } = this.state;
+        let param = {};
 
         param.section = section;
         // param.stime = stime;
         param.etime = etime;
-        this.setState({loading:true})
+        this.setState({ loading: true });
 
-        let rst = await gettreetypeSmallClass({},param)
-        
-        console.log('RightTopRightTopRightTop',rst)
+        let rst = await gettreetypeSmallClass({}, param);
 
-        let units = ['1小班','2小班','3小班','4小班','5小班']
+        console.log('RightTopRightTopRightTop', rst);
+
+        let units = ['1小班', '2小班', '3小班', '4小班', '5小班'];
 
         let complete = [];
         let unComplete = [];
         let label = [];
-        let total = []
-       
-        if(rst && rst instanceof Array){
-            rst.map((item)=>{
-                complete.push(item.Complete)
-                unComplete.push(item.UnComplete)
-                label.push(item.Label+'号小班')
-            })
+        let total = [];
+
+        if (rst && rst instanceof Array) {
+            rst.map(item => {
+                complete.push(item.Complete);
+                unComplete.push(item.UnComplete);
+                label.push(item.Label + '号小班');
+            });
         }
-        console.log('RightTopcompletecomplete',complete)
-        console.log('RightTopunCompleteunComplete',unComplete)
-        console.log('RightToplabellabel',label)
-    
+        console.log('RightTopcompletecomplete', complete);
+        console.log('RightTopunCompleteunComplete', unComplete);
+        console.log('RightToplabellabel', label);
+
         let myChart3 = echarts.init(document.getElementById('rightTop'));
         let options3 = {
             legend: {
-                data: ['未种植','已种植']
+                data: ['未种植', '已种植']
             },
             xAxis: [
                 {
-                    data: label.length>0?label:units
+                    data: label.length > 0 ? label : units
                 }
             ],
             series: [
@@ -176,72 +166,95 @@ export default class RightTop extends Component {
                     name: '未种植',
                     type: 'bar',
                     stack: '总量',
-                    label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: { color: '#FFFFFF' }
+                        }
+                    },
                     data: unComplete
                 },
                 {
                     name: '已种植',
                     type: 'bar',
                     stack: '总量',
-                    label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: { color: '#FFFFFF' }
+                        }
+                    },
                     data: complete
                 }
             ]
         };
         myChart3.setOption(options3);
-        this.setState({loading:false})
+        this.setState({ loading: false });
     }
-    
-    
-    render() { //todo 苗木种植强度分析
-        
+
+    render () {
+        // todo 苗木种植强度分析
+
         return (
             <Spin spinning={this.state.loading}>
                 <Cards search={this.search()} title={this.title()}>
-                    <div id = 'rightTop' style = {{width:'100%',height:'260px'}}>
-                    </div>
+                    <div
+                        id='rightTop'
+                        style={{ width: '100%', height: '260px' }}
+                    />
                 </Cards>
             </Spin>
-            
         );
     }
-    title(){
-        const {section,sectionoption} = this.state;
-        return <div>
-                    <Select value={section} onSelect={this.onsectionchange.bind(this)} style={{width: '80px'}}>
-                        {sectionoption}
-                    </Select>
-                    <span>各小班种植进度分析</span>
-
-                </div>
+    title () {
+        const { section, sectionoption } = this.state;
+        return (
+            <div>
+                <Select
+                    value={section}
+                    onSelect={this.onsectionchange.bind(this)}
+                    style={{ width: '80px' }}
+                >
+                    {sectionoption}
+                </Select>
+                <span>各小班种植进度分析</span>
+            </div>
+        );
     }
-    onsectionchange(value) {
+    onsectionchange (value) {
         this.setState({
-            section:value
-        })
+            section: value
+        });
     }
 
-    search() {
-            return (
-                <div>
-                    <span>截止时间：</span>
-                    <DatePicker 
-                        style={{verticalAlign:"middle"}} 
-                        defaultValue={moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')} 
-                        showTime={{ format: 'HH:mm:ss' }}
-                        format={'YYYY/MM/DD HH:mm:ss'}
-                        onChange={this.datepick.bind(this)}
-                        onOk={this.datepick.bind(this)}
-                    >
-                    </DatePicker>
-                </div>
-            ) 
+    search () {
+        return (
+            <div>
+                <span>截止时间：</span>
+                <DatePicker
+                    style={{ verticalAlign: 'middle' }}
+                    defaultValue={moment(
+                        this.state.etime,
+                        'YYYY/MM/DD HH:mm:ss'
+                    )}
+                    showTime={{ format: 'HH:mm:ss' }}
+                    format={'YYYY/MM/DD HH:mm:ss'}
+                    onChange={this.datepick.bind(this)}
+                    onOk={this.datepick.bind(this)}
+                />
+            </div>
+        );
     }
 
-    datepick(value){
-        this.setState({etime:value?moment(value).format('YYYY/MM/DD'):'',})
+    datepick (value) {
+        this.setState({
+            etime: value ? moment(value).format('YYYY/MM/DD') : ''
+        });
     }
-    
-    
-    
 }

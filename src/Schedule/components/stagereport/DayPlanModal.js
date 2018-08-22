@@ -1,53 +1,60 @@
 import React, { Component, Children } from 'react';
-import { Row, Col, Input, Form, Icon, Button, Table, Modal, DatePicker, Select, notification,Card, Steps} from 'antd';
+import {
+    Row,
+    Col,
+    Input,
+    Form,
+    Icon,
+    Button,
+    Table,
+    Modal,
+    DatePicker,
+    Select,
+    notification,
+    Card,
+    Steps
+} from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Step = Steps.Step;
 export default class DayPlanModal extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             treeDatasource: [],
-            history:[]
-        }
+            history: []
+        };
     }
-    async componentDidMount() {
-        
-        const{
-            actions:{
-                getTask
-            },
+    async componentDidMount () {
+        const {
+            actions: { getTask },
             id
-        }=this.props
+        } = this.props;
         let params = {
-            task_id:id
+            task_id: id
+        };
+        let task = await getTask(params);
+        let history = [];
+        if (task && task.history) {
+            history = task.history;
         }
-        let task = await getTask(params)
-        let history = []
-        if(task && task.history){
-            history = task.history
 
-        }
-      
         this.setState({
             treeDatasource: this.props.TreedataSource,
             history
-        })
+        });
     }
-    render() {
+    render () {
         const {
-            form: { getFieldDecorator },
+            form: { getFieldDecorator }
         } = this.props;
-        const {
-            history,
-            treeDatasource
-        } = this.state
+        const { history, treeDatasource } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
-            wrapperCol: { span: 16 },
-        }
-        
+            wrapperCol: { span: 16 }
+        };
+
         return (
             <div>
                 <Modal
@@ -55,7 +62,7 @@ export default class DayPlanModal extends Component {
                     width={800}
                     onOk={this.props.onok}
                     onCancel={this.props.oncancel}
-                    visible={true}
+                    visible
                     footer={null}
                 >
                     <div>
@@ -64,57 +71,95 @@ export default class DayPlanModal extends Component {
                                 <Col span={24}>
                                     <Row>
                                         <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='标段'>
-                                                {
-                                                    getFieldDecorator('daysection', {
-                                                        initialValue: `${this.props.sectionName || '暂无标段'}`,
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='标段'
+                                            >
+                                                {getFieldDecorator(
+                                                    'daysection',
+                                                    {
+                                                        initialValue: `${this
+                                                            .props
+                                                            .sectionName ||
+                                                            '暂无标段'}`,
                                                         rules: [
-                                                            { required: false, message: '请选择标段' }
+                                                            {
+                                                                required: false,
+                                                                message:
+                                                                    '请选择标段'
+                                                            }
                                                         ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
+                                                    }
+                                                )(<Input readOnly />)}
                                             </FormItem>
                                         </Col>
                                         <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='编号'>
-                                                {
-                                                    getFieldDecorator('daynumbercode', {
-                                                        initialValue: `${this.props.numbercode || '暂无编号'}`,
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='编号'
+                                            >
+                                                {getFieldDecorator(
+                                                    'daynumbercode',
+                                                    {
+                                                        initialValue: `${this
+                                                            .props.numbercode ||
+                                                            '暂无编号'}`,
                                                         rules: [
-                                                            { required: false, message: '请输入编号' }
+                                                            {
+                                                                required: false,
+                                                                message:
+                                                                    '请输入编号'
+                                                            }
                                                         ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
+                                                    }
+                                                )(<Input readOnly />)}
                                             </FormItem>
                                         </Col>
                                     </Row>
                                     <Row>
                                         <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='文档类型'>
-                                                {
-                                                    getFieldDecorator('daydocument', {
-                                                        initialValue: `${this.props.daydocument || '暂无文档类型'}`,
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='文档类型'
+                                            >
+                                                {getFieldDecorator(
+                                                    'daydocument',
+                                                    {
+                                                        initialValue: `${this
+                                                            .props
+                                                            .daydocument ||
+                                                            '暂无文档类型'}`,
                                                         rules: [
-                                                            { required: false, message: '请输入文档类型' }
+                                                            {
+                                                                required: false,
+                                                                message:
+                                                                    '请输入文档类型'
+                                                            }
                                                         ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
+                                                    }
+                                                )(<Input readOnly />)}
                                             </FormItem>
                                         </Col>
                                         <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='日期'>
-                                                {
-                                                    getFieldDecorator('daytimedate', {
-                                                        initialValue: `${this.props.timedate || '暂无日期'}`,
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='日期'
+                                            >
+                                                {getFieldDecorator(
+                                                    'daytimedate',
+                                                    {
+                                                        initialValue: `${this
+                                                            .props.timedate ||
+                                                            '暂无日期'}`,
                                                         rules: [
-                                                            { required: false, message: '请输入日期' }
+                                                            {
+                                                                required: false,
+                                                                message:
+                                                                    '请输入日期'
+                                                            }
                                                         ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
+                                                    }
+                                                )(<Input readOnly />)}
                                             </FormItem>
                                         </Col>
                                     </Row>
@@ -136,8 +181,10 @@ export default class DayPlanModal extends Component {
                                     <Row>
                                         <Table
                                             columns={this.columns1}
-                                            pagination={true}
-                                            dataSource={this.state.treeDatasource}
+                                            pagination
+                                            dataSource={
+                                                this.state.treeDatasource
+                                            }
                                             rowKey='index'
                                             className='foresttable'
                                         />
@@ -145,85 +192,191 @@ export default class DayPlanModal extends Component {
                                 </Col>
                             </Row>
                         </Form>
-                        <Card title={'审批流程'} style={{marginTop:10}}>
-                            <Steps direction="vertical" size="small" current={history.length>0? history.length - 1:0}>
-                                {
-                                    history.map((step, index) => {
-                                        const { state: { participants: [{ executor = {} } = {}] = [] } = {} } = step;
+                        <Card title={'审批流程'} style={{ marginTop: 10 }}>
+                            <Steps
+                                direction='vertical'
+                                size='small'
+                                current={
+                                    history.length > 0 ? history.length - 1 : 0
+                                }
+                            >
+                                {history
+                                    .map((step, index) => {
+                                        const {
+                                            state: {
+                                                participants: [
+                                                    { executor = {} } = {}
+                                                ] = []
+                                            } = {}
+                                        } = step;
                                         const { id: userID } = executor || {};
-                                        
-                                        if (step.status === 'processing') { // 根据历史状态显示
+
+                                        if (step.status === 'processing') {
+                                            // 根据历史状态显示
                                             const state = this.getCurrentState();
                                             return (
-                                                <Step 
+                                                <Step
                                                     title={
-                                                        <div style={{ marginBottom: 8 }}>
-                                                            <span>{step.state.name}-(执行中)</span>
-                                                            <span style={{ paddingLeft: 20 }}>当前执行人: </span>
-                                                            <span style={{ color: '#108ee9' }}> {`${executor.person_name}` || `${executor.username}`}</span>
-                                                        </div>}
-                                                    key={index} 
+                                                        <div
+                                                            style={{
+                                                                marginBottom: 8
+                                                            }}
+                                                        >
+                                                            <span>
+                                                                {
+                                                                    step.state
+                                                                        .name
+                                                                }
+                                                                -(执行中)
+                                                            </span>
+                                                            <span
+                                                                style={{
+                                                                    paddingLeft: 20
+                                                                }}
+                                                            >
+                                                                当前执行人:{' '}
+                                                            </span>
+                                                            <span
+                                                                style={{
+                                                                    color:
+                                                                        '#108ee9'
+                                                                }}
+                                                            >
+                                                                {' '}
+                                                                {`${
+                                                                    executor.person_name
+                                                                }` ||
+                                                                    `${
+                                                                        executor.username
+                                                                    }`}
+                                                            </span>
+                                                        </div>
+                                                    }
+                                                    key={index}
                                                 />
-    
-                                            )
+                                            );
                                         } else {
-                                            const { records: [record] } = step;
-                                            const { log_on = '', participant: { executor = {} } = {}, note = '' } = record || {};
-                                            const { person_name: name = '', organization = '' } = executor;
+                                            const {
+                                                records: [record]
+                                            } = step;
+                                            const {
+                                                log_on = '',
+                                                participant: {
+                                                    executor = {}
+                                                } = {},
+                                                note = ''
+                                            } = record || {};
+                                            const {
+                                                person_name: name = '',
+                                                organization = ''
+                                            } = executor;
                                             return (
-                                                <Step key={index} title={`${step.state.name}-(${step.status})`}
+                                                <Step
+                                                    key={index}
+                                                    title={`${
+                                                        step.state.name
+                                                    }-(${step.status})`}
                                                     description={
-                                                        <div style={{ lineHeight: 2.6 }}>
-                                                            <div>意见：{note}</div>
+                                                        <div
+                                                            style={{
+                                                                lineHeight: 2.6
+                                                            }}
+                                                        >
                                                             <div>
-                                                                <span>{`${step.state.name}`}人:{`${name}` || `${executor.username}`} [{executor.username}]</span>
-                                                                <span
-                                                                    style={{ paddingLeft: 20 }}>{`${step.state.name}`}时间：{moment(log_on).format('YYYY-MM-DD HH:mm:ss')}</span>
+                                                                意见：
+                                                                {note}
                                                             </div>
-                                                        </div>} />);
+                                                            <div>
+                                                                <span>
+                                                                    {`${
+                                                                        step
+                                                                            .state
+                                                                            .name
+                                                                    }`}
+                                                                    人:
+                                                                    {`${name}` ||
+                                                                        `${
+                                                                            executor.username
+                                                                        }`}{' '}
+                                                                    [
+                                                                    {
+                                                                        executor.username
+                                                                    }
+                                                                    ]
+                                                                </span>
+                                                                <span
+                                                                    style={{
+                                                                        paddingLeft: 20
+                                                                    }}
+                                                                >
+                                                                    {`${
+                                                                        step
+                                                                            .state
+                                                                            .name
+                                                                    }`}
+                                                                    时间：
+                                                                    {moment(
+                                                                        log_on
+                                                                    ).format(
+                                                                        'YYYY-MM-DD HH:mm:ss'
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                />
+                                            );
                                         }
-                                        
-                                    }).filter(h => !!h)
-                                }
+                                    })
+                                    .filter(h => !!h)}
                             </Steps>
                         </Card>
-                        <Row style={{marginTop:10}}>
-                            <Button  onClick={this.props.onok } style={{float:'right'}}type="primary">关闭</Button>
+                        <Row style={{ marginTop: 10 }}>
+                            <Button
+                                onClick={this.props.onok}
+                                style={{ float: 'right' }}
+                                type='primary'
+                            >
+                                关闭
+                            </Button>
                         </Row>
                     </div>
                 </Modal>
             </div>
-        )
+        );
     }
-    getCurrentState() {
-		const { platform: { task = {} } = {}, location = {} } = this.props;
-		// const { state_id = '0' } = queryString.parse(location.search) || {};
-		const { states = [] } = task;
-		return states.find(state => state.status === 'processing');
-	}
-    columns1 = [{
-		title: '序号',
-		dataIndex: 'key',
-		key: 'key',
-        width: '10%',
-        render:(text, record, index) => {
-            return <span>{record.key+1}</span>
+    getCurrentState () {
+        const { platform: { task = {} } = {}, location = {} } = this.props;
+        // const { state_id = '0' } = queryString.parse(location.search) || {};
+        const { states = [] } = task;
+        return states.find(state => state.status === 'processing');
+    }
+    columns1 = [
+        {
+            title: '序号',
+            dataIndex: 'key',
+            key: 'key',
+            width: '10%',
+            render: (text, record, index) => {
+                return <span>{record.key + 1}</span>;
+            }
+        },
+        {
+            title: '项目',
+            dataIndex: 'project',
+            key: 'project'
+        },
+        {
+            title: '单位',
+            dataIndex: 'units',
+            key: 'units'
+        },
+        {
+            title: '数量',
+            dataIndex: 'number',
+            key: 'number'
         }
-	}, {
-		title: '项目',
-		dataIndex: 'project',
-		key: 'project',
-	}, {
-		title: '单位',
-		dataIndex: 'units',
-		key: 'units',
-	}, {
-		title: '数量',
-		dataIndex: 'number',
-		key: 'number',
-	},];
+    ];
 }
 
-
 // export default Form.create()(DayPlanModal)
-

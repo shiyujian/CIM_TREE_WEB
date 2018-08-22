@@ -1,17 +1,12 @@
 import React, { Component } from 'react';
 import {
     Table,
-    Spin,
-    message,
     Modal,
     Button,
     Form,
     Row,
     Col,
-    Select,
     Input,
-    Icon,
-    DatePicker,
     Popconfirm,
     Card,
     Steps,
@@ -31,7 +26,6 @@ import ResourceFilter from './ResourceFilter';
 import { getUser } from '../../../_platform/auth';
 
 const FormItem = Form.Item;
-const { RangePicker } = DatePicker;
 const Step = Steps.Step;
 
 class ResourceTable extends Component {
@@ -635,7 +629,8 @@ class ResourceTable extends Component {
                                                                         step
                                                                             .state
                                                                             .name
-                                                                    }-(执行中)
+                                                                    }
+                                                                    -(执行中)
                                                                 </span>
                                                                 <span
                                                                     style={{
@@ -673,8 +668,7 @@ class ResourceTable extends Component {
                                                         executor = {}
                                                     } = {},
                                                     note = ''
-                                                } =
-                                                    record || {};
+                                                } = record || {};
                                                 const {
                                                     person_name: name = '',
                                                     organization = ''
@@ -692,7 +686,8 @@ class ResourceTable extends Component {
                                                                 }}
                                                             >
                                                                 <div>
-                                                                    意见：{note}
+                                                                    意见：
+                                                                    {note}
                                                                 </div>
                                                                 <div>
                                                                     <span>
@@ -700,13 +695,17 @@ class ResourceTable extends Component {
                                                                             step
                                                                                 .state
                                                                                 .name
-                                                                        }`}人:{`${name}` ||
+                                                                        }`}
+                                                                        人:
+                                                                        {`${name}` ||
                                                                             `${
                                                                                 executor.username
                                                                             }`}{' '}
-                                                                        [{
+                                                                        [
+                                                                        {
                                                                             executor.username
-                                                                        }]
+                                                                        }
+                                                                        ]
                                                                     </span>
                                                                     <span
                                                                         style={{
@@ -717,7 +716,9 @@ class ResourceTable extends Component {
                                                                             step
                                                                                 .state
                                                                                 .name
-                                                                        }`}时间：{moment(
+                                                                        }`}
+                                                                        时间：
+                                                                        {moment(
                                                                             log_on
                                                                         ).format(
                                                                             'YYYY-MM-DD HH:mm:ss'

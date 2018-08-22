@@ -1,44 +1,50 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import {Select,Row,Col,Radio,Card,DatePicker,Spin} from 'antd';
-import { PROJECT_UNITS ,TREETYPENO,ECHARTSCOLOR,SCHEDULRPROJECT} from '../../../_platform/api';
+import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
+import {
+    PROJECT_UNITS,
+    TREETYPENO,
+    ECHARTSCOLOR,
+    SCHEDULRPROJECT
+} from '../../../_platform/api';
+import moment from 'moment';
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
-import moment from 'moment';
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 export default class Warning extends Component {
-
     static propTypes = {};
-    constructor(props){
+    constructor (props) {
         super(props);
-        this.state={
-            stime: moment().subtract(10, 'days').format('YYYY/MM/DD 00:00:00'),
+        this.state = {
+            stime: moment()
+                .subtract(10, 'days')
+                .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            departOptions:"",
-            currentSection:'',
-            treetypeAll:[],
-            loading:false,
-            datas:[],
-            gpshtnum:[]
-
-        }
+            departOptions: '',
+            currentSection: '',
+            treetypeAll: [],
+            loading: false,
+            datas: [],
+            gpshtnum: []
+        };
     }
 
-    async componentDidMount() {
-
-        const {actions: {gettreeevery}} = this.props;
-        //获取全部树种信息
-        let rst = await gettreeevery()
-        console.log('gettreeeveryrst',rst)
-        if(rst && rst instanceof Array){
+    async componentDidMount () {
+        const {
+            actions: { gettreeevery }
+        } = this.props;
+        // 获取全部树种信息
+        let rst = await gettreeevery();
+        console.log('gettreeeveryrst', rst);
+        if (rst && rst instanceof Array) {
             this.setState({
-                treetypeAll:rst
-            })
+                treetypeAll: rst
+            });
         }
 
-        this.getSection()
+        this.getSection();
         let myChart = echarts.init(document.getElementById('rightbottom'));
 
         let optionLine = {
@@ -54,106 +60,105 @@ export default class Warning extends Component {
             xAxis: [
                 {
                     type: 'value',
-                    boundaryGap:[0,0.01],
+                    boundaryGap: [0, 0.01]
                 }
             ],
             yAxis: [
                 {
                     type: 'category',
-                    boundaryGap:[0,0.01],
-                    data:[],
-                },
-                
+                    boundaryGap: [0, 0.01],
+                    data: []
+                }
             ],
             series: [
                 {
-                    name:'已检验批个数',
-                    type:'bar',
-                    data:[250, 360, 280, 230, 312, 240, 290,300,266,300],
-                    barWidth:'25%',
-                    itemStyle:{
-                        normal:{
-                            color:'#02e5cd',
-                            barBorderRadius:[50,50,50,50]
+                    name: '已检验批个数',
+                    type: 'bar',
+                    data: [250, 360, 280, 230, 312, 240, 290, 300, 266, 300],
+                    barWidth: '25%',
+                    itemStyle: {
+                        normal: {
+                            color: '#02e5cd',
+                            barBorderRadius: [50, 50, 50, 50]
                         }
                     }
                 }
             ]
         };
         myChart.setOption(optionLine);
-        this.getdata()
+        this.getdata();
     }
 
-    getSection(){
-        const{
-            leftkeycode
-        }=this.props
-        let sections = []
-        PROJECT_UNITS.map((project)=>{
-            if(project.code === leftkeycode){
-                let units = project.units
-                units.map((unit)=>{
-                    sections.push(<Option key={unit.code} value={unit.code}>{unit.value}</Option>)
-                })
+    getSection () {
+        const { leftkeycode } = this.props;
+        let sections = [];
+        PROJECT_UNITS.map(project => {
+            if (project.code === leftkeycode) {
+                let units = project.units;
+                units.map(unit => {
+                    sections.push(
+                        <Option key={unit.code} value={unit.code}>
+                            {unit.value}
+                        </Option>
+                    );
+                });
                 this.setState({
-                    currentSection:units && units[0] && units[0].code
-                })
+                    currentSection: units && units[0] && units[0].code
+                });
             }
-        })
+        });
         this.setState({
             sections
-        })
+        });
     }
 
-    componentDidUpdate(prevProps, prevState){
-        const {
-            stime,
-            etime,
-            currentSection
-        } = this.state
-        const {
-            leftkeycode
-        }=this.props
-        try{
-            if(leftkeycode != prevProps.leftkeycode){
-                this.getSection()
-                this.getdata()
+    componentDidUpdate (prevProps, prevState) {
+        const { stime, etime, currentSection } = this.state;
+        const { leftkeycode } = this.props;
+        try {
+            if (leftkeycode != prevProps.leftkeycode) {
+                this.getSection();
+                this.getdata();
             }
-        }catch(e){
-            console.log(e)
+        } catch (e) {
+            console.log(e);
         }
-        if(stime != prevState.stime || etime != prevState.etime){
-            this.getdata()
+        if (stime != prevState.stime || etime != prevState.etime) {
+            this.getdata();
         }
-        if(currentSection != prevState.currentSection){
-            this.filterProjectData()
+        if (currentSection != prevState.currentSection) {
+            this.filterProjectData();
         }
     }
 
-    render() { 
-        const{
-            sections
-        }=this.state
+    render () {
+        const { sections } = this.state;
         return (
-            <div >
+            <div>
                 <Spin spinning={this.state.loading}>
                     <Card>
-                    施工时间：
-                        <RangePicker 
-                            style={{textAlign:"center"}} 
-                            defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]}  
+                        施工时间：
+                        <RangePicker
+                            style={{ textAlign: 'center' }}
+                            defaultValue={[
+                                moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
+                                moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                            ]}
                             showTime={{ format: 'HH:mm:ss' }}
                             format={'YYYY/MM/DD HH:mm:ss'}
                             onChange={this.datepick.bind(this)}
                             onOk={this.datepick.bind(this)}
+                        />
+                        <div
+                            id='rightbottom'
+                            style={{ width: '100%', height: '340px' }}
+                        />
+                        <Select
+                            placeholder='请选择标段'
+                            notFoundContent='暂无数据'
+                            value={this.state.currentSection}
+                            onSelect={this.selectSection.bind(this)}
                         >
-                        </RangePicker>
-                        <div id='rightbottom' style={{ width: '100%', height: '340px' }}></div>
-                        <Select 
-                        placeholder="请选择标段"
-                        notFoundContent="暂无数据"
-                        value={this.state.currentSection}
-                        onSelect={this.selectSection.bind(this) }>
                             {sections}
                         </Select>
                         <span>进度分析</span>
@@ -162,235 +167,244 @@ export default class Warning extends Component {
             </div>
         );
     }
-    datepick(value){
-        this.setState({stime:value[0]?moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''})
-        this.setState({etime:value[1]?moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''})
-    }
-    
-    selectSection(value){
+    datepick (value) {
         this.setState({
-            currentSection:value,
-        })
+            stime: value[0]
+                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        });
+        this.setState({
+            etime: value[1]
+                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        });
     }
-    
-    getdata(){
-        const{
-            etime,
-            stime,
-            treetypeAll
-        }=this.state
-        const{
-            leftkeycode
-        }=this.props
+
+    selectSection (value) {
+        this.setState({
+            currentSection: value
+        });
+    }
+
+    getdata () {
+        const { etime, stime, treetypeAll } = this.state;
+        const { leftkeycode } = this.props;
         let params = {
-            etime:etime,
-            stime:stime
-        }
+            etime: etime,
+            stime: stime
+        };
         this.setState({
-            loading:true
-        })
-        console.log('RightBottomaaaaaaaaaaaaaaaaaaaaa',params)
-        const {actions: {progressdata,progressalldata}} = this.props;
+            loading: true
+        });
+        console.log('RightBottomaaaaaaaaaaaaaaaaaaaaa', params);
+        const {
+            actions: { progressdata, progressalldata }
+        } = this.props;
         let gpshtnum = [];
         let times = [];
         let time = [];
         let datas = [];
         // let datas = Array(10).fill(0);
-        progressalldata({},params).then(rst=>{
-            console.log('RightBottom',rst);
-            if(rst && rst.content){
-
-                let content = []
-                rst.content.map((item)=>{
-                    if(item.ProgressType && item.ProgressType==='日实际'){
-                        content.push(item)
+        progressalldata({}, params).then(rst => {
+            console.log('RightBottom', rst);
+            if (rst && rst.content) {
+                let content = [];
+                rst.content.map(item => {
+                    if (item.ProgressType && item.ProgressType === '日实际') {
+                        content.push(item);
                     }
-                })
-                SCHEDULRPROJECT.map((item,index)=>{
+                });
+                SCHEDULRPROJECT.map((item, index) => {
                     datas[index] = new Object();
                     datas[index].project = item.name;
-                    datas[index].value = new Array()
-                })
+                    datas[index].value = new Array();
+                });
 
-                console.log('RightBottomdatas',datas)
+                console.log('RightBottomdatas', datas);
 
-                if(content && content instanceof Array){
-                    PROJECT_UNITS.map((project)=>{
-                        //获取正确的项目    
-                        if(leftkeycode.indexOf(project.code)>-1){
-                            //获取项目下的标段
-                            let sections = project.units
-                            //将各个标段的数据设置为0
-                            sections.map((section,index)=>{
-                                //定义一个二维数组，分为多个标段
-                                gpshtnum[index] = new Array()
-                                datas.map((projectData)=>{
-                                    projectData.value[index] = 0
-                                })
-                            })
-        
-                            content.map(item=>{
-                                if(item && item.UnitProject){
-                                    sections.map((section,index)=>{
-                                        if(item.UnitProject === section.code){
-                                            gpshtnum[index].push(item)
+                if (content && content instanceof Array) {
+                    PROJECT_UNITS.map(project => {
+                        // 获取正确的项目
+                        if (leftkeycode.indexOf(project.code) > -1) {
+                            // 获取项目下的标段
+                            let sections = project.units;
+                            // 将各个标段的数据设置为0
+                            sections.map((section, index) => {
+                                // 定义一个二维数组，分为多个标段
+                                gpshtnum[index] = new Array();
+                                datas.map(projectData => {
+                                    projectData.value[index] = 0;
+                                });
+                            });
+
+                            content.map(item => {
+                                if (item && item.UnitProject) {
+                                    sections.map((section, index) => {
+                                        if (item.UnitProject === section.code) {
+                                            gpshtnum[index].push(item);
                                         }
-                                    })
+                                    });
                                 }
-                            })
+                            });
                         }
-                    })
+                    });
                 }
 
-                console.log('RightBottomgpshtnum',gpshtnum)
+                console.log('RightBottomgpshtnum', gpshtnum);
 
-                gpshtnum.map((data,i)=>{
-                    data.map((arr,a)=>{
-                        let Items = arr.Items
-                        Items.map((item,x)=>{
-                            //默认的种类
+                gpshtnum.map((data, i) => {
+                    data.map((arr, a) => {
+                        let Items = arr.Items;
+                        Items.map((item, x) => {
+                            // 默认的种类
                             // console.log('RightBottomitem',item)
                             // console.log('RightBottomx',x)
-                            if(x<6){
-                                SCHEDULRPROJECT.map((project,serial)=>{
-                                    if(item.Project === project.name){
+                            if (x < 6) {
+                                SCHEDULRPROJECT.map((project, serial) => {
+                                    if (item.Project === project.name) {
                                         let reg = isNaN(item.Num);
-                                        console.log('reg',reg)
-                                        if(!reg){
-                                            if(item.Num > 0){
-                                                datas[serial].value[i] = datas[serial].value[i] + item.Num + 0
+                                        console.log('reg', reg);
+                                        if (!reg) {
+                                            if (item.Num > 0) {
+                                                datas[serial].value[i] =
+                                                    datas[serial].value[i] +
+                                                    item.Num +
+                                                    0;
                                             }
                                         }
                                         // datas[serial].value[index] = datas[serial].value[index] + item.Num + 0
                                     }
-                                })
-                            
-                            }else{//添加的数目种类
-                                let treetype = ''
-                                treetypeAll.map((tree)=>{
-                                    if(tree.TreeTypeName === item.Project){
-                                        //获取树种cdoe的首个数字，找到对应的类型
-                                        let code = tree.TreeTypeNo.substr(0, 1)
-                                        console.log('code',code)
-                                        TREETYPENO.map((forest)=>{
-                                            if(forest.id === code){
-                                                treetype = forest.name
+                                });
+                            } else {
+                                // 添加的数目种类
+                                let treetype = '';
+                                treetypeAll.map(tree => {
+                                    if (tree.TreeTypeName === item.Project) {
+                                        // 获取树种cdoe的首个数字，找到对应的类型
+                                        let code = tree.TreeTypeNo.substr(0, 1);
+                                        console.log('code', code);
+                                        TREETYPENO.map(forest => {
+                                            if (forest.id === code) {
+                                                treetype = forest.name;
                                             }
-                                        })
+                                        });
                                     }
-                                })
+                                });
                                 // console.log('RightBottomtreetype',treetype)
-                                SCHEDULRPROJECT.map((project,serial)=>{
-                                    if(treetype === project.name){
+                                SCHEDULRPROJECT.map((project, serial) => {
+                                    if (treetype === project.name) {
                                         let reg = isNaN(item.Num);
-                                        console.log('reg',reg)
-                                        if(!reg){
-                                            if(item.Num > 0){
-                                                datas[serial].value[i] = datas[serial].value[i] + item.Num + 0
+                                        console.log('reg', reg);
+                                        if (!reg) {
+                                            if (item.Num > 0) {
+                                                datas[serial].value[i] =
+                                                    datas[serial].value[i] +
+                                                    item.Num +
+                                                    0;
                                             }
                                         }
                                     }
-                                })
+                                });
                             }
-                        })
-                    
-                    })
-                })
-                console.log('RightBottomdatas',datas)
-                this.setState({
-                    datas:datas,
-                    gpshtnum:gpshtnum
-                },()=>{
-                    this.filterProjectData()
-                })
-               
-            }else{
-                this.setState({
-                    loading:false
-                })
-                this.filterProjectData()
-            }
-        })
-        
-    }
-    //根据标段筛选数据
-    filterProjectData(){
-        const{
-            gpshtnum,
-            datas,
-            currentSection
-        }=this.state
-        const{
-            leftkeycode
-        }=this.props
-        let choose = []
-        SCHEDULRPROJECT.map((item)=>{
-            choose.push(item.name)
-        })
-
-        let currentData =[];
-        PROJECT_UNITS.map((item)=>{
-            //获取正确的项目    
-            if(leftkeycode.indexOf(item.code)>-1){
-                //获取项目下的标段
-                let sections = item.units
-                //查找当前标段
-                sections.map((section,index)=>{
-                    if(section.code === currentSection){
-                        datas.map((data)=>{
-                            let value = data.value;
-                            currentData.push(value[index])
-                        })
+                        });
+                    });
+                });
+                console.log('RightBottomdatas', datas);
+                this.setState(
+                    {
+                        datas: datas,
+                        gpshtnum: gpshtnum
+                    },
+                    () => {
+                        this.filterProjectData();
                     }
-                })
+                );
+            } else {
+                this.setState({
+                    loading: false
+                });
+                this.filterProjectData();
             }
-        })
+        });
+    }
+    // 根据标段筛选数据
+    filterProjectData () {
+        const { gpshtnum, datas, currentSection } = this.state;
+        const { leftkeycode } = this.props;
+        let choose = [];
+        SCHEDULRPROJECT.map(item => {
+            choose.push(item.name);
+        });
 
+        let currentData = [];
+        PROJECT_UNITS.map(item => {
+            // 获取正确的项目
+            if (leftkeycode.indexOf(item.code) > -1) {
+                // 获取项目下的标段
+                let sections = item.units;
+                // 查找当前标段
+                sections.map((section, index) => {
+                    if (section.code === currentSection) {
+                        datas.map(data => {
+                            let value = data.value;
+                            currentData.push(value[index]);
+                        });
+                    }
+                });
+            }
+        });
 
         let myChart = echarts.init(document.getElementById('rightbottom'));
-            let optionLine = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
+        let optionLine = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            xAxis: [
+                {
+                    type: 'value',
+                    boundaryGap: [0, 0.01]
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: [0, 0.01],
+                    data: choose
+                }
+            ],
+            series: [
+                {
+                    name: '已检验批个数',
+                    type: 'bar',
+                    data: currentData,
+                    barWidth: '25%',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: { color: '#FFFFFF' }
                         }
-                    }
-                },
-                xAxis: [
-                    {
-                        type: 'value',
-                        boundaryGap:[0,0.01],
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'category',
-                        boundaryGap:[0,0.01],
-                        data:choose,
                     },
-                    
-                ],
-                series: [
-                    {
-                        name:'已检验批个数',
-                        type:'bar',
-                        data:currentData,
-                        barWidth:'25%',
-                        label: { normal: {offset:['50', '80'], show: true, position: 'inside', formatter:'{c}', textStyle:{ color:'#FFFFFF' } }},
-                        itemStyle:{
-                            normal:{
-                                color:'#02e5cd',
-                                barBorderRadius:[50,50,50,50]
-                            }
+                    itemStyle: {
+                        normal: {
+                            color: '#02e5cd',
+                            barBorderRadius: [50, 50, 50, 50]
                         }
                     }
-                ]
-            };
-            myChart.setOption(optionLine);
-            this.setState({
-                loading:false
-            })
+                }
+            ]
+        };
+        myChart.setOption(optionLine);
+        this.setState({
+            loading: false
+        });
     }
 }

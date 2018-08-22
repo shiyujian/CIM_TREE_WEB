@@ -17,15 +17,10 @@ export default class Overall extends Component {
 
     render () {
         const {
-            Package,
             News,
-            News1,
-            Attend,
             Dispatch,
             Material,
-            FormManage,
-            Approval,
-            Receipt
+            FormManage
         } = this.state || {};
         return (
             <Body>
@@ -34,10 +29,6 @@ export default class Overall extends Component {
                 </Aside>
                 <Switch>
                     {News && <Route path='/overall/news' component={News} />}
-                    {/* {News1 && <Route path="/overall/news1" component={News1}/>} */}
-                    {Receipt && (
-                        <Route path='/overall/receipt' component={Receipt} />
-                    )}
                     {Material && (
                         <Route path='/overall/material' component={Material} />
                     )}
@@ -47,15 +38,9 @@ export default class Overall extends Component {
                             component={FormManage}
                         />
                     )}
-                    {/* {Receipt && <Route path="/overall/receipt" component={Receipt}/>} */}
                     {Dispatch && (
                         <Route path='/overall/dispatch' component={Dispatch} />
                     )}
-                    {Attend && (
-                        <Route path='/overall/attend' component={Attend} />
-                    )}
-                    {/* {Approval && <Route path="/overall/approval" component={Approval}/>} */}
-                    {/* Package && <Route exact path="/overall/:id?" component={Package}/> */}
                 </Switch>
             </Body>
         );
@@ -90,12 +75,5 @@ export default class Overall extends Component {
             name: '表单管理',
             icon: <Icon name='file-text' />
         }
-        /*	{
-		key: 'attend',
-		id: 'OVERALL.CHECKIN',
-		path: '/overall/attend',
-		name: '考勤管理',
-		icon: <Icon name="user-o"/>,
-	} */
     ];
 }

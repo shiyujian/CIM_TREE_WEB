@@ -82,7 +82,7 @@ export default class Header extends Component {
                 key: 'quality',
                 id: 'QUALITY',
                 title: '质量管理',
-                path: '/quality/search',
+                path: '/quality/appraising',
                 icon: <Icon name='list-alt' />
             },
             {
@@ -248,9 +248,6 @@ export default class Header extends Component {
                                 />
                             </Link>
                         </Badge>
-                        {/* <Link to='/modeldown'>
-							<Icon name="download" title="下载模型" style={{marginLeft:10}}/>
-						</Link> */}
                     </div>
                 </div>
             </header>

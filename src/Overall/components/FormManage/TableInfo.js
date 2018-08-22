@@ -4,12 +4,11 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
-import {PROJECT_UNITS,STATIC_DOWNLOAD_API } from '../../../_platform/api';
-// import PerSearch from './PerSearch';
+import {PROJECT_UNITS, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import {getNextStates} from '../../../_platform/components/Progress/util';
 import queryString from 'query-string';
-import '../../../Datum/components/Datum/index.less'
+import '../../../Datum/components/Datum/index.less';
 import SearchInfo from './SearchInfo';
 import DetailModal from './DetailModal';
 
@@ -21,48 +20,48 @@ class TableInfo extends Component {
     static propTypes = {};
     array = [];
     code = '';
-    constructor(props) {
-        super(props)
+    constructor (props) {
+        super(props);
         this.state = {
             workdata: [],
             selectedRowKeys: [],
             dataSourceSelected: [],
             visible: false,
             fileList: [],
-            isCopyMsg: false, //接收人员是否发短信
+            isCopyMsg: false, // 接收人员是否发短信
             TreatmentData: [],
-            newFileLists:[],
+            newFileLists: [],
             detailvisible: false,
-            DetailModaldata:[],
-            code:'',
-        }
+            DetailModaldata: [],
+            code: ''
+        };
     }
 
     columns = [
         {
             title: '标段',
             dataIndex: 'sectionName',
-            key: 'sectionName',
+            key: 'sectionName'
         }, {
             title: '名称',
             dataIndex: 'name',
-            key: 'name',
+            key: 'name'
         }, {
             title: '编号',
             dataIndex: 'code',
-            key: 'code',
+            key: 'code'
         }, {
             title: '文档类型',
             dataIndex: 'document',
-            key: 'document',
+            key: 'document'
         }, {
             title: '提交单位',
             dataIndex: 'submitOrg',
-            key: 'submitOrg',
+            key: 'submitOrg'
         }, {
             title: '提交人',
             dataIndex: 'submitPerson',
-            key: 'submitPerson',
+            key: 'submitPerson'
         }, {
             title: '提交时间',
             dataIndex: 'submitTime',
@@ -73,167 +72,162 @@ class TableInfo extends Component {
             }
         }, {
             title: '流程状态',
-            dataIndex: 'status',
+            dataIndex: 'status'
         }, {
             title: '操作',
             render: record => {
                 return (
                     <span>
                         <a onClick={this.clickInfo.bind(this, record)}>查看</a>
-					</span>
-                )
-            },
+                    </span>
+                );
+            }
         }
     ]
 
-    async componentDidMount() {
-       
+    async componentDidMount () {
         this.gettaskSchedule();
     }
 
-    async componentDidUpdate(prevProps,prevState){
-		const {
+    async componentDidUpdate (prevProps, prevState) {
+        const {
             selectedDir,
             searchForm
-		}=this.props
+        } = this.props;
 
-		if(selectedDir != prevProps.selectedDir){
-			this.gettaskSchedule()
+        if (selectedDir != prevProps.selectedDir) {
+            this.gettaskSchedule();
         }
-        if(searchForm != prevProps.searchForm){
-			this.gettaskSchedule()
+        if (searchForm != prevProps.searchForm) {
+            this.gettaskSchedule();
         }
-	}
+    }
 
     // 获取表单管理流程流程信息
-    gettaskSchedule = async ()=>{
-        const { 
-            actions: { 
-                getWorkflows 
+    gettaskSchedule = async () => {
+        const {
+            actions: {
+                getWorkflows
             },
             selectedDir
         } = this.props;
 
-        let flow = selectedDir.extra_params ? selectedDir.extra_params.workflow : ''
-        let flowCode = ''
-        let document = selectedDir.name?selectedDir.name:''
-        try{
-            flowCode = flow.split('--')[0]
-            
-        }catch(e){
-            console.log(e)
+        let flow = selectedDir.extra_params ? selectedDir.extra_params.workflow : '';
+        let flowCode = '';
+        let document = selectedDir.name ? selectedDir.name:'';
+        try {
+            flowCode = flow.split('--')[0];
+        }catch (e) {
+            console.log(e);
         }
 
-        if(!flowCode){
-            return
+        if (!flowCode) {
+            return;
         }
 
-
-        let reqData={};
+        let reqData = {};
         this.props.form.validateFields((err, values) => {
-			console.log("表单管理流程", values);
-            console.log("err", err);
-            
-            values.ssection?reqData.subject_sectionName__contains = values.ssection : '';
-            values.sname?reqData.subject_name__contains = values.sname : '';
-            values.scode?reqData.subject_code__contains = values.scode : '';
-            
-            if(values.stimedate && values.stimedate instanceof Array && values.stimedate.length>0){
-				values.stimedate?reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
-				values.stimedate?reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
-			}
-            values.sstatus?reqData.status = values.sstatus : (values.sstatus === 0? reqData.status = 0 : '');
-        })
-        document?reqData.subject_document__contains = document : '';
-        
-        console.log('reqData',reqData)
+            console.log('表单管理流程', values);
+            console.log('err', err);
+
+            values.ssection ? reqData.subject_sectionName__contains = values.ssection : '';
+            values.sname ? reqData.subject_name__contains = values.sname : '';
+            values.scode ? reqData.subject_code__contains = values.scode : '';
+
+            if (values.stimedate && values.stimedate instanceof Array && values.stimedate.length > 0) {
+                values.stimedate ? reqData.real_start_time_begin = moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00') : '';
+                values.stimedate ? reqData.real_start_time_end = moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59') : '';
+            }
+            values.sstatus ? reqData.status = values.sstatus : (values.sstatus === 0 ? reqData.status = 0 : '');
+        });
+        document ? reqData.subject_document__contains = document : '';
+
+        console.log('reqData', reqData);
 
         let tmpData = Object.assign({}, reqData);
 
-
-        let task = await getWorkflows({ code: flowCode },tmpData);
+        let task = await getWorkflows({ code: flowCode }, tmpData);
         let subject = [];
         let workdata = [];
         let arrange = {};
-        task.map((item,index)=>{
+        task.map((item, index) => {
             let subject = item.subject[0];
-			let creator = item.creator;
-			let postData = subject.postData?JSON.parse(subject.postData):{};
-			let data = {
-				id:item.id,
-				workflow:item,
-				TreatmentData:subject.TreatmentData?JSON.parse(subject.TreatmentData):'',
-				section: subject.section?JSON.parse(subject.section):'',
-                sectionName: subject.sectionName?JSON.parse(subject.sectionName):'',
-                projectName: subject.projectName?JSON.parse(subject.projectName):'',
-                name: subject.name?JSON.parse(subject.name):'',
-				code: subject.code?JSON.parse(subject.code):'',
-				document: document,
-				submitOrg: postData.upload_unit?postData.upload_unit:'',
-				submitPerson: creator.person_name?creator.person_name+'('+creator.username+')':creator.username,
-				submitTime: moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),
-				status: item.status===2?'执行中':'已完成',
-			}
-			workdata.push(data)
-        })
+            let creator = item.creator;
+            let postData = subject.postData ? JSON.parse(subject.postData):{};
+            let data = {
+                id: item.id,
+                workflow: item,
+                TreatmentData: subject.TreatmentData ? JSON.parse(subject.TreatmentData):'',
+                section: subject.section ? JSON.parse(subject.section):'',
+                sectionName: subject.sectionName ? JSON.parse(subject.sectionName):'',
+                projectName: subject.projectName ? JSON.parse(subject.projectName):'',
+                name: subject.name ? JSON.parse(subject.name):'',
+                code: subject.code ? JSON.parse(subject.code):'',
+                document: document,
+                submitOrg: postData.upload_unit ? postData.upload_unit:'',
+                submitPerson: creator.person_name ? creator.person_name + '(' + creator.username + ')':creator.username,
+                submitTime: moment(item.workflow.created_on).utc().zone(-8).format('YYYY-MM-DD'),
+                status: item.status === 2 ? '执行中':'已完成'
+            };
+            workdata.push(data);
+        });
         this.setState({
-            workdata:workdata
-        },()=>{
-			this.filterTask()
-		})
+            workdata: workdata
+        }, () => {
+            this.filterTask();
+        });
     }
 
-    	//对流程信息根据选择项目进行过滤
-	filterTask(){
-		const {
-			workdata 
-		}=this.state
-		let filterData = []
-		let user = getUser()
-		
-		let sections = user.sections
-		
-		sections = JSON.parse(sections)
-		
-		let selectCode = ''
-		//关联标段的人只能看自己项目的进度流程
-		if(sections && sections instanceof Array && sections.length>0){
-			let code = sections[0].split('-')
-			selectCode = code[0] || '';
+    	// 对流程信息根据选择项目进行过滤
+    filterTask () {
+        const {
+            workdata
+        } = this.state;
+        let filterData = [];
+        let user = getUser();
 
-			workdata.map((task)=>{
-			
-				let projectName = task.projectName
-				let projectCode = this.getProjectCode(projectName)
-				
-				if(projectCode === selectCode && task.section === sections[0]){
-					filterData.push(task);
-				}
-			})
-		}else{
-			filterData = workdata
-		}      
-		
-		this.setState({
-			filterData
-		})
+        let sections = user.sections;
+
+        sections = JSON.parse(sections);
+
+        let selectCode = '';
+        // 关联标段的人只能看自己项目的进度流程
+        if (sections && sections instanceof Array && sections.length > 0) {
+            let code = sections[0].split('-');
+            selectCode = code[0] || '';
+
+            workdata.map((task) => {
+                let projectName = task.projectName;
+                let projectCode = this.getProjectCode(projectName);
+
+                if (projectCode === selectCode && task.section === sections[0]) {
+                    filterData.push(task);
+                }
+            });
+        } else{
+            filterData = workdata;
+        }
+
+        this.setState({
+            filterData
+        });
     }
-    //获取项目code
-    getProjectCode(projectName){
-        let projectCode = ''
-        PROJECT_UNITS.map((item)=>{
-            if(projectName === item.value){
-                projectCode = item.code
+    // 获取项目code
+    getProjectCode (projectName) {
+        let projectCode = '';
+        PROJECT_UNITS.map((item) => {
+            if (projectName === item.value) {
+                projectCode = item.code;
             }
-        })
-		
-		return projectCode 
+        });
+
+        return projectCode;
     }
 
-    render() {
-        const { 
+    render () {
+        const {
             selectedRowKeys,
-            filterData 
+            filterData
         } = this.state;
 
         const {
@@ -243,74 +237,73 @@ class TableInfo extends Component {
             depth
         } = this.props;
 
-        let user = getUser()
-        let username = user.username
+        let user = getUser();
+        let username = user.username;
 
         const rowSelection = {
             selectedRowKeys,
-            onChange: this.onSelectChange,
+            onChange: this.onSelectChange
         };
-        
-        //如果第三级节点被选中，才允许新增
-        let disabled = true 
-        if(isTreeSelected && depth === '3'){
-            disabled = false
+
+        // 如果第三级节点被选中，才允许新增
+        let disabled = true;
+        if (isTreeSelected && depth === '3') {
+            disabled = false;
         }
         return (
             <div>
                 {
                     this.state.detailvisible &&
-                    <DetailModal 
+                    <DetailModal
                         {...this.props}
                         {...this.state}
                         oncancel={this.detailCancle.bind(this)}
                         onok={this.detailOk.bind(this)}
                     />
                 }
-                <SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)}/>
+                <SearchInfo {...this.props} gettaskSchedule={this.gettaskSchedule.bind(this)} />
                 <Button onClick={this.addClick.bind(this)} disabled={disabled}>新增</Button>
                 {
-                    username === 'admin'?
-                    <Popconfirm
-                      placement="leftTop"
-                      title="确定删除吗？"
-                      onConfirm={this.deleteClick.bind(this)}
-                      okText="确认"
-                      cancelText="取消"
-                    >
-                        <Button disabled={disabled}>删除</Button>
-                    </Popconfirm>
-                    :
-                    ''
+                    username === 'admin' ?
+                        <Popconfirm
+                            placement='leftTop'
+                            title='确定删除吗？'
+                            onConfirm={this.deleteClick.bind(this)}
+                        okText='确认'
+                            cancelText='取消'
+                        >
+                            <Button disabled={disabled}>删除</Button>
+                        </Popconfirm>
+                    :                    ''
                 }
                 <Table
                     columns={this.columns}
-                    rowSelection={username === 'admin'?rowSelection:null} 
+                    rowSelection={username === 'admin' ? rowSelection:null}
                     dataSource={filterData}
                     bordered
                 />
-                
+
             </div>
 
         );
     }
 
     onSelectChange = (selectedRowKeys, selectedRows) => {
-        console.log('selectedRowKeys',selectedRowKeys)
-        console.log('selectedRows',selectedRows)
+        console.log('selectedRowKeys', selectedRowKeys);
+        console.log('selectedRows', selectedRows);
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     }
 
     // 操作--查看
-    clickInfo(record) {
-        this.setState({ detailvisible: true ,record:record});
+    clickInfo (record) {
+        this.setState({ detailvisible: true , record: record});
     }
     // 查看流程详情取消
-    detailCancle() {
+    detailCancle () {
         this.setState({ detailvisible: false });
     }
     // 查看流程详情确定
-    detailOk() {
+    detailOk () {
         this.setState({ detailvisible: false });
     }
     // 删除
@@ -328,7 +321,7 @@ class TableInfo extends Component {
                 message: '请先选择数据！',
                 duration: 3
             });
-            return
+            
         } else {
 
             let user = getUser()
@@ -382,15 +375,14 @@ class TableInfo extends Component {
             },
             selectedDir
         } = this.props;
-        if(selectedDir && selectedDir.extra_params && selectedDir.extra_params.workflow){
-            FormAddVisible(true)
-        }else{
+        if (selectedDir && selectedDir.extra_params && selectedDir.extra_params.workflow) {
+            FormAddVisible(true);
+        } else{
             notification.warning({
-                message:'此节点未关联流程，不能发起流程',
-                duration:3
-            })
+                message: '此节点未关联流程，不能发起流程',
+                duration: 3
+            });
         }
-		
     }
 }
-export default Form.create()(TableInfo)
+export default Form.create()(TableInfo);

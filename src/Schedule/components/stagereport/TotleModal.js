@@ -221,7 +221,8 @@ export default class TotleModal extends Component {
                                                                 {
                                                                     step.state
                                                                         .name
-                                                                }-(执行中)
+                                                                }
+                                                                -(执行中)
                                                             </span>
                                                             <span
                                                                 style={{
@@ -259,8 +260,7 @@ export default class TotleModal extends Component {
                                                     executor = {}
                                                 } = {},
                                                 note = ''
-                                            } =
-                                                record || {};
+                                            } = record || {};
                                             const {
                                                 person_name: name = '',
                                                 organization = ''
@@ -278,7 +278,8 @@ export default class TotleModal extends Component {
                                                             }}
                                                         >
                                                             <div>
-                                                                意见：{note}
+                                                                意见：
+                                                                {note}
                                                             </div>
                                                             <div>
                                                                 <span>
@@ -286,13 +287,17 @@ export default class TotleModal extends Component {
                                                                         step
                                                                             .state
                                                                             .name
-                                                                    }`}人:{`${name}` ||
+                                                                    }`}
+                                                                    人:
+                                                                    {`${name}` ||
                                                                         `${
                                                                             executor.username
                                                                         }`}{' '}
-                                                                    [{
+                                                                    [
+                                                                    {
                                                                         executor.username
-                                                                    }]
+                                                                    }
+                                                                    ]
                                                                 </span>
                                                                 <span
                                                                     style={{
@@ -303,7 +308,9 @@ export default class TotleModal extends Component {
                                                                         step
                                                                             .state
                                                                             .name
-                                                                    }`}时间：{moment(
+                                                                    }`}
+                                                                    时间：
+                                                                    {moment(
                                                                         log_on
                                                                     ).format(
                                                                         'YYYY-MM-DD HH:mm:ss'

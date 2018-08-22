@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import {Row, Col, Input, Icon, DatePicker, Select, Spin} from 'antd';
-import {Cards, SumTotal, DateImg} from '../../components';
-import { FOREST_API, TREETYPENO, PROJECT_UNITS} from '../../../_platform/api';
+import React, { Component } from 'react';
+import { Row, Col, Input, Icon, DatePicker, Select, Spin } from 'antd';
+import { Cards, SumTotal, DateImg } from '../../components';
+import { FOREST_API, TREETYPENO, PROJECT_UNITS } from '../../../_platform/api';
 import moment from 'moment';
-import {groupBy} from 'lodash';
+import { groupBy } from 'lodash';
 var echarts = require('echarts');
 const Option = Select.Option;
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 
 export default class Left extends Component {
     constructor (props) {
@@ -22,12 +22,8 @@ export default class Left extends Component {
     }
 
     componentDidUpdate (prevProps, prevState) {
-        const {
-            etime
-        } = this.state;
-        const {
-            leftkeycode
-        } = this.props;
+        const { etime } = this.state;
+        const { leftkeycode } = this.props;
         if (etime != prevState.etime) {
             this.query();
         }
@@ -53,7 +49,7 @@ export default class Left extends Component {
             },
             toolbox: {
                 feature: {
-                    saveAsImage: {show: true}
+                    saveAsImage: { show: true }
                 }
             },
             grid: {
@@ -68,7 +64,6 @@ export default class Left extends Component {
                     axisPointer: {
                         type: 'shadow'
                     }
-
                 }
             ],
             yAxis: [
@@ -93,14 +88,12 @@ export default class Left extends Component {
                     type: 'bar',
                     markPoint: {
                         data: [
-                            {type: 'max', name: '最大值'},
-                            {type: 'min', name: '最小值'}
+                            { type: 'max', name: '最大值' },
+                            { type: 'min', name: '最小值' }
                         ]
                     },
                     markLine: {
-                        data: [
-                            {type: 'average', name: '平均值'}
-                        ]
+                        data: [{ type: 'average', name: '平均值' }]
                     }
                 }
             ]
@@ -113,16 +106,12 @@ export default class Left extends Component {
     async query (no) {
         const {
             leftkeycode,
-            actions: {
-                gettreetype
-            }
+            actions: { gettreetype }
         } = this.props;
-        const {
-            etime,
-            stime
-        } = this.state;
-        if (!leftkeycode)
-            {return};
+        const { etime, stime } = this.state;
+        if (!leftkeycode) {
+            return;
+        }
         let postdata = {};
         this.setState({
             loading: true
@@ -137,7 +126,7 @@ export default class Left extends Component {
         let data = [];
 
         if (rst && rst instanceof Array) {
-            PROJECT_UNITS.map((project) => {
+            PROJECT_UNITS.map(project => {
                 // 获取正确的项目
                 if (leftkeycode.indexOf(project.code) > -1) {
                     // 获取项目下的标段
@@ -164,7 +153,6 @@ export default class Left extends Component {
         console.log('units', units);
         let myChart1 = echarts.init(document.getElementById('king'));
         let option1 = {
-
             xAxis: [
                 {
                     data: units
@@ -187,7 +175,10 @@ export default class Left extends Component {
             <div>
                 <Spin spinning={this.state.loading}>
                     <Cards search={this.searchRender()} title='苗木进场总数'>
-                        <div id= 'king' style= {{width: '100%', height: '400px'}} />
+                        <div
+                            id='king'
+                            style={{ width: '100%', height: '400px' }}
+                        />
                     </Cards>
                 </Spin>
             </div>
@@ -195,21 +186,34 @@ export default class Left extends Component {
     }
 
     searchRender () {
-        return (<div>
-            <span>选择时间：</span>
-            <RangePicker
-                style={{verticalAlign: 'middle'}}
-                defaultValue={[moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'), moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')]}
-                showTime={{ format: 'HH:mm:ss' }}
-                format={'YYYY/MM/DD HH:mm:ss'}
-                onChange={this.datepick.bind(this)}
-                onOk={this.datepick.bind(this)}
-             />
-        </div>);
+        return (
+            <div>
+                <span>选择时间：</span>
+                <RangePicker
+                    style={{ verticalAlign: 'middle' }}
+                    defaultValue={[
+                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
+                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                    ]}
+                    showTime={{ format: 'HH:mm:ss' }}
+                    format={'YYYY/MM/DD HH:mm:ss'}
+                    onChange={this.datepick.bind(this)}
+                    onOk={this.datepick.bind(this)}
+                />
+            </div>
+        );
     }
 
     datepick (value) {
-        this.setState({stime: value[0] ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss'):''});
-        this.setState({etime: value[1] ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss'):''});
+        this.setState({
+            stime: value[0]
+                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        });
+        this.setState({
+            etime: value[1]
+                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        });
     }
 }

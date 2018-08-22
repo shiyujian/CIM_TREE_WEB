@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree } from 'antd';
 const TreeNode = Tree.TreeNode;
 
-export default class TaskTree extends Component {
+export default class TaskSelectTree extends Component {
     constructor (props) {
         super(props);
         this.originOnSelect = this.props.onSelect;

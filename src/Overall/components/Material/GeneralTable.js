@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
 import {
     Table,
-    Spin,
-    message,
     Modal,
     Button,
     Form,
     Row,
     Col,
-    Select,
     Input,
-    Icon,
     Card,
     Steps,
     Popconfirm,
@@ -540,7 +536,8 @@ class GeneralTable extends Component {
                                                                         step
                                                                             .state
                                                                             .name
-                                                                    }-(执行中)
+                                                                    }
+                                                                    -(执行中)
                                                                 </span>
                                                                 <span
                                                                     style={{
@@ -578,8 +575,7 @@ class GeneralTable extends Component {
                                                         executor = {}
                                                     } = {},
                                                     note = ''
-                                                } =
-                                                    record || {};
+                                                } = record || {};
                                                 const {
                                                     person_name: name = '',
                                                     organization = ''
@@ -597,7 +593,8 @@ class GeneralTable extends Component {
                                                                 }}
                                                             >
                                                                 <div>
-                                                                    意见：{note}
+                                                                    意见：
+                                                                    {note}
                                                                 </div>
                                                                 <div>
                                                                     <span>
@@ -605,13 +602,17 @@ class GeneralTable extends Component {
                                                                             step
                                                                                 .state
                                                                                 .name
-                                                                        }`}人:{`${name}` ||
+                                                                        }`}
+                                                                        人:
+                                                                        {`${name}` ||
                                                                             `${
                                                                                 executor.username
                                                                             }`}{' '}
-                                                                        [{
+                                                                        [
+                                                                        {
                                                                             executor.username
-                                                                        }]
+                                                                        }
+                                                                        ]
                                                                     </span>
                                                                     <span
                                                                         style={{
@@ -622,7 +623,9 @@ class GeneralTable extends Component {
                                                                             step
                                                                                 .state
                                                                                 .name
-                                                                        }`}时间：{moment(
+                                                                        }`}
+                                                                        时间：
+                                                                        {moment(
                                                                             log_on
                                                                         ).format(
                                                                             'YYYY-MM-DD HH:mm:ss'

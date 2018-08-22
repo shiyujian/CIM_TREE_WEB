@@ -1,1 +1,0 @@
-export ModelDown from './ModelDown';

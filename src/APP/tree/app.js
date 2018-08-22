@@ -31,7 +31,6 @@ export default class App extends Component {
         const { default: Schedule } = await import('../../Schedule');
         const { default: System } = await import('../../System');
         const { default: Selfcare } = await import('../../Selfcare');
-        const { default: ModelDown } = await import('../../Down');
         const { default: Safety } = await import('../../Safety');
         const { default: Project } = await import('../../Project');
 
@@ -47,7 +46,6 @@ export default class App extends Component {
             Schedule,
             Selfcare,
             System,
-            ModelDown,
             Safety,
             Project
         });
@@ -66,7 +64,6 @@ export default class App extends Component {
             Schedule,
             Selfcare,
             System,
-            ModelDown,
             Safety,
             Project
         } =
@@ -101,9 +98,6 @@ export default class App extends Component {
                             <Route path='/selfcare' component={Selfcare} />
                         )}
                         {System && <Route path='/system' component={System} />}
-                        {ModelDown && (
-                            <Route path='/ModelDown' component={ModelDown} />
-                        )}
                         {Safety && <Route path='/safety' component={Safety} />}
                         {Project && (
                             <Route path='/project' component={Project} />
