@@ -458,3 +458,173 @@ export const getTaskStatus = (task) => {
     }
     return status;
 };
+export const getAreaTreeData = async (getTreeNodeList, getLittleBan) => {
+    let rst = await getTreeNodeList();
+    if (rst instanceof Array && rst.length > 0) {
+        rst.forEach((item, index) => {
+            rst[index].children = [];
+        });
+    }
+    let user = getUser();
+    let sections = user.sections;
+    let section = '';
+    sections = JSON.parse(sections);
+    if (sections && sections instanceof Array && sections.length > 0) {
+        section = sections[0];
+    }
+    // 项目级
+    let projectList = [];
+    // 子项目级
+    let unitProjectList = [];
+    if (rst instanceof Array && rst.length > 0) {
+        rst.map(node => {
+            if (user.username === 'admin') {
+                if (node.Type === '项目工程') {
+                    projectList.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                } else if (node.Type === '子项目工程') {
+                    unitProjectList.push({
+                        Name: node.Name,
+                        No: node.No,
+                        Parent: node.Parent
+                    });
+                }
+            } else if (section) {
+                let sectionArr = section.split('-');
+                let projectKey = sectionArr[0];
+                let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
+                if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
+                    projectList.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                } else if (node.Type === '子项目工程' && node.No.indexOf(unitProjectKey) !== -1) {
+                    unitProjectList.push({
+                        Name: node.Name,
+                        No: node.No,
+                        Parent: node.Parent
+                    });
+                }
+            }
+        });
+        for (let i = 0; i < projectList.length; i++) {
+            projectList[i].children = unitProjectList.filter(node => {
+                return node.Parent === projectList[i].No;
+            });
+        }
+    }
+    let totalThinClass = [];
+    for (let i = 0; i < unitProjectList.length; i++) {
+        let unitProject = unitProjectList[i];
+        let list = await getLittleBan({ no: unitProject.No });
+        let smallClassList = getSmallClass(list);
+        smallClassList.map(smallClass => {
+            let thinClassList = getThinClass(smallClass, list);
+            smallClass.children = thinClassList;
+        });
+        totalThinClass.push({
+            unitProject: unitProject.No,
+            smallClassList: smallClassList
+        });
+        unitProject.children = smallClassList;
+    }
+    console.log('projectList', projectList);
+    console.log('totalThinClass', totalThinClass);
+
+    return {
+        totalThinClass: totalThinClass,
+        projectList: projectList
+    };
+};
+
+export const getCuringTaskTreeData = async (getcCuringTypes, getCuring) => {
+    let user = getUser();
+    let sections = user.sections;
+    sections = JSON.parse(sections);
+    let curingTypes = [];
+    let taskTreeData = [];
+    if (sections && sections instanceof Array && sections.length > 0) {
+        let section = sections[0];
+        let postData = {
+            section: section
+        };
+        let curingTypesData = await getcCuringTypes();
+        curingTypes = curingTypesData && curingTypesData.content;
+        if (curingTypes && curingTypes.length > 0) {
+            let curingTaskData = await getCuring({}, postData);
+            let curingTasks = curingTaskData.content;
+            if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
+                for (let i = 0; i < curingTasks.length; i++) {
+                    let task = curingTasks[i];
+                    if (task && task.ID) {
+                        curingTypes.map((type) => {
+                            if (type.ID === task.CuringType) {
+                                let exist = false;
+                                let childData = [];
+                                // 查看TreeData里有无这个类型的数据，有的话，push
+                                taskTreeData.map((treeNode) => {
+                                    if (treeNode.ID === type.ID) {
+                                        exist = true;
+                                        childData = treeNode.children;
+                                        childData.push((task));
+                                    }
+                                });
+                                // 没有的话，创建
+                                if (!exist) {
+                                    childData.push(task);
+                                    taskTreeData.push({
+                                        ID: type.ID,
+                                        Name: type.Base_Name,
+                                        children: childData
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+    return {
+        curingTypes: curingTypes,
+        taskTreeData: taskTreeData
+    };
+};
+// 点击区域地块处理细班坐标数据
+export const handleAreaLayerData = async (eventKey, treeNodeName, getTreearea) => {
+    let handleKey = eventKey.split('-');
+    let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+    let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+    let treearea = [];
+    try {
+        let rst = await getTreearea({}, { no: no });
+        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
+            return;
+        }
+
+        let contents = rst.content;
+        let data = contents.find(content => content.Section === section);
+        let str = data.coords;
+        var target = str
+            .slice(str.indexOf('(') + 3, str.indexOf(')'))
+            .split(',')
+            .map(item => {
+                return item.split(' ').map(_item => _item - 0);
+            });
+        treearea.push(target);
+        let message = {
+            key: 3,
+            type: 'Feature',
+            properties: { name: treeNodeName, type: 'area' },
+            geometry: { type: 'Polygon', coordinates: treearea }
+        };
+        return {
+            message: message,
+            treearea: treearea
+        };
+    } catch (e) {
+        console.log('await', e);
+    }
+};

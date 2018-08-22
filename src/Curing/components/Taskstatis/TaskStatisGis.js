@@ -48,30 +48,18 @@ export default class TaskStatisGis extends Component {
     }
     /* 初始化地图 */
     _initMap () {
-        let me = this;
         this.map = L.map('mapid', window.config.initLeaflet);
-
+        // 放大缩小地图的按钮
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
-
+        // 加载基础图层
         this.tileLayer = L.tileLayer(this.tileUrls[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 17,
             storagetype: 0
         }).addTo(this.map);
-
-        this.tileLayer2 = L.tileLayer(
-            window.config.DASHBOARD_ONSITE +
-                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-            {
-                opacity: 1.0,
-                subdomains: [1, 2, 3],
-                minZoom: 11,
-                maxZoom: 21,
-                storagetype: 0,
-                tiletype: 'wtms'
-            }
-        ).addTo(this.map);
+        // 加载树图层
+        this.getTileLayer2();
     }
     componentDidUpdate (prevState, prevProps) {
         const {
@@ -82,6 +70,25 @@ export default class TaskStatisGis extends Component {
             // if (taskStatisSelectTask) {
             //     this.handleTaskSelect(taskStatisSelectTask);
             // }
+        }
+    }
+    // 获取树图层
+    getTileLayer2 = () => {
+        if (this.tileLayer2) {
+            this.tileLayer2.addTo(this.map);
+        } else {
+            this.tileLayer2 = L.tileLayer(
+                window.config.DASHBOARD_ONSITE +
+                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                {
+                    opacity: 1.0,
+                    subdomains: [1, 2, 3],
+                    minZoom: 11,
+                    maxZoom: 21,
+                    storagetype: 0,
+                    tiletype: 'wtms'
+                }
+            ).addTo(this.map);
         }
     }
     render () {
@@ -171,22 +178,7 @@ export default class TaskStatisGis extends Component {
                 this.map.removeLayer(this.tileLayer2);
             }
         } else {
-            if (this.tileLayer2) {
-                this.tileLayer2.addTo(this.map);
-            } else {
-                this.tileLayer2 = L.tileLayer(
-                    window.config.DASHBOARD_ONSITE +
-                                '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                    {
-                        opacity: 1.0,
-                        subdomains: [1, 2, 3],
-                        minZoom: 11,
-                        maxZoom: 21,
-                        storagetype: 0,
-                        tiletype: 'wtms'
-                    }
-                ).addTo(this.map);
-            }
+            this.getTileLayer2();
         }
         this.setState({
             treeLayerChecked: !treeLayerChecked

@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {
-    Sidebar,
-    Content,
-    DynamicTitle
-} from '_platform/components/layout';
+import { Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions } from '../store/person';
 import { actions as platformActions } from '_platform/store/global';
 import { Tree, Filter, Table, Addition } from '../components/Person';

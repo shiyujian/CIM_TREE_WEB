@@ -231,7 +231,6 @@ export default class Project extends Component {
                     onMouseUp={this.onEndResize.bind(this)}
                     onMouseMove={this.onResizingMenu.bind(this)}
                 >
-                    {/* <MenuSwitch {...this.props} {...this.state} /> */}
                     <div className='dashboard-menuSwitchButton'>
                         {this.options.map(option => {
                             return (

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree } from 'antd';
 const TreeNode = Tree.TreeNode;
 
-export default class DashPanel extends Component {
+export default class RiskTree extends Component {
     constructor (props) {
         super(props);
         this.featureName = this.props.featureName;
@@ -21,7 +21,6 @@ export default class DashPanel extends Component {
     genIconClass () {
         let icClass = '';
         let featureName = this.featureName;
-        // console.log("featureName",featureName)
         switch (featureName) {
             case 'geojsonFeature_track':
                 icClass = 'tr-people';
@@ -57,7 +56,6 @@ export default class DashPanel extends Component {
     render () {
         let {
             content = [],
-            trackTreeKeys = [],
             riskTreeKeys = []
         } = this.props;
         let contents = [];
@@ -69,39 +67,18 @@ export default class DashPanel extends Component {
         }
         return (
             <div className={this.genIconClass()}>
-                {
-                    this.featureName === 'geojsonFeature_track'
-                        ? (
-                            <Tree
-                                checkable
-                                showIcon
-                                onCheck={this.onCheck.bind(this)}
-                                showLine
-                                // onSelect={this.onSelect.bind(this)}
-                                defaultExpandAll
-                                defaultCheckedKeys={trackTreeKeys}
-                            >
-                                {contents.map(p => {
-                                    return this.loop(p);
-                                })}
-                            </Tree>
-                        )
-                        : (
-                            <Tree
-                                checkable
-                                showIcon
-                                onCheck={this.onCheck.bind(this)}
-                                showLine
-                                // onSelect={this.onSelect.bind(this)}
-                                defaultExpandAll
-                                defaultCheckedKeys={riskTreeKeys}
-                            >
-                                {contents.map(p => {
-                                    return this.loop(p);
-                                })}
-                            </Tree>
-                        )
-                }
+                <Tree
+                    checkable
+                    showIcon
+                    onCheck={this.onCheck.bind(this)}
+                    showLine
+                    defaultExpandAll
+                    defaultCheckedKeys={riskTreeKeys}
+                >
+                    {contents.map(p => {
+                        return this.loop(p);
+                    })}
+                </Tree>
             </div>
         );
     }

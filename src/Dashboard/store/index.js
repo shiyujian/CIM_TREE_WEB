@@ -7,8 +7,7 @@ import {
 } from '_platform/api';
 const ID = 'dashboard';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
-export const getRiskOK = createAction(`获取安全隐患`);
-export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`, [getRiskOK]);
+export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`, []);
 export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //
 export const getRiskContactSheet = createFetchAction(`${FOREST_API}/tree/patrolevent/{{ID}}`, []);
@@ -42,10 +41,10 @@ export const getCuringTaskTree = createAction(`${ID}养护任务树`);
 export const getSurvivalRateTree = createAction(`${ID}成活率树`);
 export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
 export const getCuringTypes = createAction(`${ID}养护类型`);
+export const getMenuTreeVisible = createAction(`${ID}是否显示树`);
 export const actions = {
     getTreearea,
     getRisk,
-    getRiskOK,
     getRiskContactSheet,
     getTreeNodeList,
     getLittleBan,
@@ -68,16 +67,11 @@ export const actions = {
     getCuringTaskTree,
     getSurvivalRateTree,
     getTotalThinClass,
-    getCuringTypes
+    getCuringTypes,
+    getMenuTreeVisible
 };
 export default handleActions(
     {
-        [getRiskOK]: (state, { payload }) => {
-            return {
-                ...state,
-                RiskLists: [payload]
-            };
-        },
         [switchDashboardCompoment]: (state, { payload }) => {
             return {
                 ...state,
@@ -130,6 +124,12 @@ export default handleActions(
             return {
                 ...state,
                 curingTypes: payload
+            };
+        },
+        [getMenuTreeVisible]: (state, { payload }) => {
+            return {
+                ...state,
+                menuTreeVisible: payload
             };
         }
     },

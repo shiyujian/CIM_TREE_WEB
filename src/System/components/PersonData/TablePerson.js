@@ -1,16 +1,7 @@
 import React, { Component } from 'react';
-import {
-    Table,
-    Button,
-    Notification,
-    Input,
-    Progress,
-    Select
-} from 'antd';
+import { Table, Button, Notification, Input, Progress, Select } from 'antd';
 import style from './TableOrg.css';
-import {
-    NODE_FILE_EXCHANGE_API
-} from '_platform/api';
+import { NODE_FILE_EXCHANGE_API } from '_platform/api';
 import { PROJECT_UNITS } from './../../../_platform/api';
 const Search = Input.Search;
 const { Option } = Select;

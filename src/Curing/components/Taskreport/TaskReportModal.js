@@ -431,7 +431,19 @@ class TaskReportModal extends Component {
                 console.log('postData', postData);
                 let data = await postComplete({}, postData);
                 console.log('data', data);
-                await this.props.onCancel();
+                if (data && data.code && data.code === 1) {
+                    Notification.success({
+                        message: '任务上报成功',
+                        duration: 3
+                    });
+                    await this.props.onOk();
+                } else {
+                    Notification.error({
+                        message: '任务上报失败',
+                        duration: 3
+                    });
+                    await this.props.onCancel();
+                }
                 await this.resetForm();
                 this.setState({
                     loading: true

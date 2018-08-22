@@ -5,17 +5,17 @@ import {
 import AreaTreeReport from '../AreaTreeReport';
 import TaskTree from '../TaskTree';
 import {
-    getThinClass,
-    getSmallClass,
     fillAreaColor,
     getHandleWktData,
     computeSignedArea,
-    getSectionName,
     genPopUpContent,
     getTaskThinClassName,
     getThinClassName,
     getIconType,
-    getTaskStatus
+    getTaskStatus,
+    getAreaTreeData,
+    getCuringTaskTreeData,
+    handleAreaLayerData
 } from '../auth';
 import '../Curing.less';
 import { getUser } from '_platform/auth';
@@ -116,28 +116,18 @@ export default class TaskReportTable extends Component {
     _initMap () {
         let me = this;
         this.map = L.map('mapid', window.config.initLeaflet);
-
+        // 放大缩小地图的按钮
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
-
+        // 加载基础图层
         this.tileLayer = L.tileLayer(this.tileUrls[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 17,
             storagetype: 0
         }).addTo(this.map);
-
-        this.tileLayer2 = L.tileLayer(
-            window.config.DASHBOARD_ONSITE +
-                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-            {
-                opacity: 1.0,
-                subdomains: [1, 2, 3],
-                minZoom: 11,
-                maxZoom: 21,
-                storagetype: 0,
-                tiletype: 'wtms'
-            }
-        ).addTo(this.map);
+        // 加载树图层
+        this.getTileLayer2();
+        // 地图点击事件
         this.map.on('click', function (e) {
             const {
                 coordinates,
@@ -183,70 +173,13 @@ export default class TaskReportTable extends Component {
             actions: { getTreeNodeList, getLittleBan }
         } = this.props;
         try {
-            let rst = await getTreeNodeList();
-            if (rst instanceof Array && rst.length > 0) {
-                rst.forEach((item, index) => {
-                    rst[index].children = [];
-                });
-            }
-            // 项目级
-            let projectList = [];
-            // 子项目级
-            let unitProjectList = [];
-            if (rst instanceof Array && rst.length > 0) {
-                rst.map(node => {
-                    if (this.user.username === 'admin') {
-                        if (node.Type === '项目工程') {
-                            projectList.push({
-                                Name: node.Name,
-                                No: node.No
-                            });
-                        } else if (node.Type === '子项目工程') {
-                            unitProjectList.push({
-                                Name: node.Name,
-                                No: node.No,
-                                Parent: node.Parent
-                            });
-                        }
-                    } else if (this.section) {
-                        let sectionArr = this.section.split('-');
-                        let projectKey = sectionArr[0];
-                        let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
-                        if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
-                            projectList.push({
-                                Name: node.Name,
-                                No: node.No
-                            });
-                        } else if (node.Type === '子项目工程' && node.No.indexOf(unitProjectKey) !== -1) {
-                            unitProjectList.push({
-                                Name: node.Name,
-                                No: node.No,
-                                Parent: node.Parent
-                            });
-                        }
-                    }
-                });
-                for (let i = 0; i < projectList.length; i++) {
-                    projectList[i].children = unitProjectList.filter(node => {
-                        return node.Parent === projectList[i].No;
-                    });
-                }
-            }
-            // let totalThinClass = [];
-            for (let i = 0; i < unitProjectList.length; i++) {
-                let unitProject = unitProjectList[i];
-                let list = await getLittleBan({ no: unitProject.No });
-                let smallClassList = getSmallClass(list);
-                smallClassList.map(smallClass => {
-                    let thinClassList = getThinClass(smallClass, list);
-                    smallClass.children = thinClassList;
-                });
-                this.totalThinClass.push({
-                    unitProject: unitProject.No,
-                    smallClassList: smallClassList
-                });
-                unitProject.children = smallClassList;
-            }
+            this.setState({
+                areaTreeLoading: true
+            });
+            let data = await getAreaTreeData(getTreeNodeList, getLittleBan);
+            console.log('data', data);
+            this.totalThinClass = data.totalThinClass || [];
+            let projectList = data.projectList || [];
             this.setState({
                 areaTreeData: projectList,
                 areaTreeLoading: false
@@ -263,58 +196,37 @@ export default class TaskReportTable extends Component {
                 getcCuringTypes
             }
         } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
-        let taskTreeData = [];
-        let curingTypes = [];
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
-            let postData = {
-                section: section
-            };
-            let curingTypesData = await getcCuringTypes();
-            curingTypes = curingTypesData && curingTypesData.content;
-            if (curingTypes && curingTypes.length > 0) {
-                let curingTaskData = await getCuring({}, postData);
-                let curingTasks = curingTaskData && curingTaskData.content;
-                if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
-                    for (let i = 0; i < curingTasks.length; i++) {
-                        let task = curingTasks[i];
-                        if (task && task.ID) {
-                            curingTypes.map((type) => {
-                                if (type.ID === task.CuringType) {
-                                    let exist = false;
-                                    let childData = [];
-                                    // 查看TreeData里有无这个类型的数据，有的话，push
-                                    taskTreeData.map((treeNode) => {
-                                        if (treeNode.ID === type.ID) {
-                                            exist = true;
-                                            childData = treeNode.children;
-                                            childData.push((task));
-                                        }
-                                    });
-                                    // 没有的话，创建
-                                    if (!exist) {
-                                        childData.push(task);
-                                        taskTreeData.push({
-                                            ID: type.ID,
-                                            Name: type.Base_Name,
-                                            children: childData
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }
-            }
+        try {
+            let data = await getCuringTaskTreeData(getcCuringTypes, getCuring);
+            let curingTypes = data.curingTypes || [];
+            let taskTreeData = data.taskTreeData || [];
+            this.setState({
+                taskTreeData,
+                curingTypes,
+                taskTreeLoading: false
+            });
+        } catch (e) {
+
         }
-        this.setState({
-            taskTreeData,
-            curingTypes,
-            taskTreeLoading: false
-        });
+    }
+    // 获取树图层
+    getTileLayer2 = () => {
+        if (this.tileLayer2) {
+            this.tileLayer2.addTo(this.map);
+        } else {
+            this.tileLayer2 = L.tileLayer(
+                window.config.DASHBOARD_ONSITE +
+                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                {
+                    opacity: 1.0,
+                    subdomains: [1, 2, 3],
+                    minZoom: 11,
+                    maxZoom: 21,
+                    storagetype: 0,
+                    tiletype: 'wtms'
+                }
+            ).addTo(this.map);
+        }
     }
     render () {
         const {
@@ -326,8 +238,6 @@ export default class TaskReportTable extends Component {
                 <div
                     ref='appendBody'
                     className='l-map r-main'
-                    onMouseUp={this._handleEndResize.bind(this)}
-                    onMouseMove={this._handleResizingMenu.bind(this)}
                 >
                     <div
                         className={`menuPanel ${
@@ -433,7 +343,7 @@ export default class TaskReportTable extends Component {
                     <TaskReportModal
                         {...this.props}
                         {...this.state}
-                        onOk={this.handleModalCancel.bind(this)}
+                        onOk={this.handleModalOk.bind(this)}
                         onCancel={this.handleModalCancel.bind(this)}
                     />
                     <div>
@@ -471,22 +381,7 @@ export default class TaskReportTable extends Component {
                 this.map.removeLayer(this.tileLayer2);
             }
         } else {
-            if (this.tileLayer2) {
-                this.tileLayer2.addTo(this.map);
-            } else {
-                this.tileLayer2 = L.tileLayer(
-                    window.config.DASHBOARD_ONSITE +
-                                '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                    {
-                        opacity: 1.0,
-                        subdomains: [1, 2, 3],
-                        minZoom: 11,
-                        maxZoom: 21,
-                        storagetype: 0,
-                        tiletype: 'wtms'
-                    }
-                ).addTo(this.map);
-            }
+            this.getTileLayer2();
         }
         this.setState({
             treeLayerChecked: !treeLayerChecked
@@ -569,46 +464,16 @@ export default class TaskReportTable extends Component {
         const {
             actions: { getTreearea }
         } = this.props;
-        let handleKey = eventKey.split('-');
-        let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-        let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-        let me = this;
-        let treearea = [];
         try {
-            let rst = await getTreearea({}, { no: no });
-            if (
-                !(
-                    rst &&
-                        rst.content &&
-                        rst.content instanceof Array &&
-                        rst.content.length > 0
-                )
-            ) {
-                return;
-            }
-
-            let contents = rst.content;
-            let data = contents.find(content => content.Section === section);
-            let str = data.coords;
-            var target = str
-                .slice(str.indexOf('(') + 3, str.indexOf(')'))
-                .split(',')
-                .map(item => {
-                    return item.split(' ').map(_item => _item - 0);
+            let data = await handleAreaLayerData(eventKey, treeNodeName, getTreearea);
+            if (data && data.message) {
+                let message = data.message;
+                let layer = this._createMarker(message);
+                areaLayerList[eventKey] = layer;
+                this.setState({
+                    areaLayerList
                 });
-            treearea.push(target);
-            let message = {
-                key: 3,
-                type: 'Feature',
-                properties: { name: treeNodeName, type: 'area' },
-                geometry: { type: 'Polygon', coordinates: treearea }
-            };
-
-            let layer = this._createMarker(message);
-            areaLayerList[eventKey] = layer;
-            me.setState({
-                areaLayerList
-            });
+            }
         } catch (e) {
             console.log('await', e);
         }
@@ -636,31 +501,9 @@ export default class TaskReportTable extends Component {
         });
         try {
             // 需要把圈选地图撤销
-            me._handleCreateTaskCancel();
+            this._handleCreateTaskCancel();
             // 单选，需要先全部去除图层
-            // 去除养护任务计划区域图层
-            for (let i in taskPlanLayerList) {
-                taskPlanLayerList[i].map((layer) => {
-                    this.map.removeLayer(layer);
-                });
-            }
-            // 去除养护任务实际养护区域图层
-            for (let i in taskRealLayerList) {
-                taskRealLayerList[i].map((layer) => {
-                    this.map.removeLayer(layer);
-                });
-            }
-            // 去除养护任务图标图层
-            for (let i in taskMarkerLayerList) {
-                this.map.removeLayer(taskMarkerLayerList[i]);
-            }
-            // 去除养护任务轨迹图层
-            for (let i in taskTrackLayerList) {
-                taskTrackLayerList[i].map((layer) => {
-                    this.map.removeLayer(layer);
-                });
-            }
-
+            this.handleDelAllLayer();
             // 选中加载图层
             if (selected) {
                 if (taskPlanLayerList[eventKey]) {
@@ -1000,6 +843,73 @@ export default class TaskReportTable extends Component {
             noLoading: false
         });
     }
+    // 确认上报任务成功
+    handleModalOk = async () => {
+        const {
+            taskEventKey,
+            taskPlanLayerList,
+            taskRealLayerList,
+            taskMarkerLayerList,
+            taskTrackLayerList,
+            taskMessList
+        } = this.state;
+        try {
+            await this.handleDelAllLayer();
+            await this._handleCreateTaskCancel();
+            if (taskPlanLayerList[taskEventKey]) {
+                delete taskPlanLayerList[taskEventKey];
+            }
+            if (taskRealLayerList[taskEventKey]) {
+                delete taskRealLayerList[taskEventKey];
+            }
+            if (taskMarkerLayerList[taskEventKey]) {
+                delete taskMarkerLayerList[taskEventKey];
+            }
+            if (taskTrackLayerList[taskEventKey]) {
+                delete taskTrackLayerList[taskEventKey];
+            }
+            if (taskMessList[taskEventKey]) {
+                delete taskMessList[taskEventKey];
+            }
+        } catch (e) {
+
+        }
+        this.setState({
+            isShowTaskModal: false,
+            noLoading: false
+        });
+    }
+    handleDelAllLayer = () => {
+        const {
+            taskPlanLayerList,
+            taskRealLayerList,
+            taskMarkerLayerList,
+            taskTrackLayerList
+        } = this.state;
+        // 单选，需要先全部去除图层
+        // 去除养护任务计划区域图层
+        for (let i in taskPlanLayerList) {
+            taskPlanLayerList[i].map((layer) => {
+                this.map.removeLayer(layer);
+            });
+        }
+        // 去除养护任务实际养护区域图层
+        for (let i in taskRealLayerList) {
+            taskRealLayerList[i].map((layer) => {
+                this.map.removeLayer(layer);
+            });
+        }
+        // 去除养护任务图标图层
+        for (let i in taskMarkerLayerList) {
+            this.map.removeLayer(taskMarkerLayerList[i]);
+        }
+        // 去除养护任务轨迹图层
+        for (let i in taskTrackLayerList) {
+            taskTrackLayerList[i].map((layer) => {
+                this.map.removeLayer(layer);
+            });
+        }
+    }
     // 确定圈选地图
     _handleCreateTaskOk = async () => {
         const {
@@ -1047,17 +957,6 @@ export default class TaskReportTable extends Component {
                 let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
                 // let regionData = await this._getThinClassName(regionThinClass);
                 let regionData = getThinClassName(regionThinClass, this.totalThinClass, this.sections);
-                // let sectionBool = regionData.sectionBool;
-                // if (!sectionBool) {
-                //     Notification.error({
-                //         message: '当前所选任务不属于登录用户所在标段，请重新选择',
-                //         duration: 2
-                //     });
-                //     this.map.removeLayer(polygonData);
-                //     this.resetModalState();
-                //     this.resetButState();
-                //     return;
-                // }
                 let regionThinName = regionData.regionThinName;
                 let regionThinNo = regionData.regionThinNo;
                 let regionSectionNo = regionData.regionSectionNo;
@@ -1133,14 +1032,6 @@ export default class TaskReportTable extends Component {
     _extendAndFold () {
         this.setState({ menuIsExtend: !this.state.menuIsExtend });
     }
-    /* 手动调整菜单宽度 */
-    _onStartResizeMenu (e) {
-        e.preventDefault();
-        this.menu.startPos = e.clientX;
-        this.menu.isStart = true;
-        this.menu.tempMenuWidth = this.state.menuWidth;
-        this.menu.count = 0;
-    }
     // 切换为2D
     _toggleTileLayer (index) {
         this.tileLayer.setUrl(this.tileUrls[index]);
@@ -1148,21 +1039,5 @@ export default class TaskReportTable extends Component {
             TileLayerUrl: this.tileUrls[index],
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
-    }
-    _handleEndResize (e) {
-        this.menu.isStart = false;
-    }
-    _handleResizingMenu (e) {
-        if (this.menu.isStart) {
-            e.preventDefault();
-            this.menu.count++;
-            let ys = this.menu.count % 5;
-            if (ys === 0 || ys === 1 || ys === 3 || ys === 4) return; // 降低事件执行频率
-            let dx = e.clientX - this.menu.startPos;
-            let menuWidth = this.menu.tempMenuWidth + dx;
-            if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
-            if (menuWidth < this.menu.minWidth) menuWidth = this.menu.minWidth;
-            this.setState({ menuWidth: menuWidth });
-        }
     }
 }

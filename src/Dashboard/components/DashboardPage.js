@@ -22,7 +22,6 @@ export default class DashboardPage extends Component {
         const {
             dashboardCompomentMenu
         } = this.props;
-        console.log('dashboardCompomentMenu', dashboardCompomentMenu);
         return (
             <div >
                 {
