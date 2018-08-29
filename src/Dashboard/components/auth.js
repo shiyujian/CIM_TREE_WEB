@@ -14,7 +14,6 @@ export const getSmallClass = (smallClassList) => {
             let noArr = list.No.split('-');
             // 如果小于5 说明没有标段  不符合规则
             if (noArr.length < 5) {
-                console.log('rst', list);
                 return;
             }
             // 项目 + 区块 + 标段 + 小班
@@ -52,7 +51,6 @@ export const getThinClass = (smallClass, list) => {
             let noArr = rst.No.split('-');
             // 如果小于5 说明没有标段  不符合规则
             if (noArr.length < 5) {
-                console.log('rst', rst);
                 return;
             }
             // 暂时去掉重复的节点
@@ -143,6 +141,7 @@ export const genPopUpContent = (geo) => {
                     <h2><span>标段：</span>${properties.sectionName}</h2>
                     <h2><span>小班：</span>${properties.smallClassName}</h2>
                     <h2><span>细班：</span>${properties.thinClassName}</h2>
+                    <h2><span>养护面积：</span>${properties.Area}</h2>
                     <h2><span>创建时间：</span>${properties.CreateTime}</h2>
                     <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
                     <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
@@ -310,7 +309,7 @@ export const getTaskThinClassName = (task, totalThinClass) => {
     }
 };
 
-// 获取任务中的标段，小班，细班名称
+// 获取成活率的标段，小班，细班名称
 export const getThinClassName = (thinClass, section, totalThinClass) => {
     try {
         let thinClassList = thinClass.split(',');
@@ -381,7 +380,7 @@ export const getThinClassName = (thinClass, section, totalThinClass) => {
         };
         return regionData;
     } catch (e) {
-        console.log('getTaskThinClassName', e);
+        console.log('getThinClassName', e);
     }
 };
 
@@ -442,6 +441,10 @@ export const getAreaData = async (getTreeNodeList, getLittleBan) => {
     let totalThinClass = [];
     for (let i = 0; i < unitProjectList.length; i++) {
         let unitProject = unitProjectList[i];
+        // let list = [];
+        // if (unitProject.No !== 'P009-01') {
+        //     list = await getLittleBan({ no: unitProject.No });
+        // }
         let list = await getLittleBan({ no: unitProject.No });
         let smallClassList = getSmallClass(list);
         smallClassList.map(smallClass => {
@@ -454,9 +457,6 @@ export const getAreaData = async (getTreeNodeList, getLittleBan) => {
         });
         unitProject.children = smallClassList;
     }
-    console.log('totalThinClass', totalThinClass);
-    console.log('survivalRateTree', survivalRateTree);
-    console.log('projectList', projectList);
     return {
         totalThinClass: totalThinClass,
         survivalRateTree: survivalRateTree,

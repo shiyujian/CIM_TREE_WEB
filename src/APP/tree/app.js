@@ -102,7 +102,6 @@ export default class App extends Component {
                         {Project && (
                             <Route path='/project' component={Project} />
                         )}
-
                         <Route path='/:module?' component={Footer} />
                         {Preview && <Preview />}
                     </div>

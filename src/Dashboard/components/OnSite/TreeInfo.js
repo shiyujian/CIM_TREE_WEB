@@ -1,4 +1,3 @@
-import './OnSite.less';
 import { PROJECT_UNITS, FOREST_API } from '_platform/api';
 import moment from 'moment';
 export const getSeedlingMess = (queryTreeData, carData, nurserysData) => {

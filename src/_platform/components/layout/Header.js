@@ -49,6 +49,13 @@ export default class Header extends Component {
     };
 
     render () {
+        const {
+            tabs = {}
+        } = this.props;
+        let fullScreenState = '';
+        if (tabs && tabs.fullScreenState) {
+            fullScreenState = tabs.fullScreenState;
+        }
         Header.menus = [
             {
                 key: 'home',
@@ -144,6 +151,9 @@ export default class Header extends Component {
         let permissions = getPermissions() || [];
         // permissions.splice(4,1,"appmeta.PROJECT.NURSERY.NONE.READ");
         // console.log('permissions333', permissions);
+        if (fullScreenState === 'fullScreen') {
+            return null;
+        }
         return (
             <header className='header'>
                 <a className='head-logo' href='/'>

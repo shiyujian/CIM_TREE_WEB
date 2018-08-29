@@ -10,12 +10,6 @@ export default class DashboardPage extends Component {
     }
 
     async componentDidMount () {
-        const {
-            actions: {
-                switchDashboardCompoment
-            }
-        } = this.props;
-        switchDashboardCompoment(false);
     }
 
     render () {

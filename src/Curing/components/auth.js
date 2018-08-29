@@ -157,6 +157,7 @@ export const genPopUpContent = (geo) => {
                     <h2><span>标段：</span>${properties.sectionName}</h2>
                     <h2><span>小班：</span>${properties.smallClassName}</h2>
                     <h2><span>细班：</span>${properties.thinClassName}</h2>
+                    <h2><span>养护面积：</span>${properties.Area}</h2>
                     <h2><span>创建时间：</span>${properties.CreateTime}</h2>
                     <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
                     <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>

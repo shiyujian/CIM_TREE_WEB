@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store';
+import {actions} from '../store';
 import { actions as platformActions } from '_platform/store/global';
-// import OnSiteCom from '../components/OnSite';
 import DashboardPage from '../components/DashboardPage';
 @connect(
     state => {
@@ -19,6 +18,6 @@ import DashboardPage from '../components/DashboardPage';
 )
 export default class OnSite extends Component {
     render () {
-        return <DashboardPage {...this.props} />;
+        return <DashboardPage {...this.props} {...this.state} />;
     }
 }

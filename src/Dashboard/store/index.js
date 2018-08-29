@@ -1,6 +1,5 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
-
 import {
     USER_API,
     FOREST_API
@@ -12,9 +11,9 @@ export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //
 export const getRiskContactSheet = createFetchAction(`${FOREST_API}/tree/patrolevent/{{ID}}`, []);
 // 获取巡检路线
-const getMapRouter = createFetchAction(`${FOREST_API}/tree/patrolroutes`, []);
+export const getInspectRouter = createFetchAction(`${FOREST_API}/tree/patrolroutes`, [], 'GET');
 // 获取轨迹列表
-const getMapList = createFetchAction(`${FOREST_API}/tree/patrolpositions?routeid={{routeID}}`, []);
+export const getMapList = createFetchAction(`${FOREST_API}/tree/patrolpositions?routeid={{routeID}}`, []);
 // 获取种植流程
 export const getTreeflows = createFetchAction(`${FOREST_API}/tree/treeflows`, []);
 // 获取苗圃信息
@@ -32,7 +31,8 @@ export const getcCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtyp
 // 苗木养护计划详情
 export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
 
-export const switchDashboardCompoment = createAction(`${ID}切换二维展示和工程影响`);
+export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
+export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
 export const getAreaTree = createAction(`${ID}区域地块树`);
 export const getRiskTree = createAction(`${ID}安全隐患树`);
 export const getTrackTree = createAction(`${ID}巡检路线树`);
@@ -42,13 +42,19 @@ export const getSurvivalRateTree = createAction(`${ID}成活率树`);
 export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
 export const getCuringTypes = createAction(`${ID}养护类型`);
 export const getMenuTreeVisible = createAction(`${ID}是否显示树`);
+export const switchDashboardRightMenu = createAction(`${ID}切换二维展示右侧按钮`);
+export const switchDashboardFullScreenState = createAction(`${ID}切换二维展示全屏`);
+export const switchDashboardAreaTreeLayer = createAction(`${ID}切换二维展示树图层`);
+export const switchDashboardAreaMeasure = createAction(`${ID}切换二维展示面积计算`);
+export const switchDashboardFocus = createAction(`${ID}切换二维展示聚焦初始位置`);
+
 export const actions = {
     getTreearea,
     getRisk,
     getRiskContactSheet,
     getTreeNodeList,
     getLittleBan,
-    getMapRouter,
+    getInspectRouter,
     getMapList,
     getTreeflows,
     getNurserys,
@@ -68,7 +74,13 @@ export const actions = {
     getSurvivalRateTree,
     getTotalThinClass,
     getCuringTypes,
-    getMenuTreeVisible
+    getMenuTreeVisible,
+    switchDashboardMenuType,
+    switchDashboardRightMenu,
+    switchDashboardFullScreenState,
+    switchDashboardAreaTreeLayer,
+    switchDashboardAreaMeasure,
+    switchDashboardFocus
 };
 export default handleActions(
     {
@@ -130,6 +142,42 @@ export default handleActions(
             return {
                 ...state,
                 menuTreeVisible: payload
+            };
+        },
+        [switchDashboardMenuType]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardMenuType: payload
+            };
+        },
+        [switchDashboardRightMenu]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardRightMenu: payload
+            };
+        },
+        [switchDashboardFullScreenState]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardFullScreenState: payload
+            };
+        },
+        [switchDashboardAreaTreeLayer]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardAreaTreeLayer: payload
+            };
+        },
+        [switchDashboardAreaMeasure]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardAreaMeasure: payload
+            };
+        },
+        [switchDashboardFocus]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardFocus: payload
             };
         }
     },

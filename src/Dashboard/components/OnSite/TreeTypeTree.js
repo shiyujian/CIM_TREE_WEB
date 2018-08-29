@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
-import { Tree } from 'antd';
+import { Tree, Input } from 'antd';
 const TreeNode = Tree.TreeNode;
-
+const Search = Input.Search;
 export default class extends Component {
     constructor (props) {
         super(props);
+        this.state = {
+            searchTree: [],
+            searchValue: ''
+        };
         this.featureName = this.props.featureName;
         this.originOnCheck = this.props.onCheck;
         // this.originOnSelect = this.props.onSelect;
@@ -21,7 +25,6 @@ export default class extends Component {
     genIconClass () {
         let icClass = '';
         let featureName = this.featureName;
-        // console.log("featureName",featureName)
         switch (featureName) {
             case 'geojsonFeature_track':
                 icClass = 'tr-people';
@@ -57,39 +60,66 @@ export default class extends Component {
     render () {
         let {
             content = [],
-            treetypeTreeIsDefault,
             treetypeTreeKeys
         } = this.props;
+        const {
+            searchTree,
+            searchValue
+        } = this.state;
         let contents = [];
-        for (let j = 0; j < content.length; j++) {
-            const element = content[j];
-            if (element != undefined) {
-                contents.push(element);
-            }
-        }
-        let defaultCheckedKeys = [];
-        if (treetypeTreeIsDefault === 0) {
-            if (contents && contents.length > 0) {
-                defaultCheckedKeys = [contents[0].key];
-            }
+        if (searchValue) {
+            contents = searchTree;
         } else {
-            defaultCheckedKeys = treetypeTreeKeys;
+            for (let j = 0; j < content.length; j++) {
+                const element = content[j];
+                if (element !== undefined) {
+                    contents.push(element);
+                }
+            }
         }
         return (
-            <div className={this.genIconClass()}>
-                <Tree
-                    checkable
-                    showIcon
-                    onCheck={this.onCheck.bind(this)}
-                    showLine
-                    defaultExpandAll
-                    defaultCheckedKeys={defaultCheckedKeys}
-                >
-                    {contents.map(p => {
-                        return this.loop(p);
-                    })}
-                </Tree>
+            <div>
+                <Search
+                    placeholder='请输入树种名称'
+                    onSearch={this.searchTree.bind(this)}
+                    style={{ width: '100%', marginBotton: 10, paddingRight: 5 }}
+                />
+                <div className={this.genIconClass()}>
+                    <Tree
+                        checkable
+                        showIcon
+                        onCheck={this.onCheck.bind(this)}
+                        showLine
+                        defaultCheckedKeys={treetypeTreeKeys}
+                    >
+                        {contents.map(p => {
+                            return this.loop(p);
+                        })}
+                    </Tree>
+                </div>
             </div>
+
         );
+    }
+
+    searchTree = (value) => {
+        const {
+            treetypes = []
+        } = this.props;
+        try {
+            let searchTree = [];
+            treetypes.map((tree) => {
+                let name = tree.properties.name;
+                if (name.indexOf(value) !== -1) {
+                    searchTree.push(tree);
+                }
+            });
+            this.setState({
+                searchValue: value,
+                searchTree
+            });
+        } catch (e) {
+            console.log('e', 'searchTree');
+        }
     }
 }

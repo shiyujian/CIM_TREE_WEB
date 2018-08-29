@@ -72,7 +72,7 @@ export default class RiskTree extends Component {
                     showIcon
                     onCheck={this.onCheck.bind(this)}
                     showLine
-                    defaultExpandAll
+                    // defaultExpandAll
                     defaultCheckedKeys={riskTreeKeys}
                 >
                     {contents.map(p => {

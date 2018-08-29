@@ -28,6 +28,8 @@ export default class Roles extends Component {
         const professionRoles = roles.filter(role => role.grouptype === 2);
         const departmentRoles = roles.filter(role => role.grouptype === 3);
         const curingRoles = roles.filter(role => role.grouptype === 4);
+        const nurseryBaseRoles = roles.filter(role => role.grouptype === 5);
+        const supplierRoles = roles.filter(role => role.grouptype === 6);
         const TabPane = Tabs.TabPane;
         return (
             <div>
@@ -158,6 +160,58 @@ export default class Roles extends Component {
                                 }}
                                 columns={this.columns}
                                 dataSource={curingRoles}
+                                rowKey='id'
+                            />
+                        </Card>
+                    </TabPane>
+                    <TabPane tab='苗圃基地角色' key='6'>
+                        <Card
+                            title='苗圃基地角色'
+                            extra={
+                                <Button
+                                    type='primary'
+                                    ghost
+                                    onClick={this.append.bind(this, 5)}
+                                >
+                                    添加苗圃基地角色
+                                </Button>
+                            }
+                        >
+                            <Table
+                                size='middle'
+                                bordered
+                                style={{
+                                    marginBottom: '10px',
+                                    overflow: 'hidden'
+                                }}
+                                columns={this.columns}
+                                dataSource={nurseryBaseRoles}
+                                rowKey='id'
+                            />
+                        </Card>
+                    </TabPane>
+                    <TabPane tab='供应商角色' key='7'>
+                        <Card
+                            title='供应商角色'
+                            extra={
+                                <Button
+                                    type='primary'
+                                    ghost
+                                    onClick={this.append.bind(this, 6)}
+                                >
+                                    添加供应商角色
+                                </Button>
+                            }
+                        >
+                            <Table
+                                size='middle'
+                                bordered
+                                style={{
+                                    marginBottom: '10px',
+                                    overflow: 'hidden'
+                                }}
+                                columns={this.columns}
+                                dataSource={supplierRoles}
                                 rowKey='id'
                             />
                         </Card>

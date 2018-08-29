@@ -26,7 +26,7 @@ export default class Project extends Component {
             isTwoScreenShow: 1
         };
         this.tileLayer = null;
-        this.tileLayer2 = null;
+        this.tileTreeLayerBasic = null;
         this.imgTileLayer = null;
         this.cvaTileLayer = null;
         this.map = null;
@@ -167,7 +167,7 @@ export default class Project extends Component {
             storagetype: 0
         }).addTo(this.map2);
 
-        this.tileLayer2 = L.tileLayer(this.tileUrls[1], {
+        this.tileTreeLayerBasic = L.tileLayer(this.tileUrls[1], {
             opacity: 1.0,
             subdomains: [1, 2, 3],
             minZoom: 12,
@@ -188,7 +188,7 @@ export default class Project extends Component {
     toggleTileLayer2 (e) {
         const index = e.target.value;
         console.log('index', index);
-        this.tileLayer2.setUrl(this.tileUrls[index]);
+        this.tileTreeLayerBasic.setUrl(this.tileUrls[index]);
     }
     /* 显示隐藏地图marker */
     onEndResize (e) {

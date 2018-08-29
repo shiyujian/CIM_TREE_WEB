@@ -68,7 +68,7 @@ export default class TaskReportTable extends Component {
         };
         this.checkMarkers = [];
         this.tileLayer = null;
-        this.tileLayer2 = null;
+        this.tileTreeLayerBasic = null;
         this.map = null;
         this.totalThinClass = [];
         this.sections = [];
@@ -211,10 +211,10 @@ export default class TaskReportTable extends Component {
     }
     // 获取树图层
     getTileLayer2 = () => {
-        if (this.tileLayer2) {
-            this.tileLayer2.addTo(this.map);
+        if (this.tileTreeLayerBasic) {
+            this.tileTreeLayerBasic.addTo(this.map);
         } else {
-            this.tileLayer2 = L.tileLayer(
+            this.tileTreeLayerBasic = L.tileLayer(
                 window.config.DASHBOARD_ONSITE +
                         '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
@@ -377,8 +377,8 @@ export default class TaskReportTable extends Component {
         } = this.state;
         console.log('treeLayerChecked', treeLayerChecked);
         if (treeLayerChecked) {
-            if (this.tileLayer2) {
-                this.map.removeLayer(this.tileLayer2);
+            if (this.tileTreeLayerBasic) {
+                this.map.removeLayer(this.tileTreeLayerBasic);
             }
         } else {
             this.getTileLayer2();
@@ -660,6 +660,7 @@ export default class TaskReportTable extends Component {
                     typeName: typeName || '',
                     status: status || '',
                     CuringMans: taskMess.CuringMans || '',
+                    Area: (taskMess.Area || '') + '亩',
                     CreateTime: taskMess.CreateTime || '',
                     PlanStartTime: taskMess.PlanStartTime || '',
                     PlanEndTime: taskMess.PlanEndTime || '',

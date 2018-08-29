@@ -1,47 +1,93 @@
-.dashboard-map {
-    position:relative;
-    .leaflet-popup-content h2 {
-      font-weight: 400 !important;
-      font-size: 12px !important;
-    }
-  
-    .dashboard-menuPanel {
-      position: absolute;
-      left: 135px;
-      top: 16px;
-      height: 90%;
-      width: 260px;
-      transition: all .3s;
-      z-index: 980;
-  
-      .dashboard-aside {
-        position: absolute;
-        left: 0;
-        width: 100%;
-        top: 0;
-        bottom: 0;
-        background-color: #fff;
-        color: #333;
-        z-index: 999;
-        overflow-x: hidden;
-        overflow-y: auto;
+.map-container {
+    display: flex;
+    position: absolute;
+    top: 80px;
+    // width: calc(~'100% - 160px');
+    width: 100%;
+    height: 100%;
+    // left: 160px;
 
-        .dashboard-asideTree {
-          margin-top: 20px;
-          margin-left: 20px;
+    .r-main {
+        flex: 1 1 auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 解决树loading抖动问题 */
+    .ant-tree li span.ant-tree-icon_loading {
+        left: 20px;
+        background-image: none;
+    }
+    .ant-tree-icon_loading + .ant-tree-title {
+        margin-left: 20px;
+    }
+}
+
+.map-containerFullScreen {
+    display: flex;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    .r-main {
+        flex: 1 1 auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 解决树loading抖动问题 */
+    .ant-tree li span.ant-tree-icon_loading {
+        left: 20px;
+        background-image: none;
+    }
+    .ant-tree-icon_loading + .ant-tree-title {
+        margin-left: 20px;
+    }
+}
+.dashboard-map {
+    position: relative;
+    .leaflet-popup-content h2 {
+        font-weight: 400 !important;
+        font-size: 12px !important;
+    }
+
+    .dashboard-menuPanel {
+        position: absolute;
+        left: 330px;
+        top: 40px;
+        height: 90%;
+        width: 260px;
+        transition: all 0.3s;
+        z-index: 980;
+
+        .dashboard-aside {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+            background-color: #fff;
+            color: #333;
+            z-index: 999;
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            .dashboard-asideTree {
+                margin-top: 20px;
+                margin-left: 20px;
+            }
         }
-      }
     }
-    #mapid{
-      cursor: pointer;
+    #mapid {
+        cursor: pointer;
     }
-  
+
     /*现场人员*/
     .dashboard-peopleIcon {
-      width: 21px !important;
-      height: 26px !important;
-      background-image: url("../ImageIcon/people.png");
-      background-size: 100% 100%;
+        width: 21px !important;
+        height: 26px !important;
+        background-image: url('../ImageIcon/people.png');
+        background-size: 100% 100%;
     }
 
     /*点击地图显示树图表*/
@@ -50,147 +96,138 @@
         left: -5px;
         width: 21px !important;
         height: 26px !important;
-        background-image: url("../ImageIcon/tree.png");
+        background-image: url('../ImageIcon/tree.png');
         background-size: 100% 100%;
     }
-  
+
     /*安全隐患*/
     .dashboard-riskIcon {
-      width: 21px !important;
-      height: 26px !important;
-      background-image: url("../ImageIcon/risk.png");
-      background-size: 100% 100%;
+        width: 21px !important;
+        height: 26px !important;
+        background-image: url('../ImageIcon/risk.png');
+        background-size: 100% 100%;
     }
 
     /*养护任务*/
     .dashboard-curingTaskIcon {
-      width: 26px !important;
-      height: 26px !important;
-      background-image: url("../ImageIcon/curingTask.png");
-      background-size: 100% 100%;
+        width: 26px !important;
+        height: 26px !important;
+        background-image: url('../ImageIcon/curingTask.png');
+        background-size: 100% 100%;
     }
-  
+
     .dashboard-gisTypeBut {
-      position: absolute;
-      z-index: 960;
-      top: 6px;
-      right: 50px;
-    }
-
-    .dashboard-survivalRateRadio {
-      position: absolute;
-      z-index: 960;
-      top: 300px;
-      right: 15px;
-      color: white;
-      background-color: #f5f5f5
-    }
-
-    .dashboard-menuSwitchButton {
-      position: absolute;
-      z-index: 960;
-      top: 15px;
-      left: 5px;
-    }
-
-    .dashboard-menuButtonLayout {
-      margin-bottom: 10px;
+        position: absolute;
+        z-index: 960;
+        top: 3px;
+        right: 50px;
     }
 
     .dashboard-editPolygonLayout {
-      position: absolute;
-      z-index: 960;
-      top: 6px;
-      left: 420px;
+        position: absolute;
+        z-index: 960;
+        top: 40px;
+        left: 600px;
     }
     .dashboard-areaMeasureLayout {
-      position: absolute;
-      z-index: 960;
-      top: 6px;
-      left: 670px;
-      font-size: 20px;
-      color: white;
-      background-color: #000
+        position: absolute;
+        z-index: 960;
+        top: 40px;
+        left: 835px;
+        font-size: 20px;
+        color: white;
+        background-color: #000;
     }
-  
-    .ant-tree li .ant-tree-iconEle{
-      width: 16px;
-      height: 16px;
+
+    .dashboard-menuSwitchSurvivalRateLayout {
+        position: absolute;
+        z-index: 960;
+        top: 360px;
+        right: 40px;
+        width: 76px;
+        height: 284px;
+        display: block;
+        background-image: url('../SurvivalRateImg/backGround.png');
     }
-  
+    .dashboard-rightMenuSurvivalRateImgLayout {
+        margin-left: 18px;
+        margin-top: -31px;
+    }
+
+    .dashboard-rightMenuSurvivalRateSelLayout {
+        margin-bottom: 10px;
+        display: inline-block;
+        background-image: url('../SurvivalRateImg/select.png');
+        background-size: 100% 100%;
+        width: 18px;
+        height: 18px;
+        margin-left: 4px;
+        margin-top: 6px;
+    }
+
+    .dashboard-rightMenuSurvivalRateUnSelLayout {
+        margin-bottom: 10px;
+        display: inline-block;
+        background-image: url('../SurvivalRateImg/unSelect.png');
+        background-size: 100% 100%;
+        width: 18px;
+        height: 18px;
+        margin-left: 4px;
+        margin-top: 6px;
+    }
+
+    .ant-tree li .ant-tree-iconEle {
+        width: 16px;
+        height: 16px;
+    }
+
     .ant-tree-iconEle {
-      // background: url("./ImageIcon/people.png") no-repeat;
-      background-size: cover;
+        // background: url("./ImageIcon/people.png") no-repeat;
+        background-size: cover;
     }
-  
+
     .tr-people .ant-tree-iconEle {
-      background-image: url("../ImageIcon/people.png");
+        background-image: url('../ImageIcon/people.png');
     }
-  
+
     .tr-hazard .ant-tree-iconEle {
-      background-image: url("../ImageIcon/risk.png");
+        background-image: url('../ImageIcon/risk.png');
     }
-  
+
     .tr-area .ant-tree-iconEle {
-      background-image: url("../ImageIcon/area.png");
+        background-image: url('../ImageIcon/area.png');
     }
-  
+
     /*弹出框样式*/
     .popupBox h2 span {
-      color: #0078A8;
+        color: #0078a8;
     }
-  
+
     .popupBox .btnRow {
-      text-align: center;
-      margin-top: 5px;
+        text-align: center;
+        margin-top: 5px;
     }
-    
+
     .btnViewRisk,
     .btnViewTrack {
-      display: inline-block;
-      color: #fff !important;
-      border-radius: 4px;
-      background-color: #108ee9;
-      border-color: #108ee9;
-      padding: 0 20px;
-      line-height: 24px;
-      text-decoration: none;
+        display: inline-block;
+        color: #fff !important;
+        border-radius: 4px;
+        background-color: #108ee9;
+        border-color: #108ee9;
+        padding: 0 20px;
+        line-height: 24px;
+        text-decoration: none;
     }
-  
+
     .btnViewTrack:hover {
-      background-color: #49a9ee;
-      border-color: #49a9ee;
-      text-decoration: none;
+        background-color: #49a9ee;
+        border-color: #49a9ee;
+        text-decoration: none;
     }
-  
+
     /*修改菜单边距*/
     .aside .ant-collapse-content {
-      padding: 0 8px;
+        padding: 0 8px;
     }
-  
-  }
-  
-  .map-container{
-    display: flex;
-    position: absolute;
-    top: 80px;
-    // width: calc(~'100% - 160px');
-    width: 100%;
-    height: 100%;
-    // left: 160px;
-  
-    .r-main{
-      flex:1 1 auto;
-      position: relative;
-      overflow: hidden;
-    }
-  
-    /* 解决树loading抖动问题 */
-    .ant-tree li span.ant-tree-icon_loading{
-      left: 20px;
-      background-image: none;
-    }
-    .ant-tree-icon_loading+.ant-tree-title{
-      margin-left: 20px;
-    }
-  }
+}
