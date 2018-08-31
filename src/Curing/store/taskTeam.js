@@ -11,9 +11,6 @@ export const ID = 'Forest_curing_taskteam';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getUsers = createFetchAction(`${USER_API}/users/`, []);
 
-export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
-export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //
-
 // 创建文档目录
 export const postDocDir = createFetchAction(`${SERVICE_API}/directories/`, [], 'POST');
 // 获取文档目录
@@ -56,8 +53,6 @@ export const actions = {
     getTreearea,
     getUsers,
     delDocDir,
-    getTreeNodeList,
-    getLittleBan,
     getDocList,
     postDocDir,
     getDocDir,

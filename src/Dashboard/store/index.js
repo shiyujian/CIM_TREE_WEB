@@ -7,8 +7,9 @@ import {
 const ID = 'dashboard';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`, []);
-export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
+// export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
 export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //
+export const getThinClassList = createFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []); //
 export const getRiskContactSheet = createFetchAction(`${FOREST_API}/tree/patrolevent/{{ID}}`, []);
 // 获取巡检路线
 export const getInspectRouter = createFetchAction(`${FOREST_API}/tree/patrolroutes`, [], 'GET');
@@ -39,7 +40,7 @@ export const getTrackTree = createAction(`${ID}巡检路线树`);
 export const getTreetypesTree = createAction(`${ID}树种筛选树`);
 export const getCuringTaskTree = createAction(`${ID}养护任务树`);
 export const getSurvivalRateTree = createAction(`${ID}成活率树`);
-export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
+// export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
 export const getCuringTypes = createAction(`${ID}养护类型`);
 export const getMenuTreeVisible = createAction(`${ID}是否显示树`);
 export const switchDashboardRightMenu = createAction(`${ID}切换二维展示右侧按钮`);
@@ -52,8 +53,9 @@ export const actions = {
     getTreearea,
     getRisk,
     getRiskContactSheet,
-    getTreeNodeList,
+    // getTreeNodeList,
     getLittleBan,
+    getThinClassList,
     getInspectRouter,
     getMapList,
     getTreeflows,
@@ -72,7 +74,7 @@ export const actions = {
     getTreetypesTree,
     getCuringTaskTree,
     getSurvivalRateTree,
-    getTotalThinClass,
+    // getTotalThinClass,
     getCuringTypes,
     getMenuTreeVisible,
     switchDashboardMenuType,
@@ -126,12 +128,12 @@ export default handleActions(
                 survivalRateTree: payload
             };
         },
-        [getTotalThinClass]: (state, { payload }) => {
-            return {
-                ...state,
-                totalThinClass: payload
-            };
-        },
+        // [getTotalThinClass]: (state, { payload }) => {
+        //     return {
+        //         ...state,
+        //         totalThinClass: payload
+        //     };
+        // },
         [getCuringTypes]: (state, { payload }) => {
             return {
                 ...state,

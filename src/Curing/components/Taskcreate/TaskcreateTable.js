@@ -36,7 +36,6 @@ export default class TaskCreateTable extends Component {
             selectedMenu: '1',
             treeLayerChecked: true,
             // 细班树
-            areaTreeData: [],
             areaTreeLoading: false,
             // 养护任务树
             taskTreeData: [], // 养护任务tree数据
@@ -69,7 +68,6 @@ export default class TaskCreateTable extends Component {
         this.map = null;
         this.sections = [];
         this.section = '';
-        this.totalThinClass = [];
         this.totalSmallClass = [];
         /* 菜单宽度调整 */
         this.menu = {
@@ -97,10 +95,14 @@ export default class TaskCreateTable extends Component {
     /* 渲染菜单panel */
     renderPanel (option) {
         const {
-            areaTreeData,
             areaTreeLoading,
             taskTreeData
         } = this.state;
+        const {
+            platform: {
+                tree = {}
+            }
+        } = this.props;
         if (option && option.value) {
             switch (option.value) {
                 // 区域地块
@@ -110,7 +112,7 @@ export default class TaskCreateTable extends Component {
                             <AreaTreeCreate
                                 {...this.props}
                                 onCheck={this.handleAreaCheck.bind(this)}
-                                content={areaTreeData}
+                                content={tree.thinClassTree || []}
                             />
                         </Spin>
 
@@ -130,6 +132,9 @@ export default class TaskCreateTable extends Component {
             actions: {
                 changeCheckedKeys,
                 changeSelectMap
+            },
+            platform: {
+                tree = {}
             }
         } = this.props;
         this.user = getUser();
@@ -144,7 +149,13 @@ export default class TaskCreateTable extends Component {
             // 初始化地图
             await this._initMap();
             // 获取地块树数据
-            await this._loadAreaData();
+            if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0) {
+                this.setState({
+                    areaTreeLoading: false
+                });
+            } else {
+                await this._loadAreaData();
+            }
             // 获取任务树数据
             await this._loadTaskData();
         } catch (e) {
@@ -201,18 +212,27 @@ export default class TaskCreateTable extends Component {
     // 获取地块树数据
     async _loadAreaData () {
         const {
-            actions: { getTreeNodeList, getLittleBan }
+            actions: {
+                getTreeNodeList,
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
+            }
         } = this.props;
         try {
             this.setState({
                 areaTreeLoading: true
             });
-            let data = await getAreaTreeData(getTreeNodeList, getLittleBan);
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             console.log('data', data);
-            this.totalThinClass = data.totalThinClass || [];
+            let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
+
+            // 获取所有的小班数据，用来计算养护任务的位置
+            await getTotalThinClass(totalThinClass);
+            // 区域地块树
+            await getThinClassTree(projectList);
             this.setState({
-                areaTreeData: projectList,
                 areaTreeLoading: false
             });
         } catch (e) {
@@ -660,7 +680,13 @@ export default class TaskCreateTable extends Component {
             taskMarkerLayerList,
             taskMessList
         } = this.state;
+        const {
+            platform: {
+                tree = {}
+            }
+        } = this.props;
         try {
+            let totalThinClass = tree.totalThinClass || [];
             let target = str.split(',').map(item => {
                 return item.split(' ').map(_item => _item - 0);
             });
@@ -673,7 +699,7 @@ export default class TaskCreateTable extends Component {
             });
             let treearea = [];
             let status = getTaskStatus(taskMess);
-            let regionData = getTaskThinClassName(taskMess, this.totalThinClass);
+            let regionData = getTaskThinClassName(taskMess, totalThinClass);
             console.log('regionData', regionData);
             // let regionData = this.getTaskThinClassName(taskMess);
             let sectionName = regionData.regionSectionName;
@@ -837,7 +863,10 @@ export default class TaskCreateTable extends Component {
                 postThinClassesByRegion // 查询圈选地图内的细班
             },
             selectMap,
-            checkedKeys
+            checkedKeys,
+            platform: {
+                tree = {}
+            }
         } = this.props;
         const {
             coordinates,
@@ -877,6 +906,7 @@ export default class TaskCreateTable extends Component {
             coords = coordinates;
         }
         try {
+            let totalThinClass = tree.totalThinClass || [];
             // 坐标
             let wkt = '';
             // 选择面积
@@ -910,7 +940,7 @@ export default class TaskCreateTable extends Component {
             regionArea = regionArea * 0.0015;
             // 包括的细班号
             let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
-            let regionData = getThinClassName(regionThinClass, this.totalThinClass, this.sections);
+            let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections);
             console.log('regionData', regionData);
             let sectionBool = regionData.sectionBool;
             if (!sectionBool) {

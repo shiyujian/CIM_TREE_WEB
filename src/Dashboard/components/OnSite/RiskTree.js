@@ -55,8 +55,7 @@ export default class RiskTree extends Component {
 
     render () {
         let {
-            content = [],
-            riskTreeKeys = []
+            content = []
         } = this.props;
         let contents = [];
         for (let j = 0; j < content.length; j++) {
@@ -73,7 +72,6 @@ export default class RiskTree extends Component {
                     onCheck={this.onCheck.bind(this)}
                     showLine
                     // defaultExpandAll
-                    defaultCheckedKeys={riskTreeKeys}
                 >
                     {contents.map(p => {
                         return this.loop(p);

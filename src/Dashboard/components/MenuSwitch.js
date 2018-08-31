@@ -4,6 +4,7 @@ import buildImg from './MenuImg/build.png';
 import buildImgSel from './MenuImg/buildSelect.png';
 import operateImg from './MenuImg/operate.png';
 import operateImgSel from './MenuImg/operateSelect.png';
+// window = window || {};
 export default class MenuSwitch extends Component {
     constructor (props) {
         super(props);
@@ -14,11 +15,37 @@ export default class MenuSwitch extends Component {
     async componentDidMount () {
         const {
             actions: {
-                switchDashboardAreaTreeLayer
+                switchDashboardAreaTreeLayer,
+                switchFullScreenState
+            },
+            platform: {
+                tabs = {}
             }
         } = this.props;
+        let fullScreenState = '';
+        if (tabs && tabs.fullScreenState) {
+            fullScreenState = tabs.fullScreenState;
+        }
         await switchDashboardAreaTreeLayer('tileTreeLayerBasic');
         console.log();
+        const me = this;
+        // 监听是否全屏 过去由F11触发的那种浏览器全屏模式和HTML5中内容的全屏模式是不一样的
+        window.onresize = function () {
+            let data = me.checkFull();
+            console.log('data', data);
+            console.log('fullScreenState', fullScreenState);
+            if (data) {
+                if (fullScreenState === 'unFullScreen') {
+                    console.log('ssssssssss');
+                    switchFullScreenState('fullScreen');
+                }
+            } else {
+                if (fullScreenState === 'fullScreen') {
+                    console.log('wwwwwwww');
+                    switchFullScreenState('unFullScreen');
+                }
+            }
+        };
     }
 
     options = [
@@ -54,6 +81,11 @@ export default class MenuSwitch extends Component {
             IconName: 'universal-access'
         }
     ]
+
+    checkFull () {
+        var isFullScreen = document.mozFullScreen || document.webkitIsFullScreen;
+        return isFullScreen;
+    }
 
     render () {
         const {
@@ -181,7 +213,6 @@ export default class MenuSwitch extends Component {
                 await getMenuTreeVisible(true);
             }
         } else {
-            console.log('sssssssssssss', buttonID);
             await getMenuTreeVisible(true);
             await switchDashboardCompoment(buttonID);
         }

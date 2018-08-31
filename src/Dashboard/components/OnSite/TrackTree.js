@@ -73,8 +73,7 @@ export default class TrackTree extends Component {
 
     render () {
         let {
-            content = [],
-            trackTreeKeys = []
+            content = []
         } = this.props;
         let contents = [];
         for (let j = 0; j < content.length; j++) {
@@ -90,7 +89,6 @@ export default class TrackTree extends Component {
                     showIcon
                     onCheck={this.onCheck.bind(this)}
                     showLine
-                    defaultCheckedKeys={trackTreeKeys}
                 >
                     {contents.map(p => {
                         return this.loop(p);

@@ -59,8 +59,7 @@ export default class extends Component {
 
     render () {
         let {
-            content = [],
-            treetypeTreeKeys
+            content = []
         } = this.props;
         const {
             searchTree,
@@ -90,7 +89,6 @@ export default class extends Component {
                         showIcon
                         onCheck={this.onCheck.bind(this)}
                         showLine
-                        defaultCheckedKeys={treetypeTreeKeys}
                     >
                         {contents.map(p => {
                             return this.loop(p);

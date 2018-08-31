@@ -19,7 +19,6 @@ export default class TaskStatisTable extends Component {
         super(props);
         this.state = {
             taskTotalData: [],
-            totalThinClass: [],
             loading: false,
             curingTypes: [],
             typeOption: [],
@@ -46,7 +45,6 @@ export default class TaskStatisTable extends Component {
             pagination: {},
             statisData: []
         };
-        this.totalThinClass = [];
         this.sections = [];
         this.section = '';
         this.totalDataPer = false;
@@ -110,7 +108,14 @@ export default class TaskStatisTable extends Component {
     // 获取地块树数据
     async _loadAreaData () {
         const {
-            actions: { getTreeNodeList, getLittleBan }
+            actions: {
+                getTreeNodeList,
+                getThinClassList,
+                getTotalThinClass
+            },
+            platform: {
+                tree = {}
+            }
         } = this.props;
         try {
             let projectList = [];
@@ -174,18 +179,25 @@ export default class TaskStatisTable extends Component {
                 });
             }
             this.setProjectOption(projectList);
-            for (let i = 0; i < unitProjectList.length; i++) {
-                let unitProject = unitProjectList[i];
-                let list = await getLittleBan({ no: unitProject.No });
-                let smallClassList = getSmallClass(list);
-                smallClassList.map(smallClass => {
-                    let thinClassList = getThinClass(smallClass, list);
-                    smallClass.children = thinClassList;
-                });
-                this.totalThinClass.push({
-                    unitProject: unitProject.No,
-                    smallClassList: smallClassList
-                });
+            if (tree && tree.totalThinClass && tree.totalThinClass instanceof Array && tree.totalThinClass.length > 0) {
+                console.log('tree.totalThinClass', tree.totalThinClass);
+            } else {
+                let totalThinClass = [];
+                for (let i = 0; i < unitProjectList.length; i++) {
+                    let unitProject = unitProjectList[i];
+                    let list = await getThinClassList({ no: unitProject.No });
+                    let smallClassList = getSmallClass(list);
+                    smallClassList.map(smallClass => {
+                        let thinClassList = getThinClass(smallClass, list);
+                        smallClass.children = thinClassList;
+                    });
+                    totalThinClass.push({
+                        unitProject: unitProject.No,
+                        smallClassList: smallClassList
+                    });
+                }
+                // 获取所有的小班数据，用来计算养护任务的位置
+                await getTotalThinClass(totalThinClass);
             }
             this.setState({
                 projectList,
@@ -195,7 +207,6 @@ export default class TaskStatisTable extends Component {
             }, () => {
                 this.setSmallClassOption();
             });
-            console.log('this.totalThinClass', this.totalThinClass);
         } catch (e) {
             console.log(e);
         }
@@ -486,14 +497,20 @@ export default class TaskStatisTable extends Component {
         const {
             sectionSelect
         } = this.state;
+        const {
+            platform: {
+                tree = {}
+            }
+        } = this.props;
         try {
+            let totalThinClass = tree.totalThinClass || [];
             let smallClassSelectList = [];
             let smallClassOption = [];
             let sectionArr = sectionSelect.split('-');
             console.log('sectionArr', sectionArr);
             if (sectionArr && sectionArr instanceof Array && sectionArr.length === 3) {
                 let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
-                this.totalThinClass.map((unitProjectData) => {
+                totalThinClass.map((unitProjectData) => {
                     if (unitProjectData.unitProject === unitProjectKey) {
                         let smallClassList = unitProjectData.smallClassList;
                         smallClassList.map((smallClass) => {
@@ -868,8 +885,14 @@ export default class TaskStatisTable extends Component {
     }
     // 处理任务的属性信息
     handleTaskProperty = (task) => {
+        const {
+            platform: {
+                tree = {}
+            }
+        } = this.props;
         try {
-            let regionData = getTaskThinClassName(task, this.totalThinClass);
+            let totalThinClass = tree.totalThinClass || [];
+            let regionData = getTaskThinClassName(task, totalThinClass);
             console.log('regionData', regionData);
             task.sectionName = regionData.regionSectionName || '';
             task.smallClassName = regionData.regionSmallName || '';

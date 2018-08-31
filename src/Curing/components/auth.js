@@ -2,6 +2,87 @@ import './Curing.less';
 import { PROJECT_UNITS } from '_platform/api';
 import { getUser } from '_platform/auth';
 // import { getSectionName } from './auth';
+
+export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
+    let rst = await getTreeNodeList();
+    if (rst instanceof Array && rst.length > 0) {
+        rst.forEach((item, index) => {
+            rst[index].children = [];
+        });
+    }
+    let user = getUser();
+    let sections = user.sections;
+    let section = '';
+    sections = JSON.parse(sections);
+    if (sections && sections instanceof Array && sections.length > 0) {
+        section = sections[0];
+    }
+    // 项目级
+    let projectList = [];
+    // 子项目级
+    let unitProjectList = [];
+    if (rst instanceof Array && rst.length > 0) {
+        rst.map(node => {
+            if (user.username === 'admin') {
+                if (node.Type === '项目工程') {
+                    projectList.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                } else if (node.Type === '子项目工程') {
+                    unitProjectList.push({
+                        Name: node.Name,
+                        No: node.No,
+                        Parent: node.Parent
+                    });
+                }
+            } else if (section) {
+                let sectionArr = section.split('-');
+                let projectKey = sectionArr[0];
+                let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
+                if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
+                    projectList.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                } else if (node.Type === '子项目工程' && node.No.indexOf(unitProjectKey) !== -1) {
+                    unitProjectList.push({
+                        Name: node.Name,
+                        No: node.No,
+                        Parent: node.Parent
+                    });
+                }
+            }
+        });
+        for (let i = 0; i < projectList.length; i++) {
+            projectList[i].children = unitProjectList.filter(node => {
+                return node.Parent === projectList[i].No;
+            });
+        }
+    }
+    let totalThinClass = [];
+    for (let i = 0; i < unitProjectList.length; i++) {
+        let unitProject = unitProjectList[i];
+        let list = await getThinClassList({ no: unitProject.No });
+        let smallClassList = getSmallClass(list);
+        smallClassList.map(smallClass => {
+            let thinClassList = getThinClass(smallClass, list);
+            smallClass.children = thinClassList;
+        });
+        totalThinClass.push({
+            unitProject: unitProject.No,
+            smallClassList: smallClassList
+        });
+        unitProject.children = smallClassList;
+    }
+    console.log('projectList', projectList);
+    console.log('totalThinClass', totalThinClass);
+
+    return {
+        totalThinClass: totalThinClass,
+        projectList: projectList
+    };
+};
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
     let user = getUser();
@@ -51,12 +132,24 @@ export const getSmallClass = (smallClassList) => {
             }
             // 之前没有存入过该小班，则push进数组
             if (list.SmallClass && array.indexOf(No) === -1) {
-                uniqueSmallClass.push({
-                    Name: list.SmallClassName
-                        ? list.SmallClassName + '小班'
-                        : list.SmallClass + '小班',
-                    No: No
-                });
+                if (list.SmallClassName) {
+                    if (list.SmallClassName.indexOf('小班') !== -1) {
+                        uniqueSmallClass.push({
+                            Name: list.SmallClassName,
+                            No: No
+                        });
+                    } else {
+                        uniqueSmallClass.push({
+                            Name: list.SmallClassName + '小班',
+                            No: No
+                        });
+                    }
+                } else {
+                    uniqueSmallClass.push({
+                        Name: list.SmallClass + '小班',
+                        No: No
+                    });
+                }
                 array.push(No);
             }
         });
@@ -93,12 +186,24 @@ export const getThinClass = (smallClass, list) => {
                 // 项目 + 区块 + 标段 + 小班 + 细班
                 let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
                 if (codeArray.indexOf(No) === -1) {
-                    thinClassList.push({
-                        Name: rst.ThinClassName
-                            ? rst.ThinClassName + '细班'
-                            : rst.ThinClass + '细班',
-                        No: No
-                    });
+                    if (rst.ThinClassName) {
+                        if (rst.ThinClassName.indexOf('细班') !== -1) {
+                            thinClassList.push({
+                                Name: rst.ThinClassName,
+                                No: No
+                            });
+                        } else {
+                            thinClassList.push({
+                                Name: rst.ThinClassName + '细班',
+                                No: No
+                            });
+                        }
+                    } else {
+                        thinClassList.push({
+                            Name: rst.ThinClass + '细班',
+                            No: No
+                        });
+                    }
                     codeArray.push(No);
                     nameArray.push(rst.ThinClassName);
                 }
@@ -458,86 +563,6 @@ export const getTaskStatus = (task) => {
         status = '已完成且未上报';
     }
     return status;
-};
-export const getAreaTreeData = async (getTreeNodeList, getLittleBan) => {
-    let rst = await getTreeNodeList();
-    if (rst instanceof Array && rst.length > 0) {
-        rst.forEach((item, index) => {
-            rst[index].children = [];
-        });
-    }
-    let user = getUser();
-    let sections = user.sections;
-    let section = '';
-    sections = JSON.parse(sections);
-    if (sections && sections instanceof Array && sections.length > 0) {
-        section = sections[0];
-    }
-    // 项目级
-    let projectList = [];
-    // 子项目级
-    let unitProjectList = [];
-    if (rst instanceof Array && rst.length > 0) {
-        rst.map(node => {
-            if (user.username === 'admin') {
-                if (node.Type === '项目工程') {
-                    projectList.push({
-                        Name: node.Name,
-                        No: node.No
-                    });
-                } else if (node.Type === '子项目工程') {
-                    unitProjectList.push({
-                        Name: node.Name,
-                        No: node.No,
-                        Parent: node.Parent
-                    });
-                }
-            } else if (section) {
-                let sectionArr = section.split('-');
-                let projectKey = sectionArr[0];
-                let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
-                if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
-                    projectList.push({
-                        Name: node.Name,
-                        No: node.No
-                    });
-                } else if (node.Type === '子项目工程' && node.No.indexOf(unitProjectKey) !== -1) {
-                    unitProjectList.push({
-                        Name: node.Name,
-                        No: node.No,
-                        Parent: node.Parent
-                    });
-                }
-            }
-        });
-        for (let i = 0; i < projectList.length; i++) {
-            projectList[i].children = unitProjectList.filter(node => {
-                return node.Parent === projectList[i].No;
-            });
-        }
-    }
-    let totalThinClass = [];
-    for (let i = 0; i < unitProjectList.length; i++) {
-        let unitProject = unitProjectList[i];
-        let list = await getLittleBan({ no: unitProject.No });
-        let smallClassList = getSmallClass(list);
-        smallClassList.map(smallClass => {
-            let thinClassList = getThinClass(smallClass, list);
-            smallClass.children = thinClassList;
-        });
-        totalThinClass.push({
-            unitProject: unitProject.No,
-            smallClassList: smallClassList
-        });
-        unitProject.children = smallClassList;
-    }
-    console.log('projectList', projectList);
-    console.log('totalThinClass', totalThinClass);
-
-    return {
-        totalThinClass: totalThinClass,
-        projectList: projectList
-    };
 };
 
 export const getCuringTaskTreeData = async (getcCuringTypes, getCuring) => {

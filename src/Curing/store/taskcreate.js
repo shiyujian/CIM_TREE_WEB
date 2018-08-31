@@ -11,8 +11,6 @@ export const ID = 'Forest_curing_taskcreate';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getUsers = createFetchAction(`${USER_API}/users/`, []);
 
-export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
-export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
 // 苗木养护计划详情
@@ -39,8 +37,6 @@ export const changeCheckedKeys = createAction(`${ID}_changeCheckedKeys`);
 export const actions = {
     getTreearea,
     getUsers,
-    getTreeNodeList,
-    getLittleBan,
     getCuring,
     getCuringMessage,
     postCuringTask,

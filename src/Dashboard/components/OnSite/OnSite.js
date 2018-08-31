@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-29 17:27:32
+ * @Last Modified time: 2018-08-31 16:18:42
  */
 import React, { Component } from 'react';
 import {
@@ -116,13 +116,7 @@ class OnSite extends Component {
             riskTreeLoading: true,
             treetypeTreeLoading: true,
             curingTaskTreeLoading: true,
-            survivalRateTreeLoading: true,
-            // 各个树的默认选中节点，因为各个树点开都是重新渲染，所以需要保存之前点击的节点
-            areaTreeKeys: [],
-            trackTreeKeys: [],
-            riskTreeKeys: [],
-            treetypeTreeKeys: [],
-            curingTaskTreeKeys: []
+            survivalRateTreeLoading: true
         };
         this.tileLayer = null; // 最底部基础图层
         this.tileTreeLayerBasic = null; // 树木区域图层
@@ -148,7 +142,7 @@ class OnSite extends Component {
         1: window.config.IMG_W,
         2: window.config.VEC_W
     };
-
+    // 左侧菜单栏
     options = [
         {
             label: '区域地块',
@@ -184,7 +178,7 @@ class OnSite extends Component {
             value: 'geojsonFeature_projectPic'
         }
     ];
-
+    // 右侧成活率范围
     survivalRateOptions = [
         {
             id: 'survivalRateHundred',
@@ -222,17 +216,20 @@ class OnSite extends Component {
             img: foutyImg
         }
     ]
+    // 初始化地图，获取目录树数据
     async componentDidMount () {
         const {
-            areaTree,
             trackTree,
             riskTree,
             treetypesTree,
             curingTaskTree,
-            survivalRateTree
+            survivalRateTree,
+            platform: {
+                tree = {}
+            }
         } = this.props;
         await this.initMap();
-        if (areaTree && areaTree instanceof Array && areaTree.length > 0) {
+        if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0) {
             this.setState({
                 areaTreeLoading: false
             });
@@ -298,7 +295,6 @@ class OnSite extends Component {
             await switchDashboardFocus('');
         }
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
-            console.log('sssssssssssss');
             await this.removeAllLayer();
             if (dashboardCompomentMenu !== 'geojsonFeature_survivalRate') {
                 await this.getTileLayerTreeBasic();
@@ -468,14 +464,14 @@ class OnSite extends Component {
         const {
             actions: {
                 getTreeNodeList,
-                getLittleBan,
-                getAreaTree,
+                getThinClassList,
+                getThinClassTree,
                 getSurvivalRateTree,
                 getTotalThinClass
             }
         } = this.props;
         try {
-            let data = await getAreaData(getTreeNodeList, getLittleBan);
+            let data = await getAreaData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
             let survivalRateTree = data.survivalRateTree || [];
             let projectList = data.projectList || [];
@@ -484,7 +480,7 @@ class OnSite extends Component {
             // 标段树
             await getSurvivalRateTree(survivalRateTree);
             // 区域地块树
-            await getAreaTree(projectList);
+            await getThinClassTree(projectList);
             this.setState({
                 areaTreeLoading: false
             });
@@ -897,15 +893,12 @@ class OnSite extends Component {
             trackTreeLoading,
             riskTreeLoading,
             treetypeTreeLoading,
-            curingTaskTreeLoading,
-            areaTreeKeys,
-            trackTreeKeys,
-            riskTreeKeys,
-            treetypeTreeKeys,
-            curingTaskTreeKeys
+            curingTaskTreeLoading
         } = this.state;
         const {
-            areaTree,
+            platform: {
+                tree = {}
+            },
             trackTree,
             riskTree,
             treetypesTree,
@@ -936,10 +929,9 @@ class OnSite extends Component {
                                 <Radio value={'实际定位'}>实际定位</Radio>
                             </RadioGroup>
                             <PkCodeTree
-                                treeData={areaTree}
-                                selectedKeys={this.state.areaEventKey}
+                                treeData={tree.thinClassTree || []}
+                                // selectedKeys={this.state.areaEventKey}
                                 onSelect={this._handleAreaSelect.bind(this)}
-                                areaTreeKeys={areaTreeKeys}
                             />
                         </Spin>
                     );
@@ -951,7 +943,6 @@ class OnSite extends Component {
                                 onCheck={this.handleTrackCheck.bind(this)}
                                 content={trackTree}
                                 featureName={option.value}
-                                trackTreeKeys={trackTreeKeys}
                             />
                             {/* <RangePicker
                                 style={{
@@ -971,7 +962,6 @@ class OnSite extends Component {
                                 onCheck={this.handleRiskCheck.bind(this)}
                                 content={riskTree}
                                 featureName={option.value}
-                                riskTreeKeys={riskTreeKeys}
                             />
                         </Spin>
                     );
@@ -984,7 +974,6 @@ class OnSite extends Component {
                                 content={treetypesTree}
                                 featureName={option.value}
                                 treetypes={treetypes}
-                                treetypeTreeKeys={treetypeTreeKeys}
                             />
                         </Spin>
                     );
@@ -995,7 +984,6 @@ class OnSite extends Component {
                             <CuringTaskTree
                                 onCheck={this.handleCuringTaskCheck.bind(this)}
                                 content={curingTaskTree}
-                                curingTaskTreeKeys={curingTaskTreeKeys}
                             />
                         </Spin>
                     );
@@ -1070,7 +1058,7 @@ class OnSite extends Component {
                             ) : ''
                     }
                     { // 成活率右侧范围菜单
-                        dashboardCompomentMenu === 'geojsonFeature_survivalRate' && menuTreeVisible
+                        dashboardCompomentMenu === 'geojsonFeature_survivalRate'
                             ? (
                                 <div className='dashboard-menuSwitchSurvivalRateLayout'>
                                     {
@@ -1205,8 +1193,7 @@ class OnSite extends Component {
         let areaEventTitle = info.node.props.title;
         this.setState({
             areaEventKey: keys[0],
-            areaEventTitle,
-            areaTreeKeys: keys
+            areaEventTitle
         });
         try {
             const eventKey = keys[0];
@@ -1324,9 +1311,6 @@ class OnSite extends Component {
     }
     // 巡检路线多选树节点
     handleTrackCheck = async (keys, info) => {
-        this.setState({
-            trackTreeKeys: keys
-        });
         // 当前的选中状态
         let checked = info.checked;
         let selectKey = info.node.props.eventKey;
@@ -1454,9 +1438,6 @@ class OnSite extends Component {
                 this.map.removeLayer(riskMarkerLayerList[i]);
             }
         }
-        this.setState({
-            riskTreeKeys: keys
-        });
         let me = this;
         riskTree.forEach(risk => {
             if (!risk.children) {
@@ -1490,9 +1471,6 @@ class OnSite extends Component {
     }
     /* 树种筛选多选树节点 */
     handleTreeTypeCheck = async (keys, info) => {
-        this.setState({
-            treetypeTreeKeys: keys
-        });
         let queryData = '';
         for (let i = 0; i < keys.length; i++) {
             if (keys[i] > 6) {
@@ -1507,7 +1485,6 @@ class OnSite extends Component {
         let url = window.config.DASHBOARD_TREETYPE +
             `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${queryData})`;
         // this.tileTreeTypeLayerFilter指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
-        console.log('url', url);
         this.tileTreeTypeLayerFilter = L.tileLayer.wms(url,
             {
                 layers: 'xatree:treelocation',
@@ -1520,11 +1497,6 @@ class OnSite extends Component {
     }
     // 养护任务点击
     handleCuringTaskCheck (keys, info) {
-        // 当前选中的节点
-        this.setState({
-            curingTaskTreeKeys: keys
-        });
-
         try {
             let eventKey = info.node.props.eventKey;
             // 当前的选中状态
@@ -1678,10 +1650,13 @@ class OnSite extends Component {
             curingTaskMessList
         } = this.state;
         const {
-            totalThinClass,
-            curingTypes
+            curingTypes,
+            platform: {
+                tree = {}
+            }
         } = this.props;
         try {
+            let totalThinClass = tree.totalThinClass || [];
             let target = str.split(',').map(item => {
                 return item.split(' ').map(_item => _item - 0);
             });
@@ -1878,13 +1853,13 @@ class OnSite extends Component {
         });
     }
     // 成活率加载图层
-    addSurvivalRateLayer = () => {
+    addSurvivalRateLayer = async () => {
         const {
             survivalRateSectionData,
             survivalRateRateData
         } = this.state;
         try {
-            this.removeTileTreeSurvivalRateLayer();
+            await this.removeTileTreeSurvivalRateLayer();
             let url = '';
             if (survivalRateRateData && survivalRateSectionData) {
                 url = window.config.DASHBOARD_TREETYPE +
@@ -1896,15 +1871,19 @@ class OnSite extends Component {
                 url = window.config.DASHBOARD_TREETYPE +
                 `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})`;
             }
-            this.tileSurvivalRateLayerFilter = L.tileLayer.wms(url,
-                {
-                    layers: 'xatree:thinclass',
-                    crs: L.CRS.EPSG4326,
-                    format: 'image/png',
-                    maxZoom: 22,
-                    transparent: true
-                }
-            ).addTo(this.map);
+            if (url) {
+                this.tileSurvivalRateLayerFilter = L.tileLayer.wms(url,
+                    {
+                        layers: 'xatree:thinclass',
+                        crs: L.CRS.EPSG4326,
+                        format: 'image/png',
+                        maxZoom: 22,
+                        transparent: true
+                    }
+                ).addTo(this.map);
+            } else {
+                await this.getTileTreeSurvivalRateBasic();
+            }
         } catch (e) {
             console.log('addSurvivalRateLayer', e);
         }
@@ -2050,11 +2029,14 @@ class OnSite extends Component {
     // 点击地图上的区域的成活率
     async getSurvivalRateInfo (x, y, that) {
         const {
-            totalThinClass
+            platform: {
+                tree = {}
+            }
         } = that.props;
         const {
             survivalRateMarkerLayerList
         } = that.state;
+        let totalThinClass = tree.totalThinClass || [];
         var resolutions = [
             0.703125,
             0.3515625,
@@ -2153,8 +2135,11 @@ class OnSite extends Component {
                 getCarpackbysxm,
                 getTreeMess
             },
-            totalThinClass
+            platform: {
+                tree = {}
+            }
         } = this.props;
+        let totalThinClass = tree.totalThinClass || [];
         var resolutions = [
             0.703125,
             0.3515625,

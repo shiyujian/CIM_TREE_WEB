@@ -1,14 +1,91 @@
 import './OnSite/OnSite.less';
 import { PROJECT_UNITS, FOREST_API } from '_platform/api';
 
+export const getAreaData = async (getTreeNodeList, getThinClassList) => {
+    let rst = await getTreeNodeList();
+    if (rst instanceof Array && rst.length > 0) {
+        rst.forEach((item, index) => {
+            rst[index].children = [];
+        });
+    } else {
+        this.setState({
+            areaTreeLoading: false
+        });
+        return;
+    }
+    // 项目级
+    let projectList = [];
+    // 子项目级
+    let unitProjectList = [];
+    let survivalRateTree = [];
+    if (rst instanceof Array && rst.length > 0) {
+        rst.map(node => {
+            if (node.Type === '项目工程') {
+                projectList.push({
+                    Name: node.Name,
+                    No: node.No
+                });
+                survivalRateTree.push({
+                    Name: node.Name,
+                    No: node.No
+                });
+            } else if (node.Type === '子项目工程') {
+                unitProjectList.push({
+                    Name: node.Name,
+                    No: node.No,
+                    Parent: node.Parent
+                });
+            }
+        });
+        survivalRateTree.map((survivalRate) => {
+            let sectionTree = [];
+            rst.map(node => {
+                if (node.Type === '单位工程' && node.No.indexOf(survivalRate.No) !== -1) {
+                    sectionTree.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                }
+            });
+            survivalRate.children = sectionTree;
+        });
+        for (let i = 0; i < projectList.length; i++) {
+            projectList[i].children = unitProjectList.filter(node => {
+                return node.Parent === projectList[i].No;
+            });
+        }
+    }
+    let totalThinClass = [];
+    for (let i = 0; i < unitProjectList.length; i++) {
+        let unitProject = unitProjectList[i];
+        // let list = [];
+        // if (unitProject.No !== 'P009-01') {
+        //     list = await getThinClassList({ no: unitProject.No });
+        // }
+        let list = await getThinClassList({ no: unitProject.No });
+        let smallClassList = getSmallClass(list);
+        smallClassList.map(smallClass => {
+            let thinClassList = getThinClass(smallClass, list);
+            smallClass.children = thinClassList;
+        });
+        totalThinClass.push({
+            unitProject: unitProject.No,
+            smallClassList: smallClassList
+        });
+        unitProject.children = smallClassList;
+    }
+    return {
+        totalThinClass: totalThinClass,
+        survivalRateTree: survivalRateTree,
+        projectList: projectList
+    };
+};
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
     // 将小班的code获取到，进行去重
     let uniqueSmallClass = [];
     // 进行数组去重的数组
     let array = [];
-
-    let test = [];
     try {
         smallClassList.map(list => {
             let noArr = list.No.split('-');
@@ -16,23 +93,42 @@ export const getSmallClass = (smallClassList) => {
             if (noArr.length < 5) {
                 return;
             }
+            // // 项目 + 区块 + 标段 + 小班 + 细班
+            // let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
             // 项目 + 区块 + 标段 + 小班
             let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2];
             // 之前没有存入过该小班，则push进数组
             if (list.SmallClass && array.indexOf(No) === -1) {
-                uniqueSmallClass.push({
-                    Name: list.SmallClassName
-                        ? list.SmallClassName + '小班'
-                        : list.SmallClass + '小班',
-                    No: No
-                });
+                if (list.SmallClassName) {
+                    if (list.SmallClassName.indexOf('小班') !== -1) {
+                        uniqueSmallClass.push({
+                            Name: list.SmallClassName,
+                            No: No
+                        });
+                    } else {
+                        uniqueSmallClass.push({
+                            Name: list.SmallClassName + '小班',
+                            No: No
+                        });
+                    }
+                } else {
+                    uniqueSmallClass.push({
+                        Name: list.SmallClass + '小班',
+                        No: No
+                    });
+                }
+                // uniqueSmallClass.push({
+                //     Name: list.SmallClassName
+                //         ? list.SmallClassName + '小班'
+                //         : list.SmallClass + '小班',
+                //     No: No
+                // });
                 array.push(No);
             }
         });
     } catch (e) {
         console.log('getSmallClass', e);
     }
-
     return uniqueSmallClass;
 };
 // 获取项目的细班
@@ -61,12 +157,30 @@ export const getThinClass = (smallClass, list) => {
                 // 项目 + 区块 + 标段 + 小班 + 细班
                 let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
                 if (codeArray.indexOf(No) === -1) {
-                    thinClassList.push({
-                        Name: rst.ThinClassName
-                            ? rst.ThinClassName + '细班'
-                            : rst.ThinClass + '细班',
-                        No: No
-                    });
+                    if (rst.ThinClassName) {
+                        if (rst.ThinClassName.indexOf('细班') !== -1) {
+                            thinClassList.push({
+                                Name: rst.ThinClassName,
+                                No: No
+                            });
+                        } else {
+                            thinClassList.push({
+                                Name: rst.ThinClassName + '细班',
+                                No: No
+                            });
+                        }
+                    } else {
+                        thinClassList.push({
+                            Name: rst.ThinClass + '细班',
+                            No: No
+                        });
+                    }
+                    // thinClassList.push({
+                    //     Name: rst.ThinClassName
+                    //         ? rst.ThinClassName + '细班'
+                    //         : rst.ThinClass + '细班',
+                    //     No: No
+                    // });
                     codeArray.push(No);
                     nameArray.push(rst.ThinClassName);
                 }
@@ -382,84 +496,4 @@ export const getThinClassName = (thinClass, section, totalThinClass) => {
     } catch (e) {
         console.log('getThinClassName', e);
     }
-};
-
-export const getAreaData = async (getTreeNodeList, getLittleBan) => {
-    let rst = await getTreeNodeList();
-    if (rst instanceof Array && rst.length > 0) {
-        rst.forEach((item, index) => {
-            rst[index].children = [];
-        });
-    } else {
-        this.setState({
-            areaTreeLoading: false
-        });
-        return;
-    }
-    // 项目级
-    let projectList = [];
-    // 子项目级
-    let unitProjectList = [];
-    let survivalRateTree = [];
-    if (rst instanceof Array && rst.length > 0) {
-        rst.map(node => {
-            if (node.Type === '项目工程') {
-                projectList.push({
-                    Name: node.Name,
-                    No: node.No
-                });
-                survivalRateTree.push({
-                    Name: node.Name,
-                    No: node.No
-                });
-            } else if (node.Type === '子项目工程') {
-                unitProjectList.push({
-                    Name: node.Name,
-                    No: node.No,
-                    Parent: node.Parent
-                });
-            }
-        });
-        survivalRateTree.map((survivalRate) => {
-            let sectionTree = [];
-            rst.map(node => {
-                if (node.Type === '单位工程' && node.No.indexOf(survivalRate.No) !== -1) {
-                    sectionTree.push({
-                        Name: node.Name,
-                        No: node.No
-                    });
-                }
-            });
-            survivalRate.children = sectionTree;
-        });
-        for (let i = 0; i < projectList.length; i++) {
-            projectList[i].children = unitProjectList.filter(node => {
-                return node.Parent === projectList[i].No;
-            });
-        }
-    }
-    let totalThinClass = [];
-    for (let i = 0; i < unitProjectList.length; i++) {
-        let unitProject = unitProjectList[i];
-        // let list = [];
-        // if (unitProject.No !== 'P009-01') {
-        //     list = await getLittleBan({ no: unitProject.No });
-        // }
-        let list = await getLittleBan({ no: unitProject.No });
-        let smallClassList = getSmallClass(list);
-        smallClassList.map(smallClass => {
-            let thinClassList = getThinClass(smallClass, list);
-            smallClass.children = thinClassList;
-        });
-        totalThinClass.push({
-            unitProject: unitProject.No,
-            smallClassList: smallClassList
-        });
-        unitProject.children = smallClassList;
-    }
-    return {
-        totalThinClass: totalThinClass,
-        survivalRateTree: survivalRateTree,
-        projectList: projectList
-    };
 };
