@@ -5,7 +5,6 @@ import {
     base,
     USER_API,
     SERVICE_API,
-    EXCHANGE_API,
     CODE_API
 } from '_platform/api';
 const ID = 'DISPATCH';
@@ -24,12 +23,6 @@ export const getOrgListAc = createFetchActionT(
     `${SERVICE_API}/org-tree/?depth=3`,
     [getOrgListAcOK]
 );
-// 获取接受单位的人员列表
-export const getUsersListAcOK = createAction(`${ID}获取接受单位的人员列表`);
-export const getUsersListAc = createFetchActionT(
-    `${USER_API}/users/?org_code={{code}}`,
-    [getUsersListAcOK]
-);
 // 获取抄送的人员列表
 export const getCopyUsersAcOK = createAction(`${ID}获取抄送的人员列表`);
 export const getCopyUsersAc = createFetchActionT(
@@ -42,107 +35,62 @@ export const getReceiveInfoAc = createFetchAction(
     `${CODE_API}/api/v1/file-notifications/received/?user={{user}}&per_page=10000`,
     [getReceiveInfoAcOK]
 );
-// export const getReceiveInfoAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/received/{{id}}/?user={{user}}&per_page=10000`, [getReceiveInfoAcOK]);
 // 获取发送的列表
 export const getSentInfoAcOK = createAction(`${ID}获取发送的列表`);
 export const getSentInfoAc = createFetchAction(
     `${CODE_API}/api/v1/file-notifications/sent/?user={{user}}&per_page=10000`,
     [getSentInfoAcOK]
 );
-// export const getSentInfoAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/sent/?user={{user}}&per_page=10000`, [getSentInfoAcOK]);
 // 发送文件
 export const postSentDocAc = createFetchAction(
     `${CODE_API}/api/v1/file-notifications/creation/`,
     [],
     'POST'
 );
-// export const postSentDocAc = createFetchAction(`http://47.104.160.65:6545/api/v1/file-notifications/creation/`, [], "POST");
 // 删除的发送文件
 export const deleteSentDocAc = createFetchAction(
     `${CODE_API}/api/v1/file-notifications/sent/{{id}}/?user={{user}}`,
     [],
     'DELETE'
 );
-// export const deleteSentDocAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, [], "DELETE");
 // 获取收文的详情信息
 export const getReceiveDetailAc = createFetchAction(
     `${CODE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`,
     []
 );
-// export const getReceiveDetailAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/received/{{id}}/?user={{user}}`, []);
 // 获取发文的详情信息
 export const getSendDetailAc = createFetchAction(
     `${CODE_API}/api/v1/file-notifications/sent/{{id}}/?user={{user}}`,
     []
 );
-// export const getSendDetailAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/sent/{{id}}/?user={{user}}`, []);
 // 收文已阅
 export const patchReceiveDetailAc = createFetchAction(
     `${CODE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`,
     [],
     'PATCH'
 );
-// export const patchReceiveDetailAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [], "PATCH");
 // 删除的收文
 export const deleteReceiveDocAc = createFetchAction(
     `${CODE_API}/api/v1/file-notifications/received/{{id}}/?user={{user}}`,
     [],
     'DELETE'
 );
-// export const deleteReceiveDocAc = createFetchAction(`http://10.215.160.38:6545/api/v1/file-notifications/received/{{id}}/?user={{user}}`, [], "DELETE");
 // 发送短信接口
 export const sentMessageAc = createFetchAction(
     `${CODE_API}/api/v1/sms/`,
     [],
     'POST'
 );
-// export const sentMessageAc = createFetchAction(`http://10.215.160.38:6545/api/v1/sms/`, [], "POST");
 
 // 存储table回文信息
 export const setDocInfo = createAction('table回文信息');
 
-// Loading加载状态
-export const setLoadingAc = createAction('DISLoading加载状态');
-// 设置统计里面的时间
-export const setCountTimeAc = createAction('DIS设置统计里面的时间');
-export const setSearchTimeAc = createAction('DIS设置查询里面的时间');
-// 查询当前单位下的所有人员信息
 // 获取施工单位列表
 const getOrgTreeOK = createAction('DIS获取施工单位列表');
 const getOrgTree = createFetchAction(`${SERVICE_API}/org-tree/`, [
     getOrgTreeOK
 ]);
-// 设置统计选中的单位
-const setCountSelectedAc = createAction('DIS设置统计选中的单位');
-// 设置查询选中的单位
-const setSearchSelectedAc = createAction('DIS设置查询选中的单位');
 
-// 部门考勤查询
-const getSearchInfoAcOK = createAction('DIS部门考勤查询');
-const getSearchInfoAc = createFetchAction(
-    `${base}/main/api/staff-statistic/?org_code={{code}}&year={{year}}&month={{month}}`,
-    [getSearchInfoAcOK]
-);
-
-// 查询当前单位下的所有人员信息
-const getPersonsAcOK = createAction('DIS查询当前单位下的所有人员信息');
-const getPersonsAc = createFetchAction(
-    `${SERVICE_API}/orgs/code/{{code}}/?members=true`,
-    [getPersonsAcOK]
-);
-// 设置统计查询的数据
-const getCountInfoAcT = createFetchAction(
-    `${base}/main/api/staff-statistic2/?org_code={{code}}&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`,
-    []
-);
-const setCountInfoAc = createAction('DIS设置统计查询的数据');
-
-// 查询部门出勤信息
-const getCountInfoAcOK = createAction('DIS查询部门出勤信息');
-const getCountInfoAc = createFetchAction(
-    `${base}/main/api/staff-statistic2/?org_code={{code}}&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`,
-    [getCountInfoAcOK]
-);
 // 获取部门信息
 const getOrgName = createFetchAction(
     `${SERVICE_API}/orgs/code/{{code}}/`,
@@ -201,29 +149,12 @@ export const actions = {
     sentMessageAc,
     getOrgListAcOK,
     getOrgListAc,
-    getUsersListAcOK,
-    getUsersListAc,
     getCopyUsersAcOK,
     getCopyUsersAc,
     getOrgName,
-    setLoadingAc,
-    setCountTimeAc,
 
     getOrgTreeOK,
     getOrgTree,
-    setCountSelectedAc,
-    setSearchSelectedAc,
-    getCountInfoAcOK,
-    getCountInfoAc,
-    setLoadingAc,
-    setCountTimeAc,
-    getSearchInfoAcOK,
-    getSearchInfoAc,
-    setSearchTimeAc,
-    getPersonsAcOK,
-    getPersonsAc,
-    getCountInfoAcT,
-    setCountInfoAc,
 
     setNewsTabActive
 };
@@ -241,10 +172,6 @@ export default handleActions(
         [getOrgListAcOK]: (state, { payload }) => ({
             ...state,
             orgList: payload.children
-        }),
-        [getUsersListAcOK]: (state, { payload }) => ({
-            ...state,
-            usersList: payload
         }),
         [getCopyUsersAcOK]: (state, { payload }) => ({
             ...state,
@@ -313,42 +240,6 @@ export default handleActions(
         [getOrgTreeOK]: (state, { payload }) => ({
             ...state,
             orgList: payload.children
-        }),
-        [setCountSelectedAc]: (state, { payload }) => ({
-            ...state,
-            countSelectedKey: payload
-        }),
-        [setSearchSelectedAc]: (state, { payload }) => ({
-            ...state,
-            searchSelectedKey: payload
-        }),
-        [setCountInfoAc]: (state, { payload }) => ({
-            ...state,
-            countInfo: payload
-        }),
-        [getCountInfoAcOK]: (state, { payload }) => ({
-            ...state,
-            countInfo: payload
-        }),
-        [setLoadingAc]: (state, { payload }) => ({
-            ...state,
-            loading: payload
-        }),
-        [setCountTimeAc]: (state, { payload }) => ({
-            ...state,
-            countTime: payload
-        }),
-        [getSearchInfoAcOK]: (state, { payload }) => ({
-            ...state,
-            searchInfo: payload
-        }),
-        [setSearchTimeAc]: (state, { payload }) => ({
-            ...state,
-            searchTime: payload
-        }),
-        [getPersonsAcOK]: (state, { payload }) => ({
-            ...state,
-            personList: payload.members || []
         })
     },
     {}

@@ -20,25 +20,18 @@ const getCurrentUserOrgCode = createFetchAction(
 );
 
 const setMonthSection = createAction(`${ID}_设置统计时间区间`);
-// 设置统计查询的数据
-const setCountInfoAc = createAction(`${ID}_设置统计查询的数据`);
 export const actions = {
     getOrgAttendInfoOK,
     getOrgAttendInfo,
     getCurrentUserOrgCodeOK,
     getCurrentUserOrgCode,
     setMonthSection,
-    setCountInfoAc,
     getOrgAttendInfoT
 };
 
 export default handleActions(
     {
         [getOrgAttendInfoOK]: (state, { payload }) => ({
-            ...state,
-            orgAttendInfo: payload
-        }),
-        [setCountInfoAc]: (state, { payload }) => ({
             ...state,
             orgAttendInfo: payload
         }),
