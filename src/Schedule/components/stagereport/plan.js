@@ -22,11 +22,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
     WORKFLOW_CODE,
-    base,
-    SOURCE_API,
-    DATASOURCECODE,
     PROJECT_UNITS,
-    SCHEDULETREEDATA,
     TREETYPENO
 } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';

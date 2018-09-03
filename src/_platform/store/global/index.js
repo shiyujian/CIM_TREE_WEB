@@ -3,7 +3,6 @@ import locationReducer, * as locationActions from './location';
 import previewReducer, * as previewActions from './preview';
 import tabsReducer, * as tabsActions from './tabs';
 import treeReducer, * as treeActions from './tree';
-// import progressReducer, * as progressActions from '../../components/Progress/store';
 
 import { handleActions, combineActions } from 'redux-actions';
 import {

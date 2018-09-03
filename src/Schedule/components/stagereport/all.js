@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-17 15:59:33
+ * @Last Modified time: 2018-09-03 11:31:50
  */
 import React, { Component } from 'react';
 import {
@@ -22,29 +22,22 @@ import {
     Row,
     Col,
     Input,
-    Select,
     Checkbox,
     Upload,
-    Progress,
     Icon,
     Popconfirm
 } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { Link } from 'react-router-dom';
 import { getUser } from '../../../_platform/auth';
 import {
     base,
-    SOURCE_API,
-    DATASOURCECODE,
-    SERVICE_API,
-    PROJECT_UNITS
+    PROJECT_UNITS,
+    WORKFLOW_CODE
 } from '../../../_platform/api';
 // import PerSearch from './PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
-import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import queryString from 'query-string';
 import SearchInfo from './SearchInfo';
 import TotleModal from './TotleModal';
 import './index.less';
