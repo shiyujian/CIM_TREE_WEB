@@ -218,45 +218,6 @@ export default class Member extends Component {
         } = this.props;
         this.setState({ loading: true });
         id && getMembers({ id });
-        // getUsersPage({page:1}).then(rst1=>{
-        // 	let pagination = {
-        // 		current: 1,
-        // 		total:rst1.count,
-        // 	};
-        // 	this.setState({infoList:rst1,pagination:pagination})
-
-        // })
-        // getUsers().then(rst1 => {
-        // console.log("rst1",rst1)
-
-        // 	let promises = rst1.map((item, index) => {
-        // // console.log("item",item)
-
-        // 		return getOrgInfo({ code: item.account.org_code })
-        // 	});
-        // 	let users2 = rst1.map(ele => {
-        // // console.log("ele",ele)
-
-        // 		return { ...ele, ...ele.account };
-        // 	});
-        // 	console.log("promises",promises)
-        // 	Promise.all(promises).then(rst => {
-        // 		console.log("rst",rst)
-        // 		let set = new Object();
-        // 		if (rst && rst.length > 0) {
-        // 			users2.map((item, index) => {
-        // 				console.log(item);
-        // 				if (typeof rst[index] !== "string") {
-        // 					set[item.person_id] = rst[index].parent ? rst[index].parent.name + "---" + item.organization : item.organization;
-
-        // 				} else {
-        // 					set[item.person_id] = item.organization;
-        // 				}
-        // 			})
-        // 		}
-        // 		this.setState({ orgSet: set, loading: false });
-        // 	})
-        // });
     }
     componentWillUnmount () {
         this.setState({ orgSet: null });

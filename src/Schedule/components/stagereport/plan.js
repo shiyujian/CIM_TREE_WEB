@@ -27,7 +27,6 @@ import {
 } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
-// import PerSearch from './PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import SearchInfo from './SearchInfo';
 import queryString from 'query-string';

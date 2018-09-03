@@ -52,7 +52,7 @@ export default class Tree extends Component {
             if (first) {
                 changeSidebarField('node', first);
                 const codes = Tree.collect(first);
-                getUsers({}, { org_code: codes }).then(e => {
+                getUsers({}, { org_code: codes, page: 1 }).then(e => {
                     getTreeModal(false);
                 });
             }

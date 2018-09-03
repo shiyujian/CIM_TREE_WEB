@@ -70,20 +70,20 @@ export default class System extends Component {
             path: '/system/org',
             icon: <Icon name='street-view' />
         },
-        {
-            key: 'Orgdata',
-            id: 'SYSTEM.ORGDATA',
-            name: '组织机构填报',
-            path: '/system/orgdata',
-            icon: <Icon name='street-view' />
-        },
-        {
-            key: 'Personsdata',
-            id: 'SYSTEM.PERSONSDATA',
-            name: '人员信息填报',
-            path: '/system/personsdata',
-            icon: <Icon name='street-view' />
-        },
+        // {
+        //     key: 'Orgdata',
+        //     id: 'SYSTEM.ORGDATA',
+        //     name: '组织机构填报',
+        //     path: '/system/orgdata',
+        //     icon: <Icon name='street-view' />
+        // },
+        // {
+        //     key: 'Personsdata',
+        //     id: 'SYSTEM.PERSONSDATA',
+        //     name: '人员信息填报',
+        //     path: '/system/personsdata',
+        //     icon: <Icon name='street-view' />
+        // },
         {
             key: 'Blacklist',
             id: 'SYSTEM.BLACKLIST',

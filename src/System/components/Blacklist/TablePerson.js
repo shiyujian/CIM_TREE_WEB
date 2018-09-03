@@ -5,23 +5,14 @@ import {
     Table,
     Button,
     Popconfirm,
-    Notification,
     Input,
-    Icon,
-    Spin,
     Progress,
-    Switch,
-    Pagination,
     Select,
     Form
 } from 'antd';
-import style from './TableOrg.css';
-import DelPer from './PersonExpurgate';
-import { NODE_FILE_EXCHANGE_API, STATIC_DOWNLOAD_API } from '_platform/api';
-import { flattenDeep } from 'lodash';
+import './TableOrg.css';
 import { PROJECT_UNITS } from './../../../_platform/api';
-const Search = Input.Search;
-const { Option, OptGroup } = Select;
+const { Option } = Select;
 const FormItem = Form.Item;
 class TablePerson extends Component {
     // export default class TablePerson extends Component {
@@ -403,9 +394,6 @@ class TablePerson extends Component {
         };
         return (
             <div>
-                {/* <div>
-					<Search enterButton className={style.button} onSearch={this.searchPerson.bind(this)} style={{ width: "240px" }} placeholder="请输入姓名或用户名" />
-				</div> */}
                 <Row>
                     <Col span={18}>
                         <Row>
@@ -480,7 +468,7 @@ class TablePerson extends Component {
     }
     edits (record) {
         const {
-            actions: { ModifyVisible, getAllUsers, setModifyPer }
+            actions: { ModifyVisible, setModifyPer }
         } = this.props;
         ModifyVisible(true);
         setModifyPer(record);

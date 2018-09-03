@@ -9,7 +9,6 @@ export const getTrack = createFetchAction(`${base}/main/api/user/{{ID}}/location
 export const getRisk = createFetchAction(`${base}/main/api/potential-risk/?status=1`, []);
 export const getVedio = createFetchAction(`${SERVICE_API}/loc-tree/code/CAM_ROOT/`, []);
 export const getSafeMonitor = createFetchAction(`${SERVICE_API}/monitors/code/`, []);
-export const getUsers = createFetchAction(`${USER_API}/users/`, []);
 export const getUsersOnline = createFetchAction(`${base}/main/api/users-online/`, []);
 export const getUserOrgInfo = createFetchAction(`${SERVICE_API}/persons/code/{{CODE}}/?all=true`, []);
 export const getOrgs = createFetchAction(`${SERVICE_API}/org-tree/`, []);
@@ -36,7 +35,6 @@ export const actions = {
     getRisk,
     getVedio,
     getSafeMonitor,
-    getUsers,
     getUsersOnline,
     getUserOrgInfo,
     getOrgs,

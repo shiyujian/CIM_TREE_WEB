@@ -45,23 +45,21 @@ export default class PerSearch extends Component {
 
     async componentDidUpdate (prevProps, prevState) {
         const {
-            actions: { getUsers, getWorkflowTemplate },
             code,
-            roleSearch = false,
             task,
             visible
         } = this.props;
-        if (task != prevProps.task) {
+        if (task !== prevProps.task) {
             console.log('componentDidUpdatetask', task);
             console.log('prevPropstask', prevProps.task);
             this.query();
         }
-        if (code != prevProps.code) {
+        if (code !== prevProps.code) {
             console.log('componentDidUpdatecode', code);
             console.log('prevPropscode', code);
             this.query();
         }
-        if (visible != prevProps.visible) {
+        if (visible !== prevProps.visible) {
             console.log('visiblevisiblevisiblevisiblevisiblevisible');
             this.setState({
                 text: ''

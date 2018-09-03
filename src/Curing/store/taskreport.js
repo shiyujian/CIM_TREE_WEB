@@ -3,13 +3,11 @@ import createFetchAction from 'fetch-action';
 import {createFetchActionWithHeaders as myFetch} from './fetchAction';
 
 import {
-    USER_API,
     FOREST_API
 } from '_platform/api';
 
 export const ID = 'Forest_curing_taskcreate';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
-export const getUsers = createFetchAction(`${USER_API}/users/`, []);
 
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
@@ -28,7 +26,6 @@ export const postTreeLocationNumByRegion = createFetchAction(`${FOREST_API}/curi
 export const postForsetPic = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=leader`, [], 'POST');
 export const actions = {
     getTreearea,
-    getUsers,
     getCuring,
     getCuringMessage,
     postComplete,

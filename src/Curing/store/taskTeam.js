@@ -3,13 +3,11 @@ import createFetchAction from 'fetch-action';
 
 import {
     SERVICE_API,
-    USER_API,
     FOREST_API
 } from '_platform/api';
 
 export const ID = 'Forest_curing_taskteam';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
-export const getUsers = createFetchAction(`${USER_API}/users/`, []);
 
 // 创建文档目录
 export const postDocDir = createFetchAction(`${SERVICE_API}/directories/`, [], 'POST');
@@ -51,7 +49,6 @@ export const deleteCuringGroupMan = createFetchAction(`${FOREST_API}/curing/curi
 
 export const actions = {
     getTreearea,
-    getUsers,
     delDocDir,
     getDocList,
     postDocDir,

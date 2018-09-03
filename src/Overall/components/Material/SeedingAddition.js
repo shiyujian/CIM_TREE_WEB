@@ -16,7 +16,6 @@ import {
     Spin
 } from 'antd';
 import moment from 'moment';
-// import PerSearch from './PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';

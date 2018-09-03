@@ -542,76 +542,6 @@ export default class Users extends Component {
 
                         <Row style={{ marginBottom: '20px' }}>
                             {this.confirms()}
-                            {/*	<Button onClick={this.saves.bind(this)}>确定</Button> */}
-                            {/* <Col span={3}>
-								<Button onClick={this.append.bind(this)}>添加用户</Button>
-							</Col>
-							<Col span={3}>
-								<Popconfirm title="是否真的要删除选中用户?"
-									onConfirm={this.remove.bind(this)} okText="是" cancelText="否">
-									<Button>批量删除</Button>
-
-								</Popconfirm>
-							</Col> */}
-                            {/* <Col span={6}>
-							<FormItem {...Users.layout} label="苗圃">
-								<Select placeholder="苗圃" value={this.state.tag} showSearch onChange={this.changeTagss.bind(this)}
-									 style={{ width: '100%' }}>
-									{tagsOptions}
-								</Select>
-							</FormItem>
-						</Col>
-						<Col span={4}>
-							<FormItem {...Users.layout} label="标段">
-								<Select placeholder="标段" value={this.state.sections} onChange={this.changeSections.bind(this)}
-									mode="multiple" style={{ width: '100%' }}>
-									<Option key={'P009-01-01'} >1标段</Option>
-									<Option key={'P009-01-02'} >2标段</Option>
-									<Option key={'P009-01-03'} >3标段</Option>
-									<Option key={'P009-01-04'} >4标段</Option>
-									<Option key={'P009-01-05'} >5标段</Option>
-								</Select>
-							</FormItem>
-						</Col>
-
-						<Col span={2} style={{ float: "right", marginLeft: "10px" }}>
-							<Button onClick={this.saves.bind(this)}>确定</Button>
-						</Col>
-						<Col span={6} style={{ float: "right" }}>
-							<FormItem {...Users.layout} label="角色">
-								<Select placeholder="请选择角色" value={addition.roles} onChange={this.changeRoles.bind(this)}
-									mode="multiple" style={{ width: '100%' }}>
-									<OptGroup label="苗圃角色">
-										{
-											systemRoles.map(role => {
-												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-											})
-										}
-									</OptGroup>
-									<OptGroup label="施工角色">
-										{
-											projectRoles.map(role => {
-												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-											})
-										}
-									</OptGroup>
-									<OptGroup label="监理角色">
-										{
-											professionRoles.map(role => {
-												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-											})
-										}
-									</OptGroup>
-									<OptGroup label="业主角色">
-										{
-											departmentRoles.map(role => {
-												return (<Option key={role.id} value={String(role.id)}>{role.name}</Option>)
-											})
-										}
-									</OptGroup>
-								</Select>
-							</FormItem>
-						</Col> */}
                         </Row>
                     </div>
                     <Table
@@ -849,14 +779,22 @@ export default class Users extends Component {
             this.setState({ loading: true });
             const {
                 sidebar: { node } = {},
-                actions: { deleteUser, getUsers }
+                actions: { deleteUser, getUsers, getTablePage }
             } = this.props;
             const codes = Users.collect(node);
+            let actionArr = [];
             this.selectedCodes.map(userId => {
-                return deleteUser({ userID: userId }).then(() => {
-                    getUsers({}, { org_code: codes }).then(() => {
-                        this.setState({ loading: false, selectedRowKeys: [] });
-                    });
+                actionArr.push(deleteUser({ userID: userId }));
+            });
+            Promise.all(actionArr).then((rst) => {
+                getUsers({}, { org_code: codes, page: 1 }).then((items) => {
+                    console.log('wwwwwwwwwwwwww');
+                    let pagination = {
+                        current: 1,
+                        total: items.count
+                    };
+                    getTablePage(pagination);
+                    this.setState({ loading: false, selectedRowKeys: [] });
                 });
             });
         }

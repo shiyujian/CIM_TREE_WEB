@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-03 11:31:50
+ * @Last Modified time: 2018-09-03 14:52:25
  */
 import React, { Component } from 'react';
 import {
@@ -35,7 +35,6 @@ import {
     PROJECT_UNITS,
     WORKFLOW_CODE
 } from '../../../_platform/api';
-// import PerSearch from './PerSearch';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import SearchInfo from './SearchInfo';
