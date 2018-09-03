@@ -43,7 +43,8 @@ export default class TaskStatisTable extends Component {
             thinClassSelect: '',
             smallClassSelectList: [],
             pagination: {},
-            statisData: []
+            statisData: [],
+            taskStatusSelect: ''
         };
         this.sections = [];
         this.section = '';
@@ -300,7 +301,8 @@ export default class TaskStatisTable extends Component {
             sectionSelect,
             smallClassSelect,
             thinClassSelect,
-            pagination
+            pagination,
+            taskStatusSelect
         } = this.state;
         const {
             taskStatisGisVisible
@@ -386,19 +388,27 @@ export default class TaskStatisTable extends Component {
                                 />
                             </div>
                         </div>
+                        <div style={{marginRight: 83.84}} />
+                    </div>
+                    <div className='taskSelect-container'>
+                        <div className='Search-style'>
+                            <span className='taskTable-search-span'>状态：</span>
+                            <Select
+                                className='Select-width'
+                                placeholder={'请选择状态'}
+                                value={taskStatusSelect}
+                                onChange={this.handleTaskStatusChange.bind(this)}
+                            >
+                                <Option key='已上报' value={2} title='已上报'>已上报</Option>
+                            </Select>
+                        </div>
+                        <div className='Search-style' />
+                        <div className='Search-style' />
                         <div>
                             <Button style={{marginRight: 20}} onClick={this.handleResetSearch.bind(this)}>重置</Button>
                         </div>
-                        {/* <div className='Search-style'>
-                            <span className='taskTable-search-span'>养护人员：</span>
-                            <Select
-                                className='Select-width'
-                                placeholder={'请选择养护人员'}
-                            >
-                                <Option key={'3'} value={'全部'}>全部</Option>
-                            </Select>
-                        </div> */}
                     </div>
+
                     <TaskStatisEcharts
                         {...this.props}
                         {...this.state} />
@@ -596,6 +606,12 @@ export default class TaskStatisTable extends Component {
             etime: value[1] ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss') : ''
         });
     }
+    // 状态选择
+    handleTaskStatusChange (value) {
+        this.setState({
+            taskStatusSelect: value
+        });
+    }
     // 重置搜索条件
     handleResetSearch = () => {
         if (this.totalDataPer) {
@@ -609,6 +625,7 @@ export default class TaskStatisTable extends Component {
                 sectionSelect: '',
                 smallClassSelect: '',
                 thinClassSelect: '',
+                taskStatusSelect: '',
                 smallClassSelectList: [],
                 stime: '',
                 etime: '',
@@ -624,6 +641,7 @@ export default class TaskStatisTable extends Component {
                 // 选择项
                 smallClassSelect: '',
                 thinClassSelect: '',
+                taskStatusSelect: '',
                 stime: '',
                 etime: '',
                 typeSelect: '',
@@ -657,7 +675,8 @@ export default class TaskStatisTable extends Component {
             projectSelect,
             sectionSelect,
             smallClassSelect,
-            thinClassSelect
+            thinClassSelect,
+            taskStatusSelect
         } = this.state;
         try {
             if (projectSelect && !sectionSelect && !smallClassSelect && !thinClassSelect) {
@@ -690,6 +709,7 @@ export default class TaskStatisTable extends Component {
                     curingtype: typeSelect,
                     section: sectionSelect,
                     thinclass: thinclass,
+                    status: taskStatusSelect,
                     page: page,
                     size: 5
                 };
@@ -719,6 +739,13 @@ export default class TaskStatisTable extends Component {
                                     // 获取task的养护类型
                                     task.typeName = type.Base_Name;
                                     task = this.handleTaskProperty(task);
+                                    // if (taskStatusSelect) {
+                                    //     if (task.statusName && task.statusName === taskStatusSelect) {
+                                    //         taskSearchData.push(task);
+                                    //     }
+                                    // } else {
+                                    //     taskSearchData.push(task);
+                                    // }
                                     taskSearchData.push(task);
                                 }
                             }

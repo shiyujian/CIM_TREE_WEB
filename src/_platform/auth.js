@@ -86,7 +86,8 @@ export const removePermissions = () => {
 export const getProjectUnits = (projectName) => {
     let units = [];
     PROJECT_UNITS.map((item) => {
-        if (item.value === projectName) {
+        // if (item.value === projectName) {
+        if (projectName.indexOf(item.value) !== -1) {
             units = item.units;
         }
     });

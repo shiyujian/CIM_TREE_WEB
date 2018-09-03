@@ -1,0 +1,1 @@
+export CuringTable from './CuringTable';

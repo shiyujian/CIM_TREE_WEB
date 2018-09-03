@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-31 16:18:42
+ * @Last Modified time: 2018-09-01 10:29:58
  */
 import React, { Component } from 'react';
 import {
@@ -264,13 +264,13 @@ class OnSite extends Component {
         } else {
             await this.getCuringTasks();
         }
-        if (survivalRateTree && survivalRateTree instanceof Array && survivalRateTree.length > 0) {
-            this.setState({
-                survivalRateTreeLoading: false
-            });
-        } else {
-            await this.loadAreaData();
-        }
+        // if (survivalRateTree && survivalRateTree instanceof Array && survivalRateTree.length > 0) {
+        //     this.setState({
+        //         survivalRateTreeLoading: false
+        //     });
+        // } else {
+        //     await this.loadAreaData();
+        // }
     }
     // 切换全部细班时，将其余图层去除，加载最初始图层
     componentDidUpdate = async (prevProps, prevState) => {

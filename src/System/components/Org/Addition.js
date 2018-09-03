@@ -36,7 +36,7 @@ class Addition extends Component {
 
         const title = Addition.getTitle(node, parent);
         let units = this.getUnits();
-
+        console.log('units', units);
         return (
             <Modal
                 title={

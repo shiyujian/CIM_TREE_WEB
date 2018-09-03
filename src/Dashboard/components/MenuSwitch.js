@@ -58,17 +58,6 @@ export default class MenuSwitch extends Component {
             label: '树种筛选',
             value: 'geojsonFeature_treetype',
             IconName: 'square'
-        }
-    ];
-    options1 = [
-        {
-            label: '养护任务',
-            value: 'geojsonFeature_curingTask',
-            IconName: 'curingTask'
-        },
-        {
-            label: '成活率',
-            value: 'geojsonFeature_survivalRate'
         },
         {
             label: '安全隐患',
@@ -80,6 +69,21 @@ export default class MenuSwitch extends Component {
             value: 'geojsonFeature_track',
             IconName: 'universal-access'
         }
+    ];
+    options1 = [
+        {
+            label: '养护任务',
+            value: 'geojsonFeature_curingTask',
+            IconName: 'curingTask'
+        },
+        {
+            label: '成活率',
+            value: 'geojsonFeature_survivalRate'
+        }
+        // {
+        //     label: '苗木结缘',
+        //     value: 'geojsonFeature_treeAdopt'
+        // }
     ]
 
     checkFull () {
