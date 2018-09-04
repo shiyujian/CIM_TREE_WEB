@@ -9,7 +9,6 @@ import { CuringTable } from '../components/CuringInfo';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
-    Aside,
     Body,
     Sidebar,
     Content,
@@ -35,34 +34,13 @@ export default class CuringInfo extends Component {
         super(props);
         this.state = {
             treeLists: [],
-            treetypeoption: [],
-            treetypelist: [],
             sectionoption: [],
             smallclassoption: [],
             thinclassoption: [],
-            typeoption: [],
-            statusoption: [],
-            locationoption: [],
             leftkeycode: '',
             resetkey: 0,
-            bigType: ''
+            curingTypesOption: []
         };
-    }
-    getbigTypeName (type) {
-        switch (type) {
-            case '1':
-                return '常绿乔木';
-            case '2':
-                return '落叶乔木';
-            case '3':
-                return '亚乔木';
-            case '4':
-                return '灌木';
-            case '5':
-                return '草本';
-            default:
-                return '';
-        }
     }
     componentDidMount () {
         this.biaoduan = [];
@@ -73,16 +51,13 @@ export default class CuringInfo extends Component {
         }
         const {
             actions: {
-                getTree,
-                gettreetype,
-                getTreeList,
                 getForestUsers,
                 getTreeNodeList,
                 getLittleBanAll,
-                setkeycode
+                setkeycode,
+                getCuringTypes
             },
             users,
-            treetypes,
             littleBanAll,
             platform: { tree = {} }
         } = this.props;
@@ -90,10 +65,20 @@ export default class CuringInfo extends Component {
         if (!users) {
             getForestUsers();
         }
-        // 避免反复获取森林树种列表，提高效率
-        if (!treetypes) {
-            getTreeList().then(x => this.setTreeTypeOption(x));
-        }
+        getCuringTypes().then((curingTypesData) => {
+            let curingTypes = curingTypesData && curingTypesData.content;
+            let curingTypesOption = [];
+            try {
+                curingTypes.map((type) => {
+                    curingTypesOption.push(<Option title={type.Base_Name} key={type.ID} value={type.ID}>{type.Base_Name}</Option>);
+                });
+                this.setState({
+                    curingTypesOption
+                });
+            } catch (e) {
+                console.log('获取养护类型', e);
+            }
+        });
         if (!tree.bigTreeList) {
             getTreeNodeList();
         }
@@ -102,79 +87,17 @@ export default class CuringInfo extends Component {
         }
 
         setkeycode('');
-        // 类型
-        let typeoption = [
-            <Option key={'-1'} value={''} title={'全部'}>
-                全部
-            </Option>,
-            <Option key={'1'} value={'1'} title={'常绿乔木'}>
-                常绿乔木
-            </Option>,
-            <Option key={'2'} value={'2'} title={'落叶乔木'}>
-                落叶乔木
-            </Option>,
-            <Option key={'3'} value={'3'} title={'亚乔木'}>
-                亚乔木
-            </Option>,
-            <Option key={'4'} value={'4'} title={'灌木'}>
-                灌木
-            </Option>,
-            <Option key={'5'} value={'5'} title={'地被'}>
-                地被
-            </Option>
-        ];
-        this.setState({ typeoption });
-        // 状态
-        let statusoption = [
-            <Option key={'-1'} value={''} title={'全部'}>
-                全部
-            </Option>,
-            <Option key={'1'} value={'-1'} title={'未确认'}>
-                未确认
-            </Option>,
-            <Option key={'2'} value={'0'} title={'监理抽查通过'}>
-                监理抽查通过
-            </Option>,
-            <Option key={'3'} value={'1'} title={'监理抽查退回'}>
-                监理抽查退回
-            </Option>,
-            <Option key={'4'} value={'2'} title={'业主抽查退回'}>
-                业主抽查退回
-            </Option>,
-            <Option key={'5'} value={'3'} title={'业主抽查通过'}>
-                业主抽查通过
-            </Option>
-        ];
-        this.setState({ statusoption });
-        // 定位
-        let locationoption = [
-            <Option key={'-1'} value={''} title={'全部'}>
-                全部
-            </Option>,
-            <Option key={'1'} value={'1'} title={'已定位'}>
-                已定位
-            </Option>,
-            <Option key={'2'} value={'0'} title={'未定位'}>
-                未定位
-            </Option>
-        ];
-        this.setState({ locationoption });
     }
 
     render () {
         const { keycode } = this.props;
         const {
             leftkeycode,
-            treetypeoption,
-            treetypelist,
             sectionoption,
             smallclassoption,
             thinclassoption,
-            typeoption,
-            bigType,
-            statusoption,
-            locationoption,
-            resetkey
+            resetkey,
+            curingTypesOption
         } = this.state;
         const {
             platform: { tree = {} }
@@ -204,16 +127,10 @@ export default class CuringInfo extends Component {
                             smallclassselect={this.smallclassselect.bind(this)}
                             thinclassoption={thinclassoption}
                             thinclassselect={this.thinclassselect.bind(this)}
-                            bigType={bigType}
-                            typeoption={typeoption}
-                            typeselect={this.typeselect.bind(this)}
-                            treetypeoption={treetypeoption}
-                            treetypelist={treetypelist}
-                            statusoption={statusoption}
-                            locationoption={locationoption}
                             leftkeycode={leftkeycode}
                             keycode={keycode}
                             resetinput={this.resetinput.bind(this)}
+                            curingTypesOption={curingTypesOption}
                         />
                     </Content>
                 </Main>
@@ -222,7 +139,7 @@ export default class CuringInfo extends Component {
     }
     sectionselect (value) {
         const {
-            actions: { setkeycode, getTree, getLittleBan }
+            actions: { getLittleBan }
         } = this.props;
         this.currentSection = value;
         getLittleBan({ no: value }).then(rst => {
@@ -243,7 +160,7 @@ export default class CuringInfo extends Component {
     // 小班选择, 重新获取: 细班、树种
     smallclassselect (value) {
         const {
-            actions: { setkeycode, getTree, getLittleBan }
+            actions: { getLittleBan }
         } = this.props;
         getLittleBan({ no: this.currentSection }).then(rst => {
             let smallclasses = [];
@@ -260,63 +177,18 @@ export default class CuringInfo extends Component {
             });
             this.setThinClassOption(smallclasses);
         });
-        // 树种
-        this.typeselect('');
     }
 
     // 细班选择, 重新获取: 树种
     thinclassselect (value, section) {
-        this.typeselect('');
-    }
-
-    // 类型选择, 重新获取: 树种
-    typeselect (value) {
-        const { treetypes } = this.props;
-        this.setState({ bigType: value });
-        let selectTreeType = [];
-        treetypes.map(item => {
-            if (item.TreeTypeNo == null) {
-                // console.log('itemitemitemitemitem',item)
-            }
-            if (item.TreeTypeNo) {
-                try {
-                    let code = item.TreeTypeNo.substr(0, 1);
-                    if (code === value) {
-                        selectTreeType.push(item);
-                    }
-                } catch (e) {}
-            }
-        });
-        this.setTreeTypeOption(selectTreeType);
-    }
-
-    // 设置树种选项
-    setTreeTypeOption (rst) {
-        if (rst instanceof Array) {
-            let treetypeoption = rst.map(item => {
-                return (
-                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
-                        {item.TreeTypeName}
-                    </Option>
-                );
-            });
-            treetypeoption.unshift(
-                <Option key={-1} value={''} title={'全部'}>
-                    全部
-                </Option>
-            );
-            this.setState({ treetypeoption, treetypelist: rst });
-        }
     }
 
     // 设置标段选项
     setSectionOption (rst) {
-        let user = getUser();
-        let section = JSON.parse(user.sections);
         if (rst instanceof Array) {
             let sectionList = [];
             let sectionOptions = [];
-            let sectionoption = rst.map((item, index) => {
+            rst.map((item, index) => {
                 sectionList.push(item);
             });
             let sectionData = [...new Set(sectionList)];
@@ -328,9 +200,6 @@ export default class CuringInfo extends Component {
                     </Option>
                 );
             });
-            // if(section.length === 0){   //admin用户赋给全部的查阅权限
-            //     sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            // }
             this.setState({ sectionoption: sectionOptions });
         }
     }
@@ -339,7 +208,7 @@ export default class CuringInfo extends Component {
         if (rst instanceof Array) {
             let smallclassList = [];
             let smallclassOptions = [];
-            let smallclassoption = rst.map(item => {
+            rst.map(item => {
                 if (item.name) {
                     let smalls = {
                         name: item.name,
@@ -424,7 +293,7 @@ export default class CuringInfo extends Component {
         let user = getUser();
         let keycode = value[0] || '';
         const {
-            actions: { setkeycode, gettreetype, getTree, getLittleBan }
+            actions: { setkeycode }
         } = this.props;
         setkeycode(keycode);
         this.setState({
@@ -448,7 +317,5 @@ export default class CuringInfo extends Component {
             });
         }
         this.setSectionOption(rst);
-        // 树种
-        this.typeselect('');
     }
 }

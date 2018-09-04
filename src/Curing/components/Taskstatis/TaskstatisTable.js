@@ -91,9 +91,9 @@ export default class TaskStatisTable extends Component {
             loading: true
         });
         const {
-            actions: { getcCuringTypes }
+            actions: { getCuringTypes }
         } = this.props;
-        let curingTypesData = await getcCuringTypes();
+        let curingTypesData = await getCuringTypes();
         let curingTypes = curingTypesData && curingTypesData.content;
         let typeOption = [];
         if (curingTypes && curingTypes.length > 0) {

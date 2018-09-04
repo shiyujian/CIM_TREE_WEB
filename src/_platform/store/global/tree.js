@@ -20,20 +20,18 @@ export const getThinClassList = createFetchAction(`${FOREST_API}/tree/wpunit4app
 export const getThinClassTree = createAction(`${ID}区域地块细班树`);
 export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
 
-export const getProjectListOK = createAction(
-    `${ID}获取进度管理左侧项目工程节点信息`
-);
-export const getProjectList = createFetchAction(
-    `${FOREST_API}/tree/wpunittree`,
-    [getProjectListOK]
-); //    √
-export const getScheduleTaskListOK = createAction(
-    `${ID}获取进度管理流程填报根据标段筛选左侧项目工程节点信息`
-);
-export const getScheduleTaskList = createFetchAction(
-    `${FOREST_API}/tree/wpunittree`,
-    [getScheduleTaskListOK]
-); //    √
+export const getProjectListOK = createAction(`${ID}获取进度管理左侧项目工程节点信息`);
+export const getProjectList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getProjectListOK]); //    √
+export const getScheduleTaskListOK = createAction(`${ID}获取进度管理流程填报根据标段筛选左侧项目工程节点信息`);
+export const getScheduleTaskList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getScheduleTaskListOK]); //    √
+
+// 获获取养护类型
+export const getCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
+// 获获取养护类型
+export const delCuringTask = createFetchAction(`${FOREST_API}/curing/curing/{{curingID}}`, [], 'DELETE');
+
+// 苗木养护记录查询
+export const getCuringTreeInfo = createFetchAction(`${FOREST_API}/curing/curingtrees`, []);
 
 export default handleActions(
     {

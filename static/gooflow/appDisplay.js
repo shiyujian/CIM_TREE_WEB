@@ -356,18 +356,18 @@ $(function () {
             initFlow();
         });
 
-        $.get(USERTREE, {}).success(function (rep) {
-            USERS = rep.map(function (item) {
-                return {
-                    id: item.id,
-                    person_name: item.account.person_name,
-                    text: item.account.person_name,
-                    username: item.username,
-                    organization: item.account.organization,
-                    person_code: item.account.person_code
-                };
-            });
-        });
+        // $.get(USERTREE, {}).success(function (rep) {
+        //     USERS = rep.map(function (item) {
+        //         return {
+        //             id: item.id,
+        //             person_name: item.account.person_name,
+        //             text: item.account.person_name,
+        //             username: item.username,
+        //             organization: item.account.organization,
+        //             person_code: item.account.person_code
+        //         };
+        //     });
+        // });
     } else {
         $('body').html(
             '<p style="text-align:center;padding-top:20px;color:#ccc">请先选择模板</p>'

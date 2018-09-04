@@ -23,11 +23,11 @@ class TaskCreateModal extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getcCuringTypes,
+                getCuringTypes,
                 getAllUsersData
             }
         } = this.props;
-        let curingTypes = await getcCuringTypes();
+        let curingTypes = await getCuringTypes();
         let content = curingTypes && curingTypes.content;
         let typeOptionArr = [];
         if (content && content.length > 0) {

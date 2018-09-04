@@ -3,23 +3,18 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store';
 import { actions as platformActions } from '_platform/store/global';
-import { Cards, PkCodeTree } from '../components';
+import { PkCodeTree } from '../components';
 import { QualityTable } from '../components/Qualityanalyze';
 import {
     Main,
-    Aside,
     Body,
     Sidebar,
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { Row, Col, Input, Icon, DatePicker, Select, Spin } from 'antd';
-import Blade from '_platform/components/panels/Blade';
+import { Select } from 'antd';
 import { PROJECT_UNITS } from '_platform/api';
-import moment from 'moment';
-const { RangePicker } = DatePicker;
 const Option = Select.Option;
-var echarts = require('echarts');
 
 @connect(
     state => {
@@ -91,7 +86,6 @@ export default class Qualityanalyze extends Component {
     }
 
     render () {
-        const { keycode } = this.props;
         const { leftkeycode, sectionoption, section } = this.state;
         const {
             platform: { tree = {} }
@@ -128,9 +122,6 @@ export default class Qualityanalyze extends Component {
     // 树选择
     onSelect (value = []) {
         let keycode = value[0] || '';
-        const {
-            actions: { getTree }
-        } = this.props;
         this.setState({ leftkeycode: keycode });
         // 标段
         let rst = [];

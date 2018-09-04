@@ -1,23 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Select, Row, Col, DatePicker, Cards } from 'antd';
+import { Select } from 'antd';
 import * as actions from '../store';
-import moment from 'moment';
 import { PkCodeTree } from '../components';
 import { FaithTable } from '../components/Faithanalyze';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
-    Aside,
     Body,
     Sidebar,
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-
-var echarts = require('echarts');
-const { RangePicker } = DatePicker;
 const Option = Select.Option;
 
 @connect(
@@ -48,7 +43,7 @@ export default class Faithanalyze extends Component {
 
     componentDidMount () {
         const {
-            actions: { getTree, getTreeList, gettreetype }
+            actions: { getTree }
         } = this.props;
 
         // 地块树
@@ -121,7 +116,6 @@ export default class Faithanalyze extends Component {
     }
 
     render () {
-        const { keycode } = this.props;
         const {
             treeLists,
             sectionoption,

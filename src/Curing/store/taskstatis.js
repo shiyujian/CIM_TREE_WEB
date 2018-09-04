@@ -16,8 +16,6 @@ export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{
 export const getCuringPositions = createFetchAction(`${FOREST_API}/curing/curingpositions`, [], 'GET');
 // 获取养护班组
 export const getCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggroups`, [], 'GET');
-// 获获取养护类型
-export const getcCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
 // 获取班组人员
 export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curinggroupmans?groupid={{groupid}}`, [], 'GET');
 // 修改选择地图的方式
@@ -33,7 +31,6 @@ export const actions = {
     getCuringMessage,
     getCuringPositions,
     getCuringGroup,
-    getcCuringTypes,
     getCuringGroupMans,
     changeTaskStatisGisVisible,
     changeTaskStatisSelectTask,

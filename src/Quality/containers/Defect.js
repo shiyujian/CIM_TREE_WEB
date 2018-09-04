@@ -3,39 +3,19 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '_platform/store/global';
 import {
-    Main,
-    Aside,
-    Body,
     Sidebar,
     Content,
     DynamicTitle
 } from '_platform/components/layout';
 import {
     Table,
-    Button,
     Row,
     Col,
-    Icon,
-    Modal,
     Input,
-    message,
-    notification,
-    DatePicker,
-    Select,
-    Form,
-    Upload,
-    Steps
+    Select
 } from 'antd';
-import * as previewActions from '_platform/store/global/preview';
 import HiddenModle from './HiddenModle';
 import PkCodeTree from '../components/PkCodeTree';
-import Preview from '_platform/components/layout/Preview';
-import {
-    SOURCE_API,
-    STATIC_DOWNLOAD_API,
-    WORKFLOW_CODE,
-    DefaultZoomLevel
-} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 export const Datumcode = window.DeathCode.SAFETY_AQYH;
@@ -49,7 +29,7 @@ const Option = Select.Option;
     },
     dispatch => ({
         actions: bindActionCreators(
-            { ...platformActions, ...previewActions },
+            { ...platformActions },
             dispatch
         )
     })

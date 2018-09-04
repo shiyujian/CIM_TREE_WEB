@@ -14,7 +14,7 @@ import {
     getIconType,
     getTaskStatus,
     getAreaTreeData,
-    getCuringTaskTreeData,
+    getCuringTaskReportTreeData,
     handleAreaLayerData
 } from '../auth';
 import '../Curing.less';
@@ -211,11 +211,11 @@ export default class TaskReportTable extends Component {
         const {
             actions: {
                 getCuring,
-                getcCuringTypes
+                getCuringTypes
             }
         } = this.props;
         try {
-            let data = await getCuringTaskTreeData(getcCuringTypes, getCuring);
+            let data = await getCuringTaskReportTreeData(getCuringTypes, getCuring);
             let curingTypes = data.curingTypes || [];
             let taskTreeData = data.taskTreeData || [];
             this.setState({
@@ -880,7 +880,8 @@ export default class TaskReportTable extends Component {
             taskRealLayerList,
             taskMarkerLayerList,
             taskTrackLayerList,
-            taskMessList
+            taskMessList,
+            taskTreeData
         } = this.state;
         try {
             await this.handleDelAllLayer();
@@ -900,6 +901,19 @@ export default class TaskReportTable extends Component {
             if (taskMessList[taskEventKey]) {
                 delete taskMessList[taskEventKey];
             }
+            taskTreeData.map((taskTree, taskIndex) => {
+                let children = taskTree.children;
+                children.map((child, index) => {
+                    if (child.ID === taskEventKey && children.length === 1) {
+                        taskTreeData.splice(taskIndex, 1);
+                    } else if (child.ID === taskEventKey && children.length > 1) {
+                        children.splice(index, 1);
+                    }
+                });
+            });
+            this.setState({
+                taskTreeData
+            });
         } catch (e) {
 
         }

@@ -1,16 +1,10 @@
 import React, { Component } from 'react';
 import { Row, Col, Modal, Card, Steps, Button } from 'antd';
 import {
-    SOURCE_API,
-    STATIC_DOWNLOAD_API,
-    WORKFLOW_CODE,
-    DefaultZoomLevel,
     CUS_TILEMAP
 } from '_platform/api';
 import './Register.css';
 const Step = Steps.Step;
-const leafletCenter = window.config.initLeaflet.center;
-const URL = window.config.VEC_W;
 
 export default class HiddenModle extends Component {
     constructor (props) {

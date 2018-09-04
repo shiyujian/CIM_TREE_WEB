@@ -147,3 +147,23 @@ export const onImgClick = (data) => {
     }
     return srcs;
 };
+
+export const getCuringMess = async (curingTaskData, curingTypeArr, getCuringMessage) => {
+    let curingMess = [];
+    for (let i = 0; i < curingTaskData.length; i++) {
+        let task = curingTaskData[i];
+        let postdata = {
+            id: task.CuringID
+        };
+        let data = await getCuringMessage(postdata);
+        for (let t = 0; t < curingTypeArr.length; t++) {
+            let type = curingTypeArr[t];
+            if (type.ID === data.CuringType) {
+                data.typeName = type.Base_Name;
+            }
+        }
+        data.Pics = data.Pics ? onImgClick(data.Pics) : '';
+        curingMess.push(data);
+    }
+    return curingMess;
+};

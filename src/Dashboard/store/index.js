@@ -28,7 +28,7 @@ export const getTreeTypeAction = createFetchAction(`${FOREST_API}/tree/treetypes
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
 // 获获取养护类型
-export const getcCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
+export const getCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
 // 苗木养护计划详情
 export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
 
@@ -41,7 +41,7 @@ export const getTreetypesTree = createAction(`${ID}树种筛选树`);
 export const getCuringTaskTree = createAction(`${ID}养护任务树`);
 export const getSurvivalRateTree = createAction(`${ID}成活率树`);
 // export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
-export const getCuringTypes = createAction(`${ID}养护类型`);
+export const getCuringTypeData = createAction(`${ID}养护类型`);
 export const getMenuTreeVisible = createAction(`${ID}是否显示树`);
 export const switchDashboardRightMenu = createAction(`${ID}切换二维展示右侧按钮`);
 export const switchDashboardFullScreenState = createAction(`${ID}切换二维展示全屏`);
@@ -65,7 +65,7 @@ export const actions = {
     getUserDetail,
     getTreeTypeAction,
     getCuring,
-    getcCuringTypes,
+    getCuringTypes,
     getCuringMessage,
     switchDashboardCompoment,
     getAreaTree,
@@ -75,7 +75,7 @@ export const actions = {
     getCuringTaskTree,
     getSurvivalRateTree,
     // getTotalThinClass,
-    getCuringTypes,
+    getCuringTypeData,
     getMenuTreeVisible,
     switchDashboardMenuType,
     switchDashboardRightMenu,
@@ -134,7 +134,7 @@ export default handleActions(
         //         totalThinClass: payload
         //     };
         // },
-        [getCuringTypes]: (state, { payload }) => {
+        [getCuringTypeData]: (state, { payload }) => {
             return {
                 ...state,
                 curingTypes: payload

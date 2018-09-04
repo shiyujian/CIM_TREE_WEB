@@ -428,6 +428,9 @@ class TaskReportModal extends Component {
                         'Pics': remarkPics
                     };
                 }
+                this.setState({
+                    loading: true
+                });
                 console.log('postData', postData);
                 let data = await postComplete({}, postData);
                 console.log('data', data);
@@ -444,6 +447,9 @@ class TaskReportModal extends Component {
                     });
                     await this.props.onCancel();
                 }
+                this.setState({
+                    loading: false
+                });
                 await this.resetForm();
                 this.setState({
                     loading: true

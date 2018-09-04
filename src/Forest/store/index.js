@@ -25,7 +25,6 @@ export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [
     getTreeOK
 ]); //    √
-// export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getTreeNodeListOK]); //    √
 export const gettreetype = createFetchAction(
     `${FOREST_API}/tree/treetypesbyno`,
     []
@@ -270,7 +269,6 @@ export const actions = {
     getCarpackbysxm,
     getTreeMess,
     postForsetPic
-    // getTreeNodeList
 };
 export default handleActions(
     {

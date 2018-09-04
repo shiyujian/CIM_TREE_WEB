@@ -565,7 +565,7 @@ export const getTaskStatus = (task) => {
     return status;
 };
 
-export const getCuringTaskTreeData = async (getcCuringTypes, getCuring) => {
+export const getCuringTaskTreeData = async (getCuringTypes, getCuring) => {
     let user = getUser();
     let sections = user.sections;
     sections = JSON.parse(sections);
@@ -576,7 +576,7 @@ export const getCuringTaskTreeData = async (getcCuringTypes, getCuring) => {
         let postData = {
             section: section
         };
-        let curingTypesData = await getcCuringTypes();
+        let curingTypesData = await getCuringTypes();
         curingTypes = curingTypesData && curingTypesData.content;
         if (curingTypes && curingTypes.length > 0) {
             let curingTaskData = await getCuring({}, postData);
@@ -605,6 +605,65 @@ export const getCuringTaskTreeData = async (getcCuringTypes, getCuring) => {
                                         Name: type.Base_Name,
                                         children: childData
                                     });
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+    return {
+        curingTypes: curingTypes,
+        taskTreeData: taskTreeData
+    };
+};
+export const getCuringTaskReportTreeData = async (getCuringTypes, getCuring) => {
+    let user = getUser();
+    let sections = user.sections;
+    sections = JSON.parse(sections);
+    let curingTypes = [];
+    let taskTreeData = [];
+    if (sections && sections instanceof Array && sections.length > 0) {
+        let section = sections[0];
+        let postData = {
+            section: section,
+            status: 1
+        };
+        let curingTypesData = await getCuringTypes();
+        curingTypes = curingTypesData && curingTypesData.content;
+        if (curingTypes && curingTypes.length > 0) {
+            console.log('postData', postData);
+            let curingTaskData = await getCuring({}, postData);
+            let curingTasks = curingTaskData.content;
+            if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
+                for (let i = 0; i < curingTasks.length; i++) {
+                    let task = curingTasks[i];
+                    if (task && task.ID) {
+                        curingTypes.map((type) => {
+                            if (type.ID === task.CuringType) {
+                                let exist = false;
+                                let childData = [];
+                                // 查看TreeData里有无这个类型的数据，有的话，push
+                                taskTreeData.map((treeNode) => {
+                                    if (treeNode.ID === type.ID) {
+                                        if (task.Status !== 2 && task.StartTime && task.EndTime) {
+                                            exist = true;
+                                            childData = treeNode.children;
+                                            childData.push((task));
+                                        }
+                                    }
+                                });
+                                // 没有的话，创建
+                                if (!exist) {
+                                    if (task.Status !== 2 && task.StartTime && task.EndTime) {
+                                        childData.push(task);
+                                        taskTreeData.push({
+                                            ID: type.ID,
+                                            Name: type.Base_Name,
+                                            children: childData
+                                        });
+                                    }
                                 }
                             }
                         });

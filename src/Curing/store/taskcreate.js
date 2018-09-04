@@ -18,8 +18,6 @@ export const postCuringTask = createFetchAction(`${FOREST_API}/curing/curing`, [
 export const getCuringPositions = createFetchAction(`${FOREST_API}/curing/curingpositions`, [], 'GET');
 // 获取养护班组
 export const getCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggroups`, [], 'GET');
-// 获获取养护类型
-export const getcCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
 // 根据范围查询细班
 export const postThinClassesByRegion = createFetchAction(`${FOREST_API}/curing/thinclassesbyregion`, [], 'POST');
 // 获取范围内栽植的树木数量
@@ -38,7 +36,6 @@ export const actions = {
     postCuringTask,
     getCuringPositions,
     getCuringGroup,
-    getcCuringTypes,
     postThinClassesByRegion,
     postTreeLocationNumByRegion,
     getCuringGroupMans,

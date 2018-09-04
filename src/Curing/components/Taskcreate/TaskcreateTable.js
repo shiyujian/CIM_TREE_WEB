@@ -244,10 +244,10 @@ export default class TaskCreateTable extends Component {
         const {
             actions: {
                 getCuring,
-                getcCuringTypes
+                getCuringTypes
             }
         } = this.props;
-        let data = await getCuringTaskTreeData(getcCuringTypes, getCuring);
+        let data = await getCuringTaskTreeData(getCuringTypes, getCuring);
         let curingTypes = data.curingTypes || [];
         let taskTreeData = data.taskTreeData || [];
         console.log('taskTreeData', taskTreeData);

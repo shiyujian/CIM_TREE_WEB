@@ -25,7 +25,8 @@ class TreeMessModal extends Component {
         const {
             seedlingMess,
             treeMess,
-            flowMess
+            flowMess,
+            curingMess
         } = this.props;
 
         let arr = [
@@ -39,6 +40,7 @@ class TreeMessModal extends Component {
                 title='树木详情'
                 visible
                 footer={footer}
+                width={570}
                 onOk={this.handleTreeModalCancel.bind(this)}
                 onCancel={this.handleTreeModalCancel.bind(this)}
             >
@@ -897,6 +899,71 @@ class TreeMessModal extends Component {
                                 </div>
                             </div>
                         </div>
+                    </TabPane>
+                    <TabPane tab='养护任务' key='4'>
+                        {
+                            curingMess.length > 0
+                                ? curingMess.map((curing) => {
+                                    return (
+                                        <div>
+                                            <Input
+                                                readOnly
+                                                style={{
+                                                    marginTop: '10px'
+                                                }}
+                                                size='large'
+                                                addonBefore='养护类型'
+                                                value={curing.typeName}
+                                            />
+                                            <Input
+                                                readOnly
+                                                style={{
+                                                    marginTop: '10px'
+                                                }}
+                                                size='large'
+                                                addonBefore='起止时间'
+                                                value={`${curing.StartTime} ~ ${curing.EndTime}`}
+                                            />
+                                            <Input
+                                                readOnly
+                                                style={{
+                                                    marginTop: '10px'
+                                                }}
+                                                size='large'
+                                                addonBefore='养护人员'
+                                                value={curing.CuringMans}
+                                            />
+                                            {curing.Pics && curing.Pics.length > 0
+                                                ? curing.Pics.map(
+                                                    src => {
+                                                        return (
+                                                            <div>
+                                                                <img
+                                                                    style={{
+                                                                        width:
+                                                                                        '150px',
+                                                                        height:
+                                                                                        '150px',
+                                                                        display:
+                                                                                        'block',
+                                                                        marginTop:
+                                                                                        '10px'
+                                                                    }}
+                                                                    src={
+                                                                        src
+                                                                    }
+                                                                    alt='图片'
+                                                                />
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                                : ''}
+                                        </div>
+                                    );
+                                }) : ''
+                        }
+
                     </TabPane>
                 </Tabs>
             </Modal>

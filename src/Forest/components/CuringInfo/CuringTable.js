@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import {
     Icon,
     Table,
-    Spin,
-    Tabs,
     Modal,
     Row,
     Col,
@@ -11,7 +9,6 @@ import {
     DatePicker,
     Button,
     Input,
-    InputNumber,
     Progress,
     message
 } from 'antd';
@@ -19,8 +16,6 @@ import moment from 'moment';
 import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 export default class CuringTable extends Component {
@@ -36,21 +31,13 @@ export default class CuringTable extends Component {
             leftkeycode: '',
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
-            lstime: '',
-            letime: '',
             sxm: '',
             section: '',
-            bigType: '',
-            treetype: '',
             smallclass: '',
             thinclass: '',
-            treetypename: '',
-            status: '',
             SupervisorCheck: '',
             CheckStatus: '',
-            islocation: '',
             role: 'inputer',
-            rolename: '',
             percent: 0,
             totalNum: '',
             imgArr: []
@@ -91,7 +78,7 @@ export default class CuringTable extends Component {
                     let ownerName = '';
                     if (
                         record.SupervisorCheck == -1 &&
-                        record.CheckStatus == -1
+                            record.CheckStatus == -1
                     ) {
                         return <span>未抽查</span>;
                     } else {
@@ -99,8 +86,7 @@ export default class CuringTable extends Component {
                             superName = '监理抽查通过';
                         }
 
-                        if (record.CheckStatus == 0) ownerName = '业主抽查退回';
-                        else if (record.CheckStatus == 1) {
+                        if (record.CheckStatus == 0) { ownerName = '业主抽查退回'; } else if (record.CheckStatus == 1) {
                             ownerName = '业主抽查通过';
                         } else if (record.CheckStatus == 2) {
                             ownerName = '业主抽查退回后修改';
@@ -132,9 +118,9 @@ export default class CuringTable extends Component {
                         <span>
                             {users && users[text]
                                 ? users[text].Full_Name +
-                                  '(' +
-                                  users[text].User_Name +
-                                  ')'
+                                      '(' +
+                                      users[text].User_Name +
+                                      ')'
                                 : ''}
                         </span>
                     );
@@ -143,7 +129,10 @@ export default class CuringTable extends Component {
             {
                 title: '测量时间',
                 render: (text, record) => {
-                    const { createtime1 = '', createtime2 = '' } = record;
+                    const {
+                        createtime1 = '',
+                        createtime2 = ''
+                    } = record;
                     return (
                         <div>
                             <div>{createtime1}</div>
@@ -155,7 +144,10 @@ export default class CuringTable extends Component {
             {
                 title: '定位时间',
                 render: (text, record) => {
-                    const { createtime3 = '', createtime4 = '' } = record;
+                    const {
+                        createtime3 = '',
+                        createtime4 = ''
+                    } = record;
                     return (
                         <div>
                             <div>{createtime3}</div>
@@ -316,62 +308,6 @@ export default class CuringTable extends Component {
                     }
                 }
             }
-            // ,{
-            // 	title:<div><div>是否</div><div>截干</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.JG == 1
-            // 						? <span>是</span>
-            // 						: <span>否</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // },{
-            // 	title:<div><div>干皮有无</div><div>损伤</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.GP == 1
-            // 						? <span>有</span>
-            // 						: <span>无</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // },{
-            // 	title:<div><div>冠型完整，</div><div>不偏冠</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.GXWZ == 1
-            // 						? <span>是</span>
-            // 						: <span>否</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // },{
-            // 	title:<div><div>生长</div><div>健壮</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.SZJZ == 1
-            // 						? <span>是</span>
-            // 						: <span>否</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // },{
-            // 	title:<div><div>有无病</div><div>虫害</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.BCH == 1
-            // 						? <span>有</span>
-            // 						: <span>无</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // }
         ];
     }
     getBiao (code) {
@@ -429,35 +365,21 @@ export default class CuringTable extends Component {
     }
     treeTable (details) {
         const {
-            treetypeoption,
             sectionoption,
             smallclassoption,
             thinclassoption,
-            typeoption,
-            leftkeycode,
-            keycode,
-            statusoption,
-            locationoption,
-            users
+            curingTypesOption
         } = this.props;
         const {
             sxm,
-            rolename,
             section,
             smallclass,
             thinclass,
-            bigType,
-            treetypename,
-            status,
-            islocation
+            curingTypeSelect
         } = this.state;
         const suffix1 = sxm ? (
             <Icon type='close-circle' onClick={this.emitEmpty1} />
         ) : null;
-        const suffix2 = rolename ? (
-            <Icon type='close-circle' onClick={this.emitEmpty2} />
-        ) : null;
-        let columns = [];
         let header = '';
 
         header = (
@@ -514,60 +436,14 @@ export default class CuringTable extends Component {
                             allowClear
                             className='forest-forestcalcw4'
                             defaultValue='全部'
-                            value={bigType}
+                            value={curingTypeSelect}
                             onChange={this.ontypechange.bind(this)}
                         >
-                            {typeoption}
+                            {curingTypesOption}
                         </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>树种：</span>
-                        <Select
-                            allowClear
-                            showSearch
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={treetypename}
-                            onChange={this.ontreetypechange.bind(this)}
-                        >
-                            {treetypeoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>状态：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={status}
-                            onChange={this.onstatuschange.bind(this)}
-                        >
-                            {statusoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>定位：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={islocation}
-                            onChange={this.onlocationchange.bind(this)}
-                        >
-                            {locationoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>测量人：</span>
-                        <Input
-                            suffix={suffix2}
-                            value={rolename}
-                            className='forest-forestcalcw4'
-                            onChange={this.onrolenamechange.bind(this)}
-                        />
                     </div>
                     <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>测量时间：</span>
+                        <span className='forest-search-span'>养护时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
                             defaultValue={[
@@ -579,17 +455,6 @@ export default class CuringTable extends Component {
                             format={'YYYY/MM/DD HH:mm:ss'}
                             onChange={this.datepick.bind(this)}
                             onOk={this.datepick.bind(this)}
-                        />
-                    </div>
-                    <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>定位时间：</span>
-                        <RangePicker
-                            className='forest-forestcalcw4'
-                            style={{ verticalAlign: 'middle' }}
-                            showTime={{ format: 'HH:mm:ss' }}
-                            format={'YYYY/MM/DD HH:mm:ss'}
-                            onChange={this.datepick1.bind(this)}
-                            onOk={this.datepick1.bind(this)}
                         />
                     </div>
                 </Row>
@@ -611,6 +476,7 @@ export default class CuringTable extends Component {
                         <Button
                             type='primary'
                             onClick={this.exportexcel.bind(this)}
+                            style={{display: 'none'}}
                         >
                             导出
                         </Button>
@@ -660,10 +526,6 @@ export default class CuringTable extends Component {
         this.setState({ sxm: '' });
     };
 
-    emitEmpty2 = () => {
-        this.setState({ rolename: '' });
-    };
-
     sxmchange (value) {
         this.setState({ sxm: value.target.value });
     }
@@ -674,10 +536,7 @@ export default class CuringTable extends Component {
         this.setState({
             section: value || '',
             smallclass: '',
-            thinclass: '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
+            thinclass: ''
         });
     }
 
@@ -687,10 +546,7 @@ export default class CuringTable extends Component {
         smallclassselect(value || leftkeycode, section);
         this.setState({
             smallclass: value || '',
-            thinclass: '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
+            thinclass: ''
         });
     }
 
@@ -699,33 +555,14 @@ export default class CuringTable extends Component {
         const { section, smallclass } = this.state;
         thinclassselect(value || smallclass, section);
         this.setState({
-            thinclass: value || '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
+            thinclass: value || ''
         });
     }
 
     ontypechange (value) {
-        const { typeselect } = this.props;
-        typeselect(value || '');
-        this.setState({ bigType: value || '', treetype: '', treetypename: '' });
-    }
-
-    ontreetypechange (value) {
-        this.setState({ treetype: value, treetypename: value });
-    }
-
-    onstatuschange (value) {
-        this.setState({ status: value || '' });
-    }
-
-    onlocationchange (value) {
-        this.setState({ islocation: value || '' });
-    }
-
-    onrolenamechange (value) {
-        this.setState({ rolename: value.target.value });
+        this.setState({
+            curingTypeSelect: value || ''
+        });
     }
 
     datepick (value) {
@@ -741,19 +578,6 @@ export default class CuringTable extends Component {
         });
     }
 
-    datepick1 (value) {
-        this.setState({
-            lstime: value[0]
-                ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
-            letime: value[1]
-                ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
-                : ''
-        });
-    }
-
     handleTableChange (pagination) {
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
@@ -764,12 +588,6 @@ export default class CuringTable extends Component {
     }
 
     onImgClick (data) {
-        // src = src.replace(/\/\//g,'/')
-        // src =  `${FOREST_API}/${src}`
-        // this.setState({src},() => {
-        // 	this.setState({imgvisible:true,})
-        // })
-
         let srcs = [];
         try {
             let arr = data.split(',');
@@ -826,60 +644,35 @@ export default class CuringTable extends Component {
     }
 
     qury (page) {
-        const { users } = this.props;
         const {
             sxm = '',
             section = '',
-            bigType = '',
-            treetype = '',
-            islocation = '',
-            role = '',
-            rolename = '',
             stime = '',
             etime = '',
-            lstime = '',
-            letime = '',
-            status = '',
             size,
             thinclass = '',
-            smallclass = ''
+            curingTypeSelect = ''
         } = this.state;
-        // if(this.sections.length !== 0){  //不是admin，要做查询判断了
-        // 	if(section === ''){
-        // 		message.info('请选择标段信息');
-        // 		return;
-        // 	}
-        // }
-
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
             return;
         }
 
         const {
-            actions: { getqueryTree },
-            keycode = ''
+            actions: { getCuringTreeInfo }
         } = this.props;
         let postdata = {
-            no: keycode,
             sxm,
             section,
-            bigType,
-            treetype,
-            islocation,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            lstime: lstime && moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            letime: letime && moment(letime).format('YYYY-MM-DD HH:mm:ss'),
-            status,
-            page,
-            size: size,
+            curingtype: curingTypeSelect,
             thinclass,
-            smallclass
+            page,
+            size: size
         };
-        if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
-        getqueryTree({}, postdata).then(rst => {
+        getCuringTreeInfo({}, postdata).then(rst => {
             this.setState({ loading: false, percent: 100 });
             if (!rst) return;
             let tblData = rst.content;
@@ -924,378 +717,6 @@ export default class CuringTable extends Component {
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
-
-                if (bigType == '5') {
-                    this.columns = [
-                        {
-                            title: '序号',
-                            dataIndex: 'order'
-                        },
-                        {
-                            title: '顺序码',
-                            dataIndex: 'ZZBM'
-                        },
-                        {
-                            title: '项目',
-                            dataIndex: 'Project'
-                        },
-                        {
-                            title: '标段',
-                            dataIndex: 'Section',
-                            render: (text, record) => {
-                                return <p>{this.getBiao(text)}</p>;
-                            }
-                        },
-                        {
-                            title: '位置',
-                            dataIndex: 'place'
-                        },
-                        {
-                            title: '树种',
-                            dataIndex: 'TreeTypeObj.TreeTypeName'
-                        },
-                        {
-                            title: '状态',
-                            dataIndex: 'statusname',
-                            render: (text, record) => {
-                                let superName = '';
-                                let ownerName = '';
-                                if (
-                                    record.SupervisorCheck == -1 &&
-                                    record.CheckStatus == -1
-                                ) {
-                                    return <span>未抽查</span>;
-                                } else {
-                                    if (record.SupervisorCheck == 0) { superName = '监理抽查退回'; } else if (record.SupervisorCheck === 1) {
-                                        superName = '监理抽查通过';
-                                    }
-
-                                    if (record.CheckStatus == 0) { ownerName = '业主抽查退回'; } else if (record.CheckStatus == 1) {
-                                        ownerName = '业主抽查通过';
-                                    } else if (record.CheckStatus == 2) {
-                                        ownerName = '业主抽查退回后修改';
-                                    }
-                                    if (superName && ownerName) {
-                                        return (
-                                            <div>
-                                                <div>{superName}</div>
-                                                <div>{ownerName}</div>
-                                            </div>
-                                        );
-                                    } else if (superName) {
-                                        return <span>{superName}</span>;
-                                    } else {
-                                        return <span>{ownerName}</span>;
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            title: '测量人',
-                            dataIndex: 'Inputer',
-                            render: (text, record) => {
-                                return (
-                                    <span>
-                                        {users && users[text]
-                                            ? users[text].Full_Name +
-                                              '(' +
-                                              users[text].User_Name +
-                                              ')'
-                                            : ''}
-                                    </span>
-                                );
-                            }
-                        },
-                        {
-                            title: '测量时间',
-                            render: (text, record) => {
-                                const {
-                                    createtime1 = '',
-                                    createtime2 = ''
-                                } = record;
-                                return (
-                                    <div>
-                                        <div>{createtime1}</div>
-                                        <div>{createtime2}</div>
-                                    </div>
-                                );
-                            }
-                        },
-                        {
-                            title: '实际载植量',
-                            dataIndex: 'Num'
-                        }
-                    ];
-                } else {
-                    this.columns = [
-                        {
-                            title: '序号',
-                            dataIndex: 'order'
-                        },
-                        {
-                            title: '顺序码',
-                            dataIndex: 'ZZBM'
-                        },
-                        {
-                            title: '项目',
-                            dataIndex: 'Project'
-                        },
-                        {
-                            title: '标段',
-                            dataIndex: 'Section',
-                            render: (text, record) => {
-                                return <p>{this.getBiao(text)}</p>;
-                            }
-                        },
-                        {
-                            title: '位置',
-                            dataIndex: 'place'
-                        },
-                        {
-                            title: '树种',
-                            dataIndex: 'TreeTypeObj.TreeTypeName'
-                        },
-                        {
-                            title: '状态',
-                            dataIndex: 'statusname',
-                            render: (text, record) => {
-                                let superName = '';
-                                let ownerName = '';
-                                if (
-                                    record.SupervisorCheck == -1 &&
-                                    record.CheckStatus == -1
-                                ) {
-                                    return <span>未抽查</span>;
-                                } else {
-                                    if (record.SupervisorCheck == 0) { superName = '监理抽查退回'; } else if (record.SupervisorCheck === 1) {
-                                        superName = '监理抽查通过';
-                                    }
-
-                                    if (record.CheckStatus == 0) { ownerName = '业主抽查退回'; } else if (record.CheckStatus == 1) {
-                                        ownerName = '业主抽查通过';
-                                    } else if (record.CheckStatus == 2) {
-                                        ownerName = '业主抽查退回后修改';
-                                    }
-                                    if (superName && ownerName) {
-                                        return (
-                                            <div>
-                                                <div>{superName}</div>
-                                                <div>{ownerName}</div>
-                                            </div>
-                                        );
-                                    } else if (superName) {
-                                        return <span>{superName}</span>;
-                                    } else {
-                                        return <span>{ownerName}</span>;
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            title: '定位',
-                            dataIndex: 'islocation'
-                        },
-                        {
-                            title: '测量人',
-                            dataIndex: 'Inputer',
-                            render: (text, record) => {
-                                return (
-                                    <span>
-                                        {users && users[text]
-                                            ? users[text].Full_Name +
-                                              '(' +
-                                              users[text].User_Name +
-                                              ')'
-                                            : ''}
-                                    </span>
-                                );
-                            }
-                        },
-                        {
-                            title: '测量时间',
-                            render: (text, record) => {
-                                const {
-                                    createtime1 = '',
-                                    createtime2 = ''
-                                } = record;
-                                return (
-                                    <div>
-                                        <div>{createtime1}</div>
-                                        <div>{createtime2}</div>
-                                    </div>
-                                );
-                            }
-                        },
-                        {
-                            title: '定位时间',
-                            render: (text, record) => {
-                                const {
-                                    createtime3 = '',
-                                    createtime4 = ''
-                                } = record;
-                                return (
-                                    <div>
-                                        <div>{createtime3}</div>
-                                        <div>{createtime4}</div>
-                                    </div>
-                                );
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>高度</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            render: (text, record) => {
-                                if (record.GD != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.GDFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.GDFJ
-                                            )}
-                                        >
-                                            {record.GD}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>冠幅</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            render: (text, record) => {
-                                if (record.GF != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.GFFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.GFFJ
-                                            )}
-                                        >
-                                            {record.GF}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>胸径</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            render: (text, record) => {
-                                if (record.XJ != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.XJFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.XJFJ
-                                            )}
-                                        >
-                                            {record.XJ}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>地径</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            render: (text, record) => {
-                                if (record.DJ != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.DJFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.DJFJ
-                                            )}
-                                        >
-                                            {record.DJ}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>土球厚度</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            dataIndex: 'tqhd',
-                            render: (text, record) => {
-                                if (record.TQHD != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.TQHDFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.TQHDFJ
-                                            )}
-                                        >
-                                            {record.TQHD}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>土球直径</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            dataIndex: 'tqzj',
-                            render: (text, record) => {
-                                if (record.TQZJ != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.TQHDFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.TQHDFJ
-                                            )}
-                                        >
-                                            {record.TQZJ}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        }
-                    ];
-                }
-
                 this.setState({
                     tblData,
                     pagination: pagination,
@@ -1320,71 +741,37 @@ export default class CuringTable extends Component {
         const {
             sxm = '',
             section = '',
-            bigType = '',
-            treetype = '',
-            locationstatus = '',
-            role = '',
-            rolename = '',
             stime = '',
-            lstime = '',
             etime = '',
-            letime = '',
             exportsize,
             thinclass = '',
-            smallclass = '',
-            status = ''
+            smallclass = ''
         } = this.state;
-        // if(this.sections.length !== 0){  //不是admin，要做查询判断了
-        // 	if( section === ''){
-        // 		message.info('请选择标段信息');
-        // 		return;
-        // 	}
-        // }
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
             return;
         }
         const {
-            actions: { getqueryTree, getexportTree },
-            keycode = ''
+            actions: { getexportTree }
         } = this.props;
         let postdata = {
-            no: keycode,
             sxm,
             section,
-            treetype,
-            status,
-            // locationstatus,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            lstime: lstime && moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            letime: letime && moment(letime).format('YYYY-MM-DD HH:mm:ss'),
             page: 1,
             size: exportsize,
             thinclass,
             smallclass
         };
-        if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
         getexportTree({}, postdata).then(rst3 => {
             if (rst3 === '') {
                 message.info('没有符合条件的信息');
             } else {
                 window.open(`${FOREST_API}/${rst3}`);
-                // this.createLink(this,`${FOREST_API}/${rst3}`)
             }
             this.setState({ loading: false });
         });
-    }
-
-    createLink (name, url) {
-        let link = document.createElement('a');
-        // link.download = name;
-        link.href = url;
-        link.setAttribute('download', name);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
     }
 }

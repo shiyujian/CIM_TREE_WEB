@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-01 10:29:58
+ * @Last Modified time: 2018-09-04 16:26:40
  */
 import React, { Component } from 'react';
 import {
@@ -42,7 +42,8 @@ import {
 } from '../auth';
 import {
     getSeedlingMess,
-    getTreeMessFun
+    getTreeMessFun,
+    getCuringMess
 } from './TreeInfo';
 import MenuSwitch from '../MenuSwitch';
 import {TREETYPENO} from '_platform/api';
@@ -69,6 +70,7 @@ class OnSite extends Component {
             seedlingMess: '', // 树木信息
             treeMess: '', // 苗木信息
             flowMess: '', // 流程信息
+            curingMess: '', // 养护信息
             markers: null, // 点击节点图标
             // 区域地块
             areaEventKey: '', // 区域地块选中节点的key
@@ -696,12 +698,12 @@ class OnSite extends Component {
         const {
             actions: {
                 getCuring,
-                getcCuringTypes,
+                getCuringTypes,
                 getCuringTaskTree,
-                getCuringTypes
+                getCuringTypeData
             }
         } = this.props;
-        let curingTypesData = await getcCuringTypes();
+        let curingTypesData = await getCuringTypes();
         let curingTypes = curingTypesData && curingTypesData.content;
         let curingTaskTreeData = [];
         if (curingTypes && curingTypes.length > 0) {
@@ -739,7 +741,7 @@ class OnSite extends Component {
             }
         }
         await getCuringTaskTree(curingTaskTreeData);
-        await getCuringTypes(curingTypes);
+        await getCuringTypeData(curingTypes);
         this.setState({
             curingTaskTreeLoading: false
         });
@@ -2133,11 +2135,15 @@ class OnSite extends Component {
                 getTreeflows,
                 getNurserys,
                 getCarpackbysxm,
-                getTreeMess
+                getTreeMess,
+                getCuringTreeInfo,
+                getCuringTypes,
+                getCuringMessage
             },
             platform: {
                 tree = {}
-            }
+            },
+            curingTypes
         } = this.props;
         let totalThinClass = tree.totalThinClass || [];
         var resolutions = [
@@ -2195,11 +2201,20 @@ class OnSite extends Component {
                 }
                 let postdata = {
                     sxm: data.features[0].properties.SXM
+                    // sxm: 'AUT9860'
                 };
                 let queryTreeData = await getTreeMess(postdata);
                 let treeflowDatas = await getTreeflows({}, postdata);
                 let nurserysDatas = await getNurserys({}, postdata);
                 let carData = await getCarpackbysxm(postdata);
+                let curingTreeData = await getCuringTreeInfo({}, postdata);
+                let curingTypeArr = [];
+                if (!curingTypes) {
+                    let curingTypesData = await getCuringTypes();
+                    curingTypeArr = curingTypesData && curingTypesData.content;
+                } else {
+                    curingTypeArr = curingTypes;
+                };
 
                 let SmallClassName = queryTreeData.SmallClass
                     ? queryTreeData.SmallClass + '号小班'
@@ -2225,6 +2240,8 @@ class OnSite extends Component {
 
                 let treeflowData = {};
                 let nurserysData = {};
+                let curingTaskData = [];
+                let curingTaskArr = [];
                 if (
                     treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array &&
                     treeflowDatas.content.length > 0
@@ -2237,9 +2254,23 @@ class OnSite extends Component {
                 ) {
                     nurserysData = nurserysDatas.content[0];
                 }
+                if (
+                    curingTreeData && curingTreeData.content && curingTreeData.content instanceof Array &&
+                    curingTreeData.content.length > 0
+                ) {
+                    let content = curingTreeData.content;
+                    content.map((task) => {
+                        if (curingTaskArr.indexOf(task.CuringID) === -1) {
+                            curingTaskData.push(task);
+                            curingTaskArr.push(task.CuringID);
+                        }
+                    });
+                }
                 let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
                 let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData);
                 let flowMess = treeflowData;
+                let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);
+                console.log('curingMess', curingMess);
 
                 let iconType = L.divIcon({
                     className: getIconType('tree')
@@ -2254,7 +2285,8 @@ class OnSite extends Component {
                     seedlingMess,
                     treeMess,
                     flowMess,
-                    treeMarkerLayer
+                    treeMarkerLayer,
+                    curingMess
                 });
             }
         });

@@ -7,7 +7,7 @@ import {
 } from '_platform/components/layout';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { actions, ID } from '../store/cell';
+import { actions } from '../store/cell';
 import { PROJECT_UNITS } from '_platform/api';
 import { actions as platformActions } from '_platform/store/global';
 import PkCodeTree from '../components/PkCodeTree';

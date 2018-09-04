@@ -139,22 +139,22 @@ $(function () {
                     }
                 }
             },
-            {
-                name: '执行人',
-                field: 'participants',
-                value: detail.participants.join(','),
-                group: '流程信息',
-                editor: {
-                    type: 'combotree',
-                    options: {
-                        multiple: true,
-                        data: USERS
-                    },
-                    onChange: function (value) {
-                        detail.participants = value;
-                    }
-                }
-            },
+            // {
+            //     name: '执行人',
+            //     field: 'participants',
+            //     value: detail.participants.join(','),
+            //     group: '流程信息',
+            //     editor: {
+            //         type: 'combotree',
+            //         options: {
+            //             multiple: true,
+            //             data: USERS
+            //         },
+            //         onChange: function (value) {
+            //             detail.participants = value;
+            //         }
+            //     }
+            // },
             {
                 name: '执行角色',
                 field: 'roles',
@@ -279,18 +279,18 @@ $(function () {
                                     }).map(function (resultRole) {
                                         return resultRole.text;
                                     });
-                                case 'participants':
-                                    var target = value.split(','),
-                                        result = [];
-                                    handleOnChange(target);
-                                    USERS.forEach(function (user) {
-                                        if (
-                                            target.indexOf(String(user.id)) > -1
-                                        ) {
-                                            result.push(user.text);
-                                        }
-                                    });
-                                    return result;
+                                // case 'participants':
+                                //     var target = value.split(','),
+                                //         result = [];
+                                //     handleOnChange(target);
+                                //     USERS.forEach(function (user) {
+                                //         if (
+                                //             target.indexOf(String(user.id)) > -1
+                                //         ) {
+                                //             result.push(user.text);
+                                //         }
+                                //     });
+                                //     return result;
                                 default:
                                     return value;
                             }
@@ -505,11 +505,11 @@ $(function () {
                     };
                 });
             }
-            if (item.participants.length > 0) {
-                item.participants = USERS.filter(function (user) {
-                    return item.participants.indexOf(String(user.id)) > -1;
-                });
-            }
+            // if (item.participants.length > 0) {
+            //     item.participants = USERS.filter(function (user) {
+            //         return item.participants.indexOf(String(user.id)) > -1;
+            //     });
+            // }
 
             // update roles
             if (item.roles.length > 0) {
@@ -991,18 +991,18 @@ $(function () {
             initFlow();
         });
 
-        $.get(USERTREE, {}).success(function (rep) {
-            USERS = rep.map(function (item) {
-                return {
-                    id: item.id,
-                    person_name: item.account.person_name,
-                    text: item.account.person_name,
-                    username: item.username,
-                    organization: item.account.organization,
-                    person_code: item.account.person_code
-                };
-            });
-        });
+        // $.get(USERTREE, {}).success(function (rep) {
+        //     USERS = rep.map(function (item) {
+        //         return {
+        //             id: item.id,
+        //             person_name: item.account.person_name,
+        //             text: item.account.person_name,
+        //             username: item.username,
+        //             organization: item.account.organization,
+        //             person_code: item.account.person_code
+        //         };
+        //     });
+        // });
         $.get(ROLESET, {}).success(function (rep) {
             ROLES = rep.map(function (item) {
                 return {
