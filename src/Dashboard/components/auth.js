@@ -278,6 +278,16 @@ export const genPopUpContent = (geo) => {
             //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
             // </h2>
         }
+        case 'adoptTree': {
+            return `<div>
+                        <h2><span>顺序码：</span>${properties.SXM}</h2>
+						<h2><span>领养人：</span>${properties.Aadopter}</h2>
+                        <h2><span>领养时间：</span>${properties.AdoptTime}</h2>
+                        <h2 class="btnRow">
+                            <a href="javascript:;" class="btnViewAdopt" data-id=${geo.key}>查看详情</a>
+                        </h2>
+					</div>`;
+        }
         default: {
             return null;
         }

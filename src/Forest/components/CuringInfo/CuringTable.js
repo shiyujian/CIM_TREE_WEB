@@ -349,7 +349,6 @@ export default class CuringTable extends Component {
                     footer={null}
                 >
                     {this.state.imgArr}
-                    {/* <img style={{width:"490px"}} src={this.state.src} alt="图片"/> */}
                     <Row style={{ marginTop: 10 }}>
                         <Button
                             onClick={this.handleCancel.bind(this)}

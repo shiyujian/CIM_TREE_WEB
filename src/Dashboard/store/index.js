@@ -27,10 +27,10 @@ export const getUserDetail = createFetchAction(`${USER_API}/users/{{pk}}`, []);
 export const getTreeTypeAction = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
-// 获获取养护类型
-export const getCuringTypes = createFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
-// 苗木养护计划详情
-export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
+// 根据领养人名称获取领养树
+export const getAdoptTree = createFetchAction(`${FOREST_API}/adopt/adopttrees?aadopter={{aadopter}}`, [], 'GET');
+// 苗木定位位置地理坐标系查询
+export const getTreeLocation = createFetchAction(`${FOREST_API}/tree/treelocations?sxm={{sxm}}&crs=4326`, [], 'GET');
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -65,8 +65,9 @@ export const actions = {
     getUserDetail,
     getTreeTypeAction,
     getCuring,
-    getCuringTypes,
-    getCuringMessage,
+    getAdoptTree,
+    getTreeLocation,
+
     switchDashboardCompoment,
     getAreaTree,
     getRiskTree,

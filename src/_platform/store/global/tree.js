@@ -33,6 +33,9 @@ export const delCuringTask = createFetchAction(`${FOREST_API}/curing/curing/{{cu
 // 苗木养护记录查询
 export const getCuringTreeInfo = createFetchAction(`${FOREST_API}/curing/curingtrees`, []);
 
+// 苗木养护计划详情
+export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
+
 export default handleActions(
     {
         [getTreeNodeListOK]: (state, { payload }) => {

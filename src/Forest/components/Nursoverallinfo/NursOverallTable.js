@@ -1,16 +1,11 @@
 import React, { Component } from 'react';
 import {
     Table,
-    Spin,
-    Tabs,
     Modal,
     Row,
     Col,
-    Select,
-    DatePicker,
     Button,
     Input,
-    InputNumber,
     Progress,
     message,
     Icon,
@@ -20,9 +15,6 @@ import moment from 'moment';
 import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
 import '../index.less';
 import { getUser } from '_platform/auth';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
-const { RangePicker } = DatePicker;
 
 export default class NursOverallTable extends Component {
     constructor (props) {
@@ -39,6 +31,7 @@ export default class NursOverallTable extends Component {
             seedlingMess: [],
             treeMess: [],
             flowMess: [],
+            curingMess: [],
             srcs: '',
             update: 0,
             imgArr: [],
@@ -245,6 +238,50 @@ export default class NursOverallTable extends Component {
                 }
             }
         ];
+        this.curingColumns = [
+            {
+                title: '养护类型',
+                dataIndex: 'typeName'
+            },
+            {
+                title: '起始时间',
+                render: (text, record, index) => {
+                    return (
+                        <span>
+                            {`${moment(record.StartTime).format(
+                                'YYYY-MM-DD HH:mm:ss'
+                            )} ~ ${moment(record.EndTime).format(
+                                'YYYY-MM-DD HH:mm:ss'
+                            )}`}
+                        </span>
+                    );
+                }
+            },
+            {
+                title: '养护人员',
+                dataIndex: 'CuringMans'
+            },
+            {
+                title: '照片',
+                render: (text, record) => {
+                    if (record.Pics) {
+                        return (
+                            <a
+                                disabled={!record.Pics}
+                                onClick={this.onImgClick.bind(
+                                    this,
+                                    record.Pics
+                                )}
+                            >
+                                点击查看
+                            </a>
+                        );
+                    } else {
+                        return <span>/</span>;
+                    }
+                }
+            }
+        ];
     }
     componentDidMount () {
         let user = getUser();
@@ -263,11 +300,10 @@ export default class NursOverallTable extends Component {
     }
 
     render () {
-        const { seedlingMess, treeMess, flowMess, sxm, srcs } = this.state;
+        const { seedlingMess, treeMess, flowMess, curingMess, sxm } = this.state;
         const suffix = sxm ? (
             <Icon type='close-circle' onClick={this.emitEmpty} />
         ) : null;
-        let header = '';
         return (
             <div>
                 <Row>
@@ -361,6 +397,27 @@ export default class NursOverallTable extends Component {
                         }}
                         locale={{ emptyText: '暂无信息' }}
                         dataSource={flowMess}
+                        pagination={false}
+                    />
+                </Card>
+                <Card title='养护信息' style={{ marginTop: 10 }}>
+                    <Table
+                        bordered
+                        className='foresttable'
+                        columns={this.curingColumns}
+                        loading={{
+                            tip: (
+                                <Progress
+                                    style={{ width: 200 }}
+                                    percent={this.state.percent}
+                                    status='active'
+                                    strokeWidth={5}
+                                />
+                            ),
+                            spinning: this.state.loading
+                        }}
+                        locale={{ emptyText: '暂无信息' }}
+                        dataSource={curingMess}
                         pagination={false}
                     />
                 </Card>
@@ -866,12 +923,14 @@ export default class NursOverallTable extends Component {
 
         const {
             actions: {
-                getNurserysTree,
                 getTreeMess,
                 getTreeflows,
                 getnurserys,
                 getCarpackbysxm,
-                getLittleBan
+                getLittleBan,
+                getCuringTreeInfo,
+                getCuringTypes,
+                getCuringMessage
             }
         } = this.props;
         if (!sxm) {
@@ -892,6 +951,9 @@ export default class NursOverallTable extends Component {
         let treeflowDatas = await getTreeflows({}, postdata);
         let nurserysDatas = await getnurserys({}, postdata);
         let carData = await getCarpackbysxm(postdata);
+        let curingTreeData = await getCuringTreeInfo({}, postdata);
+        let curingTypesData = await getCuringTypes();
+        let curingTypeArr = (curingTypesData && curingTypesData.content) || [];
 
         let SmallClassName = queryTreeData.SmallClass
             ? queryTreeData.SmallClass + '号小班'
@@ -922,7 +984,7 @@ export default class NursOverallTable extends Component {
                 sections[2];
             console.log('No', No);
             noList.map(rst => {
-                if (rst.No.indexOf(No) != -1) {
+                if (rst.No.indexOf(No) !== -1) {
                     SmallClassName = rst.SmallClassName
                         ? rst.SmallClassName + '号小班'
                         : SmallClassName;
@@ -936,6 +998,8 @@ export default class NursOverallTable extends Component {
         // let queryTreeData = {}
         let treeflowData = {};
         let nurserysData = {};
+        let curingTaskArr = [];
+        let curingTaskData = [];
 
         // if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
         // 	queryTreeData =  queryTreeDatas.content[0]
@@ -955,6 +1019,19 @@ export default class NursOverallTable extends Component {
             nurserysDatas.content.length > 0
         ) {
             nurserysData = nurserysDatas.content[0];
+        }
+
+        if (
+            curingTreeData && curingTreeData.content && curingTreeData.content instanceof Array &&
+            curingTreeData.content.length > 0
+        ) {
+            let content = curingTreeData.content;
+            content.map((task) => {
+                if (curingTaskArr.indexOf(task.CuringID) === -1) {
+                    curingTaskData.push(task);
+                    curingTaskArr.push(task.CuringID);
+                }
+            });
         }
 
         let remarkPics = queryTreeData.RemarkPics
@@ -1066,12 +1143,10 @@ export default class NursOverallTable extends Component {
         let flowMess = [];
 
         if (treeflowData instanceof Array) {
-            treeflowData = treeflowData;
             let len = treeflowData.length - 1;
             for (let i = len; i >= 0; i--) {
                 flowMess.push(treeflowData[i]);
             }
-        } else {
         }
 
         try {
@@ -1087,6 +1162,23 @@ export default class NursOverallTable extends Component {
             });
         } catch (e) {}
 
+        let curingMess = [];
+        for (let i = 0; i < curingTaskData.length; i++) {
+            let task = curingTaskData[i];
+            let taskID = {
+                id: task.CuringID
+            };
+            let data = await getCuringMessage(taskID);
+            for (let t = 0; t < curingTypeArr.length; t++) {
+                let type = curingTypeArr[t];
+                if (type.ID === data.CuringType) {
+                    data.typeName = type.Base_Name;
+                }
+            }
+            data.Pics = data.Pics;
+            curingMess.push(data);
+        }
+
         console.log('seedlingMess', seedlingMess);
         console.log('treeMess', treeMess);
         console.log('flowMess', flowMess);
@@ -1095,6 +1187,7 @@ export default class NursOverallTable extends Component {
                 seedlingMess,
                 treeMess,
                 flowMess,
+                curingMess,
                 loading: false,
                 percent: 100,
                 remarkPics,

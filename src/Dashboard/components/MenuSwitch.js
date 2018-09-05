@@ -79,11 +79,11 @@ export default class MenuSwitch extends Component {
         {
             label: '成活率',
             value: 'geojsonFeature_survivalRate'
+        },
+        {
+            label: '苗木结缘',
+            value: 'geojsonFeature_treeAdopt'
         }
-        // {
-        //     label: '苗木结缘',
-        //     value: 'geojsonFeature_treeAdopt'
-        // }
     ]
 
     checkFull () {
