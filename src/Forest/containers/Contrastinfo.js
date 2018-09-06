@@ -268,7 +268,7 @@ export default class Contrastinfo extends Component {
         let user = getUser();
         let keycode = value[0] || '';
         const {
-            actions: { setkeycode, gettreetype, getTree, getLittleBan }
+            actions: { setkeycode }
         } = this.props;
         setkeycode(keycode);
         this.setState({

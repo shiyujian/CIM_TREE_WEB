@@ -942,19 +942,19 @@ export default class TaskCreateTable extends Component {
             let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
             let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections);
             console.log('regionData', regionData);
-            let sectionBool = regionData.sectionBool;
-            if (!sectionBool) {
-                Notification.error({
-                    message: '当前所选区域存在不属于登录用户所在标段，请重新选择区域',
-                    duration: 2
-                });
-                if (this.state.polygonData) {
-                    this.map.removeLayer(this.state.polygonData);
-                }
-                this.resetModalState();
-                this.resetButState();
-                return;
-            }
+            // let sectionBool = regionData.sectionBool;
+            // if (!sectionBool) {
+            //     Notification.error({
+            //         message: '当前所选区域存在不属于登录用户所在标段，请重新选择区域',
+            //         duration: 2
+            //     });
+            //     if (this.state.polygonData) {
+            //         this.map.removeLayer(this.state.polygonData);
+            //     }
+            //     this.resetModalState();
+            //     this.resetButState();
+            //     return;
+            // }
             let regionThinName = regionData.regionThinName;
             let regionThinNo = regionData.regionThinNo;
             let regionSectionNo = regionData.regionSectionNo;

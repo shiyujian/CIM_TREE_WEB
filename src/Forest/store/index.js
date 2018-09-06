@@ -152,10 +152,6 @@ export const getHonestyNewTreetype = createFetchAction(
     `${FOREST_API}/tree/factoryanalysebytreetype`,
     ''
 );
-export const getLittleBan = createFetchAction(
-    `${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`,
-    []
-); //    √
 export const postPositionData = createFetchAction(
     `${FOREST_API}/tree/importLocations?user={{id}}`,
     [],
@@ -257,7 +253,6 @@ export const actions = {
     getNurserysCountFast,
     getHonestyNewTreetype,
     getHonestyNewDetailModal,
-    getLittleBan,
     getForestTreeNodeList,
     postPositionData,
     getcarpackage,

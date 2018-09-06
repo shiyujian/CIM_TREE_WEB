@@ -8,7 +8,6 @@ const ID = 'dashboard';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`, []);
 // export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
-export const getLittleBan = createFetchAction(`${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`, []); //
 export const getThinClassList = createFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []); //
 export const getRiskContactSheet = createFetchAction(`${FOREST_API}/tree/patrolevent/{{ID}}`, []);
 // 获取巡检路线
@@ -54,7 +53,6 @@ export const actions = {
     getRisk,
     getRiskContactSheet,
     // getTreeNodeList,
-    getLittleBan,
     getThinClassList,
     getInspectRouter,
     getMapList,

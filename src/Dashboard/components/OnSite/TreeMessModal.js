@@ -156,14 +156,10 @@ class TreeMessModal extends Component {
                                                 <div>
                                                     <img
                                                         style={{
-                                                            width:
-                                                                                  '150px',
-                                                            height:
-                                                                                  '150px',
-                                                            display:
-                                                                                  'block',
-                                                            marginTop:
-                                                                                  '10px'
+                                                            width: '150px',
+                                                            height: '150px',
+                                                            display: 'block',
+                                                            marginTop: '10px'
                                                         }}
                                                         src={
                                                             src
@@ -197,14 +193,10 @@ class TreeMessModal extends Component {
                                                 <div>
                                                     <img
                                                         style={{
-                                                            width:
-                                                                                  '150px',
-                                                            height:
-                                                                                  '150px',
-                                                            display:
-                                                                                  'block',
-                                                            marginTop:
-                                                                                  '10px'
+                                                            width: '150px',
+                                                            height: '150px',
+                                                            display: 'block',
+                                                            marginTop: '10px'
                                                         }}
                                                         src={
                                                             src
@@ -238,14 +230,10 @@ class TreeMessModal extends Component {
                                                 <div>
                                                     <img
                                                         style={{
-                                                            width:
-                                                                                  '150px',
-                                                            height:
-                                                                                  '150px',
-                                                            display:
-                                                                                  'block',
-                                                            marginTop:
-                                                                                  '10px'
+                                                            width: '150px',
+                                                            height: '150px',
+                                                            display: 'block',
+                                                            marginTop: '10px'
                                                         }}
                                                         src={
                                                             src
@@ -279,14 +267,10 @@ class TreeMessModal extends Component {
                                                 <div>
                                                     <img
                                                         style={{
-                                                            width:
-                                                                                  '150px',
-                                                            height:
-                                                                                  '150px',
-                                                            display:
-                                                                                  'block',
-                                                            marginTop:
-                                                                                  '10px'
+                                                            width: '150px',
+                                                            height: '150px',
+                                                            display: 'block',
+                                                            marginTop: '10px'
                                                         }}
                                                         src={
                                                             src
@@ -320,14 +304,10 @@ class TreeMessModal extends Component {
                                                 <div>
                                                     <img
                                                         style={{
-                                                            width:
-                                                                                  '150px',
-                                                            height:
-                                                                                  '150px',
-                                                            display:
-                                                                                  'block',
-                                                            marginTop:
-                                                                                  '10px'
+                                                            width: '150px',
+                                                            height: '150px',
+                                                            display: 'block',
+                                                            marginTop: '10px'
                                                         }}
                                                         src={
                                                             src
@@ -361,14 +341,10 @@ class TreeMessModal extends Component {
                                                 <div>
                                                     <img
                                                         style={{
-                                                            width:
-                                                                                  '150px',
-                                                            height:
-                                                                                  '150px',
-                                                            display:
-                                                                                  'block',
-                                                            marginTop:
-                                                                                  '10px'
+                                                            width: '150px',
+                                                            height: '150px',
+                                                            display: 'block',
+                                                            marginTop: '10px'
                                                         }}
                                                         src={
                                                             src
@@ -480,14 +456,10 @@ class TreeMessModal extends Component {
                                             <div>
                                                 <img
                                                     style={{
-                                                        width:
-                                                                              '150px',
-                                                        height:
-                                                                              '150px',
-                                                        display:
-                                                                              'block',
-                                                        marginTop:
-                                                                              '10px'
+                                                        width: '150px',
+                                                        height: '150px',
+                                                        display: 'block',
+                                                        marginTop: '10px'
                                                     }}
                                                     src={src}
                                                     alt='图片'
@@ -517,14 +489,10 @@ class TreeMessModal extends Component {
                                             <div>
                                                 <img
                                                     style={{
-                                                        width:
-                                                                              '150px',
-                                                        height:
-                                                                              '150px',
-                                                        display:
-                                                                              'block',
-                                                        marginTop:
-                                                                              '10px'
+                                                        width: '150px',
+                                                        height: '150px',
+                                                        display: 'block',
+                                                        marginTop: '10px'
                                                     }}
                                                     src={src}
                                                     alt='图片'
@@ -554,14 +522,10 @@ class TreeMessModal extends Component {
                                             <div>
                                                 <img
                                                     style={{
-                                                        width:
-                                                                              '150px',
-                                                        height:
-                                                                              '150px',
-                                                        display:
-                                                                              'block',
-                                                        marginTop:
-                                                                              '10px'
+                                                        width: '150px',
+                                                        height: '150px',
+                                                        display: 'block',
+                                                        marginTop: '10px'
                                                     }}
                                                     src={src}
                                                     alt='图片'
@@ -591,14 +555,10 @@ class TreeMessModal extends Component {
                                             <div>
                                                 <img
                                                     style={{
-                                                        width:
-                                                                              '150px',
-                                                        height:
-                                                                              '150px',
-                                                        display:
-                                                                              'block',
-                                                        marginTop:
-                                                                              '10px'
+                                                        width: '150px',
+                                                        height: '150px',
+                                                        display: 'block',
+                                                        marginTop: '10px'
                                                     }}
                                                     src={src}
                                                     alt='图片'
@@ -628,14 +588,10 @@ class TreeMessModal extends Component {
                                             <div>
                                                 <img
                                                     style={{
-                                                        width:
-                                                                              '150px',
-                                                        height:
-                                                                              '150px',
-                                                        display:
-                                                                              'block',
-                                                        marginTop:
-                                                                              '10px'
+                                                        width: '150px',
+                                                        height: '150px',
+                                                        display: 'block',
+                                                        marginTop: '10px'
                                                     }}
                                                     src={src}
                                                     alt='图片'
@@ -665,14 +621,10 @@ class TreeMessModal extends Component {
                                             <div>
                                                 <img
                                                     style={{
-                                                        width:
-                                                                              '150px',
-                                                        height:
-                                                                              '150px',
-                                                        display:
-                                                                              'block',
-                                                        marginTop:
-                                                                              '10px'
+                                                        width: '150px',
+                                                        height: '150px',
+                                                        display: 'block',
+                                                        marginTop: '10px'
                                                     }}
                                                     src={src}
                                                     alt='图片'
@@ -703,14 +655,10 @@ class TreeMessModal extends Component {
                                                 <div>
                                                     <img
                                                         style={{
-                                                            width:
-                                                                                  '150px',
-                                                            height:
-                                                                                  '150px',
-                                                            display:
-                                                                                  'block',
-                                                            marginTop:
-                                                                                  '10px'
+                                                            width: '150px',
+                                                            height: '150px',
+                                                            display: 'block',
+                                                            marginTop: '10px'
                                                         }}
                                                         src={
                                                             src
@@ -744,14 +692,10 @@ class TreeMessModal extends Component {
                                                 <div>
                                                     <img
                                                         style={{
-                                                            width:
-                                                                                  '150px',
-                                                            height:
-                                                                                  '150px',
-                                                            display:
-                                                                                  'block',
-                                                            marginTop:
-                                                                                  '10px'
+                                                            width: '150px',
+                                                            height: '150px',
+                                                            display: 'block',
+                                                            marginTop: '10px'
                                                         }}
                                                         src={
                                                             src
@@ -775,67 +719,52 @@ class TreeMessModal extends Component {
                                     let flowName = '';
                                     if (flow.Node) {
                                         if (
-                                            flow.Node ===
-                                                              '种树'
+                                            flow.Node === '种树'
                                         ) {
-                                            flowName =
-                                                                  '施工提交';
+                                            flowName = '施工提交';
                                         } else if (
-                                            flow.Node ===
-                                                              '监理'
+                                            flow.Node === '监理'
                                         ) {
                                             if (
-                                                flow.Status ===
-                                                                  1
+                                                flow.Status === 1
                                             ) {
-                                                flowName =
-                                                                      '监理通过';
+                                                flowName = '监理通过';
                                             } else {
-                                                flowName =
-                                                                      '监理拒绝';
+                                                flowName = '监理拒绝';
                                             }
                                         } else if (
-                                            flow.Node ===
-                                                              '业主'
+                                            flow.Node === '业主'
                                         ) {
                                             if (
-                                                flow.Status ===
-                                                                  2
+                                                flow.Status === 2
                                             ) {
-                                                flowName =
-                                                                      '业主抽查通过';
+                                                flowName = '业主抽查通过';
                                             } else {
-                                                flowName =
-                                                                      '业主抽查拒绝';
+                                                flowName = '业主抽查拒绝';
                                             }
                                         } else if (
-                                            flow.Node ===
-                                                              '补种'
+                                            flow.Node === '补种'
                                         ) {
-                                            flowName =
-                                                                  '施工补录扫码';
+                                            flowName = '施工补录扫码';
                                         }
                                     }
                                     return (
                                         <div>
                                             <Row
                                                 style={{
-                                                    marginTop:
-                                                                          '10px'
+                                                    marginTop: '10px'
                                                 }}
                                             >
                                                 <h3
                                                     style={{
-                                                        float:
-                                                                              'left'
+                                                        float: 'left'
                                                     }}
                                                 >
                                                     {`${flowName}:`}
                                                 </h3>
                                                 <div
                                                     style={{
-                                                        float:
-                                                                              'right'
+                                                        float: 'right'
                                                     }}
                                                 >
                                                     {flow.CreateTime
@@ -845,8 +774,7 @@ class TreeMessModal extends Component {
                                             </Row>
                                             <Row
                                                 style={{
-                                                    marginTop:
-                                                                          '10px'
+                                                    marginTop: '10px'
                                                 }}
                                             >
                                                 {`${
@@ -864,8 +792,7 @@ class TreeMessModal extends Component {
                                             <hr
                                                 className='hrstyle'
                                                 style={{
-                                                    marginTop:
-                                                                          '10px'
+                                                    marginTop: '10px'
                                                 }}
                                             />
                                         </div>
@@ -932,6 +859,7 @@ class TreeMessModal extends Component {
                                                 size='large'
                                                 addonBefore='养护人员'
                                                 value={curing.CuringMans}
+                                                title={curing.CuringMans}
                                             />
                                             {curing.Pics && curing.Pics.length > 0
                                                 ? curing.Pics.map(
@@ -940,14 +868,10 @@ class TreeMessModal extends Component {
                                                             <div>
                                                                 <img
                                                                     style={{
-                                                                        width:
-                                                                                        '150px',
-                                                                        height:
-                                                                                        '150px',
-                                                                        display:
-                                                                                        'block',
-                                                                        marginTop:
-                                                                                        '10px'
+                                                                        width: '150px',
+                                                                        height: '150px',
+                                                                        display: 'block',
+                                                                        marginTop: '10px'
                                                                     }}
                                                                     src={
                                                                         src

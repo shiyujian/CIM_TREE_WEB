@@ -223,7 +223,7 @@ export default class Faithinfo extends Component {
     onSelect (value = []) {
         let keycode = value[0] || '';
         const {
-            actions: { setkeycode, gettreetype, getTree, getLittleBan }
+            actions: { setkeycode }
         } = this.props;
         setkeycode(keycode);
         this.setState({

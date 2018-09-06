@@ -10,7 +10,8 @@ import {
     Button,
     Input,
     Progress,
-    message
+    message,
+    Card
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
@@ -22,8 +23,8 @@ export default class CuringTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            imgvisible: false,
-            tblData: [],
+            curingModalvisible: false,
+            curingTreeData: [],
             pagination: {},
             loading: false,
             size: 10,
@@ -35,12 +36,12 @@ export default class CuringTable extends Component {
             section: '',
             smallclass: '',
             thinclass: '',
-            SupervisorCheck: '',
-            CheckStatus: '',
             role: 'inputer',
             percent: 0,
             totalNum: '',
-            imgArr: []
+            imgArr: [],
+            curingTypes: [],
+            curingSXM: ''
         };
         this.columns = [
             {
@@ -49,7 +50,7 @@ export default class CuringTable extends Component {
             },
             {
                 title: '顺序码',
-                dataIndex: 'ZZBM'
+                dataIndex: 'SXM'
             },
             {
                 title: '项目',
@@ -67,245 +68,16 @@ export default class CuringTable extends Component {
                 dataIndex: 'place'
             },
             {
-                title: '树种',
-                dataIndex: 'TreeTypeObj.TreeTypeName'
-            },
-            {
-                title: '状态',
-                dataIndex: 'statusname',
-                render: (text, record) => {
-                    let superName = '';
-                    let ownerName = '';
-                    if (
-                        record.SupervisorCheck == -1 &&
-                            record.CheckStatus == -1
-                    ) {
-                        return <span>未抽查</span>;
-                    } else {
-                        if (record.SupervisorCheck == 0) { superName = '监理抽查退回'; } else if (record.SupervisorCheck === 1) {
-                            superName = '监理抽查通过';
-                        }
-
-                        if (record.CheckStatus == 0) { ownerName = '业主抽查退回'; } else if (record.CheckStatus == 1) {
-                            ownerName = '业主抽查通过';
-                        } else if (record.CheckStatus == 2) {
-                            ownerName = '业主抽查退回后修改';
-                        }
-                        if (superName && ownerName) {
-                            return (
-                                <div>
-                                    <div>{superName}</div>
-                                    <div>{ownerName}</div>
-                                </div>
-                            );
-                        } else if (superName) {
-                            return <span>{superName}</span>;
-                        } else {
-                            return <span>{ownerName}</span>;
-                        }
-                    }
-                }
-            },
-            {
-                title: '定位',
-                dataIndex: 'islocation'
-            },
-            {
-                title: '测量人',
-                dataIndex: 'Inputer',
+                title: '养护信息',
                 render: (text, record) => {
                     return (
-                        <span>
-                            {users && users[text]
-                                ? users[text].Full_Name +
-                                      '(' +
-                                      users[text].User_Name +
-                                      ')'
-                                : ''}
-                        </span>
+                        <a
+                            onClick={this.handleCuringTreeModalOk.bind(
+                                this, record)}
+                        >
+                            查看详情
+                        </a>
                     );
-                }
-            },
-            {
-                title: '测量时间',
-                render: (text, record) => {
-                    const {
-                        createtime1 = '',
-                        createtime2 = ''
-                    } = record;
-                    return (
-                        <div>
-                            <div>{createtime1}</div>
-                            <div>{createtime2}</div>
-                        </div>
-                    );
-                }
-            },
-            {
-                title: '定位时间',
-                render: (text, record) => {
-                    const {
-                        createtime3 = '',
-                        createtime4 = ''
-                    } = record;
-                    return (
-                        <div>
-                            <div>{createtime3}</div>
-                            <div>{createtime4}</div>
-                        </div>
-                    );
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>高度</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.GD != 0) {
-                        return (
-                            <a
-                                disabled={!record.GDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.GDFJ
-                                )}
-                            >
-                                {record.GD}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>冠幅</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.GF != 0) {
-                        return (
-                            <a
-                                disabled={!record.GFFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.GFFJ
-                                )}
-                            >
-                                {record.GF}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>胸径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.XJ != 0) {
-                        return (
-                            <a
-                                disabled={!record.XJFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.XJFJ
-                                )}
-                            >
-                                {record.XJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>地径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.DJ != 0) {
-                        return (
-                            <a
-                                disabled={!record.DJFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.DJFJ
-                                )}
-                            >
-                                {record.DJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>土球厚度</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                dataIndex: 'tqhd',
-                render: (text, record) => {
-                    if (record.TQHD != 0) {
-                        return (
-                            <a
-                                disabled={!record.TQHDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.TQHDFJ
-                                )}
-                            >
-                                {record.TQHD}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>土球直径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                dataIndex: 'tqzj',
-                render: (text, record) => {
-                    if (record.TQZJ != 0) {
-                        return (
-                            <a
-                                disabled={!record.TQHDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.TQHDFJ
-                                )}
-                            >
-                                {record.TQZJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
                 }
             }
         ];
@@ -321,9 +93,23 @@ export default class CuringTable extends Component {
         });
         return str;
     }
-    componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
+    componentDidMount = async () => {
+        try {
+            const {
+                actions: {
+                    getCuringTypes
+                }
+            } = this.props;
+            let curingTypesData = await getCuringTypes();
+            let curingTypes = curingTypesData && curingTypesData.content;
+            this.setState({
+                curingTypes
+            });
+            let user = getUser();
+            this.sections = JSON.parse(user.sections);
+        } catch (e) {
+            console.log('getCuringTypes', e);
+        }
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode != this.state.leftkeycode) {
@@ -335,20 +121,91 @@ export default class CuringTable extends Component {
         }
     }
     render () {
-        const { tblData } = this.state;
+        const { curingTreeData, curingTreeModalData, curingSXM } = this.state;
         return (
             <div>
-                {this.treeTable(tblData)}
+                {this.treeTable(curingTreeData)}
                 <Modal
                     width={522}
                     title='详细信息'
                     style={{ textAlign: 'center' }}
-                    visible={this.state.imgvisible}
+                    visible={this.state.curingModalvisible}
                     onOk={this.handleCancel.bind(this)}
                     onCancel={this.handleCancel.bind(this)}
                     footer={null}
                 >
-                    {this.state.imgArr}
+                    <div>
+                        <Input
+                            readOnly
+                            style={{
+                                marginTop: '10px', marginBottom: 10
+                            }}
+                            size='large'
+                            addonBefore='顺序码'
+                            value={curingSXM}
+                        />
+                    </div>
+                    {
+                        curingTreeModalData && curingTreeModalData.length > 0
+                            ? (
+                                curingTreeModalData.map((curing, index) => {
+                                    return (
+                                        <Card title={`任务${index + 1}`} style={{marginBottom: 10}} key={curing.ID}>
+                                            <Input
+                                                readOnly
+                                                style={{
+                                                    marginTop: '10px'
+                                                }}
+                                                size='large'
+                                                addonBefore='养护类型'
+                                                value={curing.typeName}
+                                            />
+                                            <Input
+                                                readOnly
+                                                style={{
+                                                    marginTop: '10px'
+                                                }}
+                                                size='large'
+                                                addonBefore='起止时间'
+                                                value={`${curing.StartTime} ~ ${curing.EndTime}`}
+                                            />
+                                            <Input
+                                                readOnly
+                                                style={{
+                                                    marginTop: '10px'
+                                                }}
+                                                size='large'
+                                                addonBefore='养护人员'
+                                                value={curing.CuringMans}
+                                                title={curing.CuringMans}
+                                            />
+                                            {curing.Pics && curing.Pics.length > 0
+                                                ? curing.Pics.map(
+                                                    src => {
+                                                        return (
+                                                            <div>
+                                                                <img
+                                                                    style={{
+                                                                        width: '150px',
+                                                                        height: '150px',
+                                                                        display: 'block',
+                                                                        marginTop: '10px'
+                                                                    }}
+                                                                    src={
+                                                                        src
+                                                                    }
+                                                                    alt='图片'
+                                                                />
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                                : ''}
+                                        </Card>
+                                    );
+                                })
+                            ) : ''
+                    }
                     <Row style={{ marginTop: 10 }}>
                         <Button
                             onClick={this.handleCancel.bind(this)}
@@ -363,6 +220,7 @@ export default class CuringTable extends Component {
         );
     }
     treeTable (details) {
+        console.log('details', details);
         const {
             sectionoption,
             smallclassoption,
@@ -511,7 +369,7 @@ export default class CuringTable extends Component {
                             ),
                             spinning: this.state.loading
                         }}
-                        locale={{ emptyText: '当天无现场测量信息' }}
+                        locale={{ emptyText: '当天无养护信息' }}
                         dataSource={details}
                         onChange={this.handleTableChange.bind(this)}
                         pagination={this.state.pagination}
@@ -586,35 +444,8 @@ export default class CuringTable extends Component {
         this.qury(pagination.current);
     }
 
-    onImgClick (data) {
-        let srcs = [];
-        try {
-            let arr = data.split(',');
-            console.log('arr', arr);
-            arr.map(rst => {
-                let src = rst.replace(/\/\//g, '/');
-                src = `${FOREST_API}/${src}`;
-                srcs.push(src);
-            });
-        } catch (e) {
-            console.log('处理图片', e);
-        }
-
-        let imgArr = [];
-        srcs.map(src => {
-            imgArr.push(
-                <img style={{ width: '490px' }} src={src} alt='图片' />
-            );
-        });
-
-        this.setState({
-            imgvisible: true,
-            imgArr: imgArr
-        });
-    }
-
     handleCancel () {
-        this.setState({ imgvisible: false });
+        this.setState({ curingModalvisible: false });
     }
     getThinClassName (no, section) {
         const { littleBanAll } = this.props;
@@ -642,7 +473,7 @@ export default class CuringTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury (page) {
+    qury = async (page) => {
         const {
             sxm = '',
             section = '',
@@ -658,7 +489,7 @@ export default class CuringTable extends Component {
         }
 
         const {
-            actions: { getCuringTreeInfo }
+            actions: { getCuringTreeInfo, getqueryTree }
         } = this.props;
         let postdata = {
             sxm,
@@ -671,58 +502,97 @@ export default class CuringTable extends Component {
             size: size
         };
         this.setState({ loading: true, percent: 0 });
-        getCuringTreeInfo({}, postdata).then(rst => {
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
-            let tblData = rst.content;
-            if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
-                    tblData[i].order = (page - 1) * size + i + 1;
+        try {
+            let rst = await getCuringTreeInfo({}, postdata);
+            if (!rst) {
+                this.setState({ loading: false, percent: 100 });
+                return;
+            };
+            let curingTreeData = rst && rst.content;
+            if (curingTreeData instanceof Array) {
+                for (let i = 0; i < curingTreeData.length; i++) {
+                    let curingTree = curingTreeData[i];
+                    curingTree.order = (page - 1) * size + i + 1;
+                    let data = await getqueryTree({}, {sxm: curingTree.SXM});
+                    let treeMess = data && data.content && data.content[0];
                     let place = '';
-                    if (plan.Section.indexOf('P010') !== -1) {
-                        place = this.getThinClassName(plan.No, plan.Section);
+                    if (treeMess.Section.indexOf('P010') !== -1) {
+                        place = this.getThinClassName(treeMess.No, treeMess.Section);
                     } else {
-                        place = `${plan.SmallClass}号小班${
-                            plan.ThinClass
+                        place = `${treeMess.SmallClass}号小班${
+                            treeMess.ThinClass
                         }号细班`;
                     }
-                    tblData[i].place = place;
-                    let statusname = '';
-
-                    tblData[i].SupervisorCheck = plan.SupervisorCheck;
-                    tblData[i].CheckStatus = plan.CheckStatus;
-                    tblData[i].statusname = statusname;
-                    let islocation = plan.LocationTime ? '已定位' : '未定位';
-                    tblData[i].islocation = islocation;
-                    let createtime1 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('YYYY-MM-DD')
-                        : '/';
-                    let createtime2 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('HH:mm:ss')
-                        : '/';
-                    let createtime3 = plan.LocationTime
-                        ? moment(plan.LocationTime).format('YYYY-MM-DD')
-                        : '/';
-                    let createtime4 = plan.LocationTime
-                        ? moment(plan.LocationTime).format('HH:mm:ss')
-                        : '/';
-                    tblData[i].createtime1 = createtime1;
-                    tblData[i].createtime2 = createtime2;
-                    tblData[i].createtime3 = createtime3;
-                    tblData[i].createtime4 = createtime4;
-                    tblData[i].Project = this.getProject(tblData[i].Section);
-                });
-                let totalNum = rst.total;
+                    curingTree.place = place;
+                    curingTree.Project = this.getProject(treeMess.Section);
+                };
+                let totalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
+                console.log('totalNum', totalNum);
+                console.log('pagination', pagination);
+                console.log('curingTreeData', curingTreeData);
+
                 this.setState({
-                    tblData,
+                    loading: false,
+                    percent: 100,
+                    curingTreeData,
                     pagination: pagination,
                     totalNum: totalNum
                 });
             }
+        } catch (e) {
+
+        }
+    }
+    handleCuringTreeModalOk = async (record) => {
+        const {
+            actions: {
+                getCuringTreeInfo,
+                getCuringMessage
+            }
+        } = this.props;
+        const {
+            curingTypes
+        } = this.state;
+        let SXM = record.SXM;
+        let rst = await getCuringTreeInfo({}, {sxm: SXM});
+        let curingTreeModalData = rst && rst.content;
+        for (let i = 0; i < curingTreeModalData.length; i++) {
+            let data = curingTreeModalData[i];
+            curingTypes.map((type) => {
+                if (data.CuringType === type.ID) {
+                    data.typeName = type.Base_Name;
+                }
+            });
+            let curingMess = await getCuringMessage({id: data.CuringID});
+            data.Pics = curingMess.Pics ? this.handleImg(curingMess.Pics) : '';
+            data.StartTime = curingMess.StartTime;
+            data.EndTime = curingMess.EndTime;
+            data.CuringMans = curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans;
+        }
+        this.setState({
+            curingTreeModalData,
+            curingModalvisible: true,
+            curingSXM: SXM
         });
+    }
+
+    handleImg = (data) => {
+        let srcs = [];
+        try {
+            let arr = data.split(',');
+            console.log('arr', arr);
+            arr.map(rst => {
+                let src = rst.replace(/\/\//g, '/');
+                src = `${FOREST_API}/${src}`;
+                srcs.push(src);
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+        return srcs;
     }
 
     getProject (section) {

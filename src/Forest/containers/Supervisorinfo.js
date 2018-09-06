@@ -178,7 +178,7 @@ export default class Supervisorinfo extends Component {
     // 标段选择
     sectionselect (value) {
         const {
-            actions: { setkeycode, getTree, getLittleBan }
+            actions: { getLittleBan }
         } = this.props;
         this.currentSection = value;
         getLittleBan({ no: value }).then(rst => {
@@ -199,7 +199,7 @@ export default class Supervisorinfo extends Component {
     // 小班选择, 重新获取: 细班、树种
     smallclassselect (value) {
         const {
-            actions: { setkeycode, getTree, getLittleBan }
+            actions: { getLittleBan }
         } = this.props;
         getLittleBan({ no: this.currentSection }).then(rst => {
             let smallclasses = [];
@@ -369,7 +369,7 @@ export default class Supervisorinfo extends Component {
         let user = getUser();
         let keycode = value[0] || '';
         const {
-            actions: { setkeycode, gettreetype, getTree, getLittleBan }
+            actions: { setkeycode }
         } = this.props;
         setkeycode(keycode);
         this.setState({
