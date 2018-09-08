@@ -10,8 +10,6 @@ export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`)
 
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
-// 苗木养护计划详情
-export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
 // 养护计划制定
 export const postCuringTask = createFetchAction(`${FOREST_API}/curing/curing`, [], 'POST');
 // 获取养护轨迹
@@ -32,7 +30,6 @@ export const changeCheckedKeys = createAction(`${ID}_changeCheckedKeys`);
 export const actions = {
     getTreearea,
     getCuring,
-    getCuringMessage,
     postCuringTask,
     getCuringPositions,
     getCuringGroup,

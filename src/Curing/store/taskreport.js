@@ -11,8 +11,6 @@ export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`)
 
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
-// 苗木养护计划详情
-export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
 // 养护任务总结
 export const postComplete = createFetchAction(`${FOREST_API}/curing/complete`, [], 'POST');
 // 获取养护轨迹
@@ -25,7 +23,6 @@ export const postForsetPic = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=
 export const actions = {
     getTreearea,
     getCuring,
-    getCuringMessage,
     postComplete,
     getCuringPositions,
     postThinClassesByRegion,

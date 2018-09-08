@@ -21,7 +21,7 @@ export default class TaskTeamTable extends Component {
     async componentDidMount () {
         const {
             actions: {
-                getAllUsersData
+                getForestAllUsersData
             }
         } = this.props;
         this.user = getUser();
@@ -38,7 +38,7 @@ export default class TaskTeamTable extends Component {
         if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
 
         } else {
-            let userData = await getAllUsersData();
+            let userData = await getForestAllUsersData();
             totalUserData = userData && userData.content;
         }
         this.setState({

@@ -19,6 +19,10 @@ export default (ID, service = '') => {
         `${SERVICE_API}/orgs/code/{{code}}/?this=true`,
         'DELETE'
     );
+    const getOrgParent = createFetchAction(
+        `${SERVICE_API}/orgs/code/{{code}}/?parent=true`,
+        'GET'
+    );
 
     const orgReducer = handleActions(
         {
@@ -32,6 +36,7 @@ export default (ID, service = '') => {
     orgReducer[`post${SERVICE}Org`] = postOrg;
     orgReducer[`put${SERVICE}Org`] = putOrg;
     orgReducer[`delete${SERVICE}Org`] = deleteOrg;
+    orgReducer[`get${SERVICE}OrgParent`] = getOrgParent;
 
     return orgReducer;
 };

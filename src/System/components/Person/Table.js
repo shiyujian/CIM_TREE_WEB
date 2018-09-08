@@ -997,7 +997,7 @@ export default class Users extends Component {
         const {
             sidebar: { node } = {},
             platform: { users = [] },
-            actions: { deleteUser, getUsers, getTablePage, getAllUsersData }
+            actions: { deleteUser, getUsers, getTablePage, getForestAllUsersData }
         } = this.props;
         const codes = Users.collect(node);
         // 		const usera = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -1020,7 +1020,7 @@ export default class Users extends Component {
             );
             deleteUser({ userID: user.id }).then(as => {
                 console.log('as', as);
-                getAllUsersData().then((userData) => {
+                getForestAllUsersData().then((userData) => {
                     console.log('userData', userData);
                     if (userData && userData.content) {
                         window.localStorage.removeItem('LZ_TOTAL_USER_DATA');

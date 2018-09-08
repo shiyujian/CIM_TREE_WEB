@@ -57,7 +57,6 @@ export default class Scheduleanalyze extends Component {
     async componentDidMount () {
         const {
             actions: { getProjectList },
-            treetypes,
             platform: { tree = {} }
         } = this.props;
 

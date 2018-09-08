@@ -36,6 +36,17 @@ export const getCuringTreeInfo = createFetchAction(`${FOREST_API}/curing/curingt
 // 苗木养护计划详情
 export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
 
+export const getForestAllUsersData = createFetchAction(
+    `${FOREST_API}/system/users`,
+    [],
+    'GET'
+);
+export const getForestUserDetail = createFetchAction(
+    `${FOREST_API}/system/user/{{id}}`,
+    [],
+    'GET'
+);
+
 export default handleActions(
     {
         [getTreeNodeListOK]: (state, { payload }) => {

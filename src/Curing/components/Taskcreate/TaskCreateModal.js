@@ -24,7 +24,7 @@ class TaskCreateModal extends Component {
         const {
             actions: {
                 getCuringTypes,
-                getAllUsersData
+                getForestAllUsersData
             }
         } = this.props;
         let curingTypes = await getCuringTypes();
@@ -44,7 +44,7 @@ class TaskCreateModal extends Component {
         if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
 
         } else {
-            let userData = await getAllUsersData();
+            let userData = await getForestAllUsersData();
             totalUserData = userData && userData.content;
         }
         let user = getUser();

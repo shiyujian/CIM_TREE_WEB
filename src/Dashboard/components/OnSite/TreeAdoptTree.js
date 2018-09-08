@@ -63,7 +63,7 @@ export default class TreeAdoptTree extends Component {
     searchTreeData = async (value) => {
         const {
             actions: {
-                getAdoptTree,
+                getAdoptTreeByAdopter,
                 getTreeLocation
             }
         } = this.props;
@@ -71,7 +71,7 @@ export default class TreeAdoptTree extends Component {
             let postdata = {
                 aadopter: value
             };
-            let data = await getAdoptTree(postdata);
+            let data = await getAdoptTreeByAdopter(postdata);
             console.log('data', data);
             let adoptTrees = (data && data.content) || [];
             for (let i = 0; i < adoptTrees.length; i++) {

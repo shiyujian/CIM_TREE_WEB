@@ -16,7 +16,7 @@ export const getToken = createFetchAction(`${QRCODE_API}/qrcode/`, [], 'GET');
 export const getLoginStateOK = createAction('二维码登录信息');
 export const getLoginState = createFetchAction(`${QRCODE_API}/qrcode/{{token}}/`, [], 'GET');
 
-export const getAllUsersData = createFetchAction(`${FOREST_API}/system/users`, [], 'GET');
+export const getForestAllUsersData = createFetchAction(`${FOREST_API}/system/users`, [], 'GET');
 
 export default handleActions({
     [loginOK]: (state, action) => {

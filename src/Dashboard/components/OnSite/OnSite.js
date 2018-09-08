@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-05 15:27:53
+ * @Last Modified time: 2018-09-08 16:10:58
  */
 import React, { Component } from 'react';
 import {
@@ -31,6 +31,7 @@ import TreeMessModal from './TreeMessModal';
 import CuringTaskTree from './CuringTaskTree';
 import SurvivalRateTree from './SurvivalRateTree';
 import TreeAdoptTree from './TreeAdoptTree';
+import AdoptTreeMessModal from './AdoptTreeMessModal';
 import {
     genPopUpContent,
     computeSignedArea,
@@ -67,7 +68,7 @@ class OnSite extends Component {
             mapLayerBtnType: true, // 切换卫星图和地图
             leafletCenter: [38.92, 115.98], // 雄安
             // 树木详情弹窗数据
-            seeVisible: false,
+            treeMessModalVisible: false,
             seedlingMess: '', // 树木信息
             treeMess: '', // 苗木信息
             flowMess: '', // 流程信息
@@ -107,6 +108,9 @@ class OnSite extends Component {
             // 成活率选项
             survivalRateRateData: '',
             survivalRateSectionData: '',
+            // 苗木结缘弹窗
+            adoptTreeModalVisible: false,
+            adoptTreeMess: '',
             // 成活率范围的点击状态，展示是否选中的图片
             survivalRateHundred: false,
             survivalRateNinety: false,
@@ -408,32 +412,30 @@ class OnSite extends Component {
 
         this.getTileLayerTreeBasic();
         // 隐患详情点击事件
-        document
-            .querySelector('.leaflet-popup-pane')
-            .addEventListener('click', async function (e) {
-                let target = e.target;
-                // 绑定隐患详情点击事件
-                if (target.getAttribute('class') === 'btnViewRisk') {
-                    let idRisk = target.getAttribute('data-id');
-                    let risk = null;
-                    me.props.riskTree.forEach(v => {
-                        if (!risk) {
-                            risk = v.children.find(v1 => v1.key === idRisk);
-                        }
-                    });
-                    if (risk) {
-                        // 获取隐患处理措施
-                        const { getRiskContactSheet } = me.props.actions;
-                        let contact = await getRiskContactSheet({ ID: idRisk });
-                        if (contact && contact.ID) {
-                            me.setState({
-                                riskMess: contact,
-                                isShowRisk: true
-                            });
-                        }
+        document.querySelector('.leaflet-popup-pane').addEventListener('click', async function (e) {
+            let target = e.target;
+            // 绑定隐患详情点击事件
+            if (target.getAttribute('class') === 'btnViewRisk') {
+                let idRisk = target.getAttribute('data-id');
+                let risk = null;
+                me.props.riskTree.forEach(v => {
+                    if (!risk) {
+                        risk = v.children.find(v1 => v1.key === idRisk);
+                    }
+                });
+                if (risk) {
+                    // 获取隐患处理措施
+                    const { getRiskContactSheet } = me.props.actions;
+                    let contact = await getRiskContactSheet({ ID: idRisk });
+                    if (contact && contact.ID) {
+                        me.setState({
+                            riskMess: contact,
+                            isShowRisk: true
+                        });
                     }
                 }
-            });
+            }
+        });
 
         this.map.on('click', function (e) {
             const {
@@ -459,9 +461,11 @@ class OnSite extends Component {
                 });
             } else if (dashboardCompomentMenu === 'geojsonFeature_area') {
                 // getThinClass(e.latlng.lng,e.latlng.lat);
-                me.getTreeInfo(e.latlng.lng, e.latlng.lat, me);
+                me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_area');
             } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
-                me.getSurvivalRateInfo(e.latlng.lng, e.latlng.lat, me);
+                me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
+            } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+                me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_treeAdopt');
             }
         });
     }
@@ -801,7 +805,7 @@ class OnSite extends Component {
         } else {
             this.tileTreeAdoptLayerBasic = L.tileLayer(
                 window.config.DASHBOARD_ONSITE +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Aalladopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                '/geoserver/gwc/service/wmts?layer=xatree%3Aadopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
@@ -1044,10 +1048,11 @@ class OnSite extends Component {
     }
     render () {
         const {
-            seeVisible,
+            treeMessModalVisible,
             coordinates,
             areaMeasure,
-            areaMeasureVisible
+            areaMeasureVisible,
+            adoptTreeModalVisible
         } = this.state;
         const {
             dashboardCompomentMenu,
@@ -1163,13 +1168,22 @@ class OnSite extends Component {
                         </div>
                     </div>
                     { // 点击某个树节点展示该节点信息
-                        seeVisible
+                        treeMessModalVisible
                             ? (
                                 <TreeMessModal
                                     {...this.props}
                                     {...this.state}
-                                    onCancel={this.handleCancelTreeMess.bind(this)}
+                                    onCancel={this.handleCancelTreeMessModal.bind(this)}
                                 />
+                            ) : ''
+                    }
+                    {
+                        adoptTreeModalVisible
+                            ? (
+                                <AdoptTreeMessModal
+                                    {...this.props}
+                                    {...this.state}
+                                    onCancel={this.handleCancelAdoptTreeMessModal.bind(this)} />
                             ) : ''
                     }
                     <Modal
@@ -1947,32 +1961,32 @@ class OnSite extends Component {
                         className: getIconType('tree')
                     });
                     let adoptTreeMarkerLayer = L.marker([adoptTree.Y, adoptTree.X], {
-                        icon: iconType,
-                        title: adoptTree.SXM
+                        icon: iconType
+                        // title: adoptTree.SXM // 如果有title字段  无法点击图标 进行查询树木信息的操作
                     });
-                    let popupData = {
-                        type: 'adoptTree',
-                        key: adoptTree.ID,
-                        properties: {
-                            ID: adoptTree.ID,
-                            Aadopter: adoptTree.Aadopter,
-                            AdoptTime: adoptTree.AdoptTime,
-                            CreateTime: adoptTree.CreateTime,
-                            EndTime: adoptTree.EndTime,
-                            SXM: adoptTree.SXM,
-                            StartTime: adoptTree.StartTime,
-                            type: 'adoptTree'
-                        },
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [adoptTree.Y, adoptTree.X]
-                        }
-                    };
-                    adoptTreeMarkerLayer.bindPopup(
-                        L.popup({ maxWidth: 240 }).setContent(
-                            genPopUpContent(popupData)
-                        )
-                    );
+                    // let popupData = {
+                    //     type: 'adoptTree',
+                    //     key: adoptTree.ID,
+                    //     properties: {
+                    //         ID: adoptTree.ID,
+                    //         Aadopter: adoptTree.Aadopter,
+                    //         AdoptTime: adoptTree.AdoptTime,
+                    //         CreateTime: adoptTree.CreateTime,
+                    //         EndTime: adoptTree.EndTime,
+                    //         SXM: adoptTree.SXM,
+                    //         StartTime: adoptTree.StartTime,
+                    //         type: 'adoptTree'
+                    //     },
+                    //     geometry: {
+                    //         type: 'Point',
+                    //         coordinates: [adoptTree.Y, adoptTree.X]
+                    //     }
+                    // };
+                    // adoptTreeMarkerLayer.bindPopup(
+                    //     L.popup({ maxWidth: 240 }).setContent(
+                    //         genPopUpContent(popupData)
+                    //     )
+                    // );
                     adoptTreeMarkerLayer.addTo(this.map);
                     adoptTreeDataList[ID] = adoptTree;
                     adoptTreeMarkerLayerList[ID] = adoptTreeMarkerLayer;
@@ -2139,108 +2153,8 @@ class OnSite extends Component {
             isShowRisk: false
         });
     }
-    // 点击地图上的区域的成活率
-    async getSurvivalRateInfo (x, y, that) {
-        const {
-            platform: {
-                tree = {}
-            }
-        } = that.props;
-        const {
-            survivalRateMarkerLayerList
-        } = that.state;
-        let totalThinClass = tree.totalThinClass || [];
-        var resolutions = [
-            0.703125,
-            0.3515625,
-            0.17578125,
-            0.087890625,
-            0.0439453125,
-            0.02197265625,
-            0.010986328125,
-            0.0054931640625,
-            0.00274658203125,
-            0.001373291015625,
-            6.866455078125e-4,
-            3.4332275390625e-4,
-            1.71661376953125e-4,
-            8.58306884765625e-5,
-            4.291534423828125e-5,
-            2.1457672119140625e-5,
-            1.0728836059570312e-5,
-            5.364418029785156e-6,
-            2.682209014892578e-6,
-            1.341104507446289e-6,
-            6.705522537231445e-7,
-            3.3527612686157227e-7
-        ];
-        var zoom = that.map.getZoom();
-        var resolution = resolutions[zoom];
-        var col = (x + 180) / resolution;
-        // 林总说明I和J必须是整数
-        var colp = Math.floor(col % 256);
-        // var colp = col % 256;
-        col = Math.floor(col / 256);
-        var row = (90 - y) / resolution;
-        // 林总说明I和J必须是整数
-        var rowp = Math.floor(row % 256);
-        // var rowp = row % 256;
-        row = Math.floor(row / 256);
-        var url =
-            window.config.DASHBOARD_ONSITE +
-            '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:thinclass&STYLE=&TILEMATRIX=EPSG:4326:' +
-            zoom +
-            '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
-            col +
-            '&TileRow=' +
-            row +
-            '&I=' +
-            colp +
-            '&J=' +
-            rowp;
-        jQuery.getJSON(url, null, async function (data) {
-            try {
-                if (data && data.features && data.features.length > 0 && data.features[0].properties) {
-                    let properties = data.features[0].properties;
-                    for (let i in survivalRateMarkerLayerList) {
-                        that.map.removeLayer(survivalRateMarkerLayerList[i]);
-                    }
-                    let areaData = getThinClassName(properties.no, properties.Section, totalThinClass);
-                    let iconData = {
-                        geometry: {
-                            coordinates: [y, x],
-                            type: 'Point'
-                        },
-                        key: properties.ID,
-                        properties: {
-                            sectionName: areaData.SectionName ? areaData.SectionName : '',
-                            smallClassName: areaData.SmallName ? areaData.SmallName : '',
-                            thinClassName: areaData.ThinName ? areaData.ThinName : '',
-                            treetype: properties.treetype,
-                            SurvivalRate: properties.SurvivalRate,
-                            type: 'survivalRate'
-                        },
-                        type: 'survivalRate'
-                    };
-                    let survivalRateLayer = that._createMarker(iconData);
-                    survivalRateMarkerLayerList[properties.ID] = survivalRateLayer;
-                    that.setState({
-                        survivalRateMarkerLayerList
-                    });
-                }
-            } catch (e) {
-
-            }
-        });
-    }
-    // 苗木信息Modal关闭
-    handleCancelTreeMess () {
-        this.setState({
-            seeVisible: !this.state.seeVisible
-        });
-    }
     // 根据点击的地图坐标与实际树的定位进行对比,根据树节点获取树节点信息
-    async getTreeInfo (x, y, that) {
+    getSxmByLocation (x, y, that, type) {
         var resolutions = [
             0.703125,
             0.3515625,
@@ -2265,19 +2179,19 @@ class OnSite extends Component {
             6.705522537231445e-7,
             3.3527612686157227e-7
         ];
-        var zoom = that.map.getZoom();
-        var resolution = resolutions[zoom];
-        var col = (x + 180) / resolution;
+        let zoom = that.map.getZoom();
+        let resolution = resolutions[zoom];
+        let col = (x + 180) / resolution;
         // 林总说明I和J必须是整数
-        var colp = Math.floor(col % 256);
-        // var colp = col % 256;
+        let colp = Math.floor(col % 256);
+        // let colp = col % 256;
         col = Math.floor(col / 256);
-        var row = (90 - y) / resolution;
+        let row = (90 - y) / resolution;
         // 林总说明I和J必须是整数
-        var rowp = Math.floor(row % 256);
-        // var rowp = row % 256;
+        let rowp = Math.floor(row % 256);
+        // let rowp = row % 256;
         row = Math.floor(row / 256);
-        var url =
+        let url =
             window.config.DASHBOARD_ONSITE +
             '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:' +
             zoom +
@@ -2289,21 +2203,42 @@ class OnSite extends Component {
             colp +
             '&J=' +
             rowp;
+        if (type === 'geojsonFeature_survivalRate') {
+            url =
+            window.config.DASHBOARD_ONSITE +
+            '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:thinclass&STYLE=&TILEMATRIX=EPSG:4326:' +
+            zoom +
+            '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
+            col +
+            '&TileRow=' +
+            row +
+            '&I=' +
+            colp +
+            '&J=' +
+            rowp;
+        }
         jQuery.getJSON(url, null, async function (data) {
+            console.log('data', data);
             if (data.features && data.features.length) {
-                if (that.state.treeMarkerLayer) {
-                    that.map.removeLayer(that.state.treeMarkerLayer);
+                if (type === 'geojsonFeature_area') {
+                    console.log('sssssssssssssssss');
+                    await that.getTreeMessData(data, x, y);
+                    await that.handleOkTreeMessModal(data, x, y);
+                } else if (type === 'geojsonFeature_survivalRate') {
+                    that.getSurvivalRateInfo(data, x, y);
+                } else if (type === 'geojsonFeature_treeAdopt') {
+                    console.log('wwwwwwwwwwwwwwwww');
+                    let adoptTreeMess = await that.getTreeAdoptInfo(data, x, y);
+                    if (adoptTreeMess) {
+                        await that.getTreeMessData(data, x, y);
+                        await that.handleOkAdoptTreeMessModal();
+                    }
                 }
-                let postdata = {
-                    sxm: data.features[0].properties.SXM
-                    // sxm: 'AUT9860'
-                };
-                that.getTreeMessData(postdata, x, y);
             }
         });
     }
     // 获取树木详情信息
-    getTreeMessData = async (postdata, x, y) => {
+    getTreeMessData = async (data, x, y) => {
         const {
             actions: {
                 getTreeflows,
@@ -2312,99 +2247,238 @@ class OnSite extends Component {
                 getTreeMess,
                 getCuringTreeInfo,
                 getCuringTypes,
-                getCuringMessage
+                getCuringMessage,
+                getForestUserDetail,
+                getUserDetail,
+                getOrgParent
             },
             platform: {
                 tree = {}
             },
             curingTypes
         } = this.props;
-        let totalThinClass = tree.totalThinClass || [];
-        let queryTreeData = await getTreeMess(postdata);
-        let treeflowDatas = await getTreeflows({}, postdata);
-        let nurserysDatas = await getNurserys({}, postdata);
-        let carData = await getCarpackbysxm(postdata);
-        let curingTreeData = await getCuringTreeInfo({}, postdata);
-        let curingTypeArr = [];
-        if (!curingTypes) {
-            let curingTypesData = await getCuringTypes();
-            curingTypeArr = curingTypesData && curingTypesData.content;
-        } else {
-            curingTypeArr = curingTypes;
-        };
+        console.log('this.props.actions', this.props.actions);
+        try {
+            let postdata = {
+                sxm: data.features[0].properties.SXM
+                // sxm: 'AUT9860'
+            };
+            let totalThinClass = tree.totalThinClass || [];
+            let queryTreeData = await getTreeMess(postdata);
+            let treeflowDatas = await getTreeflows({}, postdata);
+            let nurserysDatas = await getNurserys({}, postdata);
+            let carData = await getCarpackbysxm(postdata);
+            let curingTreeData = await getCuringTreeInfo({}, postdata);
+            let curingTypeArr = [];
+            if (!curingTypes) {
+                let curingTypesData = await getCuringTypes();
+                curingTypeArr = curingTypesData && curingTypesData.content;
+            } else {
+                curingTypeArr = curingTypes;
+            };
 
-        let SmallClassName = queryTreeData.SmallClass
-            ? queryTreeData.SmallClass + '号小班'
-            : '';
-        let ThinClassName = queryTreeData.ThinClass
-            ? queryTreeData.ThinClass + '号细班'
-            : '';
-        // 获取小班细班名称
-        if (queryTreeData && queryTreeData.Section && queryTreeData.SmallClass && queryTreeData.ThinClass) {
-            let sections = queryTreeData.Section.split('-');
-            let No =
-                        sections[0] +
-                        '-' +
-                        sections[1] +
-                        '-' +
-                        queryTreeData.SmallClass +
-                        '-' +
-                        queryTreeData.ThinClass;
-            let regionData = getThinClassName(No, queryTreeData.Section, totalThinClass);
-            SmallClassName = regionData.SmallName;
-            ThinClassName = regionData.ThinName;
-        }
+            let SmallClassName = queryTreeData.SmallClass
+                ? queryTreeData.SmallClass + '号小班'
+                : '';
+            let ThinClassName = queryTreeData.ThinClass
+                ? queryTreeData.ThinClass + '号细班'
+                : '';
+            // 获取小班细班名称
+            if (queryTreeData && queryTreeData.Section && queryTreeData.SmallClass && queryTreeData.ThinClass) {
+                let sections = queryTreeData.Section.split('-');
+                let No =
+                            sections[0] +
+                            '-' +
+                            sections[1] +
+                            '-' +
+                            queryTreeData.SmallClass +
+                            '-' +
+                            queryTreeData.ThinClass;
+                let regionData = getThinClassName(No, queryTreeData.Section, totalThinClass);
+                SmallClassName = regionData.SmallName;
+                ThinClassName = regionData.ThinName;
+            }
 
-        let treeflowData = {};
-        let nurserysData = {};
-        let curingTaskData = [];
-        let curingTaskArr = [];
-        if (
-            treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array &&
-                    treeflowDatas.content.length > 0
-        ) {
-            treeflowData = treeflowDatas.content;
-        }
-        if (
-            nurserysDatas && nurserysDatas.content && nurserysDatas.content instanceof Array &&
-                    nurserysDatas.content.length > 0
-        ) {
-            nurserysData = nurserysDatas.content[0];
-        }
-        if (
-            curingTreeData && curingTreeData.content && curingTreeData.content instanceof Array &&
-                    curingTreeData.content.length > 0
-        ) {
-            let content = curingTreeData.content;
-            content.map((task) => {
-                if (curingTaskArr.indexOf(task.CuringID) === -1) {
-                    curingTaskData.push(task);
-                    curingTaskArr.push(task.CuringID);
-                }
+            let treeflowData = {};
+            let nurserysData = {};
+            let curingTaskData = [];
+            let curingTaskArr = [];
+            if (
+                treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array &&
+                        treeflowDatas.content.length > 0
+            ) {
+                treeflowData = treeflowDatas.content;
+            }
+            if (
+                nurserysDatas && nurserysDatas.content && nurserysDatas.content instanceof Array &&
+                        nurserysDatas.content.length > 0
+            ) {
+                nurserysData = nurserysDatas.content[0];
+            }
+            if (
+                curingTreeData && curingTreeData.content && curingTreeData.content instanceof Array &&
+                        curingTreeData.content.length > 0
+            ) {
+                let content = curingTreeData.content;
+                content.map((task) => {
+                    if (curingTaskArr.indexOf(task.CuringID) === -1) {
+                        curingTaskData.push(task);
+                        curingTaskArr.push(task.CuringID);
+                    }
+                });
+            }
+            let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
+            let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData);
+            for (let i = 0; i < treeflowData.length; i++) {
+                let userForestData = await getForestUserDetail({id: treeflowData[i].FromUser});
+                let userEcidiData = await getUserDetail({pk: userForestData.PK});
+                let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
+                let orgData = await getOrgParent({code: orgCode});
+                let parent = orgData && orgData.parent;
+                let companyName = parent.name;
+                treeflowData[i].companyName = companyName;
+                treeflowData[i].orgData = parent;
+            }
+            let flowMess = treeflowData;
+            let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);
+            this.setState({
+                seedlingMess,
+                treeMess,
+                flowMess,
+                curingMess
             });
+        } catch (e) {
+            console.log('getTreeMessData', e);
         }
-        let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
-        let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData);
-        let flowMess = treeflowData;
-        let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);
-        console.log('curingMess', curingMess);
+    }
+    // 显示苗木信息Modal 和 图标
+    handleOkTreeMessModal (data, x, y) {
+        try {
+            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
+                let postdata = {
+                    sxm: data.features[0].properties.SXM
+                    // sxm: 'AUT9860'
+                };
+                if (this.state.treeMarkerLayer) {
+                    this.map.removeLayer(this.state.treeMarkerLayer);
+                }
+                let iconType = L.divIcon({
+                    className: getIconType('tree')
+                });
+                console.log('y, x', y, x);
+                let treeMarkerLayer = L.marker([y, x], {
+                    icon: iconType,
+                    title: postdata.sxm
+                });
+                treeMarkerLayer.addTo(this.map);
+                this.setState({
+                    treeMarkerLayer,
+                    treeMessModalVisible: true
+                });
+            }
+        } catch (e) {
 
-        let iconType = L.divIcon({
-            className: getIconType('tree')
-        });
-        console.log('y, x', y, x);
-        let treeMarkerLayer = L.marker([y, x], {
-            icon: iconType,
-            title: postdata.sxm
-        });
-        treeMarkerLayer.addTo(this.map);
+        }
+    }
+    // 苗木信息Modal关闭
+    handleCancelTreeMessModal () {
+        this.handleModalMessData();
         this.setState({
-            seeVisible: true,
-            seedlingMess,
-            treeMess,
-            flowMess,
-            treeMarkerLayer,
-            curingMess
+            treeMessModalVisible: false
+        });
+    }
+    // 点击地图上的区域的成活率
+    async getSurvivalRateInfo (data, x, y) {
+        const {
+            platform: {
+                tree = {}
+            }
+        } = this.props;
+        const {
+            survivalRateMarkerLayerList
+        } = this.state;
+        let totalThinClass = tree.totalThinClass || [];
+        try {
+            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
+                let properties = data.features[0].properties;
+                for (let i in survivalRateMarkerLayerList) {
+                    this.map.removeLayer(survivalRateMarkerLayerList[i]);
+                }
+                let areaData = getThinClassName(properties.no, properties.Section, totalThinClass);
+                let iconData = {
+                    geometry: {
+                        coordinates: [y, x],
+                        type: 'Point'
+                    },
+                    key: properties.ID,
+                    properties: {
+                        sectionName: areaData.SectionName ? areaData.SectionName : '',
+                        smallClassName: areaData.SmallName ? areaData.SmallName : '',
+                        thinClassName: areaData.ThinName ? areaData.ThinName : '',
+                        treetype: properties.treetype,
+                        SurvivalRate: properties.SurvivalRate,
+                        type: 'survivalRate'
+                    },
+                    type: 'survivalRate'
+                };
+                let survivalRateLayer = this._createMarker(iconData);
+                survivalRateMarkerLayerList[properties.ID] = survivalRateLayer;
+                this.setState({
+                    survivalRateMarkerLayerList
+                });
+            }
+        } catch (e) {
+            console.log('getSurvivalRateInfo', e);
+        }
+    }
+    // 获取苗木结缘信息
+    getTreeAdoptInfo = async (data, x, y) => {
+        const {
+            actions: {
+                getAdoptTrees
+            }
+        } = this.props;
+        try {
+            let adoptTreeMess = '';
+            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
+                let postdata = {
+                    sxm: data.features[0].properties.SXM
+                };
+                let adoptData = await getAdoptTrees({}, postdata);
+                let content = (adoptData && adoptData.content) || [];
+                if (content && content.length > 0) {
+                    adoptTreeMess = content[0];
+                    console.log('adoptTreeMess', adoptTreeMess);
+                    this.setState({
+                        adoptTreeMess
+                    });
+                }
+            }
+            return adoptTreeMess;
+        } catch (e) {
+            console.log('getTreeAdoptInfo', e);
+        }
+    }
+    // 显示苗木结缘Modal
+    handleOkAdoptTreeMessModal () {
+        this.setState({
+            adoptTreeModalVisible: true
+        });
+    }
+    // 关闭苗木结缘Modal
+    handleCancelAdoptTreeMessModal () {
+        this.handleModalMessData();
+        this.setState({
+            adoptTreeModalVisible: false
+        });
+    }
+    handleModalMessData () {
+        this.setState({
+            seedlingMess: '',
+            treeMess: '',
+            flowMess: '',
+            curingMess: '',
+            adoptTreeMess: ''
         });
     }
 }

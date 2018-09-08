@@ -9,7 +9,6 @@ import { CarPackageTable } from '../components/CarPackage';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
-    Aside,
     Body,
     Sidebar,
     Content,
@@ -48,9 +47,6 @@ export default class CarPackage extends Component {
     componentDidMount () {
         const {
             actions: {
-                getTree,
-                gettreetype,
-                getTreeList,
                 getForestUsers,
                 getTreeNodeList,
                 setkeycode
@@ -176,7 +172,7 @@ export default class CarPackage extends Component {
         if (rst instanceof Array) {
             let sectionList = [];
             let sectionOptions = [];
-            let sectionoption = rst.map((item, index) => {
+            rst.map((item, index) => {
                 sectionList.push(item);
             });
             let sectionData = [...new Set(sectionList)];

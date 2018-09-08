@@ -43,7 +43,6 @@ export default class Proprogress extends Component {
     async componentDidMount () {
         const {
             actions: { getProjectList },
-            treetypes,
             platform: { tree = {} }
         } = this.props;
 

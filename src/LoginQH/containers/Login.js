@@ -703,7 +703,7 @@ class Login extends Component {
             actions: {
                 login,
                 getTasks,
-                getAllUsersData
+                getForestAllUsersData
             },
             history: { replace }
         } = this.props;
@@ -719,7 +719,7 @@ class Login extends Component {
                 message.error('用户没有被激活');
             } else {
                 if (rst && rst.id) {
-                    getAllUsersData().then((userData) => {
+                    getForestAllUsersData().then((userData) => {
                         console.log('userData', userData);
                         if (userData && userData.content) {
                             let content = userData.content;

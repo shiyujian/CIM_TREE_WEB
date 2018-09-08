@@ -10,8 +10,6 @@ export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`)
 
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
-// 苗木养护计划详情
-export const getCuringMessage = createFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
 // 获取养护轨迹
 export const getCuringPositions = createFetchAction(`${FOREST_API}/curing/curingpositions`, [], 'GET');
 // 获取养护班组
@@ -28,7 +26,6 @@ export const getcCuringStat = createFetchAction(`${FOREST_API}/curing/curingstat
 export const actions = {
     getTreearea,
     getCuring,
-    getCuringMessage,
     getCuringPositions,
     getCuringGroup,
     getCuringGroupMans,

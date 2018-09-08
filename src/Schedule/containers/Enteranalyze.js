@@ -53,7 +53,6 @@ export default class Enteranalyze extends Component {
     async componentDidMount () {
         const {
             actions: { getProjectList },
-            treetypes,
             platform: { tree = {} }
         } = this.props;
 
@@ -79,8 +78,7 @@ export default class Enteranalyze extends Component {
     }
 
     render () {
-        const { keycode } = this.props;
-        const { treetypelist, sectionoption, leftkeycode } = this.state;
+        const { leftkeycode } = this.state;
         const {
             platform: { tree = {} }
         } = this.props;
@@ -121,7 +119,7 @@ export default class Enteranalyze extends Component {
         console.log('onSelect  value', value);
         let keycode = value[0] || '';
         const {
-            actions: { setkeycode, gettreetype }
+            actions: { setkeycode }
         } = this.props;
         setkeycode(keycode);
         this.setState({

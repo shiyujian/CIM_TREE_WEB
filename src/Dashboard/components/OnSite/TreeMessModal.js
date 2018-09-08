@@ -783,7 +783,7 @@ class TreeMessModal extends Component {
                                                             .FromUserObj
                                                             .Full_Name
                                                         : ''
-                                                }:${
+                                                } (${flow.companyName}) : ${
                                                     flow.Info
                                                         ? flow.Info
                                                         : ''

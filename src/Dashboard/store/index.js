@@ -7,8 +7,6 @@ import {
 const ID = 'dashboard';
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`, []);
-// export const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
-export const getThinClassList = createFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []); //
 export const getRiskContactSheet = createFetchAction(`${FOREST_API}/tree/patrolevent/{{ID}}`, []);
 // 获取巡检路线
 export const getInspectRouter = createFetchAction(`${FOREST_API}/tree/patrolroutes`, [], 'GET');
@@ -27,9 +25,11 @@ export const getTreeTypeAction = createFetchAction(`${FOREST_API}/tree/treetypes
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
 // 根据领养人名称获取领养树
-export const getAdoptTree = createFetchAction(`${FOREST_API}/adopt/adopttrees?aadopter={{aadopter}}`, [], 'GET');
+export const getAdoptTreeByAdopter = createFetchAction(`${FOREST_API}/adopt/adopttrees?aadopter={{aadopter}}`, [], 'GET');
 // 苗木定位位置地理坐标系查询
 export const getTreeLocation = createFetchAction(`${FOREST_API}/tree/treelocations?sxm={{sxm}}&crs=4326`, [], 'GET');
+// 获取苗木结缘信息
+export const getAdoptTrees = createFetchAction(`${FOREST_API}/adopt/adopttrees`, [], 'GET');
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -39,7 +39,6 @@ export const getTrackTree = createAction(`${ID}巡检路线树`);
 export const getTreetypesTree = createAction(`${ID}树种筛选树`);
 export const getCuringTaskTree = createAction(`${ID}养护任务树`);
 export const getSurvivalRateTree = createAction(`${ID}成活率树`);
-// export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
 export const getCuringTypeData = createAction(`${ID}养护类型`);
 export const getMenuTreeVisible = createAction(`${ID}是否显示树`);
 export const switchDashboardRightMenu = createAction(`${ID}切换二维展示右侧按钮`);
@@ -52,8 +51,6 @@ export const actions = {
     getTreearea,
     getRisk,
     getRiskContactSheet,
-    // getTreeNodeList,
-    getThinClassList,
     getInspectRouter,
     getMapList,
     getTreeflows,
@@ -63,8 +60,9 @@ export const actions = {
     getUserDetail,
     getTreeTypeAction,
     getCuring,
-    getAdoptTree,
+    getAdoptTreeByAdopter,
     getTreeLocation,
+    getAdoptTrees,
 
     switchDashboardCompoment,
     getAreaTree,
@@ -73,7 +71,6 @@ export const actions = {
     getTreetypesTree,
     getCuringTaskTree,
     getSurvivalRateTree,
-    // getTotalThinClass,
     getCuringTypeData,
     getMenuTreeVisible,
     switchDashboardMenuType,
@@ -127,12 +124,6 @@ export default handleActions(
                 survivalRateTree: payload
             };
         },
-        // [getTotalThinClass]: (state, { payload }) => {
-        //     return {
-        //         ...state,
-        //         totalThinClass: payload
-        //     };
-        // },
         [getCuringTypeData]: (state, { payload }) => {
             return {
                 ...state,

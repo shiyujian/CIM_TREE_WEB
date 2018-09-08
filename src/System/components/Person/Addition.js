@@ -1282,7 +1282,7 @@ class Addition extends Component {
                 getSwitch,
                 postUploadAutograph,
                 putUserBlackList,
-                getAllUsersData
+                getForestAllUsersData
             }
         } = this.props;
         const roles = addition.roles || [];
@@ -1592,7 +1592,7 @@ class Addition extends Component {
                                     return;
                                 } else {
                                     message.info('新增人员成功');
-                                    getAllUsersData().then((userData) => {
+                                    getForestAllUsersData().then((userData) => {
                                         console.log('userData', userData);
                                         if (userData && userData.content) {
                                             window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
