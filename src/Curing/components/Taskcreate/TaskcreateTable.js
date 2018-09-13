@@ -16,7 +16,8 @@ import {
     getTaskStatus,
     getAreaTreeData,
     getCuringTaskTreeData,
-    handleAreaLayerData
+    handleAreaLayerData,
+    handleCoordinates
 } from '../auth';
 import TaskCreateModal from './TaskCreateModal';
 import '../Curing.less';
@@ -35,6 +36,7 @@ export default class TaskCreateTable extends Component {
             mapLayerBtnType: true,
             selectedMenu: '1',
             treeLayerChecked: true,
+            curingLayerChecked: true,
             // 细班树
             areaTreeLoading: false,
             // 养护任务树
@@ -321,6 +323,7 @@ export default class TaskCreateTable extends Component {
                         <aside className='aside' draggable='false'>
                             <div style={{margin: 10}}>
                                 <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
+                                {/* <Checkbox checked={this.state.curingLayerChecked} onChange={this.curingLayerChange.bind(this)}>展示养护图层</Checkbox> */}
                             </div>
                             <Collapse
                                 defaultActiveKey={[this.options[0].value]}
@@ -426,6 +429,7 @@ export default class TaskCreateTable extends Component {
                 </div>
             </div>);
     }
+    // 控制基础树图层是否展示
     treeLayerChange = () => {
         const {
             treeLayerChecked
@@ -440,6 +444,23 @@ export default class TaskCreateTable extends Component {
         }
         this.setState({
             treeLayerChecked: !treeLayerChecked
+        });
+    }
+    // 控制养护图层是否展示
+    curingLayerChange = () => {
+        const {
+            curingLayerChecked
+        } = this.state;
+        console.log('curingLayerChecked', curingLayerChecked);
+        if (curingLayerChecked) {
+            if (this.tileTreeLayerBasic) {
+                this.map.removeLayer(this.tileTreeLayerBasic);
+            }
+        } else {
+            this.getTileLayer2();
+        }
+        this.setState({
+            treeLayerChecked: !curingLayerChecked
         });
     }
     // 选择细班是否展示数据，或是隐藏数据
@@ -466,8 +487,10 @@ export default class TaskCreateTable extends Component {
                     const treeNodeName = info && info.node && info.node.props && info.node.props.title;
                     // 如果之前添加过，直接将添加过的再次添加，不用再次请求
                     if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].addTo(me.map);
-                        me.map.fitBounds(areaLayerList[eventKey].getBounds());
+                        areaLayerList[eventKey].map((layer) => {
+                            layer.addTo(me.map);
+                            me.map.fitBounds(layer.getBounds());
+                        });
                         this.setState({
                             createBtnVisible: true
                         });
@@ -477,7 +500,9 @@ export default class TaskCreateTable extends Component {
                     }
                 } else {
                     if (areaLayerList[eventKey]) {
-                        me.map.removeLayer(areaLayerList[eventKey]);
+                        areaLayerList[eventKey].map((layer) => {
+                            me.map.removeLayer(layer);
+                        });
                     }
                 }
             }
@@ -497,14 +522,35 @@ export default class TaskCreateTable extends Component {
             }
         } = this.props;
         try {
-            let data = await handleAreaLayerData(eventKey, treeNodeName, getTreearea);
-            if (data && data.message) {
-                console.log('data', data);
-                let message = data.message;
-                let treearea = data.treearea || [];
-                let layer = this._createMarker(message);
-                areaLayerList[eventKey] = layer;
-                treeCoords[eventKey] = treearea;
+            let coords = await handleAreaLayerData(eventKey, treeNodeName, getTreearea);
+            if (coords && coords instanceof Array && coords.length > 0) {
+                for (let i = 0; i < coords.length; i++) {
+                    let str = coords[i];
+                    let treearea = handleCoordinates(str);
+                    let message = {
+                        key: 3,
+                        type: 'Feature',
+                        properties: {name: treeNodeName, type: 'area'},
+                        geometry: { type: 'Polygon', coordinates: treearea }
+                    };
+                    let layer = this._createMarker(message);
+                    if (i === coords.length - 1) {
+                        this.map.fitBounds(layer.getBounds());
+                    }
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].push(layer);
+                    } else {
+                        areaLayerList[eventKey] = [layer];
+                    }
+                    if (treeCoords[eventKey]) {
+                        treeCoords[eventKey].push(treearea);
+                    } else {
+                        treeCoords[eventKey] = [treearea];
+                    }
+                    console.log('treearea', treearea);
+                    console.log('coords', coords);
+                }
+                console.log('treeCoords[eventKey]', treeCoords[eventKey]);
                 if (treeCoords && Object.keys(treeCoords).length > 0) {
                     this.setState({
                         createBtnVisible: true
@@ -518,7 +564,7 @@ export default class TaskCreateTable extends Component {
                     areaLayerList,
                     treeCoords
                 });
-            }
+            };
         } catch (e) {
 
         }
@@ -687,9 +733,6 @@ export default class TaskCreateTable extends Component {
         } = this.props;
         try {
             let totalThinClass = tree.totalThinClass || [];
-            let target = str.split(',').map(item => {
-                return item.split(' ').map(_item => _item - 0);
-            });
             let treeNodeName = taskMess.CuringMans;
             let typeName = '';
             curingTypes.map((type) => {
@@ -697,7 +740,6 @@ export default class TaskCreateTable extends Component {
                     typeName = type.Base_Name;
                 }
             });
-            let treearea = [];
             let status = getTaskStatus(taskMess);
             let regionData = getTaskThinClassName(taskMess, totalThinClass);
             console.log('regionData', regionData);
@@ -714,13 +756,7 @@ export default class TaskCreateTable extends Component {
             this.setState({
                 taskMessList
             });
-            let arr = [];
-            target.map((data, index) => {
-                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
-                    arr.push([data[1], data[0]]);
-                }
-            });
-            treearea.push(arr);
+            let treearea = handleCoordinates(str);
             let message = {
                 key: 3,
                 type: 'task',
@@ -790,17 +826,7 @@ export default class TaskCreateTable extends Component {
             taskRealLayerList
         } = this.state;
         try {
-            let target = str.split(',').map(item => {
-                return item.split(' ').map(_item => _item - 0);
-            });
-            let treearea = [];
-            let arr = [];
-            target.map((data, index) => {
-                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
-                    arr.push([data[1], data[0]]);
-                }
-            });
-            treearea.push(arr);
+            let treearea = handleCoordinates(str);
             let message = {
                 key: 3,
                 type: 'realTask',
@@ -841,18 +867,12 @@ export default class TaskCreateTable extends Component {
             return layer;
         } else if (geo.properties.type === 'area') {
             // 创建区域图形
-            let area = L.geoJson(geo, {
-                style: {
-                    fillColor: fillAreaColor(geo.key),
-                    weight: 1,
-                    opacity: 1,
-                    color: '#201ffd',
-                    fillOpacity: 0.3
-                },
-                title: geo.properties.name
+            let layer = L.polygon(geo.geometry.coordinates, {
+                color: '#201ffd',
+                fillColor: fillAreaColor(geo.key),
+                fillOpacity: 0.3
             }).addTo(this.map);
-            this.map.fitBounds(area.getBounds());
-            return area;
+            return layer;
         }
     }
     // 确定圈选地图
@@ -892,9 +912,11 @@ export default class TaskCreateTable extends Component {
             let thinClassCoords = [];
             checkedKeys.map((key) => {
                 if (treeCoords[key]) {
-                    thinAreaNum = thinAreaNum + 1;
-                    let arr = treeCoords[key];
-                    thinClassCoords = thinClassCoords.concat(arr);
+                    let arrData = treeCoords[key];
+                    arrData.map((arr) => {
+                        thinAreaNum = thinAreaNum + 1;
+                        thinClassCoords = thinClassCoords.concat(arr);
+                    });
                 }
             });
             if (thinClassCoords.length === 1) {
@@ -1016,7 +1038,9 @@ export default class TaskCreateTable extends Component {
         }
         changeCheckedKeys([]);
         for (let i in areaLayerList) {
-            this.map.removeLayer(areaLayerList[i]);
+            areaLayerList[i].map((layer) => {
+                this.map.removeLayer(layer);
+            });
         }
         this.resetButState();
     }
@@ -1077,7 +1101,9 @@ export default class TaskCreateTable extends Component {
             } else {
                 changeCheckedKeys([]);
                 for (let i in areaLayerList) {
-                    this.map.removeLayer(areaLayerList[i]);
+                    areaLayerList[i].map((layer) => {
+                        this.map.removeLayer(layer);
+                    });
                 }
             }
             this.resetButState();

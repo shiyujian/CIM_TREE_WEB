@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-10 16:50:12
+ * @Last Modified time: 2018-09-13 20:07:03
  */
 import React, { Component } from 'react';
 import {
@@ -40,7 +40,9 @@ import {
     getTaskThinClassName,
     getThinClassName,
     getSectionName,
-    getAreaData
+    getAreaData,
+    handleAreaLayerData,
+    handleCoordinates
 } from '../auth';
 import {
     getSeedlingMess,
@@ -862,7 +864,9 @@ class OnSite extends Component {
         try {
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_area') {
                 for (let v in areaLayerList) {
-                    this.map.removeLayer(areaLayerList[v]);
+                    areaLayerList[v].map((layer) => {
+                        this.map.removeLayer(layer);
+                    });
                 }
                 if (treeMarkerLayer) {
                     this.map.removeLayer(treeMarkerLayer);
@@ -1254,7 +1258,9 @@ class OnSite extends Component {
         try {
             const eventKey = keys[0];
             for (let v in areaLayerList) {
-                me.map.removeLayer(areaLayerList[v]);
+                areaLayerList[v].map((layer) => {
+                    me.map.removeLayer(layer);
+                });
             }
             if (eventKey) {
                 // 细班的key加入了标段，首先对key进行处理
@@ -1265,8 +1271,10 @@ class OnSite extends Component {
                     // 如果之前添加过，直接将添加过的再次添加，不用再次请求
 
                     if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].addTo(me.map);
-                        me.map.fitBounds(areaLayerList[eventKey].getBounds());
+                        areaLayerList[eventKey].map((layer) => {
+                            layer.addTo(me.map);
+                            me.map.fitBounds(layer.getBounds());
+                        });
                     } else {
                     // 如果不是添加过，需要请求数据
                         await me._addAreaLayer(eventKey, treeNodeName);
@@ -1318,49 +1326,31 @@ class OnSite extends Component {
             actions: { getTreearea }
         } = this.props;
         try {
-            let handleKey = eventKey.split('-');
-            let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-            let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-            let me = this;
-            let treearea = [];
-            try {
-                let rst = await getTreearea({}, { no: no });
-                if (
-                    !(
-                        rst &&
-                        rst.content &&
-                        rst.content instanceof Array &&
-                        rst.content.length > 0
-                    )
-                ) {
-                    return;
+            let coords = await handleAreaLayerData(eventKey, treeNodeName, getTreearea);
+            if (coords && coords instanceof Array && coords.length > 0) {
+                for (let i = 0; i < coords.length; i++) {
+                    let str = coords[i];
+                    let treearea = handleCoordinates(str);
+                    let message = {
+                        key: 3,
+                        type: 'Feature',
+                        properties: {name: treeNodeName, type: 'area'},
+                        geometry: { type: 'Polygon', coordinates: treearea }
+                    };
+                    let layer = this._createMarker(message);
+                    if (i === coords.length - 1) {
+                        this.map.fitBounds(layer.getBounds());
+                    }
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].push(layer);
+                    } else {
+                        areaLayerList[eventKey] = [layer];
+                    }
                 }
-
-                let contents = rst.content;
-                let data = contents.find(content => content.Section === section);
-                let str = data.coords;
-                var target1 = str
-                    .slice(str.indexOf('(') + 3, str.indexOf(')'))
-                    .split(',')
-                    .map(item => {
-                        return item.split(' ').map(_item => _item - 0);
-                    });
-                treearea.push(target1);
-                let message = {
-                    key: 3,
-                    type: 'Feature',
-                    properties: { name: treeNodeName, type: 'area' },
-                    geometry: { type: 'Polygon', coordinates: treearea }
-                };
-                // let num = computeSignedArea(target1, 1);
-                let layer = this._createMarker(message);
-                areaLayerList[eventKey] = layer;
-                me.setState({
+                this.setState({
                     areaLayerList
                 });
-            } catch (e) {
-                console.log('await', e);
-            }
+            };
         } catch (e) {
             console.log('加载细班图层', e);
         }
@@ -2031,18 +2021,12 @@ class OnSite extends Component {
         try {
             if (geo.properties.type === 'area') {
                 // 创建区域图形
-                let area = L.geoJson(geo, {
-                    style: {
-                        fillColor: fillAreaColor(geo.key),
-                        weight: 1,
-                        opacity: 1,
-                        color: '#201ffd',
-                        fillOpacity: 0.3
-                    },
-                    title: geo.properties.name
+                let layer = L.polygon(geo.geometry.coordinates, {
+                    color: '#201ffd',
+                    fillColor: fillAreaColor(geo.key),
+                    fillOpacity: 0.3
                 }).addTo(this.map);
-                this.map.fitBounds(area.getBounds());
-                return area;
+                return layer;
             } else if (geo.properties.type === 'curingTask') {
                 let layer = L.polygon(geo.geometry.coordinates, {
                     color: 'blue',

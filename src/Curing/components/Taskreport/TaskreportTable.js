@@ -15,7 +15,8 @@ import {
     getTaskStatus,
     getAreaTreeData,
     getCuringTaskReportTreeData,
-    handleAreaLayerData
+    handleAreaLayerData,
+    handleCoordinates
 } from '../auth';
 import '../Curing.less';
 import { getUser } from '_platform/auth';
@@ -389,6 +390,7 @@ export default class TaskReportTable extends Component {
                 </div>
             </div>);
     }
+    // 控制基础树图层是否展示
     treeLayerChange = () => {
         const {
             treeLayerChecked
@@ -462,15 +464,19 @@ export default class TaskReportTable extends Component {
                     const treeNodeName = info && info.node && info.node.props && info.node.props.title;
                     // 如果之前添加过，直接将添加过的再次添加，不用再次请求
                     if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].addTo(me.map);
-                        me.map.fitBounds(areaLayerList[eventKey].getBounds());
+                        areaLayerList[eventKey].map((layer) => {
+                            layer.addTo(me.map);
+                            me.map.fitBounds(layer.getBounds());
+                        });
                     } else {
                         // 如果不是添加过，需要请求数据
                         me._addAreaLayer(eventKey, treeNodeName);
                     }
                 } else {
                     if (areaLayerList[eventKey]) {
-                        me.map.removeLayer(areaLayerList[eventKey]);
+                        areaLayerList[eventKey].map((layer) => {
+                            me.map.removeLayer(layer);
+                        });
                     }
                 }
             }
@@ -484,20 +490,40 @@ export default class TaskReportTable extends Component {
             areaLayerList
         } = this.state;
         const {
-            actions: { getTreearea }
+            actions: {
+                getTreearea
+            }
         } = this.props;
         try {
-            let data = await handleAreaLayerData(eventKey, treeNodeName, getTreearea);
-            if (data && data.message) {
-                let message = data.message;
-                let layer = this._createMarker(message);
-                areaLayerList[eventKey] = layer;
+            let coords = await handleAreaLayerData(eventKey, treeNodeName, getTreearea);
+            if (coords && coords instanceof Array && coords.length > 0) {
+                for (let i = 0; i < coords.length; i++) {
+                    let str = coords[i];
+                    let treearea = handleCoordinates(str);
+                    let message = {
+                        key: 3,
+                        type: 'Feature',
+                        properties: {name: treeNodeName, type: 'area'},
+                        geometry: { type: 'Polygon', coordinates: treearea }
+                    };
+                    let layer = this._createMarker(message);
+                    if (i === coords.length - 1) {
+                        this.map.fitBounds(layer.getBounds());
+                    }
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].push(layer);
+                    } else {
+                        areaLayerList[eventKey] = [layer];
+                    }
+                    console.log('treearea', treearea);
+                    console.log('coords', coords);
+                }
                 this.setState({
                     areaLayerList
                 });
-            }
+            };
         } catch (e) {
-            console.log('await', e);
+
         }
     }
     // 任务点击节点
@@ -646,9 +672,6 @@ export default class TaskReportTable extends Component {
         } = this.props;
         try {
             let totalThinClass = tree.totalThinClass || [];
-            let target = str.split(',').map(item => {
-                return item.split(' ').map(_item => _item - 0);
-            });
             let treeNodeName = taskMess.CuringMans;
             let typeName = '';
             curingTypes.map((type) => {
@@ -656,7 +679,6 @@ export default class TaskReportTable extends Component {
                     typeName = type.Base_Name;
                 }
             });
-            let treearea = [];
             let status = getTaskStatus(taskMess);
             let regionData = getTaskThinClassName(taskMess, totalThinClass);
             let sectionName = regionData.regionSectionName;
@@ -671,13 +693,7 @@ export default class TaskReportTable extends Component {
             this.setState({
                 taskMessList
             });
-            let arr = [];
-            target.map((data, index) => {
-                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
-                    arr.push([data[1], data[0]]);
-                }
-            });
-            treearea.push(arr);
+            let treearea = handleCoordinates(str);
             let message = {
                 key: 3,
                 type: 'task',
@@ -743,17 +759,7 @@ export default class TaskReportTable extends Component {
             taskRealLayerList
         } = this.state;
         try {
-            let target = str.split(',').map(item => {
-                return item.split(' ').map(_item => _item - 0);
-            });
-            let treearea = [];
-            let arr = [];
-            target.map((data, index) => {
-                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
-                    arr.push([data[1], data[0]]);
-                }
-            });
-            treearea.push(arr);
+            let treearea = handleCoordinates(str);
             let message = {
                 key: 3,
                 type: 'realTask',
@@ -851,18 +857,12 @@ export default class TaskReportTable extends Component {
             return layer;
         } else if (geo.properties.type === 'area') {
             // 创建区域图形
-            let area = L.geoJson(geo, {
-                style: {
-                    fillColor: fillAreaColor(geo.key),
-                    weight: 1,
-                    opacity: 1,
-                    color: '#201ffd',
-                    fillOpacity: 0.3
-                },
-                title: geo.properties.name
+            let layer = L.polygon(geo.geometry.coordinates, {
+                color: '#201ffd',
+                fillColor: fillAreaColor(geo.key),
+                fillOpacity: 0.3
             }).addTo(this.map);
-            this.map.fitBounds(area.getBounds());
-            return area;
+            return layer;
         }
     }
     // 取消任务详情Modal

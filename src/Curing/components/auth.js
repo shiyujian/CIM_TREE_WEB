@@ -688,28 +688,45 @@ export const handleAreaLayerData = async (eventKey, treeNodeName, getTreearea) =
         if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
             return;
         }
-
+        let coords = [];
+        let str = '';
         let contents = rst.content;
         let data = contents.find(content => content.Section === section);
-        let str = data.coords;
-        var target = str
-            .slice(str.indexOf('(') + 3, str.indexOf(')'))
-            .split(',')
-            .map(item => {
-                return item.split(' ').map(_item => _item - 0);
+        let wkt = data.coords;
+        if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+            let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
+            let arr = data.split('),(');
+            arr.map((a, index) => {
+                if (index === 0) {
+                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                } else if (index === arr.length - 1) {
+                    str = a.slice(0, a.indexOf(')'));
+                } else {
+                    str = a;
+                }
+                coords.push(str);
             });
-        treearea.push(target);
-        let message = {
-            key: 3,
-            type: 'Feature',
-            properties: { name: treeNodeName, type: 'area' },
-            geometry: { type: 'Polygon', coordinates: treearea }
-        };
-        return {
-            message: message,
-            treearea: treearea
-        };
+        } else if (wkt.indexOf('POLYGON') !== -1) {
+            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+            coords.push(str);
+        }
+        return coords;
     } catch (e) {
         console.log('await', e);
     }
+};
+
+export const handleCoordinates = (str) => {
+    let target = str.split(',').map(item => {
+        return item.split(' ').map(_item => _item - 0);
+    });
+    let treearea = [];
+    let arr = [];
+    target.map((data, index) => {
+        if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+            arr.push([data[1], data[0]]);
+        }
+    });
+    treearea.push(arr);
+    return treearea;
 };
