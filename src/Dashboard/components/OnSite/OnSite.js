@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-08 16:10:58
+ * @Last Modified time: 2018-09-10 16:50:12
  */
 import React, { Component } from 'react';
 import {
@@ -805,7 +805,8 @@ class OnSite extends Component {
         } else {
             this.tileTreeAdoptLayerBasic = L.tileLayer(
                 window.config.DASHBOARD_ONSITE +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Aadopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                '/geoserver/gwc/service/wmts?layer=xatree%3Aalladopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                // '/geoserver/gwc/service/wmts?layer=xatree%3Aadopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
@@ -1130,7 +1131,7 @@ class OnSite extends Component {
                             <div className='dashboard-editPolygonLayout'>
                                 <div>
                                     <Button type='primary' style={{marginRight: 10}} disabled={createMeasureOkDisplay} onClick={this._handleCreateMeasureOk.bind(this)}>确定</Button>
-                                    <Button type='info' style={{marginRight: 10}} disabled={createMeasureBackDisplay} onClick={this._handleCreateMeasureRetreat.bind(this)}>上一步</Button>}
+                                    <Button type='info' style={{marginRight: 10}} disabled={createMeasureBackDisplay} onClick={this._handleCreateMeasureRetreat.bind(this)}>上一步</Button>
                                     <Button type='danger' onClick={this._handleCreateMeasureCancel.bind(this)}>撤销</Button>
                                 </div>
                             </div>
@@ -1958,7 +1959,7 @@ class OnSite extends Component {
                     let adoptTree = adoptTrees[i];
                     let ID = adoptTree.ID;
                     let iconType = L.divIcon({
-                        className: getIconType('tree')
+                        className: getIconType('adopt')
                     });
                     let adoptTreeMarkerLayer = L.marker([adoptTree.Y, adoptTree.X], {
                         icon: iconType

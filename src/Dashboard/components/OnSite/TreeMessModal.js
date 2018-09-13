@@ -728,7 +728,7 @@ class TreeMessModal extends Component {
                                             if (
                                                 flow.Status === 1
                                             ) {
-                                                flowName = '监理通过';
+                                                flowName = '监理审核';
                                             } else {
                                                 flowName = '监理拒绝';
                                             }
@@ -777,17 +777,26 @@ class TreeMessModal extends Component {
                                                     marginTop: '10px'
                                                 }}
                                             >
-                                                {`${
+                                                <div style={{
+                                                        float: 'left'
+                                                    }}>
+                                                    {`${
                                                     flow.FromUserObj
                                                         ? flow
                                                             .FromUserObj
                                                             .Full_Name
                                                         : ''
-                                                } (${flow.companyName}) : ${
-                                                    flow.Info
-                                                        ? flow.Info
-                                                        : ''
-                                                }`}
+                                                    } : ${
+                                                        flow.Info
+                                                            ? flow.Info
+                                                            : ''
+                                                    }`}
+                                                </div>
+                                                <div style={{
+                                                        float: 'right'
+                                                    }}>
+                                                    {`【${flow.companyName}】`}
+                                                </div>
                                             </Row>
                                             <hr
                                                 className='hrstyle'

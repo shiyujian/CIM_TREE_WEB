@@ -9,7 +9,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { Filter, Table, Addition, Updatemodal } from '../components/Video';
+import { Filter, Table, Addition } from '../components/Video';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import { getUser } from '../../_platform/auth';
@@ -51,7 +51,6 @@ export default class Video extends Component {
                     </Content>
                     <Addition {...this.props} {...this.state} />
                 </Main>
-                <Updatemodal {...this.props} {...this.state} />
                 <Preview />
             </Body>
         );

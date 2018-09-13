@@ -306,6 +306,8 @@ export const getIconType = (type) => {
             return 'dashboard-curingTaskIcon';
         case 'survivalRate':
             return 'dashboard-treeIcon';
+        case 'adopt':
+            return 'dashboard-adoptIcon';
         default:
             break;
     }

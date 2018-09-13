@@ -62,8 +62,6 @@ export default class GeneralTable extends Component {
         this.setState({
             filterData: arr
         });
-
-        // searchRedioVisible(false)
     }
 
     render () {
@@ -75,20 +73,17 @@ export default class GeneralTable extends Component {
         if (searchvideovisible) {
             dataSource = filterData;
         }
-        // 根据登陆账号是否关联标段来筛选数据，只能查看自己项目的
-        let data = this.filterData(dataSource);
         return (
             <div>
                 <Table
                     rowSelection={this.rowSelection}
-                    dataSource={data}
+                    dataSource={dataSource}
                     columns={this.columns}
                     className='foresttables'
                     bordered
                     rowKey='code'
                 />
                 <Modal
-                    // title="视频预览"
                     visible={this.state.viewVisible}
                     cancelText={'关闭'}
                     width='800px'
@@ -132,28 +127,6 @@ export default class GeneralTable extends Component {
         );
     }
 
-    filterData (dataSource) {
-        const {
-            currentSection,
-            currentSectionName,
-            projectName
-        } = this.props;
-
-        let filterData = [];
-        if (currentSection === '' && currentSectionName === '' && projectName === '') {
-            return dataSource;
-        } else {
-            dataSource.map((doc) => {
-                if (doc && doc.extra_params && doc.extra_params.projectName) {
-                    if (doc.extra_params.projectName === projectName) {
-                        filterData.push(doc);
-                    }
-                }
-            });
-            return filterData;
-        }
-    }
-
     rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             const {
@@ -168,31 +141,26 @@ export default class GeneralTable extends Component {
             title: '项目',
             dataIndex: 'extra_params.projectName',
             key: 'extra_params.projectName'
-            // sorter: (a, b) => a.name.length - b.name.length
         },
         {
             title: '视频名称',
             dataIndex: 'name',
             key: 'name'
-            // sorter: (a, b) => a.name.length - b.name.length
         },
         {
             title: '视频类型',
             dataIndex: 'extra_params.type',
             key: 'extra_params.type'
-            // sorter: (a, b) => a.extra_params.number.length - b.extra_params.number.length
         },
         {
             title: '提交日期',
             dataIndex: 'extra_params.time',
             key: 'extra_params.time'
-            // sorter: (a, b) => a.extra_params.company.length - b.extra_params.company.length
         },
         {
             title: '备注',
             dataIndex: 'extra_params.remark',
             key: 'extra_params.remark'
-            // sorter: (a, b) => moment(a.extra_params.time).unix() - moment(b.extra_params.time).unix()
         },
         {
             title: '资料状态',
@@ -207,16 +175,6 @@ export default class GeneralTable extends Component {
                         <a onClick={this.previewFile.bind(this, record)}>
                             预览
                         </a>
-                        {record.extra_params.state === '正常文档' ? (
-                            <a
-                                style={{ marginLeft: 10 }}
-                                onClick={this.update.bind(this, record)}
-                            >
-                                更新
-                            </a>
-                        ) : (
-                            ''
-                        )}
                         <a
                             style={{ marginLeft: 10 }}
                             type='primary'
@@ -260,13 +218,5 @@ export default class GeneralTable extends Component {
         this.setState({
             viewVisible: false
         });
-    }
-
-    update (file) {
-        const {
-            actions: { updatevisible, setoldfile }
-        } = this.props;
-        updatevisible(true);
-        setoldfile(file);
     }
 }

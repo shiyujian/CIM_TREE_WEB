@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { Button, Modal, Form, Row, Col, Input, Tabs } from 'antd';
 const TabPane = Tabs.TabPane;
+import './AdoptTreeMess.less';
+import loveImg from './TreeAdoptImg/love.png';
+import treeImg from './TreeAdoptImg/tree.png';
+import userImg from './TreeAdoptImg/user.png';
 
 class AdoptTreeMessModal extends Component {
     constructor (props) {
@@ -11,8 +15,6 @@ class AdoptTreeMessModal extends Component {
 
     componentDidMount = async () => {
     };
-    componentDidUpdate (prevProps, prevState) {
-    }
 
     handleTreeModalCancel = async () => {
         await this.props.onCancel();
@@ -41,69 +43,63 @@ class AdoptTreeMessModal extends Component {
                 title='结缘信息'
                 visible
                 footer={footer}
-                width={570}
+                width={550}
                 onOk={this.handleTreeModalCancel.bind(this)}
                 onCancel={this.handleTreeModalCancel.bind(this)}
             >
                 <div>
-                    <Row style={{marginBottom: 10}}>
-                        <Row gutter={10}>
-                            <Col span={12} >
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='结缘人'
-                                    value={
-                                        adoptTreeMess.Aadopter
-                                            ? adoptTreeMess.Aadopter
-                                            : ''
-                                    }
-                                />
-                            </Col>
-                            <Col span={12} >
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonAfter='苗木编码'
-                                    value={
-                                        adoptTreeMess.SXM
-                                            ? adoptTreeMess.SXM
-                                            : ''
-                                    }
-                                />
-                            </Col>
-                        </Row>
-                        <Row gutter={10}>
-                            <Col span={12} >
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonBefore='结缘时间'
-                                    value={
-                                        adoptTreeMess.AdoptTime
-                                            ? adoptTreeMess.AdoptTime
-                                            : ''
-                                    }
-                                />
-                            </Col>
-                            <Col span={12} >
-                                <Input
-                                    readOnly
-                                    style={{ marginTop: '10px' }}
-                                    size='large'
-                                    addonAfter='苗木树种'
-                                    value={
-                                        seedlingMess.TreeTypeName
-                                            ? seedlingMess.TreeTypeName
-                                            : ''
-                                    }
-                                />
-                            </Col>
-                        </Row>
-                    </Row>
+                    <div style={{display: 'inlineBlock', marginLeft: 112, marginBottom: 15}}>
+                        <img src={userImg}/>
+                        <img src={loveImg} style={{marginLeft: 73}}/>
+                        <img src={treeImg} style={{marginLeft: 73}}/>
+                    </div>
+                    <div>
+                        {/* <div style={{marginTop: 31}} className='adoptTreeMess-modal-layout'>
+                            <div className='adoptTreeMess-mrg10'>
+                                <span className='adoptTreeMess-modal-span5'>结缘人头像：</span>
+                                <span className='adoptTreeMess-input5'>
+                                    {adoptTreeMess.Aadopter ? adoptTreeMess.Aadopter : ''}
+                                </span>
+                            </div>
+                            <div className='adoptTreeMess-mrg10'>
+                                <span className='adoptTreeMess-modal-span'>苗木照片：</span>
+                                <span className='adoptTreeMess-input4'>
+                                    {adoptTreeMess.SXM ? adoptTreeMess.SXM : ''}
+                                </span>
+                            </div>
+                        </div> */}
+                        <div style={{marginTop: 36}} className='adoptTreeMess-modal-layout'>
+                            <div className='adoptTreeMess-mrg10'>
+                                <span className='adoptTreeMess-modal-span5'>结缘人姓名：</span>
+                                <span className='adoptTreeMess-input5'>
+                                    {adoptTreeMess.Aadopter ? adoptTreeMess.Aadopter : ''}
+                                </span>
+                            </div>
+                            <div className='adoptTreeMess-mrg10'>
+                                <span className='adoptTreeMess-modal-span'>苗木编码：</span>
+                                <span className='adoptTreeMess-input4'>
+                                    {adoptTreeMess.SXM ? adoptTreeMess.SXM : ''}
+                                </span>
+                            </div>
+                        </div>
+                        <div style={{marginTop: 32}} className='adoptTreeMess-modal-layout'>
+                            <div className='adoptTreeMess-mrg10'>
+                                <span className='adoptTreeMess-modal-span5'>结缘时间：</span>
+                                <span className='adoptTreeMess-input5'>
+                                    {adoptTreeMess.AdoptTime ? adoptTreeMess.AdoptTime : ''}
+                                </span>
+                            </div>
+                            <div className='adoptTreeMess-mrg10'>
+                                <span className='adoptTreeMess-modal-span'>苗木树种：</span>
+                                <span className='adoptTreeMess-input4'>
+                                    {seedlingMess.TreeTypeName ? seedlingMess.TreeTypeName : ''}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='adoptTreeMess-modal-midTitle'>
+                        苗木详情
+                    </div>            
                     <Tabs
                         defaultActiveKey='1'
                         onChange={this.tabChange.bind(this)}
@@ -837,17 +833,26 @@ class AdoptTreeMessModal extends Component {
                                                         marginTop: '10px'
                                                     }}
                                                 >
-                                                    {`${
+                                                    <div style={{
+                                                        float: 'left'
+                                                    }}>
+                                                        {`${
                                                         flow.FromUserObj
                                                             ? flow
                                                                 .FromUserObj
                                                                 .Full_Name
                                                             : ''
-                                                    } (${flow.companyName}) : ${
-                                                        flow.Info
-                                                            ? flow.Info
-                                                            : ''
-                                                    }`}
+                                                        } : ${
+                                                            flow.Info
+                                                                ? flow.Info
+                                                                : ''
+                                                        }`}
+                                                    </div>
+                                                    <div style={{
+                                                            float: 'right'
+                                                        }}>
+                                                        {`【${flow.companyName}】`}
+                                                    </div>
                                                 </Row>
                                                 <hr
                                                     className='hrstyle'
