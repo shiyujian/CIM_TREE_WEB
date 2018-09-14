@@ -389,6 +389,28 @@ export default class CarPackageTable extends Component {
                 }
             },
             {
+                title: '司机姓名',
+                dataIndex: 'Driver',
+                render: (text, record) => {
+                    if (text) {
+                        return <p>{text}</p>;
+                    } else {
+                        return <p> / </p>;
+                    }
+                }
+            },
+            {
+                title: '司机电话',
+                dataIndex: 'DriverPhone',
+                render: (text, record) => {
+                    if (text) {
+                        return <p>{text}</p>;
+                    } else {
+                        return <p> / </p>;
+                    }
+                }
+            },
+            {
                 title: '操作',
                 render: (text, record) => {
                     return (

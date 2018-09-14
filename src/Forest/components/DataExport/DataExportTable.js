@@ -112,24 +112,15 @@ export default class LocmeasureTable extends Component {
             smallclassoption,
             thinclassoption,
             typeoption,
-            leftkeycode,
-            keycode,
-            statusoption,
-            positionoption,
-            locationoption,
-            users
+            positionoption
         } = this.props;
         const {
             sxm,
-            rolename,
             section,
             smallclass,
             thinclass,
             bigType,
-            treetypename,
-            positiontypename,
-            status,
-            islocation
+            treetypename
         } = this.state;
         let columns = [];
         let header = '';

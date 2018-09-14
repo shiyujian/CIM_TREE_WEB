@@ -42,7 +42,7 @@ export default class TreeAdoptTree extends Component {
         return (
             <div>
                 <Search
-                    placeholder='请输入养护人名称'
+                    placeholder='请输入结缘人姓名'
                     onSearch={this.searchTreeData.bind(this)}
                     style={{ width: '100%', marginBotton: 10, paddingRight: 5 }}
                 />
@@ -79,8 +79,16 @@ export default class TreeAdoptTree extends Component {
                 let SXM = adoptTree.SXM;
                 let treeData = await getTreeLocation({sxm: SXM});
                 let treeMess = treeData && treeData.content && treeData.content[0];
-                adoptTree.X = treeMess.X;
-                adoptTree.Y = treeMess.Y;
+                if (treeMess && treeMess.X && treeMess.Y) {
+                    adoptTree.X = (treeMess && treeMess.X) ? treeMess.X : '';
+                    adoptTree.Y = (treeMess && treeMess.Y) ? treeMess.Y : '';
+                }
+            }
+            // 去除没有定位数据的
+            for (let i = 0; i < adoptTrees.length; i++) {
+                if (!(adoptTrees[i] && adoptTrees[i].X && adoptTrees[i].Y)) {
+                    adoptTrees.splice(i, 1);
+                }
             }
             console.log('adoptTrees', adoptTrees);
             this.originOnCheck(adoptTrees);

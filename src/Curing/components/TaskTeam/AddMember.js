@@ -223,6 +223,11 @@ export default class AddMember extends Component {
                                 message: '关联用户成功',
                                 duration: 1
                             });
+                        } else {
+                            Notification.error({
+                                message: '关联用户失败',
+                                duration: 2
+                            });
                         }
                     } else {
                         Notification.error({

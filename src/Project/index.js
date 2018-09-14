@@ -1,3 +1,16 @@
+/**
+ *
+ * Copyright (c) 2016-present, ecidi.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @Author: ecidi.mingey
+ * @Date: 2018-09-11 14:22:58
+ * @Last Modified by: ecidi.mingey
+ * @Last Modified time: 2018-09-11 14:28:54
+ */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';

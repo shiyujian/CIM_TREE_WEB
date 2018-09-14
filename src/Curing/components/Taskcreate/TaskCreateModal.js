@@ -292,7 +292,7 @@ class TaskCreateModal extends Component {
                         } else {
                             CuringMans = CuringMans + ',' + `${person.User}`;
                         }
-                        // CuringMans.push(person.User);
+                    // CuringMans.push(person.User);
                     });
                     console.log('CuringMans', CuringMans);
                     let postData = {
@@ -308,6 +308,8 @@ class TaskCreateModal extends Component {
                         'PlanStartTime': moment(values.taskTime[0]._d).format('YYYY-MM-DD HH:mm:ss'),
                         'PlanWKT': wkt,
                         'Section': regionSectionNo,
+                        // 'Section': 'P009-01-04',
+                        // 'ThinClass': 'P009-01-007-012'
                         'ThinClass': regionThinNo
                     };
                     let taskData = await postCuringTask({}, postData);
