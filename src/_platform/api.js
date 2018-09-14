@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-27 15:16:38
+ * @Last Modified time: 2018-09-14 16:27:27
  */
 /**
  *
@@ -446,10 +446,6 @@ export const MODULES = [
             {
                 id: 'DASHBOARD.ONSITE',
                 name: '二维展示'
-            },
-            {
-                id: 'DASHBOARD.PROJECT',
-                name: '工程影像'
             }
         ]
     },
@@ -472,10 +468,6 @@ export const MODULES = [
             {
                 id: 'OVERALL.FORM',
                 name: '表单管理'
-            },
-            {
-                id: 'OVERALL.CHECKIN',
-                name: '考勤管理'
             }
         ]
     },
@@ -505,10 +497,6 @@ export const MODULES = [
         id: 'QUALITY',
         name: '质量管理',
         children: [
-            {
-                id: 'QUALITY.SEARCH',
-                name: '质量评分'
-            },
             {
                 id: 'QUALITY.APPRAISING',
                 name: '质量评优'
@@ -636,6 +624,10 @@ export const MODULES = [
                     {
                         id: 'FOREST.SEEDLINGSCHANGE',
                         name: '苗木信息修改'
+                    },
+                    {
+                        id: 'FOREST.CURINGINFO',
+                        name: '养护信息'
                     }
                 ]
             },
@@ -719,14 +711,14 @@ export const MODULES = [
                 id: 'SYSTEM.ORG',
                 name: '组织机构'
             },
-            {
-                id: 'SYSTEM.ORGDATA',
-                name: '组织机构填报'
-            },
-            {
-                id: 'SYSTEM.PERSONSDATA',
-                name: '人员信息填报'
-            },
+            // {
+            //     id: 'SYSTEM.ORGDATA',
+            //     name: '组织机构填报'
+            // },
+            // {
+            //     id: 'SYSTEM.PERSONSDATA',
+            //     name: '人员信息填报'
+            // },
             {
                 id: 'SYSTEM.BLACKLIST',
                 name: '黑名单'
@@ -760,10 +752,6 @@ export const MODULES = [
                 name: '综合管理',
                 children: [
                     {
-                        id: 'PROJECT.MATERIAL',
-                        name: '物资管理'
-                    },
-                    {
                         id: 'PROJECT.FORM',
                         name: '表单管理'
                     }
@@ -782,12 +770,12 @@ export const MODULES = [
                         name: '危险源'
                     },
                     {
-                        id: 'PROJECT.HIDDENDANGER',
-                        name: '安全隐患'
-                    },
-                    {
                         id: 'PROJECT.UNBEARABLE',
                         name: '环境保护'
+                    },
+                    {
+                        id: 'PROJECT.HIDDENDANGER',
+                        name: '安全隐患'
                     },
                     {
                         id: 'PROJECT.RISKFACTOR',
@@ -817,10 +805,10 @@ export const MODULES = [
                 id: 'PROJECT.NURSERY.NONE',
                 name: '苗木管理',
                 children: [
-                    {
-                        id: 'PROJECT.NURSERYTYPE',
-                        name: '类型管理'
-                    },
+                    // {
+                    //     id: 'PROJECT.NURSERYTYPE',
+                    //     name: '类型管理'
+                    // },
                     {
                         id: 'PROJECT.TREEMANAGE',
                         name: '树种管理'
