@@ -15,7 +15,7 @@ import {
     getThinClassName,
     getTaskStatus,
     getAreaTreeData,
-    getCuringTaskTreeData,
+    getCuringTaskCreateTreeData,
     handleAreaLayerData,
     handleCoordinates
 } from '../auth';
@@ -43,9 +43,9 @@ export default class TaskCreateTable extends Component {
             taskTreeData: [], // 养护任务tree数据
             curingTypes: [],
             taskPlanLayerList: {},
-            taskMarkerLayerList: {},
+            taskPlanMarkerLayerList: {},
+            taskRealMarkerLayerList: {},
             taskRealLayerList: {},
-            taskMessList: {}, // 养护任务详情list
             // 手动框选
             coordinates: [], // 圈选地图各个点的坐标
             areaLayerList: {}, // 选择各个细班的图层列表
@@ -83,8 +83,8 @@ export default class TaskCreateTable extends Component {
     }
 
     options = [
-        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' },
-        { label: '养护任务', value: 'geojsonFeature_task', IconName: 'task' }
+        { label: '区域地块', value: 'geojsonFeature_area', IconName: 'square' }
+        // { label: '养护任务', value: 'geojsonFeature_task', IconName: 'task' }
     ];
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -122,7 +122,7 @@ export default class TaskCreateTable extends Component {
                 case 'geojsonFeature_task':
                     return (
                         <TaskCheckTree
-                            onCheck={this.handleTaskCheck.bind(this)}
+                            // onCheck={this.handleTaskCheck.bind(this)}
                             content={taskTreeData}
                         />
                     );
@@ -249,13 +249,15 @@ export default class TaskCreateTable extends Component {
                 getCuringTypes
             }
         } = this.props;
-        let data = await getCuringTaskTreeData(getCuringTypes, getCuring);
+        let data = await getCuringTaskCreateTreeData(getCuringTypes, getCuring);
         let curingTypes = data.curingTypes || [];
         let taskTreeData = data.taskTreeData || [];
         console.log('taskTreeData', taskTreeData);
         this.setState({
             taskTreeData,
             curingTypes
+        }, () => {
+            this.getCuringRealTileLayer();
         });
     }
     // 获取树图层
@@ -275,6 +277,27 @@ export default class TaskCreateTable extends Component {
                     tiletype: 'wtms'
                 }
             ).addTo(this.map);
+        }
+    }
+    // 获取实际养护区域图层
+    getCuringRealTileLayer = () => {
+        const {
+            taskTreeData
+        } = this.state;
+        for (let i = 0; i < taskTreeData.length; i++) {
+            if (taskTreeData[i] && taskTreeData[i].children) {
+                let children = taskTreeData[i].children;
+                for (let v = 0; v < children.length; v++) {
+                    let child = children[v];
+                    let realWkt = child.WKT;
+                    let eventKey = child.ID;
+                    let isFocus = false;
+                    if ((i === taskTreeData.length - 1) && (v === children.length - 1)) {
+                        isFocus = true;
+                    }
+                    this._handleTaskWkt(realWkt, eventKey, child, 'real', isFocus);
+                }
+            }
         }
     }
 
@@ -323,7 +346,7 @@ export default class TaskCreateTable extends Component {
                         <aside className='aside' draggable='false'>
                             <div style={{margin: 10}}>
                                 <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
-                                {/* <Checkbox checked={this.state.curingLayerChecked} onChange={this.curingLayerChange.bind(this)}>展示养护图层</Checkbox> */}
+                                <Checkbox checked={this.state.curingLayerChecked} onChange={this.curingLayerChange.bind(this)}>展示养护图层</Checkbox>
                             </div>
                             <Collapse
                                 defaultActiveKey={[this.options[0].value]}
@@ -449,19 +472,41 @@ export default class TaskCreateTable extends Component {
     // 控制养护图层是否展示
     curingLayerChange = () => {
         const {
-            curingLayerChecked
+            curingLayerChecked,
+            taskRealLayerList,
+            taskRealMarkerLayerList
         } = this.state;
         console.log('curingLayerChecked', curingLayerChecked);
-        if (curingLayerChecked) {
-            if (this.tileTreeLayerBasic) {
-                this.map.removeLayer(this.tileTreeLayerBasic);
+        try {
+            if (!curingLayerChecked) {
+                if (taskRealLayerList && Object.keys(taskRealLayerList).length > 0) {
+                    for (let i in taskRealLayerList) {
+                        taskRealLayerList[i].map((layer) => {
+                            layer.addTo(this.map);
+                        });
+                    }
+                    for (let i in taskRealMarkerLayerList) {
+                        taskRealMarkerLayerList[i].addTo(this.map);
+                    }
+                } else {
+                    this._loadTaskData();
+                }
+            } else {
+                for (let i in taskRealLayerList) {
+                    taskRealLayerList[i].map((layer) => {
+                        this.map.removeLayer(layer);
+                    });
+                }
+                for (let i in taskRealMarkerLayerList) {
+                    this.map.removeLayer(taskRealMarkerLayerList[i]);
+                }
             }
-        } else {
-            this.getTileLayer2();
+            this.setState({
+                curingLayerChecked: !curingLayerChecked
+            });
+        } catch (e) {
+            console.log('curingLayerChange', e);
         }
-        this.setState({
-            treeLayerChecked: !curingLayerChecked
-        });
     }
     // 选择细班是否展示数据，或是隐藏数据
     async handleAreaCheck (keys, info) {
@@ -569,111 +614,7 @@ export default class TaskCreateTable extends Component {
 
         }
     }
-    // 任务选中节点
-    handleTaskCheck = async (keys, info) => {
-        console.log('keys', keys);
-        console.log('info', info);
-        try {
-            let eventKey = info.node.props.eventKey;
-            // 当前的选中状态
-            let checked = info.checked;
-            if (info && info.node && info.node.props && info.node.props.children) {
-                let children = info.node.props.children;
-                children.map((child, index) => {
-                    eventKey = child.key;
-                    if (checked) {
-                        if (index === children.length - 1) {
-                            this.handleTaskAddLayer(eventKey, true);
-                        } else {
-                            this.handleTaskAddLayer(eventKey, false);
-                        }
-                    } else {
-                        this.handleTaskDelLayer(eventKey);
-                    }
-                });
-            } else {
-                if (checked) {
-                    this.handleTaskAddLayer(eventKey, true);
-                } else {
-                    this.handleTaskDelLayer(eventKey);
-                }
-            }
-        } catch (e) {
-            console.log('handleTaskCheck', e);
-        }
-    }
-    // 去除任务图层
-    handleTaskDelLayer = async (eventKey) => {
-        const {
-            taskPlanLayerList,
-            taskMarkerLayerList,
-            taskRealLayerList
-        } = this.state;
-        if (taskPlanLayerList[eventKey]) {
-            taskPlanLayerList[eventKey].map((layer) => {
-                this.map.removeLayer(layer);
-            });
-        }
-        if (taskMarkerLayerList[eventKey]) {
-            this.map.removeLayer(taskMarkerLayerList[eventKey]);
-        }
-        if (taskRealLayerList[eventKey]) {
-            taskRealLayerList[eventKey].map((layer) => {
-                this.map.removeLayer(layer);
-            });
-        }
-    }
-    // 处理每个check的任务如何加载图层
-    handleTaskAddLayer = async (eventKey, isFocus) => {
-        const {
-            taskPlanLayerList,
-            taskMarkerLayerList,
-            taskRealLayerList
-        } = this.state;
-        if (taskPlanLayerList[eventKey]) {
-            taskPlanLayerList[eventKey].map((layer) => {
-                layer.addTo(this.map);
-                if (isFocus) {
-                    this.map.fitBounds(layer.getBounds());
-                }
-            });
-            if (taskMarkerLayerList[eventKey]) {
-                taskMarkerLayerList[eventKey].addTo(this.map);
-            }
-            if (taskRealLayerList[eventKey]) {
-                taskRealLayerList[eventKey].map((layer) => {
-                    layer.addTo(this.map);
-                });
-            }
-        } else {
-            // 如果不是添加过，需要请求数据
-            this.getTaskWkt(eventKey, isFocus);
-        }
-    }
-    // 获取养护任务的计划和实际区域
-    getTaskWkt = async (eventKey, isFocus) => {
-        const {
-            actions: {
-                getCuringMessage
-            }
-        } = this.props;
-        try {
-            let postData = {
-                id: eventKey
-            };
-            let taskMess = await getCuringMessage(postData);
-            let planWkt = taskMess.PlanWKT;
-            let realWkt = taskMess.WKT || '';
-            if (planWkt) {
-                this._handleTaskWkt(planWkt, eventKey, taskMess, 'plan', isFocus);
-            }
-            if (realWkt) {
-                this._handleTaskWkt(realWkt, eventKey, taskMess, 'real', isFocus);
-            }
-        } catch (e) {
-            console.log('handleWKT', e);
-        }
-    }
+
     // 处理养护区域的数据，将字符串改为数组
     _handleTaskWkt = async (wkt, eventKey, task, type, isFocus) => {
         let str = '';
@@ -694,7 +635,7 @@ export default class TaskCreateTable extends Component {
                         if (type === 'plan') {
                             this._handlePlanCoordLayer(str, task, eventKey, index, isFocus);
                         } else if (type === 'real') {
-                            this._handleRealCoordLayer(str, task, eventKey, index);
+                            this._handleRealCoordLayer(str, task, eventKey, index, isFocus);
                         }
                     } else {
                         if (type === 'plan') {
@@ -711,29 +652,25 @@ export default class TaskCreateTable extends Component {
                     // 只有一个图形，必须要设置图标
                     this._handlePlanCoordLayer(str, task, eventKey, 1, isFocus);
                 } else if (type === 'real') {
-                    this._handleRealCoordLayer(str, task, eventKey, 1);
+                    this._handleRealCoordLayer(str, task, eventKey, 1, isFocus);
                 }
             }
         } catch (e) {
             console.log('处理wkt', e);
         }
     }
-    // 养护任务计划区域加载图层
-    _handlePlanCoordLayer (str, taskMess, eventKey, index, isFocus) {
-        const {
-            taskPlanLayerList,
-            curingTypes,
-            taskMarkerLayerList,
-            taskMessList
-        } = this.state;
+    // 处理任务数据
+    _handleTaskMess (taskMess) {
         const {
             platform: {
                 tree = {}
             }
         } = this.props;
+        const {
+            curingTypes
+        } = this.state;
         try {
             let totalThinClass = tree.totalThinClass || [];
-            let treeNodeName = taskMess.CuringMans;
             let typeName = '';
             curingTypes.map((type) => {
                 if (type.ID === taskMess.CuringType) {
@@ -743,7 +680,6 @@ export default class TaskCreateTable extends Component {
             let status = getTaskStatus(taskMess);
             let regionData = getTaskThinClassName(taskMess, totalThinClass);
             console.log('regionData', regionData);
-            // let regionData = this.getTaskThinClassName(taskMess);
             let sectionName = regionData.regionSectionName;
             let smallClassName = regionData.regionSmallName;
             let thinClassName = regionData.regionThinName;
@@ -752,20 +688,29 @@ export default class TaskCreateTable extends Component {
             taskMess.thinClassName = thinClassName;
             taskMess.status = status;
             taskMess.typeName = typeName;
-            taskMessList[eventKey] = taskMess;
-            this.setState({
-                taskMessList
-            });
+            return taskMess;
+        } catch (e) {
+            console.log('_handleTaskMess', e);
+        }
+    }
+    // 养护任务计划区域加载图层
+    _handlePlanCoordLayer (str, task, eventKey, index, isFocus) {
+        const {
+            taskPlanLayerList,
+            taskPlanMarkerLayerList
+        } = this.state;
+        try {
+            let taskMess = this._handleTaskMess(task);
             let treearea = handleCoordinates(str);
             let message = {
                 key: 3,
                 type: 'task',
                 properties: {
                     ID: taskMess.ID,
-                    name: treeNodeName,
+                    name: taskMess.CuringMans,
                     type: 'task',
-                    typeName: typeName || '',
-                    status: status || '',
+                    typeName: taskMess.typeName || '',
+                    status: taskMess.status || '',
                     CuringMans: taskMess.CuringMans || '',
                     Area: (taskMess.Area || '') + '亩',
                     CreateTime: taskMess.CreateTime || '',
@@ -811,31 +756,49 @@ export default class TaskCreateTable extends Component {
                 )
             );
             marker.addTo(this.map);
-            taskMarkerLayerList[eventKey] = marker;
+            taskPlanMarkerLayerList[eventKey] = marker;
             this.setState({
-                taskMarkerLayerList,
-                selected: true
+                taskPlanMarkerLayerList
             });
         } catch (e) {
             console.log('处理str', e);
         }
     }
     // 添加实际养护区域图层
-    _handleRealCoordLayer (str, task, eventKey, index) {
+    _handleRealCoordLayer (str, task, eventKey, index, isFocus) {
         const {
-            taskRealLayerList
+            taskRealLayerList,
+            taskRealMarkerLayerList
         } = this.state;
         try {
+            let taskMess = this._handleTaskMess(task);
             let treearea = handleCoordinates(str);
             let message = {
                 key: 3,
                 type: 'realTask',
                 properties: {
-                    type: 'realTask'
+                    type: 'realTask',
+                    ID: taskMess.ID,
+                    name: taskMess.CuringMans,
+                    typeName: taskMess.typeName || '',
+                    status: taskMess.status || '',
+                    CuringMans: taskMess.CuringMans || '',
+                    Area: (taskMess.Area || '') + '亩',
+                    CreateTime: taskMess.CreateTime || '',
+                    PlanStartTime: taskMess.PlanStartTime || '',
+                    PlanEndTime: taskMess.PlanEndTime || '',
+                    StartTime: taskMess.StartTime || '',
+                    EndTime: taskMess.EndTime || '',
+                    sectionName: taskMess.sectionName || '',
+                    smallClassName: taskMess.smallClassName || '',
+                    thinClassName: taskMess.thinClassName || ''
                 },
                 geometry: { type: 'Polygon', coordinates: treearea }
             };
             let layer = this._createMarker(message);
+            if (isFocus) {
+                this.map.fitBounds(layer.getBounds());
+            }
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
             if (taskRealLayerList[eventKey]) {
                 taskRealLayerList[eventKey].push(layer);
@@ -844,6 +807,28 @@ export default class TaskCreateTable extends Component {
             }
             this.setState({
                 taskRealLayerList
+            });
+            if (!index) {
+                return;
+            }
+            // 设置任务中间的图标
+            let centerData = layer.getCenter();
+            let iconType = L.divIcon({
+                className: getIconType(message.properties.type)
+            });
+            let marker = L.marker([centerData.lat, centerData.lng], {
+                icon: iconType,
+                title: message.properties.name
+            });
+            marker.bindPopup(
+                L.popup({ maxWidth: 240 }).setContent(
+                    genPopUpContent(message)
+                )
+            );
+            marker.addTo(this.map);
+            taskRealMarkerLayerList[eventKey] = marker;
+            this.setState({
+                taskRealMarkerLayerList
             });
         } catch (e) {
             console.log('Realstr', e);
@@ -879,7 +864,6 @@ export default class TaskCreateTable extends Component {
     _handleCreateTaskOk = async () => {
         const {
             actions: {
-                postTreeLocationNumByRegion, // 查询圈选地图内的树木数量
                 postThinClassesByRegion // 查询圈选地图内的细班
             },
             selectMap,

@@ -273,6 +273,25 @@ export const genPopUpContent = (geo) => {
             //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
             // </h2>
         }
+        case 'realTask': {
+            return `<div class="popupBox">
+                    <h2><span>养护类型：</span>${properties.typeName}</h2>
+                    <h2><span>状态：</span>${properties.status}</h2>
+                    <h2><span>养护人：</span>${properties.CuringMans}</h2>
+                    <h2><span>标段：</span>${properties.sectionName}</h2>
+                    <h2><span>小班：</span>${properties.smallClassName}</h2>
+                    <h2><span>细班：</span>${properties.thinClassName}</h2>
+                    <h2><span>养护面积：</span>${properties.Area}</h2>
+                    <h2><span>创建时间：</span>${properties.CreateTime}</h2>
+                    <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
+                    <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
+                    <h2><span>实际开始时间：</span>${properties.StartTime}</h2>
+                    <h2><span>实际结束时间：</span>${properties.EndTime}</h2>
+                </div>`;
+            // <h2 class="btnRow">
+            //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
+            // </h2>
+        }
         default: {
             return null;
         }
@@ -290,6 +309,8 @@ export const getIconType = (type) => {
         case 'tree':
             return 'treeIcon';
         case 'task':
+            return 'taskIcon';
+        case 'realTask':
             return 'taskIcon';
         default:
             break;
@@ -565,7 +586,7 @@ export const getTaskStatus = (task) => {
     return status;
 };
 
-export const getCuringTaskTreeData = async (getCuringTypes, getCuring) => {
+export const getCuringTaskCreateTreeData = async (getCuringTypes, getCuring) => {
     let user = getUser();
     let sections = user.sections;
     sections = JSON.parse(sections);
@@ -574,7 +595,8 @@ export const getCuringTaskTreeData = async (getCuringTypes, getCuring) => {
     if (sections && sections instanceof Array && sections.length > 0) {
         let section = sections[0];
         let postData = {
-            section: section
+            section: section,
+            status: 2
         };
         let curingTypesData = await getCuringTypes();
         curingTypes = curingTypesData && curingTypesData.content;
