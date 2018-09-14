@@ -74,3 +74,47 @@ export const serialize = (params) => {
 		.map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
 		.join('&');
 };
+
+export const createFetchActionWithHeaders = (
+    url,
+    [successAction, failAction],
+    method = 'POST'
+) => {
+    method = method.toUpperCase();
+    return (pathnames = {}, data = {}, headers = {}, refresh = true) => {
+        return dispatch => {
+            const params = {
+                headers: headers,
+                // mode:'cors',
+                method
+            };
+
+            let u = getUrl(url, pathnames);
+
+            params.body = data;
+            return fetch(u, params)
+                .then(response => {
+                    const contentType = response.headers.get('content-type');
+                    if (
+                        contentType &&
+                        contentType.indexOf('application/json') !== -1
+                    ) {
+                        return response.json();
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(
+                    result => {
+                        refresh &&
+                            successAction &&
+                            dispatch(successAction(result));
+                        return result;
+                    },
+                    result => {
+                        refresh && failAction && dispatch(failAction(result));
+                    }
+                );
+        };
+    };
+};

@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -10,15 +11,15 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import reducer, { actions } from '../store/treeManage';
-import { Table } from '../components/TreeManage';
+import reducer, { actions } from '../store/nurseryManagement';
+import { Table } from '../components/SupplierManagement';
 @connect(
     state => {
         const {
-            project: { treeManage = {} },
+            project: { nurseryManagement = {} },
             platform
         } = state || {};
-        return { ...treeManage, platform };
+        return { ...nurseryManagement, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -27,7 +28,7 @@ import { Table } from '../components/TreeManage';
         )
     })
 )
-export default class TreeManage extends Component {
+export default class Supplieranagement extends Component {
     static propTypes = {};
 
     render () {
@@ -40,7 +41,7 @@ export default class TreeManage extends Component {
                     overflowY: 'auto'
                 }}
             >
-                <DynamicTitle title='树种管理' {...this.props} />
+                <DynamicTitle title='供应商管理' {...this.props} />
                 <Table {...this.props} />
             </div>
         );

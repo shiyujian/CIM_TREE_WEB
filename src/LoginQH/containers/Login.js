@@ -677,14 +677,11 @@ class Login extends Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                console.log('err', err);
-                console.log('values', values);
                 const data = {
                     username: values.username,
                     password: values.password,
                     remember: values.remember
                 };
-                console.log('data', data);
                 this.loginFunc(data, 0, values);
             }
         });

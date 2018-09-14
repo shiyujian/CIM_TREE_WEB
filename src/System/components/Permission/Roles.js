@@ -17,6 +17,9 @@ export default class Roles extends Component {
         const professionRoles = roles.filter(role => role.grouptype === 2);
         const departmentRoles = roles.filter(role => role.grouptype === 3);
         const curingRoles = roles.filter(role => role.grouptype === 4);
+        const nurseryRoles = roles.filter(role => role.grouptype === 5);
+        const supplierRoles = roles.filter(role => role.grouptype === 6);
+        console.log(roles, '-----');
         return (
             <div>
                 <Tree
@@ -47,6 +50,16 @@ export default class Roles extends Component {
                     </TreeNode>
                     <TreeNode key='e' title='养护'>
                         {curingRoles.map(role => {
+                            return <TreeNode key={role.id} title={role.name} />;
+                        })}
+                    </TreeNode>
+                    <TreeNode key='f' title='苗圃基地'>
+                        {nurseryRoles.map(role => {
+                            return <TreeNode key={role.id} title={role.name} />;
+                        })}
+                    </TreeNode>
+                    <TreeNode key='j' title='供应商'>
+                        {supplierRoles.map(role => {
                             return <TreeNode key={role.id} title={role.name} />;
                         })}
                     </TreeNode>
