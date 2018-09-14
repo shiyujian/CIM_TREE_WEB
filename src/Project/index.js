@@ -177,7 +177,14 @@ export default class Project extends Component {
                     key: 'NurseryManagement',
                     id: 'PROJECT.NURSERYMANAGEMENT',
                     name: '苗圃管理',
-                    path: '/project/nurserymanagement',
+                    path: '/project/nurseryManagement',
+                    icon: <Icon name='tag' />
+                },
+                {
+                    key: 'SupplierManagement',
+                    id: 'PROJECT.SUPPLIERMANAGEMENT',
+                    name: '供应商管理',
+                    path: '/project/supplierManagement',
                     icon: <Icon name='tag' />
                 }
             ]

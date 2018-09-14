@@ -42,8 +42,6 @@ export default class NurseryManagement extends Component {
             >
                 <DynamicTitle title='苗圃管理' {...this.props} />
                 <Table {...this.props} />
-                {/* <Addition {...this.props}/> */}
-                {/* <Edite {...this.props}/> */}
             </div>
         );
     }

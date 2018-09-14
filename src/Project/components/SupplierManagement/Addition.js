@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { FOREST_API } from '../../../_platform/api';
+
 import {
+    Icon,
     Form,
     Input,
     Button,
+    Upload,
     Row,
     Col,
     Modal,
-    Upload,
-    Icon,
-    message,
     Table,
     notification,
     Divider,
+    message,
     Popconfirm
 } from 'antd';
 const FormItem = Form.Item;
 
+const layoutT = {
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 }
+};
+
 class Addition extends Component {
-    static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
@@ -26,16 +31,14 @@ class Addition extends Component {
             seeVisible: false,
             newKey: Math.random()
         };
+        this.toAdd = this.toAdd.bind(this); // 新增苗圃弹框
+        this.toSave = this.toSave.bind(this); // 新增苗圃
+        this.seeBlackList = this.seeBlackList.bind(this); // 查看黑名单弹框
+        this.handleCancel = this.handleCancel.bind(this); // 隐藏弹框
+        this.checkPhone = this.checkPhone.bind(this); // 校验手机号
+        this.checkCardNo = this.checkCardNo.bind(this); // 校验身份证
     }
 
-    static layoutT = {
-        labelCol: { span: 8 },
-        wrapperCol: { span: 16 }
-    };
-    static layout = {
-        labelCol: { span: 4 },
-        wrapperCol: { span: 20 }
-    };
     export () {}
 
     render () {
@@ -46,7 +49,7 @@ class Addition extends Component {
         } = this.props;
 
         return (
-            <div>
+            <div className='supplier-additon'>
                 <div style={{ float: 'right', marginBottom: 12 }}>
                     <Button type='primary' onClick={this.see.bind(this)}>
                         查看黑名单

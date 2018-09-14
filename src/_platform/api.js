@@ -828,6 +828,10 @@ export const MODULES = [
                     {
                         id: 'PROJECT.NURSERYMANAGEMENT',
                         name: '苗圃管理'
+                    },
+                    {
+                        id: 'PROJECT.SUPPLIERMANAGEMENT',
+                        name: '供应商管理'
                     }
                 ]
             }

@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form } from 'antd';
 import { FOREST_API } from '../../../_platform/api';
-import AddEdit from './AddEdit';
 import { getUserId, formItemLayout } from '../common';
+import AddEdit from './AddEdit';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -14,28 +14,30 @@ class Tablelevel extends Component {
         super(props);
         this.state = {
             status: 0, // 审核状态
-            nurseryname: '', // 苗圃名称
+            suppliername: '', // 供应商名称
             total: 0,
             page: 1,
-            nurseryList: [], // 苗圃列表
-            visible: false, // 新增编辑苗圃弹框
+            supplierList: [], // 供应商列表
+            visible: false, // 新增编辑供应商弹框
             visibleTitle: '', // 弹框标题
             seeVisible: false, // 查看弹框
             auditVisible: false, // 审核弹框
+            RegionCode: '',
             options: [],
             record: null,
             optionList: []
         };
+        this.Checker = '';
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
         this.handleStatus = this.handleStatus.bind(this); // 状态
-        this.handleName = this.handleName.bind(this); // 查询苗圃名称
-        this.toAdd = this.toAdd.bind(this); // 新增苗圃弹框
-        this.handleAudit = this.handleAudit.bind(this); // 苗圃审核
+        this.handleName = this.handleName.bind(this); // 查询供应商名称
+        this.toAdd = this.toAdd.bind(this); // 新增供应商弹框
+        this.handleAudit = this.handleAudit.bind(this); // 供应商审核
         this.handleCancel = this.handleCancel.bind(this); // 隐藏弹框
     }
     componentDidMount () {
-        const { getRegionCodes, getSupplierList } = this.props.actions;
+        const { getRegionCodes, getNurseryList } = this.props.actions;
         // 获取行政区划编码
         getRegionCodes({}, {grade: 1}).then(rep => {
             let province = [];
@@ -50,12 +52,12 @@ class Tablelevel extends Component {
                 options: province
             });
         });
-        // 获取所有供应商
-        getSupplierList().then(rep => {
+        // 获取所有苗圃
+        getNurseryList().then(rep => {
             let optionList = [];
             rep.content.map(item => {
                 optionList.push(
-                    <Option key={item.ID} value={item.ID}>{item.SupplierName}</Option>
+                    <Option key={item.ID} value={item.ID}>{item.NurseryName}</Option>
                 );
             });
             this.setState({
@@ -63,14 +65,17 @@ class Tablelevel extends Component {
             });
         });
         this.onSearch();
+        // console.log('aaa');
+        // this.Checker = getUserId();
+        // console.log(this.Checker);
     }
     columns = [
         {
-            title: '苗圃名称',
+            title: '供应商名称',
             key: 0,
             width: '120',
             fixed: 'left',
-            dataIndex: 'NurseryName'
+            dataIndex: 'SupplierName'
         }, {
             title: '行政区划',
             key: 1,
@@ -80,42 +85,59 @@ class Tablelevel extends Component {
         }, {
             title: '行政区划编码',
             key: 2,
-            width: '130',
             dataIndex: 'RegionCode'
         }, {
-            title: '产地',
+            title: '详细地址',
             key: 3,
-            width: '80',
+            dataIndex: 'Address'
+        }, {
+            title: '工商注册号',
+            key: 4,
             dataIndex: 'TreePlace'
         }, {
-            title: '负责人姓名',
-            key: 4,
-            dataIndex: 'Leader'
-        }, {
-            title: '负责人手机号',
+            title: '统一信用代码',
             key: 5,
-            dataIndex: 'LeaderPhone'
+            dataIndex: 'USCC'
         }, {
-            title: '负责人身份证号',
+            title: '组织机构代码',
             key: 6,
-            dataIndex: 'LeaderCardNo'
+            dataIndex: 'TreePlace'
+        }, {
+            title: '法人姓名',
+            key: 7,
+            dataIndex: 'LegalPerson'
+        }, {
+            title: '法人手机',
+            key: 8,
+            dataIndex: 'LegalPersonPhone'
+        }, {
+            title: '法人身份证号',
+            key: 9,
+            dataIndex: 'LegalPersonCardNo'
         }, {
             title: '身份证正面',
-            key: 7,
-            dataIndex: 'LeaderCard',
+            key: 10,
+            dataIndex: 'LegalPersonCard',
             render: (text) => {
                 return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
             }
         }, {
             title: '身份证反面',
-            key: 8,
-            dataIndex: 'LeaderCardBack',
+            key: 11,
+            dataIndex: 'LegalPersonCardBack',
+            render: (text) => {
+                return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
+            }
+        }, {
+            title: '营业执照',
+            key: 12,
+            dataIndex: 'BusinessLicense',
             render: (text) => {
                 return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
             }
         }, {
             title: '状态',
-            key: 9,
+            key: 13,
             dataIndex: 'CheckStatus',
             render: (text) => {
                 if (text === 0) {
@@ -128,7 +150,7 @@ class Tablelevel extends Component {
             }
         }, {
             title: '操作',
-            key: 10,
+            key: 14,
             width: 160,
             fixed: 'right',
             dataIndex: 'action',
@@ -148,21 +170,21 @@ class Tablelevel extends Component {
         }
     ];
     render () {
-        const { nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options } = this.state;
         const { getFieldDecorator } = this.props.form;
+        const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options } = this.state;
         return (
             <div className='table-level'>
                 <Row>
                     <Col span={6}>
-                        <h3>苗圃列表</h3>
+                        <h3>供应商列表</h3>
                     </Col>
                     <Col span={12}>
                         <label
                             style={{marginRight: 10}}
                         >
-                            苗圃名称:
+                            供应商名称:
                         </label>
-                        <Input id='TreeData' className='search_input' onChange={this.handleName} />
+                        <Input className='search_input' />
                         <Button
                             type='primary'
                             onClick={this.onSearch}
@@ -183,7 +205,7 @@ class Tablelevel extends Component {
                             style={{ float: 'right' }}
                             onClick={this.toAdd}
                         >
-                            新增苗圃
+                            添加供应商
                         </Button>
                     </Col>
                 </Row>
@@ -194,7 +216,7 @@ class Tablelevel extends Component {
                         >
                             状态:
                         </label>
-                        <Select allowClear style={{width: 120}} onChange={this.handleStatus}>
+                        <Select defaultValue={0} style={{width: 120}} onChange={this.handleStatus}>
                             <Option value={0}>未审核</Option>
                             <Option value={1}>审核通过</Option>
                             <Option value={2}>审核不通过</Option>
@@ -203,7 +225,7 @@ class Tablelevel extends Component {
                 </Row>
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
-                        <Table columns={this.columns} bordered dataSource={nurseryList}
+                        <Table columns={this.columns} bordered dataSource={supplierList}
                             scroll={{ x: 1300 }} pagination={false} rowKey='ID' />
                         <Pagination total={total} page={page} pageSize={10}
                             showQuickJumper onChange={this.onSearch} />
@@ -259,9 +281,27 @@ class Tablelevel extends Component {
             </div>
         );
     }
+    handleAudit () {
+        const { checkSupplier } = this.props.actions;
+        this.props.form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            const param = {
+                ID: this.state.record.ID,
+                Checker: this.Checker,
+                CheckStatus: values.CheckStatus,
+                CheckInfo: values.CheckInfo,
+                CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
+            };
+            checkSupplier({}, param).then((rep) => {
+                console.log(rep);
+            });
+        });
+    }
     onClear () {
         this.setState({
-            nurseryname: ''
+            suppliername: ''
         });
     }
     seeModal (text) {
@@ -270,55 +310,22 @@ class Tablelevel extends Component {
             LeaderCard: text
         });
     }
-    onSearch (page = 1, pageSize = 10) {
-        const { status, nurseryname } = this.state;
-        const { getNurseryList } = this.props.actions;
-        const param = {
-            status,
-            nurseryname,
-            size: pageSize,
-            page
-        };
-        getNurseryList({}, param).then((rep) => {
-            if (rep.code === 200) {
-                this.setState({
-                    total: rep.total,
-                    nurseryList: rep.content,
-                    page: rep.pageinfo.page
-                });
-            }
-        });
-    }
-    handleAudit () {
-        const { checkNursery } = this.props.actions;
-        this.props.form.validateFields((err, values) => {
-            if (err) {
-                return;
-            }
-            const Checker = getUserId();
-            const param = {
-                ID: this.state.record.ID,
-                Checker: Checker,
-                CheckStatus: values.CheckStatus,
-                CheckInfo: values.CheckInfo,
-                CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
-            };
-            checkNursery({}, param).then((rep) => {
-                console.log(rep);
-            });
+    handleName (e) {
+        this.setState({
+            suppliername: e.target.value
         });
     }
     toAdd () {
         this.setState({
             visible: true,
-            visibleTitle: '新增苗圃'
+            visibleTitle: '新增供应商'
         });
     }
     toEdit (record, e) {
         e.preventDefault();
         this.setState({
             visible: true,
-            visibleTitle: '编辑苗圃',
+            visibleTitle: '编辑供应商',
             record
         });
     }
@@ -331,19 +338,33 @@ class Tablelevel extends Component {
     }
     toDelete (record, e) {
         e.preventDefault();
-        const { deleteNursery } = this.props.actions;
-        deleteNursery({ID: record.ID}).then((rep) => {
+        const { deleteSupplier } = this.props.actions;
+        deleteSupplier({ID: record.ID}).then((rep) => {
             this.onSearch();
+        });
+    }
+    onSearch (page = 1, pageSize = 10) {
+        const { status, suppliername } = this.state;
+        const { getSupplierList } = this.props.actions;
+        const param = {
+            status,
+            suppliername,
+            size: pageSize,
+            page
+        };
+        getSupplierList({}, param).then((rep) => {
+            if (rep.code === 200) {
+                this.setState({
+                    total: rep.total,
+                    supplierList: rep.content,
+                    page: rep.pageinfo.page
+                });
+            }
         });
     }
     handleStatus (value) {
         this.setState({
             status: value
-        });
-    }
-    handleName (e) {
-        this.setState({
-            nurseryname: e.target.value
         });
     }
     handleCancel () {
