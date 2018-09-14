@@ -67,6 +67,14 @@ class Addition extends Component {
                 name: '养护角色',
                 value: roles.filter(role => role.grouptype === 4)
             });
+            systemRoles.push({
+                name: '苗圃基地角色',
+                value: roles.filter(role => role.grouptype === 5)
+            });
+            systemRoles.push({
+                name: '供应商角色',
+                value: roles.filter(role => role.grouptype === 6)
+            });
         } else {
             for (let i = 0; i < user.groups.length; i++) {
                 const rolea = user.groups[i].grouptype;
@@ -106,6 +114,18 @@ class Addition extends Component {
                     case 4:
                         systemRoles.push({
                             name: '养护角色',
+                            value: roles.filter(role => role.grouptype === 4)
+                        });
+                        break;
+                    case 5:
+                        systemRoles.push({
+                            name: '苗圃基地角色',
+                            value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 6:
+                        systemRoles.push({
+                            name: '供应商角色',
                             value: roles.filter(role => role.grouptype === 4)
                         });
                         break;
@@ -165,6 +185,16 @@ class Addition extends Component {
                 children: ['业主', '业主文书', '业主领导'],
                 value: roles.filter(role => role.grouptype === 3)
             });
+            systemRoles.push({
+                name: '苗圃基地职务',
+                children: ['苗圃基地'],
+                value: roles.filter(role => role.grouptype === 5)
+            });
+            systemRoles.push({
+                name: '供应商职务',
+                children: ['供应商'],
+                value: roles.filter(role => role.grouptype === 6)
+            });
         } else {
             for (let i = 0; i < user.groups.length; i++) {
                 const rolea = user.groups[i].grouptype;
@@ -214,6 +244,20 @@ class Addition extends Component {
                             name: '业主职务',
                             children: ['业主', '业主文书', '业主领导'],
                             value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 5:
+                        systemRoles.push({
+                            name: '苗圃基地职务',
+                            children: ['苗圃基地'],
+                            value: roles.filter(role => role.grouptype === 5)
+                        });
+                        break;
+                    case 6:
+                        systemRoles.push({
+                            name: '供应商职务',
+                            children: ['供应商'],
+                            value: roles.filter(role => role.grouptype === 6)
                         });
                         break;
                     default:

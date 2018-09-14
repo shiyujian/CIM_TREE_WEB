@@ -323,6 +323,14 @@ export default class Users extends Component {
                     return sectiones.join();
                 }
             },
+            {
+                title: '状态',
+                dataIndex: 'is_active',
+                key: 'is_active',
+                render: (text, record, index) => {
+                    return text ? '已审核' : '未审核';
+                }
+            },
             // , {
             // 	title: '苗圃',
             // 	// dataIndex: "tags",
