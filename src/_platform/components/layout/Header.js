@@ -138,8 +138,15 @@ export default class Header extends Component {
                 key: 'project',
                 id: 'PROJECT',
                 title: '项目管理',
-                path: '/project/nurserymanagement',
+                path: '/project/nurseryManagement',
                 icon: <Icon name='cogs' />
+            },
+            {
+                key: 'market',
+                id: 'MARKET',
+                title: '苗木市场',
+                path: '/market/seedlingsupply',
+                icon: <Icon name='shopping-cart' />
             }
         ];
         const { match: { params: { module = '' } = {} } = {} } = this.props;
@@ -172,7 +179,7 @@ export default class Header extends Component {
                             permission =>
                                 permission === `appmeta.${menu.id}.READ`
                         );
-                        // let has = true
+                        // let has = true;
                         let str;
                         if (has) {
                             if (username !== 'admin') {
