@@ -139,7 +139,7 @@ export default class Header extends Component {
                 id: 'PROJECT',
                 title: '项目管理',
                 path: '/project/nurseryManagement',
-                icon: <Icon name='cogs' />
+                icon: <Icon name='sitemap' />
             },
             {
                 key: 'market',

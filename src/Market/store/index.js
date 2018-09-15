@@ -3,6 +3,7 @@ import { actionsMap } from '_platform/store/util';
 import seedlingSupplyReducer, { actions as seedlingSupplyActions } from './seedlingSupply';
 import seedlingPurchaseReducer, { actions as seedlingPurchaseActions } from './seedlingPurchase';
 import supplyReleaseReducer, { actions as supplyReleaseActions } from './supplyRelease';
+import demandReleaseReducer, { actions as demandReleaseActions } from './demandRelease';
 
 export default handleActions(
     {
@@ -26,6 +27,13 @@ export default handleActions(
         ) => ({
             ...state,
             supplyRelease: supplyReleaseReducer(state.supplyRelease, action)
+        }),
+        [combineActions(...actionsMap(demandReleaseActions))]: (
+            state = {},
+            action
+        ) => ({
+            ...state,
+            demandRelease: demandReleaseReducer(state.demandRelease, action)
         })
     },
     {}

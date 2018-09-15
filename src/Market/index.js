@@ -31,7 +31,8 @@ export default class MarketContainer extends Component {
         const {
             SeedlingSupply = null,
             SeedlingPurchase = null,
-            SupplyRelease = null
+            SupplyRelease = null,
+            DemandRelease = null
         } = this.state || {};
         return (
             <Body>
@@ -59,6 +60,12 @@ export default class MarketContainer extends Component {
                         <Route
                             path='/market/supplyrelease'
                             component={SupplyRelease}
+                        />
+                    )}
+                    {DemandRelease && (
+                        <Route
+                            path='/market/demandrelease'
+                            component={DemandRelease}
                         />
                     )}
                 </Main>
@@ -89,6 +96,12 @@ export default class MarketContainer extends Component {
                     id: 'MARKET.SUPPLYRELEASE',
                     path: '/market/supplyrelease',
                     name: '供应发布'
+                },
+                {
+                    key: 'demandrelease',
+                    id: 'MARKET.DEMANDRELEASE',
+                    path: '/market/demandrelease',
+                    name: '需求发布'
                 }
             ]
         }
