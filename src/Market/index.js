@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-01 16:58:31
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-15 10:36:18
+ * @Last Modified time: 2018-09-15 11:24:13
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -90,20 +90,20 @@ export default class MarketContainer extends Component {
                     id: 'MARKET.SEEDLINGPURCHASE',
                     path: '/market/seedlingpurchase',
                     name: '苗木求购'
-                },
-                {
-                    key: 'supplyrelease',
-                    id: 'MARKET.SUPPLYRELEASE',
-                    path: '/market/supplyrelease',
-                    name: '供应发布'
-                },
-                {
-                    key: 'demandrelease',
-                    id: 'MARKET.DEMANDRELEASE',
-                    path: '/market/demandrelease',
-                    name: '需求发布'
                 }
             ]
+        },
+        {
+            key: 'supplyrelease',
+            id: 'MARKET.SUPPLYRELEASE',
+            path: '/market/supplyrelease',
+            name: '供应发布'
+        },
+        {
+            key: 'demandrelease',
+            id: 'MARKET.DEMANDRELEASE',
+            path: '/market/demandrelease',
+            name: '需求发布'
         }
     ];
     static defaultOpenKeys = ['supermarket'];
