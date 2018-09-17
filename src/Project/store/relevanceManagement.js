@@ -1,18 +1,14 @@
-import {createAction, handleActions, combineActions} from 'redux-actions';
+import {createAction, handleActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {FOREST_API} from '_platform/api';
-import booleanFactory from '_platform/store/higher-order/bool';
 import {createFetchActionWithHeaders as myFetch} from './myfetchAction';
 
 export const ID = 'nurserymanagement';
 export const getNurseryListOK = createAction(`${ID}_getNurseryList`);
 export const getNurseryList = createFetchAction(`${FOREST_API}/system/nurserybases`, [getNurseryListOK]); // 获取苗圃列表
-export const postNursery = createFetchAction(`${FOREST_API}/system/nurserybase`, [], 'POST'); // 新建苗圃
-export const putNursery = createFetchAction(`${FOREST_API}/system/nurserybase`, [], 'PUT'); // 编辑苗圃
-export const deleteNursery = createFetchAction(`${FOREST_API}/system/nurserybase/{{ID}}`, [], 'DELETE'); // 删除苗圃
-export const checkNursery = createFetchAction(`${FOREST_API}/system/checknurserybase`, [], 'post'); // 苗圃审核
-
 export const getSupplierList = createFetchAction(`${FOREST_API}/system/suppliers`); // 获取供应商列表
+export const getNb2ss = createFetchAction(`${FOREST_API}/system/nb2ss`); // 获取苗圃基地供应商的绑定关系
+export const checknb2s = createFetchAction(`${FOREST_API}/system/checknb2s`); // 苗圃基地供应商的绑定审核
 
 export const getRegionCodes = createFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
 export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
@@ -21,11 +17,9 @@ export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetyp
 export const actions = {
     getNurseryListOK,
 	getNurseryList,
-	postNursery,
-	putNursery,
-	deleteNursery,
-	checkNursery,
-	getSupplierList,
+    getSupplierList,
+	getNb2ss,
+	checknb2s,
 	getRegionCodes,
 	changeEditVisible,
 	postUploadImage

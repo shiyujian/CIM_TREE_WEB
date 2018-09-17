@@ -199,6 +199,13 @@ export default class Project extends Component {
                     name: '供应商管理',
                     path: '/project/supplierManagement',
                     icon: <Icon name='tag' />
+                },
+                {
+                    key: 'RelevanceManagement',
+                    id: 'PROJECT.RELEVANCEMANAGEMENT',
+                    name: '绑定管理',
+                    path: '/project/relevanceManagement',
+                    icon: <Icon name='tag' />
                 }
             ]
         }

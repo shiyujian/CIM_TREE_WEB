@@ -6,8 +6,8 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { actions } from '../store/supplierManagement';
-import { Table } from '../components/SupplierManagement';
+import { actions } from '../store/relevanceManagement';
+import { Table } from '../components/RelevanceManagement';
 @connect(
     state => {
         const {
@@ -23,7 +23,8 @@ import { Table } from '../components/SupplierManagement';
         )
     })
 )
-class SupplierManagement extends Component {
+
+export default class RelevanceManagement extends Component {
     static propTypes = {};
 
     render () {
@@ -36,11 +37,9 @@ class SupplierManagement extends Component {
                     overflowY: 'auto'
                 }}
             >
-                <DynamicTitle title='供应商管理' {...this.props} />
+                <DynamicTitle title='绑定管理' {...this.props} />
                 <Table {...this.props} />
             </div>
         );
     }
 }
-
-export default SupplierManagement;

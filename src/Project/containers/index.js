@@ -13,3 +13,4 @@ export RiskEvaluation from './RiskEvaluation';
 export ProDoc from './ProDoc';
 export NurseryManagement from './NurseryManagement';
 export SupplierManagement from './SupplierManagement';
+export RelevanceManagement from './RelevanceManagement';
