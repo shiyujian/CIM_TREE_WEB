@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import moment from 'moment';
+
 import {
     Table,
     Row,
@@ -9,15 +11,19 @@ import {
     message,
     Input,
     Progress,
+    Modal,
+    Form,
     Spin
 } from 'antd';
 import { PROJECT_UNITS } from './../../../_platform/api';
+import { formItemLayout } from '../common';
+import { getUser } from '_platform/auth';
 import './index.less';
 const { Option, OptGroup } = Select;
+const FormItem = Form.Item;
+const { TextArea } = Input;
 
-// class Users extends Component {
-
-export default class Users extends Component {
+class Users extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -35,13 +41,26 @@ export default class Users extends Component {
             TreeCodes: '',
             isBtn: true,
             objPage: '',
-            objPages: ''
+            objPages: '',
+            record: null,
+            showModal: false
         };
+        this.handleAudit = this.handleAudit.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
     static layout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 18 }
     };
+    componentDidMount () {
+        this.Checker = getUser().id; // 登陆用户
+    }
+    componentWillReceiveProps (nextProps) {
+        this.setState({ TreeCodes: this.props.getTreeCodes });
+        if (this.state.TreeCodes !== this.props.getTreeCodes) {
+            this.setState({ roles: [] });
+        }
+    }
     changeRoles (value) {
         const {
             actions: { changeAdditionField }
@@ -240,12 +259,14 @@ export default class Users extends Component {
         }
     }
     render () {
+        const { getFieldDecorator } = this.props.form;
         const {
             platform: { roles = [] },
             sidebar: {
                 node: { code } = {}
             } = {}
         } = this.props;
+        const { showModal } = this.state;
         const systemRoles = roles.filter(role => role.grouptype === 0);
         const projectRoles = roles.filter(role => role.grouptype === 1);
         const professionRoles = roles.filter(role => role.grouptype === 2);
@@ -355,66 +376,64 @@ export default class Users extends Component {
             // }
             {
                 title: '操作',
-                render: user => {
+                render: (text, record) => {
                     const userc = JSON.parse(
                         window.localStorage.getItem('QH_USER_DATA')
                     );
+                    let arr = [
+                        <a
+                            onClick={this.edit.bind(this, record)}
+                            key={1}
+                            style={{ marginRight: '.5em' }}
+                        >
+                            编辑
+                        </a>,
+                        <Popconfirm
+                            title='是否真的要删除用户?'
+                            key={2}
+                            onConfirm={this.del.bind(this, record)}
+                            okText='是'
+                            cancelText='否'
+                        >
+                            <a>删除</a>
+                        </Popconfirm>
+                    ];
                     if (userc.is_superuser === true) {
-                        let add = ''; // 是否禁用启用
-                        let acc = ''; // 是否禁用启用颜色
-                        // let aee = ''; // 是否是黑名单
-                        // let att = ''; // 是否是黑名单颜色
-                        if (user.is_active === true) {
-                            add = '禁用';
-                            acc = '';
-                        } else {
-                            add = '启用';
-                            acc = 'red';
-                        }
-                        // if(user.is_black== 1){
-                        // 	att = 'red'
-                        // 	 aee = '取消黑名单'
-                        // }else if(user.is_black== 0){
-                        // 	 aee = '加入黑名单'
-                        // 	 att=''
-                        // }
-                        return [
-                            <a
-                                onClick={this.edit.bind(this, user)}
-                                key={1}
-                                style={{ marginRight: '.5em' }}
-                            >
-                                编辑
-                            </a>,
-                            <Popconfirm
-                                title='是否真的要删除用户?'
-                                key={2}
-                                onConfirm={this.del.bind(this, user)}
-                                okText='是'
-                                cancelText='否'
-                            >
-                                <a>删除</a>
-                            </Popconfirm>,
-                            <a
+                        if (record.is_active === true) {
+                            arr.push(<a
                                 key={3}
-                                style={{ marginLeft: '.5em', color: acc }}
-                                onClick={this.disable.bind(this, user)}
+                                style={{marginLeft: '.5em'}}
+                                onClick={this.disable.bind(this, record)}
                             >
-                                {add}
-                            </a>
-                            // <a style={{ marginLeft: '.5em', color: att  }} onClick={this.black.bind(this, user)} >{aee}</a>
-                        ];
+                                禁用
+                            </a>);
+                        } else {
+                            arr.push(<a
+                                key={3}
+                                style={{ marginLeft: '.5em', color: 'red' }}
+                                onClick={this.disable.bind(this, record)}
+                            >
+                                启用
+                            </a>, <a
+                                key={4}
+                                style={{marginLeft: '.5em'}}
+                                onClick={this.toAudit.bind(this, record)}
+                            >
+                                审核
+                            </a>);
+                        }
                     } else {
-                        return (
+                        arr = [
                             <a
-                                onClick={this.edit.bind(this, user)}
+                                onClick={this.edit.bind(this, record)}
                                 key={4}
                                 style={{ marginRight: '.5em' }}
                             >
                                 编辑
                             </a>
-                        );
+                        ];
                     }
+                    return arr;
                 }
             }
         ];
@@ -575,17 +594,72 @@ export default class Users extends Component {
                         }}
                     />
                 </Spin>
+                <Modal visible={showModal} title='审核'
+                    onOk={this.handleAudit} onCancel={this.handleCancel}
+                >
+                    <Form>
+                        <FormItem
+                            {...formItemLayout}
+                            label='审核结果'
+                        >
+                            {getFieldDecorator('CheckStatus', {
+                                rules: [{required: true, message: '必填项'}]
+                            })(
+                                <Select style={{ width: 150 }} allowClear>
+                                    <Option value={1}>审核通过</Option>
+                                    <Option value={2}>审核不通过</Option>
+                                </Select>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label='审核备注'
+                        >
+                            {getFieldDecorator('CheckInfo', {
+                            })(
+                                <TextArea rows={4} />
+                            )}
+                        </FormItem>
+                    </Form>
+                </Modal>
             </div>
         ) : (
             <h3>{'没有权限'}</h3>
         );
     }
-    componentWillReceiveProps (nextProps) {
-        this.setState({ TreeCodes: this.props.getTreeCodes });
-        if (this.state.TreeCodes !== this.props.getTreeCodes) {
-            this.setState({ roles: [] });
-        }
+    toAudit (record) {
+        this.setState({
+            showModal: true,
+            record
+        });
     }
+    handleAudit () {
+        const { checkUsers } = this.props.actions;
+        this.props.form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            const param = {
+                ID: this.state.record.id,
+                Checker: this.Checker,
+                CheckStatus: values.CheckStatus,
+                CheckInfo: values.CheckInfo,
+                CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
+            };
+            checkUsers({}, param).then((rep) => {
+                if (rep.code === 1) {
+                    message.success('审核成功');
+                }
+            });
+        });
+    }
+    handleCancel () {
+        this.setState({
+            showModal: false,
+            record: null
+        });
+    }
+    
     async changePage (obj) {
         let text = document.getElementById('NurseryData').value;
         const {
@@ -1086,8 +1160,6 @@ export default class Users extends Component {
                             getTablePage(pagination);
                             this.setState({ loading: false });
                         }
-
-                        // this.setState({  loading: false })
                     });
                 }
             });
@@ -1105,4 +1177,5 @@ export default class Users extends Component {
         return rst;
     };
 }
-// export default Form.create()(Users)
+
+export default Form.create()(Users);

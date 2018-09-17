@@ -43,6 +43,7 @@ export const getImgArr = createAction('编辑时如果有照片就显示照片')
 export const getSwitch = createAction('黑名单控制开关');
 
 const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
+const checkUsers = createFetchAction(`${FOREST_API}/system/checksuser`, [], 'POST'); // 审核用户
 
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
@@ -54,6 +55,7 @@ export const actions = {
     ...sidebarReducer,
     ...additionReducer,
     ...filterReducer,
+    checkUsers,
     getTagsOK,
     getTags,
     getTreeModal,

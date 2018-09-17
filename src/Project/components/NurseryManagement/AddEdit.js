@@ -102,7 +102,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.NurseryName,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入苗圃名称' />
+                                        <Input placeholder='请输入苗圃名称' disabled={record} />
                                     )}
                                 </FormItem>
                             </Col>
@@ -154,7 +154,8 @@ class AddEdit extends Component {
                                     label='负责人'
                                 >
                                     {getFieldDecorator('Leader', {
-                                        initialValue: record && record.Leader
+                                        initialValue: record && record.Leader,
+                                        rules: [{required: true, message: '必填项'}]
                                     })(
                                         <Input placeholder='请输入负责人姓名' />
                                     )}
@@ -166,7 +167,8 @@ class AddEdit extends Component {
                                     label='负责人手机号'
                                 >
                                     {getFieldDecorator('LeaderPhone', {
-                                        initialValue: record && record.LeaderPhone
+                                        initialValue: record && record.LeaderPhone,
+                                        rules: [{required: true, message: '必填项'}]
                                     })(
                                         <Input placeholder='请输入负责人手机号' maxLength='11' onBlur={this.checkPhone} />
                                     )}
@@ -179,6 +181,7 @@ class AddEdit extends Component {
                                 >
                                     {getFieldDecorator('LeaderCardNo', {
                                         initialValue: record && record.LeaderCardNo,
+                                        rules: [{required: true, message: '必填项'}]
                                     })(
                                         <Input placeholder='请输入负责人身份证号' maxLength='18' onBlur={this.checkCardNo} />
                                     )}
@@ -229,20 +232,6 @@ class AddEdit extends Component {
     }
     handleCancel () {
         this.props.handleCancel();
-        this.props.form.setFieldsValue({
-            NurseryName: '',
-            TreePlace: '',
-            Address: '',
-            Leader: '',
-            LeaderPhone: '',
-            LeaderCardNo: ''
-        });
-        this.setState({
-            fileList: [],
-            fileListBack: [],
-            LeaderCard: '',
-            LeaderCardBack: ''
-        });
     }
     toSave () {
         const {

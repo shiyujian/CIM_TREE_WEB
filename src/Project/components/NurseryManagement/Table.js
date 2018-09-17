@@ -194,7 +194,7 @@ class Tablelevel extends Component {
                         >
                             状态:
                         </label>
-                        <Select allowClear style={{width: 120}} onChange={this.handleStatus}>
+                        <Select defaultValue={0} allowClear style={{width: 150}} onChange={this.handleStatus}>
                             <Option value={0}>未审核</Option>
                             <Option value={1}>审核通过</Option>
                             <Option value={2}>审核不通过</Option>
@@ -350,7 +350,8 @@ class Tablelevel extends Component {
         this.setState({
             visible: false,
             seeVisible: false,
-            auditVisible: false
+            auditVisible: false,
+            record: null
         });
     }
 }
