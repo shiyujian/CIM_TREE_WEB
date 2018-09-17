@@ -165,7 +165,7 @@ class Tablelevel extends Component {
                         <Input id='TreeData' className='search_input' onChange={this.handleName} />
                         <Button
                             type='primary'
-                            onClick={this.onSearch}
+                            onClick={()=>{this.onSearch()}}
                             style={{minWidth: 30, marginRight: 20}}
                         >
                             查询
@@ -205,7 +205,7 @@ class Tablelevel extends Component {
                     <Col span={24}>
                         <Table columns={this.columns} bordered dataSource={nurseryList}
                             scroll={{ x: 1300 }} pagination={false} rowKey='ID' />
-                        <Pagination total={total} page={page} pageSize={10}
+                        <Pagination total={total} page={page} pageSize={10} style={{marginTop: '10px'}}
                             showQuickJumper onChange={this.onSearch} />
                     </Col>
                 </Row>
@@ -282,7 +282,7 @@ class Tablelevel extends Component {
         getNurseryList({}, param).then((rep) => {
             if (rep.code === 200) {
                 this.setState({
-                    total: rep.total,
+                    total: rep.pageinfo.total,
                     nurseryList: rep.content,
                     page: rep.pageinfo.page
                 });
