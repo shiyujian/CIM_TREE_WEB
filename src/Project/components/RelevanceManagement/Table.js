@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form } from 'antd';
+import { Input, Button, Select, Table, Pagination, Modal, Form } from 'antd';
 import { getUser } from '_platform/auth';
 import { formItemLayout } from '../common';
 

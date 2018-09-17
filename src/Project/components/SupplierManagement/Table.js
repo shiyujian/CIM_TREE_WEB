@@ -168,7 +168,7 @@ class Tablelevel extends Component {
     ];
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options } = this.state;
+        const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options, suppliername } = this.state;
         return (
             <div className='table-level'>
                 <Row>
@@ -181,7 +181,7 @@ class Tablelevel extends Component {
                         >
                             供应商名称:
                         </label>
-                        <Input className='search_input' onChange={this.handleName} />
+                        <Input className='search_input' value={suppliername} onChange={this.handleName} />
                         <Button
                             type='primary'
                             onClick={()=>{this.onSearch()}}

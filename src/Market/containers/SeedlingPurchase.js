@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/seedlingPurchase';
 import { actions as platformActions } from '_platform/store/global';
+import { DataList } from '../components/SeedlingPurchase';
 import {
     Main,
     Body,
@@ -36,9 +37,7 @@ export default class SeedlingPurchase extends Component {
                 <Main>
                     <DynamicTitle title='苗木求购' {...this.props} />
                     <Content>
-                        <div>
-                            苗木求购
-                        </div>
+                        <DataList {...this.props} />
                     </Content>
                 </Main>
             </Body>
