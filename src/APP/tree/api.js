@@ -100,6 +100,13 @@ export const tree_menus = [
         title: '项目管理',
         path: '/project/nurserymanagement',
         icon: <Icon name='cogs' />
+    },
+    {
+        key: 'market',
+        id: 'MARKET',
+        title: '苗木市场',
+        path: '/market/seedlingsupply',
+        icon: <Icon name='shopping-cart' />
     }
 ];
 

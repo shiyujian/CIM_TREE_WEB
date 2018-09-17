@@ -32,7 +32,7 @@ export default class TaskCreateTable extends Component {
         this.state = {
             isNotThree: true,
             menuIsExtend: true /* 菜单是否展开 */,
-            menuWidth: 260 /* 菜单宽度 */,
+            menuWidth: 270 /* 菜单宽度 */,
             mapLayerBtnType: true,
             selectedMenu: '1',
             treeLayerChecked: true,
@@ -77,7 +77,7 @@ export default class TaskCreateTable extends Component {
             isStart: false,
             tempMenuWidth: 0,
             count: 0,
-            minWidth: 260,
+            minWidth: 270,
             maxWidth: 500
         };
     }

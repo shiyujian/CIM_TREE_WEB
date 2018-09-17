@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-14 16:27:27
+ * @Last Modified time: 2018-09-15 11:25:51
  */
 /**
  *
@@ -823,6 +823,34 @@ export const MODULES = [
                     }
                 ]
             }
+        ]
+    },
+    {
+        id: 'MARKET',
+        name: '苗木市场',
+        children: [
+            {
+                id: 'MARKET.SUPERMARKET.NONE',
+                name: '苗木超市',
+                children: [
+                    {
+                        id: 'MARKET.SEEDLINGSUPPLY',
+                        name: '苗木供应'
+                    },
+                    {
+                        id: 'MARKET.SEEDLINGPURCHASE',
+                        name: '苗木求购'
+                    }
+                ]
+            },
+            {
+                id: 'MARKET.SUPPLYRELEASE',
+                name: '供应发布'
+            }
+            // {
+            //     id: 'MARKET.DEMANDRELEASE',
+            //     name: '需求发布'
+            // }
         ]
     }
 ];
