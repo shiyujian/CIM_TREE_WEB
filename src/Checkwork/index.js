@@ -29,9 +29,9 @@ export default class CheckworkContainer extends Component {
 
     render () {
         const {
-            ElectronicFence = null,
-            AttendanceCount = null,
-            AttendanceGroup = null
+            ElectronicFence,
+            AttendanceCount,
+            AttendanceGroup
         } = this.state || {};
         return (
             <Body>

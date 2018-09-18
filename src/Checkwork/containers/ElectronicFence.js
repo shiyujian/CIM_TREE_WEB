@@ -3,15 +3,17 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/electronicFence';
 import { actions as platformActions } from '_platform/store/global';
+
 import {
     Main,
     Body,
     Content,
     DynamicTitle
 } from '_platform/components/layout';
+import { CountFilter, CountTable } from '../components/AttendanceCount';
 @connect(
     state => {
-        const { checkwork: { electronicFence = {} }, platform } = state;
+        const { checkwork:{ electronicFence = {} }, platform } = state;
         return { ...electronicFence, platform };
     },
     dispatch => ({
@@ -36,9 +38,8 @@ export default class ElectronicFence extends Component {
                 <Main>
                     <DynamicTitle title='电子围栏' {...this.props} />
                     <Content>
-                        <div>
-                            电子围栏
-                        </div>
+                        <CountFilter {...this.props} {...this.state} />
+                        <CountTable {...this.props} {...this.state} />
                     </Content>
                 </Main>
             </Body>
