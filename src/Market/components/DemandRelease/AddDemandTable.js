@@ -14,6 +14,7 @@ import {
     Select,
     DatePicker
 } from 'antd';
+import closeImg from '../Img/close.png';
 import moment from 'moment';
 import './AddDemandTable.less';
 import { getUser } from '_platform/auth';
@@ -221,27 +222,31 @@ class AddDemandTable extends Component {
             }
         ];
         treeTypeData.push(
-            <Card key={moment().unix().toString()} style={{marginBottom: 10}}>
-                <div className='AddDemandTable-layout'>
-                    <div className='AddDemandTable-message-layout'>
+            <Card key={moment().unix().toString()}
+                // extra={<img src={closeImg} onClick={this.handleCloseTreeCard.bind(this)} />}
+                style={{marginBottom: 22}}>
+                <div className='AddDemandTable-treetype-layout'>
+                    <div className='AddDemandTable-treetype-message-layout'>
                         <span className='AddDemandTable-message-span'>树木类型：</span>
                         <Select
                             className='AddDemandTable-message-component'
                             onChange={this.handleTreeTypeChange.bind(this, len)}
                         />
                     </div>
-                    <div className='AddDemandTable-message-layout'>
+                    <div className='AddDemandTable-treetype-message-layout'>
                         <span className='AddDemandTable-message-span'>树木名称：</span>
                         <Select
                             className='AddDemandTable-message-component'
                             onChange={this.handleTreeNameChange.bind(this, len)}
                         />
                     </div>
+                    <img src={closeImg} onClick={this.handleCloseTreeCard.bind(this)} style={{float: 'right'}} />
                 </div>
                 <Table
                     columns={this.columns}
                     dataSource={dataSource[len]}
                     bordered
+                    pagination={false}
                 />
             </Card>
         );
@@ -249,6 +254,10 @@ class AddDemandTable extends Component {
             treeTypeData,
             dataSource
         });
+    }
+
+    handleCloseTreeCard = () => {
+        console.log('ssssssssssss');
     }
 
     handleTreeTypeChange = (value, len) => {

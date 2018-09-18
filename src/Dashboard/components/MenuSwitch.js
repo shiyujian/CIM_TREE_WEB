@@ -83,6 +83,10 @@ export default class MenuSwitch extends Component {
         {
             label: '苗木结缘',
             value: 'geojsonFeature_treeAdopt'
+        },
+        {
+            label: '辅助验收',
+            value: 'geojsonFeature_assistCheck'
         }
     ]
 
