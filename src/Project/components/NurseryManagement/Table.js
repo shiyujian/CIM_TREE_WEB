@@ -148,7 +148,7 @@ class Tablelevel extends Component {
         }
     ];
     render () {
-        const { nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options } = this.state;
+        const { nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options, nurseryname } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='table-level'>
@@ -162,7 +162,7 @@ class Tablelevel extends Component {
                         >
                             苗圃名称:
                         </label>
-                        <Input id='TreeData' className='search_input' onChange={this.handleName} />
+                        <Input className='search_input' value={nurseryname} onChange={this.handleName} />
                         <Button
                             type='primary'
                             onClick={()=>{this.onSearch()}}
@@ -194,7 +194,7 @@ class Tablelevel extends Component {
                         >
                             状态:
                         </label>
-                        <Select allowClear style={{width: 120}} onChange={this.handleStatus}>
+                        <Select defaultValue={0} allowClear style={{width: 150}} onChange={this.handleStatus}>
                             <Option value={0}>未审核</Option>
                             <Option value={1}>审核通过</Option>
                             <Option value={2}>审核不通过</Option>
@@ -350,7 +350,8 @@ class Tablelevel extends Component {
         this.setState({
             visible: false,
             seeVisible: false,
-            auditVisible: false
+            auditVisible: false,
+            record: null
         });
     }
 }

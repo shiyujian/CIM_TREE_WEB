@@ -128,7 +128,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.SupplierName,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入供应商名称' />
+                                        <Input placeholder='请输入供应商名称' disabled={record} />
                                     )}
                                 </FormItem>
                             </Col>
@@ -168,8 +168,7 @@ class AddEdit extends Component {
                                     label='地址'
                                 >
                                     {getFieldDecorator('Address', {
-                                        initialValue: record && record.TreePlace,
-                                        rules: [{required: true, message: '必填项'}]
+                                        initialValue: record && record.TreePlace
                                     })(
                                         <Input placeholder='请输入地址' />
                                     )}
@@ -178,10 +177,11 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='负责人'
+                                    label='法人代表'
                                 >
                                     {getFieldDecorator('LegalPerson', {
-                                        initialValue: record && record.LegalPerson
+                                        initialValue: record && record.LegalPerson,
+                                        rules: [{required: true, message: '必填项'}]
                                     })(
                                         <Input placeholder='请输入负责人姓名' />
                                     )}
@@ -190,10 +190,11 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='负责人手机号'
+                                    label='法人手机号'
                                 >
                                     {getFieldDecorator('LegalPersonPhone', {
-                                        initialValue: record && record.LegalPersonPhone
+                                        initialValue: record && record.LegalPersonPhone,
+                                        rules: [{required: true, message: '必填项'}]
                                     })(
                                         <Input placeholder='请输入负责人手机号' maxLength='11' onBlur={this.checkPhone} />
                                     )}
@@ -202,10 +203,11 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='负责人身份证号'
+                                    label='法人身份证号'
                                 >
                                     {getFieldDecorator('LegalPersonCardNo', {
-                                        initialValue: record && record.LegalPersonCardNo
+                                        initialValue: record && record.LegalPersonCardNo,
+                                        rules: [{required: true, message: '必填项'}]
                                     })(
                                         <Input placeholder='请输入负责人身份证号' maxLength='18' onBlur={this.checkCardNo} />
                                     )}
@@ -268,22 +270,6 @@ class AddEdit extends Component {
     }
     handleCancel () {
         this.props.handleCancel();
-        this.props.form.setFieldsValue({
-            SupplierName: '',
-            USCC: '',
-            Address: '',
-            Leader: '',
-            LeaderPhone: '',
-            LegalPersonCardNo: ''
-        });
-        this.setState({
-            fileList: [],
-            fileListBack: [],
-            fileListLicense: [],
-            LegalPersonCard: '',
-            LegalPersonCardBack: '',
-            BusinessLicense: ''
-        });
     }
     toSave () {
         const {

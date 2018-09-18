@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form } from 'antd';
+import { Input, Button, Select, Table, Pagination, Modal, Form } from 'antd';
 import { getUser } from '_platform/auth';
 import { formItemLayout } from '../common';
 
@@ -17,13 +17,13 @@ class Tablelevel extends Component {
             record: {}
         };
         this.Checker = '';
-        this.toSearch = this.toSearch.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
-        this.handleOk = this.handleOk.bind(this);
+        this.toSearch = this.toSearch.bind(this); // 查询
+        this.handleCancel = this.handleCancel.bind(this); // 取消
+        this.handleOk = this.handleOk.bind(this); // 审核
     }
     componentDidMount () {
         this.toSearch();
-        this.Checker = getUser().id;
+        this.Checker = getUser().id; // 登陆用户
     }
     columns = [
         {

@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store/seedlingPurchase';
+import * as actions from '../store/attendanceCount';
 import { actions as platformActions } from '_platform/store/global';
-import { DataList } from '../components/SeedlingPurchase';
 import {
     Main,
     Body,
@@ -12,8 +11,8 @@ import {
 } from '_platform/components/layout';
 @connect(
     state => {
-        const { market: { seedlingPurchase = {} }, platform } = state;
-        return { ...seedlingPurchase, platform };
+        const { checkwork: { attendanceCount = {} }, platform } = state;
+        return { ...attendanceCount, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -22,7 +21,7 @@ import {
         )
     })
 )
-export default class SeedlingPurchase extends Component {
+export default class AttendanceCount extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -35,9 +34,9 @@ export default class SeedlingPurchase extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='苗木求购' {...this.props} />
+                    <DynamicTitle title='考勤统计' {...this.props} />
                     <Content>
-                        <DataList {...this.props} />
+                      
                     </Content>
                 </Main>
             </Body>
