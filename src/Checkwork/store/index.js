@@ -6,21 +6,21 @@ import attendanceGroupReducer, { actions as attendanceGroupActions } from './att
 
 export default handleActions(
     {
-        [combineActions(...actionsMap(seedlingSupplyActions))]: (
+        [combineActions(...actionsMap(electronicFenceActions))]: (
             state = {},
             action
         ) => ({
             ...state,
             electronicFence: electronicFenceReducer(state.electronicFence, action)
         }),
-        [combineActions(...actionsMap(seedlingPurchaseActions))]: (
+        [combineActions(...actionsMap(attendanceCountActions))]: (
             state = {},
             action
         ) => ({
             ...state,
             attendanceCount: attendanceCountReducer(state.attendanceCount, action)
         }),
-        [combineActions(...actionsMap(supplyReleaseActions))]: (
+        [combineActions(...actionsMap(attendanceGroupActions))]: (
             state = {},
             action
         ) => ({

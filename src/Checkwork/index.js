@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-01 16:58:31
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-15 11:24:13
+ * @Last Modified time: 2018-09-18 10:56:17
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -70,8 +70,8 @@ export default class CheckworkContainer extends Component {
         {
             key: 'electronicfence',
             id: 'CHECKWORK.ELECTRONICFENCE',
-            path: '/checkwork/electronicfence'
-            name: '电子围栏',
+            path: '/checkwork/electronicfence',
+            name: '电子围栏'
         },
         {
             key: 'supplyrelease',

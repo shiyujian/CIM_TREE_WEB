@@ -6,8 +6,4 @@ import {
 } from '_platform/api';
 
 export default handleActions({
-    [changeSelectMap]: (state, {payload}) => ({
-        ...state,
-        selectMap: payload
-    })
 }, {});

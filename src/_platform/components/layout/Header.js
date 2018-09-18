@@ -121,6 +121,20 @@ export default class Header extends Component {
                 icon: <Icon name='map' />
             },
             {
+                key: 'market',
+                id: 'MARKET',
+                title: '苗木市场',
+                path: '/market/seedlingsupply',
+                icon: <Icon name='shopping-cart' />
+            },
+            {
+                key: 'checkwork',
+                id: 'CHECKWORK',
+                title: '考勤管理',
+                path: '/checkwork/electronicfence',
+                icon: <Icon name='print' />
+            },
+            {
                 key: 'selfcare',
                 id: 'SELFCARE',
                 title: '个人中心',
@@ -140,20 +154,6 @@ export default class Header extends Component {
                 title: '项目管理',
                 path: '/project/nurseryManagement',
                 icon: <Icon name='sitemap' />
-            },
-            {
-                key: 'checkwork',
-                id: 'CHECKWORK',
-                title: '考勤管理',
-                path: '/checkwork/electronicfence',
-                icon: <Icon name='print' />
-            },
-            {
-                key: 'market',
-                id: 'MARKET',
-                title: '苗木市场',
-                path: '/market/seedlingsupply',
-                icon: <Icon name='shopping-cart' />
             }
         ];
         const { match: { params: { module = '' } = {} } = {} } = this.props;

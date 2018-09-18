@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-15 11:25:51
+ * @Last Modified time: 2018-09-18 11:06:27
  */
 /**
  *
@@ -670,6 +670,52 @@ export const MODULES = [
         ]
     },
     {
+        id: 'MARKET',
+        name: '苗木市场',
+        children: [
+            {
+                id: 'MARKET.SUPERMARKET.NONE',
+                name: '苗木超市',
+                children: [
+                    {
+                        id: 'MARKET.SEEDLINGSUPPLY',
+                        name: '苗木供应'
+                    },
+                    {
+                        id: 'MARKET.SEEDLINGPURCHASE',
+                        name: '苗木求购'
+                    }
+                ]
+            },
+            {
+                id: 'MARKET.SUPPLYRELEASE',
+                name: '供应发布'
+            },
+            {
+                id: 'MARKET.DEMANDRELEASE',
+                name: '需求发布'
+            }
+        ]
+    },
+    {
+        id: 'CHECKWORK',
+        name: '考勤管理',
+        children: [
+            {
+                id: 'CHECKWORK.ELECTRONICFENCE',
+                name: '电子围栏'
+            },
+            {
+                id: 'CHECKWORK.ATTENDANCECOUNT',
+                name: '考勤统计'
+            },
+            {
+                id: 'CHECKWORK.ATTENDANCEGROUP',
+                name: '考勤群体'
+            }
+        ]
+    },
+    {
         id: 'SELFCARE',
         name: '个人中心',
         children: [
@@ -823,52 +869,6 @@ export const MODULES = [
                     }
                 ]
             }
-        ]
-    },
-    {
-        id: 'CHECKWORK',
-        name: '考勤管理',
-        children: [
-            {
-                id: 'CHECKWORK.ELECTRONICFENCE.NONE',
-                name: '电子围栏',
-            },
-            {
-                id: 'CHECKWORK.ATTENDANCECOUNT',
-                name: '考勤统计'
-            },
-            {
-                id: 'CHECKWORK.ATTENDANCEGROUP',
-                name: '考勤群体'
-            }
-        ]
-    },
-    {
-        id: 'MARKET',
-        name: '苗木市场',
-        children: [
-            {
-                id: 'MARKET.SUPERMARKET.NONE',
-                name: '苗木超市',
-                children: [
-                    {
-                        id: 'MARKET.SEEDLINGSUPPLY',
-                        name: '苗木供应'
-                    },
-                    {
-                        id: 'MARKET.SEEDLINGPURCHASE',
-                        name: '苗木求购'
-                    }
-                ]
-            },
-            {
-                id: 'MARKET.SUPPLYRELEASE',
-                name: '供应发布'
-            }
-            // {
-            //     id: 'MARKET.DEMANDRELEASE',
-            //     name: '需求发布'
-            // }
         ]
     }
 ];

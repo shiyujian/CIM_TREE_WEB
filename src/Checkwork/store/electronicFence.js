@@ -5,10 +5,5 @@ import {
     FOREST_API
 } from '_platform/api';
 
-
 export default handleActions({
-    [changeSelectMap]: (state, {payload}) => ({
-        ...state,
-        selectMap: payload
-    })
 }, {});

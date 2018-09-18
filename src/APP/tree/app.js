@@ -34,6 +34,7 @@ export default class App extends Component {
         const { default: Safety } = await import('../../Safety');
         const { default: Project } = await import('../../Project');
         const { default: Market } = await import('../../Market');
+        const { default: Checkwork } = await import('../../Checkwork');
 
         this.setState({
             Home,
@@ -49,7 +50,8 @@ export default class App extends Component {
             System,
             Safety,
             Project,
-            Market
+            Market,
+            Checkwork
         });
     }
 
@@ -68,7 +70,8 @@ export default class App extends Component {
             System,
             Safety,
             Project,
-            Market
+            Market,
+            Checkwork
         } =
             this.state || {};
         return (
@@ -107,6 +110,9 @@ export default class App extends Component {
                         )}
                         {Market && (
                             <Route path='/market' component={Market} />
+                        )}
+                        {Checkwork && (
+                            <Route path='/checkwork' component={Checkwork} />
                         )}
                         <Route path='/:module?' component={Footer} />
                         {Preview && <Preview />}

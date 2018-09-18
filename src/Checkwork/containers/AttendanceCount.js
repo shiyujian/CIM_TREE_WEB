@@ -36,7 +36,7 @@ export default class AttendanceCount extends Component {
                 <Main>
                     <DynamicTitle title='考勤统计' {...this.props} />
                     <Content>
-                      
+                        考勤统计
                     </Content>
                 </Main>
             </Body>
