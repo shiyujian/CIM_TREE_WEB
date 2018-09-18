@@ -68,23 +68,23 @@ export default class CountTable extends Component {
         },
         {
             title: '上班时间',
-            dataIndex: 'extra_params.state',
-            key: 'extra_params.state'
+            dataIndex: 'extra_params.starttime',
+            key: 'extra_params.starttime'
         },
         {
             title: '下班时间',
-            dataIndex: 'extra_params.state',
-            key: 'extra_params.state'
+            dataIndex: 'extra_params.endtime',
+            key: 'extra_params.endtime'
         },
         {
             title: '出勤情况',
-            dataIndex: 'extra_params.state',
-            key: 'extra_params.state'
+            dataIndex: 'extra_params.qinkuang',
+            key: 'extra_params.qinkuang'
         },
         {
             title: '状态',
-            dataIndex: 'extra_params.state',
-            key: 'extra_params.state'
+            dataIndex: 'extra_params.status',
+            key: 'extra_params.status'
         },
         {
             title: '照片',

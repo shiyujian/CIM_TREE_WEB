@@ -24,8 +24,7 @@ class CountFilter extends Component {
     };
     render () {
         const {
-            form: { getFieldDecorator },
-            Doc = []
+            form: { getFieldDecorator }
         } = this.props;
         return (
             <Form style={{ marginBottom: 24 }}>
@@ -33,7 +32,7 @@ class CountFilter extends Component {
                     <Col span={18}>
                         <Row>
                             <Col span={8}>
-                                <FormItem {...Filter.layout} label='项目'>
+                                <FormItem {...CountFilter.layout} label='项目'>
                                     {getFieldDecorator('projectName', {
                                         rules: [
                                             {
@@ -45,7 +44,7 @@ class CountFilter extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={8}>
-                                <FormItem {...Filter.layout} label='标段'>
+                                <FormItem {...CountFilter.layout} label='标段'>
                                     {getFieldDecorator('section', {
                                         rules: [
                                             {
@@ -72,7 +71,7 @@ class CountFilter extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={8}>
-                                <FormItem {...Filter.layout} label='姓名'>
+                                <FormItem {...CountFilter.layout} label='姓名'>
                                     {getFieldDecorator('name', {
                                         rules: [
                                             {
@@ -81,7 +80,7 @@ class CountFilter extends Component {
                                             }
                                         ]
                                     })(
-                                      <Input placeholder='请输入姓名' />) 
+                                      <Input placeholder='请输入姓名' />
                                     )}
                                 </FormItem>
                             </Col>
@@ -92,7 +91,7 @@ class CountFilter extends Component {
                     <Col span={18}>
                         <Row>
                            <Col span={8}>
-                                <FormItem {...Filter.layout} label='时间'>
+                                <FormItem {...CountFilter.layout} label='时间'>
                                     {getFieldDecorator('searchDate', {
                                         rules: [
                                             {
@@ -114,8 +113,8 @@ class CountFilter extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={8}>
-                                <FormItem {...Filter.layout} label='出勤'>
-                                    {getFieldDecorator('section', {
+                                <FormItem {...CountFilter.layout} label='出勤'>
+                                    {getFieldDecorator('chuqin', {
                                         rules: [
                                             {
                                                 required: false,
@@ -141,8 +140,8 @@ class CountFilter extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={8}>
-                                <FormItem {...Filter.layout} label='状态'>
-                                    {getFieldDecorator('name', {
+                                <FormItem {...CountFilter.layout} label='状态'>
+                                    {getFieldDecorator('status', {
                                         rules: [
                                             {
                                                 required: false,
@@ -197,8 +196,8 @@ class CountFilter extends Component {
                     <Col span={18}>
                         <Row>
                             <Col span={8}>
-                                <FormItem {...Filter.layout} label='考勤群体'>
-                                    {getFieldDecorator('projectName', {
+                                <FormItem {...CountFilter.layout} label='考勤群体'>
+                                    {getFieldDecorator('group', {
                                         rules: [
                                             {
                                                 required: false,
@@ -206,13 +205,26 @@ class CountFilter extends Component {
                                             }
                                         ]
                                     })(
-
+                                        <Select>
+                                            <Option
+                                                key={'宣传片'}
+                                                value={'宣传片'}
+                                            >
+                                                宣传片
+                                            </Option>
+                                            <Option
+                                                key={'操作视频'}
+                                                value={'操作视频'}
+                                            >
+                                                操作视频
+                                            </Option>
+                                        </Select>
                                     )}
                                 </FormItem>
                             </Col>
                             <Col span={8}>
-                                <FormItem {...Filter.layout} label='角色'>
-                                    {getFieldDecorator('section', {
+                                <FormItem {...CountFilter.layout} label='角色'>
+                                    {getFieldDecorator('juese', {
                                         rules: [
                                             {
                                                 required: false,
@@ -238,8 +250,8 @@ class CountFilter extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={8}>
-                                <FormItem {...Filter.layout} label='职务'>
-                                    {getFieldDecorator('name', {
+                                <FormItem {...CountFilter.layout} label='职务'>
+                                    {getFieldDecorator('zhiwu', {
                                         rules: [
                                             {
                                                 required: false,
@@ -247,7 +259,20 @@ class CountFilter extends Component {
                                             }
                                         ]
                                     })(
-                            
+                                        <Select>
+                                            <Option
+                                                key={'宣传片'}
+                                                value={'宣传片'}
+                                            >
+                                                宣传片
+                                            </Option>
+                                            <Option
+                                                key={'操作视频'}
+                                                value={'操作视频'}
+                                            >
+                                                操作视频
+                                            </Option>
+                                        </Select>
                                     )}
                                 </FormItem>
                             </Col>

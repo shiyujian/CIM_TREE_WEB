@@ -10,7 +10,6 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { CountFilter, CountTable } from '../components/AttendanceCount';
 @connect(
     state => {
         const { checkwork:{ electronicFence = {} }, platform } = state;
@@ -38,8 +37,7 @@ export default class ElectronicFence extends Component {
                 <Main>
                     <DynamicTitle title='电子围栏' {...this.props} />
                     <Content>
-                        <CountFilter {...this.props} {...this.state} />
-                        <CountTable {...this.props} {...this.state} />
+                        
                     </Content>
                 </Main>
             </Body>
