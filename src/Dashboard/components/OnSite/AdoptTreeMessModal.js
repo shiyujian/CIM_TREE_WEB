@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Button, Modal, Form, Row, Col, Input, Tabs } from 'antd';
-const TabPane = Tabs.TabPane;
 import './AdoptTreeMess.less';
 import loveImg from './TreeAdoptImg/love.png';
 import treeImg from './TreeAdoptImg/tree.png';
 import userImg from './TreeAdoptImg/user.png';
+const TabPane = Tabs.TabPane;
 
 class AdoptTreeMessModal extends Component {
     constructor (props) {
@@ -49,9 +49,9 @@ class AdoptTreeMessModal extends Component {
             >
                 <div>
                     <div style={{display: 'inlineBlock', marginLeft: 112, marginBottom: 15}}>
-                        <img src={userImg}/>
-                        <img src={loveImg} style={{marginLeft: 73}}/>
-                        <img src={treeImg} style={{marginLeft: 73}}/>
+                        <img src={userImg} />
+                        <img src={loveImg} style={{marginLeft: 73}} />
+                        <img src={treeImg} style={{marginLeft: 73}} />
                     </div>
                     <div>
                         {/* <div style={{marginTop: 31}} className='adoptTreeMess-modal-layout'>
@@ -99,7 +99,7 @@ class AdoptTreeMessModal extends Component {
                     </div>
                     <div className='adoptTreeMess-modal-midTitle'>
                         苗木详情
-                    </div>            
+                    </div>
                     <Tabs
                         defaultActiveKey='1'
                         onChange={this.tabChange.bind(this)}
@@ -837,11 +837,11 @@ class AdoptTreeMessModal extends Component {
                                                         float: 'left'
                                                     }}>
                                                         {`${
-                                                        flow.FromUserObj
-                                                            ? flow
-                                                                .FromUserObj
-                                                                .Full_Name
-                                                            : ''
+                                                            flow.FromUserObj
+                                                                ? flow
+                                                                    .FromUserObj
+                                                                    .Full_Name
+                                                                : ''
                                                         } : ${
                                                             flow.Info
                                                                 ? flow.Info
@@ -849,8 +849,8 @@ class AdoptTreeMessModal extends Component {
                                                         }`}
                                                     </div>
                                                     <div style={{
-                                                            float: 'right'
-                                                        }}>
+                                                        float: 'right'
+                                                    }}>
                                                         {`【${flow.companyName}】`}
                                                     </div>
                                                 </Row>

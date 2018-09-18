@@ -778,14 +778,14 @@ class TreeMessModal extends Component {
                                                 }}
                                             >
                                                 <div style={{
-                                                        float: 'left'
-                                                    }}>
+                                                    float: 'left'
+                                                }}>
                                                     {`${
-                                                    flow.FromUserObj
-                                                        ? flow
-                                                            .FromUserObj
-                                                            .Full_Name
-                                                        : ''
+                                                        flow.FromUserObj
+                                                            ? flow
+                                                                .FromUserObj
+                                                                .Full_Name
+                                                            : ''
                                                     } : ${
                                                         flow.Info
                                                             ? flow.Info
@@ -793,8 +793,8 @@ class TreeMessModal extends Component {
                                                     }`}
                                                 </div>
                                                 <div style={{
-                                                        float: 'right'
-                                                    }}>
+                                                    float: 'right'
+                                                }}>
                                                     {`【${flow.companyName}】`}
                                                 </div>
                                             </Row>

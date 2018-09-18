@@ -10,14 +10,15 @@ export const ID = 'Market_supermarket_demandRelease';
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
 // 修改选择地图的方式
-export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
+export const changeAddDemandModalVisible = createAction(`${ID}_changeAddDemandModalVisible`);
 
 export const actions = {
-    getCuring
+    getCuring,
+    changeAddDemandModalVisible
 };
 export default handleActions({
-    [changeSelectMap]: (state, {payload}) => ({
+    [changeAddDemandModalVisible]: (state, {payload}) => ({
         ...state,
-        selectMap: payload
+        addDemandModalVisible: payload
     })
 }, {});
