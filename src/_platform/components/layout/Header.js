@@ -142,6 +142,13 @@ export default class Header extends Component {
                 icon: <Icon name='sitemap' />
             },
             {
+                key: 'checkwork',
+                id: 'CHECKWORK',
+                title: '考勤管理',
+                path: '/checkwork/electronicfence',
+                icon: <Icon name='print' />
+            },
+            {
                 key: 'market',
                 id: 'MARKET',
                 title: '苗木市场',
