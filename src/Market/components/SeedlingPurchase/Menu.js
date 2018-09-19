@@ -42,7 +42,8 @@ class Menu extends Component {
 
     }
     toDetails () {
-        
+        console.log(this);
+        window.location.href = '/market/purchasedetails';
     }
 }
 

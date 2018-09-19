@@ -3,6 +3,39 @@ import SimpleTree from '_platform/components/panels/SimpleTree';
 import { TreeSelect } from 'antd';
 const TreeNode = TreeSelect.TreeNode;
 
+const addGroup = (supplier_list, str) => {
+    const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));
+    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
+    const supplierCode_province = JSON.parse(window.sessionStorage.getItem('supplierCode_province'));
+    let arr_province = [];
+    supplier_list.map(ite => {
+        if (str === '供应商') {
+            ite.RegionCode = supplier_regionCode[ite.pk];
+            ite.province = supplierCode_province[supplier_regionCode[ite.pk]];
+        } else {
+            ite.RegionCode = nursery_regionCode[ite.pk];
+            ite.province = supplierCode_province[nursery_regionCode[ite.pk]];
+        }
+        if (!arr_province.includes(ite.province)) {
+            arr_province.push(ite.province);
+        }
+    });
+    let newChildren = [];
+    arr_province.map((ite, inde) => {
+        let arr1 = [];
+        supplier_list.map(record => {
+            if (ite === record.province) {
+                arr1.push(record);
+            }
+        });
+        newChildren.push({
+            name: ite || '其他',
+            children: arr1,
+            code: inde
+        });
+    });
+    return newChildren;
+}
 export default class Tree extends Component {
     static propTypes = {};
     constructor (props) {
@@ -28,12 +61,46 @@ export default class Tree extends Component {
         );
     }
 
+    componentWillMount () {
+        const {
+            actions: { getSupplierList, getRegionCodes, getNurseryList }
+        } = this.props;
+        getRegionCodes({}, {grade: 3}).then(rst => {
+            let obj = {};
+            rst.map(item => {
+                obj[item.ID] = item.MergerName.split(',')[1];
+            });
+            window.sessionStorage.setItem('supplierCode_province', JSON.stringify(obj));
+        });
+        getSupplierList().then(rst => {
+            let obj = {};
+            rst.content.map(item => {
+                obj[item.OrgPK] = item.RegionCode;
+            });
+            window.sessionStorage.setItem('supplier_regionCode', JSON.stringify(obj));
+        });
+        getNurseryList().then(rst => {
+            let obj = {};
+            rst.content.map(item => {
+                obj[item.OrgPK] = item.RegionCode;
+            });
+            window.sessionStorage.setItem('nursery_regionCode', JSON.stringify(obj));
+        });
+    }
     componentDidMount () {
         const {
             actions: { getOrgTree, changeSidebarField, getUsers, getTreeModal, getOrgTreeSelect }
         } = this.props;
         getOrgTree({}, { depth: 3 }).then(rst => {
             if (rst && rst.children) {
+                rst.children.map(item => {
+                    if (item.name === '供应商') {
+                        item.children = addGroup(item.children, '供应商');
+                    } else if (item.name === '苗圃基地') {
+                        item.children = addGroup(item.children, '苗圃基地');
+                    }
+                });
+                console.log(rst.children);
                 this.getList(rst.children);
                 // 目前只针对业主的单位，name为建设单位   所以对建设单位进行loop
                 if (rst.children && rst.children instanceof Array && rst.children.length > 0) {

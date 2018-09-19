@@ -31,6 +31,7 @@ export default class MarketContainer extends Component {
         const {
             SeedlingSupply = null,
             SeedlingPurchase = null,
+            PurchaseDetails = null,
             SupplyRelease = null,
             DemandRelease = null
         } = this.state || {};
@@ -54,6 +55,12 @@ export default class MarketContainer extends Component {
                         <Route
                             path='/market/seedlingpurchase'
                             component={SeedlingPurchase}
+                        />
+                    )}
+                    {SeedlingPurchase && (
+                        <Route
+                            path='/market/purchasedetails'
+                            component={PurchaseDetails}
                         />
                     )}
                     {SupplyRelease && (
