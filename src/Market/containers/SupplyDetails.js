@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store/supplyRelease';
+import * as actions from '../store/seedlingPurchase';
 import { actions as platformActions } from '_platform/store/global';
-import { DataList } from '../components/SupplyRelease';
+import { DataList } from '../components/SupplyDetails';
 import {
     Main,
     Body,
@@ -12,8 +12,8 @@ import {
 } from '_platform/components/layout';
 @connect(
     state => {
-        const { market: { supplyRelease = {} }, platform } = state;
-        return { ...supplyRelease, platform };
+        const { market: { seedlingPurchase = {} }, platform } = state;
+        return { ...seedlingPurchase, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -22,7 +22,7 @@ import {
         )
     })
 )
-export default class SupplyRelease extends Component {
+export default class PurchaseDetails extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -35,9 +35,8 @@ export default class SupplyRelease extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='供应发布' {...this.props} />
                     <Content>
-                        <DataList />
+                        <DataList {...this.props} />
                     </Content>
                 </Main>
             </Body>

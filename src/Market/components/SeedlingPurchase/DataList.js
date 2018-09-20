@@ -18,7 +18,7 @@ class DataList extends Component {
     render () {
         const { getFieldDecorator } = this.props.form;
         return (
-            <div className='data-list' style={{margin: '0 40px'}}>
+            <div className='seedling-purchase' style={{padding: '20px 40px'}}>
                 <Form onSubmit={this.handleSubmit} layout='inline'>
                     <FormItem
                         label='采购编号'
@@ -52,7 +52,7 @@ class DataList extends Component {
                 </Form>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='全 部' key='1'>
-                        <Menu />
+                        <Menu {...this.props} />
                     </TabPane>
                 </Tabs>
             </div>

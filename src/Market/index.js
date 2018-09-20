@@ -30,9 +30,11 @@ export default class MarketContainer extends Component {
     render () {
         const {
             SeedlingSupply = null,
+            SupplyDetails = null,
             SeedlingPurchase = null,
             PurchaseDetails = null,
             SupplyRelease = null,
+            AddSeedling = null,
             DemandRelease = null
         } = this.state || {};
         return (
@@ -51,6 +53,12 @@ export default class MarketContainer extends Component {
                             component={SeedlingSupply}
                         />
                     )}
+                    {SupplyDetails && (
+                        <Route
+                            path='/market/supplydetails'
+                            component={SupplyDetails}
+                        />
+                    )}
                     {SeedlingPurchase && (
                         <Route
                             path='/market/seedlingpurchase'
@@ -67,6 +75,12 @@ export default class MarketContainer extends Component {
                         <Route
                             path='/market/supplyrelease'
                             component={SupplyRelease}
+                        />
+                    )}
+                    {AddSeedling && (
+                        <Route
+                            path='/market/addseedling'
+                            component={AddSeedling}
                         />
                     )}
                     {DemandRelease && (

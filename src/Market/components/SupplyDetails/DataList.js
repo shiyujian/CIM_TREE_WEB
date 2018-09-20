@@ -1,10 +1,11 @@
 
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Button } from 'antd';
-import Menu from './Menu';
-import TableLi from './TableLi';
-import './DataList.less';
+import { Form, Button, Input, Select, Tabs } from 'antd';
+
+const FormItem = Form.Item;
+const Option = Select.Option;
+const TabPane = Tabs.TabPane;
 
 class DataList extends Component {
     constructor (props) {
@@ -14,16 +15,12 @@ class DataList extends Component {
         };
     }
     render () {
+        const { getFieldDecorator } = this.props.form;
         return (
-            <div className='data-list' style={{margin: '0 40px'}}>
-                <Link to='/market/seedlingpurchase'>
+            <div className='seedling-supply' style={{padding: '20px 40px'}}>
+                <Link to='/market/seedlingsupply'>
                     <Button type='primary' style={{marginBottom: 5}}>返 回</Button>
                 </Link>
-                <Menu />
-                <div className='content-list'>
-                    <h3>报价单</h3>
-                    <TableLi />
-                </div>
             </div>
         );
     }

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/supplyRelease';
 import { actions as platformActions } from '_platform/store/global';
-import { DataList } from '../components/SupplyRelease';
+import { DataList } from '../components/AddSeedling';
 import {
     Main,
     Body,

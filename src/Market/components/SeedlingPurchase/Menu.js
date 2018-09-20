@@ -1,5 +1,6 @@
 
 import React, {Component} from 'react';
+import { Link } from 'react-router-dom';
 import { Form, Input, Button, Tabs } from 'antd';
 import './Menu.less';
 
@@ -14,7 +15,6 @@ class Menu extends Component {
         };
         this.handlePane = this.handlePane.bind(this); // 切换标签页
         this.handleSubmit = this.handleSubmit.bind(this); // 提交查询
-        this.toDetails = this.toDetails.bind(this); // 需求详情
     }
     render () {
         const { getFieldDecorator } = this.props.form;
@@ -30,7 +30,9 @@ class Menu extends Component {
                 </div>
                 <div className='fixed'>
                     <p>已有5人报价</p>
-                    <Button type='primary' onClick={this.toDetails}>需求详情</Button>
+                    <Link to='/market/purchasedetails'>
+                        <Button type='primary'>需求详情</Button>
+                    </Link>
                 </div>
             </div>
         );
@@ -40,10 +42,6 @@ class Menu extends Component {
     }
     handleSubmit () {
 
-    }
-    toDetails () {
-        console.log(this);
-        window.location.href = '/market/purchasedetails';
     }
 }
 

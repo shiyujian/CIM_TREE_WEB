@@ -18,27 +18,27 @@ class TableLi extends Component {
             render: text => <Input />
         }, {
             title: '可供数量',
-            key: '1',
+            key: '2',
             dataIndex: '可供数量',
             render: text => <Input />
         }, {
             title: '苗源地',
-            key: '1',
+            key: '3',
             dataIndex: '可供数量',
             render: text => <Input />
         }, {
             title: '报价说明',
-            key: '1',
+            key: '4',
             dataIndex: '可供数量',
             render: text => <Input />
         }, {
             title: '附件',
-            key: '1',
+            key: '5',
             dataIndex: '可供数量',
             render: text => <a onClick={this.uploadFile.bind(this)}>上传附件</a>
         }, {
             title: '操作',
-            key: '1',
+            key: '6',
             dataIndex: 'action',
             render: (text, record) => <Button>提交</Button>
         }
