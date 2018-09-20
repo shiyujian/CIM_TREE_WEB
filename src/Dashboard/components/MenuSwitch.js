@@ -50,8 +50,8 @@ export default class MenuSwitch extends Component {
 
     options = [
         {
-            label: '区域地块',
-            value: 'geojsonFeature_area',
+            label: '树木信息',
+            value: 'geojsonFeature_treeMess',
             IconName: 'square'
         },
         {
@@ -83,11 +83,11 @@ export default class MenuSwitch extends Component {
         {
             label: '苗木结缘',
             value: 'geojsonFeature_treeAdopt'
-        },
-        {
-            label: '辅助验收',
-            value: 'geojsonFeature_assistCheck'
         }
+        // {
+        //     label: '辅助验收',
+        //     value: 'geojsonFeature_assistCheck'
+        // }
     ]
 
     checkFull () {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tree } from 'antd';
+import { Tree, Spin } from 'antd';
 const TreeNode = Tree.TreeNode;
 
 export default class SurvivalRateTree extends Component {
@@ -37,22 +37,23 @@ export default class SurvivalRateTree extends Component {
     }
 
     render () {
-        const { treeData = [] } = this.props;
+        const {
+            survivalRateTree = [],
+            survivalRateTreeLoading
+        } = this.props;
         return (
             <div>
-                {treeData.length ? (
+                <Spin spinning={survivalRateTreeLoading}>
                     <Tree
                         showLine
                         checkable
                         onCheck={this.onCheck.bind(this)}
                     >
-                        {treeData.map(p => {
+                        {survivalRateTree.map(p => {
                             return this.loop(p);
                         })}
                     </Tree>
-                ) : (
-                    ''
-                )}
+                </Spin>
             </div>
         );
     }

@@ -236,7 +236,7 @@ export const genPopUpContent = (geo) => {
 						<h2><span>标段：</span>${properties.sectionName}</h2>
 					</div>`;
         }
-        case 'risk': {
+        case 'riskQuality': {
             return `<div>
 						<h2><span>隐患内容：</span>${properties.name}</h2>
                         <h2><span>隐患类型：</span>${properties.riskType}</h2>
@@ -247,7 +247,46 @@ export const genPopUpContent = (geo) => {
                         </h2>
 					</div>`;
         }
-        case 'curingTask': {
+        case 'riskDanger': {
+            return `<div>
+						<h2><span>隐患内容：</span>${properties.name}</h2>
+                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
+                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
+						<h2><span>整改状态：</span>${properties.status}</h2>
+                        <h2 class="btnRow">
+                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
+                        </h2>
+					</div>`;
+        }
+        case 'riskOther': {
+            return `<div>
+						<h2><span>隐患内容：</span>${properties.name}</h2>
+                        <h2><span>隐患类型：</span>${properties.riskType}</h2>
+                        <h2><span>隐患描述：</span>${properties.Problem}</h2>
+						<h2><span>整改状态：</span>${properties.status}</h2>
+                        <h2 class="btnRow">
+                            <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
+                        </h2>
+					</div>`;
+        }
+        case 'planCuringTask': {
+            return `<div class="popupBox">
+                    <h2><span>养护类型：</span>${properties.typeName}</h2>
+                    <h2><span>状态：</span>${properties.status}</h2>
+                    <h2><span>养护人：</span>${properties.CuringMans}</h2>
+                    <h2><span>标段：</span>${properties.sectionName}</h2>
+                    <h2><span>小班：</span>${properties.smallClassName}</h2>
+                    <h2><span>细班：</span>${properties.thinClassName}</h2>
+                    <h2><span>养护面积：</span>${properties.Area}</h2>
+                    <h2><span>创建时间：</span>${properties.CreateTime}</h2>
+                    <h2><span>计划开始时间：</span>${properties.PlanStartTime}</h2>
+                    <h2><span>计划结束时间：</span>${properties.PlanEndTime}</h2>
+                </div>`;
+            // <h2 class="btnRow">
+            //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
+            // </h2>
+        }
+        case 'realCuringTask': {
             return `<div class="popupBox">
                     <h2><span>养护类型：</span>${properties.typeName}</h2>
                     <h2><span>状态：</span>${properties.status}</h2>
@@ -295,14 +334,21 @@ export const genPopUpContent = (geo) => {
 };
 // 获取对应的ICON
 export const getIconType = (type) => {
+    console.log('type', type);
     switch (type) {
         case 'track':
             return 'dashboard-peopleIcon';
-        case 'risk':
-            return 'dashboard-riskIcon';
+        case 'riskQuality':
+            return 'dashboard-riskQualityIcon';
+        case 'riskDanger':
+            return 'dashboard-riskDangerIcon';
+        case 'riskOther':
+            return 'dashboard-riskOtherIcon';
         case 'tree':
             return 'dashboard-treeIcon';
-        case 'curingTask':
+        case 'realCuringTask':
+            return 'dashboard-curingTaskIcon';
+        case 'planCuringTask':
             return 'dashboard-curingTaskIcon';
         case 'survivalRate':
             return 'dashboard-treeIcon';
@@ -561,4 +607,225 @@ export const handleCoordinates = (str) => {
     });
     treearea.push(arr);
     return treearea;
+};
+
+export const handleRiskData = (datas) => {
+    let riskObj = {};
+    let risks = [];
+    // 安全隐患数据处理
+    if (datas && datas instanceof Array && datas.length > 0) {
+        datas.forEach((v, index) => {
+            // 去除坐标为0的点  和  名称为空的点（名称为空的点   type类型也不一样）
+            if (v['X'] === 0 || v['Y'] === 0 || v['ProblemType'] === '') {
+                return;
+            }
+            let level = v['EventType'];
+            let name = v['ProblemType'];
+            let ResponseOrg = v['ReorganizerObj'];
+            // 位置
+            let locationX = v['X'];
+            let locationY = v['Y'];
+            let coordinates = [locationY, locationX];
+            // 隐患类型
+            let iconType = 'riskQuality';
+            let riskType = '';
+            if (v.EventType === 0) {
+                riskType = '质量缺陷';
+                iconType = 'riskQuality';
+            } else if (v.EventType === 1) {
+                riskType = '安全隐患';
+                iconType = 'riskDanger';
+            } else if (v.EventType === 2) {
+                riskType = '其他';
+                iconType = 'riskOther';
+            }
+            riskObj[level] = riskObj[level] || {
+                key: riskType,
+                properties: {
+                    name: riskType
+                },
+                children: []
+            };
+            let status = '';
+            if (v.Status === -1) {
+                status = '已提交';
+            } else if (v.Status === 0) {
+                status = '未审核通过';
+            } else if (v.Status === 1) {
+                status = '（审核通过）整改中';
+            } else if (v.Status === 2) {
+                status = '整改完成';
+            } else if (v.Status === 3) {
+                status = '确认完成';
+            }
+            riskObj[level].children.push({
+                type: iconType,
+                key: v.ID,
+                properties: {
+                    riskType: riskType,
+                    measure: '',
+                    name: name,
+                    Problem: v.Problem,
+                    response_org: ResponseOrg ? ResponseOrg.Full_Name : '',
+                    status: status,
+                    RouteID: v.RouteID,
+                    CreateTime: v.CreateTime,
+                    ID: v.ID,
+                    InputerObj: v.InputerObj,
+                    Supervisor: v.Supervisor,
+                    type: 'risk'
+                },
+                geometry: {
+                    type: 'Point',
+                    coordinates: coordinates
+                }
+            });
+        });
+    }
+    for (let i in riskObj) {
+        risks.push(riskObj[i]);
+    }
+    return risks;
+};
+
+export const handleTrackData = (routes) => {
+    let trackTree = [];
+    let personNoList = [];
+    if (routes && routes instanceof Array && routes.length > 0) {
+        routes.forEach(route => {
+            if (route && route.ID && route.PatrolerUser !== undefined && route.PatrolerUser !== null) {
+                let PatrolerUser = route.PatrolerUser;
+                let getDataStatus = true;
+                let dataIndex = 0;
+                personNoList.forEach((person, index) => {
+                    if (person === PatrolerUser.ID) {
+                        getDataStatus = false;
+                        dataIndex = index;
+                    }
+                });
+                if (getDataStatus) {
+                    let children = [];
+                    children.push({
+                        ID: route.ID,
+                        CreateTime: route.CreateTime,
+                        EndTime: route.EndTime,
+                        Patroler: route.Patroler,
+                        Status: route.Status,
+                        PatrolerUser: route.PatrolerUser
+                    });
+                    trackTree.push({
+                        ID: PatrolerUser.ID,
+                        Full_Name: PatrolerUser.Full_Name,
+                        PK: PatrolerUser.PK,
+                        Phone: PatrolerUser.Phone,
+                        User_Name: PatrolerUser.User_Name,
+                        children: children
+                    });
+                    personNoList.push(PatrolerUser.ID);
+                } else {
+                    trackTree[dataIndex].children.push({
+                        ID: route.ID,
+                        CreateTime: route.CreateTime,
+                        EndTime: route.EndTime,
+                        Patroler: route.Patroler,
+                        Status: route.Status,
+                        PatrolerUser: route.PatrolerUser
+                    });
+                }
+            }
+        });
+    }
+    return trackTree;
+};
+
+export const handleCuringTaskData = async (curingTypesData, curingTasks) => {
+    let curingTaskTreeData = [];
+    if (curingTasks && curingTasks instanceof Array && curingTasks.length > 0) {
+        for (let i = 0; i < curingTasks.length; i++) {
+            let task = curingTasks[i];
+            if (task && task.ID) {
+                curingTypesData.map((type) => {
+                    if (type.ID === task.CuringType) {
+                        let exist = false;
+                        let childData = [];
+                        // 查看TreeData里有无这个类型的数据，有的话，push
+                        curingTaskTreeData.map((treeNode) => {
+                            if (treeNode.ID === type.ID) {
+                                exist = true;
+                                childData = treeNode.children;
+                                childData.push((task));
+                            }
+                        });
+                        // 没有的话，创建
+                        if (!exist) {
+                            childData.push(task);
+                            curingTaskTreeData.push({
+                                ID: type.ID,
+                                Name: type.Base_Name,
+                                children: childData
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    }
+    return curingTaskTreeData;
+};
+
+export const handleCuringTaskMess = (str, taskMess, totalThinClass, curingTypes) => {
+    let target = str.split(',').map(item => {
+        return item.split(' ').map(_item => _item - 0);
+    });
+    let treeNodeName = taskMess.CuringMans;
+    let typeName = '';
+    curingTypes.map((type) => {
+        if (type.ID === taskMess.CuringType) {
+            typeName = type.Base_Name;
+        }
+    });
+    let treearea = [];
+    let status = '未完成';
+    if (taskMess.Status === 2) {
+        status = '已上报';
+    }
+    let regionData = getTaskThinClassName(taskMess, totalThinClass);
+    let sectionName = regionData.regionSectionName;
+    let smallClassName = regionData.regionSmallName;
+    let thinClassName = regionData.regionThinName;
+    taskMess.sectionName = sectionName;
+    taskMess.smallClassName = smallClassName;
+    taskMess.thinClassName = thinClassName;
+    taskMess.status = status;
+    taskMess.typeName = typeName;
+    let arr = [];
+    target.map((data, index) => {
+        if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+            arr.push([data[1], data[0]]);
+        }
+    });
+    treearea.push(arr);
+    let message = {
+        key: 3,
+        type: status === '已上报' ? 'realCuringTask' : 'planCuringTask',
+        properties: {
+            ID: taskMess.ID,
+            name: treeNodeName,
+            type: status === '已上报' ? 'realCuringTask' : 'planCuringTask',
+            typeName: typeName || '',
+            status: status || '',
+            CuringMans: taskMess.CuringMans || '',
+            Area: (taskMess.Area || '') + '亩',
+            CreateTime: taskMess.CreateTime || '',
+            PlanStartTime: taskMess.PlanStartTime || '',
+            PlanEndTime: taskMess.PlanEndTime || '',
+            StartTime: taskMess.StartTime || '',
+            EndTime: taskMess.EndTime || '',
+            sectionName: taskMess.sectionName || '',
+            smallClassName: taskMess.smallClassName || '',
+            thinClassName: taskMess.thinClassName || ''
+        },
+        geometry: { type: 'Polygon', coordinates: treearea }
+    };
+    return message;
 };

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tree, Input } from 'antd';
+import { Tree, Input, Spin } from 'antd';
 const TreeNode = Tree.TreeNode;
 const Search = Input.Search;
 export default class TreeAdoptTree extends Component {
@@ -59,7 +59,8 @@ export default class TreeAdoptTree extends Component {
 
     render () {
         let {
-            content = []
+            treetypesTree = [],
+            treetypesTreeLoading
         } = this.props;
         const {
             searchTree,
@@ -69,8 +70,8 @@ export default class TreeAdoptTree extends Component {
         if (searchValue) {
             contents = searchTree;
         } else {
-            for (let j = 0; j < content.length; j++) {
-                const element = content[j];
+            for (let j = 0; j < treetypesTree.length; j++) {
+                const element = treetypesTree[j];
                 if (element !== undefined) {
                     contents.push(element);
                 }
@@ -78,23 +79,25 @@ export default class TreeAdoptTree extends Component {
         }
         return (
             <div>
-                <Search
-                    placeholder='请输入树种名称'
-                    onSearch={this.searchTree.bind(this)}
-                    style={{ width: '100%', marginBotton: 10, paddingRight: 5 }}
-                />
-                <div className={this.genIconClass()}>
-                    <Tree
-                        checkable
-                        showIcon
-                        onCheck={this.onCheck.bind(this)}
-                        showLine
-                    >
-                        {contents.map(p => {
-                            return this.loop(p);
-                        })}
-                    </Tree>
-                </div>
+                <Spin spinning={treetypesTreeLoading}>
+                    <Search
+                        placeholder='请输入树种名称'
+                        onSearch={this.searchTree.bind(this)}
+                        style={{ width: '100%', marginBotton: 10, paddingRight: 5 }}
+                    />
+                    <div className={this.genIconClass()}>
+                        <Tree
+                            checkable
+                            showIcon
+                            onCheck={this.onCheck.bind(this)}
+                            showLine
+                        >
+                            {contents.map(p => {
+                                return this.loop(p);
+                            })}
+                        </Tree>
+                    </div>
+                </Spin>
             </div>
 
         );

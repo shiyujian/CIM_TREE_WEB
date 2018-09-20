@@ -20,7 +20,7 @@ export const getNurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
 export const getCarpackbysxm = createFetchAction(`${FOREST_API}/tree/carpackbysxm/{{sxm}}`, []);
 // 获取树木现场种植的信息
 export const getTreeMess = createFetchAction(`${FOREST_API}/tree/tree/{{sxm}}`, []);
-export const getUserDetail = createFetchAction(`${USER_API}/users/{{pk}}`, []);
+export const getUserDetail = createFetchAction(`${USER_API}/users/{{pk}}/`, []);
 export const getTreeTypeAction = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
@@ -46,6 +46,13 @@ export const switchDashboardFullScreenState = createAction(`${ID}切换二维展
 export const switchDashboardAreaTreeLayer = createAction(`${ID}切换二维展示树图层`);
 export const switchDashboardAreaMeasure = createAction(`${ID}切换二维展示面积计算`);
 export const switchDashboardFocus = createAction(`${ID}切换二维展示聚焦初始位置`);
+// export const switchRiskTreeTimeType = createAction(`${ID}切换安全隐患时间筛选条件`);
+export const getAreaTreeLoading = createAction(`${ID}区域地块树加载loading`);
+export const getRiskTreeLoading = createAction(`${ID}安全隐患树加载loading`);
+export const getTrackTreeLoading = createAction(`${ID}巡检路线树加载loading`);
+export const getTreetypesTreeLoading = createAction(`${ID}树种筛选树加载loading`);
+export const getCuringTaskTreeLoading = createAction(`${ID}养护任务树加载loading`);
+export const getSurvivalRateTreeLoading = createAction(`${ID}成活率树加载loading`);
 
 export const actions = {
     getTreearea,
@@ -78,7 +85,14 @@ export const actions = {
     switchDashboardFullScreenState,
     switchDashboardAreaTreeLayer,
     switchDashboardAreaMeasure,
-    switchDashboardFocus
+    switchDashboardFocus,
+    // switchRiskTreeTimeType
+    getAreaTreeLoading,
+    getRiskTreeLoading,
+    getTrackTreeLoading,
+    getTreetypesTreeLoading,
+    getCuringTaskTreeLoading,
+    getSurvivalRateTreeLoading
 };
 export default handleActions(
     {
@@ -171,7 +185,49 @@ export default handleActions(
                 ...state,
                 dashboardFocus: payload
             };
+        },
+        [getAreaTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                areaTreeLoading: payload
+            };
+        },
+        [getRiskTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                riskTreeLoading: payload
+            };
+        },
+        [getTrackTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                trackTreeLoading: payload
+            };
+        },
+        [getTreetypesTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                treetypesTreeLoading: payload
+            };
+        },
+        [getCuringTaskTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                curingTaskTreeLoading: payload
+            };
+        },
+        [getSurvivalRateTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                survivalRateTreeLoading: payload
+            };
         }
+        // [switchRiskTreeTimeType]: (state, { payload }) => {
+        //     return {
+        //         ...state,
+        //         riskTreeTimeType: payload
+        //     };
+        // }
     },
     {}
 );

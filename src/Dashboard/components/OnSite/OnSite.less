@@ -55,7 +55,7 @@
         position: absolute;
         left: 330px;
         top: 40px;
-        height: 90%;
+        height: 80%;
         width: 260px;
         transition: all 0.3s;
         z-index: 980;
@@ -103,12 +103,42 @@
     }
 
     /*安全隐患*/
-    .dashboard-riskIcon {
+    .dashboard-riskQualityIcon {
         width: 21px !important;
         height: 26px !important;
         top: -5px;
         left: -4px;
-        background-image: url('../ImageIcon/risk.png');
+        background-image: url('./RiskImg/quality.png');
+        background-size: 100% 100%;
+    }
+
+    /*安全隐患*/
+    .dashboard-riskDangerIcon {
+        width: 21px !important;
+        height: 26px !important;
+        top: -5px;
+        left: -4px;
+        background-image: url('./RiskImg/danger.png');
+        background-size: 100% 100%;
+    }
+
+    /*安全隐患*/
+    .dashboard-riskOtherIcon {
+        width: 21px !important;
+        height: 26px !important;
+        top: -5px;
+        left: -4px;
+        background-image: url('./RiskImg/other.png');
+        background-size: 100% 100%;
+    }
+
+    /*养护任务*/
+    .dashboard-curingPlanTaskIcon {
+        width: 25px !important;
+        height: 25px !important;
+        top: -13px;
+        left: -6px;
+        background-image: url('../ImageIcon/curingTask.png');
         background-size: 100% 100%;
     }
 
@@ -190,6 +220,88 @@
         margin-top: 6px;
     }
 
+    .dashboard-menuSwitchRiskTypeLayout {
+        position: absolute;
+        z-index: 960;
+        top: 360px;
+        right: 40px;
+        width: 76px;
+        height: 150px;
+        display: block;
+        background-image: url('./RiskImg/background.png');
+    }
+
+    dashboard-menuSwitchRiskTypeDataLayout {
+        margin-top: 20px;
+    }
+    .dashboard-rightMenuRiskTypeImgLayout {
+        margin-left: 14px;
+        margin-top: -31px;
+    }
+
+    .dashboard-rightMenuRiskTypeSelLayout {
+        margin-bottom: 10px;
+        display: inline-block;
+        background-image: url('./RiskImg/select.png');
+        background-size: 100% 100%;
+        width: 18px;
+        height: 18px;
+        margin-left: 4px;
+        margin-top: 6px;
+    }
+
+    .dashboard-rightMenuRiskTypeUnSelLayout {
+        margin-bottom: 10px;
+        display: inline-block;
+        background-image: url('./RiskImg/unSelect.png');
+        background-size: 100% 100%;
+        width: 18px;
+        height: 18px;
+        margin-left: 4px;
+        margin-top: 6px;
+    }
+
+    .dashboard-menuSwitchCuringTaskTypeLayout {
+        position: absolute;
+        z-index: 960;
+        top: 360px;
+        right: 40px;
+        width: 76px;
+        height: 350px;
+        display: block;
+        background-image: url('./CuringTaskImg/background.png');
+    }
+
+    dashboard-menuSwitchCuringTaskTypeDataLayout {
+        margin-top: 20px;
+    }
+    .dashboard-rightMenuCuringTaskTypeImgLayout {
+        margin-left: 14px;
+        margin-top: -31px;
+    }
+
+    .dashboard-rightMenuCuringTaskTypeSelLayout {
+        margin-bottom: 10px;
+        display: inline-block;
+        background-image: url('./CuringTaskImg/select.png');
+        background-size: 100% 100%;
+        width: 18px;
+        height: 18px;
+        margin-left: 4px;
+        margin-top: 6px;
+    }
+
+    .dashboard-rightMenuCuringTaskTypeUnSelLayout {
+        margin-bottom: 10px;
+        display: inline-block;
+        background-image: url('./CuringTaskImg/unSelect.png');
+        background-size: 100% 100%;
+        width: 18px;
+        height: 18px;
+        margin-left: 4px;
+        margin-top: 6px;
+    }
+
     .ant-tree li .ant-tree-iconEle {
         width: 16px;
         height: 16px;
@@ -255,5 +367,33 @@
     /*修改菜单边距*/
     .aside .ant-collapse-content {
         padding: 0 8px;
+    }
+
+    .dashboard-rightAreaMenu {
+        position: absolute;
+        right: 120px;
+        top: 40px;
+        height: 80%;
+        width: 260px;
+        transition: all 0.3s;
+        z-index: 980;
+
+        .dashboard-rightAreaMenu-aside {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255, 0.9);
+            color: #333;
+            z-index: 999;
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            .dashboard-rightAreaMenu-areaTree {
+                margin-top: 20px;
+                margin-left: 20px;
+            }
+        }
     }
 }

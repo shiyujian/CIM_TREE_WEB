@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tree } from 'antd';
+import { Tree, Spin } from 'antd';
 const TreeNode = Tree.TreeNode;
 
 export default class PkCodeTree extends Component {
@@ -33,24 +33,23 @@ export default class PkCodeTree extends Component {
     }
 
     render () {
-        const { treeData = [] } = this.props;
+        const {
+            treeData = [],
+            areaTreeLoading
+        } = this.props;
+        console.log('areaTreeLoading', areaTreeLoading);
         return (
             <div>
-                {treeData.length ? (
+                <Spin spinning={areaTreeLoading}>
                     <Tree
                         showLine
-                        // selectedKeys={[this.props.selectedKeys]}
                         onSelect={this.props.onSelect}
-                        // defaultExpandedKeys={areaTreeKeys}
-                        // defaultSelectedKeys={areaTreeKeys}
                     >
                         {treeData.map(p => {
                             return this.loop(p);
                         })}
                     </Tree>
-                ) : (
-                    ''
-                )}
+                </Spin>
             </div>
         );
     }
