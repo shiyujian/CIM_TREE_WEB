@@ -1501,8 +1501,7 @@ class Addition extends Component {
                                 account: {
                                     person_name: addition.person_name,
                                     person_type: 'C_PER',
-                                    person_avatar_url:
-                                        this.props.fileList || '',
+                                    person_avatar_url: this.props.fileList || '',
                                     person_signature_url:
                                         this.props.postUploadAutographs || '',
                                     organization: {

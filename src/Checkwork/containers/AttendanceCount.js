@@ -9,8 +9,10 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
+import { CountFilter, CountTable } from '../components/AttendanceCount';
 @connect(
     state => {
+        
         const { checkwork: { attendanceCount = {} }, platform } = state;
         return { ...attendanceCount, platform };
     },
@@ -32,14 +34,10 @@ export default class AttendanceCount extends Component {
 
     render () {
         return (
-            <Body>
-                <Main>
-                    <DynamicTitle title='考勤统计' {...this.props} />
-                    <Content>
-                        考勤统计
-                    </Content>
-                </Main>
-            </Body>
+            <div style={{overflow:'hidden', padding:'0 20px'}}>
+                <CountFilter {...this.props} {...this.state} />
+                <CountTable {...this.props} {...this.state} /> 
+            </div>     
         );
     }
 }

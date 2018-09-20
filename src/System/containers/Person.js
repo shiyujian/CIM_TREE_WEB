@@ -22,7 +22,6 @@ export default class Person extends Component {
     static propTypes = {};
 
     render () {
-        // console.log("3333333333",this.props)
         return (
             <div>
                 <DynamicTitle title='用户管理' {...this.props} />

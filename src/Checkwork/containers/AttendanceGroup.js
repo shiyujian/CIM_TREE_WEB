@@ -9,6 +9,11 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
+import {
+    AttendanceGroupTable,
+    AsideTree
+} from '../components/AttendanceGroup';
+import './index.less';
 @connect(
     state => {
         const { checkwork: { attendanceGroup = {} }, platform } = state;
@@ -31,17 +36,14 @@ export default class AttendanceGroup extends Component {
     componentDidMount () {}
 
     render () {
-        return (
-            <Body>
-                <Main>
-                    <DynamicTitle title='考勤群体' {...this.props} />
-                    <Content>
-                        <div>
-                        考勤群体
-                        </div>
-                    </Content>
-                </Main>
-            </Body>
+        return (       
+            <div className='taskTeam-Layout'>
+                <AsideTree {...this.props} {...this.state} className='aside-Layout'/>
+                <div className='table-Layout'>
+                    <AttendanceGroupTable {...this.props} {...this.state} />
+                </div>
+            </div>
+               
         );
     }
 }

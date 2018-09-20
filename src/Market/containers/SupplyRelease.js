@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/supplyRelease';
 import { actions as platformActions } from '_platform/store/global';
+import { DataList } from '../components/SupplyRelease';
 import {
     Main,
     Body,
@@ -36,9 +37,7 @@ export default class SupplyRelease extends Component {
                 <Main>
                     <DynamicTitle title='供应发布' {...this.props} />
                     <Content>
-                        <div>
-                        供应发布
-                        </div>
+                        <DataList />
                     </Content>
                 </Main>
             </Body>
