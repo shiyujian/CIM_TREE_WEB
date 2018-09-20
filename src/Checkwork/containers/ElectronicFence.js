@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/electronicFence';
 import { actions as platformActions } from '_platform/store/global';
+import { TaskCreateTable } from '../components/ElectronicFence';
 
 import {
     Main,
@@ -33,14 +34,7 @@ export default class ElectronicFence extends Component {
 
     render () {
         return (
-            <Body>
-                <Main>
-                    <DynamicTitle title='电子围栏' {...this.props} />
-                    <Content>
-                        
-                    </Content>
-                </Main>
-            </Body>
+            <TaskCreateTable {...this.props} />        
         );
     }
 }

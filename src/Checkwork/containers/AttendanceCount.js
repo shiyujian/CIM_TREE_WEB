@@ -34,15 +34,10 @@ export default class AttendanceCount extends Component {
 
     render () {
         return (
-            <Body>
-                <Main>
-                    <DynamicTitle title='考勤统计' {...this.props} />
-                    <Content>
-                        <CountFilter {...this.props} {...this.state} />
-                        <CountTable {...this.props} {...this.state} />
-                    </Content>
-                </Main>
-            </Body>
+            <div style={{overflow:'hidden', padding:'0 20px'}}>
+                <CountFilter {...this.props} {...this.state} />
+                <CountTable {...this.props} {...this.state} /> 
+            </div>     
         );
     }
 }
