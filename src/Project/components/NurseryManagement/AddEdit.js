@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Icon, Input, Button, Select, Modal, Form, Upload, Cascader, notification, message } from 'antd';
 import { checkTel, isCardNo, layoutT } from '../common';
-import { FOREST_API } from '../../../_platform/api';
+import { FOREST_API } from '_platform/api';
 const FormItem = Form.Item;
 
 class AddEdit extends Component {
@@ -28,7 +28,9 @@ class AddEdit extends Component {
         console.log(this.props.record);
         this.setState({
             record: this.props.record,
-            options: this.props.options
+            options: this.props.options,
+            LeaderCard: this.props.record.LeaderCard,
+            LeaderCardBack: this.props.record.LeaderCardBack
         });
     }
     render () {
@@ -82,6 +84,7 @@ class AddEdit extends Component {
                 });
             }
         };
+        console.log(record);
         return (
             <div className='add-edit'>
                 <Modal
@@ -269,6 +272,7 @@ class AddEdit extends Component {
             };
             if (record) {
                 postdata.ID = record.ID;
+                postdata.WKT = 'POINT(120 30)';
                 putNursery({}, postdata).then(rep => {
                     if (rep && rep.code === 2) {
                         notification.error({

@@ -1,51 +1,61 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs } from 'antd';
+import { Form, Input, Button, Tabs, Select } from 'antd';
 import Menu from './Menu';
+import './DataList.less';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
+const Option = Select.Option;
 
 class DataList extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            page: 1,
+            total: 0,
+            dataList: [],
             a: 1
         };
+        this.onSearch = this.onSearch.bind(this);
         this.handlePane = this.handlePane.bind(this); // 切换标签页
-        this.handleSubmit = this.handleSubmit.bind(this); // 提交查询
+    }
+    componentDidMount () {
+        this.onSearch();
     }
     render () {
         const { getFieldDecorator } = this.props.form;
         return (
-            <div className='seedling-purchase' style={{padding: '20px 40px'}}>
-                <Form onSubmit={this.handleSubmit} layout='inline'>
+            <div className='seedling-purchase' style={{padding: '0 20px'}}>
+                <Form layout='inline'>
                     <FormItem
                         label='采购编号'
                     >
-                        {getFieldDecorator('email')(
+                        {getFieldDecorator('purchaseno')(
                             <Input style={{width: 150}} />
                         )}
                     </FormItem>
                     <FormItem
                         label='采购名称'
                     >
-                        {getFieldDecorator('email')(
+                        {getFieldDecorator('projectname')(
                             <Input style={{width: 150}} />
                         )}
                     </FormItem>
                     <FormItem
                         label='状态'
                     >
-                        {getFieldDecorator('email')(
-                            <Input style={{width: 150}} />
+                        {getFieldDecorator('status')(
+                            <Select allowClear style={{ width: 150 }}>
+                                <Option value={0}>未发布</Option>
+                                <Option value={1}>报价中</Option>
+                                <Option value={2}>选标中</Option>
+                                <Option value={3}>已结束</Option>
+                            </Select>
                         )}
                     </FormItem>
                     <FormItem style={{marginLeft: 134}}>
-                        <Button
-                            type='primary'
-                            htmlType='submit'
-                        >
+                        <Button type='primary' onClick={this.onSearch}>
                             查询
                         </Button>
                     </FormItem>
@@ -58,10 +68,26 @@ class DataList extends Component {
             </div>
         );
     }
-    handlePane () {
-
+    onSearch () {
+        const { getPurchaseList } = this.props.actions;
+        const formVal = this.props.form.getFieldsValue();
+        const { page } = this.state;
+        getPurchaseList({}, {
+            purchaseno: formVal.purchaseno || '',
+            projectname: formVal.projectname || '',
+            status: formVal.status || 0,
+            page
+        }).then(rep => {
+            if (rep.code === 200) {
+                this.setState({
+                    page: rep.pageinfo.page,
+                    total: rep.pageinfo.total,
+                    dataList: rep.content
+                });
+            }
+        });
     }
-    handleSubmit () {
+    handlePane () {
 
     }
 }

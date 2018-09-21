@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 
-import { Form, Input, Button, Tabs } from 'antd';
+import { Form, Input, Button, Tabs, Card, Col, Row } from 'antd';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
@@ -19,15 +19,15 @@ class Menu extends Component {
     render () {
         const { getFieldDecorator } = this.props.form;
         return (
-            <div className='seedling-supply-menu'>
-                <Link to='/market/supplydetails' key='1'>
-                    <div style={{width: 230, height: 150}}>
-                        <img src='' alt='图片找不到了' width='230' height='150' />
-                        <h3>松柏（2200株）<span>一个月前发布</span></h3>
+            <div className='menu'>
+                <Link to='/market/supplydetails'>
+                    <Card style={{width: 230, height: 150}} key='1'>
+                        <img src='' alt='图片找不到了' width='220' height='150' />
+                        <h3>松柏（2200株）<span style={{float: 'right', fontSize: 12, color: '#888'}}>一个月前发布</span></h3>
                         <p>主杆径：2-3厘米</p>
                         <p>北京一亩良田公司</p>
-                        <p className='last-price'>100-200<span>山东菏泽</span></p>
-                    </div>
+                        <p><span style={{color: '#ff5b05', fontSize: 20, fontWeight: 'bold'}}>100-200</span><span style={{float: 'right'}}>山东菏泽</span></p>
+                    </Card>
                 </Link>
             </div>
         );

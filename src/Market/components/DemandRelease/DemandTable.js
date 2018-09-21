@@ -23,39 +23,41 @@ export default class DemandTable extends Component {
             display = 'none'
         }
         return (
-            <div style={{display: display}}>
+            <div style={{display: display, padding: '0 20px'}}>
                 <Filter {...this.props} {...this.state} />
                 <div>
                     {
                         datasource.map((data, index) => {
                             return (
-                                <Card title='card' key='1'>
+                                <Card title='card' key='1' className='menu'>
                                     <Row className='DemandTable-span-display'>
-                                        <span className='DemandTable-card-span'>测试</span>
-                                        <span>报价中</span>
+                                        <Col span={24}>
+                                            <span className='DemandTable-card-span'>测试</span>
+                                            <span>报价中</span>
+                                        </Col>
                                     </Row>
-                                    <div className='DemandTable-card-layout'>
-                                        <div className='DemandTable-card-sub-layout'>
-                                            <div className='DemandTable-span-display'>
-                                                <span>报价起止时间：</span>
-                                            </div>
-                                            <div className='DemandTable-span-display'>
+                                    <Row className='DemandTable-card-layout'>
+                                        <Col span={6}>
+                                            <p>
+                                                <span>报价起止时间:</span>
+                                            </p>
+                                            <p>
                                                 <span>用苗地：</span>
-                                            </div>
-                                            <div className='DemandTable-span-display'>
+                                            </p>
+                                            <p>
                                                 <span>采购品种：</span>
-                                            </div>
-                                            <div className='DemandTable-span-display'>
+                                            </p>
+                                            <p>
                                                 <span>联系方式：</span>
-                                            </div>
-                                        </div>
-                                        <div className='DemandTable-card-sub-layout'>
+                                            </p>
+                                        </Col>
+                                        <Col span={6}>
                                             sssssssssssss
-                                        </div>
-                                        <div className='DemandTable-card-sub-layout'>
+                                        </Col>
+                                        <Col span={6}>
                                             ddddddddd
-                                        </div>
-                                    </div>
+                                        </Col>
+                                    </Row>
                                 </Card>
                             );
                         })

@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import { Form, Button, Input, Select, Tabs } from 'antd';
 import Menu from './Menu';
-import './DataList.less';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -19,7 +18,7 @@ class DataList extends Component {
     render () {
         const { getFieldDecorator } = this.props.form;
         return (
-            <div className='supply-release' style={{padding: '20px 40px'}}>
+            <div className='supply-release' style={{padding: '0 20px'}}>
                 <Form layout='inline' onSubmit={this.handleSubmit}>
                     <FormItem
                         label='苗木名称'

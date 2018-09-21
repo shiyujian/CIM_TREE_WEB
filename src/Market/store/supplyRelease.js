@@ -1,19 +1,28 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
-
+import {createFetchActionWithHeaders as myFetch} from './fetchAction';
 import {
-    FOREST_API
+    FOREST_API, SEEDLING_API
 } from '_platform/api';
 
 export const ID = 'Market_supermarket_supplyRelease';
 // 示例action
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
+export const AddCommodity = createFetchAction(`${SEEDLING_API}/good/spu`, [], 'POST'); // 新增苗木
+export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); // 新增苗木
+export const getNurseryByPk = createFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃基地列表
 // 修改选择地图的方式
 export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 
+export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=mall`, [], 'POST'); // 上传图片
+
 export const actions = {
-    getCuring
+    getCuring,
+    AddCommodity,
+    getTreeTypes,
+    getNurseryByPk,
+    postUploadImage
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({
@@ -21,3 +30,4 @@ export default handleActions({
         selectMap: payload
     })
 }, {});
+

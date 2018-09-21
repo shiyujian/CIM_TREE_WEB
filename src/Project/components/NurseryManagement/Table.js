@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form } from 'antd';
-import { FOREST_API } from '../../../_platform/api';
+import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, message } from 'antd';
+import { FOREST_API } from '_platform/api';
 import AddEdit from './AddEdit';
-import { getUserId, formItemLayout } from '../common';
+import { getUser, formItemLayout } from '_platform/auth';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -295,16 +295,19 @@ class Tablelevel extends Component {
             if (err) {
                 return;
             }
-            const Checker = getUserId();
+            const { id } = getUser();
             const param = {
                 ID: this.state.record.ID,
-                Checker: Checker,
+                Checker: id,
                 CheckStatus: values.CheckStatus,
                 CheckInfo: values.CheckInfo,
                 CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
             };
             checkNursery({}, param).then((rep) => {
-                console.log(rep);
+                if (rep.code === 1) {
+                    message.success('审核成功');
+                    this.handleCancel();
+                }
             });
         });
     }
@@ -353,6 +356,7 @@ class Tablelevel extends Component {
             auditVisible: false,
             record: null
         });
+        this.onSearch();
     }
 }
 

@@ -15,7 +15,6 @@ const headers = {
 	// 'pragma': 'no-cache',
 };
 
-
 export default (url, [successAction, failAction], method = 'GET', defaultParams = {}) => {
 	method = method.toUpperCase();
 	return (pathnames = {}, data = {}, refresh = true) => {

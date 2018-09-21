@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Input, Button, Select, Table, Pagination, Modal, Form } from 'antd';
-import { getUser } from '_platform/auth';
-import { formItemLayout } from '../common';
+import { Input, Select, Table, Modal, Form, message } from 'antd';
+import { getUser, formItemLayout } from '_platform/auth';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -45,13 +44,16 @@ class Tablelevel extends Component {
         }, {
             title: '审核状态',
             dataIndex: 'CheckStatus',
-            key: '5'
+            key: '5',
+            render: (text) => {
+                return text === 0 ? '未审核' : '已审核';
+            }
         }, {
             title: '操作',
             dataIndex: 'action',
             key: '6',
             render: (text, record) => {
-                if (record.CheckStatus) {
+                if (record.CheckStatus === 0) {
                     return <a onClick={this.toCheck.bind(this, record)}>审核</a>;
                 }
             }
@@ -125,15 +127,20 @@ class Tablelevel extends Component {
             if (err) {
                 return;
             }
+            const { id } = getUser();
             const param = {
                 ID: this.state.record.ID,
-                Checker: this.Checker,
+                Checker: id,
                 CheckStatus: values.CheckStatus,
                 CheckInfo: values.CheckInfo,
                 CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
             };
             checknb2s({}, param).then((rep) => {
                 console.log(rep);
+                if (rep.code === 1) {
+                    message.success('审核成功');
+                    this.handleCancel();
+                }
             });
         });
     }

@@ -43,6 +43,9 @@
 3.IP、端口和服务地址必须做出说明
 4.在src/_platform/API.js和src下所有源码当中,不能出现IP和端口固定的情况;
 */
+import 'whatwg-fetch';
+require('es6-promise').polyfill();
+
 window.config = window.config || {};
 let DOMAIN, SDOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
 
@@ -121,6 +124,7 @@ export const QRCODE_API = `${base}/service/appserver`;
 
 // 智慧森林
 export const FOREST_API = `${window.config.SDOMAIN}`;
+export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
 // export const FOREST_API = `${window.config.SDOMAIN}:${window.config.FORESTPORT}`;
 export const FOREST_SYSTEM = `${FOREST_API}/system`;
 // 苗圃定位模板
@@ -866,6 +870,10 @@ export const MODULES = [
                     {
                         id: 'PROJECT.SUPPLIERMANAGEMENT',
                         name: '供应商管理'
+                    },
+                    {
+                        id: 'PROJECT.RELEVANCEMANAGEMENT',
+                        name: '绑定管理'
                     }
                 ]
             }
@@ -875,6 +883,62 @@ export const MODULES = [
 // const APPLABEL = 'accounts';
 
 // const CONTENTTYPE = 'appmeta';
+
+const getUrl = (template, pathnames = {}) => {
+    return template.replace(/\{\{(\w+)}}/g, (literal, key) => {
+        if (key in pathnames) {
+            return pathnames[key];
+        } else {
+            return '';
+        }
+    });
+};
+
+export const myFetch = (
+    url,
+    [successAction, failAction],
+    method = 'POST'
+) => {
+    method = method.toUpperCase();
+    return (pathnames = {}, data = {}, headers = {}, refresh = true) => {
+        return dispatch => {
+            const params = {
+                headers: headers,
+                // mode:'cors',
+                method
+            };
+
+            let u = getUrl(url, pathnames);
+
+            params.body = data;
+            return fetch(u, params)
+                .then(response => {
+                    const contentType = response.headers.get('content-type');
+                    if (
+                        contentType &&
+                        contentType.indexOf('application/json') !== -1
+                    ) {
+                        return response.json();
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(
+                    result => {
+                        refresh &&
+                            successAction &&
+                            dispatch(successAction(result));
+                        return result;
+                    },
+                    result => {
+                        refresh && failAction && dispatch(failAction(result));
+                    }
+                );
+        };
+    };
+};
+
+export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=org`, [], 'POST');
 
 export const DOMAIN_CODES = {
     dir: '文档222',

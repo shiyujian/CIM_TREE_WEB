@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs } from 'antd';
+import { Form, Input, Button, Tabs, Card, Row, Col } from 'antd';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
@@ -18,22 +18,26 @@ class Menu extends Component {
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='menu'>
-                <header>发布时间:</header>
-                <div className='content'>
-                    <img src='' alt='图片找不到了' width='180' height='120' style={{float: 'left', margin: 23}} />
-                    <div style={{float: 'left', margin: 23}}>
-                        <h3>沙地柏<span></span></h3>
-                        <ul>
-                            <li>类型：</li>
-                            <li>用苗地：</li>
-                            <li>采购品种：</li>
-                        </ul>
-                    </div>
-                </div>
-                <div className='fixed'>
-                    <Button type='primary' onClick={this.toEditInfo}>修改信息</Button>
-                    <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>
-                </div>
+                <Card title={'发布时间：'}>
+                    <Row>
+                        <Col span={6}>
+                            <img src='' alt='图片找不到了' width='180px' height='120px' />
+                        </Col>
+                        <Col span={6}>
+                            <h3>沙地柏<span></span></h3>
+                            <p>类型：</p>
+                            <p>用苗地：</p>
+                            <p>采购品种：</p>
+                        </Col>
+                        <Col span={6}>
+                            <p>采购品种：采购品种：采购品种：</p>
+                        </Col>
+                        <Col span={6}>
+                            <Button type='primary' onClick={this.toEditInfo}>修改信息</Button>
+                            <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>
+                        </Col>
+                    </Row>
+                </Card>
             </div>
         );
     }

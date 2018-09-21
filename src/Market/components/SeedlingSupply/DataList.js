@@ -15,22 +15,26 @@ class DataList extends Component {
         this.state = {
             a: 1
         };
+        this.onSearch = this.onSearch.bind(this);
+    }
+    componentDidMount () {
+        this.onSearch();
     }
     render () {
         const { getFieldDecorator } = this.props.form;
         return (
-            <div className='seedling-supply' style={{padding: '20px 40px'}}>
-                <Form layout='inline' onSubmit={this.handleSubmit}>
+            <div className='seedling-supply' style={{padding: '0 20px'}}>
+                <Form layout='inline'>
                     <FormItem
                         label='苗木名称'
                     >
-                        {getFieldDecorator('email')(
+                        {getFieldDecorator('treetypename')(
                             <Input style={{width: '200px'}} />
                         )}
                     </FormItem>
-                    <FormItem style={{marginLeft: '200px'}}
+                    <FormItem style={{marginLeft: 150}}
                     >
-                        <Button type='primary'>查询</Button>
+                        <Button type='primary' onClick={this.onSearch}>查询</Button>
                     </FormItem>
                 </Form>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
@@ -40,6 +44,21 @@ class DataList extends Component {
                 </Tabs>
             </div>
         );
+    }
+    onSearch () {
+        const { getSeedlingSupplyList } = this.props.actions;
+        const formVal = this.props.form.getFieldsValue();
+        getSeedlingSupplyList({}, {
+            treetypename: formVal.treetypename || ''
+        }).then((rep) => {
+            if (rep.code === 200) {
+                this.setState({
+                    page: rep.pageinfo.page,
+                    total: rep.pageinfo.total,
+                    dataList: rep.content
+                });
+            }
+        });
     }
 }
 

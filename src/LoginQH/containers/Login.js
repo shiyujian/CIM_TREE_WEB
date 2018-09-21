@@ -14,7 +14,8 @@ import {
     setUser,
     clearUser,
     setPermissions,
-    removePermissions
+    removePermissions,
+    getUser
 } from '../../_platform/auth';
 import QRCode from '../components/QRCode';
 import { QRCODE_API } from '_platform/api';
@@ -53,7 +54,6 @@ class Login extends Component {
 
     componentDidMount () {
         let QH_LOGIN_USER = window.localStorage.getItem('QH_LOGIN_USER');
-        console.log('QH_LOGIN_USER', QH_LOGIN_USER);
         if (QH_LOGIN_USER) {
             QH_LOGIN_USER = JSON.parse(QH_LOGIN_USER) || {};
             if (QH_LOGIN_USER.username && QH_LOGIN_USER.password) {
@@ -69,8 +69,6 @@ class Login extends Component {
                 document.getElementById('pwdInp').value =
                     QH_LOGIN_USER.password;
                 this.state.checked = QH_LOGIN_USER.remember;
-
-                console.log('componentDidMount=====================');
             }
             // this.loginFunc(QH_LOGIN_USER, 1);
         }
@@ -87,8 +85,6 @@ class Login extends Component {
 
             me.intervalID = setInterval(function () {
                 getLoginState({ token: token }).then(rst => {
-                    console.log('token', token);
-                    console.log('rst', rst);
                     if (rst && rst.user) {
                         clearInterval(me.intervalID);
                         const {
@@ -107,8 +103,6 @@ class Login extends Component {
                             username: rst.username,
                             password: rst.password
                         };
-                        console.log('data', data);
-                        console.log('id', rst.id);
                         getTasks(
                             {},
                             { task: 'processing', executor: rst.id }
@@ -147,6 +141,8 @@ class Login extends Component {
                                 org_code,
                                 sections
                             );
+                            console.log(getUser(), 'cookie存的信息');
+
                             // cookie('QH_USER_DATA', JSON.stringify(userMessage));
                             setPermissions(permissions);
                             window.localStorage.setItem(
@@ -163,7 +159,6 @@ class Login extends Component {
                         });
                         return true;
                     } else if (rst && rst.token) {
-                        console.log('开始递归');
                         return true;
                     } else {
                         notification.error({
@@ -550,8 +545,6 @@ class Login extends Component {
                 if (rst.token) {
                     let token = rst.token;
                     let QRUrl = QRCODE_API + rst.url;
-                    console.log('token', token);
-                    console.log('QRUrl', QRUrl);
                     this.setState({
                         token: token,
                         QRUrl: QRUrl
@@ -594,7 +587,6 @@ class Login extends Component {
         } = this.props;
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                // console.log('values',values)
                 // let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
                 let partn = /^1[0-9]{10}$/;
                 let phonenumber = values.phone;
@@ -717,7 +709,6 @@ class Login extends Component {
             } else {
                 if (rst && rst.id) {
                     getForestAllUsersData().then((userData) => {
-                        console.log('userData', userData);
                         if (userData && userData.content) {
                             let content = userData.content;
                             window.localStorage.setItem(
@@ -776,6 +767,7 @@ class Login extends Component {
                                 sections,
                                 isOwnerClerk
                             );
+                            console.log(getUser(), 'cookie存的信息');
 
                             setPermissions(permissions);
 
@@ -785,7 +777,6 @@ class Login extends Component {
                                         'QH_LOGIN_USER',
                                         JSON.stringify(data)
                                     );
-                                    // console.log('uuu',window.localStorage.getItem('QH_LOGIN_USER'));
                                 } else {
                                     window.localStorage.removeItem(
                                         'QH_LOGIN_USER'

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store/seedlingPurchase';
+import * as actions from '../store/seedlingSupply';
 import { actions as platformActions } from '_platform/store/global';
 import { DataList } from '../components/SupplyDetails';
 import {

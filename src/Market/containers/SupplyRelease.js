@@ -37,7 +37,7 @@ export default class SupplyRelease extends Component {
                 <Main>
                     <DynamicTitle title='供应发布' {...this.props} />
                     <Content>
-                        <DataList />
+                        <DataList {...this.props} />
                     </Content>
                 </Main>
             </Body>
