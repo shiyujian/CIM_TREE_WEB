@@ -327,7 +327,16 @@ class CountFilter extends Component {
         } = this.props;
         validateFields((err, values) => {
             let params = {};
-            debugger
+            params['project_code'] = values.project_code;
+            params['section'] = values.section;
+            params['name'] = values.name;
+            params['searchDate'] = values.searchDate;
+            params['chuqin'] = values.chuqin;
+            params['status'] = values.status;
+            params['group'] = values.group;
+            params['role'] = values.role;
+            params['duty'] = values.duty;
+            this.props.query(params);
         });
     }
     clear () {

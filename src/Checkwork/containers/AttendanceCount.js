@@ -52,10 +52,34 @@ export default class AttendanceCount extends Component {
         });
     }
 
+    query = (queryParams) => {  //考勤查询
+        const {actions: {getCheckRecord}} = this.props;
+        let params = []; 
+        if (queryParams) {
+            for (let key in queryParams) {
+                if(queryParams[key] !=undefined){
+                    params.push(key + '=' + encodeURI(queryParams[key]));
+                }
+            }
+        }
+        params = params.join('&');
+        this.setState({
+            loading:true
+        })
+        getCheckRecord({params})
+          .then((data) => {
+              this.setState({
+                  allcheckrecord: data,
+                  loading: false
+              });
+          });
+
+    };
+
     render () {
         return (
             <div style={{overflow:'hidden', padding:'0 20px'}}>
-                <CountFilter {...this.props} {...this.state} />
+                <CountFilter {...this.props} {...this.state} query={this.query.bind(this)}/>
                 <Spin spinning={this.state.loading} tip='数据加载中，请稍等...'>
                     <CountTable {...this.props} {...this.state} /> 
                 </Spin>
