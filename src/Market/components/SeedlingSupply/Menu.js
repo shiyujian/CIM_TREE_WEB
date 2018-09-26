@@ -14,14 +14,13 @@ class Menu extends Component {
             a: 1
         };
         this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
-        this.toSoldOut = this.toSoldOut.bind(this); // 需求详情
     }
     render () {
         const { getFieldDecorator } = this.props.form;
         const { record } = this.props;
         return (
             <div className='menu'>
-                <Link to='/market/supplydetails'>
+                <Link to={`/market/supplydetails?id=${record['ID']}`}>
                     <Card bodyStyle={{ padding: 0 }} bordered={false}>
                         <div>
                             <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='100%' height='150' />
@@ -45,10 +44,6 @@ class Menu extends Component {
     }
     toEditInfo () {
 
-    }
-    toSoldOut () {
-        console.log(this);
-        window.location.href = '/market/purchasedetails';
     }
 }
 

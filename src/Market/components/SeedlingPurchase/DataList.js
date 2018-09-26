@@ -25,6 +25,7 @@ class DataList extends Component {
         this.onSearch();
     }
     render () {
+        const { dataList } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='seedling-purchase' style={{padding: '0 20px'}}>
@@ -33,21 +34,21 @@ class DataList extends Component {
                         label='采购编号'
                     >
                         {getFieldDecorator('purchaseno')(
-                            <Input style={{width: 150}} />
+                            <Input style={{width: 150}} placeholder='请输入采购编号' />
                         )}
                     </FormItem>
                     <FormItem
                         label='采购名称'
                     >
                         {getFieldDecorator('projectname')(
-                            <Input style={{width: 150}} />
+                            <Input style={{width: 150}} placeholder='请输入采购名称' />
                         )}
                     </FormItem>
                     <FormItem
                         label='状态'
                     >
                         {getFieldDecorator('status')(
-                            <Select allowClear style={{ width: 150 }}>
+                            <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
                                 <Option value={0}>未发布</Option>
                                 <Option value={1}>报价中</Option>
                                 <Option value={2}>选标中</Option>
@@ -62,7 +63,11 @@ class DataList extends Component {
                 </Form>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='全 部' key='1'>
-                        <Menu {...this.props} />
+                        {
+                            dataList.map((item, index) => {
+                                return <Menu {...this.props} record={item} key={index} />;
+                            })
+                        }
                     </TabPane>
                 </Tabs>
             </div>
@@ -91,7 +96,7 @@ class DataList extends Component {
 
     }
     onClear () {
-
+        this.props.form.resetFields();
     }
 }
 

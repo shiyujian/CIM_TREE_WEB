@@ -27,16 +27,16 @@ class Menu extends Component {
                             <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='180px' height='120px' />
                         </Col>
                         <Col span={7}>
-                            <h3>{record.TreeTypeName}<span>({record.SKU})</span></h3>
-                            <p>类型：</p>
-                            <p>价格：￥{record.MinPrice}-{record.MaxPrice}</p>
+                            <h3>{record.ProjectName}-{record.Section}<span>({record.SKU})</span></h3>
+                            <p>用苗地：{record.UseNurseryAddress}</p>
+                            <p>报价时间：{record.StartTime}-{record.EndTime}</p>
                             <p>商品备注：{record.TreeDescribe}</p>
                         </Col>
                         <Col span={6}>
                             <p>采购品种：采购品种：采购品种：</p>
                         </Col>
                         <Col span={6} style={{paddingTop: 30}}>
-                            <Link to={`/market/addseedling?id=${record.ID}`}>
+                            <Link to={`/market/adddemand?id=${record.ID}`}>
                                 <Button type='primary' onClick={this.toEditInfo}>修改信息</Button>
                             </Link>
                             <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>

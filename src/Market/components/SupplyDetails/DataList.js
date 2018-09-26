@@ -2,6 +2,7 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import { Form, Button, Input, Select, Tabs, InputNumber, Row, Col } from 'antd';
+import { searchToObj } from '_platform/auth';
 import './DataList.less';
 
 const FormItem = Form.Item;
@@ -16,8 +17,11 @@ class DataList extends Component {
         };
     }
     componentDidMount () {
-        const { getSeedlingSupplyById } = this.props.actions;
-        getSeedlingSupplyById().then((rep) => {
+        const { getProductById } = this.props.actions;
+        // 根据id获取详细信息
+        const { id } = searchToObj(this.props.location.search);
+        console.log(id, '---');
+        getProductById({}, {id}).then((rep) => {
             
         });
     }

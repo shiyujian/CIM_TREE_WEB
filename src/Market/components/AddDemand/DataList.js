@@ -19,8 +19,8 @@ class DataList extends Component {
             options: [], // 行政区划
             card: [], // 卡片个数
             treeNames: [], // 树木名称数组
-            projectName: '', // 项目名称
-            sectionName: '', // 标段
+            ProjectName: '', // 项目名称
+            Section: '', // 标段
             TreeTypeID: '', // 树木ID
             length: 0, // 树种个数
             dataList: [] // 数组
@@ -85,7 +85,7 @@ class DataList extends Component {
         }];
     }
     componentDidMount () {
-        const { getTreeTypes, getRegionCodes, getWpunittree, getNurseryByPk, getProductById } = this.props.actions;  
+        const { getTreeTypes, getRegionCodes, getWpunittree, getNurseryByPk, getPurchaseById } = this.props.actions;  
         // 获得所有项目
         getWpunittree().then(rep => {
             let arr = [];
@@ -128,9 +128,9 @@ class DataList extends Component {
         // 编辑商品
         const { id } = searchToObj(this.props.location.search);
         if (id) {
-            getProductById({id}).then(rep => {
+            getPurchaseById({id}).then(rep => {
                 this.setState({
-                    productInfo: rep
+                    purchaseInfo: rep
                 });
             });
         }
@@ -155,7 +155,7 @@ class DataList extends Component {
         });
     }
     render () {
-        const { productInfo, Option, Option_section, options } = this.state;
+        const { purchaseInfo, Option, Option_section, options } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='add-seedling' style={{padding: '0 20px'}}>
@@ -163,36 +163,29 @@ class DataList extends Component {
                     <TabPane tab='填写信息' key='1'>
                         <Form layout='inline' onSubmit={this.handleSubmit}>
                             <FormItem label='项目名称'>
-                                {getFieldDecorator('ProjectName', {
-                                    rules: [{required: true, message: '必填项'}]
-                                })(
-                                    <Select
-                                        allowClear style={{width: 150}}
-                                        onChange={this.handleProjectName}
-                                    >
-                                        {
-                                            Option.length > 0 ? Option.map(item => {
-                                                return <Option value={item.No}>{item.Name}</Option>;
-                                            }) : null
-                                        }
-                                    </Select>
-                                )}
+                                <Select
+                                    defaultValue={purchaseInfo ? purchaseInfo['ProjectName'] : ''}
+                                    allowClear style={{width: 150}}
+                                    onChange={this.handleProjectName}
+                                >
+                                    {
+                                        Option.length > 0 ? Option.map(item => {
+                                            return <Option value={item.No}>{item.Name}</Option>;
+                                        }) : null
+                                    }
+                                </Select>
                             </FormItem>
                             <FormItem label='标段选择'>
-                                {getFieldDecorator('Section', {
-                                    rules: [{required: true, message: '必填项'}]
-                                })(
-                                    <Select
-                                        allowClear style={{width: 150}}
-                                        onChange={this.handleSectionName}
-                                    >
-                                        {
-                                            Option_section.length > 0 ? Option_section.map(item => {
-                                                return <Option value={item.No}>{item.Name}</Option>;
-                                            }) : null
-                                        }
-                                    </Select>
-                                )}
+                                <Select
+                                    allowClear style={{width: 150}}
+                                    onChange={this.handleSectionName}
+                                >
+                                    {
+                                        Option_section.length > 0 ? Option_section.map(item => {
+                                            return <Option value={item.No}>{item.Name}</Option>;
+                                        }) : null
+                                    }
+                                </Select>
                             </FormItem>
                             <FormItem label='用苗地'>
                                 {getFieldDecorator('UseNurseryRegionCode', {
@@ -230,7 +223,7 @@ class DataList extends Component {
                             }
                             <FormItem label='文本介绍' className='label-block'>
                                 {getFieldDecorator('TreeDescribe', {
-                                    initialValue: productInfo ? productInfo.TreeDescribe : ''
+                                    initialValue: purchaseInfo ? purchaseInfo.TreeDescribe : ''
                                 })(
                                     <TextArea rows={4} style={{width: 750}} />
                                 )}
@@ -247,14 +240,14 @@ class DataList extends Component {
     }
     editVersion (str, index, record, e) {
         let { dataList } = this.state;
-        dataList[record.nub][index][str] = e.target.value;
+        dataList[record.cardKey][index][str] = e.target.value;
         this.setState({
             dataList
         });
     }
     toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
-        const { RegionCode, StartTime, EndTime, dataList } = this.state;
+        const { RegionCode, StartTime, EndTime, dataList, ProjectName, Section } = this.state;
         const { postPurchase } = this.props.actions;
         let Specs = [];
         dataList.map(item => {
@@ -265,8 +258,8 @@ class DataList extends Component {
         postPurchase({}, {
             StartTime,
             EndTime,
-            ProjectName: formVal.ProjectName,
-            Section: formVal.Section,
+            ProjectName,
+            Section,
             UseNurseryRegionCode: RegionCode,
             TreeDescribe: formVal.TreeDescribe,
             Status,
@@ -284,7 +277,7 @@ class DataList extends Component {
     handleProjectName (value) {
         const { getWpunittree } = this.props.actions;
         this.setState({
-            projectName: value
+            ProjectName: value
         });
         getWpunittree().then(rep => {
             let arr = [];
@@ -301,7 +294,7 @@ class DataList extends Component {
 
     handleSectionName (value) {
         this.setState({
-            sectionName: value
+            Section: value
         });
     }
     loadRegion (selectedOptions) {
@@ -344,7 +337,7 @@ class DataList extends Component {
             EndTime: dateString[1]
         });
     }
-    addVersion (nub) {
+    addVersion (cardKey) {
         if (!this.state.TreeTypeID) {
             message.error('请选择树种');
             return;
@@ -352,7 +345,7 @@ class DataList extends Component {
         let { dataList, length, card, TreeTypeID } = this.state;
         const obj = {
             number: dataList[length - 1].length,
-            nub,
+            cardKey,
             TreeTypeID,
             DBH: '',
             GroundDiameter: '',
@@ -362,15 +355,15 @@ class DataList extends Component {
             Price: '',
             Stock: ''
         };
-        dataList[nub].push(obj);
-        card[nub] = <Card key={nub}>
+        dataList[cardKey].push(obj);
+        card[cardKey] = <Card key={cardKey}>
             <div style={{marginBottom: 10}}>
                 <span>树木名称：</span>
                 <Cascader options={this.treeTypes} onChange={this.handleTreeTypes}
                     placeholder='请选择苗木品种' style={{width: 200}} />
                 <Button type='primary' onClick={this.addVersion.bind(this, length - 1)} style={{float: 'right'}}>新增规格</Button>
             </div>
-            <Table columns={this.columns} dataSource={dataList[nub]} bordered style={{minWidth: 700}} pagination={false} rowKey='number' />
+            <Table columns={this.columns} dataSource={dataList[cardKey]} bordered style={{minWidth: 700}} pagination={false} rowKey='number' />
         </Card>;
         this.setState({
             dataList,

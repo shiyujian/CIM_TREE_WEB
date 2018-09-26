@@ -1,10 +1,8 @@
 
 import React, {Component} from 'react';
 import { Form, Input, Button, Tabs, Select, Table, Upload, Row, Col, Icon, Modal, Cascader, message } from 'antd';
-import { TREETYPENO, FOREST_API, postUploadImage } from '_platform/api';
-import { searchToObj } from '_platform/auth';
-import { getUser } from '_platform/auth';
-
+import { TREETYPENO, FOREST_API } from '_platform/api';
+import { searchToObj, getUser } from '_platform/auth';
 import './DataList.less';
 
 const FormItem = Form.Item;
@@ -12,6 +10,7 @@ const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const TextArea = Input.TextArea;
 
+console.log(TREETYPENO);
 class DataList extends Component {
     constructor (props) {
         super(props);
@@ -22,19 +21,19 @@ class DataList extends Component {
             LocalPhoto: '', // 局部特写照片
             MostPhoto: '', // 成片栽植照片
             OtherPhoto: '', // 其他照片
-            dataList: [],
-            treeTypes: [],
+            dataList: [], // 表格数据
+            treeTypes: [], // 树种
             fileList_one: [],
             fileList_two: [],
             fileList_three: [],
             fileList_other: [],
-            TreeTypeName: '',
-            TreeTypeID: 0
+            TreeTypeID: '' // 树种名称
         };
-        this.loadTreeTypes = this.loadTreeTypes.bind(this); // 加载树种类型
-        this.handleTreeTypes = this.handleTreeTypes.bind(this); // 选择树种类型
+        this.treeTypeList = [];
+        this.handleTreeType = this.handleTreeType.bind(this); // 树种名称
         this.addVersion = this.addVersion.bind(this); // 增加规格
         this.editVersion = this.editVersion.bind(this); // 编辑规格
+        this.handleTreeTypeNo = this.handleTreeTypeNo.bind(this); // 树种类型
         this.columns = [{
             title: '胸径（cm）',
             dataIndex: 'DBH',
@@ -87,16 +86,24 @@ class DataList extends Component {
         }];
     }
     componentDidMount () {
-        const { getNurseryByPk, getProductById } = this.props.actions;
+        const { getTreeTypes, getNurseryByPk, getProductById } = this.props.actions;
         // 获取树种类型
-        TREETYPENO.map(item => {
-            item.value = item.id;
-            item.label = item.name;
-            item.isLeaf = false;
+        let obj = {};
+        getTreeTypes().then(rep => {
+            sessionStorage.setItem('TreeType_TREETYPENO', JSON.stringify(obj));
+            this.treeTypeList = rep;
         });
-        this.setState({
-            treeTypes: TREETYPENO
-        });
+        // 编辑商品
+        const { id } = searchToObj(this.props.location.search);
+        if (id) {
+            getProductById({id}).then(rep => {
+                this.setState({
+                    TreeTypeID: rep.TreeTypeID
+                }, () => {
+                    console.log(rep.TreeTypeID);
+                });
+            });
+        }
         // 获取苗圃基地的责任人电话，以及绑定的供应商
         const { org_code } = getUser();
         if (org_code) {
@@ -110,19 +117,9 @@ class DataList extends Component {
                 }
             });
         }
-        // 编辑商品
-        const { id } = searchToObj(this.props.location.search);
-        if (id) {
-            getProductById({id}).then(rep => {
-                console.log(rep);
-                this.setState({
-                    productInfo: rep
-                });
-            });
-        }
     }
     render () {
-        const { dataList, treeTypes, fileList_one, fileList_two, fileList_three, fileList_other, productInfo } = this.state;
+        const { dataList, treeTypes, fileList_one, fileList_two, fileList_three, fileList_other, productInfo, TreeTypeID } = this.state;
         const { getFieldDecorator } = this.props.form;
         const props_one = {
             action: '',
@@ -197,9 +194,25 @@ class DataList extends Component {
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='填写信息' key='1'>
                         <Form layout='inline' onSubmit={this.handleSubmit}>
+                            <FormItem label='树种类型'>
+                                <Select onChange={this.handleTreeTypeNo} style={{width: 150}}>
+                                    {
+                                        TREETYPENO.map(item => {
+                                            return <Option key={item.id} value={item.id}>{item.name}</Option>;
+                                        })
+                                    }
+                                </Select>
+                            </FormItem>
                             <FormItem label='树种名称'>
-                                <Cascader options={treeTypes} loadData={this.loadTreeTypes} onChange={this.handleTreeTypes}
-                                    placeholder='请选择苗木品种' style={{width: 200}} />
+                                <Select defaultValue={TreeTypeID} onChange={this.handleTreeType} style={{width: 150}}>
+                                    {
+                                        treeTypes.length > 0 ? treeTypes.map(item => {
+                                            return <Option key={item.ID} value={item.ID}>{item.TreeTypeName}</Option>;
+                                        }) : this.treeTypeList.map(item => {
+                                            return <Option key={item.ID} value={item.ID}>{item.TreeTypeName}</Option>;
+                                        })
+                                    }
+                                </Select>
                             </FormItem>
                             <FormItem label='联系人'>
                                 {getFieldDecorator('Leader')(
@@ -223,7 +236,7 @@ class DataList extends Component {
                             <FormItem label='规格' className='label-block'>
                                 <Button type='primary' onClick={this.addVersion}
                                     style={{position: 'absolute', left: 680, top: -40, zIndex: 100}}>新增</Button>
-                                <Table columns={this.columns} dataSource={dataList} bordered style={{minWidth: 700}} pagination={false} />
+                                <Table columns={this.columns} dataSource={dataList} bordered style={{maxWidth: 750}} pagination={false} />
                             </FormItem>
                             <FormItem label='上传照片' className='label-block'>
                                 <Row style={{width: 520}}>
@@ -293,47 +306,13 @@ class DataList extends Component {
             dataList: [...this.state.dataList]
         });
     }
-    handleTreeTypes (value, selectedOptions) {
-        if (selectedOptions.length === 2) {
-            this.setState({
-                TreeTypeName: selectedOptions[1].TreeTypeName,
-                TreeTypeID: selectedOptions[1].ID
-            });
-        }
-    }
-    loadTreeTypes (selectedOptions) {
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-        console.log(selectedOptions);
-        const { getTreeTypes } = this.props.actions;
-        setTimeout(() => {
-            targetOption.loading = false;
-            // 获取树种类型
-            getTreeTypes().then(rep => {
-                TREETYPENO.map(item => {
-                    item.children = [];
-                    rep.map(row => {
-                        row.value = row.ID;
-                        row.label = row.TreeTypeName;
-                        if (item.id === row.TreeTypeNo.slice(0, 1)) {
-                            item.children.push(row);
-                        }
-                    });
-                });
-                this.setState({
-                    treeTypes: TREETYPENO
-                });
-            });
-        }, 10);
-    }
     toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
-        const { TreeTypeName, TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList } = this.state;
+        const { TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList } = this.state;
         console.log(dataList);
         const { AddCommodity } = this.props.actions;
         AddCommodity({}, {
             TreeTypeID,
-            TreeTypeName,
             Photo,
             LocalPhoto,
             MostPhoto,
@@ -349,6 +328,22 @@ class DataList extends Component {
             } else if (rep.code === 2) {
                 message.error('该商品已存在');
             }
+        });
+    }
+    handleTreeTypeNo (value) {
+        let arr = [];
+        this.treeTypeList.map(item => {
+            if (item.TreeTypeNo.slice(0, 1) === value) {
+                arr.push(item);
+            }
+        });
+        this.setState({
+            treeTypes: arr
+        });
+    }
+    handleTreeType (value) {
+        this.setState({
+            TreeTypeID: value
         });
     }
 }
