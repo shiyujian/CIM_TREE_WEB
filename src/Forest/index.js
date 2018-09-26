@@ -7,6 +7,19 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @Author: ecidi.mingey
+ * @Date: 2018-09-25 10:51:59
+ * @Last Modified by: ecidi.mingey
+ * @Last Modified time: 2018-09-25 11:03:29
+ */
+/**
+ *
+ * Copyright (c) 2016-present, ecidi.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @Author: ecidi.mingey
  * @Date: 2018-09-01 16:58:31
  * @Last Modified by: ecidi.mingey
  * @Last Modified time: 2018-09-03 09:22:59
@@ -45,7 +58,8 @@ export default class ForestContainer extends Component {
             CarPackage = null,
             DataExport = null,
             SeedlingsChange = null,
-            CuringInfo = null
+            CuringInfo = null,
+            DataStatis = null
         } = this.state || {};
         return (
             <Body>
@@ -148,6 +162,12 @@ export default class ForestContainer extends Component {
                         <Route
                             path='/forest/curinginfo'
                             component={CuringInfo}
+                        />
+                    )}
+                    {DataStatis && (
+                        <Route
+                            path='/forest/datastatis'
+                            component={DataStatis}
                         />
                     )}
                 </Main>
@@ -268,6 +288,12 @@ export default class ForestContainer extends Component {
                     name: '定位数据导出'
                 }
             ]
+        },
+        {
+            key: 'datastatis',
+            id: 'FOREST.DATASTATIS',
+            path: '/forest/datastatis',
+            name: '数据统计'
         }
     ];
     static defaultOpenKeys = ['info', 'analyze', 'import'];

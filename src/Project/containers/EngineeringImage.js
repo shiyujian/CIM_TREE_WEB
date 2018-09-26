@@ -38,64 +38,69 @@ export default class EngineeringImage extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            hidden: {
-                'margin-right': '8px',
-                visibility: 'hidden'
-            },
-            show: {
-                'margin-right': '8px',
-                visibility: 'visible'
-            },
-            data: ''
+            treeSelectData: '',
+            buttonDisabled: true,
+            addDelPanel: '',
+            treeSelected: false,
+            userButtonPermission: false,
+            currentpk: '',
+            currentcode: ''
         };
     }
-    state = {
-        addOrDel: 'NOR',
-        hadSelectDir: false
-    };
 
-    selectStandardDir (value = [], node) {
-        console.log(node);
-        let data = node.node.props.data[0].children
-            ? node.node.props.data[0].children
-            : 'undefined';
-        this.setState({
-            data: data
-        });
-        this.setState({ hadSelectDir: true });
-        const [code] = value;
-        console.log('code', code);
+    selectStandardDir (keys = [], info) {
         const {
-            actions: { setcurrentcode, savecode, setcurrentpk, refreshPanelTo }
-        } = this.props;
-        if (code === undefined) {
-            setcurrentcode(code);
-            setcurrentpk(code);
-            savecode(code);
-            refreshPanelTo('NOR');
+            user
+        } = this.state;
+        console.log('info', info);
+        console.log('keys', keys);
+        let treeSelected = info.selected;
+        this.setState({
+            addDelPanel: '',
+            treeSelected
+        });
+        let userButtonPermission = false;
+        if (treeSelected) {
+            let treeSelectData = info.node.props.data;
+            console.log('treeSelectData', treeSelectData);
+            const [code] = keys;
+            console.log('code', code);
+            if (user && user.username === 'admin') {
+                userButtonPermission = true;
+            } else {
+                let extraOrgLeaf = treeSelectData.extra_params.orgLeaf ? treeSelectData.extra_params.orgLeaf : '';
+                if (extraOrgLeaf) {
+                    userButtonPermission = true;
+                }
+            }
+            this.setState({
+                currentpk: code.split('--')[0],
+                currentcode: code.split('--')[1],
+                userButtonPermission,
+                treeSelectData
+            });
         } else {
-            console.log(code.split('--')[1]);
-            setcurrentcode(code.split('--')[1]);
-            setcurrentpk(code.split('--')[0]);
-            savecode(code);
-            refreshPanelTo('NOR');
+            if (user && user.username === 'admin') {
+                userButtonPermission = true;
+            }
+            this.setState({
+                currentpk: '',
+                currentcode: '',
+                userButtonPermission,
+                treeSelectData: ''
+            });
         }
     }
 
     render () {
         const {
-            // platform: {dir: {list = [],} = {}} = {},
-            worktree = [],
-            adddelpanel = 'NOR',
-            keycode = []
+            worktree = []
         } = this.props;
-
-        const { hadSelectDir } = this.state;
-
-        let {
-            actions: { refreshPanelTo }
-        } = this.props;
-
+        const {
+            userButtonPermission,
+            addDelPanel,
+            treeSelected
+        } = this.state;
         return (
             <div>
                 <DynamicTitle title='工程影像' {...this.props} />
@@ -107,52 +112,93 @@ export default class EngineeringImage extends Component {
                         }}
                     >
                         <Button
-                            style={
-                                this.state.data === 'undefined'
-                                    ? this.state.hidden
-                                    : this.state.show
-                            }
-                            onClick={() => {
-                                refreshPanelTo('ADD');
-                            }}
+                            onClick={this.handleAddDir.bind(this)}
+                            disabled={!userButtonPermission}
                         >
                             新增目录
                         </Button>
                         <Button
-                            onClick={() => {
-                                refreshPanelTo('DEL');
-                            }}
+                            onClick={this.handleDelDir.bind(this)}
+                            disabled={!userButtonPermission || !treeSelected}
                         >
                             删除目录
                         </Button>
                     </div>
                     <PkCodeTree
                         treeData={worktree}
-                        selectedKeys={keycode}
                         onSelect={this.selectStandardDir.bind(this)}
                     />
                 </Sidebar>
                 <Content>
-                    {adddelpanel === 'NOR' ? null : adddelpanel === 'ADD' ? (
-                        <AddDirPanel {...this.props} />
-                    ) : hadSelectDir ? (
-                        <DelDirPanel {...this.props} />
-                    ) : (
-                        <Alert
-                            message='请在左侧选择需要删除的目录'
-                            type='error'
-                            closable
-                        />
-                    )}
+                    {
+                        !userButtonPermission
+                            ? null
+                            : addDelPanel === 'ADD'
+                                ? (
+                                    <AddDirPanel {...this.props} {...this.state} handleDirClear={this.handleAddDirClear.bind(this)} />
+                                )
+                                : addDelPanel === 'DEL'
+                                    ? (
+                                        <DelDirPanel {...this.props} {...this.state} handleDirClear={this.handleDelDirClear.bind(this)} />
+                                    ) : ''
+                    }
                 </Content>
             </div>
         );
+    }
+
+    handleAddDir = (e) => {
+        this.setState({
+            addDelPanel: 'ADD'
+        });
+    }
+
+    handleDelDir = (e) => {
+        this.setState({
+            addDelPanel: 'DEL'
+        });
+    }
+
+    handleAddDirClear = () => {
+        this.setState({
+            addDelPanel: ''
+        });
+    }
+
+    handleDelDirClear = () => {
+        const {
+            user
+        } = this.state;
+        let userButtonPermission = false;
+        if (user && user.username === 'admin') {
+            userButtonPermission = true;
+        }
+        console.log('userButtonPermission', userButtonPermission);
+        this.setState({
+            addDelPanel: '',
+            currentpk: '',
+            currentcode: '',
+            treeSelectData: '',
+            treeSelected: false,
+            userButtonPermission
+        });
     }
 
     componentDidMount () {
         const {
             actions: { getworkTree, savepk, addDir }
         } = this.props;
+        let user = window.localStorage.getItem('QH_USER_DATA');
+        user = JSON.parse(user);
+        console.log('user', user);
+        let userButtonPermission = false;
+        if (user && user.username === 'admin') {
+            userButtonPermission = true;
+        }
+        this.setState({
+            user: user,
+            userButtonPermission
+        });
         getworkTree({ code: Datumcode }).then(rst => {
             if (!rst.pk) {
                 addDir(

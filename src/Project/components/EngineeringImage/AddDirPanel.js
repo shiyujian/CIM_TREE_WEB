@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Form, Input, Button, message, Row, Col } from 'antd';
+import { Card, Form, Input, Button, message, Row, Col, Select } from 'antd';
 export const Datumcode = window.DeathCode.DATUM_GCYX;
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 class AddDirPanel extends Component {
     constructor (props) {
@@ -11,94 +12,106 @@ class AddDirPanel extends Component {
 
     createNewDir () {
         let {
-            actions: { addDir, refreshPanelTo, getworkTree, changeadddocs },
+            actions: { addDir, getworkTree },
             form: { validateFields },
-            adddocs = {},
             datumpk = {},
             currentcode = {},
-            currentpk = {}
+            currentpk = {},
+            user
         } = this.props;
-        if (adddocs.code === undefined || adddocs.name === undefined) {
-            message.warning('不能进行提交');
-        }
-        if (JSON.stringify(currentcode) === '{}') {
-            addDir(
-                {},
-                {
-                    name: adddocs.name,
-                    code: adddocs.code,
-                    obj_type: 'C_DIR',
-                    status: 'A',
-                    parent: {
-                        pk: datumpk,
-                        code: Datumcode,
-                        obj_type: 'C_DIR'
-                    }
-                }
-            ).then(rst => {
-                if (rst.code === '') {
-                    message.error('新增不成功');
+        validateFields((err, values) => {
+            console.log('values', values);
+            if (!err) {
+                console.log('currentcode', currentcode);
+                if (!currentcode) {
+                    addDir(
+                        {},
+                        {
+                            name: values.dirName,
+                            code: `gcyx_${values.dirCode}`,
+                            obj_type: 'C_DIR',
+                            status: 'A',
+                            parent: {
+                                pk: datumpk,
+                                code: Datumcode,
+                                obj_type: 'C_DIR'
+                            },
+                            extra_params: {
+                                orgLeaf: values.dirOrg
+                            }
+                        }
+                    ).then(rst => {
+                        if (rst.code === '') {
+                            message.error('新增不成功');
+                        } else {
+                            message.success('新增目录成功！');
+                            this.props.handleDirClear();
+                            getworkTree({ code: Datumcode });
+                            this.clear();
+                        }
+                    });
                 } else {
-                    message.success('新增目录成功！');
-                    refreshPanelTo('NOR');
-                    getworkTree({ code: Datumcode });
-                    changeadddocs();
+                    let orgLeaf = true;
+                    if (user && user.username === 'admin') {
+                        orgLeaf = values.dirOrg;
+                    }
+                    addDir(
+                        {},
+                        {
+                            name: values.dirName,
+                            code: `gcyx_${values.dirCode}`,
+                            obj_type: 'C_DIR',
+                            status: 'A',
+                            parent: {
+                                pk: currentpk,
+                                code: currentcode,
+                                obj_type: 'C_DIR'
+                            },
+                            extra_params: {
+                                orgLeaf: orgLeaf
+                            }
+                        }
+                    ).then(rst => {
+                        if (rst.code === '') {
+                            message.error('新增不成功');
+                        } else {
+                            message.success('新增目录成功！');
+                            this.props.handleDirClear();
+                            getworkTree({ code: Datumcode });
+                            this.clear();
+                        }
+                    });
                 }
+            }
+        });
+    }
+
+    clear = () => {
+        const {
+            form: {
+                setFieldsValue
+            },
+            user
+        } = this.props;
+        if (user && user.username === 'admin') {
+            setFieldsValue({
+                dirName: '',
+                dirCode: '',
+                dirOrg: ''
             });
         } else {
-            addDir(
-                {},
-                {
-                    name: adddocs.name,
-                    code: adddocs.code,
-                    obj_type: 'C_DIR',
-                    status: 'A',
-                    parent: {
-                        pk: currentpk,
-                        code: currentcode,
-                        obj_type: 'C_DIR'
-                    }
-                }
-            ).then(rst => {
-                if (rst.code === '') {
-                    message.error('新增不成功');
-                } else {
-                    message.success('新增目录成功！');
-                    refreshPanelTo('NOR');
-                    getworkTree({ code: Datumcode });
-                    changeadddocs();
-                }
+            setFieldsValue({
+                dirName: '',
+                dirCode: ''
             });
         }
-    }
-
-    name (filter, event) {
-        let name = event.target.value;
-        const {
-            actions: { changeadddocs },
-            adddocs = {}
-        } = this.props;
-        adddocs.name = name;
-        changeadddocs({ ...adddocs });
-    }
-
-    code (filter, event) {
-        let code = event.target.value;
-        const {
-            actions: { changeadddocs },
-            adddocs = {}
-        } = this.props;
-        adddocs.code = code;
-        changeadddocs({ ...adddocs });
     }
 
     render () {
         let {
             form: { getFieldDecorator },
-            filter = {},
-            adddocs = {},
             currentcode = {},
-            currentpk = {}
+            user
         } = this.props;
         console.log(currentcode);
 
@@ -106,36 +119,29 @@ class AddDirPanel extends Component {
             labelCol: {},
             wrapperCol: { span: 10 }
         };
+        let title = '';
+        if (currentcode) {
+            title = '新增子目录';
+        } else {
+            title = '新增平级目录';
+        }
 
         return (
-            <div style={{ padding: '50px 0' }}>
-                <Row>
-                    <Col span={12}>
-                        <span>
-                            {JSON.stringify(currentcode) === '{}'
-                                ? '新增平级目录'
-                                : '新增子目录'}
-                        </span>
-                    </Col>
-                    {JSON.stringify(currentcode) === '{}' ? null : (
-                        <div>
-                            <label>父级code</label>
-                            <span>{currentcode}</span>
-                            <label>父级PK</label>
-                            <span>{currentpk}</span>
-                        </div>
-                    )}
-                </Row>
+            <Card title={title}>
                 <Form layout='vertical'>
                     <FormItem {...formItemLayout} label='目录名称'>
-                        <Input
-                            placeholder='请输入目录名称'
-                            onChange={this.name.bind(this, filter)}
-                            value={adddocs.name}
-                        />
+                        {getFieldDecorator('dirName', {
+                            initialValue: '',
+                            rules: [
+                                {
+                                    required: true,
+                                    message: '请输入目录名称'
+                                }
+                            ]
+                        })(<Input placeholder='请输入目录名称' />)}
                     </FormItem>
-                    <FormItem {...formItemLayout} label='目录code值'>
-                        {getFieldDecorator('code', {
+                    <FormItem {...formItemLayout} label='目录编码'>
+                        {getFieldDecorator('dirCode', {
                             rules: [
                                 {
                                     required: true,
@@ -145,19 +151,33 @@ class AddDirPanel extends Component {
                                 }
                             ],
                             initialValue: ''
-                        })(
-                            <Input
-                                placeholder='请输入目录编码'
-                                onChange={this.code.bind(this, filter)}
-                                value={adddocs.code}
-                            />
-                        )}
+                        })(<Input placeholder='请输入目录编码' />)}
                     </FormItem>
+                    {
+                        user && user.username === 'admin'
+                            ? (<FormItem {...formItemLayout} label='是否组织机构叶子节点'>
+                                {getFieldDecorator('dirOrg', {
+                                    rules: [
+                                        {
+                                            required: true,
+                                            message:
+                                        '请选择是否组织机构叶子节点'
+                                        }
+                                    ]
+                                })(
+                                    <Select>
+                                        <Option value key={'是'}>是</Option>
+                                        <Option value={false} key={'否'}>否</Option>
+                                    </Select>
+                                )}
+                            </FormItem>) : ''
+                    }
+
                     <Button onClick={this.createNewDir.bind(this)}>
                         确定创建
                     </Button>
                 </Form>
-            </div>
+            </Card>
         );
     }
 }

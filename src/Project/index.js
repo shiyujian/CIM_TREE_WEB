@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-11 14:22:58
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-11 14:28:54
+ * @Last Modified time: 2018-09-26 16:09:54
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -67,19 +67,19 @@ export default class Project extends Component {
                     icon: <Icon name='retweet' />
                 },
                 {
-                    key: 'EngineeringImage',
-                    id: 'PROJECT.ENGINEERINGIMAGE',
-                    name: '工程影像',
-                    path: '/project/engineeringImage',
-                    exact: true,
-                    icon: <Icon name='retweet' />
-                },
-                {
                     key: 'ProDoc',
                     id: 'PROJECT.PRODOC',
                     name: '工程文档',
                     path: '/project/proDoc',
                     icon: <Icon name='code' />
+                },
+                {
+                    key: 'EngineeringImage',
+                    id: 'PROJECT.ENGINEERINGIMAGE',
+                    name: '影像资料',
+                    path: '/project/engineeringImage',
+                    exact: true,
+                    icon: <Icon name='retweet' />
                 }
             ]
         },

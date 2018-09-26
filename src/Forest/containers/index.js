@@ -10,3 +10,4 @@ export Contrastinfo from './Contrastinfo';
 export DataExport from './DataExport';
 export SeedlingsChange from './SeedlingsChange';
 export CuringInfo from './CuringInfo';
+export DataStatis from './DataStatis';
