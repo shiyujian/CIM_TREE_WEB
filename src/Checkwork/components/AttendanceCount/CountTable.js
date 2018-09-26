@@ -17,7 +17,8 @@ export default class CountTable extends Component {
 
 
     render () {
-        
+
+        let allcheckrecord = this.props.allcheckrecord;
         let dataSource = [];  
 
         return (
@@ -53,18 +54,18 @@ export default class CountTable extends Component {
         },
         {
             title: '角色',
-            dataIndex: 'extra_params.time',
-            key: 'extra_params.time'
+            dataIndex: 'extra_params.role',
+            key: 'extra_params.role'
         },
         {
             title: '职务',
-            dataIndex: 'extra_params.remark',
-            key: 'extra_params.remark'
+            dataIndex: 'extra_params.duty',
+            key: 'extra_params.duty'
         },
         {
             title: '考勤群体',
-            dataIndex: 'extra_params.state',
-            key: 'extra_params.state'
+            dataIndex: 'extra_params.group',
+            key: 'extra_params.group'
         },
         {
             title: '上班时间',

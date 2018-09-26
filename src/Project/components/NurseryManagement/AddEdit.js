@@ -25,13 +25,16 @@ class AddEdit extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 取消弹框
     }
     componentDidMount () {
-        console.log(this.props.record);
         this.setState({
-            record: this.props.record,
-            options: this.props.options,
-            LeaderCard: this.props.record.LeaderCard,
-            LeaderCardBack: this.props.record.LeaderCardBack
+            options: this.props.options
         });
+        if (this.props.record) {
+            this.setState({
+                record: this.props.record,
+                LeaderCard: this.props.record.LeaderCard,
+                LeaderCardBack: this.props.record.LeaderCardBack
+            });
+        }
     }
     render () {
         const { fileList, fileListBack, options, record } = this.state;

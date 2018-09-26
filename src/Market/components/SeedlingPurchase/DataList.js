@@ -19,6 +19,7 @@ class DataList extends Component {
         };
         this.onSearch = this.onSearch.bind(this);
         this.handlePane = this.handlePane.bind(this); // 切换标签页
+        this.onClear = this.onClear.bind(this);
     }
     componentDidMount () {
         this.onSearch();
@@ -55,9 +56,8 @@ class DataList extends Component {
                         )}
                     </FormItem>
                     <FormItem style={{marginLeft: 134}}>
-                        <Button type='primary' onClick={this.onSearch}>
-                            查询
-                        </Button>
+                        <Button type='primary' onClick={this.onSearch}>查询</Button>
+                        <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>
                     </FormItem>
                 </Form>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
@@ -88,6 +88,9 @@ class DataList extends Component {
         });
     }
     handlePane () {
+
+    }
+    onClear () {
 
     }
 }

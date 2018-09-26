@@ -24,6 +24,7 @@ class Tablelevel extends Component {
             auditVisible: false, // 审核弹框
             options: [],
             record: null,
+            LeaderCard: '', // 身份证正反面
             optionList: []
         };
         this.onClear = this.onClear.bind(this); // 清空
@@ -68,24 +69,18 @@ class Tablelevel extends Component {
         {
             title: '苗圃名称',
             key: 0,
-            width: '120',
+            width: 120,
             fixed: 'left',
             dataIndex: 'NurseryName'
         }, {
-            title: '行政区划',
-            key: 1,
-            width: '120',
-            fixed: 'left',
-            dataIndex: 'Address'
-        }, {
             title: '行政区划编码',
             key: 2,
-            width: '130',
+            width: 130,
             dataIndex: 'RegionCode'
         }, {
             title: '产地',
             key: 3,
-            width: '80',
+            width: 80,
             dataIndex: 'TreePlace'
         }, {
             title: '负责人姓名',
@@ -138,8 +133,8 @@ class Tablelevel extends Component {
                         <a onClick={this.toEdit.bind(this, record)}>修改</a>
                         <span className='ant-divider' />
                         {
-                            record.CheckStatus === 0 ? [<a onClick={this.toAudit.bind(this, record)}>审核</a>,
-                                <span className='ant-divider' />] : []
+                            record.CheckStatus === 0 ? [<a key='one' onClick={this.toAudit.bind(this, record)}>审核</a>,
+                                <span key='two' className='ant-divider' />] : []
                         }
                         <a onClick={this.toDelete.bind(this, record)}>删除</a>
                     </span>
@@ -264,10 +259,10 @@ class Tablelevel extends Component {
             nurseryname: ''
         });
     }
-    seeModal (text) {
+    seeModal (LeaderCard) {
         this.setState({
             seeVisible: true,
-            LeaderCard: text
+            LeaderCard
         });
     }
     onSearch (page = 1, pageSize = 10) {

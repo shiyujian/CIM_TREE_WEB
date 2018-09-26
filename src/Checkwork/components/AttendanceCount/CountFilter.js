@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { STATIC_DOWNLOAD_API,PROJECT_UNITS } from '../../../_platform/api';
 import {
     Form,
     Input,
@@ -12,6 +12,7 @@ import {
     Select
 } from 'antd';
 import moment from 'moment';
+import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
@@ -22,10 +23,95 @@ class CountFilter extends Component {
         labelCol: { span: 6 },
         wrapperCol: { span: 18 }
     };
+
+    constructor (props) {
+        super(props);
+        this.state = {
+            sectionArray: [],
+            projectArray: []
+        };
+    }
+
+
+    componentDidMount () {
+        this.getSection();
+    }
+
+    async getSection () {
+        let user = getUser();
+        let projectArray = [];
+        let sectionArray = [];
+        let sections = user.sections;
+        sections = JSON.parse(sections);
+        if (sections && sections instanceof Array && sections.length > 0) {
+            let section = sections[0];
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                PROJECT_UNITS.map(item => {
+                    if (code[0] === item.code) {
+                        projectArray.push(
+                            <Option key={item.value} value={item.value}>
+                                {item.value}
+                            </Option>
+                        );
+                        let units = item.units;
+                        units.map(unit => {
+                            sectionArray.push(
+                                <Option key={unit.code} value={unit.code}>
+                                    {unit.value}
+                                </Option>
+                            );
+                        });
+                    }
+                });
+            }
+        } else {
+            PROJECT_UNITS.map(project => {
+                projectArray.push(
+                    <Option key={project.value} value={project.value}>
+                        {project.value}
+                    </Option>
+                );
+            });
+        }
+        this.setState({
+            projectArray: projectArray,
+            sectionArray: sectionArray
+        });
+    }
+
+     // 项目选择函数
+    onSelectChange (value) {
+        const {
+            form: { setFieldsValue }
+        } = this.props;
+        setFieldsValue({
+            section: undefined
+        });
+        let sectionArray = [];
+        PROJECT_UNITS.map(project => {
+            if (project.value === value) {
+                let units = project.units;
+                units.map(unit => {
+                    sectionArray.push(
+                        <Option key={unit.code} value={unit.code}>
+                            {unit.value}
+                        </Option>
+                    );
+                });
+            }
+        });
+        this.setState({
+            sectionArray: sectionArray
+        });
+    }
+
     render () {
         const {
             form: { getFieldDecorator }
         } = this.props;
+        const { projectArray, sectionArray } = this.state;
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
@@ -33,39 +119,27 @@ class CountFilter extends Component {
                         <Row>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='项目'>
-                                    {getFieldDecorator('projectName', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请输入项目名称'
-                                            }
-                                        ]
-                                    })(<Input placeholder='请输入项目名称' />)}
+                                    {getFieldDecorator('project_code', {
+                
+                                    })(
+                                        <Select
+                                            placeholder='请选择项目'
+                                            onChange={this.onSelectChange.bind(
+                                                this
+                                            )}
+                                        >
+                                            {projectArray}
+                                        </Select>
+                                    )}
                                 </FormItem>
                             </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='标段'>
                                     {getFieldDecorator('section', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择标段'
-                                            }
-                                        ]
+            
                                     })(
-                                        <Select>
-                                            <Option
-                                                key={'宣传片'}
-                                                value={'宣传片'}
-                                            >
-                                                宣传片
-                                            </Option>
-                                            <Option
-                                                key={'操作视频'}
-                                                value={'操作视频'}
-                                            >
-                                                操作视频
-                                            </Option>
+                                        <Select placeholder='请选择标段'>
+                                            {sectionArray}
                                         </Select>
                                     )}
                                 </FormItem>
@@ -73,12 +147,7 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='姓名'>
                                     {getFieldDecorator('name', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请输入姓名'
-                                            }
-                                        ]
+                                   
                                     })(
                                       <Input placeholder='请输入姓名' />
                                     )}
@@ -93,13 +162,7 @@ class CountFilter extends Component {
                            <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='时间'>
                                     {getFieldDecorator('searchDate', {
-                                        rules: [
-                                            {
-                                                type: 'array',
-                                                required: false,
-                                                message: '请选择时间'
-                                            }
-                                        ]
+                    
                                     })(
                                         <RangePicker
                                             size='default'
@@ -115,14 +178,9 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='出勤'>
                                     {getFieldDecorator('chuqin', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择是否出勤'
-                                            }
-                                        ]
+                                
                                     })(
-                                        <Select>
+                                        <Select placeholder='请选择是否出勤'>
                                             <Option
                                                 key={'是'}
                                                 value={'是'}
@@ -142,14 +200,9 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='状态'>
                                     {getFieldDecorator('status', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择状态'
-                                            }
-                                        ]
+        
                                     })(
-                                        <Select>
+                                        <Select  placeholder='请选择状态'>
                                             <Option
                                                 key={'迟到'}
                                                 value={'迟到'}
@@ -198,14 +251,9 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='考勤群体'>
                                     {getFieldDecorator('group', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择考勤群体'
-                                            }
-                                        ]
+                                       
                                     })(
-                                        <Select>
+                                        <Select  placeholder='请选择考勤群体'>
                                             <Option
                                                 key={'宣传片'}
                                                 value={'宣传片'}
@@ -224,15 +272,10 @@ class CountFilter extends Component {
                             </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='角色'>
-                                    {getFieldDecorator('juese', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择角色'
-                                            }
-                                        ]
+                                    {getFieldDecorator('role', {
+                                        
                                     })(
-                                        <Select>
+                                        <Select  placeholder='请选择角色'>
                                             <Option
                                                 key={'宣传片'}
                                                 value={'宣传片'}
@@ -251,15 +294,10 @@ class CountFilter extends Component {
                             </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='职务'>
-                                    {getFieldDecorator('zhiwu', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择职务'
-                                            }
-                                        ]
+                                    {getFieldDecorator('duty', {
+                                        
                                     })(
-                                        <Select>
+                                        <Select  placeholder='请选择职务'>
                                             <Option
                                                 key={'宣传片'}
                                                 value={'宣传片'}
@@ -284,10 +322,25 @@ class CountFilter extends Component {
     }
 
     query () {
-       
+        const {
+            form: { validateFields }
+        } = this.props;
+        validateFields((err, values) => {
+            let params = {};
+            params['project_code'] = values.project_code;
+            params['section'] = values.section;
+            params['name'] = values.name;
+            params['searchDate'] = values.searchDate;
+            params['chuqin'] = values.chuqin;
+            params['status'] = values.status;
+            params['group'] = values.group;
+            params['role'] = values.role;
+            params['duty'] = values.duty;
+            this.props.query(params);
+        });
     }
     clear () {
-     
+        this.props.form.resetFields();
     }
 
 }

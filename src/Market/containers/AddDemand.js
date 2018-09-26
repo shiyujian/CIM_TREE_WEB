@@ -3,17 +3,17 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/demandRelease';
 import { actions as platformActions } from '_platform/store/global';
+import { DataList } from '../components/addDemand';
 import {
     Main,
     Body,
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { DataList } from '../components/DemandRelease';
 @connect(
     state => {
-        const { market: { demandRelease = {} }, platform } = state;
-        return { ...demandRelease, platform };
+        const { market: { supplyRelease = {} }, platform } = state;
+        return { ...supplyRelease, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -22,7 +22,7 @@ import { DataList } from '../components/DemandRelease';
         )
     })
 )
-export default class DemandRelease extends Component {
+export default class SupplyRelease extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -32,13 +32,9 @@ export default class DemandRelease extends Component {
     componentDidMount () {}
 
     render () {
-        const {
-            addDemandModalVisible
-        } = this.props;
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='需求发布' {...this.props} />
                     <Content>
                         <DataList {...this.props} />
                     </Content>

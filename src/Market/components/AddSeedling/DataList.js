@@ -2,6 +2,7 @@
 import React, {Component} from 'react';
 import { Form, Input, Button, Tabs, Select, Table, Upload, Row, Col, Icon, Modal, Cascader, message } from 'antd';
 import { TREETYPENO, FOREST_API, postUploadImage } from '_platform/api';
+import { searchToObj } from '_platform/auth';
 import { getUser } from '_platform/auth';
 
 import './DataList.less';
@@ -15,6 +16,7 @@ class DataList extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            productInfo: null,
             showModal: false,
             Photo: '', // 全株照片
             LocalPhoto: '', // 局部特写照片
@@ -31,10 +33,6 @@ class DataList extends Component {
         };
         this.loadTreeTypes = this.loadTreeTypes.bind(this); // 加载树种类型
         this.handleTreeTypes = this.handleTreeTypes.bind(this); // 选择树种类型
-        this.addSupplier = this.addSupplier.bind(this); // 添加供应商
-        this.handleOk = this.handleOk.bind(this); // 确认添加供应商
-        this.handleCancel = this.handleCancel.bind(this); // 取消发布
-        this.toRelease = this.toRelease.bind(this); // 发布
         this.addVersion = this.addVersion.bind(this); // 增加规格
         this.editVersion = this.editVersion.bind(this); // 编辑规格
         this.columns = [{
@@ -89,7 +87,7 @@ class DataList extends Component {
         }];
     }
     componentDidMount () {
-        const { getNurseryByPk } = this.props.actions;
+        const { getNurseryByPk, getProductById } = this.props.actions;
         // 获取树种类型
         TREETYPENO.map(item => {
             item.value = item.id;
@@ -112,9 +110,19 @@ class DataList extends Component {
                 }
             });
         }
+        // 编辑商品
+        const { id } = searchToObj(this.props.location.search);
+        if (id) {
+            getProductById({id}).then(rep => {
+                console.log(rep);
+                this.setState({
+                    productInfo: rep
+                });
+            });
+        }
     }
     render () {
-        const { dataList, showModal, treeTypes, fileList_one, fileList_two, fileList_three, fileList_other } = this.state;
+        const { dataList, treeTypes, fileList_one, fileList_two, fileList_three, fileList_other, productInfo } = this.state;
         const { getFieldDecorator } = this.props.form;
         const props_one = {
             action: '',
@@ -208,7 +216,6 @@ class DataList extends Component {
                                     multiple
                                     style={{ width: 350 }}
                                     placeholder='请选择供应商'
-                                    onChange={this.addSupplier}
                                 >
                                     <Option value='1'>Lucy</Option>
                                 </Select>
@@ -247,22 +254,19 @@ class DataList extends Component {
                                 </Row>
                             </FormItem>
                             <FormItem label='文本介绍' className='label-block'>
-                                {getFieldDecorator('TreeDescribe')(
+                                {getFieldDecorator('TreeDescribe', {
+                                    initialValue: productInfo ? productInfo.TreeDescribe : ''
+                                })(
                                     <TextArea rows={4} style={{width: 750}} />
                                 )}
                             </FormItem>
                             <FormItem style={{width: 800, textAlign: 'center'}}>
-                                <Button style={{marginRight: 20}}>暂存</Button>
-                                <Button type='primary' onClick={this.toRelease}>发布</Button>
+                                <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
+                                <Button type='primary' onClick={this.toRelease.bind(this, 1)}>发布</Button>
                             </FormItem>
                         </Form>
                     </TabPane>
                 </Tabs>
-                <Modal title='添加供应商' visible={showModal}
-                    onOk={this.handleOk} onCancel={this.handleCancel}
-                >
-                    <p>some contents...</p>
-                </Modal>
             </div>
         );
     }
@@ -322,12 +326,11 @@ class DataList extends Component {
             });
         }, 10);
     }
-    toRelease () {
+    toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
         const { TreeTypeName, TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList } = this.state;
         console.log(dataList);
         const { AddCommodity } = this.props.actions;
-
         AddCommodity({}, {
             TreeTypeID,
             TreeTypeName,
@@ -335,25 +338,17 @@ class DataList extends Component {
             LocalPhoto,
             MostPhoto,
             OtherPhoto,
-            TreeDescribe: formVal.TreeDescribe
+            TreeDescribe: formVal.TreeDescribe,
+            Status
         }).then(rep => {
             console.log(rep);
-            if (rep.code === 1) {
+            if (rep.code === 1 && Status === 1) {
                 message.success('发布成功');
+            } else if (rep.code === 1 && Status === 0) {
+                message.success('暂存成功');
+            } else if (rep.code === 2) {
+                message.error('该商品已存在');
             }
-        });
-    }
-    addSupplier () {
-        this.setState({
-            showModal: true
-        });
-    }
-    handleCancel () {
-
-    }
-    handleOk () {
-        this.setState({
-            showModal: false
         });
     }
 }

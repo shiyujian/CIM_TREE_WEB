@@ -116,6 +116,7 @@ export default class Tablelevel extends Component {
                                     superuser ? this.columns : this.columns1
                                 }
                                 bordered
+                                key='ID'
                             />
                             <Edite {...this.props} {...this.state} />
                         </Col>
@@ -249,37 +250,37 @@ export default class Tablelevel extends Component {
     columns = [
         {
             title: '树种ID',
-            key: 'ID',
+            key: '1',
             dataIndex: 'ID',
             width: '5%'
         },
         {
             title: '树种学名',
-            key: 'TreeTypeName',
+            key: '2',
             dataIndex: 'TreeTypeName',
             width: '10%'
         },
         {
             title: '所属类型',
-            key: 'TreeTypeGenera',
+            key: '3',
             dataIndex: 'TreeTypeGenera',
             width: '10%'
         },
         {
             title: '编码',
-            key: 'TreeTypeNo',
+            key: '4',
             dataIndex: 'TreeTypeNo',
             width: '5%'
         },
         {
             title: '习性',
-            key: 'GrowthHabit',
+            key: '5',
             dataIndex: 'GrowthHabit',
             width: '55%'
         },
         {
             title: 'Pics',
-            key: 'Pics',
+            key: '6',
             dataIndex: 'Pics',
             width: '5%',
             render: (text, record) => {
@@ -324,7 +325,7 @@ export default class Tablelevel extends Component {
         },
         {
             title: '操作',
-            key: 'operate',
+            key: '7',
             dataIndex: 'operate',
             width: '10%',
             render: (text, record, index) => {
@@ -349,37 +350,38 @@ export default class Tablelevel extends Component {
     columns1 = [
         {
             title: '树种ID',
-            key: 'ID',
+            key: '1',
             dataIndex: 'ID',
             width: '5%'
         },
         {
             title: '树种学名',
-            key: 'TreeTypeName',
+            key: '2',
             dataIndex: 'TreeTypeName',
             width: '10%'
         },
         {
             title: '所属类型',
-            key: 'TreeTypeGenera',
+            key: '3',
             dataIndex: 'TreeTypeGenera',
             width: '10%'
         },
         {
             title: '编码',
-            key: 'TreeTypeNo',
+            key: '4',
             dataIndex: 'TreeTypeNo',
             width: '5%'
         },
         {
             title: '习性',
-            key: 'GrowthHabit',
+            key: '5',
             dataIndex: 'GrowthHabit',
             width: '55%'
         },
         {
             title: 'Pics',
             width: '5%',
+            key: '6',
             render: (text, record) => {
                 if (record.Pics != null) {
                     let img = `${FOREST_API}/${record.Pics.replace(
@@ -411,7 +413,7 @@ export default class Tablelevel extends Component {
         },
         {
             title: '操作',
-            key: 'operate',
+            key: '7',
             dataIndex: 'operate',
             width: '10%',
             render: (text, record, index) => {
