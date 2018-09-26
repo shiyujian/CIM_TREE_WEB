@@ -29,9 +29,16 @@ class DataList extends Component {
             <div className='supply-release' style={{padding: '0 20px'}}>
                 <Form layout='inline'>
                     <FormItem
-                        label='苗木名称'
+                        label='采购编号'
                     >
-                        {getFieldDecorator('treetypename')(
+                        {getFieldDecorator('purchaseno')(
+                            <Input style={{width: '200px'}} />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        label='采购名称'
+                    >
+                        {getFieldDecorator('projectname')(
                             <Input style={{width: '200px'}} />
                         )}
                     </FormItem>
@@ -51,9 +58,9 @@ class DataList extends Component {
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>
                     </FormItem>
                 </Form>
-                <Link to='/market/addseedling'>
+                <Link to='/market/adddemand'>
                     <Button type='primary'
-                        style={{position: 'absolute', right: 60, zIndex: 100}}>新增苗木</Button>
+                        style={{position: 'absolute', right: 60, zIndex: 100}}>新增需求</Button>
                 </Link>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='全 部' key='1'>
@@ -69,9 +76,10 @@ class DataList extends Component {
     }
     toSearch () {
         const formVal = this.props.form.getFieldsValue();
-        const { getProductList } = this.props.actions;
-        getProductList({}, {
-            treetypename: formVal.treetypename || '',
+        const { getPurchaseList } = this.props.actions;
+        getPurchaseList({}, {
+            purchaseno: '',
+            projectname: formVal.projectname || '',
             status: formVal.status || ''
         }).then((rep) => {
             if (rep.code === 200) {

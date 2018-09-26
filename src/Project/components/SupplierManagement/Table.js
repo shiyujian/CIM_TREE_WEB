@@ -70,59 +70,59 @@ class Tablelevel extends Component {
         {
             title: '供应商名称',
             key: 0,
-            width: '120',
+            width: 120,
             fixed: 'left',
             dataIndex: 'SupplierName'
         }, {
             title: '行政区划',
             key: 1,
-            width: '120',
+            width: 120,
             fixed: 'left',
             dataIndex: 'Address'
         }, {
             title: '行政区划编码',
             key: 2,
-            width: '100',
+            width: 100,
             dataIndex: 'RegionCode'
         }, {
             title: '详细地址',
             key: 3,
-            width: '120',
+            width: 120,
             dataIndex: 'Address'
         }, {
             title: '工商注册号',
             key: 4,
-            width: '100',
+            width: 100,
             dataIndex: 'TreePlace'
         }, {
             title: '统一信用代码',
             key: 5,
-            width: '100',
+            width: 100,
             dataIndex: 'USCC'
         }, {
             title: '组织机构代码',
             key: 6,
-            width: '100',
+            width: 100,
             dataIndex: 'TreePlace'
         }, {
             title: '法人姓名',
             key: 7,
-            width: '100',
+            width: 100,
             dataIndex: 'LegalPerson'
         }, {
             title: '法人手机',
             key: 8,
-            width: '140',
+            width: 140,
             dataIndex: 'LegalPersonPhone'
         }, {
             title: '法人身份证号',
             key: 9,
-            width: '200',
+            width: 200,
             dataIndex: 'LegalPersonCardNo'
         }, {
             title: '身份证正面',
             key: 10,
-            width: '80',
+            width: 80,
             dataIndex: 'LegalPersonCard',
             render: (text) => {
                 return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
@@ -130,7 +130,7 @@ class Tablelevel extends Component {
         }, {
             title: '身份证反面',
             key: 11,
-            width: '80',
+            width: 80,
             dataIndex: 'LegalPersonCardBack',
             render: (text) => {
                 return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
@@ -138,7 +138,7 @@ class Tablelevel extends Component {
         }, {
             title: '营业执照',
             key: 12,
-            width: '80',
+            width: 80,
             dataIndex: 'BusinessLicense',
             render: (text) => {
                 return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
@@ -146,7 +146,7 @@ class Tablelevel extends Component {
         }, {
             title: '状态',
             key: 13,
-            width: '100',
+            width: 100,
             dataIndex: 'CheckStatus',
             render: (text) => {
                 if (text === 0) {
@@ -169,8 +169,8 @@ class Tablelevel extends Component {
                         <a onClick={this.toEdit.bind(this, record)}>修改</a>
                         <span className='ant-divider' />
                         {
-                            record.CheckStatus === 0 ? [<a onClick={this.toAudit.bind(this, record)}>审核</a>,
-                                <span className='ant-divider' />] : []
+                            record.CheckStatus === 0 ? [<a key='one' onClick={this.toAudit.bind(this, record)}>审核</a>,
+                                <span key='two' className='ant-divider' />] : []
                         }
                         <a onClick={this.toDelete.bind(this, record)}>删除</a>
                     </span>

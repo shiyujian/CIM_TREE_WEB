@@ -10,8 +10,10 @@ export const ID = 'Market_supermarket_supplyRelease';
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
 export const AddCommodity = createFetchAction(`${SEEDLING_API}/good/spu`, [], 'POST'); // 新增苗木
-export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); // 新增苗木
+export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); // 获取苗木品种
 export const getNurseryByPk = createFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃基地列表
+export const getProductList = createFetchAction(`${SEEDLING_API}/good/goods`); // 获取商品列表
+export const getProductById = createFetchAction(`${SEEDLING_API}/good/good/{{id}}`); // 根据ID获取商品
 // 修改选择地图的方式
 export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 
@@ -22,7 +24,9 @@ export const actions = {
     AddCommodity,
     getTreeTypes,
     getNurseryByPk,
-    postUploadImage
+    postUploadImage,
+    getProductList,
+    getProductById
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({
