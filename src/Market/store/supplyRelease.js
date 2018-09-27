@@ -15,6 +15,7 @@ export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); /
 export const getNurseryByPk = createFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃基地列表
 export const getProductList = createFetchAction(`${SEEDLING_API}/good/goods`); // 获取商品列表
 export const getProductById = createFetchAction(`${SEEDLING_API}/good/good/{{id}}`); // 根据ID获取商品
+export const getBindingSupplier = createFetchAction(`${FOREST_API}/system/nb2ss`); // 根据苗圃基地获取绑定的供应商
 // 修改选择地图的方式
 export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 
@@ -28,7 +29,8 @@ export const actions = {
     getNurseryByPk,
     postUploadImage,
     getProductList,
-    getProductById
+    getProductById,
+    getBindingSupplier
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({

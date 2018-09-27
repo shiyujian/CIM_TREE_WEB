@@ -14,17 +14,25 @@ class DataList extends Component {
         super(props);
         this.state = {
             dataList: [],
+            projectList: [],
             a: 1
         };
         this.toSearch = this.toSearch.bind(this);
         this.onClear = this.onClear.bind(this);
     }
     componentDidMount () {
+        // 获取所有项目和标段
+        const { getTreeTypes, getRegionCodes, getWpunittree, getOrgTree_new, getPurchaseById } = this.props.actions;  
+        getWpunittree().then(rep => {
+            this.setState({
+                projectList: rep
+            });
+        });
         this.toSearch();
     }
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { dataList } = this.state;
+        const { dataList, projectList } = this.state;
         return (
             <div className='supply-release' style={{padding: '0 20px'}}>
                 <Form layout='inline'>
@@ -65,8 +73,8 @@ class DataList extends Component {
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='全 部' key='1'>
                         {
-                            dataList.length > 0 ? dataList.map(item => {
-                                return <Menu record={item} />;
+                            dataList.length > 0 ? dataList.map((item,index) => {
+                                return <Menu record={item} key={index} projectList={projectList} />;
                             }) : []
                         }
                     </TabPane>

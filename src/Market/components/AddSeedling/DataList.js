@@ -10,29 +10,45 @@ const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const TextArea = Input.TextArea;
 
+const myUpload = {
+    width: 100,
+    height: 80,
+    display: 'block',
+    border: '1px solid #d9d9d9',
+    borderRadius: 6,
+    cursor: 'pointer'
+};
+const myIcon = {
+    width: 100,
+    height: 80,
+    padding: '25px 35px',
+    fontSize: 28,
+    color: '#999'
+};
 class DataList extends Component {
     constructor (props) {
         super(props);
         this.state = {
             productInfo: null,
             showModal: false,
+            Suppliers: [], // 供应商列表
+            supplier: '', // 选择的供应商
             Photo: '', // 全株照片
             LocalPhoto: '', // 局部特写照片
             MostPhoto: '', // 成片栽植照片
             OtherPhoto: '', // 其他照片
             dataList: [], // 表格数据
-            treeTypes: [], // 树种
-            fileList_one: [],
-            fileList_two: [],
-            fileList_three: [],
-            fileList_other: [],
-            TreeTypeID: '' // 树种名称
+            treeTypeList: [], // 树种
+            TreeTypeID: '' // 树种ID
         };
-        this.treeTypeList = [];
+        this.Creater = ''; // 用户ID
+        this.TreeTypeList = []; // 所有树种
+        this.NurseryBaseID = ''; // 苗圃基地ID
+        this.TreeTypeName = ''; // 树种名称
         this.handleTreeType = this.handleTreeType.bind(this); // 树种名称
         this.addVersion = this.addVersion.bind(this); // 增加规格
-        this.editVersion = this.editVersion.bind(this); // 编辑规格
         this.handleTreeTypeNo = this.handleTreeTypeNo.bind(this); // 树种类型
+        this.handleSupplier = this.handleSupplier.bind(this); // 选择供应商
         this.columns = [{
             title: '胸径（cm）',
             dataIndex: 'DBH',
@@ -64,9 +80,19 @@ class DataList extends Component {
         }, {
             title: '培育方式',
             dataIndex: 'CultivationMode',
+            width: 100,
             key: '5',
             render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'CultivationMode', index)} />;
+                return (
+                    <Select style={{ width: 100 }} onChange={this.editVersionMode.bind(this, 'CultivationMode', index)}>
+                        <Option value={0}>地苗</Option>
+                        <Option value={1}>断根苗</Option>
+                        <Option value={2}>假植苗</Option>
+                        <Option value={3}>袋苗</Option>
+                        <Option value={4}>盆苗</Option>
+                        <Option value={5}>山苗</Option>
+                    </Select>
+                );
             }
         }, {
             title: '价格（元）',
@@ -85,27 +111,32 @@ class DataList extends Component {
         }];
     }
     componentDidMount () {
-        const { getTreeTypes, getNurseryByPk, getProductById } = this.props.actions;
+        const { getTreeTypes, getNurseryByPk, getProductById, getBindingSupplier } = this.props.actions;
         // 获取树种类型
-        let obj = {};
         getTreeTypes().then(rep => {
-            sessionStorage.setItem('TreeType_TREETYPENO', JSON.stringify(obj));
-            this.treeTypeList = rep;
+            this.TreeTypeList = rep;
         });
         // 编辑商品
-        const { id } = searchToObj(this.props.location.search);
-        if (id) {
-            getProductById({id}).then(rep => {
+        const { key } = searchToObj(this.props.location.search);
+        if (key) {
+            getProductById({id: key}).then(rep => {
+                this.TreeTypeName = rep.TreeTypeName;
                 this.setState({
                     TreeTypeID: rep.TreeTypeID,
-                    productInfo: rep
+                    productInfo: rep,
+                    Photo: rep.Photo,
+                    LocalPhoto: rep.LocalPhoto,
+                    MostPhoto: rep.MostPhoto,
+                    OtherPhoto: rep.OtherPhoto
                 }, () => {
                     console.log(rep);
                 });
             });
         }
         // 获取苗圃基地的责任人电话，以及绑定的供应商
-        const { org_code } = getUser();
+        const { id, org_code } = getUser();
+        this.Creater = id;
+        console.log(getUser(), '----');
         if (org_code) {
             getNurseryByPk({}, {pk: org_code}).then((rep) => {
                 if (rep.code === 200 && rep.content.length > 0) {
@@ -114,16 +145,23 @@ class DataList extends Component {
                         Leader: obj.Leader,
                         LeaderPhone: obj.LeaderPhone
                     });
+                    this.NurseryBaseID = obj.ID;
+                    getBindingSupplier({}, {
+                        nurserybaseid: this.NurseryBaseID
+                    }).then(rst => {
+                        this.setState({
+                            Suppliers: rst
+                        });
+                    });
                 }
             });
         }
     }
     render () {
-        const { dataList, treeTypes, fileList_one, fileList_two, fileList_three, fileList_other, productInfo, TreeTypeID } = this.state;
+        const { dataList, treeTypeList, Photo, LocalPhoto, MostPhoto, OtherPhoto, productInfo, TreeTypeID, Suppliers } = this.state;
         const { getFieldDecorator } = this.props.form;
         const props_one = {
             action: '',
-            fileList: fileList_one,
             beforeUpload: (file, fileList) => {
                 const formdata = new FormData();
                 formdata.append('a_file', file);
@@ -131,16 +169,19 @@ class DataList extends Component {
                 postUploadImage({}, formdata).then((rep) => {
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
-                        Photo: rep,
-                        fileList_one: fileList
+                        Photo: rep
                     });
                 });
                 return false;
+            },
+            onRemove: () => {
+                this.setState({
+                    Photo: ''
+                });
             }
         };
         const props_two = {
             action: '',
-            fileList: fileList_two,
             beforeUpload: (file, fileList) => {
                 const formdata = new FormData();
                 formdata.append('a_file', file);
@@ -148,16 +189,19 @@ class DataList extends Component {
                 postUploadImage({}, formdata).then((rep) => {
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
-                        LocalPhoto: rep,
-                        fileList_two: fileList
+                        LocalPhoto: rep
                     });
                 });
                 return false;
+            },
+            onRemove: () => {
+                this.setState({
+                    LocalPhoto: ''
+                });
             }
         };
         const props_three = {
             action: '',
-            fileList: fileList_three,
             beforeUpload: (file, fileList) => {
                 const formdata = new FormData();
                 formdata.append('a_file', file);
@@ -165,16 +209,19 @@ class DataList extends Component {
                 postUploadImage({}, formdata).then((rep) => {
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
-                        MostPhoto: rep,
-                        fileList_three: fileList
+                        MostPhoto: rep
                     });
                 });
                 return false;
+            },
+            onRemove: () => {
+                this.setState({
+                    MostPhoto: ''
+                });
             }
         };
         const props_other = {
             action: '',
-            fileList: fileList_other,
             beforeUpload: (file, fileList) => {
                 const formdata = new FormData();
                 formdata.append('a_file', file);
@@ -182,11 +229,15 @@ class DataList extends Component {
                 postUploadImage({}, formdata).then((rep) => {
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
-                        OtherPhoto: rep,
-                        fileList_other: fileList
+                        OtherPhoto: rep
                     });
                 });
                 return false;
+            },
+            onRemove: () => {
+                this.setState({
+                    OtherPhoto: ''
+                });
             }
         };
         return (
@@ -206,11 +257,9 @@ class DataList extends Component {
                             <FormItem label='树种名称'>
                                 <Select defaultValue={TreeTypeID} onChange={this.handleTreeType} style={{width: 150}}>
                                     {
-                                        treeTypes.length > 0 ? treeTypes.map(item => {
+                                        treeTypeList.length > 0 ? treeTypeList.map(item => {
                                             return <Option key={item.ID} value={item.ID}>{item.TreeTypeName}</Option>;
-                                        }) : this.treeTypeList.map(item => {
-                                            return <Option key={item.ID} value={item.ID}>{item.TreeTypeName}</Option>;
-                                        })
+                                        }) : []
                                     }
                                 </Select>
                             </FormItem>
@@ -226,11 +275,16 @@ class DataList extends Component {
                             </FormItem>
                             <FormItem label='供应商' style={{display: 'block'}}>
                                 <Select
-                                    multiple
+                                    allowClear
+                                    onChange={this.handleSupplier}
                                     style={{ width: 350 }}
                                     placeholder='请选择供应商'
                                 >
-                                    <Option value='1'>Lucy</Option>
+                                    {
+                                        Suppliers ? Suppliers.map(item => {
+                                            return <Option value={item.SupplierID} key={item.SupplierID}>{item.SupplierName}}</Option>
+                                        }) : []
+                                    }
                                 </Select>
                             </FormItem>
                             <FormItem label='规格' className='label-block'>
@@ -238,29 +292,41 @@ class DataList extends Component {
                                     style={{position: 'absolute', left: 680, top: -40, zIndex: 100}}>新增</Button>
                                 <Table columns={this.columns} dataSource={dataList} bordered style={{maxWidth: 750}} pagination={false} />
                             </FormItem>
-                            <FormItem label='上传照片' className='label-block'>
-                                <Row style={{width: 520}}>
+                            <FormItem label='上传照片' className='label-block' style={{width: 520}}>
+                                <Row gutter={16}>
                                     <Col span={6}>
-                                        <Upload {...props_one}>
-                                            <Icon type='plus' className='upload-icon' />
+                                        <Upload {...props_one} style={myUpload}>
+                                            {
+                                                Photo ? <img src={`${FOREST_API}/${Photo}`} alt='' style={{width: 98, height: 78}} />
+                                                    : <Icon type='plus' style={myIcon} />
+                                            }
                                         </Upload>
                                         <p>单株全景</p>
                                     </Col>
                                     <Col span={6}>
-                                        <Upload {...props_two}>
-                                            <Icon type='plus' className='upload-icon' />
+                                        <Upload {...props_two} style={myUpload}>
+                                            {
+                                                LocalPhoto ? <img src={`${FOREST_API}/${LocalPhoto}`} alt='' style={{width: 98, height: 78}} />
+                                                    : <Icon type='plus' style={myIcon} />
+                                            }
                                         </Upload>
                                         <p>局部特写</p>
                                     </Col>
                                     <Col span={6}>
-                                        <Upload {...props_three}>
-                                            <Icon type='plus' className='upload-icon' />
+                                        <Upload {...props_three} style={myUpload}>
+                                            {
+                                                MostPhoto ? <img src={`${FOREST_API}/${MostPhoto}`} alt='' style={{width: 98, height: 78}} />
+                                                    : <Icon type='plus' style={myIcon} />
+                                            }
                                         </Upload>
                                         <p>成片栽植</p>
                                     </Col>
                                     <Col span={6}>
-                                        <Upload {...props_other}>
-                                            <Icon type='plus' className='upload-icon' />
+                                        <Upload {...props_other} style={myUpload}>
+                                            {
+                                                OtherPhoto ? <img src={`${FOREST_API}/${OtherPhoto}`} alt='' style={{width: 98, height: 78}} />
+                                                    : <Icon type='plus' style={myIcon} />
+                                            }
                                         </Upload>
                                         <p>其他</p>
                                     </Col>
@@ -284,7 +350,13 @@ class DataList extends Component {
         );
     }
     addVersion () {
+        let { dataList, supplier } = this.state;
+        if (!supplier) {
+            message.error('请先选择供应商');
+            return;
+        }
         const obj = {
+            SupplierID: supplier, // 供应商
             DBH: '',
             GroundDiameter: '',
             CrownWidth: '',
@@ -293,7 +365,6 @@ class DataList extends Component {
             Price: '',
             Stock: ''
         };
-        let { dataList } = this.state;
         dataList.push(obj);
         this.setState({
             dataList
@@ -306,19 +377,29 @@ class DataList extends Component {
             dataList: [...this.state.dataList]
         });
     }
+    editVersionMode (str, index, value) {
+        this.state.dataList[index][str] = value;
+        this.setState({
+            dataList: [...this.state.dataList]
+        });
+    }
     toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
         const { productInfo, TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList } = this.state;
         console.log(dataList);
         const { postCommodity, putCommodity } = this.props.actions;
         const pro = {
+            Status,
             TreeTypeID,
+            TreeTypeName: this.TreeTypeName,
             Photo,
             LocalPhoto,
             MostPhoto,
             OtherPhoto,
+            Creater: this.Creater,
+            NurseryBaseID: this.NurseryBaseID,
             TreeDescribe: formVal.TreeDescribe,
-            Status
+            SKUs: dataList
         };
         if (productInfo) {
             pro.ID = productInfo.ID;
@@ -343,18 +424,28 @@ class DataList extends Component {
     }
     handleTreeTypeNo (value) {
         let arr = [];
-        this.treeTypeList.map(item => {
+        this.TreeTypeList.map(item => {
             if (item.TreeTypeNo.slice(0, 1) === value) {
                 arr.push(item);
             }
         });
         this.setState({
-            treeTypes: arr
+            treeTypeList: arr
         });
     }
     handleTreeType (value) {
         this.setState({
             TreeTypeID: value
+        });
+        this.state.treeTypeList.map(item => {
+            if (item.ID === value) {
+                this.TreeTypeName = item.TreeTypeName;
+            }
+        });
+    }
+    handleSupplier (value) {
+        this.setState({
+            supplier: value
         });
     }
 }

@@ -58,8 +58,8 @@ class DataList extends Component {
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='全 部' key='1'>
                         {
-                            dataList.length > 0 ? dataList.map(item => {
-                                return <Menu record={item} />;
+                            dataList.length > 0 ? dataList.map((item, index) => {
+                                return <Menu record={item} {...this.props} toSearch={this.toSearch} key={index}/>;
                             }) : []
                         }
                     </TabPane>
@@ -72,7 +72,7 @@ class DataList extends Component {
         const { getProductList } = this.props.actions;
         getProductList({}, {
             treetypename: formVal.treetypename || '',
-            status: formVal.status || ''
+            status: formVal.status || 1
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({
