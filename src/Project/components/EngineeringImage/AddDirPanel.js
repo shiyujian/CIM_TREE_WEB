@@ -17,7 +17,10 @@ class AddDirPanel extends Component {
             datumpk = {},
             currentcode = {},
             currentpk = {},
-            user
+            user,
+            isAdmin,
+            extraOrgLeaf,
+            extraOrgCode
         } = this.props;
         validateFields((err, values) => {
             console.log('values', values);
@@ -37,7 +40,8 @@ class AddDirPanel extends Component {
                                 obj_type: 'C_DIR'
                             },
                             extra_params: {
-                                orgLeaf: values.dirOrg
+                                orgLeaf: values.dirOrgLeaf,
+                                orgCode: values.dirOrgCode
                             }
                         }
                     ).then(rst => {
@@ -52,8 +56,10 @@ class AddDirPanel extends Component {
                     });
                 } else {
                     let orgLeaf = true;
-                    if (user && user.username === 'admin') {
-                        orgLeaf = values.dirOrg;
+                    let orgCode = extraOrgCode;
+                    if (isAdmin && extraOrgLeaf) {
+                        orgLeaf = values.dirOrgLeaf;
+                        orgCode = values.dirOrgCode;
                     }
                     addDir(
                         {},
@@ -68,7 +74,8 @@ class AddDirPanel extends Component {
                                 obj_type: 'C_DIR'
                             },
                             extra_params: {
-                                orgLeaf: orgLeaf
+                                orgLeaf: orgLeaf,
+                                orgCode: orgCode
                             }
                         }
                     ).then(rst => {
@@ -91,13 +98,15 @@ class AddDirPanel extends Component {
             form: {
                 setFieldsValue
             },
-            user
+            isAdmin,
+            extraOrgLeaf
         } = this.props;
-        if (user && user.username === 'admin') {
+        if (isAdmin && !extraOrgLeaf) {
             setFieldsValue({
                 dirName: '',
                 dirCode: '',
-                dirOrg: ''
+                dirOrgCode: '',
+                dirOrgLeaf: ''
             });
         } else {
             setFieldsValue({
@@ -111,7 +120,8 @@ class AddDirPanel extends Component {
         let {
             form: { getFieldDecorator },
             currentcode = {},
-            user
+            isAdmin,
+            extraOrgLeaf
         } = this.props;
         console.log(currentcode);
 
@@ -154,25 +164,43 @@ class AddDirPanel extends Component {
                         })(<Input placeholder='请输入目录编码' />)}
                     </FormItem>
                     {
-                        user && user.username === 'admin'
-                            ? (<FormItem {...formItemLayout} label='是否组织机构叶子节点'>
-                                {getFieldDecorator('dirOrg', {
-                                    rules: [
-                                        {
-                                            required: true,
-                                            message:
-                                        '请选择是否组织机构叶子节点'
-                                        }
-                                    ]
-                                })(
-                                    <Select>
-                                        <Option value key={'是'}>是</Option>
-                                        <Option value={false} key={'否'}>否</Option>
-                                    </Select>
-                                )}
-                            </FormItem>) : ''
-                    }
+                        (isAdmin && !extraOrgLeaf)
+                            ? (
+                                <div>
+                                    <FormItem {...formItemLayout} label='组织机构编码'>
+                                        {getFieldDecorator('dirOrgCode', {
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message:
+                                                    '必须为英文字母、数字以及 -_~`*!.[]{}()的组合',
+                                                    pattern: /^[\w\d\_\-]+$/
+                                                }
+                                            ]
+                                        })(
+                                            <Input placeholder='请输入目录编码' />
+                                        )}
+                                    </FormItem>
+                                    <FormItem {...formItemLayout} label='是否组织机构叶子节点'>
+                                        {getFieldDecorator('dirOrgLeaf', {
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message:
+                                                    '请选择是否组织机构叶子节点'
+                                                }
+                                            ]
+                                        })(
+                                            <Select placeholder='请选择是否组织机构叶子节点'>
+                                                <Option value key='是' >是</Option>
+                                                <Option value={false} key='否' >否</Option>
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                </div>
 
+                            ) : ''
+                    }
                     <Button onClick={this.createNewDir.bind(this)}>
                         确定创建
                     </Button>

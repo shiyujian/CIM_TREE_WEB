@@ -38,116 +38,41 @@ export default class ProDoc extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            hidden: {
-                'margin-right': '8px',
-                visibility: 'hidden'
-            },
-            show: {
-                'margin-right': '8px',
-                visibility: 'visible'
-            },
-            data: ''
+            treeSelectData: '',
+            addDelPanel: '',
+            treeSelected: false,
+            userButtonPermission: false,
+            currentpk: '',
+            currentcode: '',
+            isAdmin: false,
+            orgCode: '',
+            extraOrgLeaf: false,
+            extraOrgCode: ''
         };
-    }
-    state = {
-        addOrDel: 'NOR',
-        hadSelectDir: false
-    };
-
-    selectStandardDir (value = [], node) {
-        console.log(node);
-        let data = node.node.props.data[0].children
-            ? node.node.props.data[0].children
-            : 'undefined';
-        this.setState({
-            data: data
-        });
-        this.setState({ hadSelectDir: true });
-        const [code] = value;
-        const {
-            actions: { setcurrentcode, savecode, setcurrentpk, refreshPanelTo }
-        } = this.props;
-        if (code === undefined) {
-            setcurrentcode(code);
-            setcurrentpk(code);
-            savecode(code);
-            refreshPanelTo('NOR');
-        } else {
-            console.log(code.split('--')[1]);
-            setcurrentcode(code.split('--')[1]);
-            setcurrentpk(code.split('--')[0]);
-            savecode(code);
-            refreshPanelTo('NOR');
-        }
-    }
-
-    render () {
-        console.log(this.props);
-        const { worktree = [], adddelpanel = 'NOR', keycode = [] } = this.props;
-
-        const { hadSelectDir } = this.state;
-
-        let {
-            actions: { refreshPanelTo }
-        } = this.props;
-
-        return (
-            <div>
-                <DynamicTitle title='工程文档' {...this.props} />
-                <Sidebar>
-                    <div
-                        style={{
-                            borderBottom: 'solid 1px #999',
-                            paddingBottom: 8
-                        }}
-                    >
-                        <Button
-                            style={
-                                this.state.data === 'undefined'
-                                    ? this.state.hidden
-                                    : this.state.show
-                            }
-                            onClick={() => {
-                                refreshPanelTo('ADD');
-                            }}
-                        >
-                            新增目录
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                refreshPanelTo('DEL');
-                            }}
-                        >
-                            删除目录
-                        </Button>
-                    </div>
-                    <PkCodeTree
-                        treeData={worktree}
-                        selectedKeys={keycode}
-                        onSelect={this.selectStandardDir.bind(this)}
-                    />
-                </Sidebar>
-                <Content>
-                    {adddelpanel === 'NOR' ? null : adddelpanel === 'ADD' ? (
-                        <AddDirPanel {...this.props} />
-                    ) : hadSelectDir ? (
-                        <DelDirPanel {...this.props} />
-                    ) : (
-                        <Alert
-                            message='请在左侧选择需要删除的目录'
-                            type='error'
-                            closable
-                        />
-                    )}
-                </Content>
-            </div>
-        );
     }
 
     componentDidMount () {
         const {
             actions: { getworkTree, savepk, addDir }
         } = this.props;
+        let user = window.localStorage.getItem('QH_USER_DATA');
+        user = JSON.parse(user);
+        console.log('user', user);
+        let isAdmin = false;
+        let orgCode = '';
+        let userButtonPermission = false;
+        if (user && user.username === 'admin') {
+            userButtonPermission = true;
+            isAdmin = true;
+        } else {
+            orgCode = user && user.account && user.account.org_code;
+        }
+        this.setState({
+            user: user,
+            userButtonPermission,
+            isAdmin,
+            orgCode
+        });
         getworkTree({ code: Datumcode }).then(rst => {
             if (!rst.pk) {
                 addDir(
@@ -168,6 +93,150 @@ export default class ProDoc extends Component {
             } else {
                 savepk(rst.pk);
             }
+        });
+    }
+
+    selectStandardDir (keys = [], info) {
+        const {
+            isAdmin,
+            orgCode
+        } = this.state;
+        console.log('info', info);
+        console.log('keys', keys);
+        let treeSelected = info.selected;
+        this.setState({
+            addDelPanel: '',
+            treeSelected
+        });
+        let userButtonPermission = false;
+        if (treeSelected) {
+            let treeSelectData = info.node.props.data;
+            let extraOrgCode = treeSelectData.extra_params.orgCode ? treeSelectData.extra_params.orgCode : '';
+            console.log('treeSelectData', treeSelectData);
+            const [code] = keys;
+            console.log('code', code);
+            if (isAdmin) {
+                userButtonPermission = true;
+            } else {
+                if (extraOrgCode === orgCode) {
+                    userButtonPermission = true;
+                }
+            }
+            let extraOrgLeaf = treeSelectData.extra_params.orgLeaf ? treeSelectData.extra_params.orgLeaf : '';
+            this.setState({
+                currentpk: code.split('--')[0],
+                currentcode: code.split('--')[1],
+                userButtonPermission,
+                treeSelectData,
+                extraOrgLeaf,
+                extraOrgCode
+            });
+        } else {
+            if (isAdmin) {
+                userButtonPermission = true;
+            }
+            this.setState({
+                currentpk: '',
+                currentcode: '',
+                userButtonPermission,
+                treeSelectData: '',
+                extraOrgLeaf: false,
+                extraOrgCode: ''
+            });
+        }
+    }
+
+    render () {
+        const {
+            worktree = []
+        } = this.props;
+        const {
+            userButtonPermission,
+            addDelPanel,
+            treeSelected
+        } = this.state;
+        return (
+            <div>
+                <DynamicTitle title='工程文档' {...this.props} />
+                <Sidebar>
+                    <div
+                        style={{
+                            borderBottom: 'solid 1px #999',
+                            paddingBottom: 8
+                        }}
+                    >
+                        <Button
+                            onClick={this.handleAddDir.bind(this)}
+                            disabled={!userButtonPermission}
+                        >
+                            新增目录
+                        </Button>
+                        <Button
+                            onClick={this.handleDelDir.bind(this)}
+                            disabled={!userButtonPermission || !treeSelected}
+                        >
+                            删除目录
+                        </Button>
+                    </div>
+                    <PkCodeTree
+                        treeData={worktree}
+                        onSelect={this.selectStandardDir.bind(this)}
+                    />
+                </Sidebar>
+                <Content>
+                    {
+                        !userButtonPermission
+                            ? null
+                            : addDelPanel === 'ADD'
+                                ? (
+                                    <AddDirPanel {...this.props} {...this.state} handleDirClear={this.handleAddDirClear.bind(this)} />
+                                )
+                                : addDelPanel === 'DEL'
+                                    ? (
+                                        <DelDirPanel {...this.props} {...this.state} handleDirClear={this.handleDelDirClear.bind(this)} />
+                                    ) : ''
+                    }
+                </Content>
+            </div>
+        );
+    }
+
+    handleAddDir = (e) => {
+        this.setState({
+            addDelPanel: 'ADD'
+        });
+    }
+
+    handleDelDir = (e) => {
+        this.setState({
+            addDelPanel: 'DEL'
+        });
+    }
+    // 增加目录成功后
+    handleAddDirClear = () => {
+        this.setState({
+            addDelPanel: ''
+        });
+    }
+    // 删除目录成功后
+    handleDelDirClear = () => {
+        const {
+            isAdmin
+        } = this.state;
+        let userButtonPermission = false;
+        if (isAdmin) {
+            userButtonPermission = true;
+        }
+        console.log('userButtonPermission', userButtonPermission);
+        this.setState({
+            addDelPanel: '',
+            currentpk: '',
+            currentcode: '',
+            treeSelectData: '',
+            treeSelected: false,
+            userButtonPermission,
+            extraOrgLeaf: false,
+            extraOrgCode: ''
         });
     }
 }

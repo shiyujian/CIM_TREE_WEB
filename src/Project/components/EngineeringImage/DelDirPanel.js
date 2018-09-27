@@ -28,6 +28,11 @@ export default class DelDirPanel extends Component {
                     message: '该目录下存在文档，请清理文档后再删除',
                     duration: 3
                 });
+            } else if (rst.toString().indexOf('This Location has children') !== -1) {
+                Notification.warning({
+                    message: '该目录下存在子目录，请清理子目录后再删除',
+                    duration: 3
+                });
             };
         });
     }
