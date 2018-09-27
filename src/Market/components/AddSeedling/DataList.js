@@ -10,7 +10,6 @@ const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const TextArea = Input.TextArea;
 
-console.log(TREETYPENO);
 class DataList extends Component {
     constructor (props) {
         super(props);
@@ -98,9 +97,10 @@ class DataList extends Component {
         if (id) {
             getProductById({id}).then(rep => {
                 this.setState({
-                    TreeTypeID: rep.TreeTypeID
+                    TreeTypeID: rep.TreeTypeID,
+                    productInfo: rep
                 }, () => {
-                    console.log(rep.TreeTypeID);
+                    console.log(rep);
                 });
             });
         }
@@ -308,10 +308,10 @@ class DataList extends Component {
     }
     toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
-        const { TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList } = this.state;
+        const { productInfo, TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList } = this.state;
         console.log(dataList);
-        const { AddCommodity } = this.props.actions;
-        AddCommodity({}, {
+        const { postCommodity, putCommodity } = this.props.actions;
+        const pro = {
             TreeTypeID,
             Photo,
             LocalPhoto,
@@ -319,16 +319,27 @@ class DataList extends Component {
             OtherPhoto,
             TreeDescribe: formVal.TreeDescribe,
             Status
-        }).then(rep => {
-            console.log(rep);
-            if (rep.code === 1 && Status === 1) {
-                message.success('发布成功');
-            } else if (rep.code === 1 && Status === 0) {
-                message.success('暂存成功');
-            } else if (rep.code === 2) {
-                message.error('该商品已存在');
-            }
-        });
+        };
+        if (productInfo) {
+            pro.ID = productInfo.ID;
+            putCommodity({}, pro).then(rep => {
+                if (rep.code === 1 && Status === 1) {
+                    message.success('编辑成功');
+                } else if (rep.code === 1 && Status === 0) {
+                    message.success('暂存成功');
+                }
+            });
+        } else {
+            postCommodity({}, pro).then(rep => {
+                if (rep.code === 1 && Status === 1) {
+                    message.success('发布成功');
+                } else if (rep.code === 1 && Status === 0) {
+                    message.success('暂存成功');
+                } else if (rep.code === 2) {
+                    message.error('该商品已存在');
+                }
+            });
+        }
     }
     handleTreeTypeNo (value) {
         let arr = [];

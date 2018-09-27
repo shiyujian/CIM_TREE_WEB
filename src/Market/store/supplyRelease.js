@@ -9,7 +9,8 @@ export const ID = 'Market_supermarket_supplyRelease';
 // 示例action
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
-export const AddCommodity = createFetchAction(`${SEEDLING_API}/good/spu`, [], 'POST'); // 新增苗木
+export const postCommodity = createFetchAction(`${SEEDLING_API}/good/spu`, [], 'POST'); // 新增苗木
+export const putCommodity = createFetchAction(`${SEEDLING_API}/good/spu`, [], 'PUT'); // 编辑苗木
 export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); // 获取苗木品种
 export const getNurseryByPk = createFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃基地列表
 export const getProductList = createFetchAction(`${SEEDLING_API}/good/goods`); // 获取商品列表
@@ -21,7 +22,8 @@ export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetyp
 
 export const actions = {
     getCuring,
-    AddCommodity,
+    postCommodity,
+    putCommodity,
     getTreeTypes,
     getNurseryByPk,
     postUploadImage,

@@ -50,8 +50,6 @@ class Menu extends Component {
 
     }
     toSoldOut () {
-        console.log(this);
-        window.location.href = '/market/purchasedetails';
     }
 }
 

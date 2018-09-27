@@ -247,15 +247,15 @@ class DataList extends Component {
     }
     toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
-        const { RegionCode, StartTime, EndTime, dataList, ProjectName, Section } = this.state;
-        const { postPurchase } = this.props.actions;
+        const { productInfo, RegionCode, StartTime, EndTime, dataList, ProjectName, Section } = this.state;
+        const { postPurchase, putPurchase } = this.props.actions;
         let Specs = [];
         dataList.map(item => {
             item.map(ite => {
                 Specs.push(ite);
             });
         });
-        postPurchase({}, {
+        const pro = {
             StartTime,
             EndTime,
             ProjectName,
@@ -264,15 +264,27 @@ class DataList extends Component {
             TreeDescribe: formVal.TreeDescribe,
             Status,
             Specs
-        }).then(rep => {
-            if (rep.code === 1 && Status === 1) {
-                message.success('发布成功');
-            } else if (rep.code === 1 && Status === 0) {
-                message.success('暂存成功');
-            } else if (rep.code === 2) {
-                message.error('该商品已存在');
-            }
-        });
+        };
+        if (productInfo) {
+            pro.ID = productInfo.ID;
+            putPurchase({}, pro).then(rep => {
+                if (rep.code === 1 && Status === 1) {
+                    message.success('编辑成功');
+                } else if (rep.code === 1 && Status === 0) {
+                    message.success('暂存成功');
+                }
+            });
+        } else {
+            postPurchase({}, pro).then(rep => {
+                if (rep.code === 1 && Status === 1) {
+                    message.success('发布成功');
+                } else if (rep.code === 1 && Status === 0) {
+                    message.success('暂存成功');
+                } else if (rep.code === 2) {
+                    message.error('该商品已存在');
+                }
+            });
+        }
     }
     handleProjectName (value) {
         const { getWpunittree } = this.props.actions;

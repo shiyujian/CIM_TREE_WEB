@@ -398,6 +398,7 @@ class Users extends Component {
                             <a>删除</a>
                         </Popconfirm>
                     ];
+                    console.log(userc, '-----');
                     if (userc.is_superuser === true) {
                         if (record.is_active === true) {
                             arr.push(<a
@@ -432,6 +433,37 @@ class Users extends Component {
                                 编辑
                             </a>
                         ];
+                    }
+
+                    // 供应商文书权限
+                    if (userc.groups.length > 0 && userc.groups[0]['id'] === 64) {
+                        if (record.is_active) {
+                            arr = [
+                                <a
+                                    onClick={this.edit.bind(this, record)}
+                                    key={1}
+                                    style={{ marginRight: '.5em' }}
+                                >
+                                    编辑
+                                </a>
+                            ];
+                        } else {
+                            arr = [
+                                <a
+                                    onClick={this.edit.bind(this, record)}
+                                    key={1}
+                                    style={{ marginRight: '.5em' }}
+                                >
+                                    编辑
+                                </a>, <a
+                                    key={2}
+                                    style={{marginLeft: '.5em'}}
+                                    onClick={this.toAudit.bind(this, record)}
+                                >
+                                    审核
+                                </a>
+                            ];
+                        }
                     }
                     return arr;
                 }
@@ -631,32 +663,6 @@ class Users extends Component {
         this.setState({
             showModal: true,
             record
-        });
-    }
-    handleAudit () {
-        const { checkUsers } = this.props.actions;
-        this.props.form.validateFields((err, values) => {
-            if (err) {
-                return;
-            }
-            const param = {
-                ID: this.state.record.id,
-                Checker: this.Checker,
-                CheckStatus: values.CheckStatus,
-                CheckInfo: values.CheckInfo,
-                CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
-            };
-            checkUsers({}, param).then((rep) => {
-                if (rep.code === 1) {
-                    message.success('审核成功');
-                }
-            });
-        });
-    }
-    handleCancel () {
-        this.setState({
-            showModal: false,
-            record: null
         });
     }
     
@@ -961,6 +967,77 @@ class Users extends Component {
             this.forceUpdate();
             // console.log("rst", rst)
             // console.log("333333333", JSON.parse(rst.msg))
+        });
+    }
+    handleCancel () {
+        this.setState({
+            showModal: false,
+            record: null
+        });
+    }
+    handleAudit () {
+        const { record } = this.state;
+        const {
+            sidebar: { node } = {},
+            actions: { putUser }
+        } = this.props;
+        let groupe = [];
+        for (let j = 0; j < record.groups.length; j++) {
+            const element = record.groups[j];
+            groupe.push(element.id);
+        }
+        this.props.form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            let is_active = values['CheckStatus'] === 1;
+            const param = {
+                id: record.id,
+                username: record.username,
+                email: record.email,
+                account: {
+                    person_name: record.person_name,
+                    person_type: 'C_PER',
+                    person_avatar_url: record.person_avatar_url || '',
+                    person_signature_url: record.person_signature_url || '',
+                    organization: {
+                        pk: node.pk,
+                        code: record.org_code,
+                        obj_type: 'C_ORG',
+                        rel_type: 'member',
+                        name: record.organization
+                    }
+                },
+                tags: record.tags,
+                sections: record.sections,
+                groups: groupe,
+                is_active,
+                id_num: record.id_num,
+                id_image: record.id_image,
+                basic_params: {
+                    info: {
+                        电话: record.person_telephone || '',
+                        性别: record.gender || '',
+                        技术职称: record.title || '',
+                        phone: record.person_telephone || '',
+                        sex: record.gender || '',
+                        duty: ''
+                    }
+                },
+                extra_params: {},
+                title: record.title || ''
+            };
+            putUser({}, param).then((rep) => {
+                if (rep.code === 1) {
+                    this.setState({
+                        showModal: false,
+                        record: null
+                    });
+                    // 刷新列表
+                    this.clear();
+                    message.success('审核成功');
+                }
+            });
         });
     }
     disable (user, event) {

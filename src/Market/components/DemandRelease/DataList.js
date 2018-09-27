@@ -32,21 +32,21 @@ class DataList extends Component {
                         label='采购编号'
                     >
                         {getFieldDecorator('purchaseno')(
-                            <Input style={{width: '200px'}} />
+                            <Input style={{width: '200px'}} placeholder='请输入采购编号' />
                         )}
                     </FormItem>
                     <FormItem
                         label='采购名称'
                     >
                         {getFieldDecorator('projectname')(
-                            <Input style={{width: '200px'}} />
+                            <Input style={{width: '200px'}} placeholder='请输入采购名称' />
                         )}
                     </FormItem>
                     <FormItem
                         label='状态'
                     >
                         {getFieldDecorator('status')(
-                            <Select allowClear style={{ width: 150 }}>
+                            <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
                                 <Option value={0}>未上架</Option>
                                 <Option value={1}>上架中</Option>
                             </Select>
@@ -92,7 +92,7 @@ class DataList extends Component {
         });
     }
     onClear () {
-
+        this.props.form.resetFields();
     }
 }
 
