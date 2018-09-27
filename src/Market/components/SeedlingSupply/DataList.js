@@ -16,16 +16,17 @@ class DataList extends Component {
             dataList: [],
             page: 1,
             total: 0,
-            a: 1
+            treetypename: ''
         };
         this.onSearch = this.onSearch.bind(this);
         this.onClear = this.onClear.bind(this);
+        this.handleTreeTypeName = this.handleTreeTypeName.bind(this);
     }
     componentDidMount () {
         this.onSearch();
     }
     render () {
-        const { page, total, dataList } = this.state;
+        const { page, total, dataList, treetypename } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='seedling-supply' style={{padding: '0 20px'}}>
@@ -33,9 +34,8 @@ class DataList extends Component {
                     <FormItem
                         label='苗木名称'
                     >
-                        {getFieldDecorator('treetypename')(
-                            <Input style={{width: '200px'}} />
-                        )}
+                        <Input value={treetypename} onChange={this.handleTreeTypeName}
+                            style={{width: '200px'}} placeholder='请输入苗木名称' />
                     </FormItem>
                     <FormItem style={{marginLeft: 150}}
                     >
@@ -63,9 +63,8 @@ class DataList extends Component {
     }
     onSearch () {
         const { getProductList } = this.props.actions;
-        const formVal = this.props.form.getFieldsValue();
         getProductList({}, {
-            treetypename: formVal.treetypename || '',
+            treetypename: this.state.treetypename || '',
             status: ''
         }).then((rep) => {
             if (rep.code === 200) {
@@ -78,7 +77,14 @@ class DataList extends Component {
         });
     }
     onClear () {
-
+        this.setState({
+            treetypename: ''
+        });
+    }
+    handleTreeTypeName (e) {
+        this.setState({
+            treetypename: e.target.value
+        });
     }
 }
 

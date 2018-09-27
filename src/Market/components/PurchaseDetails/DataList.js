@@ -18,9 +18,7 @@ class DataList extends Component {
         const { getPurchaseById } = this.props.actions;
         const { id } = searchToObj(this.props.location.search);
         console.log(id);
-        getPurchaseById({
-            id: parseInt(id)
-        }).then((rep) => {
+        getPurchaseById({}, {id}).then((rep) => {
             
         });
     }

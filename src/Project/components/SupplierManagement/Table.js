@@ -53,7 +53,7 @@ class Tablelevel extends Component {
             });
         });
         // 获取所有苗圃
-        getNurseryList().then(rep => {
+        getNurseryList({}, {status: 1}).then(rep => {
             let optionList = [];
             rep.content.map(item => {
                 optionList.push(
