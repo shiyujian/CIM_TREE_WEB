@@ -75,14 +75,14 @@ export default class TaskTeamTable extends Component {
     }
     _getRelMemMess = () => {
         const {
-            curingGroupMans = []
+            getCheckGroupMans = []
         } = this.props;
         const {
             totalUserData = []
         } = this.state;
         let dataSource = [];
-        if (curingGroupMans && curingGroupMans instanceof Array && curingGroupMans.length > 0) {
-            curingGroupMans.map((man) => {
+        if (getCheckGroupMans && getCheckGroupMans instanceof Array && getCheckGroupMans.length > 0) {
+            getCheckGroupMans.map((man) => {
                 totalUserData.map((userData) => {
                     if (Number(userData.ID) === man.User) {
                         dataSource.push(userData);
@@ -124,7 +124,7 @@ export default class TaskTeamTable extends Component {
         },
         {
             title: '角色',
-            dataIndex: 'juese'
+            dataIndex: 'Roles'
         },
         {
             title: '职务',

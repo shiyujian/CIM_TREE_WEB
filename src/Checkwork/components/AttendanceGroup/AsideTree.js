@@ -23,6 +23,7 @@ class AsideTree extends Component {
             selectKey: '' // 选中节点的key
         };
         this.section = '';
+        this.project_code = '';
     }
 
     componentDidMount = async () => {
@@ -43,6 +44,7 @@ class AsideTree extends Component {
         sections = JSON.parse(sections);
         // 使目录树和标段相关联
         this.section = sections[0];
+        this.project_code = this.section.substr(0, 4);
         await this._getSectionTeams();
         this.setState({
             addDisabled: false
@@ -60,10 +62,10 @@ class AsideTree extends Component {
     _getSectionTeams = async () => {
         const {
             actions: {
-                getCuringGroup
+                getCheckGroup
             }
         } = this.props;
-        let taskTeams = await getCuringGroup({}, {section: this.section});
+        let taskTeams = await getCheckGroup({}, {section: this.section});
         console.log('taskTeams', taskTeams);
         let sectionName = await getSectionName(this.section);
         let teamsTree = [
@@ -95,8 +97,8 @@ class AsideTree extends Component {
             } else if (parent) {
                 return (
                     <TreeNode
-                        key={`${data.ID}^^${parent.ID}`}
-                        title={data.GroupName}
+                        key={`${data.id}^^${parent.ID}`}
+                        title={data.name}
                     >
                         {data.children &&
                         data.children.map(m => {
@@ -107,8 +109,8 @@ class AsideTree extends Component {
             } else {
                 return (
                     <TreeNode
-                        key={data.ID}
-                        title={data.GroupName}
+                        key={data.id}
+                        title={data.name}
                     >
                         {data.children &&
                         data.children.map(m => {
@@ -134,6 +136,7 @@ class AsideTree extends Component {
             labelCol: { span: 6 },
             wrapperCol: { span: 18 }
         };
+
         return (
             <div className='total-main'>
                 <div className='test'>
@@ -189,7 +192,7 @@ class AsideTree extends Component {
                         >
                             <Row>
                                 <FormItem {...FormItemLayout} label='群体名称'>
-                                    {getFieldDecorator('teamName', {
+                                    {getFieldDecorator('name', {
                                         rules: [
                                             { required: true, message: '请输入群体名称' }
                                         ]
@@ -202,7 +205,7 @@ class AsideTree extends Component {
                             </Row>
                             <Row>
                                 <FormItem {...FormItemLayout} label='群体描述'>
-                                    {getFieldDecorator('teamDesc', {
+                                    {getFieldDecorator('desc', {
                                         rules: [
                                             { required: true, message: '请输入群体描述' }
                                         ]
@@ -222,7 +225,7 @@ class AsideTree extends Component {
     _getAdminData = async () => {
         const {
             actions: {
-                getCuringGroup,
+                getCheckGroup,
                 changeSelectSection
             }
         } = this.props;
@@ -234,7 +237,7 @@ class AsideTree extends Component {
                 let projectName = project.value;
                 units.map(async unit => {
                     let sectionName = projectName + unit.value;
-                    let taskTeams = await getCuringGroup({}, {section: unit.code});
+                    let taskTeams = await getCheckGroup({}, {section: unit.code});
                     if (taskTeams && taskTeams.length > 0) {
                         loopTime = loopTime + 1;
                         if (loopTime === 1) {
@@ -257,7 +260,7 @@ class AsideTree extends Component {
     _getAdminTeams = async (section) => {
         const {
             actions: {
-                getCuringGroup
+                getCheckGroup
             }
         } = this.props;
         const {
@@ -266,7 +269,7 @@ class AsideTree extends Component {
         teamsTree.map(async (data, index) => {
             if (data && data.ID && data.ID === section) {
                 let sectionName = data.name;
-                let taskTeams = await getCuringGroup({}, {section: section});
+                let taskTeams = await getCheckGroup({}, {section: section});
                 if (taskTeams && taskTeams.length > 0) {
                     data = {
                         key: section,
@@ -287,21 +290,25 @@ class AsideTree extends Component {
     _handleAddTeam = async () => {
         const {
             actions: {
-                postCuringGroup
+                postCheckGroup
             }
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
-                let teamName = values.teamName;
-                let teamDesc = values.teamDesc;
+                let name = values.name;
+                let desc = values.desc;
+                let keyArr = this.state.selectKey.split('^^');
+                let section = keyArr[1];
+                let project_code = keyArr[1].substr(0,4);
                 let postData = {
-                    GroupName: teamName,
-                    Section: this.section,
-                    Remark: teamDesc
+                    name: name,
+                    section: this.section!=''?this.section:section,
+                    project_code: this.project_code!=''?this.project_code:project_code,
+                    desc: desc
                 };
-                let curinggroup = await postCuringGroup({}, postData);
-                console.log('curinggroup', curinggroup);
-                if (curinggroup && curinggroup.code && curinggroup.code === 1) {
+                let checkgroup = await postCheckGroup({}, postData);
+                console.log('checkgroup', checkgroup);
+                if (checkgroup && checkgroup.id) {
                     Notification.success({
                         message: '新增群体成功',
                         dutation: 3
@@ -312,7 +319,7 @@ class AsideTree extends Component {
                     this._docList(this.section);
                 } else {
                     Notification.error({
-                        message: '新增班组失败',
+                        message: '新增群体失败',
                         dutation: 3
                     });
                 }
@@ -323,10 +330,10 @@ class AsideTree extends Component {
     _handleDelDoc = async () => {
         const {
             actions: {
-                deleteCuringGroup,
+                deleteCheckGroup,
                 changeSelectMemTeam,
                 changeSelectState,
-                getCuringGroupMansOk
+                getCheckGroupMansOk
             }
         } = this.props;
         const {
@@ -337,23 +344,23 @@ class AsideTree extends Component {
             try {
                 let keyArr = selectKey.split('^^');
                 if (keyArr && keyArr.length === 2) {
-                    let delData = await deleteCuringGroup({ID: keyArr[0]});
+                    let delData = await deleteCheckGroup({id: keyArr[0]});
                     console.log('delData', delData);
-                    if (delData && delData.code && delData.code === 1) {
+                    if (delData == '') {
                         Notification.success({
                             message: '删除群体成功',
                             dutation: 3
                         });
                         changeSelectState(false);
                         changeSelectMemTeam();
-                        getCuringGroupMansOk([]);
+                        getCheckGroupMansOk([]);
                         this._docList(keyArr[1]);
                         this.setState({
                             selected: false
                         });
                     } else {
                         Notification.error({
-                            message: '删除班组失败',
+                            message: '删除群体失败',
                             dutation: 3
                         });
                     }
@@ -375,7 +382,7 @@ class AsideTree extends Component {
                 changeSelectSection,
                 changeSelectMemTeam,
                 changeSelectState,
-                getCuringGroupMans
+                getCheckGroupMans
             }
         } = this.props;
         const {
@@ -410,7 +417,7 @@ class AsideTree extends Component {
                 let postData = {
                     groupid: keyArr[0]
                 };
-                let data = await getCuringGroupMans(postData);
+                let data = await getCheckGroupMans({id: keyArr[0]});
                 console.log('data', data);
             }
         } catch (e) {

@@ -19,7 +19,11 @@ export default class CountTable extends Component {
     render () {
 
         let allcheckrecord = this.props.allcheckrecord;
-        let dataSource = [];  
+        let dataSource = allcheckrecord;  
+
+        const pagination = { // 设置每页显示的页数
+            pageSize: 10
+        };
 
         return (
             <div>
@@ -28,6 +32,7 @@ export default class CountTable extends Component {
                     rowSelection={this.rowSelection}
                     dataSource={dataSource}
                     columns={this.columns}
+                    pagination={pagination}
                     className='foresttables'
                     bordered
                     rowKey='code'
