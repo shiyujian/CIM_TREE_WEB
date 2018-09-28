@@ -1,7 +1,8 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs, Select, Table, Upload, Row, Col, Icon, Modal, Cascader, message, Card, DatePicker  } from 'antd';
-import { TREETYPENO, FOREST_API, postUploadImage } from '_platform/api';
+import moment from 'moment';
+import { Form, Input, Button, Tabs, Select, Table, Cascader, message, Card, DatePicker } from 'antd';
+import { TREETYPENO } from '_platform/api';
 import { searchToObj, getUser } from '_platform/auth';
 
 const FormItem = Form.Item;
@@ -9,6 +10,7 @@ const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const TextArea = Input.TextArea;
 const { RangePicker } = DatePicker;
+const dateFormat = 'YYYY/MM/DD';
 class DataList extends Component {
     constructor (props) {
         super(props);
@@ -16,9 +18,9 @@ class DataList extends Component {
             productInfo: null, // 回显信息
             sectionList: [], // 标段
             projectList: [], // 项目列表
-            optionList: [], // 行政区划
-            card: [], // 卡片个数
-            Contacter: '', //联系人
+            TreeTypeList: [], // 树种类型
+            RegionCodeList: [], // 行政区划
+            Contacter: '', // 联系人
             Phone: '', // 联系电话
             treeNames: [], // 树木名称数组
             ProjectName: '', // 项目名称
@@ -29,42 +31,42 @@ class DataList extends Component {
         };
         this.Creater = ''; // 发布者
         this.CreaterOrg = ''; // 发布者所在单位org
-        this.TreeTypeList = []; // 树种类型
+        this.SectionList = []; // 标段列表
         this.UseNurseryAddress = ''; // 行政区划地址
+        this.purchaseid = ''; // 采购单ID
         this.handleProjectName = this.handleProjectName.bind(this); // 项目名称
         this.handleSectionName = this.handleSectionName.bind(this); // 标段选择
         this.loadRegion = this.loadRegion.bind(this); // 加载市县
         this.handleRegion = this.handleRegion.bind(this); // 行政区划
         this.handleRange = this.handleRange.bind(this); // 起止日期
         this.onAddSpecs = this.onAddSpecs.bind(this); // 新增树种
-        this.handleTreeTypes = this.handleTreeTypes.bind(this); // 树木类型改变
         this.columns = [{
             title: '胸径（cm）',
             dataIndex: 'DBH',
             key: '1',
             render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'DBH', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'DBH', index, record)} />;
             }
         }, {
             title: '地径（cm）',
             dataIndex: 'GroundDiameter',
             key: '2',
             render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'GroundDiameter', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'GroundDiameter', index, record)} />;
             }
         }, {
             title: '冠幅（cm）',
             dataIndex: 'CrownWidth',
             key: '3',
             render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'CrownWidth', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'CrownWidth', index, record)} />;
             }
         }, {
             title: '自然高（cm）',
             dataIndex: 'Height',
             key: '4',
             render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'Height', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'Height', index, record)} />;
             }
         }, {
             title: '培育方式',
@@ -72,7 +74,7 @@ class DataList extends Component {
             key: '5',
             render: (text, record, index) => {
                 return (
-                    <Select style={{ width: 100 }} onChange={this.editVersionMode.bind(this, 'CultivationMode', index, record)}>
+                    <Select value={text} style={{ width: 100 }} onChange={this.editVersionMode.bind(this, 'CultivationMode', index, record)}>
                         <Option value={0}>地苗</Option>
                         <Option value={1}>断根苗</Option>
                         <Option value={2}>假植苗</Option>
@@ -87,57 +89,45 @@ class DataList extends Component {
             dataIndex: 'Num',
             key: '7',
             render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'Num', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'Num', index, record)} />;
             }
         }];
     }
     componentDidMount () {
-        const { getTreeTypes, getRegionCodes, getWpunittree, getOrgTree_new, getPurchaseById } = this.props.actions;  
+        const { getTreeTypes, getRegionCodes, getWpunittree, getPurchaseById, getPurchaseStandard } = this.props.actions;
         // 获得所有项目
         getWpunittree().then(rep => {
-            let arr = [];
+            let projectList = [];
+            let sectionList = [];
             rep.map(item => {
+                if (item['No'].length === 10) {
+                    sectionList.push(item);
+                }
                 if (item['No'].indexOf('-') === -1) {
-                    arr.push(item);
+                    projectList.push(item);
                 };
             });
+            this.SectionList = sectionList;
             this.setState({
-                projectList: arr
+                projectList,
+                sectionList
             });
         });
         // 获取行政区划编码
         getRegionCodes({}, {grade: 1}).then(rep => {
-            let province = [];
+            let RegionCodeList = [];
             rep.map(item => {
-                province.push({
+                RegionCodeList.push({
                     value: item.ID,
                     label: item.Name,
                     isLeaf: false
                 });
             });
             this.setState({
-                optionList: province
+                RegionCodeList
             });
         });
-        // 获取施工方的责任人电话
-        const { id, org_code, phone, name } = getUser();
-        console.log(getUser());
-        this.Creater = id;
-        this.CreaterOrg = org_code;
-        this.setState({
-            Contacter: name,
-            Phone: phone
-        })
-        // 编辑商品
-        const { key } = searchToObj(this.props.location.search);
-        if (key) {
-            getPurchaseById({id: key}).then(rep => {
-                this.setState({
-                    purchaseInfo: rep,
-                    ProjectName: rep.ProjectName
-                });
-            });
-        }
+        
         // 获取树种类型
         getTreeTypes().then(rep => {
             TREETYPENO.map(item => {
@@ -153,13 +143,81 @@ class DataList extends Component {
                     }
                 });
             });
-            this.TreeTypeList = TREETYPENO;
-            // 加载一个card
-            this.onAddSpecs();
+            this.setState({
+                TreeTypeList: TREETYPENO
+            });
+            console.log(this.state.TreeTypeList);
+        });
+        // 编辑采购单
+        const { key } = searchToObj(this.props.location.search);
+        this.purchaseid = key;
+        if (key) {
+            getPurchaseById({id: key}).then(rep => {
+                console.log(rep, '采购单详情');
+                this.setState({
+                    purchaseInfo: rep,
+                    ProjectName: rep.ProjectName,
+                    Section: rep.Section,
+                    StartTime: rep.StartTime,
+                    EndTime: rep.EndTime
+                });
+            });
+            getPurchaseStandard({}, {purchaseid: key}).then(rep => {
+                console.log(rep, '采购单规格');
+                let arr = [];
+                rep.map(item => {
+                    if (!arr.includes(item.TreeTypeID)) {
+                        arr.push(item.TreeTypeID);
+                    }
+                });
+                let dataList = [];
+                arr.map((item, index) => {
+                    // card数量
+                    let arrIndex = [];
+                    rep.map(row => {
+                        if (row.TreeTypeID === item) {
+                            arrIndex.push(row);
+                        }
+                    });
+                    dataList.push(arrIndex);
+                });
+                console.log(dataList);
+                this.setState({
+                    dataList
+                });
+            });
+        }
+        // 获取施工方的责任人电话
+        const { id, org_code, phone, name } = getUser();
+        console.log(getUser());
+        this.Creater = id;
+        this.CreaterOrg = org_code;
+        this.setState({
+            Contacter: name,
+            Phone: phone
         });
     }
+    renderCard () {
+        let card = [];
+        const { getTreeTypes } = this.props.actions;
+        this.state.dataList.map((item, index) => {
+            let str = '';
+            card.push(
+                <Card key={index}>
+                    <div style={{marginBottom: 10}}>
+                        <span>树木名称：</span>
+                        <Cascader value={[str, item[0].TreeTypeID]} options={this.state.TreeTypeList} onChange={this.handleTreeTypes.bind(this, index)}
+                            placeholder='请选择苗木品种' style={{width: 200}} />
+                        <Button type='primary' onClick={this.addVersion.bind(this, index, item.length)} style={{float: 'right'}}>新增规格</Button>
+                    </div>
+                    <Table columns={this.columns} dataSource={item} bordered style={{minWidth: 700}} pagination={false} rowKey='number' />
+                </Card>
+            );
+        });
+        return card;
+    }
     render () {
-        const { purchaseInfo, Contacter, Phone, ProjectName, projectList, sectionList, optionList } = this.state;
+        const { purchaseInfo, Contacter, Phone, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='add-seedling' style={{padding: '0 20px'}}>
@@ -168,7 +226,7 @@ class DataList extends Component {
                         <Form layout='inline' onSubmit={this.handleSubmit}>
                             <FormItem label='项目名称'>
                                 <Select
-                                    defaultValue={ProjectName}
+                                    value={ProjectName}
                                     allowClear style={{width: 150}}
                                     onChange={this.handleProjectName}
                                 >
@@ -181,6 +239,7 @@ class DataList extends Component {
                             </FormItem>
                             <FormItem label='标段选择'>
                                 <Select
+                                    value={Section}
                                     allowClear style={{width: 150}}
                                     onChange={this.handleSectionName}
                                 >
@@ -197,27 +256,28 @@ class DataList extends Component {
                                 })(
                                     <Cascader placeholder='选择您所在的城市'
                                         loadData={this.loadRegion}
-                                        options={optionList}
+                                        options={RegionCodeList}
                                         onChange={this.handleRegion}
                                         changeOnSelect
                                     />
                                 )}
                             </FormItem>
                             <FormItem label='联系人'>
-                                <Input disabled value={Contacter}/>
+                                <Input disabled value={Contacter} />
                             </FormItem>
                             <FormItem label='联系电话'>
-                                <Input disabled value={Phone}/>
+                                <Input disabled value={Phone} />
                             </FormItem>
                             <FormItem label='报价起止日期'>
-                                <RangePicker
-                                    onChange={this.handleRange}
+                                <RangePicker value={
+                                    StartTime ? [moment(StartTime, dateFormat), moment(EndTime, dateFormat)] : []
+                                } onChange={this.handleRange}
                                 />
                             </FormItem>
                             <h2>树种/规格</h2>
                             <Button onClick={this.onAddSpecs} type='primary'>新增树种</Button>
                             {
-                                this.state.card
+                                this.renderCard()
                             }
                             <FormItem label='文本介绍' className='label-block'>
                                 {getFieldDecorator('TreeDescribe', {
@@ -297,20 +357,15 @@ class DataList extends Component {
         }
     }
     handleProjectName (value) {
-        const { getWpunittree } = this.props.actions;
-        this.setState({
-            ProjectName: value
+        let sectionList = [];
+        this.SectionList.map(item => {
+            if (item['No'].indexOf(value) > -1) {
+                sectionList.push(item);
+            }
         });
-        getWpunittree().then(rep => {
-            let arr = [];
-            rep.map(item => {
-                if (item['No'].length === 10 && item['No'].indexOf(value) > -1) {
-                    arr.push(item);
-                }
-            });
-            this.setState({
-                sectionList: arr
-            });
+        this.setState({
+            ProjectName: value,
+            sectionList
         });
     }
 
@@ -330,6 +385,7 @@ class DataList extends Component {
                 rep.map(item => {
                     if (item.LevelType === '3') {
                         targetOption.children.push({
+                            MergerName: item.MergerName,
                             value: item.ID,
                             label: item.Name
                         });
@@ -342,20 +398,19 @@ class DataList extends Component {
                     }
                 });
                 this.setState({
-                    optionList: [...this.state.optionList]
+                    RegionCodeList: [...this.state.RegionCodeList]
                 });
             });
         }, 100);
     }
     handleRegion (value, selectedOptions) {
-        console.log(selectedOptions, '---');
-        let RegionCode = value[value.length - 1];
-        selectedOptions.map(item => {
-            this.UseNurseryAddress = this.UseNurseryAddress + item.label + '/';
-        });
-        this.setState({
-            RegionCode
-        });
+        if (value.length === 3) {
+            this.UseNurseryAddress = selectedOptions[2].MergerName;
+            let RegionCode = value[value.length - 1];
+            this.setState({
+                RegionCode
+            });
+        }
     }
     handleRange (date, dateString) {
         this.setState({
@@ -363,16 +418,16 @@ class DataList extends Component {
             EndTime: dateString[1]
         });
     }
-    addVersion (cardKey) {
+    addVersion (cardKey, rowKey) {
         if (!this.state.TreeTypeID) {
             message.error('请选择树种');
             return;
         }
-        let { dataList, length, card, TreeTypeID } = this.state;
+        let { dataList } = this.state;
         const obj = {
-            number: dataList[length - 1].length,
-            cardKey,
-            TreeTypeID,
+            number: rowKey,
+            cardKey: cardKey,
+            TreeTypeID: dataList[cardKey][0].TreeTypeID,
             DBH: '',
             GroundDiameter: '',
             CrownWidth: '',
@@ -381,45 +436,38 @@ class DataList extends Component {
             Num: ''
         };
         dataList[cardKey].push(obj);
-        card[cardKey] = <Card key={cardKey}>
-            <div style={{marginBottom: 10}}>
-                <span>树木名称：</span>
-                <Cascader options={this.TreeTypeList} onChange={this.handleTreeTypes}
-                    placeholder='请选择苗木品种' style={{width: 200}} />
-                <Button type='primary' onClick={this.addVersion.bind(this, length - 1)} style={{float: 'right'}}>新增规格</Button>
-            </div>
-            <Table columns={this.columns} dataSource={dataList[cardKey]} bordered style={{minWidth: 700}} pagination={false} rowKey='number' />
-        </Card>;
         this.setState({
-            dataList,
-            card
+            dataList
         });
     }
     onAddSpecs () {
-        let { card, length, dataList } = this.state;
-        let dom = <Card key={card.length}>
-            <div style={{marginBottom: 10}}>
-                <span>树木名称：</span>
-                <Cascader options={this.TreeTypeList} onChange={this.handleTreeTypes}
-                    placeholder='请选择苗木品种' style={{width: 200}} />
-                <Button type='primary' onClick={this.addVersion.bind(this, length)} style={{float: 'right'}}>新增规格</Button>
-            </div>
-            <Table columns={this.columns} bordered style={{minWidth: 700}} pagination={false} rowKey='number' />
-        </Card>;
-        card.push(dom);
-        dataList[length] = [];
-        length += 1;
+        let { dataList } = this.state;
+        dataList[dataList.length] = [{
+            number: 0,
+            cardKey: dataList.length,
+            TreeTypeID: '',
+            DBH: '',
+            GroundDiameter: '',
+            CrownWidth: '',
+            Height: '',
+            CultivationMode: '',
+            Num: ''
+        }];
         this.setState({
-            length,
-            dataList,
-            card
+            dataList
         });
     }
-    handleTreeTypes (value, selectedOptions) {
+    handleTreeTypes (cardKey, value, selectedOptions) {
+        console.log(value);
         if (selectedOptions.length === 2) {
             this.setState({
                 TreeTypeName: selectedOptions[1].TreeTypeName,
                 TreeTypeID: selectedOptions[1].ID
+            });
+            this.state.dataList.map((item, index) => {
+                if (index === cardKey) {
+                    item[0].TreeTypeID = selectedOptions[1].ID;
+                }
             });
         }
     }

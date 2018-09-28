@@ -15,6 +15,7 @@ class DataList extends Component {
             page: 1,
             total: 0,
             dataList: [],
+            projectList: [], // 项目标段
             a: 1
         };
         this.onSearch = this.onSearch.bind(this);
@@ -22,10 +23,16 @@ class DataList extends Component {
         this.onClear = this.onClear.bind(this);
     }
     componentDidMount () {
+        const { getWpunittree } = this.props.actions;
+        getWpunittree().then(rep => {
+            this.setState({
+                projectList: rep
+            });
+        });
         this.onSearch();
     }
     render () {
-        const { dataList } = this.state;
+        const { dataList, projectList } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='seedling-purchase' style={{padding: '0 20px'}}>
@@ -65,7 +72,7 @@ class DataList extends Component {
                     <TabPane tab='全 部' key='1'>
                         {
                             dataList.map((item, index) => {
-                                return <Menu {...this.props} record={item} key={index} />;
+                                return <Menu {...this.props} record={item} key={index} projectList={projectList} />;
                             })
                         }
                     </TabPane>

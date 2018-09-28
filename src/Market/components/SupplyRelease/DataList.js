@@ -53,7 +53,7 @@ class DataList extends Component {
                 </Form>
                 <Link to='/market/addseedling'>
                     <Button type='primary'
-                        style={{position: 'absolute', right: 60, zIndex: 100}}>新增苗木</Button>
+                        style={{position: 'absolute', right: 60, zIndex: 100}}>新增供应</Button>
                 </Link>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='全 部' key='1'>
