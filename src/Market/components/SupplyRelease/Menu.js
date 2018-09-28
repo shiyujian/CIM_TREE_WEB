@@ -1,8 +1,8 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs, Card, Row, Col } from 'antd';
+import { Form, Input, Button, Tabs, Card, Row, Col, message } from 'antd';
 import { Link } from 'react-router-dom';
-import { FOREST_API } from '_platform/api';
+import { FOREST_API, TREETYPENO } from '_platform/api';
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 
@@ -13,12 +13,19 @@ class Menu extends Component {
             a: 1
         };
         this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
-        this.toSoldOut = this.toSoldOut.bind(this); // 需求详情
+        this.toSoldOut = this.toSoldOut.bind(this); // 下架
     }
     render () {
         const { record } = this.props;
         console.log(record);
         const { getFieldDecorator } = this.props.form;
+        console.log(TREETYPENO);
+        let TreeTypeName;
+        TREETYPENO.map(item => {
+            if(item.id === record.TreeTypeNo.slice(0, 1)){
+                TreeTypeName = item.name;
+            }
+        });
         return (
             <div className='menu' style={{marginTop: 10}}>
                 <Card title={'发布时间：'}>
@@ -28,7 +35,7 @@ class Menu extends Component {
                         </Col>
                         <Col span={7}>
                             <h3>{record.TreeTypeName}<span>({record.SKU})</span></h3>
-                            <p>类型：</p>
+                            <p>类型：{TreeTypeName}</p>
                             <p>价格：￥{record.MinPrice}-{record.MaxPrice}</p>
                             <p>商品备注：{record.TreeDescribe}</p>
                         </Col>
@@ -36,7 +43,7 @@ class Menu extends Component {
                             <p>采购品种：采购品种：采购品种：</p>
                         </Col>
                         <Col span={6} style={{paddingTop: 30}}>
-                            <Link to={`/market/addseedling?id=${record.ID}`}>
+                            <Link to={`/market/addseedling?key=${record.ID}`}>
                                 <Button type='primary' onClick={this.toEditInfo}>修改信息</Button>
                             </Link>
                             <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>
@@ -50,6 +57,16 @@ class Menu extends Component {
 
     }
     toSoldOut () {
+        const { putCommodity } = this.props.actions;
+        putCommodity({}, {
+            ID: this.props.record.ID,
+            Status: 0
+        }).then(rep => {
+            if (rep.code === 1) {
+                this.props.toSearch();
+                message.success('下架成功');
+            }
+        });
     }
 }
 

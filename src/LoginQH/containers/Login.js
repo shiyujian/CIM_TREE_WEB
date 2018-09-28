@@ -115,6 +115,7 @@ class Login extends Component {
                                 'QH_USER_DATA',
                                 JSON.stringify(rst)
                             );
+                            rst.isOwnerClerk = isOwnerClerk;
                             const {
                                 username,
                                 id,
@@ -127,7 +128,8 @@ class Login extends Component {
                                 organization: org,
                                 person_code: code,
                                 org_code,
-                                sections
+                                sections,
+                                person_telephone: phone
                             } = account;
                             setUser(
                                 username,
@@ -139,7 +141,9 @@ class Login extends Component {
                                 code,
                                 is_superuser,
                                 org_code,
-                                sections
+                                sections,
+                                isOwnerClerk,
+                                phone
                             );
                             console.log(getUser(), 'cookie存的信息');
 
@@ -751,9 +755,9 @@ class Login extends Component {
                                 organization: org,
                                 person_code: code,
                                 org_code,
-                                sections
+                                sections,
+                                person_telephone: phone,
                             } = account;
-
                             setUser(
                                 username,
                                 id,
@@ -765,7 +769,8 @@ class Login extends Component {
                                 is_superuser,
                                 org_code,
                                 sections,
-                                isOwnerClerk
+                                isOwnerClerk,
+                                phone
                             );
                             console.log(getUser(), 'cookie存的信息');
 

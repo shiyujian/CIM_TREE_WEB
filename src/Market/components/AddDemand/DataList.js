@@ -14,10 +14,12 @@ class DataList extends Component {
         super(props);
         this.state = {
             productInfo: null, // 回显信息
-            Option_section: [], // 标段
-            Option: [], // 工程
-            options: [], // 行政区划
+            sectionList: [], // 标段
+            projectList: [], // 项目列表
+            optionList: [], // 行政区划
             card: [], // 卡片个数
+            Contacter: '', //联系人
+            Phone: '', // 联系电话
             treeNames: [], // 树木名称数组
             ProjectName: '', // 项目名称
             Section: '', // 标段
@@ -25,7 +27,10 @@ class DataList extends Component {
             length: 0, // 树种个数
             dataList: [] // 数组
         };
-        this.treeTypes = [];
+        this.Creater = ''; // 发布者
+        this.CreaterOrg = ''; // 发布者所在单位org
+        this.TreeTypeList = []; // 树种类型
+        this.UseNurseryAddress = ''; // 行政区划地址
         this.handleProjectName = this.handleProjectName.bind(this); // 项目名称
         this.handleSectionName = this.handleSectionName.bind(this); // 标段选择
         this.loadRegion = this.loadRegion.bind(this); // 加载市县
@@ -66,26 +71,28 @@ class DataList extends Component {
             dataIndex: 'CultivationMode',
             key: '5',
             render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'CultivationMode', index, record)} />;
-            }
-        }, {
-            title: '价格（元）',
-            dataIndex: 'Price',
-            key: '6',
-            render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'Price', index, record)} />;
+                return (
+                    <Select style={{ width: 100 }} onChange={this.editVersionMode.bind(this, 'CultivationMode', index, record)}>
+                        <Option value={0}>地苗</Option>
+                        <Option value={1}>断根苗</Option>
+                        <Option value={2}>假植苗</Option>
+                        <Option value={3}>袋苗</Option>
+                        <Option value={4}>盆苗</Option>
+                        <Option value={5}>山苗</Option>
+                    </Select>
+                );
             }
         }, {
             title: '库存（棵）',
-            dataIndex: 'Stock',
+            dataIndex: 'Num',
             key: '7',
             render: (text, record, index) => {
-                return <Input onChange={this.editVersion.bind(this, 'Stock', record, index)} />;
+                return <Input onChange={this.editVersion.bind(this, 'Num', index, record)} />;
             }
         }];
     }
     componentDidMount () {
-        const { getTreeTypes, getRegionCodes, getWpunittree, getNurseryByPk, getPurchaseById } = this.props.actions;  
+        const { getTreeTypes, getRegionCodes, getWpunittree, getOrgTree_new, getPurchaseById } = this.props.actions;  
         // 获得所有项目
         getWpunittree().then(rep => {
             let arr = [];
@@ -95,7 +102,7 @@ class DataList extends Component {
                 };
             });
             this.setState({
-                Option: arr
+                projectList: arr
             });
         });
         // 获取行政区划编码
@@ -109,28 +116,25 @@ class DataList extends Component {
                 });
             });
             this.setState({
-                options: province
+                optionList: province
             });
         });
-        // 获取苗圃基地的责任人电话，以及绑定的供应商
-        const { org_code } = getUser();
-        if (org_code) {
-            getNurseryByPk({}, {pk: org_code}).then((rep) => {
-                if (rep.code === 200 && rep.content.length > 0) {
-                    const obj = rep.content[0];
-                    this.props.form.setFieldsValue({
-                        Leader: obj.Leader,
-                        LeaderPhone: obj.LeaderPhone
-                    });
-                }
-            });
-        }
+        // 获取施工方的责任人电话
+        const { id, org_code, phone, name } = getUser();
+        console.log(getUser());
+        this.Creater = id;
+        this.CreaterOrg = org_code;
+        this.setState({
+            Contacter: name,
+            Phone: phone
+        })
         // 编辑商品
-        const { id } = searchToObj(this.props.location.search);
-        if (id) {
-            getPurchaseById({id}).then(rep => {
+        const { key } = searchToObj(this.props.location.search);
+        if (key) {
+            getPurchaseById({id: key}).then(rep => {
                 this.setState({
-                    purchaseInfo: rep
+                    purchaseInfo: rep,
+                    ProjectName: rep.ProjectName
                 });
             });
         }
@@ -149,13 +153,13 @@ class DataList extends Component {
                     }
                 });
             });
-            this.treeTypes = TREETYPENO;
+            this.TreeTypeList = TREETYPENO;
             // 加载一个card
             this.onAddSpecs();
         });
     }
     render () {
-        const { purchaseInfo, Option, Option_section, options } = this.state;
+        const { purchaseInfo, Contacter, Phone, ProjectName, projectList, sectionList, optionList } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='add-seedling' style={{padding: '0 20px'}}>
@@ -164,14 +168,14 @@ class DataList extends Component {
                         <Form layout='inline' onSubmit={this.handleSubmit}>
                             <FormItem label='项目名称'>
                                 <Select
-                                    defaultValue={purchaseInfo ? purchaseInfo['ProjectName'] : ''}
+                                    defaultValue={ProjectName}
                                     allowClear style={{width: 150}}
                                     onChange={this.handleProjectName}
                                 >
                                     {
-                                        Option.length > 0 ? Option.map(item => {
-                                            return <Option value={item.No}>{item.Name}</Option>;
-                                        }) : null
+                                        projectList.length > 0 ? projectList.map(item => {
+                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                        }) : []
                                     }
                                 </Select>
                             </FormItem>
@@ -181,9 +185,9 @@ class DataList extends Component {
                                     onChange={this.handleSectionName}
                                 >
                                     {
-                                        Option_section.length > 0 ? Option_section.map(item => {
-                                            return <Option value={item.No}>{item.Name}</Option>;
-                                        }) : null
+                                        sectionList.length > 0 ? sectionList.map(item => {
+                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                        }) : []
                                     }
                                 </Select>
                             </FormItem>
@@ -193,31 +197,25 @@ class DataList extends Component {
                                 })(
                                     <Cascader placeholder='选择您所在的城市'
                                         loadData={this.loadRegion}
-                                        options={options}
+                                        options={optionList}
                                         onChange={this.handleRegion}
                                         changeOnSelect
                                     />
                                 )}
                             </FormItem>
                             <FormItem label='联系人'>
-                                {getFieldDecorator('Leader')(
-                                    <Input disabled />
-                                )}
+                                <Input disabled value={Contacter}/>
                             </FormItem>
                             <FormItem label='联系电话'>
-                                {getFieldDecorator('LeaderPhone')(
-                                    <Input disabled />
-                                )}
+                                <Input disabled value={Phone}/>
                             </FormItem>
                             <FormItem label='报价起止日期'>
-                                {getFieldDecorator('LeaderPhone')(
-                                    <RangePicker
-                                        onChange={this.handleRange}
-                                    />
-                                )}
+                                <RangePicker
+                                    onChange={this.handleRange}
+                                />
                             </FormItem>
                             <h2>树种/规格</h2>
-                            <Button onClick={this.onAddSpecs}>新增树种</Button>
+                            <Button onClick={this.onAddSpecs} type='primary'>新增树种</Button>
                             {
                                 this.state.card
                             }
@@ -245,9 +243,16 @@ class DataList extends Component {
             dataList
         });
     }
+    editVersionMode (str, index, record, value) {
+        let { dataList } = this.state;
+        dataList[record.cardKey][index][str] = value;
+        this.setState({
+            dataList
+        });
+    }
     toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
-        const { productInfo, RegionCode, StartTime, EndTime, dataList, ProjectName, Section } = this.state;
+        const { productInfo, Contacter, Phone, RegionCode, StartTime, EndTime, dataList, ProjectName, Section } = this.state;
         const { postPurchase, putPurchase } = this.props.actions;
         let Specs = [];
         dataList.map(item => {
@@ -256,6 +261,11 @@ class DataList extends Component {
             });
         });
         const pro = {
+            UseNurseryAddress: this.UseNurseryAddress,
+            Contacter,
+            Phone,
+            Creater: this.Creater,
+            CreaterOrg: this.CreaterOrg,
             StartTime,
             EndTime,
             ProjectName,
@@ -280,8 +290,8 @@ class DataList extends Component {
                     message.success('发布成功');
                 } else if (rep.code === 1 && Status === 0) {
                     message.success('暂存成功');
-                } else if (rep.code === 2) {
-                    message.error('该商品已存在');
+                } else {
+                    message.error('操作失败');
                 }
             });
         }
@@ -299,7 +309,7 @@ class DataList extends Component {
                 }
             });
             this.setState({
-                Option_section: arr
+                sectionList: arr
             });
         });
     }
@@ -332,13 +342,17 @@ class DataList extends Component {
                     }
                 });
                 this.setState({
-                    options: [...this.state.options]
+                    optionList: [...this.state.optionList]
                 });
             });
         }, 100);
     }
-    handleRegion (value) {
+    handleRegion (value, selectedOptions) {
+        console.log(selectedOptions, '---');
         let RegionCode = value[value.length - 1];
+        selectedOptions.map(item => {
+            this.UseNurseryAddress = this.UseNurseryAddress + item.label + '/';
+        });
         this.setState({
             RegionCode
         });
@@ -364,14 +378,13 @@ class DataList extends Component {
             CrownWidth: '',
             Height: '',
             CultivationMode: '',
-            Price: '',
-            Stock: ''
+            Num: ''
         };
         dataList[cardKey].push(obj);
         card[cardKey] = <Card key={cardKey}>
             <div style={{marginBottom: 10}}>
                 <span>树木名称：</span>
-                <Cascader options={this.treeTypes} onChange={this.handleTreeTypes}
+                <Cascader options={this.TreeTypeList} onChange={this.handleTreeTypes}
                     placeholder='请选择苗木品种' style={{width: 200}} />
                 <Button type='primary' onClick={this.addVersion.bind(this, length - 1)} style={{float: 'right'}}>新增规格</Button>
             </div>
@@ -387,7 +400,7 @@ class DataList extends Component {
         let dom = <Card key={card.length}>
             <div style={{marginBottom: 10}}>
                 <span>树木名称：</span>
-                <Cascader options={this.treeTypes} onChange={this.handleTreeTypes}
+                <Cascader options={this.TreeTypeList} onChange={this.handleTreeTypes}
                     placeholder='请选择苗木品种' style={{width: 200}} />
                 <Button type='primary' onClick={this.addVersion.bind(this, length)} style={{float: 'right'}}>新增规格</Button>
             </div>

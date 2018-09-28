@@ -150,14 +150,14 @@ export default class AddMember extends Component {
 
     _getRelMem = async () => {
         const {
-            curingGroupMans
+            checkGroupMans
         } = this.props;
         const {
             totalUserData
         } = this.state;
         let RelationMem = [];
-        if (curingGroupMans && curingGroupMans instanceof Array && curingGroupMans.length > 0) {
-            curingGroupMans.map((man) => {
+        if (checkGroupMans && checkGroupMans instanceof Array && checkGroupMans.length > 0) {
+            checkGroupMans.map((man) => {
                 totalUserData.map((userData) => {
                     if (Number(userData.ID) === man.User) {
                         RelationMem.push(Number(userData.PK));
@@ -187,11 +187,11 @@ export default class AddMember extends Component {
         } = this.state;
         const {
             actions: {
-                postCuringGroupMan,
-                deleteCuringGroupMan
+                postCheckGroupMans,
+                deleteCheckGroupMans
             },
             selectMemTeam,
-            curingGroupMans
+            checkGroupMans
         } = this.props;
         let checked = e.target.checked;
         console.log('user', user);
@@ -213,7 +213,7 @@ export default class AddMember extends Component {
                             'User': checkUserId, // 用户ID  非PK
                             'FullName': user.account.person_name || user.username // 用户姓名
                         };
-                        let addData = await postCuringGroupMan({}, postAddData);
+                        let addData = await postCheckGroupMans({}, postAddData);
                         console.log('addData', addData);
                         if (addData && addData.code && addData.code === 1) {
                             await this.getRelatedMans();
@@ -239,7 +239,7 @@ export default class AddMember extends Component {
                 }
             } else {
                 let deleteID = '';
-                curingGroupMans.map((man) => {
+                checkGroupMans.map((man) => {
                     if (man.User === checkUserId) {
                         deleteID = man.ID;
                     }
@@ -247,7 +247,7 @@ export default class AddMember extends Component {
                 let postData = {
                     id: deleteID
                 };
-                let deleteData = await deleteCuringGroupMan(postData);
+                let deleteData = await deleteCheckGroupMans(postData);
                 if (deleteData && deleteData.code && deleteData.code === 1) {
                     await this.getRelatedMans();
                     RelationMem.map((memberID, index) => {
@@ -278,14 +278,14 @@ export default class AddMember extends Component {
     getRelatedMans = async () => {
         const {
             actions: {
-                getCuringGroupMans
+                getCheckGroupMans
             },
             selectMemTeam
         } = this.props;
         let postGetData = {
-            groupid: selectMemTeam.ID
+            id: selectMemTeam.ID
         };
-        await getCuringGroupMans(postGetData);
+        await getCheckGroupMans(postGetData);
     }
 
     columns = [

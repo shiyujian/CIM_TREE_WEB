@@ -132,13 +132,14 @@ class Tablelevel extends Component {
                 ID: this.state.record.ID,
                 Checker: id,
                 CheckStatus: values.CheckStatus,
-                CheckInfo: values.CheckInfo,
+                CheckInfo: values.CheckInfo || '',
                 CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
             };
             checknb2s({}, param).then((rep) => {
                 console.log(rep);
                 if (rep.code === 1) {
                     message.success('审核成功');
+                    this.toSearch();
                     this.handleCancel();
                 }
             });

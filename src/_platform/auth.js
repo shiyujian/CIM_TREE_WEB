@@ -17,11 +17,13 @@ export const getUser = () => {
         code: cookie.get('code'),
         is_superuser: cookie.get('is_superuser') !== 'false',
         org_code: cookie.get('org_code'),
-        sections: cookie.get('sections')
+        sections: cookie.get('sections'),
+        isOwnerClerk: cookie.get('isOwnerClerk'),
+        phone: cookie.get('phone'),
     };
 };
 
-export const setUser = (username, id, name, org, tasks, password, code, is_superuser, org_code, sections, isOwnerClerk) => {
+export const setUser = (username, id, name, org, tasks, password, code, is_superuser, org_code, sections, isOwnerClerk, phone) => {
     cookie.set('username', username);
     cookie.set('id', id);
     cookie.set('name', name);
@@ -33,6 +35,7 @@ export const setUser = (username, id, name, org, tasks, password, code, is_super
     cookie.set('org_code', org_code); // 所在组织机构code
     cookie.set('sections', sections);
     cookie.set('isOwnerClerk', isOwnerClerk);
+    cookie.set('phone', phone); // 用户手机号
 };
 
 export const clearUser = () => {
@@ -46,6 +49,8 @@ export const clearUser = () => {
     cookie.remove('is_superuser');
     cookie.remove('org_code');
     cookie.remove('sections');
+    cookie.remove('isOwnerClerk');
+    cookie.remove('phone');
 };
 
 export const clearCookies = () => {

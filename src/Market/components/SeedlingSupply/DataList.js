@@ -65,7 +65,7 @@ class DataList extends Component {
         const { getProductList } = this.props.actions;
         getProductList({}, {
             treetypename: this.state.treetypename || '',
-            status: ''
+            status: 0
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({

@@ -3,7 +3,8 @@ import createFetchAction from 'fetch-action';
 
 import {
     SERVICE_API,
-    FOREST_API
+    FOREST_API,
+    base
 } from '_platform/api';
 export const ID = 'Checkwork_attendancegroup';
 // 示例action
@@ -52,6 +53,29 @@ export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curing
 // 获取养护班组
 export const deleteCuringGroupMan = createFetchAction(`${FOREST_API}/curing/curinggroupman/{{id}}`, [], 'DELETE');
 
+//获取考情群体
+export const getCheckGroup = createFetchAction(`${base}/main/api/check-group/`, [], 'GET');
+
+//增加考勤群体
+export const postCheckGroup = createFetchAction(`${base}/main/api/check-group/`, [], 'POST');
+
+
+//删除考勤群体
+export const deleteCheckGroup = createFetchAction(`${base}/main/api/check-group/{{id}}/`, [], 'DELETE');
+
+//获取群体成员
+export const getCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [], 'GET');
+
+// 将人员信息上传至redux
+export const getCheckGroupMansOk = createAction(`${ID}_getCheckGroupMansOk`);
+
+//增加群体成员
+export const postCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [], 'POST');
+
+//增加群体成员
+export const deleteCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [], 'DELETE');
+
+
 
 export const actions = {
     getCuring,
@@ -73,7 +97,14 @@ export const actions = {
     postCuringGroupMan,
     getCuringGroupMans,
     getCuringGroupMansOk,
-    deleteCuringGroupMan
+    deleteCuringGroupMan,
+    getCheckGroup,
+    postCheckGroup,
+    deleteCheckGroup,
+    getCheckGroupMans,
+    postCheckGroupMans,
+    getCheckGroupMansOk,
+    deleteCheckGroupMans,
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({
@@ -99,5 +130,9 @@ export default handleActions({
     [getCuringGroupMansOk]: (state, {payload}) => ({
         ...state,
         curingGroupMans: payload
+    }),
+    [getCheckGroupMansOk]: (state, {payload}) => ({
+        ...state,
+        checkGroupMans: payload
     })
 }, {});
