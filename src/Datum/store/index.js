@@ -34,6 +34,7 @@ const followReducer = booleanFactory(ID, 'follow');
 const changeDocs = createAction(`${ID}_CHANGE_DOCS`);
 const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 const selectDocuments = createAction(`${ID}_SELECTDOUMENT`);
+const selectTableRowKeys = createAction(`${ID}_TableRowKeys`);
 const updatevisible = createAction(`${ID}_updatevisible`);
 const setoldfile = createAction(`${ID}setoldfile`);
 export const setkeycode = createAction(`${ID}_setkeycode`);
@@ -50,6 +51,26 @@ export const postForsetVideo = myFetch(
     [],
     'POST'
 );
+export const getForsetVideo = createFetchAction(
+    `${FOREST_API}/tree/videos`,
+    [],
+    'GET'
+);
+export const reportForsetVideo = createFetchAction(
+    `${FOREST_API}/tree/video`,
+    [],
+    'POST'
+);
+export const updateForsetVideo = createFetchAction(
+    `${FOREST_API}/tree/video`,
+    [],
+    'PUT'
+);
+export const deleteForsetVideo = createFetchAction(
+    `${FOREST_API}/tree/video/{{ID}}`,
+    [],
+    'DELETE'
+);
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -57,6 +78,7 @@ export const actions = {
     setcurrentcode,
     putdocument,
     selectDocuments,
+    selectTableRowKeys,
     deletedoc,
     SearchOK,
     Search,
@@ -68,6 +90,10 @@ export const actions = {
     searchVideoMessage,
     searchVideoVisible,
     postForsetVideo,
+    getForsetVideo,
+    reportForsetVideo,
+    updateForsetVideo,
+    deleteForsetVideo,
     ...documentReducer,
     ...additionReducer,
     ...visibleReducer,
@@ -126,6 +152,10 @@ export default handleActions(
         [selectDocuments]: (state, { payload }) => ({
             ...state,
             selected: payload
+        }),
+        [selectTableRowKeys]: (state, { payload }) => ({
+            ...state,
+            selectedRowKeys: payload
         }),
         [SearchOK]: (state, { payload }) => ({
             ...state,

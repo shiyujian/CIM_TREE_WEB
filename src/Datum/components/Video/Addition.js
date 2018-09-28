@@ -9,9 +9,11 @@ import {
     Button,
     Icon,
     Spin,
-    Notification
+    Notification,
+    Input
 } from 'antd';
 const Dragger = Upload.Dragger;
+const FormItem = Form.Item;
 export const Datumcode = window.DeathCode.DATUM_VIDEO;
 
 class Addition extends Component {
@@ -20,14 +22,21 @@ class Addition extends Component {
         this.state = {
             progress: 0,
             isUploading: false,
-            viewVisible: false
+            viewVisible: false,
+            viewUrl: '',
+            postUrl: ''
         };
     }
     render () {
         const {
-            additionVisible = false
+            additionVisible = false,
+            form: { getFieldDecorator }
         } = this.props;
         let { isUploading } = this.state;
+        const FormItemLayout = {
+            labelCol: { span: 8 },
+            wrapperCol: { span: 16 }
+        };
         let arr = [
             <Button key='back' size='large' onClick={this.uploadFileModalCancel.bind(this)}>
                 取消
@@ -78,6 +87,7 @@ class Addition extends Component {
                 </Modal>
                 <Modal
                     title='视频预览'
+                    // visible
                     visible={this.state.viewVisible}
                     cancelText={'关闭'}
                     width='800px'
@@ -107,6 +117,62 @@ class Addition extends Component {
                             />
                         </video>
                         <Row style={{ marginTop: 10 }}>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='视频名称'
+                                    >
+                                        {getFieldDecorator(
+                                            'videoName',
+                                            {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请输入视频名称'
+                                                    }
+                                                ]
+                                            }
+                                        )(
+                                            <Input
+                                                placeholder='请输入视频名称'
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='备注'
+                                    >
+                                        {getFieldDecorator(
+                                            'videoDesc',
+                                            {
+                                                rules: [
+                                                    {
+                                                        required: false,
+                                                        message: '请输入备注'
+                                                    }
+                                                ]
+                                            }
+                                        )(
+                                            <Input
+                                                placeholder='请输入备注'
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </Row>
+
+                        <Row style={{ marginTop: 10 }}>
+                            <Button
+                                onClick={this.videoViewReport.bind(this)}
+                                style={{ float: 'right', marginLeft: 10 }}
+                                type='primary'
+                            >
+                                上报
+                            </Button>
                             <Button
                                 onClick={this.videoViewModalCancel.bind(this)}
                                 style={{ float: 'right' }}
@@ -114,6 +180,7 @@ class Addition extends Component {
                             >
                                 关闭
                             </Button>
+
                         </Row>
                     </div>
                 </Modal>
@@ -168,6 +235,7 @@ class Addition extends Component {
                         let src = rst.replace(/\/\//g, '/');
                         src = `${FOREST_API}/${src}`;
                         this.setState({
+                            postUrl: rst,
                             viewUrl: src,
                             viewVisible: true,
                             isUploading: false
@@ -178,6 +246,7 @@ class Addition extends Component {
                             duration: 3
                         });
                         this.setState({
+                            postUrl: '',
                             viewUrl: '',
                             viewVisible: false,
                             isUploading: false
@@ -215,10 +284,68 @@ class Addition extends Component {
     }
 
     videoViewModalCancel () {
+        const {
+            actions: {
+                toggleAddition
+            }
+        } = this.props;
+        this.clearForm();
+        toggleAddition(false);
         this.setState({
             viewVisible: false,
             viewUrl: '',
+            postUrl: '',
             isUploading: false
+        });
+    }
+    // 上报视频
+    videoViewReport = () => {
+        const {
+            actions: {
+                reportForsetVideo,
+                searchVideoMessage,
+                searchVideoVisible
+            }
+        } = this.props;
+        const {
+            postUrl
+        } = this.state;
+        try {
+            this.props.form.validateFields(async (err, values) => {
+                if (!err) {
+                    let postData = {
+                        VideoName: values.videoName, // 视频名称
+                        VideoDescribe: values.videoDesc, // 视频说明
+                        VideoPath: postUrl, // 视频路径
+                        VideoCover: ''// 视频封面  可为空
+                    };
+                    let reportData = await reportForsetVideo({}, postData);
+                    console.log('reportData', reportData);
+                    if (reportData && reportData.code && reportData.code === 1) {
+                        Notification.success({
+                            message: '视频上报成功',
+                            duration: 3
+                        });
+                        this.videoViewModalCancel();
+                        searchVideoMessage();
+                        searchVideoVisible(true);
+                    } else {
+                        Notification.error({
+                            message: '视频上报失败',
+                            duration: 3
+                        });
+                    }
+                }
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+
+    clearForm = () => {
+        this.props.form.setFieldsValue({
+            videoName: '',
+            videoDesc: ''
         });
     }
 }

@@ -26,14 +26,14 @@ class Filter extends Component {
     render () {
         const {
             form: { getFieldDecorator },
-            Doc = []
+            selected = []
         } = this.props;
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
                     <Col span={18}>
                         <Row>
-                            <Col span={8}>
+                            <Col span={10}>
                                 <FormItem {...Filter.layout} label='视频名称'>
                                     {getFieldDecorator('searchName', {
                                         rules: [
@@ -45,55 +45,7 @@ class Filter extends Component {
                                     })(<Input placeholder='请输入视频名称' />)}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
-                                <FormItem {...Filter.layout} label='视频类型'>
-                                    {getFieldDecorator('searchType', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请输入视频名称'
-                                            }
-                                        ]
-                                    })(
-                                        <Select>
-                                            <Option
-                                                key={'宣传片'}
-                                                value={'宣传片'}
-                                            >
-                                                宣传片
-                                            </Option>
-                                            <Option
-                                                key={'操作视频'}
-                                                value={'操作视频'}
-                                            >
-                                                操作视频
-                                            </Option>
-                                        </Select>
-                                    )}
-                                </FormItem>
-                            </Col>
-                            <Col span={8}>
-                                <FormItem {...Filter.layout} label='提交日期'>
-                                    {getFieldDecorator('searchDate', {
-                                        rules: [
-                                            {
-                                                type: 'array',
-                                                required: false,
-                                                message: '请选择日期'
-                                            }
-                                        ]
-                                    })(
-                                        <RangePicker
-                                            size='default'
-                                            format='YYYY-MM-DD'
-                                            style={{
-                                                width: '100%',
-                                                height: '100%'
-                                            }}
-                                        />
-                                    )}
-                                </FormItem>
-                            </Col>
+                            <Col span={14} />
                         </Row>
                     </Col>
 
@@ -124,7 +76,7 @@ class Filter extends Component {
                         >
                             新增
                         </Button>
-                        {Doc.length === 0 ? (
+                        {selected.length === 0 ? (
                             <Button
                                 style={{ marginRight: 10 }}
                                 disabled
@@ -143,7 +95,6 @@ class Filter extends Component {
                                 <Button
                                     style={{ marginRight: 10 }}
                                     type='danger'
-                                    onClick={this.delete.bind(this)}
                                 >
                                     删除
                                 </Button>
@@ -176,18 +127,6 @@ class Filter extends Component {
             if (values.searchName) {
                 search.searchName = values.searchName;
             }
-            if (values.searchType) {
-                search.searchType = values.searchType;
-            }
-            if (values.searchDate) {
-                search.searchDate_begin = moment(values.searchDate[0]._d)
-                    .subtract(1, 'days')
-                    .format('YYYY-MM-DD');
-                search.searchDate_end = moment(values.searchDate[1]._d)
-                    .add(1, 'days')
-                    .format('YYYY-MM-DD');
-            }
-
             let postData = Object.assign({}, search);
             searchVideoMessage(postData);
             searchVideoVisible(true);
@@ -195,79 +134,54 @@ class Filter extends Component {
     }
     clear () {
         const {
-            actions: { searchVideoMessage }
+            actions: { searchVideoMessage, searchVideoVisible }
         } = this.props;
         this.props.form.setFieldsValue({
-            searchName: undefined,
-            searchDate: undefined,
-            searchType: undefined
+            searchName: undefined
         });
-        searchVideoMessage({});
+        searchVideoMessage();
+        searchVideoVisible(true);
     }
     cancel () {}
 
-    delete () {
-    }
     confirm () {
         const {
-            coded = [],
             selected = [],
-            actions: { deletedoc, getdocument }
+            actions: {
+                deleteForsetVideo,
+                searchVideoMessage,
+                searchVideoVisible,
+                selectDocuments,
+                selectTableRowKeys
+            }
         } = this.props;
         if (selected === undefined || selected.length === 0) {
             message.warning('请先选择要删除的文件！');
             return;
         }
+        let IDList = [];
         selected.map(rst => {
-            coded.push(rst.code);
+            IDList.push(rst.ID);
         });
-        let promises = coded.map(function (code) {
-            return deletedoc({ code: code });
+        let promises = IDList.map(function (id) {
+            return deleteForsetVideo({ ID: id });
         });
         message.warning('删除文件中...');
         Promise.all(promises)
             .then(() => {
                 message.success('删除文件成功！');
-                getdocument({ code: Datumcode }).then(() => {});
+                searchVideoMessage();
+                searchVideoVisible(true);
+                selectDocuments([]);
+                selectTableRowKeys([]);
             })
             .catch(() => {
                 message.error('删除失败！');
-                getdocument({ code: Datumcode }).then(() => {});
+                searchVideoMessage();
+                searchVideoVisible(true);
+                selectDocuments([]);
+                selectTableRowKeys([]);
             });
-    }
-    createLink = (name, url) => {
-        // 下载
-        let link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', this);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    download () {
-        const {
-            selected = [],
-            file = [],
-            files = []
-        } = this.props;
-        if (selected.length === 0) {
-            message.warning('没有选择无法下载');
-        }
-        selected.map(rst => {
-            file.push(rst.basic_params.files);
-        });
-        file.map(value => {
-            value.map(cot => {
-                files.push(cot.download_url);
-            });
-        });
-        files.map(down => {
-            let download =
-                STATIC_DOWNLOAD_API + '/media' + down.split('/media')[1];
-            this.createLink(this, download);
-        });
     }
 }
 export default Form.create()(Filter);

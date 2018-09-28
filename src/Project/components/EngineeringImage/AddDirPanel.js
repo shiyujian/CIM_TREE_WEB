@@ -57,7 +57,7 @@ class AddDirPanel extends Component {
                 } else {
                     let orgLeaf = true;
                     let orgCode = extraOrgCode;
-                    if (isAdmin && extraOrgLeaf) {
+                    if (isAdmin && !extraOrgLeaf) {
                         orgLeaf = values.dirOrgLeaf;
                         orgCode = values.dirOrgCode;
                     }
