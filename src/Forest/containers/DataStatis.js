@@ -6,6 +6,7 @@ import * as actions from '../store';
 import { PkCodeTree } from '../components';
 import { PROJECT_UNITS } from '_platform/api';
 import { actions as platformActions } from '_platform/store/global';
+import { DataStatisTable } from '../components/DataStatis';
 import {
     Main,
     Body,
@@ -13,7 +14,10 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { getUser } from '_platform/auth';
+import {
+    getUser,
+    getAreaTreeData
+} from '_platform/auth';
 const Option = Select.Option;
 @connect(
     state => {
@@ -36,11 +40,14 @@ export default class DataStatis extends Component {
             typeoption: [],
             sectionoption: [],
             smallclassoption: [],
-            thinclassoption: []
+            thinclassoption: [],
+            treetypeoption: [],
+            sectionsData: [],
+            smallClassesData: []
         };
     }
 
-    componentDidMount () {
+    componentDidMount = async () => {
         this.biaoduan = [];
         for (let i = 0; i < PROJECT_UNITS.length; i++) {
             PROJECT_UNITS[i].units.map(item => {
@@ -49,57 +56,63 @@ export default class DataStatis extends Component {
         }
         const {
             actions: {
-                getTree,
-                gettreetype,
                 getTreeList,
                 getForestUsers,
                 getTreeNodeList,
-                getLittleBanAll,
-                setkeycode
+                setkeycode,
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
             },
             users,
             treetypes,
-            littleBanAll,
             platform: { tree = {} }
         } = this.props;
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
-        // 避免反复获取森林树种列表，提高效率
-        if (!treetypes) {
-            getTreeList().then(x => this.setTreeTypeOption(x));
-        }
-        if (!tree.bigTreeList) {
-            getTreeNodeList();
-        }
-        if (!littleBanAll) {
-            getLittleBanAll();
-        }
+        try {
+            // 避免反复获取森林用户数据，提高效率
+            if (!users) {
+                getForestUsers();
+            }
+            // 避免反复获取森林树种列表，提高效率
+            if (!treetypes) {
+                getTreeList().then(x => this.setTreeTypeOption(x));
+            }
+            if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+                let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+                let totalThinClass = data.totalThinClass || [];
+                let projectList = data.projectList || [];
+                // 获取所有的小班数据，用来计算养护任务的位置
+                await getTotalThinClass(totalThinClass);
+                // 区域地块树
+                await getThinClassTree(projectList);
+            }
 
-        setkeycode('');
-        // 类型
-        let typeoption = [
-            <Option key={'-1'} value={''} title={'全部'}>
+            setkeycode('');
+            // 类型
+            let typeoption = [
+                <Option key={'-1'} value={''} title={'全部'}>
                 全部
-            </Option>,
-            <Option key={'1'} value={'1'} title={'常绿乔木'}>
+                </Option>,
+                <Option key={'1'} value={'1'} title={'常绿乔木'}>
                 常绿乔木
-            </Option>,
-            <Option key={'2'} value={'2'} title={'落叶乔木'}>
+                </Option>,
+                <Option key={'2'} value={'2'} title={'落叶乔木'}>
                 落叶乔木
-            </Option>,
-            <Option key={'3'} value={'3'} title={'亚乔木'}>
+                </Option>,
+                <Option key={'3'} value={'3'} title={'亚乔木'}>
                 亚乔木
-            </Option>,
-            <Option key={'4'} value={'4'} title={'灌木'}>
+                </Option>,
+                <Option key={'4'} value={'4'} title={'灌木'}>
                 灌木
-            </Option>,
-            <Option key={'5'} value={'5'} title={'地被'}>
+                </Option>,
+                <Option key={'5'} value={'5'} title={'地被'}>
                 地被
-            </Option>
-        ];
-        this.setState({ typeoption });
+                </Option>
+            ];
+            this.setState({ typeoption });
+        } catch (e) {
+
+        }
     }
 
     render () {
@@ -108,11 +121,11 @@ export default class DataStatis extends Component {
         } = this.props;
         const {
             leftkeycode,
-            typeoption
+            resetkey
         } = this.state;
         let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
+        if (tree.thinClassTree) {
+            treeList = tree.thinClassTree;
         }
         return (
             <Body>
@@ -126,7 +139,16 @@ export default class DataStatis extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        数据统计
+                        <DataStatisTable
+                            key={resetkey}
+                            {...this.props}
+                            {...this.state}
+                            sectionselect={this.sectionselect.bind(this)}
+                            smallclassselect={this.smallclassselect.bind(this)}
+                            thinclassselect={this.thinclassselect.bind(this)}
+                            resetinput={this.resetinput.bind(this)}
+                            typeselect={this.typeselect.bind(this)}
+                        />
                     </Content>
                 </Main>
             </Body>
@@ -134,9 +156,14 @@ export default class DataStatis extends Component {
     }
 
     // 树选择, 重新获取: 标段、小班、细班、树种并置空
-    onSelect (value = []) {
+    onSelect (keys, info) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let treeList = tree.thinClassTree;
+
         let user = getUser();
-        let keycode = value[0] || '';
+        let keycode = keys[0] || '';
         const {
             actions: { setkeycode }
         } = this.props;
@@ -145,41 +172,43 @@ export default class DataStatis extends Component {
             leftkeycode: keycode,
             resetkey: ++this.state.resetkey
         });
-        let sections = JSON.parse(user.sections);
-        // 标段
-        let rst = [];
-        if (sections.length === 0) {
-            // 是admin
-            rst = this.biaoduan.filter(item => {
-                return item.code.indexOf(keycode) !== -1;
-            });
-        } else {
-            rst = this.biaoduan.filter(item => {
-                return (
-                    item.code.indexOf(keycode) !== -1 &&
-                    sections.indexOf(item.code) !== -1
-                );
+        console.log('info', info);
+        let sectionsData = [];
+        if (keycode) {
+            treeList.map((treeData) => {
+                if (keycode === treeData.No) {
+                    sectionsData = treeData.children;
+                }
             });
         }
-        this.setSectionOption(rst);
+        this.setState({
+            sectionsData
+        });
         // 树种
         this.typeselect('');
+
+        let sections = JSON.parse(user.sections);
+        // 标段
+        if (sections.length === 0) {
+            // 是admin或者业主
+            this.setSectionOption(sectionsData);
+        } else {
+            sectionsData.map((sectionData) => {
+                if (sections[0] === sectionData) {
+                    this.setSectionOption(sectionData);
+                }
+            });
+        }
     }
 
     // 设置标段选项
     setSectionOption (rst) {
         if (rst instanceof Array) {
-            let sectionList = [];
             let sectionOptions = [];
-            rst.map((item, index) => {
-                sectionList.push(item);
-            });
-            let sectionData = [...new Set(sectionList)];
-            sectionData.sort();
-            sectionData.map(sec => {
+            rst.map(sec => {
                 sectionOptions.push(
-                    <Option key={sec.code} value={sec.code} title={sec.value}>
-                        {sec.value}
+                    <Option key={sec.No} value={sec.No} title={sec.Name}>
+                        {sec.Name}
                     </Option>
                 );
             });
@@ -189,50 +218,27 @@ export default class DataStatis extends Component {
 
     sectionselect (value) {
         const {
-            actions: { getLittleBan }
-        } = this.props;
-        this.currentSection = value;
-        getLittleBan({ no: value }).then(rst => {
-            let smallclasses = [];
-            rst.map((item, index) => {
-                let smallname = {
-                    code: rst[index].SmallClass,
-                    name: rst[index].SmallClassName
-                        ? rst[index].SmallClassName
-                        : rst[index].SmallClass
-                };
-                smallclasses.push(smallname);
-            });
-            this.setSmallClassOption(smallclasses);
+            sectionsData
+        } = this.state;
+        sectionsData.map((sectionData) => {
+            if (value === sectionData.No) {
+                let smallClassesData = sectionData.children;
+                this.setState({
+                    smallClassesData
+                });
+                this.setSmallClassOption(smallClassesData);
+            }
         });
     }
 
     // 设置小班选项
     setSmallClassOption (rst) {
         if (rst instanceof Array) {
-            let smallclassList = [];
             let smallclassOptions = [];
-            rst.map(item => {
-                if (item.name) {
-                    let smalls = {
-                        name: item.name,
-                        code: item.code
-                    };
-                    smallclassList.push(smalls);
-                }
-            });
-            let smalls = [];
-            let array = [];
-            smallclassList.map(item => {
-                if (array.indexOf(item.code) === -1) {
-                    smalls.push(item);
-                    array.push(item.code);
-                }
-            });
-            smalls.map(small => {
+            rst.map(small => {
                 smallclassOptions.push(
-                    <Option key={small.code} value={small.code} title={small.name}>
-                        {small.name}
+                    <Option key={small.No} value={small.No} title={small.Name}>
+                        {small.Name}
                     </Option>
                 );
             });
@@ -245,34 +251,30 @@ export default class DataStatis extends Component {
         }
     }
 
+    // 小班选择, 重新获取: 细班
+    smallclassselect (value) {
+        const {
+            smallClassesData
+        } = this.state;
+        smallClassesData.map((smallClassData) => {
+            if (value === smallClassData.No) {
+                let thinClassesData = smallClassData.children;
+                this.setState({
+                    thinClassesData
+                });
+                this.setThinClassOption(thinClassesData);
+            }
+        });
+    }
+
     // 设置细班选项
     setThinClassOption (rst) {
         if (rst instanceof Array) {
-            let thinclassList = [];
             let thinclassOptions = [];
-
-            // 去除重复的细班,虽然细班是最小的节点，但是只要还有其他元素组成不同，所以数组里面会有相同的细班code，需要去重
-            let array = [];
-            let data = [];
-            rst.map(item => {
-                if (item.code && array.indexOf(item.code) === -1) {
-                    let thins = {
-                        code: item.code,
-                        name: item.name
-                    };
-                    thinclassList.push(thins);
-                    array.push(item.code);
-                } else {
-                    data.push(item);
-                }
-            });
-            // 重复数据
-            console.log('data', data);
-
-            thinclassList.map(thin => {
+            rst.map(thin => {
                 thinclassOptions.push(
-                    <Option key={thin.code} value={thin.code} title={thin.name}>
-                        {thin.name}
+                    <Option key={thin.No} value={thin.No} title={thin.Name}>
+                        {thin.Name}
                     </Option>
                 );
             });
@@ -285,10 +287,54 @@ export default class DataStatis extends Component {
         }
     }
 
+    // 细班选择, 重新获取: 树种
+    thinclassselect (value) {
+    }
+
     // 重置
     resetinput (leftkeycode) {
         this.setState({ resetkey: ++this.state.resetkey }, () => {
             this.onSelect([leftkeycode]);
         });
+    }
+
+    // 类型选择, 重新获取: 树种
+    typeselect (value) {
+        const { treetypes } = this.props;
+        this.setState({ bigType: value });
+        let selectTreeType = [];
+        treetypes.map(item => {
+            if (item.TreeTypeNo == null) {
+                // console.log('itemitemitemitemitem',item)
+            }
+            if (item.TreeTypeNo) {
+                try {
+                    let code = item.TreeTypeNo.substr(0, 1);
+                    if (code === value) {
+                        selectTreeType.push(item);
+                    }
+                } catch (e) {}
+            }
+        });
+        this.setTreeTypeOption(selectTreeType);
+    }
+
+    // 设置树种选项
+    setTreeTypeOption (rst) {
+        if (rst instanceof Array) {
+            let treetypeoption = rst.map(item => {
+                return (
+                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                        {item.TreeTypeName}
+                    </Option>
+                );
+            });
+            treetypeoption.unshift(
+                <Option key={-1} value={''} title={'全部'}>
+                        全部
+                </Option>
+            );
+            this.setState({ treetypeoption, treetypelist: rst });
+        }
     }
 }

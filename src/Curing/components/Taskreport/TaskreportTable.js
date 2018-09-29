@@ -13,13 +13,15 @@ import {
     getThinClassName,
     getIconType,
     getTaskStatus,
-    getAreaTreeData,
     getCuringTaskReportTreeData,
     handleAreaLayerData,
     handleCoordinates
 } from '../auth';
 import '../Curing.less';
-import { getUser } from '_platform/auth';
+import {
+    getUser,
+    getAreaTreeData
+} from '_platform/auth';
 import TaskReportModal from './TaskReportModal';
 const Panel = Collapse.Panel;
 window.config = window.config || {};

@@ -37,7 +37,7 @@ export default class Aside extends Component {
                 <div
                     style={{
                         width: '100%',
-                        height: '950px',
+                        height: '800%',
                         position: 'absolute',
                         left: 0,
                         top: 0,

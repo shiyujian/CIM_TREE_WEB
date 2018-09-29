@@ -121,11 +121,10 @@ export default class TaskStatisTable extends Component {
         try {
             let projectList = [];
             let sectionList = [];
+            let totalSectionList = [];
             let sectionOption = [];
             let sectionSelect = '';
             let rst = await getTreeNodeList();
-            // 子项目级
-            let unitProjectList = [];
             if (rst instanceof Array && rst.length > 0) {
                 rst.map(node => {
                     if (this.totalDataPer) {
@@ -135,14 +134,12 @@ export default class TaskStatisTable extends Component {
                                 No: node.No
                             });
                         }
-                        if (node.Type === '子项目工程') {
-                            unitProjectList.push({
+                        if (node.Type === '单位工程') {
+                            sectionList.push({
                                 Name: node.Name,
                                 No: node.No
                             });
-                        }
-                        if (node.Type === '单位工程') {
-                            sectionList.push({
+                            totalSectionList.push({
                                 Name: node.Name,
                                 No: node.No
                             });
@@ -156,12 +153,10 @@ export default class TaskStatisTable extends Component {
                                 No: node.No
                             });
                         }
-                        let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
-                        if (node.Type === '子项目工程' && node.No.indexOf(unitProjectKey) !== -1) {
-                            unitProjectList.push({
+                        if (node.Type === '单位工程') {
+                            totalSectionList.push({
                                 Name: node.Name,
-                                No: node.No,
-                                Parent: node.Parent
+                                No: node.No
                             });
                         }
                         if (node.Type === '单位工程' && node.No.indexOf(this.section) !== -1) {
@@ -184,16 +179,19 @@ export default class TaskStatisTable extends Component {
                 console.log('tree.totalThinClass', tree.totalThinClass);
             } else {
                 let totalThinClass = [];
-                for (let i = 0; i < unitProjectList.length; i++) {
-                    let unitProject = unitProjectList[i];
-                    let list = await getThinClassList({ no: unitProject.No });
+                for (let i = 0; i < totalSectionList.length; i++) {
+                    let section = totalSectionList[i];
+                    let sectionNo = section.No;
+                    let sectionNoArr = sectionNo.split('-');
+                    let parentNo = sectionNoArr[0] + '-' + sectionNoArr[1];
+                    let list = await getThinClassList({ no: parentNo }, {section: sectionNoArr[2]});
                     let smallClassList = getSmallClass(list);
                     smallClassList.map(smallClass => {
                         let thinClassList = getThinClass(smallClass, list);
                         smallClass.children = thinClassList;
                     });
                     totalThinClass.push({
-                        unitProject: unitProject.No,
+                        section: section.No,
                         smallClassList: smallClassList
                     });
                 }
@@ -519,10 +517,9 @@ export default class TaskStatisTable extends Component {
             let sectionArr = sectionSelect.split('-');
             console.log('sectionArr', sectionArr);
             if (sectionArr && sectionArr instanceof Array && sectionArr.length === 3) {
-                let unitProjectKey = sectionArr[0] + '-' + sectionArr[1];
-                totalThinClass.map((unitProjectData) => {
-                    if (unitProjectData.unitProject === unitProjectKey) {
-                        let smallClassList = unitProjectData.smallClassList;
+                totalThinClass.map((sectionData) => {
+                    if (sectionData.section === sectionSelect) {
+                        let smallClassList = sectionData.smallClassList;
                         smallClassList.map((smallClass) => {
                             let smallClassHandleKey = smallClass.No.split('-');
                             let sectionNo = smallClassHandleKey[0] + '-' + smallClassHandleKey[1] + '-' + smallClassHandleKey[2];

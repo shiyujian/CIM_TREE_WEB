@@ -267,7 +267,7 @@ class Addition extends Component {
         },
         onChange: ({ file, fileList, event }) => {
             this.setState({
-                isUploading: true
+                isUploading: false
             });
             const status = file.status;
             if (status === 'done') {

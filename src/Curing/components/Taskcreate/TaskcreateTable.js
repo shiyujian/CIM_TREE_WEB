@@ -14,14 +14,16 @@ import {
     getTaskThinClassName,
     getThinClassName,
     getTaskStatus,
-    getAreaTreeData,
     getCuringTaskCreateTreeData,
     handleAreaLayerData,
     handleCoordinates
 } from '../auth';
 import TaskCreateModal from './TaskCreateModal';
 import '../Curing.less';
-import { getUser } from '_platform/auth';
+import {
+    getUser,
+    getAreaTreeData
+} from '_platform/auth';
 
 const Panel = Collapse.Panel;
 window.config = window.config || {};
@@ -226,7 +228,6 @@ export default class TaskCreateTable extends Component {
                 areaTreeLoading: true
             });
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
-            console.log('data', data);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
 
@@ -252,7 +253,6 @@ export default class TaskCreateTable extends Component {
         let data = await getCuringTaskCreateTreeData(getCuringTypes, getCuring);
         let curingTypes = data.curingTypes || [];
         let taskTreeData = data.taskTreeData || [];
-        console.log('taskTreeData', taskTreeData);
         this.setState({
             taskTreeData,
             curingTypes
@@ -457,7 +457,6 @@ export default class TaskCreateTable extends Component {
         const {
             treeLayerChecked
         } = this.state;
-        console.log('treeLayerChecked', treeLayerChecked);
         if (treeLayerChecked) {
             if (this.tileTreeLayerBasic) {
                 this.map.removeLayer(this.tileTreeLayerBasic);
@@ -476,7 +475,6 @@ export default class TaskCreateTable extends Component {
             taskRealLayerList,
             taskRealMarkerLayerList
         } = this.state;
-        console.log('curingLayerChecked', curingLayerChecked);
         try {
             if (!curingLayerChecked) {
                 if (taskRealLayerList && Object.keys(taskRealLayerList).length > 0) {
@@ -592,10 +590,7 @@ export default class TaskCreateTable extends Component {
                     } else {
                         treeCoords[eventKey] = [treearea];
                     }
-                    console.log('treearea', treearea);
-                    console.log('coords', coords);
                 }
-                console.log('treeCoords[eventKey]', treeCoords[eventKey]);
                 if (treeCoords && Object.keys(treeCoords).length > 0) {
                     this.setState({
                         createBtnVisible: true
@@ -679,7 +674,6 @@ export default class TaskCreateTable extends Component {
             });
             let status = getTaskStatus(taskMess);
             let regionData = getTaskThinClassName(taskMess, totalThinClass);
-            console.log('regionData', regionData);
             let sectionName = regionData.regionSectionName;
             let smallClassName = regionData.regionSmallName;
             let thinClassName = regionData.regionThinName;
@@ -947,7 +941,6 @@ export default class TaskCreateTable extends Component {
             // 包括的细班号
             let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
             let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections);
-            console.log('regionData', regionData);
             // let sectionBool = regionData.sectionBool;
             // if (!sectionBool) {
             //     Notification.error({

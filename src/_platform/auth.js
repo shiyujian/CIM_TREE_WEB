@@ -19,7 +19,7 @@ export const getUser = () => {
         org_code: cookie.get('org_code'),
         sections: cookie.get('sections'),
         isOwnerClerk: cookie.get('isOwnerClerk'),
-        phone: cookie.get('phone'),
+        phone: cookie.get('phone')
     };
 };
 
@@ -145,4 +145,222 @@ export const formItemLayout = {
         xs: { span: 24 },
         sm: { span: 14 }
     }
+};
+
+export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
+    let rst = await getTreeNodeList();
+    if (rst instanceof Array && rst.length > 0) {
+        rst.forEach((item, index) => {
+            rst[index].children = [];
+        });
+    }
+    let user = getUser();
+    let sections = user.sections;
+    let section = '';
+    sections = JSON.parse(sections);
+    if (sections && sections instanceof Array && sections.length > 0) {
+        section = sections[0];
+    }
+    // 项目级
+    let projectList = [];
+    // 单位工程级
+    let sectionList = [];
+    if (rst instanceof Array && rst.length > 0) {
+        rst.map(node => {
+            if (user.username === 'admin') {
+                if (node.Type === '项目工程') {
+                    projectList.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                } else if (node.Type === '单位工程') {
+                    let noArr = node.No.split('-');
+                    if (noArr && noArr instanceof Array && noArr.length === 3) {
+                        sectionList.push({
+                            Name: node.Name,
+                            No: node.No,
+                            Parent: noArr[0]
+                        });
+                    }
+                }
+            } else if (section) {
+                let sectionArr = section.split('-');
+                let projectKey = sectionArr[0];
+                if (node.Type === '项目工程' && node.No.indexOf(projectKey) !== -1) {
+                    projectList.push({
+                        Name: node.Name,
+                        No: node.No
+                    });
+                } else if (node.Type === '单位工程' && node.No === section) {
+                    sectionList.push({
+                        Name: node.Name,
+                        No: node.No,
+                        Parent: projectKey
+                    });
+                }
+            }
+        });
+        for (let i = 0; i < projectList.length; i++) {
+            projectList[i].children = sectionList.filter(node => {
+                return node.Parent === projectList[i].No;
+            });
+        }
+    }
+    let totalThinClass = [];
+    for (let i = 0; i < sectionList.length; i++) {
+        let section = sectionList[i];
+        let sectionNo = section.No;
+        let sectionNoArr = sectionNo.split('-');
+        let parentNo = sectionNoArr[0] + '-' + sectionNoArr[1];
+        let list = await getThinClassList({ no: parentNo }, {section: sectionNoArr[2]});
+        let smallClassList = getSmallClass(list);
+        smallClassList.map(smallClass => {
+            let thinClassList = getThinClass(smallClass, list);
+            smallClass.children = thinClassList;
+        });
+        totalThinClass.push({
+            section: section.No,
+            smallClassList: smallClassList
+        });
+        section.children = smallClassList;
+    }
+    console.log('projectList', projectList);
+    console.log('totalThinClass', totalThinClass);
+
+    return {
+        totalThinClass: totalThinClass,
+        projectList: projectList
+    };
+};
+// 获取项目的小班
+export const getSmallClass = (smallClassList) => {
+    let user = getUser();
+    let sections = user.sections;
+    let section = '';
+    sections = JSON.parse(sections);
+    if (sections && sections instanceof Array && sections.length > 0) {
+        section = sections[0];
+    }
+    // 将小班的code获取到，进行去重
+    let uniqueSmallClass = [];
+    // 进行数组去重的数组
+    let array = [];
+    try {
+        smallClassList.map(list => {
+            let noArr = list.No.split('-');
+            // 如果小于5 说明没有标段  不符合规则
+            if (noArr.length < 5) {
+                console.log('rst', list);
+                return;
+            }
+            // 项目 + 区块 + 标段 + 小班
+            let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2];
+            // 项目 + 区块 + 标段
+            let sectionNo = noArr[0] + '-' + noArr[1] + '-' + noArr[4];
+
+            // 管理员可以查看所有数据，其他人员只能查看符合自己标段的数据
+            let userMess = window.localStorage.getItem('QH_USER_DATA');
+            userMess = JSON.parse(userMess);
+            let permission = false;
+            if (userMess.username === 'admin') {
+                permission = true;
+            }
+            let groups = userMess.groups || [];
+            groups.map((group) => {
+                if (group.name.indexOf('业主') !== -1) {
+                    permission = true;
+                }
+            });
+            // permission为true说明是管理员或者业主
+            if (permission) {
+                // console.log('wwwww', sectionNo);
+            } else if (section) {
+                if (sectionNo !== section) {
+                    return;
+                }
+            }
+            // 之前没有存入过该小班，则push进数组
+            if (list.SmallClass && array.indexOf(No) === -1) {
+                if (list.SmallClassName) {
+                    if (list.SmallClassName.indexOf('小班') !== -1) {
+                        uniqueSmallClass.push({
+                            Name: list.SmallClassName,
+                            No: No
+                        });
+                    } else {
+                        uniqueSmallClass.push({
+                            Name: list.SmallClassName + '小班',
+                            No: No
+                        });
+                    }
+                } else {
+                    uniqueSmallClass.push({
+                        Name: list.SmallClass + '小班',
+                        No: No
+                    });
+                }
+                array.push(No);
+            }
+        });
+    } catch (e) {
+        console.log('getSmallClass', e);
+    }
+
+    return uniqueSmallClass;
+};
+// 获取项目的细班
+export const getThinClass = (smallClass, list) => {
+    let thinClassList = [];
+    let codeArray = [];
+    let nameArray = [];
+    try {
+        list.map(rst => {
+            let smallClassCode = smallClass.No.split('-');
+            let projectNo = smallClassCode[0];
+            let unitProjectNo = smallClassCode[1];
+            let sectionNo = smallClassCode[2];
+            let smallClassNo = smallClassCode[3];
+
+            let noArr = rst.No.split('-');
+            // 如果小于5 说明没有标段  不符合规则
+            if (noArr.length < 5) {
+                console.log('rst', rst);
+                return;
+            }
+            // 暂时去掉重复的节点
+            if (
+                noArr[0] === projectNo && noArr[1] === unitProjectNo && noArr[4] === sectionNo &&
+                noArr[2] === smallClassNo
+            ) {
+                // 项目 + 区块 + 标段 + 小班 + 细班
+                let No = noArr[0] + '-' + noArr[1] + '-' + noArr[4] + '-' + noArr[2] + '-' + noArr[3];
+                if (codeArray.indexOf(No) === -1) {
+                    if (rst.ThinClassName) {
+                        if (rst.ThinClassName.indexOf('细班') !== -1) {
+                            thinClassList.push({
+                                Name: rst.ThinClassName,
+                                No: No
+                            });
+                        } else {
+                            thinClassList.push({
+                                Name: rst.ThinClassName + '细班',
+                                No: No
+                            });
+                        }
+                    } else {
+                        thinClassList.push({
+                            Name: rst.ThinClass + '细班',
+                            No: No
+                        });
+                    }
+                    codeArray.push(No);
+                    nameArray.push(rst.ThinClassName);
+                }
+            }
+        });
+    } catch (e) {
+        console.log('getThinClass', e);
+    }
+
+    return thinClassList;
 };

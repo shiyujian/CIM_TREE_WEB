@@ -15,8 +15,8 @@ export const getAreaData = async (getTreeNodeList, getThinClassList) => {
     }
     // 项目级
     let projectList = [];
-    // 子项目级
-    let unitProjectList = [];
+    // 单位工程级
+    let sectionList = [];
     let survivalRateTree = [];
     if (rst instanceof Array && rst.length > 0) {
         rst.map(node => {
@@ -29,12 +29,15 @@ export const getAreaData = async (getTreeNodeList, getThinClassList) => {
                     Name: node.Name,
                     No: node.No
                 });
-            } else if (node.Type === '子项目工程') {
-                unitProjectList.push({
-                    Name: node.Name,
-                    No: node.No,
-                    Parent: node.Parent
-                });
+            } else if (node.Type === '单位工程') {
+                let noArr = node.No.split('-');
+                if (noArr && noArr instanceof Array && noArr.length === 3) {
+                    sectionList.push({
+                        Name: node.Name,
+                        No: node.No,
+                        Parent: noArr[0]
+                    });
+                }
             }
         });
         survivalRateTree.map((survivalRate) => {
@@ -50,29 +53,28 @@ export const getAreaData = async (getTreeNodeList, getThinClassList) => {
             survivalRate.children = sectionTree;
         });
         for (let i = 0; i < projectList.length; i++) {
-            projectList[i].children = unitProjectList.filter(node => {
+            projectList[i].children = sectionList.filter(node => {
                 return node.Parent === projectList[i].No;
             });
         }
     }
     let totalThinClass = [];
-    for (let i = 0; i < unitProjectList.length; i++) {
-        let unitProject = unitProjectList[i];
-        // let list = [];
-        // if (unitProject.No !== 'P009-01') {
-        //     list = await getThinClassList({ no: unitProject.No });
-        // }
-        let list = await getThinClassList({ no: unitProject.No });
+    for (let i = 0; i < sectionList.length; i++) {
+        let section = sectionList[i];
+        let sectionNo = section.No;
+        let sectionNoArr = sectionNo.split('-');
+        let parentNo = sectionNoArr[0] + '-' + sectionNoArr[1];
+        let list = await getThinClassList({ no: parentNo }, {section: sectionNoArr[2]});
         let smallClassList = getSmallClass(list);
         smallClassList.map(smallClass => {
             let thinClassList = getThinClass(smallClass, list);
             smallClass.children = thinClassList;
         });
         totalThinClass.push({
-            unitProject: unitProject.No,
+            section: section.No,
             smallClassList: smallClassList
         });
-        unitProject.children = smallClassList;
+        section.children = smallClassList;
     }
     return {
         totalThinClass: totalThinClass,
@@ -417,11 +419,11 @@ export const getTaskThinClassName = (task, totalThinClass) => {
         let smallNoList = [];
         if (thinClassList && thinClassList instanceof Array && thinClassList.length > 0) {
             thinClassList.map((thinNo, index) => {
-                totalThinClass.map((unitProjectData) => {
-                    let unitProject = unitProjectData.unitProject;
+                totalThinClass.map((sectionData) => {
+                    let sectionNo = sectionData.section;
                     // 首先根据区块找到对应的细班list
-                    if (section.indexOf(unitProject) !== -1) {
-                        let smallClassList = unitProjectData.smallClassList;
+                    if (section === sectionNo) {
+                        let smallClassList = sectionData.smallClassList;
                         smallClassList.map((smallClass) => {
                         // tree结构的数据经过了处理，需要和api获取的数据调整一致
                             let smallClassHandleKey = smallClass.No.split('-');
@@ -492,11 +494,11 @@ export const getThinClassName = (thinClass, section, totalThinClass) => {
         let smallNoList = [];
         if (thinClassList && thinClassList instanceof Array && thinClassList.length > 0) {
             thinClassList.map((thinNo, index) => {
-                totalThinClass.map((unitProjectData) => {
-                    let unitProject = unitProjectData.unitProject;
+                totalThinClass.map((sectionData) => {
+                    let sectionNo = sectionData.section;
                     // 首先根据区块找到对应的细班list
-                    if (section.indexOf(unitProject) !== -1) {
-                        let smallClassList = unitProjectData.smallClassList;
+                    if (section === sectionNo) {
+                        let smallClassList = sectionData.smallClassList;
                         smallClassList.map((smallClass) => {
                         // tree结构的数据经过了处理，需要和api获取的数据调整一致
                             let smallClassHandleKey = smallClass.No.split('-');

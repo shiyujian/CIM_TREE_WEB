@@ -209,6 +209,24 @@ export const postForsetPic = myFetch(
     'POST'
 );
 
+// 栽植、未栽植数量统计
+export const getTreePlanting = createFetchAction(
+    `${FOREST_API}/tree/treestat4pie`,
+    []
+);
+
+// 定位、未定位数量统计，用于饼图
+export const getLocationStat = createFetchAction(
+    `${FOREST_API}/tree/locationstat4pie`,
+    []
+);
+
+// 按树种统计栽植量
+export const getStatByTreetype = createFetchAction(
+    `${FOREST_API}/tree/statbytreetype`,
+    []
+);
+
 export const actions = {
     getTreeLocations,
     getExportTreeLocations,
@@ -263,7 +281,10 @@ export const actions = {
     getTreeflows,
     getCarpackbysxm,
     getTreeMess,
-    postForsetPic
+    postForsetPic,
+    getTreePlanting,
+    getLocationStat,
+    getStatByTreetype
 };
 export default handleActions(
     {
