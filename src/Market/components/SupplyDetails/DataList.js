@@ -15,6 +15,13 @@ const myButton = {
     borderRadius: 10,
     marginRight: 10
 };
+const myButtonActive = {
+    color: '#40a9ff',
+    borderColor: '#40a9ff',
+    height: 22,
+    borderRadius: 10,
+    marginRight: 10
+};
 class DataList extends Component {
     constructor (props) {
         super(props);
@@ -60,7 +67,7 @@ class DataList extends Component {
                 OtherPhoto: rep.OtherPhoto,
                 TreeTypeName: rep.TreeTypeName,
                 TreeDescribe: rep.TreeDescribe,
-                UpdateTime: rep.UpdateTime,
+                UpdateTime: rep.UpdateTime.split(' ')[0],
                 NurseryName: rep.NurseryBase.NurseryName,
                 Leader: rep.NurseryBase.Leader,
                 LeaderPhone: rep.NurseryBase.LeaderPhone,
@@ -77,6 +84,7 @@ class DataList extends Component {
                     this.setState({
                         TreeTypeID: dataList[0].TreeTypeID,
                         TreeTypeName: dataList[0].TreeTypeName,
+                        dataList: dataList[0],
                         Price: dataList[0].Price,
                         Stock: dataList[0].Stock,
                         Height: dataList[0].Height,
@@ -100,12 +108,15 @@ class DataList extends Component {
             let standardList = [];
             arrSpecName.map(item => {
                 let arr = [];
+                let str = '';
                 rep.map(row => {
                     if (item === row.SpecName) {
+                        str = row.SpecFieldName;
                         arr.push(row);
                     }
                 });
                 standardList.push({
+                    SpecFieldName: str,
                     name: item,
                     children: arr
                 });
@@ -117,7 +128,7 @@ class DataList extends Component {
         });
     }
     render () {
-        const { TreeTypeName, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeDescribe, Leader,
+        const { TreeTypeName, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeDescribe, Leader, Height, dataList,
             LeaderPhone, UpdateTime, SKU, standardList, Stock, Price, TreePlace, NurseryName} = this.state;
         return (
             <div className='supply-details' style={{padding: '0 20px'}}>
@@ -138,7 +149,10 @@ class DataList extends Component {
                                         <p style={{marginTop: '0.2em'}} key={index}>
                                             {item.name}：
                                             {
-                                                item.children.map((row, num) => <Button style={myButton} key={num}>{row.SpecValue}</Button>)
+                                                item.children.map((row, num) => {
+                                                    return row.SpecValue === dataList[item.SpecFieldName] + '' ? <Button style={myButtonActive} key={num}>{row.SpecValue}</Button>
+                                                        : <Button style={myButton} key={num}>{row.SpecValue}</Button>;
+                                                })
                                             }
                                         </p>
                                     );

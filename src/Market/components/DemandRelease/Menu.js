@@ -15,31 +15,48 @@ class Menu extends Component {
         this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
         this.toSoldOut = this.toSoldOut.bind(this); // 需求详情
     }
+    componentWillReceiveProps (nextProps) {
+        if (nextProps.record) {
+            let StartTime = nextProps.record['StartTime'].split(' ')[0];
+            let EndTime = nextProps.record['EndTime'].split(' ')[0];
+            this.setState({
+                StartTime,
+                EndTime
+            });
+        }
+        if (nextProps.projectList && nextProps.record) {
+            nextProps.projectList.map(item => {
+                if (item.No === nextProps.record.ProjectName) {
+                    this.setState({
+                        ProjectName: item.Name
+                    });
+                }
+                if (item.No === nextProps.record.Section) {
+                    this.setState({
+                        Section: item.Name
+                    });
+                }
+            });
+        }
+    }
     render () {
-        const { record, projectList } = this.props;
-        let ProjectName = '', Section = '';
-        projectList.map(item => {
-            if (item.No === record.ProjectName) {
-                ProjectName = item.Name;
-            }
-            if (item.No === record.Section) {
-                Section = item.Name;
-            }
-        });
+        const { StartTime, EndTime, ProjectName, Section } = this.state;
+        const { record } = this.props;
         return (
             <div className='menu' style={{marginTop: 10}}>
                 <Card title={'发布时间：'}>
                     <Row>
                         <Col span={8}>
-                            <h3>{ProjectName}-{Section}<span>({record.SKU})</span></h3>
+                            <h3>{ProjectName}{Section}<span>({record.SKU})</span></h3>
+                            <p>报价起止时间：{StartTime}至{EndTime}</p>
                             <p>用苗地：{record.UseNurseryAddress}</p>
-                            <p>报价时间：{record.StartTime}-{record.EndTime}</p>
-                            <p>商品备注：{record.TreeDescribe}</p>
+                            <p>采购品种：{record.TreeTypes}</p>
+                            <p>联系方式：{record.Phone}({record.Contacter})</p>
                         </Col>
                         <Col span={8}>
                             <p>采购品种：采购品种：采购品种：</p>
                         </Col>
-                        <Col span={8} style={{paddingTop: 30}}>
+                        <Col span={8} style={{paddingTop: 40}}>
                             <Button onClick={this.toEditInfo}>查看报价</Button>
                             <Link to={`/market/adddemand?key=${record.ID}`}>
                                 <Button type='primary' onClick={this.toEditInfo} style={{marginLeft: 15}}>编辑需求</Button>

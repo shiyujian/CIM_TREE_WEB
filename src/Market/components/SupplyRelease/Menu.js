@@ -1,31 +1,32 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs, Card, Row, Col, message } from 'antd';
+import { Form, Button, Card, Row, Col, message } from 'antd';
 import { Link } from 'react-router-dom';
 import { FOREST_API, TREETYPENO } from '_platform/api';
-const FormItem = Form.Item;
-const TabPane = Tabs.TabPane;
 
 class Menu extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            a: 1
+            TreeTypeName: '' // 类型名称
         };
         this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
         this.toSoldOut = this.toSoldOut.bind(this); // 下架
     }
+    componentDidMount () {
+        const { record } = this.props;
+        if (record.TreeTypeNo) {
+            TREETYPENO.map(item => {
+                if (item.id === record.TreeTypeNo.slice(0, 1)) {
+                    this.setState({
+                        TreeTypeName: item.name
+                    });
+                }
+            });
+        }
+    }
     render () {
         const { record } = this.props;
-        console.log(record);
-        const { getFieldDecorator } = this.props.form;
-        console.log(TREETYPENO);
-        let TreeTypeName;
-        TREETYPENO.map(item => {
-            if(item.id === record.TreeTypeNo.slice(0, 1)){
-                TreeTypeName = item.name;
-            }
-        });
         return (
             <div className='menu' style={{marginTop: 10}}>
                 <Card title={'发布时间：'}>
@@ -35,7 +36,7 @@ class Menu extends Component {
                         </Col>
                         <Col span={7}>
                             <h3>{record.TreeTypeName}<span>({record.SKU})</span></h3>
-                            <p>类型：{TreeTypeName}</p>
+                            <p>类型：{this.state.TreeTypeName}</p>
                             <p>价格：￥{record.MinPrice}-{record.MaxPrice}</p>
                             <p>商品备注：{record.TreeDescribe}</p>
                         </Col>

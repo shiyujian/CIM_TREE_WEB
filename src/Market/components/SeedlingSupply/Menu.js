@@ -27,7 +27,7 @@ class Menu extends Component {
             TreeTypeName = record.TreeTypeName;
             NurseryName = record.NurseryBase.NurseryName;
             TreePlace = record.NurseryBase.TreePlace;
-            UpdateTime = record.UpdateTime;
+            UpdateTime = record.UpdateTime.split(' ')[0];
         }
         return (
             <div className='menu'>
