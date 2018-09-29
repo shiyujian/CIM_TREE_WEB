@@ -16,6 +16,9 @@ export const getNurseryByPk = createFetchAction(`${FOREST_API}/system/nurserybas
 export const getProductList = createFetchAction(`${SEEDLING_API}/good/goods`); // 获取商品列表
 export const getProductById = createFetchAction(`${SEEDLING_API}/good/good/{{id}}`); // 根据ID获取商品
 export const getBindingSupplier = createFetchAction(`${FOREST_API}/system/nb2ss`); // 根据苗圃基地获取绑定的供应商
+export const getInventoryList = createFetchAction(`${SEEDLING_API}/good/skus`); // 获取sku库存列表
+export const postInventory = createFetchAction(`${SEEDLING_API}/good/sku`, [], 'POST'); // 增加sku库存
+export const putInventory = createFetchAction(`${SEEDLING_API}/good/spu`, [], 'PUT'); // 编辑sku库存
 // 修改选择地图的方式
 export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 
@@ -30,7 +33,10 @@ export const actions = {
     postUploadImage,
     getProductList,
     getProductById,
-    getBindingSupplier
+    getBindingSupplier,
+    getInventoryList,
+    postInventory,
+    putInventory
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({

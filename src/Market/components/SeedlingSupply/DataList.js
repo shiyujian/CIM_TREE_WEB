@@ -49,8 +49,8 @@ class DataList extends Component {
                             {
                                 dataList.length > 0 ? dataList.map((item, index) => {
                                     return (
-                                        <Col span='6'>
-                                            <Menu key={index} record={item} />
+                                        <Col span='6' key={index}>
+                                            <Menu record={item} />
                                         </Col>
                                     );
                                 }) : <Col span='6'>没有更多了</Col>
@@ -65,7 +65,7 @@ class DataList extends Component {
         const { getProductList } = this.props.actions;
         getProductList({}, {
             treetypename: this.state.treetypename || '',
-            status: 0
+            status: ''
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({

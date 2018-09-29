@@ -28,10 +28,10 @@ class Menu extends Component {
                         <div style={{padding: '0 10px'}}>
                             <h3>
                                 {record.TreeTypeName}（{record.SKU}）
-                                <span style={{float: 'right', fontSize: 12, color: '#888'}}>一个月前发布</span>
+                                <span style={{float: 'right', fontSize: 12, color: '#888'}}>{record.CreateTime}</span>
                             </h3>
                             <p>主杆径：2-3厘米</p>
-                            <p>{record.NurseryBase}</p>
+                            {/* <p>{record.NurseryBase}</p> */}
                             <p>
                                 <span style={{color: '#ff5b05', fontSize: 20, fontWeight: 'bold'}}>{record.MinPrice}-{record.MaxPrice}</span>
                                 <span style={{float: 'right'}}>山东菏泽</span>

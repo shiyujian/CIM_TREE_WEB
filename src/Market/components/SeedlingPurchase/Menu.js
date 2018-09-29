@@ -16,14 +16,23 @@ class Menu extends Component {
         this.handleSubmit = this.handleSubmit.bind(this); // 提交查询
     }
     render () {
-        const { record } = this.props;
+        const { record, projectList } = this.props;
         const { getFieldDecorator } = this.props.form;
+        let ProjectName = '', Section = '';
+        projectList.map(item => {
+            if (item.No === record.ProjectName) {
+                ProjectName = item.Name;
+            }
+            if (item.No === record.Section) {
+                Section = item.Name;
+            }
+        });
         return (
             <div className='menu'>
                 <Card title='发布时间:'>
                     <Row>
                         <Col span={18}>
-                            <h3>{record.ProjectName}-{record.Section}采购单</h3>
+                            <h3>{ProjectName}-{Section}采购单</h3>
                             <p className='title'>发布单位:<span>报价起止时间:</span></p>
                             <p>用苗地:{record.UseNurseryAddress}</p>
                             <p>采购品种:</p>

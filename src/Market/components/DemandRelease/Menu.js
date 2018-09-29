@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs, Card, Row, Col } from 'antd';
+import { Form, Input, Button, Tabs, Card, Row, Col, message } from 'antd';
 import { Link } from 'react-router-dom';
 import { FOREST_API } from '_platform/api';
 const FormItem = Form.Item;
@@ -17,7 +17,7 @@ class Menu extends Component {
     }
     render () {
         const { record, projectList } = this.props;
-        console.log(record);
+        console.log(record,'00000');
         console.log(projectList);
         const { getFieldDecorator } = this.props.form;
         return (
@@ -34,8 +34,9 @@ class Menu extends Component {
                             <p>采购品种：采购品种：采购品种：</p>
                         </Col>
                         <Col span={8} style={{paddingTop: 30}}>
+                            <Button onClick={this.toEditInfo}>查看报价</Button>
                             <Link to={`/market/adddemand?key=${record.ID}`}>
-                                <Button onClick={this.toEditInfo}>查看报价</Button>
+                                <Button type='primary' onClick={this.toEditInfo} style={{marginLeft: 15}}>编辑需求</Button>
                             </Link>
                             <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>
                         </Col>
@@ -48,8 +49,14 @@ class Menu extends Component {
 
     }
     toSoldOut () {
-        console.log(this);
-        window.location.href = '/market/purchasedetails';
+        const { changeStatus } = this.props.actions;
+        changeStatus({}, {
+            id: this.props.record.ID,
+            status: 3
+        }).then(rep => {
+            message.success('下架成功');
+            this.props.toSearch();
+        });
     }
 }
 

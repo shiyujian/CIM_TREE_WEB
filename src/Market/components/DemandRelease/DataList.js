@@ -22,7 +22,7 @@ class DataList extends Component {
     }
     componentDidMount () {
         // 获取所有项目和标段
-        const { getTreeTypes, getRegionCodes, getWpunittree, getOrgTree_new, getPurchaseById } = this.props.actions;  
+        const { getWpunittree } = this.props.actions;
         getWpunittree().then(rep => {
             this.setState({
                 projectList: rep
@@ -73,8 +73,8 @@ class DataList extends Component {
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='全 部' key='1'>
                         {
-                            dataList.length > 0 ? dataList.map((item,index) => {
-                                return <Menu record={item} key={index} projectList={projectList} />;
+                            dataList.length > 0 ? dataList.map((item, index) => {
+                                return <Menu record={item} key={index} projectList={projectList} {...this.props} toSearch={this.toSearch} />;
                             }) : []
                         }
                     </TabPane>

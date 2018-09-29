@@ -26,15 +26,20 @@ class DataList extends Component {
             OtherPhoto: '', // 其他图
             TreeTypeName: '', // 商品名称
             TreeDescribe: '', // 产品简介
+            CreateTime: '', // 创建时间
+            Leader: '', // 苗圃基地责任人
+            LeaderPhone: '', // 责任人联系方式
             SKU: '' // 库存
         };
         this.spuid = ''; // 商品id
+        this.NurseryBaseID = ''; // 苗圃基地ID
     }
     componentDidMount () {
-        const { getProductById, getSpecsById } = this.props.actions;
+        const { getProductById, getSpecsById, getInventoryList } = this.props.actions;
         // 根据id获取详细信息
         this.spuid = searchToObj(this.props.location.search).id;
         getProductById({id: this.spuid}).then((rep) => {
+            this.NurseryBaseID = rep.NurseryBaseID;
             this.setState({
                 productInfo: rep,
                 Photo: rep.Photo,
@@ -43,7 +48,17 @@ class DataList extends Component {
                 OtherPhoto: rep.OtherPhoto,
                 TreeTypeName: rep.TreeTypeName,
                 TreeDescribe: rep.TreeDescribe,
+                CreateTime: rep.CreateTime,
+                Leader: rep.NurseryBase.Leader,
+                LeaderPhone: rep.NurseryBase.LeaderPhone,
                 SKU: rep.SKU
+            });
+            // 获取sku库存列表
+            getInventoryList({}, {
+                spuid: this.spuid,
+                nurserybase: this.NurseryBaseID
+            }).then(rep => {
+
             });
         });
         // 根据商品id获取规格
@@ -52,8 +67,7 @@ class DataList extends Component {
         });
     }
     render () {
-        const { productInfo, TreeTypeName, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeDescribe, SKU } = this.state;
-        const { getFieldDecorator } = this.props.form;
+        const { TreeTypeName, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeDescribe, Leader, LeaderPhone, CreateTime, SKU } = this.state;
         return (
             <div className='supply-details' style={{padding: '0 20px'}}>
                 <Link to='/market/seedlingsupply'>
@@ -93,11 +107,11 @@ class DataList extends Component {
                             <Button type='primary'>加入购物车</Button>
                         </Col>
                         <Col span={6}>
-                            <li>供应商：</li>
-                            <li>起苗地：</li>
-                            <li>联系人：</li>
-                            <li>联系电话：</li>
-                            <li>发布时间：</li>
+                            <p>供应商：</p>
+                            <p>起苗地：</p>
+                            <p>联系人：{Leader}</p>
+                            <p>联系电话：{LeaderPhone}</p>
+                            <p>发布时间：{CreateTime}</p>
                         </Col>
                     </Row>
                 </div>
