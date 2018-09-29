@@ -62,6 +62,7 @@ export default class TaskCreateTable extends Component {
             treeCoords: {},
             // 下发任务Modal数据
             wkt: '',
+            groupwkt: '',
             noLoading: false
         };
         this.tileLayer = null;
@@ -102,7 +103,8 @@ export default class TaskCreateTable extends Component {
         const {
             platform: {
                 tree = {}
-            }
+            },
+            teamsTree
         } = this.props;
         if (option && option.value) {
             switch (option.value) {
@@ -113,7 +115,7 @@ export default class TaskCreateTable extends Component {
                             <AreaTreeCreate
                                 {...this.props}
                                 onCheck={this.handleAreaCheck.bind(this)}
-                                content={tree.thinClassTree || []}
+                                content={teamsTree || []}
                             />
                         </Spin>
 
@@ -217,22 +219,27 @@ export default class TaskCreateTable extends Component {
                 getTreeNodeList,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree
+                getThinClassTree,
+                getCheckGroup,
+                getTeamsTree
             }
         } = this.props;
         try {
             this.setState({
                 areaTreeLoading: true
             });
-            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList,getCheckGroup);
             console.log('data', data);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];
+            let teamsTree = data.teamsTree || [];
 
             // 获取所有的小班数据，用来计算养护任务的位置
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+            // 获取所有的考勤群体
+            await getTeamsTree(teamsTree);
             this.setState({
                 areaTreeLoading: false
             });
@@ -851,6 +858,7 @@ export default class TaskCreateTable extends Component {
         });
         let coords = [];
         let thinAreaNum = 0;
+        let groupwkt = '';
         if (selectMap === '标段选择') {
             let thinClassCoords = [];
             checkedKeys.map((key) => {
@@ -870,6 +878,7 @@ export default class TaskCreateTable extends Component {
         } else if (selectMap === '手动框选') {
             coords = coordinates;
         }
+        groupwkt = coords;
         try {
             let totalThinClass = tree.totalThinClass || [];
             // 坐标
@@ -928,6 +937,7 @@ export default class TaskCreateTable extends Component {
             // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
             this.setState({
                 wkt,
+                groupwkt,
                 regionArea,
                 // treeNum,
                 regionData,

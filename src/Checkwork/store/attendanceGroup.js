@@ -53,7 +53,7 @@ export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curing
 // 获取养护班组
 export const deleteCuringGroupMan = createFetchAction(`${FOREST_API}/curing/curinggroupman/{{id}}`, [], 'DELETE');
 
-//获取考情群体
+//获取考勤群体
 export const getCheckGroup = createFetchAction(`${base}/main/api/check-group/`, [], 'GET');
 
 //增加考勤群体
@@ -64,16 +64,18 @@ export const postCheckGroup = createFetchAction(`${base}/main/api/check-group/`,
 export const deleteCheckGroup = createFetchAction(`${base}/main/api/check-group/{{id}}/`, [], 'DELETE');
 
 //获取群体成员
-export const getCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [], 'GET');
+export const getCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [getCheckGroupMansOk], 'GET');
 
 // 将人员信息上传至redux
 export const getCheckGroupMansOk = createAction(`${ID}_getCheckGroupMansOk`);
 
-//增加群体成员
+//增加群体成员/删除群体成员
 export const postCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [], 'POST');
 
-//增加群体成员
-export const deleteCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [], 'DELETE');
+
+
+// 修改所选择的群组,以便给群组增加删减人员
+export const changeCheckGroup = createAction(`${ID}_changeCheckGroup`);
 
 
 
@@ -104,7 +106,7 @@ export const actions = {
     getCheckGroupMans,
     postCheckGroupMans,
     getCheckGroupMansOk,
-    deleteCheckGroupMans,
+    changeCheckGroup,
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({
@@ -118,6 +120,10 @@ export default handleActions({
     [changeSelectSection]: (state, {payload}) => ({
         ...state,
         selectSection: payload
+    }),
+    [changeCheckGroup]: (state, {payload}) => ({
+        ...state,
+        checkGroup: payload
     }),
     [changeSelectMemTeam]: (state, {payload}) => ({
         ...state,

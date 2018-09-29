@@ -102,7 +102,7 @@ class TaskCreateModal extends Component {
         return (
 
             <Modal
-                title='新建任务'
+                title='新建电子围栏'
                 // onOk={this._handleTaskModalOk.bind(this)}
                 // onCancel={this.props.onCancel}
                 visible
@@ -113,108 +113,7 @@ class TaskCreateModal extends Component {
             >
                 <Spin spinning={this.state.loading}>
                     <Form>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='养护类型'>
-                                {getFieldDecorator('taskType', {
-                                    rules: [
-                                        { required: true, message: '请选择养护类型' }
-                                    ]
-                                })(
-                                    <Select placeholder={'请选择养护类型'}>
-                                        {typeOptionArr}
-                                    </Select>
-                                )}
-                            </FormItem>
-                        </Row>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='任务时间'>
-                                {getFieldDecorator('taskTime', {
-                                    rules: [
-                                        { required: true, message: '请选择任务时间' }
-                                    ]
-                                })(
-                                    <RangePicker
-                                        showTime
-                                        format='YYYY-MM-DD HH:mm:ss'
-                                        placeholder={['计划开始时间', '计划结束时间']}
-                                        style={{
-                                            width: '100%',
-                                            height: '100%'
-                                        }}
-                                    />
-                                )}
-                            </FormItem>
-                        </Row>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='养护班组'>
-                                {getFieldDecorator('taskTeam', {
-                                    rules: [
-                                        { required: true, message: '请选择养护班组' }
-                                    ]
-                                })(
-                                    <PersonTree {...this.props} onSelect={this._handleSelectTeam.bind(this)} />
-                                )}
-                            </FormItem>
-                        </Row>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='面积(亩)'>
-                                {getFieldDecorator('taskTreeArea', {
-                                    initialValue: `${regionArea}`,
-                                    rules: [
-                                        { required: true, message: '请输入面积' }
-                                    ]
-                                })(
-                                    <Input readOnly />
-                                )}
-                            </FormItem>
-                        </Row>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='标段'>
-                                {getFieldDecorator('taskSection', {
-                                    initialValue: `${regionSectionName}`,
-                                    rules: [
-                                        { required: true, message: '请输入标段名称' }
-                                    ]
-                                })(
-                                    <Input readOnly />
-                                )}
-                            </FormItem>
-                        </Row>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='细班'>
-                                {getFieldDecorator('taskThinClass', {
-                                    initialValue: `${regionThinName}`,
-                                    rules: [
-                                        { required: true, message: '请输入细班名称' }
-                                    ]
-                                })(
-                                    <Input readOnly />
-                                )}
-                            </FormItem>
-                        </Row>
-                        {/* <Row>
-                            <FormItem {...FormItemLayout} label='树木数量(棵)'>
-                                {getFieldDecorator('taskTreeNum', {
-                                    initialValue: `${treeNum}`,
-                                    rules: [
-                                        { required: true, message: '请输入树木数量' }
-                                    ]
-                                })(
-                                    <Input readOnly />
-                                )}
-                            </FormItem>
-                        </Row> */}
-                        {/* <Row>
-                        <FormItem {...FormItemLayout} label='备注'>
-                            {getFieldDecorator('taskRemark', {
-                                rules: [
-                                    { required: false, message: '请输入备注' }
-                                ]
-                            })(
-                                <TextArea rows={4} />
-                            )}
-                        </FormItem>
-                    </Row> */}
+                        
                     </Form>
                 </Spin>
             </Modal>
@@ -264,8 +163,10 @@ class TaskCreateModal extends Component {
             regionThinNo,
             regionSectionNo,
             wkt,
+            groupwkt,
+            checkedKeys,
             actions: {
-                postCuringTask
+                postCheckScope
             }
         } = this.props;
         const {
@@ -274,8 +175,15 @@ class TaskCreateModal extends Component {
         } = this.state;
         if (!(signUser && signUser.ID)) {
             Notification.error({
-                message: '当前登录用户无法下发任务',
+                message: '当前登录用户无法划分电子围栏',
                 duration: 2
+            });
+            return;
+        }
+        if(checkedKeys.length == 0){
+            Notification.error({
+                 message: '请先选择群体',
+                 duration: 2
             });
             return;
         }
@@ -285,38 +193,22 @@ class TaskCreateModal extends Component {
             console.log('values', values);
             if (!err) {
                 try {
-                    let CuringMans = '';
-                    teamPerson.map((person, index) => {
-                        if (index === 0) {
-                            CuringMans = CuringMans + `${person.User}`;
-                        } else {
-                            CuringMans = CuringMans + ',' + `${person.User}`;
-                        }
-                    // CuringMans.push(person.User);
-                    });
-                    console.log('CuringMans', CuringMans);
+                    let wkt = groupwkt;
+                    let boundary = [];
+                    for(let i=0;i<wkt.length;i++){
+                        boundary.push({
+                            lat:wkt[i][1],
+                            lng:wkt[i][0]
+                        })
+                    }
                     let postData = {
-                        'Area': Number(values.taskTreeArea),
-                        'Creater': signUser.ID,
-                        'CuringGroup': values.taskTeam,
-                        'CuringMans': CuringMans,
-                        'CuringMode': 0,
-                        'CuringType': values.taskType,
-                        // 'Num': Number(values.taskTreeNum),
-                        'Num': 0,
-                        'PlanEndTime': moment(values.taskTime[1]._d).format('YYYY-MM-DD HH:mm:ss'),
-                        'PlanStartTime': moment(values.taskTime[0]._d).format('YYYY-MM-DD HH:mm:ss'),
-                        'PlanWKT': wkt,
-                        'Section': regionSectionNo,
-                        // 'Section': 'P009-01-04',
-                        // 'ThinClass': 'P009-01-007-012'
-                        'ThinClass': regionThinNo
+                        'boundary': boundary,
                     };
-                    let taskData = await postCuringTask({}, postData);
+                    let taskData = await postCheckScope({id:checkedKeys[0]}, postData);
                     console.log('taskData', taskData);
-                    if (taskData && taskData.code && taskData.code === 1) {
+                    if (taskData) {
                         Notification.success({
-                            message: '下发任务成功',
+                            message: '电子围栏划分成功',
                             dutation: 3
                         });
                         await this.props.onOk();
@@ -325,7 +217,7 @@ class TaskCreateModal extends Component {
                         });
                     } else {
                         Notification.error({
-                            message: '下发任务失败',
+                            message: '电子围栏划分失败',
                             dutation: 3
                         });
                     }

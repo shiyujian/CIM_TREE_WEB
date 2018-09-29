@@ -3,7 +3,7 @@ import { PROJECT_UNITS } from '_platform/api';
 import { getUser } from '_platform/auth';
 // import { getSectionName } from './auth';
 
-export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
+export const getAreaTreeData = async (getTreeNodeList, getThinClassList, getCheckGroup) => {
     let rst = await getTreeNodeList();
     if (rst instanceof Array && rst.length > 0) {
         rst.forEach((item, index) => {
@@ -78,9 +78,33 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
     console.log('projectList', projectList);
     console.log('totalThinClass', totalThinClass);
 
+
+    let teamsTree = [];
+    PROJECT_UNITS.map(async project => {
+        if (project.units) {
+            let units = project.units;
+            let projectName = project.value;
+            units.map(async unit => {
+                let sectionName = projectName + unit.value;
+                let taskTeams = await getCheckGroup({}, {section: unit.code});
+                if (taskTeams && taskTeams.length > 0) {
+                    teamsTree.push({
+                        No: unit.code,
+                        Name: sectionName,
+                        children: taskTeams
+                    });
+                }
+            });
+        }
+    });
+
+    console.log('teamsTree', teamsTree);
+
+
     return {
         totalThinClass: totalThinClass,
-        projectList: projectList
+        projectList: projectList,
+        teamsTree: teamsTree
     };
 };
 // 获取项目的小班

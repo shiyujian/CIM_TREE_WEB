@@ -7,7 +7,7 @@ import AddMember from './AddMember';
 import { PROJECT_UNITS } from '_platform/api';
 window.config = window.config || {};
 
-export default class TaskTeamTable extends Component {
+export default class AttendanceGroupTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -52,7 +52,8 @@ export default class TaskTeamTable extends Component {
         const {
             selectState
         } = this.props;
-        let disabled = true;
+        //let disabled = true;
+        let disabled = false;
         if (selectState && !relateDisabled) {
             disabled = false;
         }
@@ -75,16 +76,17 @@ export default class TaskTeamTable extends Component {
     }
     _getRelMemMess = () => {
         const {
-            getCheckGroupMans = []
+            checkGroupMans = []
         } = this.props;
         const {
             totalUserData = []
         } = this.state;
+        debugger
         let dataSource = [];
-        if (getCheckGroupMans && getCheckGroupMans instanceof Array && getCheckGroupMans.length > 0) {
-            getCheckGroupMans.map((man) => {
+        if (checkGroupMans && checkGroupMans instanceof Array && checkGroupMans.length > 0) {
+            checkGroupMans.map((man) => {
                 totalUserData.map((userData) => {
-                    if (Number(userData.ID) === man.User) {
+                    if (Number(userData.ID) === man.id) {
                         dataSource.push(userData);
                     }
                 });

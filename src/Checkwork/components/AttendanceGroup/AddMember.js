@@ -159,7 +159,7 @@ export default class AddMember extends Component {
         if (checkGroupMans && checkGroupMans instanceof Array && checkGroupMans.length > 0) {
             checkGroupMans.map((man) => {
                 totalUserData.map((userData) => {
-                    if (Number(userData.ID) === man.User) {
+                    if (Number(userData.ID) === man.id) {
                         RelationMem.push(Number(userData.PK));
                     }
                 });
@@ -188,10 +188,12 @@ export default class AddMember extends Component {
         const {
             actions: {
                 postCheckGroupMans,
-                deleteCheckGroupMans
+                deleteCheckGroupMans,
+                getCheckGroupMans,
             },
             selectMemTeam,
-            checkGroupMans
+            checkGroupMans,
+            checkGroup,
         } = this.props;
         let checked = e.target.checked;
         console.log('user', user);
@@ -204,18 +206,44 @@ export default class AddMember extends Component {
                 }
             });
             console.log('checkUserId', checkUserId);
+            let id = checkGroup;
+            let members = await getCheckGroupMans({id:id});
+            let membersArr = [];
+            let Arr = [];
+            if(members.length>0){
+                for(let i=0;i<members.length;i++){
+                    membersArr.push(members[i].id);
+                }
+            }
+
+            if (membersArr.length > 0) {
+                for (let i = 0; i < membersArr.length; i++) {
+                    if (pk === membersArr[i]) {
+                        membersArr.splice(i, 1);
+                        Arr = [
+                            ...membersArr
+                        ];
+                    } else {
+                        Arr = [
+                            ...membersArr,
+                            pk
+                        ];
+                    }
+                }
+            } else {
+                Arr = [
+                    pk
+                ];
+            }
             if (checked) {
                 try {
                     if (checkUserId) {
                         let postAddData = {
-                            'GroupID': selectMemTeam.ID,
-                            'GroupName': selectMemTeam.GroupName, // 班组名称
-                            'User': checkUserId, // 用户ID  非PK
-                            'FullName': user.account.person_name || user.username // 用户姓名
+                            members:Arr,
                         };
-                        let addData = await postCheckGroupMans({}, postAddData);
+                        let addData = await postCheckGroupMans({id:id}, postAddData);
                         console.log('addData', addData);
-                        if (addData && addData.code && addData.code === 1) {
+                        if (addData) {
                             await this.getRelatedMans();
                             RelationMem.push(user.id);
                             Notification.success({
@@ -238,17 +266,11 @@ export default class AddMember extends Component {
                     console.log('e', e);
                 }
             } else {
-                let deleteID = '';
-                checkGroupMans.map((man) => {
-                    if (man.User === checkUserId) {
-                        deleteID = man.ID;
-                    }
-                });
-                let postData = {
-                    id: deleteID
+                let postAddData = {
+                    members:Arr,
                 };
-                let deleteData = await deleteCheckGroupMans(postData);
-                if (deleteData && deleteData.code && deleteData.code === 1) {
+                let deleteData = await postCheckGroupMans({id:id}, postAddData);
+                if (deleteData) {
                     await this.getRelatedMans();
                     RelationMem.map((memberID, index) => {
                         if (memberID === user.id) {
@@ -283,7 +305,7 @@ export default class AddMember extends Component {
             selectMemTeam
         } = this.props;
         let postGetData = {
-            id: selectMemTeam.ID
+            id: selectMemTeam.id
         };
         await getCheckGroupMans(postGetData);
     }

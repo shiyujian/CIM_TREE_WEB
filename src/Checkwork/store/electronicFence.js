@@ -2,7 +2,8 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 
 import {
-    FOREST_API
+    FOREST_API,
+    base
 } from '_platform/api';
 
 export const ID = 'Checkwork_electronicfence';
@@ -28,6 +29,17 @@ export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 // 修改选中节点
 export const changeCheckedKeys = createAction(`${ID}_changeCheckedKeys`);
 
+//获取考勤群体
+export const getCheckGroup = createFetchAction(`${base}/main/api/check-group/`, [], 'GET');
+
+//获取群体下的所有围栏
+export const getCheckScope = createFetchAction(`${base}/main/api/group/{{id}}/scope/`, [], 'GET');
+
+//为群体设置电子围栏
+export const postCheckScope = createFetchAction(`${base}/main/api/group/{{id}}/scope/`, [], 'POST');
+
+export const getTeamsTree = createAction(`${ID}获取所有的考勤群体数据`);
+
 export const actions = {
     getTreearea,
     getCuring,
@@ -38,7 +50,11 @@ export const actions = {
     postTreeLocationNumByRegion,
     getCuringGroupMans,
     changeSelectMap,
-    changeCheckedKeys
+    changeCheckedKeys,
+    getCheckGroup,
+    getCheckScope,
+    postCheckScope,
+    getTeamsTree,
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({
@@ -48,5 +64,9 @@ export default handleActions({
     [changeCheckedKeys]: (state, {payload}) => ({
         ...state,
         checkedKeys: payload
+    }),
+    [getTeamsTree]: (state, { payload }) => ({
+        ...state,
+        teamsTree: payload
     })
 }, {});

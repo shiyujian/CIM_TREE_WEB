@@ -226,7 +226,7 @@ class AsideTree extends Component {
         const {
             actions: {
                 getCheckGroup,
-                changeSelectSection
+                changeSelectSection,
             }
         } = this.props;
         let teamsTree = [];
@@ -382,7 +382,8 @@ class AsideTree extends Component {
                 changeSelectSection,
                 changeSelectMemTeam,
                 changeSelectState,
-                getCheckGroupMans
+                getCheckGroupMans,
+                changeCheckGroup,
             }
         } = this.props;
         const {
@@ -401,23 +402,24 @@ class AsideTree extends Component {
                 let section = keyArr[1];
                 console.log('section', section);
                 await changeSelectSection(section);
+                await changeCheckGroup(keyArr[0]);
                 // 将班组信息上传至redux
                 teamsTree.map((list) => {
                     if (list.ID === keyArr[1]) {
                         let taskTeams = list.children;
                         taskTeams.map(async (team) => {
-                            console.log('team.ID', team.ID);
+                            console.log('team.id', team.id);
                             console.log('keyArr[0]', keyArr[0]);
-                            if (team.ID === Number(keyArr[0])) {
+                            if (team.id === Number(keyArr[0])) {
                                 await changeSelectMemTeam(team);
                             }
                         });
                     }
                 });
                 let postData = {
-                    groupid: keyArr[0]
+                    id: keyArr[0]
                 };
-                let data = await getCheckGroupMans({id: keyArr[0]});
+                let data = await getCheckGroupMans(postData);
                 console.log('data', data);
             }
         } catch (e) {

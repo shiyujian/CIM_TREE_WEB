@@ -45,14 +45,14 @@ export default class AreaTreeCreate extends Component {
         } else {
             loopTime = 1;
         }
-        if (loopTime <= 3) {
+        if (loopTime <= 1) {
             disableCheckbox = true;
         }
         if (p) {
             return (
                 <TreeNode
-                    title={p.Name}
-                    key={p.No}
+                    title={p.Name?p.Name:p.name}
+                    key={p.No?p.No:p.id}
                     disableCheckbox={disableCheckbox}
                     selectable={false}
                 >
