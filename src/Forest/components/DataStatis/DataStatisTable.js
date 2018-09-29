@@ -55,7 +55,7 @@ export default class DataStatisTable extends Component {
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
-        this.query(1);
+        // this.query(1);
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode != this.state.leftkeycode) {
@@ -143,7 +143,7 @@ export default class DataStatisTable extends Component {
                             {treetypeoption}
                         </Select>
                     </div>
-                    <div className='forest-mrg-datePicker'>
+                    {/* <div className='forest-mrg-datePicker'>
                         <span className='forest-search-span'>载植时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
@@ -157,7 +157,7 @@ export default class DataStatisTable extends Component {
                             onChange={this.datepick.bind(this)}
                             onOk={this.datepick.bind(this)}
                         />
-                    </div>
+                    </div> */}
                 </Row>
                 <Row style={{marginTop: 10, marginBottom: 10}}>
                     <Col span={2} >
@@ -208,7 +208,7 @@ export default class DataStatisTable extends Component {
                             </Col>
                         </Card>
                     </Row>
-                    <Row>
+                    {/* <Row>
                         <Card
                             title='苗木来源情况'
                             style={{marginTop: 10}}
@@ -220,7 +220,7 @@ export default class DataStatisTable extends Component {
                                 <BottomBottom {...this.state} {...this.props} />
                             </Row>
                         </Card>
-                    </Row>
+                    </Row> */}
                 </Row>
             </div>
         );
@@ -283,7 +283,7 @@ export default class DataStatisTable extends Component {
         resetinput(leftkeycode);
     }
 
-    query = (first) => {
+    query = () => {
         const {
             section = '',
             bigType = '',
@@ -293,6 +293,10 @@ export default class DataStatisTable extends Component {
             thinclass = '',
             smallclass = ''
         } = this.state;
+        console.log('smallclass', smallclass);
+        console.log('thinclass', thinclass);
+        console.log('section', section);
+
         const {
             actions: {
                 getTreePlanting,
@@ -301,16 +305,17 @@ export default class DataStatisTable extends Component {
             }
         } = this.props;
         try {
-            if (first) {
-
-            } else {
-                if (thinclass === '') {
-                    message.info('请选择项目，标段，小班及细班信息');
-                    return;
-                }
+            let no = '';
+            if (thinclass) {
+                let arr = thinclass.split('-');
+                no = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
+            } else if (smallclass) {
+                let arr = smallclass.split('-');
+                no = arr[0] + '-' + arr[1] + '-' + arr[4];
             }
+
             let postdata = {
-                no: thinclass,
+                no: no,
                 section,
                 treetype
             };

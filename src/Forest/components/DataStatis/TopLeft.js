@@ -54,11 +54,21 @@ export default class Top extends Component {
 
     async componentDidUpdate (prevProps, prevState) {
         const {
-            treePlantingQueryTime
+            treePlantingQueryTime,
+            queryTime
         } = this.props;
+        if (queryTime && queryTime !== prevProps.queryTime) {
+            this.loading();
+        }
         if (treePlantingQueryTime && treePlantingQueryTime !== prevProps.treePlantingQueryTime) {
             this.query();
         }
+    }
+
+    loading = () => {
+        this.setState({
+            loading: true
+        });
     }
 
     query = () => {
@@ -83,6 +93,9 @@ export default class Top extends Component {
                     ]
                 };
                 myChart.setOption(option);
+                this.setState({
+                    loading: false
+                });
             }
         } catch (e) {
 
@@ -91,10 +104,12 @@ export default class Top extends Component {
 
     render () {
         return (
-            <div
-                id='topLeft'
-                style={{ width: '100%', height: '300px' }}
-            />
+            <Spin spinning={this.state.loading}>
+                <div
+                    id='topLeft'
+                    style={{ width: '100%', height: '300px' }}
+                />
+            </Spin>
         );
     }
 }

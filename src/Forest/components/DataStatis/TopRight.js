@@ -57,9 +57,18 @@ export default class Top extends Component {
             locationStatQueryTime,
             queryTime
         } = this.props;
+        if (queryTime && queryTime !== prevProps.queryTime) {
+            this.loading();
+        }
         if (locationStatQueryTime && locationStatQueryTime !== prevProps.locationStatQueryTime) {
             this.query();
         }
+    }
+
+    loading = () => {
+        this.setState({
+            loading: true
+        });
     }
 
     query = () => {
@@ -84,6 +93,9 @@ export default class Top extends Component {
                     ]
                 };
                 myChart.setOption(option);
+                this.setState({
+                    loading: false
+                });
             }
         } catch (e) {
 
@@ -91,6 +103,7 @@ export default class Top extends Component {
     }
 
     render () {
+        console.log('loading', this.state.loading);
         return (
             <Spin spinning={this.state.loading}>
                 <div

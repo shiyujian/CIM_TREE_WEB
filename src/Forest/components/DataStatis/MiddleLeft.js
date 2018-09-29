@@ -58,11 +58,21 @@ export default class Middle extends Component {
 
     async componentDidUpdate (prevProps, prevState) {
         const {
-            statByTreetypeQueryTime
+            statByTreetypeQueryTime,
+            queryTime
         } = this.props;
+        if (queryTime && queryTime !== prevProps.queryTime) {
+            this.loading();
+        }
         if (statByTreetypeQueryTime && statByTreetypeQueryTime !== prevProps.statByTreetypeQueryTime) {
             this.query();
         }
+    }
+
+    loading = () => {
+        this.setState({
+            loading: true
+        });
     }
 
     getTreetypeData = () => {
@@ -121,6 +131,9 @@ export default class Middle extends Component {
                 ]
             };
             myChart.setOption(option);
+            this.setState({
+                loading: false
+            });
         } catch (e) {
             console.log('middleLeft', e);
         }
@@ -128,10 +141,12 @@ export default class Middle extends Component {
 
     render () {
         return (
-            <div
-                id='middleLeft'
-                style={{ width: '100%', height: '350px' }}
-            />
+            <Spin spinning={this.state.loading}>
+                <div
+                    id='middleLeft'
+                    style={{ width: '100%', height: '350px' }}
+                />
+            </Spin>
         );
     }
 }

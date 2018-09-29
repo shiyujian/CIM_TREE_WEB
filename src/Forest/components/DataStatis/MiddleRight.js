@@ -8,7 +8,8 @@ export default class Middle extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            dataSource: []
+            dataSource: [],
+            loading: false
         };
     }
     async componentDidMount () {
@@ -17,11 +18,21 @@ export default class Middle extends Component {
 
     async componentDidUpdate (prevProps, prevState) {
         const {
-            statByTreetypeQueryTime
+            statByTreetypeQueryTime,
+            queryTime
         } = this.props;
+        if (queryTime && queryTime !== prevProps.queryTime) {
+            this.loading();
+        }
         if (statByTreetypeQueryTime && statByTreetypeQueryTime !== prevProps.statByTreetypeQueryTime) {
             this.query();
         }
+    }
+
+    loading = () => {
+        this.setState({
+            loading: true
+        });
     }
 
     query = () => {
@@ -42,7 +53,8 @@ export default class Middle extends Component {
                 });
                 console.log('statByTreetype', statByTreetype);
                 this.setState({
-                    dataSource: statByTreetype
+                    dataSource: statByTreetype,
+                    loading: false
                 });
             }
         } catch (e) {
@@ -56,20 +68,22 @@ export default class Middle extends Component {
         } = this.state;
 
         return (
-            <div
-                id='middleRight'
-                style={{ width: '100%', height: '350px' }}
-            >
-                <Table
-                    dataSource={dataSource}
-                    columns={this.column}
-                    rowKey='index'
-                    bordered
-                    pagination={false}
-                    scroll={{ y: 291 }}
-                    style={{height: '100%'}}
-                />
-            </div>
+            <Spin spinning={this.state.loading}>
+                <div
+                    id='middleRight'
+                    style={{ width: '100%', height: '350px' }}
+                >
+                    <Table
+                        dataSource={dataSource}
+                        columns={this.column}
+                        rowKey='index'
+                        bordered
+                        pagination={false}
+                        scroll={{ y: 291 }}
+                        style={{height: '100%'}}
+                    />
+                </div>
+            </Spin>
         );
     }
 
