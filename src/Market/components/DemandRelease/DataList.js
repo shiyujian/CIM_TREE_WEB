@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import { Form, Button, Input, Select, Tabs } from 'antd';
 import Menu from './Menu';
-import { Repeat } from 'immutable';
 
 const FormItem = Form.Item;
 const Option = Select.Option;

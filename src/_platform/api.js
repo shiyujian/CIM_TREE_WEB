@@ -391,6 +391,33 @@ export const TREETYPENO = [
     }
 ];
 
+export const CULTIVATIONMODE = [
+    {
+        id: 0,
+        name: '地苗'
+    },
+    {
+        id: 1,
+        name: '断根苗'
+    },
+    {
+        id: 2,
+        name: '假植苗'
+    },
+    {
+        id: 3,
+        name: '袋苗'
+    },
+    {
+        id: 4,
+        name: '盆苗'
+    },
+    {
+        id: 5,
+        name: '山苗'
+    }
+];
+
 export const SCHEDULRPROJECT = [
     {
         id: 6,

@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import moment from 'moment';
 import { Form, Input, Button, Tabs, Select, Table, Cascader, message, Card, DatePicker } from 'antd';
-import { TREETYPENO } from '_platform/api';
+import { TREETYPENO, CULTIVATIONMODE } from '_platform/api';
 import { searchToObj, getUser } from '_platform/auth';
 
 const FormItem = Form.Item;
@@ -19,7 +19,8 @@ class DataList extends Component {
             sectionList: [], // 标段
             projectList: [], // 项目列表
             TreeTypeList: [], // 树种类型
-            RegionCodeList: [], // 行政区划
+            RegionCodeList: [], // 行政区划树列表
+            RegionCode: '', // 行政区划
             Contacter: '', // 联系人
             Phone: '', // 联系电话
             treeNames: [], // 树木名称数组
@@ -27,6 +28,7 @@ class DataList extends Component {
             Section: '', // 标段
             TreeTypeID: '', // 树木ID
             length: 0, // 树种个数
+            Describe: '', // 求购描述
             dataList: [] // 数组
         };
         this.Creater = ''; // 发布者
@@ -34,12 +36,14 @@ class DataList extends Component {
         this.SectionList = []; // 标段列表
         this.UseNurseryAddress = ''; // 行政区划地址
         this.purchaseid = ''; // 采购单ID
+        this.treeTypeList = []; // 所有树种类型
         this.handleProjectName = this.handleProjectName.bind(this); // 项目名称
         this.handleSectionName = this.handleSectionName.bind(this); // 标段选择
         this.loadRegion = this.loadRegion.bind(this); // 加载市县
         this.handleRegion = this.handleRegion.bind(this); // 行政区划
         this.handleRange = this.handleRange.bind(this); // 起止日期
         this.onAddSpecs = this.onAddSpecs.bind(this); // 新增树种
+        this.handleDescribe = this.handleDescribe.bind(this); // 描述
         this.columns = [{
             title: '胸径（cm）',
             dataIndex: 'DBH',
@@ -75,12 +79,9 @@ class DataList extends Component {
             render: (text, record, index) => {
                 return (
                     <Select value={text} style={{ width: 100 }} onChange={this.editVersionMode.bind(this, 'CultivationMode', index, record)}>
-                        <Option value={0}>地苗</Option>
-                        <Option value={1}>断根苗</Option>
-                        <Option value={2}>假植苗</Option>
-                        <Option value={3}>袋苗</Option>
-                        <Option value={4}>盆苗</Option>
-                        <Option value={5}>山苗</Option>
+                        {
+                            CULTIVATIONMODE.map(item => <Option value={item.id} key={item.id}>{item.name}</Option>)
+                        }
                     </Select>
                 );
             }
@@ -91,9 +92,21 @@ class DataList extends Component {
             render: (text, record, index) => {
                 return <Input value={text} onChange={this.editVersion.bind(this, 'Num', index, record)} />;
             }
+        }, {
+            title: '操作',
+            dataIndex: '编辑',
+            key: '8',
+            render: (text, record, index) => {
+                return (
+                    <span>
+                        <a onClick={this.toEdit.bind(this, record, index)}>保存</a>
+                    </span>
+                );
+            }
         }];
     }
     componentDidMount () {
+        console.log(this.state.Describe, 'dddd');
         const { getTreeTypes, getRegionCodes, getWpunittree, getPurchaseById, getPurchaseStandard } = this.props.actions;
         // 获得所有项目
         getWpunittree().then(rep => {
@@ -127,9 +140,9 @@ class DataList extends Component {
                 RegionCodeList
             });
         });
-        
         // 获取树种类型
         getTreeTypes().then(rep => {
+            this.treeTypeList = rep;
             TREETYPENO.map(item => {
                 item.value = item.id;
                 item.label = item.name;
@@ -146,7 +159,7 @@ class DataList extends Component {
             this.setState({
                 TreeTypeList: TREETYPENO
             });
-            console.log(this.state.TreeTypeList);
+            console.log(this.state.TreeTypeList, '树种');
         });
         // 编辑采购单
         const { key } = searchToObj(this.props.location.search);
@@ -159,11 +172,13 @@ class DataList extends Component {
                     ProjectName: rep.ProjectName,
                     Section: rep.Section,
                     StartTime: rep.StartTime,
-                    EndTime: rep.EndTime
+                    EndTime: rep.EndTime,
+                    RegionCode: rep.UseNurseryRegionCode,
+                    Describe: rep.Describe || ''
                 });
+                this.UseNurseryAddress = rep.UseNurseryAddress;
             });
             getPurchaseStandard({}, {purchaseid: key}).then(rep => {
-                console.log(rep, '采购单规格');
                 let arr = [];
                 rep.map(item => {
                     if (!arr.includes(item.TreeTypeID)) {
@@ -176,14 +191,15 @@ class DataList extends Component {
                     let arrIndex = [];
                     rep.map(row => {
                         if (row.TreeTypeID === item) {
+                            row.cardKey = index;
                             arrIndex.push(row);
                         }
                     });
                     dataList.push(arrIndex);
                 });
-                console.log(dataList);
                 this.setState({
-                    dataList
+                    dataList,
+                    TreeTypeID: 64
                 });
             });
         }
@@ -199,9 +215,13 @@ class DataList extends Component {
     }
     renderCard () {
         let card = [];
-        const { getTreeTypes } = this.props.actions;
         this.state.dataList.map((item, index) => {
             let str = '';
+            this.treeTypeList.map(row => {
+                if (row.ID === item[0].TreeTypeID) {
+                    str = row.TreeTypeNo.slice(0, 1);
+                }
+            });
             card.push(
                 <Card key={index}>
                     <div style={{marginBottom: 10}}>
@@ -217,7 +237,7 @@ class DataList extends Component {
         return card;
     }
     render () {
-        const { purchaseInfo, Contacter, Phone, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime } = this.state;
+        const { purchaseInfo, Contacter, Phone, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime, Describe } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='add-seedling' style={{padding: '0 20px'}}>
@@ -279,16 +299,15 @@ class DataList extends Component {
                             {
                                 this.renderCard()
                             }
-                            <FormItem label='文本介绍' className='label-block'>
-                                {getFieldDecorator('TreeDescribe', {
-                                    initialValue: purchaseInfo ? purchaseInfo.TreeDescribe : ''
-                                })(
-                                    <TextArea rows={4} style={{width: 750}} />
-                                )}
+                            <FormItem label='求购描述' className='label-block'>
+                                <TextArea rows={4} style={{width: 750}} value={Describe} onChange={this.handleDescribe} />
                             </FormItem>
                             <FormItem style={{width: 800, textAlign: 'center'}}>
                                 <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
-                                <Button type='primary' onClick={this.toRelease.bind(this, 1)}>发布</Button>
+                                {
+                                    purchaseInfo ? <Button type='primary' onClick={this.toRelease.bind(this, 1)}>编辑</Button>
+                                        : <Button type='primary' onClick={this.toRelease.bind(this, 1)}>发布</Button>
+                                }
                             </FormItem>
                         </Form>
                     </TabPane>
@@ -310,34 +329,76 @@ class DataList extends Component {
             dataList
         });
     }
+    toEdit (record, index, e) {
+        e.preventDefault();
+        const { postPurchaseStandard, putPurchaseStandard } = this.props.actions;
+        if (record.ID) {
+            // 编辑采购单规格
+            putPurchaseStandard({}, {
+                ID: record.ID,
+                Num: record.Num,
+                Height: record.Height,
+                CrownWidth: record.CrownWidth,
+                DBH: record.DBH,
+                GroundDiameter: record.GroundDiameter,
+                TreeTypeID: record.TreeTypeID,
+                TreeTypeName: record.TreeTypeName,
+                CultivationMode: record.CultivationMode
+            }).then(rep => {
+                if (rep.code === 1) {
+                    message.success('编辑采购单规格成功');
+                }
+            });
+        } else {
+            // 增加采购单规格
+            postPurchaseStandard({}, {
+                PurchaseID: this.purchaseid,
+                Num: record.Num,
+                Height: record.Height,
+                CrownWidth: record.CrownWidth,
+                DBH: record.DBH,
+                GroundDiameter: record.GroundDiameter,
+                TreeTypeID: record.TreeTypeID,
+                TreeTypeName: record.TreeTypeName,
+                CultivationMode: record.CultivationMode
+            }).then(rep => {
+                if (rep.code === 1) {
+                    message.success('增加采购单规格成功');
+                }
+            });
+        }
+    }
     toRelease (Status) {
-        const formVal = this.props.form.getFieldsValue();
-        const { productInfo, Contacter, Phone, RegionCode, StartTime, EndTime, dataList, ProjectName, Section } = this.state;
+        const { purchaseInfo, Contacter, Phone, RegionCode, StartTime, EndTime, dataList, ProjectName, Section, Describe } = this.state;
         const { postPurchase, putPurchase } = this.props.actions;
         let Specs = [];
         dataList.map(item => {
-            item.map(ite => {
-                Specs.push(ite);
+            item.map(row => {
+                let obj = {
+                    Num: row.Num,
+                    TreeTypeID: row.TreeTypeID,
+                    TreeTypeName: row.TreeTypeName,
+                    Height: row.Height,
+                    CrownWidth: row.CrownWidth,
+                    DBH: row.DBH,
+                    GroundDiameter: row.GroundDiameter
+                };
+                Specs.push(obj);
             });
         });
-        const pro = {
-            UseNurseryAddress: this.UseNurseryAddress,
-            Contacter,
-            Phone,
-            Creater: this.Creater,
-            CreaterOrg: this.CreaterOrg,
-            StartTime,
-            EndTime,
-            ProjectName,
-            Section,
-            UseNurseryRegionCode: RegionCode,
-            TreeDescribe: formVal.TreeDescribe,
-            Status,
-            Specs
-        };
-        if (productInfo) {
-            pro.ID = productInfo.ID;
-            putPurchase({}, pro).then(rep => {
+        if (purchaseInfo) {
+            putPurchase({}, {
+                ID: purchaseInfo.ID,
+                ProjectName,
+                Section,
+                UseNurseryAddress: this.UseNurseryAddress,
+                UseNurseryRegionCode: RegionCode,
+                Contacter,
+                Phone,
+                StartTime,
+                EndTime,
+                Describe
+            }).then(rep => {
                 if (rep.code === 1 && Status === 1) {
                     message.success('编辑成功');
                 } else if (rep.code === 1 && Status === 0) {
@@ -345,7 +406,20 @@ class DataList extends Component {
                 }
             });
         } else {
-            postPurchase({}, pro).then(rep => {
+            postPurchase({}, {
+                UseNurseryAddress: this.UseNurseryAddress,
+                Contacter,
+                Phone,
+                Creater: this.Creater,
+                CreaterOrg: this.CreaterOrg,
+                StartTime,
+                EndTime,
+                ProjectName,
+                Section,
+                UseNurseryRegionCode: RegionCode,
+                Specs,
+                Describe
+            }).then(rep => {
                 if (rep.code === 1 && Status === 1) {
                     message.success('发布成功');
                 } else if (rep.code === 1 && Status === 0) {
@@ -419,11 +493,11 @@ class DataList extends Component {
         });
     }
     addVersion (cardKey, rowKey) {
+        let { dataList } = this.state;
         if (!this.state.TreeTypeID) {
             message.error('请选择树种');
             return;
         }
-        let { dataList } = this.state;
         const obj = {
             number: rowKey,
             cardKey: cardKey,
@@ -446,6 +520,7 @@ class DataList extends Component {
             number: 0,
             cardKey: dataList.length,
             TreeTypeID: '',
+            TreeTypeName: '',
             DBH: '',
             GroundDiameter: '',
             CrownWidth: '',
@@ -467,9 +542,15 @@ class DataList extends Component {
             this.state.dataList.map((item, index) => {
                 if (index === cardKey) {
                     item[0].TreeTypeID = selectedOptions[1].ID;
+                    item[0].TreeTypeName = selectedOptions[1].TreeTypeName;
                 }
             });
         }
+    }
+    handleDescribe (e) {
+        this.setState({
+            Describe: e.target.value
+        });
     }
 }
 

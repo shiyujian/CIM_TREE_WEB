@@ -17,7 +17,6 @@ class Menu extends Component {
     }
     render () {
         const { record, projectList } = this.props;
-        const { getFieldDecorator } = this.props.form;
         let ProjectName = '', Section = '';
         projectList.map(item => {
             if (item.No === record.ProjectName) {
@@ -33,13 +32,15 @@ class Menu extends Component {
                     <Row>
                         <Col span={18}>
                             <h3>{ProjectName}-{Section}采购单</h3>
-                            <p className='title'>发布单位:<span>报价起止时间:</span></p>
-                            <p>用苗地:{record.UseNurseryAddress}</p>
-                            <p>采购品种:</p>
-                            <p>发布时间:{record.StartTime}-{record.EndTime}</p>
+                            <p className='title'>发布单位:{record.CreaterOrg}<span>报价起止时间:{record.StartTime}-{record.EndTime}</span></p>
+                            <p>
+                                <span>用苗地:{record.UseNurseryAddress}</span>
+                                <span style={{marginLeft: 20}}>采购品种:{record.TreeTypes}</span>
+                            </p>
+                            <p>联系方式:{record.Phone}（{record.Contacter}）</p>
                         </Col>
                         <Col span={6} style={{textAlign: 'center'}}>
-                            <p style={{marginTop: 22}}>已有5人报价</p>
+                            <p style={{marginTop: 22}}>已有 {record.OfferNun} 人报价</p>
                             <Link to={`/market/purchasedetails?id=${record.ID}`}>
                                 <Button type='primary'>需求详情</Button>
                             </Link>

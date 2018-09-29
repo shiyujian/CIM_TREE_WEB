@@ -21,7 +21,7 @@ export const putPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/s
 export const getWpunittree = createFetchAction(`${FOREST_API}/tree/wpunittree`); // 获得所有项目
 export const getRegionCodes = createFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
 export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); // 获取苗木品种
-export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`); // 获取苗木品种
+export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`); // 根据code获取组织机构
 
 // 修改选择地图的方式
 export const changeAddDemandModalVisible = createAction(`${ID}_changeAddDemandModalVisible`);
