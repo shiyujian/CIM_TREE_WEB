@@ -17,15 +17,21 @@ class Menu extends Component {
     }
     render () {
         const { record, projectList } = this.props;
-        console.log(record,'00000');
-        console.log(projectList);
-        const { getFieldDecorator } = this.props.form;
+        let ProjectName = '', Section = '';
+        projectList.map(item => {
+            if (item.No === record.ProjectName) {
+                ProjectName = item.Name;
+            }
+            if (item.No === record.Section) {
+                Section = item.Name;
+            }
+        });
         return (
             <div className='menu' style={{marginTop: 10}}>
                 <Card title={'发布时间：'}>
                     <Row>
                         <Col span={8}>
-                            <h3>{record.ProjectName}-{record.Section}<span>({record.SKU})</span></h3>
+                            <h3>{ProjectName}-{Section}<span>({record.SKU})</span></h3>
                             <p>用苗地：{record.UseNurseryAddress}</p>
                             <p>报价时间：{record.StartTime}-{record.EndTime}</p>
                             <p>商品备注：{record.TreeDescribe}</p>

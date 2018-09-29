@@ -13,6 +13,7 @@ export const getProductList = createFetchAction(`${SEEDLING_API}/good/goods`); /
 export const getProductById = createFetchAction(`${SEEDLING_API}/good/good/{{id}}`); // 根据ID苗木商品详情
 export const getSpecsById = createFetchAction(`${SEEDLING_API}/good/specs`); // 根据ID获取规格
 export const getInventoryList = createFetchAction(`${SEEDLING_API}/good/skus`); // 获取sku库存列表
+export const getSupplierById = createFetchAction(`${FOREST_API}/system/supplier/{{id}}`); // 根据供应商id获取供应商信息
 
 // 修改选择地图的方式
 export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
@@ -22,7 +23,8 @@ export const actions = {
     getProductList,
     getProductById,
     getSpecsById,
-    getInventoryList
+    getInventoryList,
+    getSupplierById
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({

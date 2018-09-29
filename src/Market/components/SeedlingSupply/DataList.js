@@ -27,7 +27,6 @@ class DataList extends Component {
     }
     render () {
         const { page, total, dataList, treetypename } = this.state;
-        const { getFieldDecorator } = this.props.form;
         return (
             <div className='seedling-supply' style={{padding: '0 20px'}}>
                 <Form layout='inline'>
@@ -65,7 +64,7 @@ class DataList extends Component {
         const { getProductList } = this.props.actions;
         getProductList({}, {
             treetypename: this.state.treetypename || '',
-            status: ''
+            status: 1
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({

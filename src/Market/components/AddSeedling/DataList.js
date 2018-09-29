@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
 import { Form, Input, Button, Tabs, Select, Table, Upload, Row, Col, Icon, Modal, Cascader, message } from 'antd';
-import { TREETYPENO, FOREST_API } from '_platform/api';
+import { TREETYPENO, FOREST_API, CULTIVATIONMODE } from '_platform/api';
 import { searchToObj, getUser } from '_platform/auth';
 import './DataList.less';
 
@@ -39,7 +39,7 @@ class DataList extends Component {
             MostPhoto: '', // 成片栽植照片
             OtherPhoto: '', // 其他照片
             dataList: [], // 表格数据
-            length: 0,
+            number: 0, // 表格条数
             treeTypeList: [], // 树种
             TreeTypeNo: '', // 树木类型
             TreeTypeID: '' // 树种ID
@@ -90,12 +90,9 @@ class DataList extends Component {
             render: (text, record, index) => {
                 return (
                     <Select value={text} style={{ width: 100 }} onChange={this.editVersionMode.bind(this, 'CultivationMode', index)}>
-                        <Option value={0}>地苗</Option>
-                        <Option value={1}>断根苗</Option>
-                        <Option value={2}>假植苗</Option>
-                        <Option value={3}>袋苗</Option>
-                        <Option value={4}>盆苗</Option>
-                        <Option value={5}>山苗</Option>
+                        {
+                            CULTIVATIONMODE.map(item => <Option value={item.id} key={item.id}>{item.name}</Option>)
+                        }
                     </Select>
                 );
             }
@@ -119,7 +116,8 @@ class DataList extends Component {
             key: '8',
             render: (text, record, index) => {
                 return (<span>
-                    <a onClick={this.onDelete.bind(this, record, index)}>清空</a>
+                    <a onClick={this.toEdit.bind(this, record, index)}>保存</a>
+                    {/* <a onClick={this.onDelete.bind(this, record, index)}>删除</a> */}
                 </span>);
             }
         }];
@@ -129,7 +127,6 @@ class DataList extends Component {
         // 获取树种类型
         getTreeTypes().then(rep => {
             this.TreeTypeList = rep;
-            console.log(rep, 'bbbb');
             this.setState({
                 treeTypeList: rep
             });
@@ -141,7 +138,6 @@ class DataList extends Component {
             // 根据id获取商品详细
             getProductById({id: key}).then(rep => {
                 this.TreeTypeName = rep.TreeTypeName;
-                console.log(rep, '9999');
                 this.setState({
                     productInfo: rep,
                     TreeTypeNo: rep.TreeTypeNo.slice(0, 1),
@@ -163,6 +159,7 @@ class DataList extends Component {
                         this.dataListLength += 1;
                         dataList.push({
                             number: index,
+                            ID: item.ID,
                             TreeTypeID: item.TreeTypeID,
                             Stock: item.Stock,
                             DBH: item.DBH,
@@ -174,10 +171,9 @@ class DataList extends Component {
                             CultivationMode: item.CultivationMode
                         });
                     });
-                    console.log(dataList, 'aaaa');
                     this.setState({
                         dataList,
-                        length: this.dataListLength,
+                        number: this.dataListLength,
                         SupplierID: dataList[0].SupplierID
                     });
                 }
@@ -186,7 +182,6 @@ class DataList extends Component {
         // 获取苗圃基地的责任人电话，以及绑定的供应商
         const { id, org_code } = getUser();
         this.Creater = id;
-        console.log(getUser(), '----');
         if (org_code) {
             getNurseryByPk({}, {pk: org_code}).then((rep) => {
                 if (rep.code === 200 && rep.content.length > 0) {
@@ -392,7 +387,10 @@ class DataList extends Component {
                             </FormItem>
                             <FormItem style={{width: 800, textAlign: 'center'}}>
                                 <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
-                                <Button type='primary' onClick={this.toRelease.bind(this, 1)}>发布</Button>
+                                {
+                                    productInfo ? <Button type='primary' onClick={this.toRelease.bind(this, 1)}>编辑</Button>
+                                        : <Button type='primary' onClick={this.toRelease.bind(this, 1)}>发布</Button>
+                                }
                             </FormItem>
                         </Form>
                     </TabPane>
@@ -401,14 +399,15 @@ class DataList extends Component {
         );
     }
     addVersion () {
-        let { dataList, SupplierID, length } = this.state;
+        let { dataList, SupplierID, number } = this.state;
         if (!SupplierID) {
             message.error('请先选择供应商');
             return;
         }
         const obj = {
-            number: length,
+            number,
             SupplierID,
+            SPUID: this.spuid,
             DBH: '',
             GroundDiameter: '',
             CrownWidth: '',
@@ -420,11 +419,10 @@ class DataList extends Component {
         dataList.push(obj);
         this.setState({
             dataList,
-            length: length + 1
+            number: number + 1
         });
     }
     editVersion (str, index, e) {
-        console.log(str, index, e);
         this.state.dataList[index][str] = e.target.value;
         this.setState({
             dataList: [...this.state.dataList]
@@ -439,21 +437,7 @@ class DataList extends Component {
     toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
         const { productInfo, TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList } = this.state;
-        console.log(dataList);
-        const { postCommodity, putCommodity, putInventory } = this.props.actions;
-        const pro = {
-            Status,
-            TreeTypeID,
-            TreeTypeName: this.TreeTypeName,
-            Photo,
-            LocalPhoto,
-            MostPhoto,
-            OtherPhoto,
-            Creater: this.Creater,
-            NurseryBaseID: this.NurseryBaseID,
-            TreeDescribe: formVal.TreeDescribe,
-            SKUs: dataList
-        };
+        const { postCommodity, putCommodity } = this.props.actions;
         if (productInfo) {
             // 编辑spu,sku
             putCommodity({}, {
@@ -465,34 +449,6 @@ class DataList extends Component {
                 MostPhoto,
                 OtherPhoto
             }).then(rep => {
-                console.log(this, 'ddddd');
-                if (dataList.length > this.dataListLength) {
-                    // postInventory({}, {
-                    //     SPUID: this.spuid,
-                    //     SupplierID: this.state.SupplierID,
-                    // }).then(rep => {
-
-                    // });
-                }
-                for (let i in dataList) {
-                    if (i < this.dataListLength) {
-                        putInventory({}, {
-                            ID: this.spuid,
-                            DBH: dataList[i].DBH,
-                            Price: dataList[i].Price,
-                            Stock: dataList[i].Stock,
-                            SupplierID: dataList[i].SupplierID,
-                            Height: dataList[i].Height,
-                            CrownWidth: dataList[i].CrownWidth,
-                            GroundDiameter: dataList[i].GroundDiameter,
-                            CultivationMode: dataList[i].CultivationMode
-                        }).then(rep => {
-                            if (rep.code === 1) {
-                                message.success('编辑库存成功');
-                            }
-                        });
-                    }
-                }
                 if (rep.code === 1 && Status === 1) {
                     message.success('编辑成功');
                 } else if (rep.code === 1 && Status === 0) {
@@ -501,7 +457,19 @@ class DataList extends Component {
             });
         } else {
             // 新增spu
-            postCommodity({}, pro).then(rep => {
+            postCommodity({}, {
+                Status,
+                TreeTypeID,
+                TreeTypeName: this.TreeTypeName,
+                Photo,
+                LocalPhoto,
+                MostPhoto,
+                OtherPhoto,
+                Creater: this.Creater,
+                NurseryBaseID: this.NurseryBaseID,
+                TreeDescribe: formVal.TreeDescribe,
+                SKUs: dataList
+            }).then(rep => {
                 if (rep.code === 1 && Status === 1) {
                     message.success('发布成功');
                 } else if (rep.code === 1 && Status === 0) {
@@ -539,24 +507,42 @@ class DataList extends Component {
             SupplierID: value
         });
     }
-    onDelete (record, index) {
-        console.log(record, index, '1111');
+    // onDelete (record, index) {
+    //     const { putInventory } = this.props.actions;
+    //     const { dataList, SupplierID } = this.state;
+    //     dataList[index] = {
+    //         number: index,
+    //         SupplierID,
+    //         DBH: '',
+    //         GroundDiameter: '',
+    //         CrownWidth: '',
+    //         Height: '',
+    //         CultivationMode: '',
+    //         Price: '',
+    //         Stock: ''
+    //     };
+    //     this.setState({
+    //         dataList
+    //     });
+    // }
+    toEdit (record, index, e) {
+        e.preventDefault();
+        const { postInventory, putInventory } = this.props.actions;
         const { dataList } = this.state;
-        console.log(dataList);
-        dataList[index] = {
-            number: index,
-            SupplierID: this.state.SupplierID, // 供应商
-            DBH: '',
-            GroundDiameter: '',
-            CrownWidth: '',
-            Height: '',
-            CultivationMode: '',
-            Price: '',
-            Stock: ''
-        };
-        this.setState({
-            dataList
-        });
+        if (index < this.dataListLength) {
+            putInventory({}, dataList[index]).then(rep => {
+                if (rep.code === 1) {
+                    message.success('保存规格成功');
+                }
+            });
+        } else {
+            // 新增
+            postInventory({}, dataList[index]).then(rep => {
+                if (rep.code === 1) {
+                    message.success('新增规格成功');
+                }
+            });
+        }
     }
 }
 
