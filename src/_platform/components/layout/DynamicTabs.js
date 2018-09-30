@@ -96,5 +96,5 @@ export default class DynamicTabs extends Component {
         // toggleAside();
     }
 
-    static ignoreModules = ['login', '', 'dashboard', 'modeldown', 'video', 'curing'];
+    static ignoreModules = ['login', '', 'dashboard', 'modeldown', 'video', 'curing', 'checkwork'];
 }
