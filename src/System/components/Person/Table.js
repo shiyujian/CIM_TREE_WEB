@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import moment from 'moment';
 
 import {
     Table,
@@ -66,18 +65,15 @@ class Users extends Component {
             actions: { changeAdditionField }
         } = this.props;
         changeAdditionField('roles', value);
-        console.log('value', value);
         this.setState({
             roles: value
         });
     }
     changeSections (value) {
-        console.log('value', value);
         this.setState({ sections: value });
     }
 
     changeTagss (value) {
-        console.log('value', value);
         this.setState({ tag: value });
     }
     initopthins (list) {
@@ -88,7 +84,18 @@ class Users extends Component {
         return ops;
     }
     // 人员标段和组织机构标段比较器，如果满足条件返回true
-    compare (user, l1, s) {
+    compare (user, l1, s, node) {
+        let groups = user.groups;
+        let isClericalStaff = false;
+        groups.map((group) => {
+            if (group.name === '施工文书') {
+                isClericalStaff = true;
+            }
+        });
+        if (isClericalStaff && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
+            return true;
+        }
+
         if (user.is_superuser) {
             return true;
         }
@@ -103,8 +110,6 @@ class Users extends Component {
 
     search () {
         let text = document.getElementById('NurseryData').value;
-        console.log('text', text);
-        console.log('this.state.roles', this.state.roles);
         const {
             actions: { getUsers, getTablePage, getIsBtn }
         } = this.props;
@@ -119,7 +124,6 @@ class Users extends Component {
                     page: 1
                 }
             ).then(items => {
-                console.log('items111111', items);
                 let pagination = {
                     current: 1,
                     total: items.count
@@ -251,7 +255,6 @@ class Users extends Component {
         return sectione;
     }
     setColor (record, i) {
-        // console.log("users",users)
         if (record.is_black === 1 || record.is_black === true) {
             return 'background';
         } else {
@@ -263,7 +266,8 @@ class Users extends Component {
         const {
             platform: { roles = [] },
             sidebar: {
-                node: { code } = {}
+                node: { code } = {},
+                node = {}
             } = {}
         } = this.props;
         const { showModal } = this.state;
@@ -377,9 +381,20 @@ class Users extends Component {
             {
                 title: '操作',
                 render: (text, record) => {
+                    const {
+                        sidebar: {
+                            node: { code } = {},
+                            node = {}
+                        } = {}
+                    } = this.props;
                     const userc = JSON.parse(
                         window.localStorage.getItem('QH_USER_DATA')
                     );
+                    console.log('userc', userc);
+                    let editVisible = true;
+                    if (userc && userc.username !== 'admin' && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
+                        editVisible = false;
+                    }
                     let arr = [
                         <a
                             onClick={this.edit.bind(this, record)}
@@ -398,7 +413,6 @@ class Users extends Component {
                             <a>删除</a>
                         </Popconfirm>
                     ];
-                    console.log(userc, '-----');
                     if (userc.is_superuser === true) {
                         if (record.is_active === true) {
                             arr.push(<a
@@ -424,15 +438,19 @@ class Users extends Component {
                             </a>);
                         }
                     } else {
-                        arr = [
-                            <a
-                                onClick={this.edit.bind(this, record)}
-                                key={4}
-                                style={{ marginRight: '.5em' }}
-                            >
-                                编辑
-                            </a>
-                        ];
+                        if (editVisible) {
+                            arr = [
+                                <a
+                                    onClick={this.edit.bind(this, record)}
+                                    key={4}
+                                    style={{ marginRight: '.5em' }}
+                                >
+                                    编辑
+                                </a>
+                            ];
+                        } else {
+                            arr = ['/'];
+                        }
                     }
 
                     // 供应商文书权限
@@ -470,7 +488,6 @@ class Users extends Component {
             }
         ];
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-
         let is_active = false;
         if (user.is_superuser) {
             is_active = true;
@@ -481,10 +498,10 @@ class Users extends Component {
                     ucodes.pop();
                     const codeu = ucodes.join();
                     const ucode = codeu.replace(/,/g, '_');
-                    is_active = this.compare(user, ucode, code);
+                    is_active = this.compare(user, ucode, code, node);
                 } else {
                     const ucode = user.account.org_code.substring(0, 9);
-                    is_active = this.compare(user, ucode, code);
+                    is_active = this.compare(user, ucode, code, node);
                 }
             }
         }
@@ -665,7 +682,7 @@ class Users extends Component {
             record
         });
     }
-    
+
     async changePage (obj) {
         let text = document.getElementById('NurseryData').value;
         const {
@@ -876,7 +893,6 @@ class Users extends Component {
             });
             Promise.all(actionArr).then((rst) => {
                 getUsers({}, { org_code: codes, page: 1 }).then((items) => {
-                    console.log('wwwwwwwwwwwwww');
                     let pagination = {
                         current: 1,
                         total: items.count
@@ -919,7 +935,6 @@ class Users extends Component {
             const element = user.groups[j];
             groupe.push(element.id);
         }
-        console.log('groupe', groupe, user);
         putUser(
             {},
             {
@@ -965,8 +980,6 @@ class Users extends Component {
             }
         ).then(rst => {
             this.forceUpdate();
-            // console.log("rst", rst)
-            // console.log("333333333", JSON.parse(rst.msg))
         });
     }
     handleCancel () {
@@ -1115,13 +1128,10 @@ class Users extends Component {
             }
         ).then(rst => {
             this.forceUpdate();
-            console.log('rst', rst);
-            console.log('333333333', JSON.parse(rst.msg));
         });
     }
 
     edit (user, event) {
-        console.log('user', user);
         if (user.is_black === 1 || user.is_black === true) {
             message.warn('用户已加入黑名单,不可编辑');
             return;
@@ -1138,12 +1148,9 @@ class Users extends Component {
         // 	message.warn('请选择最下级组织结构目录');
 
         // } else {
-        // 	// console.log("user", user)
-        // 	// console.log("resetAdditionField", resetAdditionField)
 
         // }
         getSwitch(user.is_black);
-        console.log('11111111111111', user.is_black);
         resetAdditionField({
             visible: true,
             roles: groups.map(group => String(group.id)),
@@ -1178,9 +1185,7 @@ class Users extends Component {
                 this.props.getTablePages.current
             );
             deleteUser({ userID: user.id }).then(as => {
-                console.log('as', as);
                 getForestAllUsersData().then((userData) => {
-                    console.log('userData', userData);
                     if (userData && userData.content) {
                         window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
                         let content = userData.content;
@@ -1192,7 +1197,6 @@ class Users extends Component {
                 });
                 if (this.props.getIsBtns) {
                     getUsers({}, { org_code: codes, page: pages }).then(es => {
-                        console.log('es', es);
                         let pagination = {
                             current: this.props.getTablePages.current,
                             total: es.count
@@ -1210,8 +1214,6 @@ class Users extends Component {
                             roles: this.state.roles
                         }
                     ).then(items => {
-                        console.log('items', items);
-
                         if (items && items.length === 0) {
                             let pagination = {
                                 current: 0,

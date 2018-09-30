@@ -182,7 +182,7 @@ export default class Tree extends Component {
     getList (data = []) {
         const { childList } = this.state;
         return data.map((item, index) => {
-            childList[index] = new Array();
+            childList[index] = [];
             if (item.children && item.children.length) {
                 childList[index].push({
                     code: item.code,
@@ -235,7 +235,7 @@ export default class Tree extends Component {
             // const codeu=ucodes.join()
             // ucode=codeu.replace(/,/g,'_')
         }
-        if (this.compare(user, ucode, o.code)) {
+        if (this.compare(user, ucode, o)) {
             if (o.code) {
                 getTreeModal(true);
             } else {
@@ -243,6 +243,7 @@ export default class Tree extends Component {
             }
             changeSidebarField('node', o);
             const codes = Tree.collect(o);
+
             getTreeCode(codes);
             getUsers({}, { org_code: codes, page: 1 }).then(e => {
                 let pagination = {
@@ -277,7 +278,21 @@ export default class Tree extends Component {
     // 	}
     // 	return false;
     // }
-    compare (user, l1, s) {
+    compare (user, l1, o) {
+        let s;
+        if (o && o.code) {
+            s = o.code;
+        }
+        let groups = user.groups;
+        let isClericalStaff = false;
+        groups.map((group) => {
+            if (group.name === '施工文书') {
+                isClericalStaff = true;
+            }
+        });
+        if (isClericalStaff && (o.topParent === '苗圃基地' || o.topParent === '供应商')) {
+            return true;
+        }
         if (user.is_superuser) {
             return true;
         }
@@ -301,16 +316,21 @@ export default class Tree extends Component {
 
         return false;
     }
-    static loop = (list, code) => {
+    static loop = (list, code, loopTimes = 0, topParent) => {
         let rst = null;
         list.forEach((item = {}) => {
+            if (loopTimes === 0) {
+                topParent = item.name;
+            }
             const { code: value, children = [] } = item;
             if (value === code) {
                 rst = item;
+                rst.topParent = topParent;
             } else {
-                const tmp = Tree.loop(children, code);
+                const tmp = Tree.loop(children, code, loopTimes + 1, topParent);
                 if (tmp) {
                     rst = tmp;
+                    rst.topParent = topParent;
                 }
             }
         });
