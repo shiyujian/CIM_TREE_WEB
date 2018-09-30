@@ -31,11 +31,11 @@ const addGroup = (supplier_list, str) => {
         newChildren.push({
             name: ite || '其他',
             children: arr1,
-            code: inde
+            code: inde.toString() + str
         });
     });
     return newChildren;
-}
+};
 export default class Tree extends Component {
     static propTypes = {};
     constructor (props) {
@@ -100,7 +100,6 @@ export default class Tree extends Component {
                         item.children = addGroup(item.children, '苗圃基地');
                     }
                 });
-                console.log(rst.children);
                 this.getList(rst.children);
                 // 目前只针对业主的单位，name为建设单位   所以对建设单位进行loop
                 if (rst.children && rst.children instanceof Array && rst.children.length > 0) {
@@ -213,7 +212,7 @@ export default class Tree extends Component {
             // const codeu=ucodes.join()
             // ucode=codeu.replace(/,/g,'_')
         }
-        if (this.compare(user, ucode, o.code)) {
+        if (this.compare(user, ucode, o)) {
             if (o.code) {
                 getTreeModal(true);
             } else {
@@ -221,6 +220,7 @@ export default class Tree extends Component {
             }
             changeSidebarField('node', o);
             const codes = Tree.collect(o);
+
             getTreeCode(codes);
             getUsers({}, { org_code: codes, page: 1 }).then(e => {
                 let pagination = {
@@ -255,11 +255,24 @@ export default class Tree extends Component {
     // 	}
     // 	return false;
     // }
-    compare (user, l1, s) {
+    compare (user, l1, o) {
+        let s;
+        if (o && o.code) {
+            s = o.code;
+        }
+        let groups = user.groups;
+        let isClericalStaff = false;
+        groups.map((group) => {
+            if (group.name === '施工文书') {
+                isClericalStaff = true;
+            }
+        });
+        if (isClericalStaff && (o.topParent === '苗圃基地' || o.topParent === '供应商')) {
+            return true;
+        }
         if (user.is_superuser) {
             return true;
         }
-        // console.log(11111111,l1,s)
         if (l1 === undefined || s === undefined) {
             return false;
         }
@@ -280,16 +293,21 @@ export default class Tree extends Component {
 
         return false;
     }
-    static loop = (list, code) => {
+    static loop = (list, code, loopTimes = 0, topParent) => {
         let rst = null;
         list.forEach((item = {}) => {
+            if (loopTimes === 0) {
+                topParent = item.name;
+            }
             const { code: value, children = [] } = item;
             if (value === code) {
                 rst = item;
+                rst.topParent = topParent;
             } else {
-                const tmp = Tree.loop(children, code);
+                const tmp = Tree.loop(children, code, loopTimes + 1, topParent);
                 if (tmp) {
                     rst = tmp;
+                    rst.topParent = topParent;
                 }
             }
         });
