@@ -384,6 +384,7 @@ class AsideTree extends Component {
                 changeSelectState,
                 getCheckGroupMans,
                 changeCheckGroup,
+                getCheckGroupMansOk,
             }
         } = this.props;
         const {
@@ -420,6 +421,7 @@ class AsideTree extends Component {
                     id: keyArr[0]
                 };
                 let data = await getCheckGroupMans(postData);
+                await getCheckGroupMansOk(data);
                 console.log('data', data);
             }
         } catch (e) {

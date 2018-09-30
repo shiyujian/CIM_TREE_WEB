@@ -28,13 +28,15 @@ class CountFilter extends Component {
         super(props);
         this.state = {
             sectionArray: [],
-            projectArray: []
+            projectArray: [],
+            groupArray: [],
         };
     }
 
 
     componentDidMount () {
         this.getSection();
+        this.getCheckGroup();
     }
 
     async getSection () {
@@ -81,6 +83,25 @@ class CountFilter extends Component {
         });
     }
 
+    async getCheckGroup(){
+        const {
+            actions: { getCheckGroup }
+        } = this.props;
+        let groupArray = [];
+        let data = await getCheckGroup();
+        data.map(p =>{
+            groupArray.push(
+                <Option key={p.id} value={p.id}>
+                    {p.name}
+                </Option>
+            );
+        });
+        this.setState({
+            groupArray: groupArray,
+        });
+    }
+
+
      // 项目选择函数
     onSelectChange (value) {
         const {
@@ -111,7 +132,7 @@ class CountFilter extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { projectArray, sectionArray } = this.state;
+        const { projectArray, sectionArray, groupArray } = this.state;
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
@@ -254,18 +275,7 @@ class CountFilter extends Component {
                                        
                                     })(
                                         <Select  placeholder='请选择考勤群体'>
-                                            <Option
-                                                key={'宣传片'}
-                                                value={'宣传片'}
-                                            >
-                                                宣传片
-                                            </Option>
-                                            <Option
-                                                key={'操作视频'}
-                                                value={'操作视频'}
-                                            >
-                                                操作视频
-                                            </Option>
+                                           {groupArray}
                                         </Select>
                                     )}
                                 </FormItem>
@@ -277,16 +287,16 @@ class CountFilter extends Component {
                                     })(
                                         <Select  placeholder='请选择角色'>
                                             <Option
-                                                key={'宣传片'}
-                                                value={'宣传片'}
+                                                key={'1'}
+                                                value={'1'}
                                             >
-                                                宣传片
+                                                1
                                             </Option>
                                             <Option
-                                                key={'操作视频'}
-                                                value={'操作视频'}
+                                                key={'2'}
+                                                value={'2'}
                                             >
-                                                操作视频
+                                                2
                                             </Option>
                                         </Select>
                                     )}
@@ -299,16 +309,16 @@ class CountFilter extends Component {
                                     })(
                                         <Select  placeholder='请选择职务'>
                                             <Option
-                                                key={'宣传片'}
-                                                value={'宣传片'}
+                                                key={'1'}
+                                                value={'1'}
                                             >
-                                                宣传片
+                                                1
                                             </Option>
                                             <Option
-                                                key={'操作视频'}
-                                                value={'操作视频'}
+                                                key={'2'}
+                                                value={'2'}
                                             >
-                                                操作视频
+                                                2
                                             </Option>
                                         </Select>
                                     )}
