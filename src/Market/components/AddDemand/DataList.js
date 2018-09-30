@@ -15,7 +15,7 @@ class DataList extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            productInfo: null, // 回显信息
+            purchaseInfo: null, // 回显信息
             sectionList: [], // 标段
             projectList: [], // 项目列表
             TreeTypeList: [], // 树种类型
@@ -96,10 +96,12 @@ class DataList extends Component {
             title: '操作',
             dataIndex: '编辑',
             key: '8',
+            width: 70,
             render: (text, record, index) => {
                 return (
                     <span>
-                        <a onClick={this.toEdit.bind(this, record, index)}>保存</a>
+                        {this.state.purchaseInfo ? <a onClick={this.toEdit.bind(this, record, index)}>保存</a> : ''}
+                        <a onClick={this.toDelete.bind(this, record, index)}>清空</a>
                     </span>
                 );
             }
@@ -550,6 +552,24 @@ class DataList extends Component {
     handleDescribe (e) {
         this.setState({
             Describe: e.target.value
+        });
+    }
+    toDelete (record, index) {
+        const { dataList } = this.state;
+        dataList[record.cardKey][index] = {
+            CrownWidth: '',
+            CultivationMode: '',
+            DBH: '',
+            GroundDiameter: '',
+            Height: '',
+            Num: '',
+            TreeTypeID: record.TreeTypeID,
+            TreeTypeName: record.TreeTypeName,
+            cardKey: record.cardKey,
+            number: index
+        };
+        this.setState({
+            dataList
         });
     }
 }

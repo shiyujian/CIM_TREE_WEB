@@ -431,17 +431,11 @@ class Addition extends Component {
     render () {
         const {
             form: { getFieldDecorator },
-            // platform: { roles = [] },
             addition = {},
             actions: { changeAdditionField },
-            tags = [],
             orgTreeSelect
         } = this.props;
-        const tagsOptions = this.initopthins(tags);
-        // const { search } = this.state;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        // let nurseryData = [];
-        let defaultNurse = this.query(addition);
         let units = this.getUnits();
         let avatar_url = '';
         let avatar_urlName;
@@ -986,30 +980,6 @@ class Addition extends Component {
                                     ) : (
                                         ''
                                     )}
-                                    <FormItem {...Addition.layout} label='苗圃'>
-                                        {/* <Select placeholder="苗圃" showSearch value={addition.tags} onChange={changeAdditionField.bind(this, 'tags')}
-									mode="multiple" style={{ width: '100%' }} > */}
-                                        {/* {tagsOptions} */}
-                                        <Select
-                                            placeholder='苗圃'
-                                            showSearch
-                                            value={defaultNurse}
-                                            optionFilterProp='children'
-                                            filterOption={(input, option) =>
-                                                option.props.children
-                                                    .toLowerCase()
-                                                    .indexOf(
-                                                        input.toLowerCase()
-                                                    ) >= 0
-                                            }
-                                            onChange={this.changeNursery.bind(
-                                                this
-                                            )}
-                                            style={{ width: '100%' }}
-                                        >
-                                            {tagsOptions}
-                                        </Select>
-                                    </FormItem>
                                     <Row>
                                         <Col span={8}>
                                             {user.is_superuser ? (
@@ -1177,23 +1147,6 @@ class Addition extends Component {
         return getProjectUnits(projectName);
     }
 
-    // 初始化苗圃
-    initopthins (list) {
-        const ops = [];
-        for (let i = 0; i < list.length; i++) {
-            ops.push(
-                <Option
-                    key={JSON.stringify(list[i].ID)}
-                    value={JSON.stringify(list[i].ID)}
-                    title={list[i].NurseryName + '-' + list[i].Factory}
-                >
-                    {list[i].NurseryName + '-' + list[i].Factory}
-                </Option>
-            );
-        }
-        return ops;
-    }
-
     componentDidMount () {
         const {
             actions: { getRoles }
@@ -1253,54 +1206,6 @@ class Addition extends Component {
         if (value !== addition.black_remark) {
             this.setState({ black_remarkValue: value });
             changeAdditionField('black_remark', value);
-        }
-    }
-    // 将选择的苗圃传入redux
-    changeNursery (value) {
-        const {
-            actions: { changeAdditionField },
-            tags = []
-        } = this.props;
-        let defaultTags = [];
-        // 对于从select组建传过来的value，进行判断，如果是ID，直接push，如果是苗圃名字，那么找到对应的ID，再push
-        // value.map((item) => {
-        let data = value.toString().split('-');
-        if (data.length === 2) {
-            tags.map(rst => {
-                if (rst && rst.ID) {
-                    if (
-                        rst.NurseryName === data[0] &&
-                        rst.Factory === data[1]
-                    ) {
-                        defaultTags.push(rst.ID.toString());
-                    }
-                }
-            });
-        } else {
-            defaultTags.push(value.toString());
-        }
-        // })
-        defaultTags = [...new Set(defaultTags)];
-        changeAdditionField('tags', defaultTags);
-    }
-    // 对苗圃的id显示为苗圃的名称
-    query (value) {
-        if (value && value.tags) {
-            const { tags = [] } = this.props;
-            let array = value.tags || [];
-            let defaultNurse = [];
-            array.map(item => {
-                tags.map(rst => {
-                    if (rst && rst.ID) {
-                        if (rst.ID.toString() === item) {
-                            defaultNurse.push(
-                                rst.NurseryName + '-' + rst.Factory
-                            );
-                        }
-                    }
-                });
-            });
-            return defaultNurse;
         }
     }
 

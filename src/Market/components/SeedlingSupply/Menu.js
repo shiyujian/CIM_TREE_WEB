@@ -16,7 +16,6 @@ class Menu extends Component {
         this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
     }
     render () {
-        const { getFieldDecorator } = this.props.form;
         const { record } = this.props;
         console.log(record.NurseryBase);
         let TreeTypeName = '';
@@ -27,7 +26,7 @@ class Menu extends Component {
             TreeTypeName = record.TreeTypeName;
             NurseryName = record.NurseryBase.NurseryName;
             TreePlace = record.NurseryBase.TreePlace;
-            UpdateTime = record.UpdateTime;
+            UpdateTime = record.UpdateTime.split(' ')[0];
         }
         return (
             <div className='menu'>

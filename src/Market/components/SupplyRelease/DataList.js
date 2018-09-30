@@ -59,7 +59,7 @@ class DataList extends Component {
                     <TabPane tab='全 部' key='1'>
                         {
                             dataList.length > 0 ? dataList.map((item, index) => {
-                                return <Menu record={item} {...this.props} toSearch={this.toSearch} key={index}/>;
+                                return <Menu record={item} {...this.props} toSearch={this.toSearch} key={index} />;
                             }) : []
                         }
                     </TabPane>

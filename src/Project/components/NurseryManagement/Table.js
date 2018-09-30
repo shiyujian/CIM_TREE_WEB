@@ -249,6 +249,7 @@ class Tablelevel extends Component {
                         visibleTitle={visibleTitle}
                         optionList={optionList}
                         handleCancel={this.handleCancel}
+                        onSearch={this.onSearch}
                     /> : null
                 }
             </div>
@@ -351,7 +352,6 @@ class Tablelevel extends Component {
             auditVisible: false,
             record: null
         });
-        this.onSearch();
     }
 }
 

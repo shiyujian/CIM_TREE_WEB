@@ -65,12 +65,11 @@ class Addition extends Component {
                                 pattern: /^[\w\d\_\-]+$/
                             }
                         ],
-                        initialValue: ''
+                        initialValue: addition.code
                     })(
                         <Input
                             readOnly={!parent}
                             placeholder='请输入编码'
-                            value={addition.code}
                             onChange={changeAdditionField.bind(this, 'code')}
                         />
                     )}
