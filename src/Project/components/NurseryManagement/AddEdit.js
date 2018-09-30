@@ -265,7 +265,7 @@ class AddEdit extends Component {
                 NurseryName: values.NurseryName,
                 TreePlace: values.TreePlace,
                 RegionCode: RegionCode,
-                Address: values.Address,
+                Address: values.Address || '',
                 Leader: values.Leader,
                 LeaderPhone: values.LeaderPhone,
                 LeaderCardNo: values.LeaderCardNo,
@@ -286,6 +286,7 @@ class AddEdit extends Component {
                             message: '编辑苗圃成功'
                         });
                         this.props.handleCancel();
+                        this.props.onSearch();
                     } else {
                         notification.error({
                             message: '编辑失败'
@@ -303,6 +304,7 @@ class AddEdit extends Component {
                             message: '新增苗圃成功'
                         });
                         this.props.handleCancel();
+                        this.props.onSearch();
                     } else {
                         notification.error({
                             message: '新增失败'

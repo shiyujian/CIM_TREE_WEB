@@ -16,7 +16,6 @@ class Menu extends Component {
         this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
     }
     render () {
-        const { getFieldDecorator } = this.props.form;
         const { record } = this.props;
         console.log(record.NurseryBase);
         let TreeTypeName = '';

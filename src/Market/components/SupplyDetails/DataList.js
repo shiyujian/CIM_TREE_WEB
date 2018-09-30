@@ -48,6 +48,7 @@ class DataList extends Component {
             DBH: '',
             GroundDiameter: '',
             CultivationMode: '',
+            dataList: [],
             SupplierID: ''
         };
         this.spuid = ''; // 商品id

@@ -3,39 +3,62 @@ import SimpleTree from '_platform/components/panels/SimpleTree';
 import { TreeSelect } from 'antd';
 const TreeNode = TreeSelect.TreeNode;
 
-const addGroup = (supplier_list, str) => {
+const addGroupSupplier = (supplier_list, str) => {
     const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));
-    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
-    const supplierCode_province = JSON.parse(window.sessionStorage.getItem('supplierCode_province'));
+    const regionCode_province = JSON.parse(window.sessionStorage.getItem('regionCode_province'));
     let arr_province = [];
-    supplier_list.map(ite => {
-        if (str === '供应商') {
-            ite.RegionCode = supplier_regionCode[ite.pk];
-            ite.province = supplierCode_province[supplier_regionCode[ite.pk]];
-        } else {
-            ite.RegionCode = nursery_regionCode[ite.pk];
-            ite.province = supplierCode_province[nursery_regionCode[ite.pk]];
-        }
-        if (!arr_province.includes(ite.province)) {
-            arr_province.push(ite.province);
+    supplier_list.map(item => {
+        item.RegionCode = supplier_regionCode[item.code];
+        item.province = regionCode_province[item.RegionCode];
+        if (!arr_province.includes(item.province)) {
+            arr_province.push(item.province);
         }
     });
     let newChildren = [];
-    arr_province.map((ite, inde) => {
+    arr_province.map((item, index) => {
         let arr1 = [];
         supplier_list.map(record => {
-            if (ite === record.province) {
+            if (item === record.province) {
                 arr1.push(record);
             }
         });
         newChildren.push({
-            name: ite || '其他',
+            name: item || '其他',
             children: arr1,
-            code: inde
+            code: index
         });
     });
     return newChildren;
-}
+};
+
+const addGroupNursery = (nursery_list, str) => {
+    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
+    const regionCode_province = JSON.parse(window.sessionStorage.getItem('regionCode_province'));
+    let arr_province = [];
+    nursery_list.map(item => {
+        item.RegionCode = nursery_regionCode[item.code];
+        item.province = regionCode_province[item.RegionCode];
+        if (!arr_province.includes(item.province)) {
+            arr_province.push(item.province);
+        }
+    });
+    let newChildren = [];
+    arr_province.map((item, index) => {
+        let arr1 = [];
+        nursery_list.map(record => {
+            if (item === record.province) {
+                arr1.push(record);
+            }
+        });
+        newChildren.push({
+            name: item || '其他',
+            children: arr1,
+            code: index
+        });
+    });
+    return newChildren;
+};
+
 export default class Tree extends Component {
     static propTypes = {};
     constructor (props) {
@@ -70,7 +93,7 @@ export default class Tree extends Component {
             rst.map(item => {
                 obj[item.ID] = item.MergerName.split(',')[1];
             });
-            window.sessionStorage.setItem('supplierCode_province', JSON.stringify(obj));
+            window.sessionStorage.setItem('regionCode_province', JSON.stringify(obj));
         });
         getSupplierList().then(rst => {
             let obj = {};
@@ -95,12 +118,11 @@ export default class Tree extends Component {
             if (rst && rst.children) {
                 rst.children.map(item => {
                     if (item.name === '供应商') {
-                        item.children = addGroup(item.children, '供应商');
+                        item.children = addGroupSupplier(item.children, '供应商');
                     } else if (item.name === '苗圃基地') {
-                        item.children = addGroup(item.children, '苗圃基地');
+                        item.children = addGroupNursery(item.children, '苗圃基地');
                     }
                 });
-                console.log(rst.children);
                 this.getList(rst.children);
                 // 目前只针对业主的单位，name为建设单位   所以对建设单位进行loop
                 if (rst.children && rst.children instanceof Array && rst.children.length > 0) {
@@ -259,7 +281,6 @@ export default class Tree extends Component {
         if (user.is_superuser) {
             return true;
         }
-        // console.log(11111111,l1,s)
         if (l1 === undefined || s === undefined) {
             return false;
         }
