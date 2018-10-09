@@ -14,7 +14,7 @@ import {
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { Option, OptGroup } = Select;
 const { RangePicker } = DatePicker;
 
 class CountFilter extends Component {
@@ -126,6 +126,248 @@ class CountFilter extends Component {
         this.setState({
             sectionArray: sectionArray
         });
+    }
+
+    renderContent () {
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const {
+            platform: { roles = [] }
+        } = this.props;
+        debugger
+        var systemRoles = [];
+        if (user.is_superuser) {
+            systemRoles.push({
+                name: '苗圃角色',
+                value: roles.filter(role => role.grouptype === 0)
+            });
+            systemRoles.push({
+                name: '施工角色',
+                value: roles.filter(role => role.grouptype === 1)
+            });
+            systemRoles.push({
+                name: '监理角色',
+                value: roles.filter(role => role.grouptype === 2)
+            });
+            systemRoles.push({
+                name: '业主角色',
+                value: roles.filter(role => role.grouptype === 3)
+            });
+            systemRoles.push({
+                name: '养护角色',
+                value: roles.filter(role => role.grouptype === 4)
+            });
+            systemRoles.push({
+                name: '苗圃基地角色',
+                value: roles.filter(role => role.grouptype === 5)
+            });
+            systemRoles.push({
+                name: '供应商角色',
+                value: roles.filter(role => role.grouptype === 6)
+            });
+        } else {
+            for (let i = 0; i < user.groups.length; i++) {
+                const rolea = user.groups[i].grouptype;
+                switch (rolea) {
+                    case 0:
+                        systemRoles.push({
+                            name: '苗圃角色',
+                            value: roles.filter(role => role.grouptype === 0)
+                        });
+                        break;
+                    case 1:
+                        systemRoles.push({
+                            name: '苗圃角色',
+                            value: roles.filter(role => role.grouptype === 0)
+                        });
+                        systemRoles.push({
+                            name: '施工角色',
+                            value: roles.filter(role => role.grouptype === 1)
+                        });
+                        systemRoles.push({
+                            name: '养护角色',
+                            value: roles.filter(role => role.grouptype === 4)
+                        });
+                        break;
+                    case 2:
+                        systemRoles.push({
+                            name: '监理角色',
+                            value: roles.filter(role => role.grouptype === 2)
+                        });
+                        break;
+                    case 3:
+                        systemRoles.push({
+                            name: '业主角色',
+                            value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 4:
+                        systemRoles.push({
+                            name: '养护角色',
+                            value: roles.filter(role => role.grouptype === 4)
+                        });
+                        break;
+                    case 5:
+                        systemRoles.push({
+                            name: '苗圃基地角色',
+                            value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 6:
+                        systemRoles.push({
+                            name: '供应商角色',
+                            value: roles.filter(role => role.grouptype === 4)
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        const objs = systemRoles.map(roless => {
+            return (
+                <OptGroup label={roless.name} key={roless.name}>
+                    {roless.value.map(role => {
+                        return (
+                            <Option key={role.id} value={String(role.id)}>
+                                {role.name}
+                            </Option>
+                        );
+                    })}
+                </OptGroup>
+            );
+        });
+        return objs;
+    }
+    renderTitle () {
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const {
+            platform: { roles = [] }
+        } = this.props;
+        var systemRoles = [];
+        if (user.is_superuser) {
+            systemRoles.push({
+                name: '苗圃职务',
+                children: ['苗圃'],
+                value: roles.filter(role => role.grouptype === 0)
+            });
+            systemRoles.push({
+                name: '施工职务',
+                children: [
+                    '施工领导',
+                    '协调调度人',
+                    '质量负责人',
+                    '安全负责人',
+                    '文明负责人',
+                    '普通员工',
+                    '施工文书',
+                    '测量员'
+                ],
+                value: roles.filter(role => role.grouptype === 1)
+            });
+            systemRoles.push({
+                name: '监理职务',
+                children: ['总监', '监理组长', '普通监理', '监理文书'],
+                value: roles.filter(role => role.grouptype === 2)
+            });
+            systemRoles.push({
+                name: '业主职务',
+                children: ['业主', '业主文书', '业主领导'],
+                value: roles.filter(role => role.grouptype === 3)
+            });
+            systemRoles.push({
+                name: '苗圃基地职务',
+                children: ['苗圃基地'],
+                value: roles.filter(role => role.grouptype === 5)
+            });
+            systemRoles.push({
+                name: '供应商职务',
+                children: ['供应商'],
+                value: roles.filter(role => role.grouptype === 6)
+            });
+        } else {
+            for (let i = 0; i < user.groups.length; i++) {
+                const rolea = user.groups[i].grouptype;
+                switch (rolea) {
+                    case 0:
+                        systemRoles.push({
+                            name: '苗圃职务',
+                            children: ['苗圃'],
+                            value: roles.filter(role => role.grouptype === 0)
+                        });
+                        break;
+                    case 1:
+                        systemRoles.push({
+                            name: '苗圃职务',
+                            children: ['苗圃'],
+                            value: roles.filter(role => role.grouptype === 0)
+                        });
+                        systemRoles.push({
+                            name: '施工职务',
+                            children: [
+                                '施工领导',
+                                '协调调度人',
+                                '质量负责人',
+                                '安全负责人',
+                                '文明负责人',
+                                '普通员工',
+                                '施工文书',
+                                '测量员'
+                            ],
+                            value: roles.filter(role => role.grouptype === 1)
+                        });
+                        break;
+                    case 2:
+                        systemRoles.push({
+                            name: '监理职务',
+                            children: [
+                                '总监',
+                                '监理组长',
+                                '普通监理',
+                                '监理文书'
+                            ],
+                            value: roles.filter(role => role.grouptype === 2)
+                        });
+                        break;
+                    case 3:
+                        systemRoles.push({
+                            name: '业主职务',
+                            children: ['业主', '业主文书', '业主领导'],
+                            value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 5:
+                        systemRoles.push({
+                            name: '苗圃基地职务',
+                            children: ['苗圃基地'],
+                            value: roles.filter(role => role.grouptype === 5)
+                        });
+                        break;
+                    case 6:
+                        systemRoles.push({
+                            name: '供应商职务',
+                            children: ['供应商'],
+                            value: roles.filter(role => role.grouptype === 6)
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        const objs = systemRoles.map(roless => {
+            return (
+                <OptGroup label={roless.name} key={roless.name} >
+                    {roless.children.map(role => {
+                        return (
+                            <Option key={role} value={role}>
+                                {role}
+                            </Option>
+                        );
+                    })}
+                </OptGroup>
+            );
+        });
+        return objs;
     }
 
     render () {
@@ -285,19 +527,20 @@ class CountFilter extends Component {
                                     {getFieldDecorator('role', {
                                         
                                     })(
-                                        <Select  placeholder='请选择角色'>
-                                            <Option
-                                                key={'1'}
-                                                value={'1'}
-                                            >
-                                                1
-                                            </Option>
-                                            <Option
-                                                key={'2'}
-                                                value={'2'}
-                                            >
-                                                2
-                                            </Option>
+                                        <Select
+                                            placeholder='请选择角色'
+                                            optionFilterProp='children'
+                                            filterOption={(input, option) =>
+                                                option.props.children
+                                                    .toLowerCase()
+                                                    .indexOf(
+                                                        input.toLowerCase()
+                                                    ) >= 0
+                                            }
+                                            mode='multiple'
+                                            style={{ width: '100%' }}
+                                        >
+                                            {this.renderContent()}
                                         </Select>
                                     )}
                                 </FormItem>
@@ -307,19 +550,11 @@ class CountFilter extends Component {
                                     {getFieldDecorator('duty', {
                                         
                                     })(
-                                        <Select  placeholder='请选择职务'>
-                                            <Option
-                                                key={'1'}
-                                                value={'1'}
-                                            >
-                                                1
-                                            </Option>
-                                            <Option
-                                                key={'2'}
-                                                value={'2'}
-                                            >
-                                                2
-                                            </Option>
+                                        <Select
+                                            placeholder='请选择职务'
+                                            style={{ width: '100%' }}
+                                        >
+                                            {this.renderTitle()}
                                         </Select>
                                     )}
                                 </FormItem>
