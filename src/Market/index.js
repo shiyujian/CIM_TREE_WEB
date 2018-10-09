@@ -13,7 +13,7 @@
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 
@@ -35,8 +35,7 @@ export default class MarketContainer extends Component {
             PurchaseDetails = null,
             SupplyRelease = null,
             AddSeedling = null,
-            DemandRelease = null,
-            AddDemand = null
+            DemandRelease = null
         } = this.state || {};
         return (
             <Body>
@@ -88,12 +87,6 @@ export default class MarketContainer extends Component {
                         <Route
                             path='/market/demandrelease'
                             component={DemandRelease}
-                        />
-                    )}
-                    {AddDemand && (
-                        <Route
-                            path='/market/adddemand'
-                            component={AddDemand}
                         />
                     )}
                 </Main>

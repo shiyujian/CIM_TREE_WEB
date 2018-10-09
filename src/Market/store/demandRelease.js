@@ -24,7 +24,8 @@ export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); /
 export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`); // 根据code获取组织机构
 
 // 修改选择地图的方式
-export const changeAddDemandModalVisible = createAction(`${ID}_changeAddDemandModalVisible`);
+export const changeAddDemandVisible = createAction(`${ID}_changeAddDemandVisible`);
+export const changeAddDemandKey = createAction(`${ID}_changeAddDemandKey`);
 
 export const actions = {
     getCuring,
@@ -40,11 +41,16 @@ export const actions = {
     getRegionCodes,
     getTreeTypes,
     getOrgTree_new,
-    changeAddDemandModalVisible
+    changeAddDemandVisible,
+    changeAddDemandKey
 };
 export default handleActions({
-    [changeAddDemandModalVisible]: (state, {payload}) => ({
+    [changeAddDemandVisible]: (state, {payload}) => ({
         ...state,
-        addDemandModalVisible: payload
+        addDemandVisible: payload
+    }),
+    [changeAddDemandKey]: (state, {payload}) => ({
+        ...state,
+        addDemandKey: payload
     })
 }, {});

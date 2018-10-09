@@ -1,10 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs, Card, Row, Col, message } from 'antd';
-import { Link } from 'react-router-dom';
-import { FOREST_API } from '_platform/api';
-const FormItem = Form.Item;
-const TabPane = Tabs.TabPane;
+import { Form, Button, Card, Row, Col, message } from 'antd';
 
 class Menu extends Component {
     constructor (props) {
@@ -12,7 +8,6 @@ class Menu extends Component {
         this.state = {
             a: 1
         };
-        this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
         this.toSoldOut = this.toSoldOut.bind(this); // 需求详情
     }
     componentWillReceiveProps (nextProps) {
@@ -58,9 +53,7 @@ class Menu extends Component {
                         </Col>
                         <Col span={8} style={{paddingTop: 40}}>
                             <Button onClick={this.toEditInfo}>查看报价</Button>
-                            <Link to={`/market/adddemand?key=${record.ID}`}>
-                                <Button type='primary' onClick={this.toEditInfo} style={{marginLeft: 15}}>编辑需求</Button>
-                            </Link>
+                            <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)} style={{marginLeft: 15}}>编辑需求</Button>
                             <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>
                         </Col>
                     </Row>
@@ -68,8 +61,8 @@ class Menu extends Component {
             </div>
         );
     }
-    toEditInfo () {
-
+    toEditInfo (key) {
+        this.props.toAddDemand(key);
     }
     toSoldOut () {
         const { changeStatus } = this.props.actions;

@@ -16,7 +16,8 @@ export const getOfferInventoryById = createFetchAction(`${SEEDLING_API}/purchase
 export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`); // 根据code获取组织机构
 
 // 修改选择地图的方式
-export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
+export const changePurchaseDetailsVisible = createAction(`${ID}_changePurchaseDetailsVisible`);
+export const changePurchaseDetailsKey = createAction(`${ID}_changePurchaseDetailsKey`);
 
 export const actions = {
     getCuring,
@@ -24,11 +25,17 @@ export const actions = {
     getWpunittree,
     getPurchaseById,
     getOfferInventoryById,
-    getOrgTree_new
+    getOrgTree_new,
+    changePurchaseDetailsVisible,
+    changePurchaseDetailsKey
 };
 export default handleActions({
-    [changeSelectMap]: (state, {payload}) => ({
+    [changePurchaseDetailsVisible]: (state, {payload}) => ({
         ...state,
-        selectMap: payload
+        purchaseDetailsVisible: payload
+    }),
+    [changePurchaseDetailsKey]: (state, {payload}) => ({
+        ...state,
+        purchaseDetailsKey: payload
     })
 }, {});

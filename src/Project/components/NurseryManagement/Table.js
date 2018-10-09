@@ -209,7 +209,7 @@ class Tablelevel extends Component {
                     style={{textAlign: 'center'}}
                     footer={null}
                 >
-                    <img src={FOREST_API + '/' + LeaderCard} width='300' height='200' alt='图片找不到了' />
+                    <img src={FOREST_API + '/' + LeaderCard} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
                 {
                     auditVisible ? <Modal title='审核' visible
@@ -332,7 +332,12 @@ class Tablelevel extends Component {
         e.preventDefault();
         const { deleteNursery } = this.props.actions;
         deleteNursery({ID: record.ID}).then((rep) => {
-            this.onSearch();
+            if (rep.code === 1) {
+                message.success('删除成功');
+                this.onSearch();
+            } else {
+                message.success('删除失败，请确认本机构下无用户');
+            }
         });
     }
     handleStatus (value) {

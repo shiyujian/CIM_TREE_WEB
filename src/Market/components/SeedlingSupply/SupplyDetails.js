@@ -2,14 +2,9 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import { FOREST_API } from '_platform/api';
-import { Form, Button, Input, Select, Tabs, InputNumber, Row, Col } from 'antd';
+import { Form, Button, InputNumber, Row, Col } from 'antd';
 import { searchToObj } from '_platform/auth';
-import './DataList.less';
-import { width } from 'window-size';
-
-const FormItem = Form.Item;
-const Option = Select.Option;
-const TabPane = Tabs.TabPane;
+import './SupplyDetails.less';
 const myButton = {
     height: 22,
     borderRadius: 10,
@@ -57,7 +52,7 @@ class DataList extends Component {
     componentDidMount () {
         const { getProductById, getSpecsById, getInventoryList } = this.props.actions;
         // 根据id获取详细信息
-        this.spuid = searchToObj(this.props.location.search).id;
+        this.spuid = this.props.supplyDetailsKey;
         getProductById({id: this.spuid}).then((rep) => {
             this.NurseryBaseID = rep.NurseryBaseID;
             this.setState({
@@ -133,9 +128,7 @@ class DataList extends Component {
             LeaderPhone, UpdateTime, SKU, standardList, Stock, Price, TreePlace, NurseryName} = this.state;
         return (
             <div className='supply-details' style={{padding: '0 20px'}}>
-                <Link to='/market/seedlingsupply'>
-                    <Button type='primary' style={{marginBottom: 5}}>返 回</Button>
-                </Link>
+                <Button type='primary' onClick={this.toReturn.bind(this)} style={{marginBottom: 5}}>返 回</Button>
                 <div style={{height: 250, padding: 20, border: '1px solid #ccc'}}>
                     <Row gutter={16}>
                         <Col span={5}>
@@ -194,6 +187,9 @@ class DataList extends Component {
                 </div>
             </div>
         );
+    }
+    toReturn () {
+        this.props.actions.changeSupplyDetailsVisible(false);
     }
 }
 

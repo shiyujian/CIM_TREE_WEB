@@ -1,2 +1,0 @@
-
-export DataList from './DataList'

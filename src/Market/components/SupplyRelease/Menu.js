@@ -1,7 +1,6 @@
 
 import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, message } from 'antd';
-import { Link } from 'react-router-dom';
 import { FOREST_API, TREETYPENO } from '_platform/api';
 
 class Menu extends Component {
@@ -10,7 +9,6 @@ class Menu extends Component {
         this.state = {
             TreeTypeName: '' // 类型名称
         };
-        this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
         this.toSoldOut = this.toSoldOut.bind(this); // 下架
     }
     componentDidMount () {
@@ -44,9 +42,7 @@ class Menu extends Component {
                             <p>采购品种：采购品种：采购品种：</p>
                         </Col>
                         <Col span={6} style={{paddingTop: 30}}>
-                            <Link to={`/market/addseedling?key=${record.ID}`}>
-                                <Button type='primary' onClick={this.toEditInfo}>修改信息</Button>
-                            </Link>
+                            <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)}>修改信息</Button>
                             <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>
                         </Col>
                     </Row>
@@ -54,8 +50,8 @@ class Menu extends Component {
             </div>
         );
     }
-    toEditInfo () {
-
+    toEditInfo (key) {
+        this.props.toAddSeedling(key);
     }
     toSoldOut () {
         const { putCommodity } = this.props.actions;

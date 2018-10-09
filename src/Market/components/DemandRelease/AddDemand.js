@@ -3,7 +3,8 @@ import React, {Component} from 'react';
 import moment from 'moment';
 import { Form, Input, Button, Tabs, Select, Table, Cascader, message, Card, DatePicker } from 'antd';
 import { TREETYPENO, CULTIVATIONMODE } from '_platform/api';
-import { searchToObj, getUser } from '_platform/auth';
+import { getUser } from '_platform/auth';
+import './AddDemand.less';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
@@ -11,7 +12,7 @@ const Option = Select.Option;
 const TextArea = Input.TextArea;
 const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY/MM/DD';
-class DataList extends Component {
+class AddDemand extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -164,10 +165,9 @@ class DataList extends Component {
             console.log(this.state.TreeTypeList, '树种');
         });
         // 编辑采购单
-        const { key } = searchToObj(this.props.location.search);
-        this.purchaseid = key;
-        if (key) {
-            getPurchaseById({id: key}).then(rep => {
+        this.purchaseid = this.props.addDemandKey;
+        if (this.purchaseid) {
+            getPurchaseById({id: this.purchaseid}).then(rep => {
                 console.log(rep, '采购单详情');
                 this.setState({
                     purchaseInfo: rep,
@@ -180,7 +180,7 @@ class DataList extends Component {
                 });
                 this.UseNurseryAddress = rep.UseNurseryAddress;
             });
-            getPurchaseStandard({}, {purchaseid: key}).then(rep => {
+            getPurchaseStandard({}, {purchaseid: this.purchaseid}).then(rep => {
                 let arr = [];
                 rep.map(item => {
                     if (!arr.includes(item.TreeTypeID)) {
@@ -196,6 +196,9 @@ class DataList extends Component {
                             row.cardKey = index;
                             arrIndex.push(row);
                         }
+                    });
+                    arrIndex.map((row, number) => {
+                        row.number = number;
                     });
                     dataList.push(arrIndex);
                 });
@@ -217,6 +220,7 @@ class DataList extends Component {
     }
     renderCard () {
         let card = [];
+        console.log(this.state.dataList, '数据');
         this.state.dataList.map((item, index) => {
             let str = '';
             this.treeTypeList.map(row => {
@@ -242,7 +246,8 @@ class DataList extends Component {
         const { purchaseInfo, Contacter, Phone, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime, Describe } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
-            <div className='add-seedling' style={{padding: '0 20px'}}>
+            <div className='addDemand' style={{padding: '0 20px'}}>
+                <Button type='primary' onClick={this.toReturn.bind(this)} style={{marginBottom: 5}}>返 回</Button>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='填写信息' key='1'>
                         <Form layout='inline' onSubmit={this.handleSubmit}>
@@ -316,6 +321,9 @@ class DataList extends Component {
                 </Tabs>
             </div>
         );
+    }
+    toReturn () {
+        this.props.actions.changeAddDemandVisible(false);
     }
     editVersion (str, index, record, e) {
         let { dataList } = this.state;
@@ -574,4 +582,4 @@ class DataList extends Component {
     }
 }
 
-export default Form.create()(DataList);
+export default Form.create()(AddDemand);

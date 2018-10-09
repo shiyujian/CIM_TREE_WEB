@@ -1,10 +1,7 @@
 
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Input, Button, Tabs, Card, Row, Col } from 'antd';
-
-const FormItem = Form.Item;
-const TabPane = Tabs.TabPane;
+import { Form, Button, Card, Row, Col } from 'antd';
 
 class Menu extends Component {
     constructor (props) {
@@ -68,9 +65,7 @@ class Menu extends Component {
                         </Col>
                         <Col span={6} style={{textAlign: 'center'}}>
                             <p style={{marginTop: 22}}>已有 {record.OfferNun} 人报价</p>
-                            <Link to={`/market/purchasedetails?id=${record.ID}`}>
-                                <Button type='primary'>需求详情</Button>
-                            </Link>
+                            <Button type='primary' onClick={this.toPurchaseDetails.bind(this, record.ID)}>需求详情</Button>
                         </Col>
                     </Row>
                 </Card>
@@ -82,6 +77,10 @@ class Menu extends Component {
     }
     handleSubmit () {
 
+    }
+    toPurchaseDetails (key) {
+        this.props.actions.changePurchaseDetailsVisible(true);
+        this.props.actions.changePurchaseDetailsKey(key);
     }
 }
 

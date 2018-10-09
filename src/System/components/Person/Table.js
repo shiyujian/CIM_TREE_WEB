@@ -42,7 +42,10 @@ class Users extends Component {
             objPage: '',
             objPages: '',
             record: null,
-            showModal: false
+            showModal: false,
+            dataList: [], // 表格数据用户
+            page: 1,
+            total: 0
         };
         this.handleAudit = this.handleAudit.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
@@ -58,6 +61,17 @@ class Users extends Component {
         this.setState({ TreeCodes: this.props.getTreeCodes });
         if (this.state.TreeCodes !== this.props.getTreeCodes) {
             this.setState({ roles: [] });
+        }
+        if (nextProps.platform.users) {
+            this.setState({
+                dataList: nextProps.platform.users
+            });
+        }
+        if (nextProps.getTablePages) {
+            this.setState({
+                page: nextProps.getTablePages.current,
+                total: nextProps.getTablePages.total
+            });
         }
     }
     changeRoles (value) {
@@ -238,22 +252,6 @@ class Users extends Component {
             return defaultNurse;
         }
     }
-    sectiontitle (record) {
-        let sectione = [];
-        for (let i = 0; i < PROJECT_UNITS.length; i++) {
-            const item = PROJECT_UNITS[i];
-            for (let j = 0; j < item.units.length; j++) {
-                const element = item.units[j];
-                for (let z = 0; z < record.sections.length; z++) {
-                    const items = record.sections[z];
-                    if (items === element.code) {
-                        sectione.push(element.value);
-                    }
-                }
-            }
-        }
-        return sectione;
-    }
     setColor (record, i) {
         if (record.is_black === 1 || record.is_black === true) {
             return 'background';
@@ -270,127 +268,108 @@ class Users extends Component {
                 node = {}
             } = {}
         } = this.props;
-        const { showModal } = this.state;
+        const { showModal, dataList, page, total } = this.state;
         const systemRoles = roles.filter(role => role.grouptype === 0);
         const projectRoles = roles.filter(role => role.grouptype === 1);
         const professionRoles = roles.filter(role => role.grouptype === 2);
         const departmentRoles = roles.filter(role => role.grouptype === 3);
-
-        const {
-            platform: { users = [] }
-        } = this.props;
         const columns = [
             {
                 title: '序号',
+                key: '0',
                 dataIndex: 'index',
-                render: index => {
+                render: (text, record, index) => {
                     return index + 1;
                 }
             },
             {
                 title: '姓名',
-                dataIndex: 'person_name'
+                key: '1',
+                dataIndex: 'person_name',
+                render: (text, record) => {
+                    return record.account ? record.account.person_name : '';
+                }
             },
             {
                 title: '用户名',
+                key: '2',
                 dataIndex: 'username'
             },
             {
                 title: '性别',
-                dataIndex: 'gender'
+                key: '3',
+                dataIndex: 'gender',
+                render: (text, record) => {
+                    return record.account ? record.account.gender : '';
+                }
             },
             {
                 title: '角色',
                 width: '15%',
-                render: user => {
-                    if (user.roles) {
-                        const {
-                            platform: { roles = [] }
-                        } = this.props;
-                        let add = [];
-                        for (let i = 0; i < user.roles.length; i++) {
-                            for (let j = 0; j < roles.length; j++) {
-                                if (user.roles[i] === roles[j].id) {
-                                    add.push(roles[j].name);
-                                }
-                            }
-                        }
-                        return add.join('、');
-                    } else {
-                        const { groups = [] } = user || {};
-                        const roles = groups.map(group => group.name);
-                        return roles.join('、');
-                    }
+                key: '4',
+                render: (text, record) => {
+                    return record.groups.length > 0 ? record.groups[0].name : '';
                 }
             },
             {
                 title: '职务',
-                dataIndex: 'title'
+                key: '5',
+                dataIndex: 'title',
+                render: (text, record) => {
+                    return record.account ? record.account.title : '';
+                }
             },
             {
                 title: '手机号码',
-                dataIndex: 'person_telephone'
+                key: '6',
+                dataIndex: 'person_telephone',
+                render: (text, record) => {
+                    return record.account ? record.account.person_telephone : '';
+                }
             },
-            // , {
-            // 	title: '邮箱',
-            // 	dataIndex: 'email',
-            // }
             {
                 title: '所属部门',
-                dataIndex: 'organization'
+                key: '7',
+                dataIndex: 'organization',
+                render: (text, record) => {
+                    return record.account ? record.account.organization : '';
+                }
             },
             {
                 title: '标段',
-                // dataIndex: "sections",
-                // key: 'Sections',
-                render: (text, record, index) => {
-                    let sectiones = this.sectiontitle(record);
-                    return sectiones.join();
+                key: '8',
+                render: (text, record) => {
+                    let str = '';
+                    PROJECT_UNITS.map(item => {
+                        item.units.map(row => {
+                            if (record.account && row.code === record.account.sections[0]) {
+                                str = row.value;
+                            }
+                        });
+                    });
+                    return str;
                 }
             },
             {
                 title: '状态',
+                key: '9',
                 dataIndex: 'is_active',
-                key: 'is_active',
-                render: (text, record, index) => {
+                render: text => {
                     return text ? '已审核' : '未审核';
                 }
             },
-            // , {
-            // 	title: '苗圃',
-            // 	// dataIndex: "tags",
-            // 	// key: 'tags',
-            // 	render: (text, record, index) => {
-            // 		let defaultNurse = this.query(record)
-            // 		return defaultNurse.join()
-            // 	}
-            // }
-            // , {
-            // 	title: '电子签章',
-            // 	dataIndex: 'relative_signature_url',
-            // 	render: (sign) => {
-            // 		return <img width={30} src={`${sign}`} alt="" />;
-            // 	}
-            // }, {
-            // 	title: '头像',
-            // 	dataIndex: 'relative_avatar_url',
-            // 	render: (avatar) => {
-            // 		return <img width={20} src={`${avatar}`} alt="" />;
-            // 	}
-            // }
             {
                 title: '操作',
+                key: '10',
                 render: (text, record) => {
                     const {
                         sidebar: {
-                            node: { code } = {},
                             node = {}
                         } = {}
                     } = this.props;
                     const userc = JSON.parse(
                         window.localStorage.getItem('QH_USER_DATA')
                     );
-                    console.log('userc', userc);
                     let editVisible = true;
                     if (userc && userc.username !== 'admin' && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
                         editVisible = false;
@@ -626,9 +605,9 @@ class Users extends Component {
                         bordered
                         rowSelection={this.rowSelection}
                         columns={columns}
-                        dataSource={users}
+                        dataSource={dataList}
                         rowClassName={this.setColor.bind(this)}
-                        pagination={this.props.getTablePages}
+                        pagination={{current: page, total: total}}
                         onChange={this.changePage.bind(this)}
                         loading={{
                             tip: (
@@ -686,21 +665,18 @@ class Users extends Component {
     async changePage (obj) {
         let text = document.getElementById('NurseryData').value;
         const {
-            actions: { getUsers, getTreeModal, getTablePage }
+            actions: { getUsers, getTreeModal }
         } = this.props;
         if (this.props.getIsBtns) {
-            getTreeModal(true);
             getUsers(
                 {},
                 { org_code: this.props.getTreeCodes, page: obj.current }
             ).then(e => {
-                let pagination = {
-                    current: obj.current,
+                this.setState({
+                    objPages: obj.current,
+                    page: obj.current,
                     total: e.count
-                };
-                this.setState({ objPages: obj.current });
-                getTablePage(pagination);
-                getTreeModal(false);
+                });
             });
         } else {
             getTreeModal(true);
@@ -713,13 +689,11 @@ class Users extends Component {
                     page: obj.current
                 }
             ).then(e => {
-                let pagination = {
-                    current: obj.current,
+                this.setState({
+                    objPages: obj.current,
+                    page: obj.current,
                     total: e.count
-                };
-
-                this.setState({ objPage: obj.current });
-                getTablePage(pagination);
+                });
                 getTreeModal(false);
             });
         }
@@ -884,7 +858,7 @@ class Users extends Component {
             this.setState({ loading: true });
             const {
                 sidebar: { node } = {},
-                actions: { deleteUser, getUsers, getTablePage }
+                actions: { deleteUser, getUsers }
             } = this.props;
             const codes = Users.collect(node);
             let actionArr = [];
@@ -892,13 +866,21 @@ class Users extends Component {
                 actionArr.push(deleteUser({ userID: userId }));
             });
             Promise.all(actionArr).then((rst) => {
-                getUsers({}, { org_code: codes, page: 1 }).then((items) => {
-                    let pagination = {
-                        current: 1,
-                        total: items.count
-                    };
-                    getTablePage(pagination);
-                    this.setState({ loading: false, selectedRowKeys: [] });
+                let code = 1;
+                rst.map(item => {
+                    if (!item.code === 1) {
+                        code = 0;
+                    }
+                });
+                if (code === 1) {
+                    message.success('批量删除成功');
+                }
+                getUsers({}, { org_code: codes, page: this.state.page }).then((items) => {
+                    this.setState({
+                        loading: false,
+                        dataList: items.results,
+                        selectedRowKeys: []
+                    });
                 });
             });
         }
@@ -1162,29 +1144,15 @@ class Users extends Component {
     del (user) {
         const {
             sidebar: { node } = {},
-            platform: { users = [] },
-            actions: { deleteUser, getUsers, getTablePage, getForestAllUsersData }
+            actions: { deleteUser, getUsers, getForestAllUsersData }
         } = this.props;
         const codes = Users.collect(node);
-        // 		const usera = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        // console.log("usera",usera)
-        // 		let is_active = false
-        // 		if (usera.is_superuser) {
-
-        // 		}
         let text = document.getElementById('NurseryData').value;
-        let pages;
-        if (users && users.length === 1) {
-            pages = this.props.getTablePages.current - 1;
-        } else {
-            pages = this.props.getTablePages.current;
-        }
         if (user.id) {
-            console.log(
-                'this.props.getTablePages.current',
-                this.props.getTablePages.current
-            );
-            deleteUser({ userID: user.id }).then(as => {
+            deleteUser({ userID: user.id }).then(rep => {
+                if (rep.code === 1) {
+                    message.success('删除用户成功');
+                }
                 getForestAllUsersData().then((userData) => {
                     if (userData && userData.content) {
                         window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
@@ -1196,14 +1164,11 @@ class Users extends Component {
                     }
                 });
                 if (this.props.getIsBtns) {
-                    getUsers({}, { org_code: codes, page: pages }).then(es => {
-                        let pagination = {
-                            current: this.props.getTablePages.current,
-                            total: es.count
-                        };
-                        getTablePage(pagination);
-
-                        this.setState({ loading: false });
+                    getUsers({}, { org_code: codes, page: this.state.page }).then(es => {
+                        this.setState({
+                            loading: false,
+                            dataList: es.results
+                        });
                     });
                 } else {
                     getUsers(
@@ -1215,12 +1180,6 @@ class Users extends Component {
                         }
                     ).then(items => {
                         if (items && items.length === 0) {
-                            let pagination = {
-                                current: 0,
-                                total: 0
-                            };
-                            getTablePage(pagination);
-
                             let currents;
                             if (this.props.getTablePages.current === 0) {
                                 currents = 1;
@@ -1229,15 +1188,16 @@ class Users extends Component {
                             }
                             this.setState({
                                 loading: false,
-                                objPages: currents
+                                objPages: currents,
+                                page: currents,
+                                total: 0
                             });
                         } else {
-                            let pagination = {
-                                current: 1,
+                            this.setState({
+                                loading: false,
+                                page: 1,
                                 total: items.length + 1
-                            };
-                            getTablePage(pagination);
-                            this.setState({ loading: false });
+                            });
                         }
                     });
                 }

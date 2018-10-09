@@ -16,7 +16,8 @@ export const getInventoryList = createFetchAction(`${SEEDLING_API}/good/skus`); 
 export const getSupplierById = createFetchAction(`${FOREST_API}/system/supplier/{{id}}`); // 根据供应商id获取供应商信息
 
 // 修改选择地图的方式
-export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
+export const changeSupplyDetailsVisible = createAction(`${ID}_changeSupplyDetailsVisible`);
+export const changeSupplyDetailsKey = createAction(`${ID}_cchangeSupplyDetailsKey`);
 
 export const actions = {
     getCuring,
@@ -24,11 +25,17 @@ export const actions = {
     getProductById,
     getSpecsById,
     getInventoryList,
-    getSupplierById
+    getSupplierById,
+    changeSupplyDetailsVisible,
+    changeSupplyDetailsKey
 };
 export default handleActions({
-    [changeSelectMap]: (state, {payload}) => ({
+    [changeSupplyDetailsVisible]: (state, {payload}) => ({
         ...state,
-        selectMap: payload
+        supplyDetailsVisible: payload
+    }),
+    [changeSupplyDetailsKey]: (state, {payload}) => ({
+        ...state,
+        supplyDetailsKey: payload
     })
 }, {});

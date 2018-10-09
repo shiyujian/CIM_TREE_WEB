@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/seedlingPurchase';
 import { actions as platformActions } from '_platform/store/global';
-import { DataList } from '../components/SeedlingPurchase';
+import { PurchaseList, PurchaseDetails } from '../components/SeedlingPurchase';
 import {
     Main,
     Body,
@@ -29,15 +29,20 @@ export default class SeedlingPurchase extends Component {
         };
     }
 
-    componentDidMount () {}
-
     render () {
+        const {
+            purchaseDetailsVisible, purchaseDetailsKey
+        } = this.props;
+        console.log(purchaseDetailsVisible, purchaseDetailsKey);
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='苗木求购' {...this.props} />
                     <Content>
-                        <DataList {...this.props} />
+                        <PurchaseList {...this.props} />
+                        {
+                            purchaseDetailsVisible ? <PurchaseDetails {...this.props} /> : ''
+                        }
                     </Content>
                 </Main>
             </Body>

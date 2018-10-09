@@ -2,13 +2,13 @@
 import React, {Component} from 'react';
 import { Form, Input, Button, Tabs, Select } from 'antd';
 import Menu from './Menu';
-import './DataList.less';
+import './PurchaseList.less';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
-class DataList extends Component {
+class PurchaseList extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -34,8 +34,9 @@ class DataList extends Component {
     render () {
         const { dataList, projectList } = this.state;
         const { getFieldDecorator } = this.props.form;
+        let display = this.props.purchaseDetailsVisible ? 'none' : 'block';
         return (
-            <div className='seedling-purchase' style={{padding: '0 20px'}}>
+            <div className='purchaseList' style={{display: display, padding: '0 20px'}}>
                 <Form layout='inline'>
                     <FormItem
                         label='采购编号'
@@ -107,4 +108,4 @@ class DataList extends Component {
     }
 }
 
-export default Form.create()(DataList);
+export default Form.create()(PurchaseList);

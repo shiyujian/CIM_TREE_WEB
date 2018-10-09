@@ -13,11 +13,9 @@ class Menu extends Component {
         this.state = {
             a: 1
         };
-        this.toEditInfo = this.toEditInfo.bind(this); // 提交查询
     }
     render () {
         const { record } = this.props;
-        console.log(record.NurseryBase);
         let TreeTypeName = '';
         let TreePlace = '';
         let NurseryName = '';
@@ -30,30 +28,25 @@ class Menu extends Component {
         }
         return (
             <div className='menu'>
-                <Link to={`/market/supplydetails?id=${record['ID']}`}>
-                    <Card bodyStyle={{ padding: 0 }} bordered={false}>
-                        <div>
-                            <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='100%' height='150' />
-                        </div>
-                        <div style={{padding: '0 10px'}}>
-                            <h3>
-                                {TreeTypeName}（{record.SKU}）
-                                <span style={{float: 'right', fontSize: 12, color: '#888'}}>{UpdateTime}</span>
-                            </h3>
-                            <p>主杆径：2-3厘米</p>
-                            <p>{NurseryName}</p>
-                            <p>
-                                <span style={{color: '#ff5b05', fontSize: 20, fontWeight: 'bold'}}>{record.MinPrice}-{record.MaxPrice}</span>
-                                <span style={{float: 'right'}}>{TreePlace}</span>
-                            </p>
-                        </div>
-                    </Card>
-                </Link>
+                <Card bodyStyle={{ padding: 0 }} bordered={false}>
+                    <div>
+                        <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='100%' height='150' />
+                    </div>
+                    <div style={{padding: '0 10px'}}>
+                        <h3>
+                            {TreeTypeName}（{record.SKU}）
+                            <span style={{float: 'right', fontSize: 12, color: '#888'}}>{UpdateTime}</span>
+                        </h3>
+                        <p>主杆径：2-3厘米</p>
+                        <p>{NurseryName}</p>
+                        <p>
+                            <span style={{color: '#ff5b05', fontSize: 20, fontWeight: 'bold'}}>{record.MinPrice}-{record.MaxPrice}</span>
+                            <span style={{float: 'right'}}>{TreePlace}</span>
+                        </p>
+                    </div>
+                </Card>
             </div>
         );
-    }
-    toEditInfo () {
-
     }
 }
 

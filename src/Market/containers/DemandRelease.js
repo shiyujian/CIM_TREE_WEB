@@ -9,7 +9,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { DataList } from '../components/DemandRelease';
+import { DemandTable, AddDemand } from '../components/DemandRelease';
 @connect(
     state => {
         const { market: { demandRelease = {} }, platform } = state;
@@ -29,18 +29,20 @@ export default class DemandRelease extends Component {
         };
     }
 
-    componentDidMount () {}
-
     render () {
         const {
-            addDemandModalVisible
+            addDemandVisible, addDemandKey
         } = this.props;
+        console.log(addDemandVisible, addDemandKey);
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='需求发布' {...this.props} />
                     <Content>
-                        <DataList {...this.props} />
+                        <DemandTable {...this.props} />
+                        {
+                            addDemandVisible ? <AddDemand {...this.props} /> : ''
+                        }
                     </Content>
                 </Main>
             </Body>

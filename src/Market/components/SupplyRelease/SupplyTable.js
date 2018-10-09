@@ -1,9 +1,7 @@
 
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
 import { Form, Button, Input, Select, Tabs } from 'antd';
 import Menu from './Menu';
-import { Repeat } from 'immutable';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -25,8 +23,9 @@ class DataList extends Component {
     render () {
         const { getFieldDecorator } = this.props.form;
         const { dataList } = this.state;
+        let display = this.props.addSeedlingVisible ? 'none' : 'block';
         return (
-            <div className='supply-release' style={{padding: '0 20px'}}>
+            <div className='supply-release' style={{display: display, padding: '0 20px'}}>
                 <Form layout='inline'>
                     <FormItem
                         label='苗木名称'
@@ -51,15 +50,13 @@ class DataList extends Component {
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>
                     </FormItem>
                 </Form>
-                <Link to='/market/addseedling'>
-                    <Button type='primary'
-                        style={{position: 'absolute', right: 60, zIndex: 100}}>新增供应</Button>
-                </Link>
+                <Button type='primary' onClick={this.toAddSeedling.bind(this)}
+                    style={{position: 'absolute', right: 60, zIndex: 100}}>新增供应</Button>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='全 部' key='1'>
                         {
                             dataList.length > 0 ? dataList.map((item, index) => {
-                                return <Menu record={item} {...this.props} toSearch={this.toSearch} key={index} />;
+                                return <Menu record={item} {...this.props} toSearch={this.toSearch} key={index} toAddSeedling={this.toAddSeedling} />;
                             }) : []
                         }
                     </TabPane>
@@ -85,6 +82,11 @@ class DataList extends Component {
     }
     onClear () {
         this.props.form.resetFields();
+    }
+    toAddSeedling = (key) => {
+        const { changeAddSeedlingVisible, changeAddSeedlingKey } = this.props.actions;
+        changeAddSeedlingVisible(true);
+        changeAddSeedlingKey(key);
     }
 }
 

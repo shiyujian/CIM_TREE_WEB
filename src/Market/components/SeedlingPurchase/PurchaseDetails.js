@@ -4,13 +4,12 @@ import { Link } from 'react-router-dom';
 import { Form, Button, Card, Row, Col, Table, Input } from 'antd';
 import { searchToObj } from '../common';
 import { CULTIVATIONMODE } from '_platform/api';
-import './DataList.less';
+import './PurchaseDetails.less';
 
-class DataList extends Component {
+class PurchaseDetails extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            a: 1,
             purchaseInfo: null,
             ProjectName: '', // 项目名称
             Section: '', // 标段
@@ -25,10 +24,11 @@ class DataList extends Component {
             organizationName: '' // 组织机构名称
         };
         this.purchaseid = ''; // 采购单ID
+        this.toOffer = this.toOffer.bind(this); // 我要报价
     }
     componentDidMount () {
         const { getPurchaseById, getWpunittree, getOfferInventoryById, getOrgTree_new } = this.props.actions;
-        this.purchaseid = searchToObj(this.props.location.search).id;
+        this.purchaseid = this.props.purchaseDetailsKey;
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
             let arr = [];
@@ -69,25 +69,30 @@ class DataList extends Component {
         });
         // 根据id获取采购报价清单
         getOfferInventoryById({}, {purchaseid: this.purchaseid}).then(rep => {
-
+            this.setState({
+                dataList: [{
+                    Price: rep.Price,
+                    Describe: rep.Describe
+                }]
+            });
         });
     }
     columns = [
         {
             title: '到货总价',
             key: '1',
-            dataIndex: '可供数量',
-            render: text => <Input />
+            dataIndex: 'Price',
+            render: text => <Input style={{width: 150}} />
         }, {
             title: '报价说明',
-            key: '4',
-            dataIndex: '可供数量',
-            render: text => <Input />
+            key: '2',
+            dataIndex: 'Describe',
+            render: text => <Input style={{width: 200}} />
         }, {
             title: '操作',
-            key: '6',
+            key: '3',
             dataIndex: 'action',
-            render: (text, record) => <Button>提交</Button>
+            render: (text, record) => <a onClick={this.toRelease.bind(this, record)}>报 价</a>
         }
     ];
     render () {
@@ -102,10 +107,8 @@ class DataList extends Component {
             }
         });
         return (
-            <div className='data-list' style={{padding: '0 20px'}}>
-                <Link to='/market/seedlingpurchase'>
-                    <Button type='primary' style={{marginBottom: 5}}>返 回</Button>
-                </Link>
+            <div className='purchaseDetails' style={{padding: '0 20px'}}>
+                <Button type='primary' style={{marginBottom: 5}} onClick={this.toReturn.bind(this)}>返 回</Button>
                 <Card>
                     <Row>
                         <Col span={16}>
@@ -130,7 +133,7 @@ class DataList extends Component {
                                     <header>
                                         <span>柏树</span>
                                         <span style={{marginLeft: 20}}>胸径{item.DBH};地经{item.GroundDiameter};自然高{item.Height};冠幅{item.CrownWidth};培育方式：{item.name};{item.Num}棵</span>
-                                        <Button type='primary' style={{marginLeft: 20}}>我要报价</Button>
+                                        <Button type='primary' style={{marginLeft: 20}} onClick={this.toOffer}>我要报价</Button>
                                         <span style={{marginLeft: 20}}>已有5人报价</span>
                                     </header>
                                     <Table columns={this.columns} dataSource={dataList} />
@@ -142,6 +145,21 @@ class DataList extends Component {
             </div>
         );
     }
+    toOffer () {
+        const { dataList } = this.state;
+        dataList.push({
+
+        });
+        this.setState({
+            dataList
+        });
+    }
+    toRelease (record, e) {
+        e.preventDefault();
+    }
+    toReturn () {
+        this.props.actions.changePurchaseDetailsVisible(false);
+    }
 }
 
-export default Form.create()(DataList);
+export default Form.create()(PurchaseDetails);

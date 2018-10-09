@@ -1,12 +1,10 @@
 
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
-import { Form, Button, Input, Select, Tabs, Row, Col } from 'antd';
+import { Form, Button, Input, Tabs, Row, Col } from 'antd';
 import Menu from './Menu';
-import './DataList.less';
+import './SupplyList.less';
 
 const FormItem = Form.Item;
-const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 
 class DataList extends Component {
@@ -26,9 +24,11 @@ class DataList extends Component {
         this.onSearch();
     }
     render () {
-        const { page, total, dataList, treetypename } = this.state;
+        const { dataList, treetypename } = this.state;
+        let display = this.props.supplyDetailsVisible ? 'none' : 'block';
+        console.log(display);
         return (
-            <div className='seedling-supply' style={{padding: '0 20px'}}>
+            <div className='seedling-supply' style={{display: display, padding: '0 20px'}}>
                 <Form layout='inline'>
                     <FormItem
                         label='苗木名称'
@@ -48,7 +48,7 @@ class DataList extends Component {
                             {
                                 dataList.length > 0 ? dataList.map((item, index) => {
                                     return (
-                                        <Col span='6' key={index}>
+                                        <Col span='6' key={index} onClick={this.toSupplyDetails.bind(this, item.ID)}>
                                             <Menu record={item} />
                                         </Col>
                                     );
@@ -59,6 +59,10 @@ class DataList extends Component {
                 </Tabs>
             </div>
         );
+    }
+    toSupplyDetails (key) {
+        this.props.actions.changeSupplyDetailsVisible(true);
+        this.props.actions.changeSupplyDetailsKey(key);
     }
     onSearch () {
         const { getProductList } = this.props.actions;

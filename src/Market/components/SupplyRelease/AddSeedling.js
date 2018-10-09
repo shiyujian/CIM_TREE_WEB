@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import { Form, Input, Button, Tabs, Select, Table, Upload, Row, Col, Icon, Modal, Cascader, message } from 'antd';
 import { TREETYPENO, FOREST_API, CULTIVATIONMODE } from '_platform/api';
 import { searchToObj, getUser } from '_platform/auth';
-import './DataList.less';
+import './AddSeedling.less';
 
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
@@ -25,7 +25,7 @@ const myIcon = {
     fontSize: 28,
     color: '#999'
 };
-class DataList extends Component {
+class AddSeedling extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -132,11 +132,10 @@ class DataList extends Component {
             });
         });
         // 编辑商品
-        const { key } = searchToObj(this.props.location.search);
-        this.spuid = key;
-        if (key) {
+        this.spuid = this.props.addSeedlingKey;
+        if (this.spuid) {
             // 根据id获取商品详细
-            getProductById({id: key}).then(rep => {
+            getProductById({id: this.spuid}).then(rep => {
                 this.TreeTypeName = rep.TreeTypeName;
                 this.setState({
                     productInfo: rep,
@@ -286,7 +285,8 @@ class DataList extends Component {
             }
         };
         return (
-            <div className='add-seedling' style={{padding: '0 20px'}}>
+            <div className='addSeedling' style={{padding: '0 20px'}}>
+                <Button type='primary' onClick={this.toReturn.bind(this)} style={{marginBottom: 5}}>返 回</Button>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
                     <TabPane tab='填写信息' key='1'>
                         <Form layout='inline' onSubmit={this.handleSubmit}>
@@ -310,12 +310,12 @@ class DataList extends Component {
                             </FormItem>
                             <FormItem label='联系人'>
                                 {getFieldDecorator('Leader')(
-                                    <Input disabled />
+                                    <Input disabled style={{width: 150}} />
                                 )}
                             </FormItem>
                             <FormItem label='联系电话'>
                                 {getFieldDecorator('LeaderPhone')(
-                                    <Input disabled />
+                                    <Input disabled style={{width: 150}} />
                                 )}
                             </FormItem>
                             <FormItem label='供应商' style={{display: 'block'}}>
@@ -397,6 +397,9 @@ class DataList extends Component {
                 </Tabs>
             </div>
         );
+    }
+    toReturn () {
+        this.props.actions.changeAddSeedlingVisible(false);
     }
     addVersion () {
         let { dataList, SupplierID, number } = this.state;
@@ -546,4 +549,4 @@ class DataList extends Component {
     }
 }
 
-export default Form.create()(DataList);
+export default Form.create()(AddSeedling);

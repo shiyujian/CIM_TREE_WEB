@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/seedlingSupply';
 import { actions as platformActions } from '_platform/store/global';
-import { DataList } from '../components/SeedlingSupply';
+import { SupplyList, SupplyDetails } from '../components/SeedlingSupply';
 import {
     Main,
     Body,
@@ -29,15 +29,20 @@ export default class SeedlingSupply extends Component {
         };
     }
 
-    componentDidMount () {}
-
     render () {
+        const {
+            supplyDetailsVisible, supplyDetailsKey
+        } = this.props;
+        console.log(supplyDetailsVisible, supplyDetailsKey);
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='苗木供应' {...this.props} />
                     <Content>
-                        <DataList {...this.props} />
+                        <SupplyList {...this.props} />
+                        {
+                            supplyDetailsVisible ? <SupplyDetails {...this.props} /> : ''
+                        }
                     </Content>
                 </Main>
             </Body>

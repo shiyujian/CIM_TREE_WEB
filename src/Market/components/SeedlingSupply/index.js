@@ -1,3 +1,4 @@
 
-export DataList from './DataList'
+export SupplyList from './SupplyList';
+export SupplyDetails from './SupplyDetails';
 
