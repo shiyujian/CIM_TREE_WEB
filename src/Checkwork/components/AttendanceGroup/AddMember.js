@@ -158,11 +158,12 @@ export default class AddMember extends Component {
         let RelationMem = [];
         if (checkGroupMans && checkGroupMans instanceof Array && checkGroupMans.length > 0) {
             checkGroupMans.map((man) => {
-                totalUserData.map((userData) => {
-                    if (Number(userData.ID) === man.id) {
-                        RelationMem.push(Number(userData.PK));
-                    }
-                });
+                // totalUserData.map((userData) => {
+                //     if (Number(userData.ID) === man.id) {
+                //         RelationMem.push(Number(userData.PK));
+                //     }
+                // });
+                RelationMem.push(Number(man.id));
             });
         }
         this.setState({

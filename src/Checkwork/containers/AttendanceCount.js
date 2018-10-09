@@ -78,7 +78,7 @@ export default class AttendanceCount extends Component {
 
     render () {
         return (
-            <div style={{overflow:'hidden', padding:'0 20px'}}>
+            <div style={{overflow:'hidden', padding:'0 20px',marginLeft:'160px',marginTop:'20px'}}>
                 <CountFilter {...this.props} {...this.state} query={this.query.bind(this)}/>
                 <Spin spinning={this.state.loading} tip='数据加载中，请稍等...'>
                     <CountTable {...this.props} {...this.state} /> 

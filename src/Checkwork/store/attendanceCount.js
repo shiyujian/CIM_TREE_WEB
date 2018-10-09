@@ -12,10 +12,14 @@ export const ID = 'Checkwork_attendancecount';
 export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 
 // 考勤列表
-export const getCheckRecord = createFetchAction(`${base}/main/api/check-record/list/?{{params}}`, [], 'GET')
+export const getCheckRecord = createFetchAction(`${base}/main/api/check-record/list/?{{params}}`, [], 'GET');
+
+//获取考勤群体
+export const getCheckGroup = createFetchAction(`${base}/main/api/check-group/`, [], 'GET');
 
 export const actions = {
-    getCheckRecord
+    getCheckRecord,
+    getCheckGroup
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({

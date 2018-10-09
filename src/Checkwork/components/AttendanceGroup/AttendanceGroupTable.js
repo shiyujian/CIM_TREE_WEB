@@ -81,16 +81,16 @@ export default class AttendanceGroupTable extends Component {
         const {
             totalUserData = []
         } = this.state;
-        debugger
         let dataSource = [];
         if (checkGroupMans && checkGroupMans instanceof Array && checkGroupMans.length > 0) {
-            checkGroupMans.map((man) => {
-                totalUserData.map((userData) => {
-                    if (Number(userData.ID) === man.id) {
-                        dataSource.push(userData);
-                    }
-                });
-            });
+            //checkGroupMans.map((man) => {
+                // totalUserData.map((userData) => {
+                //     if (Number(userData.ID) === man.id) {
+                //         dataSource.push(userData);
+                //     }
+                // });
+            //});
+            dataSource = checkGroupMans;
         }
         console.log('dataSource', dataSource);
         return dataSource;
@@ -114,23 +114,23 @@ export default class AttendanceGroupTable extends Component {
         },
         {
             title: '部门',
-            dataIndex: 'Det'
+            dataIndex: 'account.organization'
         },
         {
             title: '姓名',
-            dataIndex: 'Full_Name'
+            dataIndex: 'account.person_name'
         },
         {
             title: '账号',
-            dataIndex: 'User_Name'
+            dataIndex: 'username'
         },
         {
             title: '角色',
-            dataIndex: 'Roles'
+            dataIndex: 'account.title'
         },
         {
             title: '职务',
-            dataIndex: 'Duty'
+            dataIndex: ''
         }
        
     ];

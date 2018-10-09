@@ -9,13 +9,14 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-01 16:58:31
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-18 10:56:17
+ * @Last Modified time: 2018-09-30 15:46:22
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Main, Aside, Body } from '_platform/components/layout';
+import { Main, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
+import Aside from './components/Aside';
 
 export default class CheckworkContainer extends Component {
     async componentDidMount () {

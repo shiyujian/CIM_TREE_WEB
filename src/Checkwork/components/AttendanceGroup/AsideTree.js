@@ -297,9 +297,10 @@ class AsideTree extends Component {
             if (!err) {
                 let name = values.name;
                 let desc = values.desc;
-                let keyArr = this.state.selectKey.split('^^');
-                let section = keyArr[1];
-                let project_code = keyArr[1].substr(0,4);
+                let keyArr = this.user.sections;
+                keyArr = keyArr.replace(/\[|]/g,'').replace(/\"/g,'');
+                let section = keyArr;
+                let project_code = keyArr.substr(0,4);
                 let postData = {
                     name: name,
                     section: this.section!=''?this.section:section,
@@ -384,6 +385,7 @@ class AsideTree extends Component {
                 changeSelectState,
                 getCheckGroupMans,
                 changeCheckGroup,
+                getCheckGroupMansOk,
             }
         } = this.props;
         const {
@@ -420,6 +422,7 @@ class AsideTree extends Component {
                     id: keyArr[0]
                 };
                 let data = await getCheckGroupMans(postData);
+                await getCheckGroupMansOk(data);
                 console.log('data', data);
             }
         } catch (e) {
