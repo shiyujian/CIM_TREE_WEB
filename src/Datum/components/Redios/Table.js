@@ -15,9 +15,9 @@ export default class GeneralTable extends Component {
     }
 
     componentDidUpdate (prevProps, prevState) {
-        const { searchrediovisible, searchredio, Doc = [] } = this.props;
+        const { searchRedioVisible, searchredio, Doc = [] } = this.props;
         if (
-            searchrediovisible &&
+            searchRedioVisible &&
             (searchredio !== prevProps.searchredio || Doc !== prevProps.Doc) &&
             Doc.length > 0
         ) {
@@ -52,16 +52,16 @@ export default class GeneralTable extends Component {
             filterData: arr
         });
 
-        // searchRedioVisible(false)
+        // getSearchRedioVisible(false)
     }
 
     render () {
-        const { Doc = [], searchrediovisible } = this.props;
+        const { Doc = [], searchRedioVisible } = this.props;
         const { filterData = [] } = this.state;
 
         // 数据是要搜索后的  还是   所有数据
         let dataSource = Doc;
-        if (searchrediovisible) {
+        if (searchRedioVisible) {
             dataSource = filterData;
         }
         // 根据登陆账号是否关联标段来筛选数据，只能查看自己项目的

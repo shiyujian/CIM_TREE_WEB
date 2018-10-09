@@ -40,7 +40,7 @@ export const getTree = createFetchAction(
 );
 
 export const searchRedioMessage = createAction(`${ID}获取影像资料搜索信息`);
-export const searchRedioVisible = createAction(`${ID}是否搜索影像资料`);
+export const getSearchRedioVisible = createAction(`${ID}是否搜索影像资料`);
 
 export const actions = {
     getdocumentOK,
@@ -58,7 +58,7 @@ export const actions = {
     getTreeOK,
     getTree,
     searchRedioMessage,
-    searchRedioVisible,
+    getSearchRedioVisible,
     ...documentReducer,
     ...additionReducer,
     ...visibleReducer,
@@ -125,9 +125,9 @@ export default handleActions(
             ...state,
             searchredio: payload
         }),
-        [searchRedioVisible]: (state, { payload }) => ({
+        [getSearchRedioVisible]: (state, { payload }) => ({
             ...state,
-            searchrediovisible: payload
+            searchRedioVisible: payload
         })
     },
     {}

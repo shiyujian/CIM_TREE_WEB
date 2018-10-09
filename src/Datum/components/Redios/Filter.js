@@ -87,7 +87,7 @@ class Filter extends Component {
                 </Row>
                 <Row gutter={24}>
                     <Col span={24}>
-                        {!this.props.parent ? (
+                        {!this.props.isTreeSelected ? (
                             <Button style={{ marginRight: 10 }} disabled>
                                 新增
                             </Button>
@@ -100,13 +100,6 @@ class Filter extends Component {
                                 新增
                             </Button>
                         )}
-                        {/* </Col> */}
-                        {/* <Col span ={2}> */}
-                        {/* (Doc.length === 0 )?
-								<Button style={{marginRight: 10}} disabled>下载文件</Button>:
-								<Button style={{marginRight: 10}} type="primary" onClick={this.download.bind(this)}>下载文件</Button> */}
-                        {/* </Col> */}
-                        {/* <Col span ={2}> */}
                         {Doc.length === 0 ? (
                             <Button
                                 style={{ marginRight: 10 }}
@@ -119,14 +112,12 @@ class Filter extends Component {
                             <Popconfirm
                                 title='确定要删除文件吗？'
                                 onConfirm={this.confirm.bind(this)}
-                                onCancel={this.cancel.bind(this)}
                                 okText='Yes'
                                 cancelText='No'
                             >
                                 <Button
                                     style={{ marginRight: 10 }}
                                     type='danger'
-                                    onClick={this.delete.bind(this)}
                                 >
                                     删除
                                 </Button>
@@ -142,22 +133,14 @@ class Filter extends Component {
         const {
             actions: {
                 toggleAddition
-            },
-            currentSection,
-            currentSectionName,
-            projectName
+            }
         } = this.props;
-
-        if (currentSection === '' && currentSectionName === '' && projectName === '') {
-            message.error('该用户未关联标段，不能添加文档');
-            return;
-        }
         toggleAddition(true);
     }
 
     query () {
         const {
-            actions: { searchRedioMessage, searchRedioVisible },
+            actions: { searchRedioMessage, getSearchRedioVisible },
             form: { validateFields }
         } = this.props;
         validateFields((err, values) => {
@@ -179,17 +162,8 @@ class Filter extends Component {
 
             let postData = Object.assign({}, search);
             searchRedioMessage(postData);
-            searchRedioVisible(true);
+            getSearchRedioVisible(true);
         });
-
-        // validateFields((err, values) => {
-        // 	let search = {}
-        // 	search = {
-        // 		doc_name: values.searchname
-        // 	};
-
-        // 	getdocument({ code: currentcode.code }, search);
-        // })
     }
     clear () {
         const {
@@ -201,10 +175,7 @@ class Filter extends Component {
         });
         searchRedioMessage({});
     }
-    cancel () {}
 
-    delete () {
-    }
     confirm () {
         const {
             coded = [],
@@ -232,40 +203,6 @@ class Filter extends Component {
                 message.error('删除失败！');
                 getdocument({ code: currentcode.code }).then(() => {});
             });
-    }
-    createLink = (name, url) => {
-        // 下载
-        let link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', this);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    download () {
-        const {
-            selected = [],
-            file = [],
-            files = []
-        } = this.props;
-        if (selected.length === 0) {
-            message.warning('没有选择无法下载');
-        }
-        selected.map(rst => {
-            file.push(rst.basic_params.files);
-        });
-        file.map(value => {
-            value.map(cot => {
-                files.push(cot.download_url);
-            });
-        });
-        files.map(down => {
-            let download =
-                STATIC_DOWNLOAD_API + '/media' + down.split('/media')[1];
-            this.createLink(this, download);
-        });
     }
 }
 export default Form.create()(Filter);

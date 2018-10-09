@@ -62,6 +62,8 @@ export default class Redios extends Component {
             currentSection: '',
             currentSectionName: ''
         };
+        this.orgCode = '';
+        this.user = '';
     }
 
     render () {
@@ -89,19 +91,37 @@ export default class Redios extends Component {
             </Body>
         );
     }
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
-            actions: { getTree, searchRedioVisible }
+            actions: {
+                getTree,
+                getSearchRedioVisible,
+                getOrgParent,
+                setkeycode
+            }
         } = this.props;
-        this.setState({ loading: true });
-        searchRedioVisible(false);
-        getTree({ code: Datumcode }).then(({ children }) => {
+        try {
+            this.getSection();
+            this.setState({ loading: true });
+            this.user = localStorage.getItem('QH_USER_DATA');
+            this.user = JSON.parse(this.user);
+            console.log('this.user', this.user);
+            if (this.user.username !== 'admin') {
+                let orgCode = this.user.account.org_code;
+                let orgData = await getOrgParent({code: orgCode});
+                let parent = orgData && orgData.parent;
+                console.log('orgData', orgData);
+                console.log('parent', parent);
+                this.orgCode = parent.code;
+                console.log('this.orgCode', this.orgCode);
+            }
+            await setkeycode('');
+            await getSearchRedioVisible(false);
+            await getTree({ code: Datumcode });
             this.setState({ loading: false });
-        });
-        if (this.props.Doc) {
-            this.setState({ isTreeSelected: true });
+        } catch (e) {
+            console.log('e', e);
         }
-        this.getSection();
     }
 
     // 获取当前登陆用户的标段
@@ -138,31 +158,34 @@ export default class Redios extends Component {
         }
     }
 
-    onSelect (value = [], e) {
-        const [code] = value;
+    onSelect (keys = [], e) {
+        let [value] = keys;
         const {
             actions: {
                 getdocument,
                 setcurrentcode,
                 setkeycode,
-                searchRedioVisible
+                getSearchRedioVisible
             }
         } = this.props;
-
-        searchRedioVisible(false);
-        setkeycode(code);
-        if (code === undefined) {
-            return;
+        console.log('keys', keys);
+        console.log('e', e);
+        if (e.selected) {
+            let folder = JSON.parse(value);
+            console.log('folder', folder);
+            let org_code = folder.extra_params.orgCode;
+            let code = folder.code;
+            if ((this.user && this.user.username === 'admin') || this.orgCode === org_code) {
+                getSearchRedioVisible(false);
+                setkeycode(value);
+                this.doc_type = e.node.props.title;
+                this.setState({
+                    isTreeSelected: e.selected,
+                    selectDoc: e.node.props.title
+                });
+                setcurrentcode({ code: code });
+                getdocument({ code: code });
+            }
         }
-
-        let parent = code.split('--')[3];
-        this.doc_type = e.node.props.title;
-        this.setState({
-            isTreeSelected: e.selected,
-            parent: parent,
-            selectDoc: e.node.props.title
-        });
-        setcurrentcode({ code: code.split('--')[1] });
-        getdocument({ code: code.split('--')[1] });
     }
 }
