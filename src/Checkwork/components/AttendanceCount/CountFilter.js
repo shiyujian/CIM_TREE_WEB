@@ -30,6 +30,8 @@ class CountFilter extends Component {
             sectionArray: [],
             projectArray: [],
             groupArray: [],
+            start:'',
+            end:'',
         };
     }
 
@@ -133,7 +135,6 @@ class CountFilter extends Component {
         const {
             platform: { roles = [] }
         } = this.props;
-        debugger
         var systemRoles = [];
         if (user.is_superuser) {
             systemRoles.push({
@@ -370,6 +371,13 @@ class CountFilter extends Component {
         return objs;
     }
 
+    changeFormDate (value, results) {
+        this.setState({
+            start:results[0],
+            end:results[1]
+        })
+    }
+
     render () {
         const {
             form: { getFieldDecorator }
@@ -428,6 +436,9 @@ class CountFilter extends Component {
                     
                                     })(
                                         <RangePicker
+                                            onChange={this.changeFormDate.bind(
+                                                this
+                                            )}
                                             size='default'
                                             format='YYYY-MM-DD'
                                             style={{
@@ -575,7 +586,10 @@ class CountFilter extends Component {
             params['project_code'] = values.project_code;
             params['section'] = values.section;
             params['name'] = values.name;
-            params['searchDate'] = values.searchDate;
+            if(values.searchDate){
+                params['start'] = this.state.start;
+                params['end'] = this.state.end;
+            }
             params['chuqin'] = values.chuqin;
             params['status'] = values.status;
             params['group'] = values.group;
