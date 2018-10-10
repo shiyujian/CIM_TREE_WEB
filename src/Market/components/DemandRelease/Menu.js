@@ -10,23 +10,23 @@ class Menu extends Component {
         };
         this.toSoldOut = this.toSoldOut.bind(this); // 需求详情
     }
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.record) {
-            let StartTime = nextProps.record['StartTime'].split(' ')[0];
-            let EndTime = nextProps.record['EndTime'].split(' ')[0];
+    componentDidMount () {
+        if (this.props.record) {
+            let StartTime = this.props.record['StartTime'].split(' ')[0];
+            let EndTime = this.props.record['EndTime'].split(' ')[0];
             this.setState({
                 StartTime,
                 EndTime
             });
         }
-        if (nextProps.projectList && nextProps.record) {
-            nextProps.projectList.map(item => {
-                if (item.No === nextProps.record.ProjectName) {
+        if (this.props.projectList && this.props.record) {
+            this.props.projectList.map(item => {
+                if (item.No === this.props.record.ProjectName) {
                     this.setState({
                         ProjectName: item.Name
                     });
                 }
-                if (item.No === nextProps.record.Section) {
+                if (item.No === this.props.record.Section) {
                     this.setState({
                         Section: item.Name
                     });
@@ -54,7 +54,9 @@ class Menu extends Component {
                         <Col span={8} style={{paddingTop: 40}}>
                             <Button onClick={this.toEditInfo}>查看报价</Button>
                             <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)} style={{marginLeft: 15}}>编辑需求</Button>
-                            <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>
+                            <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>
+                                {record.Status === 1 ? '下架' : '上架'}
+                            </Button>
                         </Col>
                     </Row>
                 </Card>
@@ -68,10 +70,14 @@ class Menu extends Component {
         const { changeStatus } = this.props.actions;
         changeStatus({}, {
             id: this.props.record.ID,
-            status: 3
+            status: this.props.record.Status === 1 ? 0 : 1
         }).then(rep => {
-            message.success('下架成功');
-            this.props.toSearch();
+            if (rep.code === 1) {
+                message.success('上下架成功');
+                this.props.toSearch();
+            } else {
+                message.success('上下架失败');
+            }
         });
     }
 }

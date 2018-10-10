@@ -55,7 +55,9 @@ class PurchaseList extends Component {
                     <FormItem
                         label='状态'
                     >
-                        {getFieldDecorator('status')(
+                        {getFieldDecorator('status', {
+                            initialValue: 1
+                        })(
                             <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
                                 <Option value={0}>未发布</Option>
                                 <Option value={1}>报价中</Option>
@@ -88,7 +90,7 @@ class PurchaseList extends Component {
         getPurchaseList({}, {
             purchaseno: formVal.purchaseno || '',
             projectname: formVal.projectname || '',
-            status: formVal.status || 0,
+            status: formVal.status === undefined ? '' : formVal.status,
             page
         }).then(rep => {
             if (rep.code === 200) {
