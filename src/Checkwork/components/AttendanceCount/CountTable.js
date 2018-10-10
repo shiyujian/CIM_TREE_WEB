@@ -84,8 +84,8 @@ export default class CountTable extends Component {
         },
         {
             title: '出勤情况',
-            dataIndex: 'extra_params.qinkuang',
-            key: 'extra_params.qinkuang'
+            dataIndex: 'extra_params.checkin',
+            key: 'extra_params.checkin'
         },
         {
             title: '状态',
