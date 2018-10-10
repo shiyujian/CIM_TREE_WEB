@@ -53,14 +53,8 @@ class Tablelevel extends Component {
         });
         // 获取所有供应商
         getSupplierList().then(rep => {
-            let optionList = [];
-            rep.content.map(item => {
-                optionList.push(
-                    <Option key={item.ID} value={item.ID}>{item.SupplierName}</Option>
-                );
-            });
             this.setState({
-                optionList: optionList
+                optionList: rep.content
             });
         });
         this.onSearch();
@@ -302,6 +296,7 @@ class Tablelevel extends Component {
             checkNursery({}, param).then((rep) => {
                 if (rep.code === 1) {
                     message.success('审核成功');
+                    this.onSearch();
                     this.handleCancel();
                 }
             });

@@ -88,7 +88,7 @@ class PurchaseList extends Component {
         getPurchaseList({}, {
             purchaseno: formVal.purchaseno || '',
             projectname: formVal.projectname || '',
-            status: formVal.status || 0,
+            status: formVal.status === undefined ? '' : formVal.status,
             page
         }).then(rep => {
             if (rep.code === 200) {

@@ -166,7 +166,7 @@ class AddDemand extends Component {
         });
         // 编辑采购单
         this.purchaseid = this.props.addDemandKey;
-        if (this.purchaseid) {
+        if (typeof this.purchaseid === 'string') {
             getPurchaseById({id: this.purchaseid}).then(rep => {
                 console.log(rep, '采购单详情');
                 this.setState({
@@ -210,7 +210,6 @@ class AddDemand extends Component {
         }
         // 获取施工方的责任人电话
         const { id, org_code, phone, name } = getUser();
-        console.log(getUser());
         this.Creater = id;
         this.CreaterOrg = org_code;
         this.setState({
@@ -290,10 +289,10 @@ class AddDemand extends Component {
                                 )}
                             </FormItem>
                             <FormItem label='联系人'>
-                                <Input disabled value={Contacter} />
+                                <Input value={Contacter} />
                             </FormItem>
                             <FormItem label='联系电话'>
-                                <Input disabled value={Phone} />
+                                <Input value={Phone} />
                             </FormItem>
                             <FormItem label='报价起止日期'>
                                 <RangePicker value={
@@ -312,8 +311,8 @@ class AddDemand extends Component {
                             <FormItem style={{width: 800, textAlign: 'center'}}>
                                 <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
                                 {
-                                    purchaseInfo ? <Button type='primary' onClick={this.toRelease.bind(this, 1)}>编辑</Button>
-                                        : <Button type='primary' onClick={this.toRelease.bind(this, 1)}>发布</Button>
+                                    purchaseInfo ? <Button type='primary' onClick={this.toCheck.bind(this)}>编辑</Button>
+                                        : <Button type='primary' onClick={this.toCheck.bind(this)}>发布</Button>
                                 }
                             </FormItem>
                         </Form>
@@ -377,6 +376,22 @@ class AddDemand extends Component {
                 }
             });
         }
+    }
+    toCheck () {
+        const { ProjectName, Section, RegionCode, Contacter, Phone } = this.state;
+        if (ProjectName === '' && Section === '') {
+            message.error('请先选择项目和标段');
+            return;
+        }
+        if (RegionCode === '') {
+            message.error('请先选择用苗地');
+            return;
+        }
+        if (Contacter === '' && Phone === '') {
+            message.error('请先完成照片上传');
+            return;
+        }
+        this.toRelease(1);
     }
     toRelease (Status) {
         const { purchaseInfo, Contacter, Phone, RegionCode, StartTime, EndTime, dataList, ProjectName, Section, Describe } = this.state;

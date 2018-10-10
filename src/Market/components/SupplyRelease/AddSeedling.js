@@ -1,8 +1,8 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs, Select, Table, Upload, Row, Col, Icon, Modal, Cascader, message } from 'antd';
+import { Form, Input, Button, Tabs, Select, Table, Upload, Row, Col, Icon, message } from 'antd';
 import { TREETYPENO, FOREST_API, CULTIVATIONMODE } from '_platform/api';
-import { searchToObj, getUser } from '_platform/auth';
+import { getUser } from '_platform/auth';
 import './AddSeedling.less';
 
 const FormItem = Form.Item;
@@ -29,17 +29,17 @@ class AddSeedling extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            isAmend: false, // 是否修改
             productInfo: null,
             showModal: false,
             SupplierList: [], // 供应商列表
-            SupplierID: '',
+            SupplierID: [],
             supplier: '', // 选择的供应商
             Photo: '', // 全株照片
             LocalPhoto: '', // 局部特写照片
             MostPhoto: '', // 成片栽植照片
             OtherPhoto: '', // 其他照片
             dataList: [], // 表格数据
-            number: 0, // 表格条数
             treeTypeList: [], // 树种
             TreeTypeNo: '', // 树木类型
             TreeTypeID: '' // 树种ID
@@ -117,7 +117,6 @@ class AddSeedling extends Component {
             render: (text, record, index) => {
                 return (<span>
                     <a onClick={this.toEdit.bind(this, record, index)}>保存</a>
-                    {/* <a onClick={this.onDelete.bind(this, record, index)}>删除</a> */}
                 </span>);
             }
         }];
@@ -133,11 +132,12 @@ class AddSeedling extends Component {
         });
         // 编辑商品
         this.spuid = this.props.addSeedlingKey;
-        if (this.spuid) {
+        if (typeof this.spuid === 'string') {
             // 根据id获取商品详细
             getProductById({id: this.spuid}).then(rep => {
                 this.TreeTypeName = rep.TreeTypeName;
                 this.setState({
+                    isAmend: true,
                     productInfo: rep,
                     TreeTypeNo: rep.TreeTypeNo.slice(0, 1),
                     TreeTypeID: rep.TreeTypeID,
@@ -154,26 +154,34 @@ class AddSeedling extends Component {
             }).then(rep => {
                 if (rep.code === 200 && rep.content.length > 0) {
                     let dataList = [];
+                    let SupplierID = [];
+                    rep.content.map(item => {
+                        if (!SupplierID.includes(item.SupplierID)) {
+                            SupplierID.push(item.SupplierID);
+                        }
+                    });
+                    let number = 0;
                     rep.content.map((item, index) => {
-                        this.dataListLength += 1;
-                        dataList.push({
-                            number: index,
-                            ID: item.ID,
-                            TreeTypeID: item.TreeTypeID,
-                            Stock: item.Stock,
-                            DBH: item.DBH,
-                            Price: item.Price,
-                            Height: item.Height,
-                            CrownWidth: item.CrownWidth,
-                            GroundDiameter: item.GroundDiameter,
-                            SupplierID: item.SupplierID,
-                            CultivationMode: item.CultivationMode
-                        });
+                        if (item.SupplierID === SupplierID[0]) {
+                            this.dataListLength += 1;
+                            dataList.push({
+                                number: number++,
+                                ID: item.ID,
+                                TreeTypeID: item.TreeTypeID,
+                                Stock: item.Stock,
+                                DBH: item.DBH,
+                                Price: item.Price,
+                                Height: item.Height,
+                                CrownWidth: item.CrownWidth,
+                                GroundDiameter: item.GroundDiameter,
+                                SupplierID: item.SupplierID,
+                                CultivationMode: item.CultivationMode
+                            });
+                        }
                     });
                     this.setState({
                         dataList,
-                        number: this.dataListLength,
-                        SupplierID: dataList[0].SupplierID
+                        SupplierID
                     });
                 }
             });
@@ -186,8 +194,8 @@ class AddSeedling extends Component {
                 if (rep.code === 200 && rep.content.length > 0) {
                     const obj = rep.content[0];
                     this.props.form.setFieldsValue({
-                        Leader: obj.Leader,
-                        LeaderPhone: obj.LeaderPhone
+                        Contacter: obj.Leader,
+                        Phone: obj.LeaderPhone
                     });
                     this.NurseryBaseID = obj.ID;
                     getBindingSupplier({}, {
@@ -202,7 +210,7 @@ class AddSeedling extends Component {
         }
     }
     render () {
-        const { dataList, treeTypeList, Photo, LocalPhoto, MostPhoto, OtherPhoto, productInfo, TreeTypeID, TreeTypeNo, SupplierList, SupplierID } = this.state;
+        const { isAmend, dataList, treeTypeList, Photo, LocalPhoto, MostPhoto, OtherPhoto, productInfo, TreeTypeID, TreeTypeNo, SupplierList, SupplierID } = this.state;
         const { getFieldDecorator } = this.props.form;
         const props_one = {
             action: '',
@@ -291,7 +299,7 @@ class AddSeedling extends Component {
                     <TabPane tab='填写信息' key='1'>
                         <Form layout='inline' onSubmit={this.handleSubmit}>
                             <FormItem label='树种类型'>
-                                <Select value={TreeTypeNo} onChange={this.handleTreeTypeNo} style={{width: 150}}>
+                                <Select value={TreeTypeNo} onChange={this.handleTreeTypeNo} style={{width: 150}} disabled={isAmend}>
                                     {
                                         TREETYPENO.map(item => {
                                             return <Option key={item.id} value={item.id}>{item.name}</Option>;
@@ -300,7 +308,7 @@ class AddSeedling extends Component {
                                 </Select>
                             </FormItem>
                             <FormItem label='树种名称'>
-                                <Select value={TreeTypeID} onChange={this.handleTreeType} style={{width: 150}}>
+                                <Select value={TreeTypeID} onChange={this.handleTreeType} style={{width: 150}} disabled={isAmend}>
                                     {
                                         treeTypeList.length > 0 ? treeTypeList.map(item => {
                                             return <Option key={item.ID} value={item.ID}>{item.TreeTypeName}</Option>;
@@ -309,21 +317,22 @@ class AddSeedling extends Component {
                                 </Select>
                             </FormItem>
                             <FormItem label='联系人'>
-                                {getFieldDecorator('Leader')(
-                                    <Input disabled style={{width: 150}} />
+                                {getFieldDecorator('Contacter')(
+                                    <Input style={{width: 150}} />
                                 )}
                             </FormItem>
                             <FormItem label='联系电话'>
-                                {getFieldDecorator('LeaderPhone')(
-                                    <Input disabled style={{width: 150}} />
+                                {getFieldDecorator('Phone')(
+                                    <Input style={{width: 150}} />
                                 )}
                             </FormItem>
                             <FormItem label='供应商' style={{display: 'block'}}>
                                 <Select
-                                    allowClear
+                                    disabled={isAmend}
+                                    mode='multiple'
                                     value={SupplierID}
                                     onChange={this.handleSupplier}
-                                    style={{ width: 350 }}
+                                    style={{ width: 620 }}
                                     placeholder='请选择供应商'
                                 >
                                     {
@@ -388,8 +397,8 @@ class AddSeedling extends Component {
                             <FormItem style={{width: 800, textAlign: 'center'}}>
                                 <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
                                 {
-                                    productInfo ? <Button type='primary' onClick={this.toRelease.bind(this, 1)}>编辑</Button>
-                                        : <Button type='primary' onClick={this.toRelease.bind(this, 1)}>发布</Button>
+                                    productInfo ? <Button type='primary' onClick={this.toCheck.bind(this)}>编辑</Button>
+                                        : <Button type='primary' onClick={this.toCheck.bind(this)}>发布</Button>
                                 }
                             </FormItem>
                         </Form>
@@ -402,15 +411,15 @@ class AddSeedling extends Component {
         this.props.actions.changeAddSeedlingVisible(false);
     }
     addVersion () {
-        let { dataList, SupplierID, number } = this.state;
-        if (!SupplierID) {
+        let { dataList, SupplierID } = this.state;
+        if (SupplierID.length === 0) {
             message.error('请先选择供应商');
             return;
         }
         const obj = {
-            number,
-            SupplierID,
-            SPUID: this.spuid,
+            number: dataList.length,
+            SupplierID: SupplierID[0],
+            SPUID: typeof this.spuid === 'string' ? this.spuid : '',
             DBH: '',
             GroundDiameter: '',
             CrownWidth: '',
@@ -421,8 +430,7 @@ class AddSeedling extends Component {
         };
         dataList.push(obj);
         this.setState({
-            dataList,
-            number: number + 1
+            dataList
         });
     }
     editVersion (str, index, e) {
@@ -437,20 +445,42 @@ class AddSeedling extends Component {
             dataList: [...this.state.dataList]
         });
     }
+    toCheck () {
+        const { TreeTypeID, Photo, LocalPhoto, MostPhoto } = this.state;
+        if (TreeTypeID === '') {
+            message.error('请选择发布的树种');
+            return;
+        }
+        if (Photo === '' && LocalPhoto === '' && MostPhoto === '') {
+            message.error('请完成照片上传');
+            return;
+        }
+        this.toRelease(1);
+    }
     toRelease (Status) {
         const formVal = this.props.form.getFieldsValue();
-        const { productInfo, TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList } = this.state;
+        const { productInfo, TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList, SupplierID } = this.state;
         const { postCommodity, putCommodity } = this.props.actions;
+        let SKUs = [];
+        SupplierID.map((item) => {
+            dataList.map(row => {
+                delete row.number;
+                SKUs.push({...row, SupplierID: item});
+            });
+        });
         if (productInfo) {
             // 编辑spu,sku
             putCommodity({}, {
                 ID: this.spuid,
+                Contacter: formVal.Contacter,
+                Phone: formVal.Phone,
                 TreeDescribe: formVal.TreeDescribe,
                 Status,
                 Photo,
                 LocalPhoto,
                 MostPhoto,
-                OtherPhoto
+                OtherPhoto,
+                SKUs
             }).then(rep => {
                 if (rep.code === 1 && Status === 1) {
                     message.success('编辑成功');
@@ -461,6 +491,9 @@ class AddSeedling extends Component {
         } else {
             // 新增spu
             postCommodity({}, {
+                Contacter: formVal.Contacter,
+                Phone: formVal.Phone,
+                TreeDescribe: formVal.TreeDescribe,
                 Status,
                 TreeTypeID,
                 TreeTypeName: this.TreeTypeName,
@@ -470,8 +503,7 @@ class AddSeedling extends Component {
                 OtherPhoto,
                 Creater: this.Creater,
                 NurseryBaseID: this.NurseryBaseID,
-                TreeDescribe: formVal.TreeDescribe,
-                SKUs: dataList
+                SKUs
             }).then(rep => {
                 if (rep.code === 1 && Status === 1) {
                     message.success('发布成功');
@@ -506,6 +538,7 @@ class AddSeedling extends Component {
         });
     }
     handleSupplier (value) {
+        console.log(value);
         this.setState({
             SupplierID: value
         });
@@ -531,10 +564,21 @@ class AddSeedling extends Component {
     toEdit (record, index, e) {
         e.preventDefault();
         const { postInventory, putInventory } = this.props.actions;
-        const { dataList } = this.state;
+        const { dataList, SupplierID } = this.state;
+        console.log(record);
         if (index < this.dataListLength) {
-            putInventory({}, dataList[index]).then(rep => {
-                if (rep.code === 1) {
+            let actionArr = [];
+            SupplierID.map(item => {
+                actionArr.push(putInventory({}, {...record, SupplierID: item}));
+            });
+            Promise.all(actionArr).then(rep => {
+                let code = 1;
+                rep.map(item => {
+                    if (!item.code === 1) {
+                        code = 0;
+                    }
+                });
+                if (code === 1) {
                     message.success('保存规格成功');
                 }
             });

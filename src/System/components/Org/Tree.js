@@ -2,62 +2,6 @@ import React, { Component } from 'react';
 import SimpleTree from '_platform/components/panels/SimpleTree';
 import { Button, Popconfirm } from 'antd';
 
-const addGroupSupplier = (supplier_list, str) => {
-    const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));
-    const regionCode_province = JSON.parse(window.sessionStorage.getItem('regionCode_province'));
-    let arr_province = [];
-    supplier_list.map(item => {
-        item.RegionCode = supplier_regionCode[item.code];
-        item.province = regionCode_province[item.RegionCode];
-        if (!arr_province.includes(item.province)) {
-            arr_province.push(item.province);
-        }
-    });
-    let newChildren = [];
-    arr_province.map((item, index) => {
-        let arr1 = [];
-        supplier_list.map(record => {
-            if (item === record.province) {
-                arr1.push(record);
-            }
-        });
-        newChildren.push({
-            name: item || '其他',
-            children: arr1,
-            code: index
-        });
-    });
-    return newChildren;
-};
-
-const addGroupNursery = (nursery_list, str) => {
-    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
-    const regionCode_province = JSON.parse(window.sessionStorage.getItem('regionCode_province'));
-    let arr_province = [];
-    nursery_list.map(item => {
-        item.RegionCode = nursery_regionCode[item.code];
-        item.province = regionCode_province[item.RegionCode];
-        if (!arr_province.includes(item.province)) {
-            arr_province.push(item.province);
-        }
-    });
-    let newChildren = [];
-    arr_province.map((item, index) => {
-        let arr1 = [];
-        nursery_list.map(record => {
-            if (item === record.province) {
-                arr1.push(record);
-            }
-        });
-        newChildren.push({
-            name: item || '其他',
-            children: arr1,
-            code: index
-        });
-    });
-    return newChildren;
-};
-
 export default class Tree extends Component {
     static propTypes = {};
     constructor (props) {
@@ -68,16 +12,38 @@ export default class Tree extends Component {
             listVisible: true
         };
     }
+    componentDidMount () {
+        const {
+            actions: { getOrgTree, changeSidebarField }
+        } = this.props;
+        getOrgTree({}, { depth: 4 }).then(rst => {
+            let dataList = [];
+            if (rst && rst.children) {
+                dataList = rst.children.filter(item => {
+                    if (item.name !== '供应商' && item.name !== '苗圃基地') {
+                        return item;
+                    }
+                });
+                this.setState({
+                    dataList
+                });
+                this.getList(dataList);
+            }
+            const { children: [first] = [] } = rst || {};
+            this.setState({ list: this.filiter(rst.children) });
+            if (first) {
+                changeSidebarField('node', { ...first, type: 'project' });
+            }
+        });
+    }
 
     render () {
+        const { dataList } = this.state;
         const {
             platform: { org: { children = [] } = {} },
             sidebar: { node = {} } = {}
         } = this.props;
-        const { childList, listVisible } = this.state;
         const { code } = node || {};
-
-        // const list=this.filiter(children);
         return (
             <div>
                 <div
@@ -109,7 +75,7 @@ export default class Tree extends Component {
                     </Popconfirm>
                 </div>
                 <SimpleTree
-                    dataSource={children}
+                    dataSource={dataList}
                     selectedKey={code}
                     onSelect={this.select.bind(this)}
                 />
@@ -211,35 +177,11 @@ export default class Tree extends Component {
         return false;
     }
 
-    componentDidMount () {
-        const {
-            actions: { getOrgTree, changeSidebarField }
-        } = this.props;
-        getOrgTree({}, { depth: 4 }).then(rst => {
-            if (rst && rst.children) {
-                rst.children.map(item => {
-                    if (item.name === '供应商') {
-                        item.children = addGroupSupplier(item.children, '供应商');
-                    } else if (item.name === '苗圃基地') {
-                        item.children = addGroupNursery(item.children, '苗圃基地');
-                    }
-                });
-                this.getList(rst.children);
-            }
-            const { children: [first] = [] } = rst || {};
-            this.setState({ list: this.filiter(rst.children) });
-            if (first) {
-                changeSidebarField('node', { ...first, type: 'project' });
-            }
-        });
-    }
-
     addOrg () {
         const {
             platform: { org = {} },
             actions: { changeAdditionField, changeSidebarField }
         } = this.props;
-        console.log(this.props);
         changeSidebarField('parent', org);
         changeAdditionField('visible', true);
     }
@@ -251,7 +193,6 @@ export default class Tree extends Component {
             actions: { changeSidebarField }
         } = this.props;
         const org = Tree.loop(children, eventKey);
-        console.log('org', org);
         changeSidebarField('node', org);
     }
 

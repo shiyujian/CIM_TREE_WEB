@@ -1,4 +1,4 @@
-import {createAction,handleActions,combineActions} from 'redux-actions';
+import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 
 import fieldFactory from '_platform/store/service/field';
@@ -18,14 +18,14 @@ export const actions = {
 export default handleActions({
 	[combineActions(...actionsMap(sidebarReducer))]: (state, action) => ({
 		...state,
-		sidebar: sidebarReducer(state.sidebar, action),
+		sidebar: sidebarReducer(state.sidebar, action)
 	}),
 	[combineActions(...actionsMap(additionReducer))]: (state, action) => ({
 		...state,
-		addition: additionReducer(state.addition, action),
+		addition: additionReducer(state.addition, action)
 	}),
 	[getListStore]: (state, {payload}) => ({
 		...state,
 		listStore: payload
-	}),
+	})
 }, {});

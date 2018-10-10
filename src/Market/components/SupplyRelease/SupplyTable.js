@@ -7,21 +7,23 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 
-class DataList extends Component {
+class SupplyTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
             dataList: [],
-            a: 1
+            treetypename: '',
+            status: ''
         };
         this.toSearch = this.toSearch.bind(this);
         this.onClear = this.onClear.bind(this);
+        this.handleTreeType = this.handleTreeType.bind(this);
+        this.handleStatus = this.handleStatus.bind(this);
     }
     componentDidMount () {
         this.toSearch();
     }
     render () {
-        const { getFieldDecorator } = this.props.form;
         const { dataList } = this.state;
         let display = this.props.addSeedlingVisible ? 'none' : 'block';
         return (
@@ -30,19 +32,15 @@ class DataList extends Component {
                     <FormItem
                         label='苗木名称'
                     >
-                        {getFieldDecorator('treetypename')(
-                            <Input style={{width: '200px'}} placeholder='请输入苗木名称' />
-                        )}
+                        <Input style={{width: '200px'}} placeholder='请输入苗木名称' onChange={this.handleTreeType} />
                     </FormItem>
                     <FormItem
                         label='状态'
                     >
-                        {getFieldDecorator('status')(
-                            <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
-                                <Option value={0}>未上架</Option>
-                                <Option value={1}>上架中</Option>
-                            </Select>
-                        )}
+                        <Select allowClear defaultValue={1} style={{ width: 150 }} placeholder='请选择状态' onChange={this.handleStatus}>
+                            <Option value={0}>未上架</Option>
+                            <Option value={1}>上架中</Option>
+                        </Select>
                     </FormItem>
                     <FormItem style={{marginLeft: '200px'}}
                     >
@@ -65,11 +63,11 @@ class DataList extends Component {
         );
     }
     toSearch () {
-        const formVal = this.props.form.getFieldsValue();
+        const { treetypename, status } = this.state;
         const { getProductList } = this.props.actions;
         getProductList({}, {
-            treetypename: formVal.treetypename || '',
-            status: formVal.status || 1
+            treetypename,
+            status: status === undefined ? '' : status
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({
@@ -81,13 +79,26 @@ class DataList extends Component {
         });
     }
     onClear () {
-        this.props.form.resetFields();
+        this.setState({
+            treetypename: '',
+            status: ''
+        });
     }
     toAddSeedling = (key) => {
         const { changeAddSeedlingVisible, changeAddSeedlingKey } = this.props.actions;
         changeAddSeedlingVisible(true);
         changeAddSeedlingKey(key);
     }
+    handleTreeType (e) {
+        this.setState({
+            treetypename: e.target.value
+        });
+    }
+    handleStatus (value) {
+        this.setState({
+            status: value
+        });
+    }
 }
 
-export default Form.create()(DataList);
+export default SupplyTable;
