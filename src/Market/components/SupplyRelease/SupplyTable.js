@@ -13,7 +13,7 @@ class SupplyTable extends Component {
         this.state = {
             dataList: [],
             treetypename: '',
-            status: ''
+            status: 1
         };
         this.toSearch = this.toSearch.bind(this);
         this.onClear = this.onClear.bind(this);
@@ -24,7 +24,7 @@ class SupplyTable extends Component {
         this.toSearch();
     }
     render () {
-        const { dataList } = this.state;
+        const { dataList, status } = this.state;
         let display = this.props.addSeedlingVisible ? 'none' : 'block';
         return (
             <div className='supply-release' style={{display: display, padding: '0 20px'}}>
@@ -37,7 +37,7 @@ class SupplyTable extends Component {
                     <FormItem
                         label='状态'
                     >
-                        <Select allowClear defaultValue={1} style={{ width: 150 }} placeholder='请选择状态' onChange={this.handleStatus}>
+                        <Select allowClear defaultValue={status} style={{ width: 150 }} placeholder='请选择状态' onChange={this.handleStatus}>
                             <Option value={0}>未上架</Option>
                             <Option value={1}>上架中</Option>
                         </Select>

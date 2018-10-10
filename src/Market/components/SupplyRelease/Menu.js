@@ -9,10 +9,11 @@ class Menu extends Component {
         this.state = {
             TreeTypeName: '' // 类型名称
         };
-        this.toSoldOut = this.toSoldOut.bind(this); // 下架
+        this.toSoldOut = this.toSoldOut.bind(this); // 上下架
     }
     componentDidMount () {
         const { record } = this.props;
+        console.log(record, '上下架');
         if (record.TreeTypeNo) {
             TREETYPENO.map(item => {
                 if (item.id === record.TreeTypeNo.slice(0, 1)) {
@@ -43,7 +44,11 @@ class Menu extends Component {
                         </Col>
                         <Col span={6} style={{paddingTop: 30}}>
                             <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)}>修改信息</Button>
-                            <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>下架</Button>
+                            <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>
+                                {
+                                    record.Status === 1 ? '下架' : '上架'
+                                }
+                            </Button>
                         </Col>
                     </Row>
                 </Card>
@@ -54,14 +59,16 @@ class Menu extends Component {
         this.props.toAddSeedling(key);
     }
     toSoldOut () {
-        const { putCommodity } = this.props.actions;
-        putCommodity({}, {
+        const { changeStatus } = this.props.actions;
+        changeStatus({}, {
             ID: this.props.record.ID,
-            Status: 0
+            Status: this.props.record.Status === 1 ? 0 : 1
         }).then(rep => {
             if (rep.code === 1) {
                 this.props.toSearch();
-                message.success('下架成功');
+                message.success('上下架成功');
+            } else {
+                message.success('上下架失败');
             }
         });
     }

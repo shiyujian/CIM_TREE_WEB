@@ -55,7 +55,9 @@ class PurchaseList extends Component {
                     <FormItem
                         label='状态'
                     >
-                        {getFieldDecorator('status')(
+                        {getFieldDecorator('status', {
+                            initialValue: 1
+                        })(
                             <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
                                 <Option value={0}>未发布</Option>
                                 <Option value={1}>报价中</Option>
