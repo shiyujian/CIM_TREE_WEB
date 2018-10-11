@@ -4,6 +4,7 @@ import { Row, Col, Icon, Input, Button, Select, Modal, Form, Upload, Cascader, n
 import { checkTel, isCardNo, layoutT } from '../common';
 import { FOREST_API } from '../../../_platform/api';
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 class AddEdit extends Component {
     constructor (props) {
@@ -13,6 +14,8 @@ class AddEdit extends Component {
             fileListBack: [],
             fileListLicense: [],
             options: [],
+            optionList: [], // 绑定苗圃基地列表
+            Nurserys: [], // 绑定的苗圃基地
             record: null,
             LegalPersonCard: '', // 身份证正面url
             LegalPersonCardBack: '', // 身份证反面url
@@ -27,14 +30,14 @@ class AddEdit extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 取消弹框
     }
     componentDidMount () {
-        console.log(this.props.record);
         this.setState({
             record: this.props.record,
-            options: this.props.options
+            options: this.props.options,
+            optionList: this.props.optionList
         });
     }
     render () {
-        const { fileList, fileListBack, fileListLicense, options, record } = this.state;
+        const { fileList, fileListBack, fileListLicense, options, optionList, record } = this.state;
         const { getFieldDecorator } = this.props.form;
         const props = {
             action: `${FOREST_API}/UploadHandler.ashx?filetype=org`,
@@ -218,18 +221,24 @@ class AddEdit extends Component {
                                     {...layoutT}
                                     label='绑定的苗圃基地'
                                 >
-                                    {getFieldDecorator('NB2Ss', {
-                                    })(
-                                        <Select mode='multiple' placeholder='请选择想要绑定的苗圃基地'>
-                                            {this.props.optionList}
-                                        </Select>
-                                    )}
+                                    <Select
+                                        mode='multiple'
+                                        filterOption={false}
+                                        onChange={this.handleNursery.bind(this)}
+                                        onSearch={this.searchNursery.bind(this)}
+                                        placeholder='请选择想要绑定的苗圃基地'>
+                                        {
+                                            optionList.map(item => {
+                                                return <Option key={item.ID} value={item.ID}>{item.NurseryName}</Option>;
+                                            })
+                                        }
+                                    </Select>
                                 </FormItem>
                             </Col>
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='身份证正面'
+                                    label='法人身份证正面'
                                 >
                                     <Upload {...props}>
                                         <Button>
@@ -241,7 +250,7 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='身份证反面'
+                                    label='法人身份证反面'
                                 >
                                     <Upload {...propsBack}>
                                         <Button>
@@ -268,6 +277,23 @@ class AddEdit extends Component {
             </div>
         );
     }
+    handleNursery (value) {
+        this.setState({
+            Nurserys: value,
+            optionList: this.props.optionList
+        });
+    }
+    searchNursery (value) {
+        let optionList = [];
+        this.props.optionList.map(item => {
+            if (item.NurseryName.includes(value)) {
+                optionList.push(item);
+            }
+        });
+        this.setState({
+            optionList
+        });
+    }
     handleCancel () {
         this.props.handleCancel();
     }
@@ -280,14 +306,14 @@ class AddEdit extends Component {
             if (err) {
                 return;
             }
-            const { LegalPersonCard, LegalPersonCardBack, BusinessLicense, RegionCode, record } = this.state;
+            const { LegalPersonCard, LegalPersonCardBack, BusinessLicense, RegionCode, record, Nurserys } = this.state;
             if (!LegalPersonCard || !LegalPersonCardBack || !BusinessLicense) {
                 message.error('请上传身份证正反面');
                 return;
             }
             let arr = [];
-            if (values.NB2Ss && values.NB2Ss.length > 0) {
-                values.NB2Ss.map(item => {
+            if (Nurserys.length > 0) {
+                Nurserys.map(item => {
                     arr.push({
                         NurseryBaseID: item
                     });
@@ -306,7 +332,6 @@ class AddEdit extends Component {
                 BusinessLicense,
                 NB2Ss: arr
             };
-            console.log(record);
             if (record) {
                 postdata.ID = record.ID;
                 putSupplier({}, postdata).then(rep => {
@@ -318,6 +343,7 @@ class AddEdit extends Component {
                         notification.success({
                             message: '编辑供应商成功'
                         });
+                        this.props.onSearch();
                         this.props.handleCancel();
                     } else {
                         notification.error({
@@ -335,6 +361,7 @@ class AddEdit extends Component {
                         notification.success({
                             message: '新增供应商成功'
                         });
+                        this.props.onSearch();
                         this.props.handleCancel();
                     } else {
                         notification.error({
@@ -366,7 +393,6 @@ class AddEdit extends Component {
         });
     }
     loadRegion (selectedOptions) {
-        console.log(1);
         const targetOption = selectedOptions[selectedOptions.length - 1];
         targetOption.loading = true;
         setTimeout(() => {

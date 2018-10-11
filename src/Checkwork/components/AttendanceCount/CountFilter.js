@@ -30,6 +30,8 @@ class CountFilter extends Component {
             sectionArray: [],
             projectArray: [],
             groupArray: [],
+            start:'',
+            end:'',
         };
     }
 
@@ -133,7 +135,6 @@ class CountFilter extends Component {
         const {
             platform: { roles = [] }
         } = this.props;
-        debugger
         var systemRoles = [];
         if (user.is_superuser) {
             systemRoles.push({
@@ -370,6 +371,13 @@ class CountFilter extends Component {
         return objs;
     }
 
+    changeFormDate (value, results) {
+        this.setState({
+            start:results[0],
+            end:results[1]
+        })
+    }
+
     render () {
         const {
             form: { getFieldDecorator }
@@ -428,6 +436,9 @@ class CountFilter extends Component {
                     
                                     })(
                                         <RangePicker
+                                            onChange={this.changeFormDate.bind(
+                                                this
+                                            )}
                                             size='default'
                                             format='YYYY-MM-DD'
                                             style={{
@@ -440,21 +451,21 @@ class CountFilter extends Component {
                             </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='出勤'>
-                                    {getFieldDecorator('chuqin', {
+                                    {getFieldDecorator('checkin', {
                                 
                                     })(
                                         <Select placeholder='请选择是否出勤'>
                                             <Option
-                                                key={'是'}
-                                                value={'是'}
+                                                key={'y'}
+                                                value={'y'}
                                             >
-                                                是
+                                                出勤
                                             </Option>
                                             <Option
-                                                key={'否'}
-                                                value={'否'}
+                                                key={'n'}
+                                                value={'n'}
                                             >
-                                                否
+                                                未出勤
                                             </Option>
                                         </Select>
                                     )}
@@ -575,8 +586,11 @@ class CountFilter extends Component {
             params['project_code'] = values.project_code;
             params['section'] = values.section;
             params['name'] = values.name;
-            params['searchDate'] = values.searchDate;
-            params['chuqin'] = values.chuqin;
+            if(values.searchDate){
+                params['start'] = this.state.start;
+                params['end'] = this.state.end;
+            }
+            params['checkin'] = values.checkin;
             params['status'] = values.status;
             params['group'] = values.group;
             params['role'] = values.role;

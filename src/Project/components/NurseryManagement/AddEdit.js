@@ -4,6 +4,7 @@ import { Row, Col, Icon, Input, Button, Select, Modal, Form, Upload, Cascader, n
 import { checkTel, isCardNo, layoutT } from '../common';
 import { FOREST_API } from '_platform/api';
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 class AddEdit extends Component {
     constructor (props) {
@@ -12,6 +13,8 @@ class AddEdit extends Component {
             fileList: [],
             fileListBack: [],
             options: [],
+            optionList: [], // 绑定供应商列表
+            Suppliers: [], // 绑定的供应商
             record: null,
             LeaderCard: '', // 身份证正面url
             LeaderCardBack: '', // 身份证反面url
@@ -35,9 +38,14 @@ class AddEdit extends Component {
                 LeaderCardBack: this.props.record.LeaderCardBack
             });
         }
+        if (this.props.optionList) {
+            this.setState({
+                optionList: this.props.optionList
+            });
+        }
     }
     render () {
-        const { fileList, fileListBack, options, record } = this.state;
+        const { fileList, fileListBack, options, record, optionList } = this.state;
         const { getFieldDecorator } = this.props.form;
         const props = {
             action: `${FOREST_API}/UploadHandler.ashx?filetype=org`,
@@ -87,7 +95,6 @@ class AddEdit extends Component {
                 });
             }
         };
-        console.log(record);
         return (
             <div className='add-edit'>
                 <Modal
@@ -198,18 +205,24 @@ class AddEdit extends Component {
                                     {...layoutT}
                                     label='绑定的供应商'
                                 >
-                                    {getFieldDecorator('Suppliers', {
-                                    })(
-                                        <Select mode='multiple' placeholder='请选择想要绑定的供应商'>
-                                            {this.props.optionList}
-                                        </Select>
-                                    )}
+                                    <Select
+                                        mode='multiple'
+                                        filterOption={false}
+                                        onChange={this.handleSuppliers.bind(this)}
+                                        onSearch={this.searchSuppliers.bind(this)}
+                                        placeholder='请选择想要绑定的供应商'>
+                                        {
+                                            optionList.map(item => {
+                                                return <Option key={item.ID} value={item.ID}>{item.SupplierName}</Option>;
+                                            })
+                                        }
+                                    </Select>
                                 </FormItem>
                             </Col>
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='身份证正面'
+                                    label='负责人身份证正面'
                                 >
                                     <Upload {...props}>
                                         <Button>
@@ -221,7 +234,7 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='身份证反面'
+                                    label='负责人身份证反面'
                                 >
                                     <Upload {...propsBack}>
                                         <Button>
@@ -236,6 +249,23 @@ class AddEdit extends Component {
             </div>
         );
     }
+    handleSuppliers (value) {
+        this.setState({
+            Suppliers: value,
+            optionList: this.props.optionList
+        });
+    }
+    searchSuppliers (value) {
+        let optionList = [];
+        this.props.optionList.map(item => {
+            if (item.SupplierName.includes(value)) {
+                optionList.push(item);
+            }
+        });
+        this.setState({
+            optionList
+        });
+    }
     handleCancel () {
         this.props.handleCancel();
     }
@@ -248,14 +278,14 @@ class AddEdit extends Component {
             if (err) {
                 return;
             }
-            const { LeaderCard, LeaderCardBack, RegionCode, record } = this.state;
+            const { LeaderCard, LeaderCardBack, RegionCode, record, Suppliers } = this.state;
             if (!LeaderCard || !LeaderCardBack) {
                 message.error('请上传身份证正反面');
                 return;
             }
             let arr = [];
-            if (values.Suppliers && values.Suppliers.length > 0) {
-                values.Suppliers.map(item => {
+            if (Suppliers.length > 0) {
+                Suppliers.map(item => {
                     arr.push({
                         ID: item
                     });

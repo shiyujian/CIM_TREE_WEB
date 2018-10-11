@@ -58,10 +58,14 @@ class DemandTable extends Component {
                     <FormItem
                         label='状态'
                     >
-                        {getFieldDecorator('status')(
+                        {getFieldDecorator('status', {
+                            initialValue: 1
+                        })(
                             <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
-                                <Option value={0}>未上架</Option>
-                                <Option value={1}>上架中</Option>
+                                <Option value={0}>未发布</Option>
+                                <Option value={1}>报价中</Option>
+                                <Option value={2}>选标中</Option>
+                                <Option value={3}>已结束</Option>
                             </Select>
                         )}
                     </FormItem>
@@ -96,7 +100,7 @@ class DemandTable extends Component {
         getPurchaseList({}, {
             purchaseno: '',
             projectname: formVal.projectname || '',
-            status: formVal.status || ''
+            status: formVal.status === undefined ? '' : formVal.status
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({

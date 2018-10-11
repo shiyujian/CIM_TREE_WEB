@@ -19,6 +19,7 @@ export const getBindingSupplier = createFetchAction(`${FOREST_API}/system/nb2ss`
 export const getInventoryList = createFetchAction(`${SEEDLING_API}/good/skus`); // 获取sku库存列表
 export const postInventory = createFetchAction(`${SEEDLING_API}/good/sku`, [], 'POST'); // 增加sku库存
 export const putInventory = createFetchAction(`${SEEDLING_API}/good/sku`, [], 'PUT'); // 编辑sku库存
+export const changeStatus = createFetchAction(`${SEEDLING_API}/good/changestatus`); // 商品上下架
 
 export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=mall`, [], 'POST'); // 上传图片
 
@@ -39,6 +40,7 @@ export const actions = {
     getInventoryList,
     postInventory,
     putInventory,
+    changeStatus,
     changeAddSeedlingVisible,
     changeAddSeedlingKey
 };
