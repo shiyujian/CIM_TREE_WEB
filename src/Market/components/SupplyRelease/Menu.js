@@ -13,7 +13,6 @@ class Menu extends Component {
     }
     componentDidMount () {
         const { record } = this.props;
-        console.log(record, '上下架');
         if (record.TreeTypeNo) {
             TREETYPENO.map(item => {
                 if (item.id === record.TreeTypeNo.slice(0, 1)) {

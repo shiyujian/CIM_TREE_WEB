@@ -45,14 +45,14 @@ class DemandTable extends Component {
                         label='采购编号'
                     >
                         {getFieldDecorator('purchaseno')(
-                            <Input style={{width: '200px'}} placeholder='请输入采购编号' />
+                            <Input className='input-width' placeholder='请输入采购编号' />
                         )}
                     </FormItem>
                     <FormItem
                         label='采购名称'
                     >
                         {getFieldDecorator('projectname')(
-                            <Input style={{width: '200px'}} placeholder='请输入采购名称' />
+                            <Input className='input-width' placeholder='请输入采购名称' />
                         )}
                     </FormItem>
                     <FormItem
@@ -69,7 +69,7 @@ class DemandTable extends Component {
                             </Select>
                         )}
                     </FormItem>
-                    <FormItem style={{marginLeft: '200px'}}
+                    <FormItem className='search-left'
                     >
                         <Button type='primary' onClick={this.toSearch}>查询</Button>
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>

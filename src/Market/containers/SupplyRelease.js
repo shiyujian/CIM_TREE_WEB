@@ -33,15 +33,13 @@ export default class SupplyRelease extends Component {
         const {
             addSeedlingVisible, addSeedlingKey
         } = this.props;
-        console.log(addSeedlingVisible, addSeedlingKey);
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='供应发布' {...this.props} />
                     <Content>
-                        <SupplyTable {...this.props} />
                         {
-                            addSeedlingVisible ? <AddSeedling {...this.props} /> : ''
+                            addSeedlingVisible ? <AddSeedling {...this.props} /> : <SupplyTable {...this.props} />
                         }
                     </Content>
                 </Main>

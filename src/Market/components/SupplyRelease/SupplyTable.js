@@ -25,14 +25,13 @@ class SupplyTable extends Component {
     }
     render () {
         const { dataList, status } = this.state;
-        let display = this.props.addSeedlingVisible ? 'none' : 'block';
         return (
-            <div className='supply-release' style={{display: display, padding: '0 20px'}}>
+            <div className='supply-release content-padding'>
                 <Form layout='inline'>
                     <FormItem
                         label='苗木名称'
                     >
-                        <Input style={{width: '200px'}} placeholder='请输入苗木名称' onChange={this.handleTreeType} />
+                        <Input className='input-width' placeholder='请输入苗木名称' onChange={this.handleTreeType} />
                     </FormItem>
                     <FormItem
                         label='状态'
@@ -42,7 +41,7 @@ class SupplyTable extends Component {
                             <Option value={1}>上架中</Option>
                         </Select>
                     </FormItem>
-                    <FormItem style={{marginLeft: '200px'}}
+                    <FormItem className='search-left'
                     >
                         <Button type='primary' onClick={this.toSearch}>查询</Button>
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>
