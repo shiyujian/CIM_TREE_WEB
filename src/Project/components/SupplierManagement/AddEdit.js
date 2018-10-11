@@ -13,10 +13,11 @@ class AddEdit extends Component {
             fileList: [],
             fileListBack: [],
             fileListLicense: [],
-            options: [],
+            options: [], // 行政区划
             optionList: [], // 绑定苗圃基地列表
             Nurserys: [], // 绑定的苗圃基地
             record: null,
+            isAmend: false,
             LegalPersonCard: '', // 身份证正面url
             LegalPersonCardBack: '', // 身份证反面url
             BusinessLicense: '',
@@ -31,19 +32,48 @@ class AddEdit extends Component {
     }
     componentDidMount () {
         this.setState({
-            record: this.props.record,
             options: this.props.options,
             optionList: this.props.optionList
         });
+        // 修改
+        if (this.props.record) {
+            const { getNb2ss } = this.props.actions;
+            const fileList = {
+                uid: '-1',
+                status: 'done'
+            };
+            this.setState({
+                isAmend: true,
+                record: this.props.record,
+                LegalPersonCard: this.props.record.LegalPersonCard,
+                LegalPersonCardBack: this.props.record.LegalPersonCardBack,
+                BusinessLicense: this.props.record.BusinessLicense,
+                fileList: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LegalPersonCard}`}],
+                fileListBack: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LegalPersonCardBack}`}],
+                fileListLicense: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.BusinessLicense}`}]
+            });
+            // 根据供应商id获取绑定苗圃
+            getNb2ss({}, {supplierid: this.props.record.ID}).then(rep => {
+                let Nurserys = [];
+                rep.map(item => {
+                    Nurserys.push(item.NurseryBaseID);
+                });
+                this.setState({
+                    Nurserys
+                });
+            });
+        }
     }
     render () {
-        const { fileList, fileListBack, fileListLicense, options, optionList, record } = this.state;
+        const { fileList, fileListBack, fileListLicense, options, optionList, record, isAmend, Nurserys } = this.state;
         const { getFieldDecorator } = this.props.form;
+        console.log(record);
         const props = {
-            action: `${FOREST_API}/UploadHandler.ashx?filetype=org`,
+            action: '',
             listType: 'picture',
             fileList: fileList,
             beforeUpload: (file, fileList) => {
+                console.log(fileList, '----');
                 const formdata = new FormData();
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
@@ -51,7 +81,7 @@ class AddEdit extends Component {
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
                         LegalPersonCard: rep,
-                        fileList: fileList
+                        fileList
                     });
                 });
                 return false;
@@ -63,8 +93,9 @@ class AddEdit extends Component {
                 });
             }
         };
+        console.log(props.defaultFileList, '---');
         const propsBack = {
-            action: `${FOREST_API}/UploadHandler.ashx?filetype=org`,
+            action: '',
             listType: 'picture',
             fileList: fileListBack,
             beforeUpload: (file, fileList) => {
@@ -88,7 +119,7 @@ class AddEdit extends Component {
             }
         };
         const propsLicense = {
-            action: `${FOREST_API}/UploadHandler.ashx?filetype=org`,
+            action: '',
             listType: 'picture',
             fileList: fileListLicense,
             beforeUpload: (file, fileList) => {
@@ -131,7 +162,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.SupplierName,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入供应商名称' disabled={record} />
+                                        <Input placeholder='请输入供应商名称' disabled={isAmend} />
                                     )}
                                 </FormItem>
                             </Col>
@@ -171,7 +202,7 @@ class AddEdit extends Component {
                                     label='地址'
                                 >
                                     {getFieldDecorator('Address', {
-                                        initialValue: record && record.TreePlace
+                                        initialValue: record && record.Address
                                     })(
                                         <Input placeholder='请输入地址' />
                                     )}
@@ -186,7 +217,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.LegalPerson,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入负责人姓名' />
+                                        <Input placeholder='请输入负责人姓名' disabled={isAmend} />
                                     )}
                                 </FormItem>
                             </Col>
@@ -212,7 +243,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.LegalPersonCardNo,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入负责人身份证号' maxLength='18' onBlur={this.checkCardNo} />
+                                        <Input placeholder='请输入负责人身份证号' maxLength='18' disabled={isAmend} onBlur={this.checkCardNo} />
                                     )}
                                 </FormItem>
                             </Col>
@@ -222,6 +253,7 @@ class AddEdit extends Component {
                                     label='绑定的苗圃基地'
                                 >
                                     <Select
+                                        value={Nurserys}
                                         mode='multiple'
                                         filterOption={false}
                                         onChange={this.handleNursery.bind(this)}

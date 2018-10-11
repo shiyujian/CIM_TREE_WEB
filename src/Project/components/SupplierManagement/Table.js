@@ -13,7 +13,7 @@ class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            status: 0, // 审核状态
+            status: 1, // 审核状态
             suppliername: '', // 供应商名称
             total: 0,
             page: 1,
@@ -30,6 +30,7 @@ class Tablelevel extends Component {
         this.Checker = '';
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
+        this.handlePage = this.handlePage.bind(this); // 换页
         this.handleStatus = this.handleStatus.bind(this); // 状态
         this.handleName = this.handleName.bind(this); // 查询供应商名称
         this.toAdd = this.toAdd.bind(this); // 新增供应商弹框
@@ -174,7 +175,7 @@ class Tablelevel extends Component {
     ];
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options, suppliername } = this.state;
+        const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options, suppliername, status } = this.state;
         return (
             <div className='table-level'>
                 <Row>
@@ -190,7 +191,7 @@ class Tablelevel extends Component {
                         <Input className='search_input' value={suppliername} onChange={this.handleName} />
                         <Button
                             type='primary'
-                            onClick={()=>{this.onSearch()}}
+                            onClick={this.onSearch}
                             style={{minWidth: 30, marginRight: 20}}
                         >
                             查询
@@ -219,7 +220,7 @@ class Tablelevel extends Component {
                         >
                             状态:
                         </label>
-                        <Select defaultValue={0} allowClear style={{width: 150}} onChange={this.handleStatus}>
+                        <Select defaultValue={status} allowClear style={{width: 150}} onChange={this.handleStatus}>
                             <Option value={0}>未审核</Option>
                             <Option value={1}>审核通过</Option>
                             <Option value={2}>审核不通过</Option>
@@ -231,7 +232,7 @@ class Tablelevel extends Component {
                         <Table columns={this.columns} bordered dataSource={supplierList}
                             scroll={{ x: 1700 }} pagination={false} rowKey='ID' />
                         <Pagination total={total} page={page} pageSize={10} style={{marginTop: '10px'}}
-                            showQuickJumper onChange={this.onSearch} />
+                            showQuickJumper onChange={this.handlePage} />
                     </Col>
                 </Row>
                 <Modal title='查看' visible={seeVisible}
@@ -284,6 +285,13 @@ class Tablelevel extends Component {
                 }
             </div>
         );
+    }
+    handlePage (page) {
+        this.setState({
+            page
+        }, () => {
+            this.onSearch();
+        });
     }
     handleAudit () {
         const { checkSupplier } = this.props.actions;
@@ -357,13 +365,13 @@ class Tablelevel extends Component {
             }
         });
     }
-    onSearch (page = 1, pageSize = 10) {
-        const { status, suppliername } = this.state;
+    onSearch () {
+        const { page, status, suppliername } = this.state;
         const { getSupplierList } = this.props.actions;
         const param = {
             status,
             suppliername,
-            size: pageSize,
+            size: 10,
             page
         };
         getSupplierList({}, param).then((rep) => {
