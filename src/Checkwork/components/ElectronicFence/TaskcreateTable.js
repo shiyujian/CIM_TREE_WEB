@@ -106,6 +106,15 @@ export default class TaskCreateTable extends Component {
             },
             teamsTree
         } = this.props;
+        let section = this.section;   //用户只能看到自己标段权限下的电子围栏
+        let teamsTrees = [];
+        if(teamsTree){
+            for(let i=0;i<teamsTree.length;i++){
+                if(section == teamsTree[i].No){
+                    teamsTrees.push(teamsTree[i]);
+                }
+            }
+        }
         if (option && option.value) {
             switch (option.value) {
                 // 区域地块
@@ -115,7 +124,7 @@ export default class TaskCreateTable extends Component {
                             <AreaTreeCreate
                                 {...this.props}
                                 onCheck={this.handleAreaCheck.bind(this)}
-                                content={teamsTree || []}
+                                content={teamsTrees || []}
                             />
                         </Spin>
 
@@ -474,7 +483,7 @@ export default class TaskCreateTable extends Component {
             treeLayerChecked: !treeLayerChecked
         });
     }
-    // 选择细班是否展示数据，或是隐藏数据
+    // 选择标段是否展示数据，或是隐藏数据
     async handleAreaCheck (keys, info) {
         const {
             areaLayerList
@@ -492,8 +501,8 @@ export default class TaskCreateTable extends Component {
             }
             // 选中节点对key进行处理
             let handleKey = eventKey.split('-');
-            // 如果选中的是细班，则直接添加图层
-            if (handleKey.length === 5) {
+            // 如果选中的是标段，则直接添加图层
+            if (handleKey.length === 1) {
                 if (checked) {
                     const treeNodeName = info && info.node && info.node.props && info.node.props.title;
                     // 如果之前添加过，直接将添加过的再次添加，不用再次请求
@@ -521,7 +530,7 @@ export default class TaskCreateTable extends Component {
             console.log('分辨是否为标段', e);
         }
     }
-    // 选中细班，则在地图上加载细班图层
+    // 选中标段，则在地图上加载电子围栏图层
     async _addAreaLayer (eventKey, treeNodeName) {
         const {
             areaLayerList,
@@ -529,11 +538,11 @@ export default class TaskCreateTable extends Component {
         } = this.state;
         const {
             actions: {
-                getTreearea
+                getCheckScope
             }
         } = this.props;
         try {
-            let coords = await handleAreaLayerData(eventKey, treeNodeName, getTreearea);
+            let coords = await handleAreaLayerData(eventKey, treeNodeName, getCheckScope);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];

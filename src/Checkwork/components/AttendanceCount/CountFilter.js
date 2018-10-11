@@ -451,21 +451,21 @@ class CountFilter extends Component {
                             </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='出勤'>
-                                    {getFieldDecorator('chuqin', {
+                                    {getFieldDecorator('checkin', {
                                 
                                     })(
                                         <Select placeholder='请选择是否出勤'>
                                             <Option
-                                                key={'是'}
-                                                value={'是'}
+                                                key={'y'}
+                                                value={'y'}
                                             >
-                                                是
+                                                出勤
                                             </Option>
                                             <Option
-                                                key={'否'}
-                                                value={'否'}
+                                                key={'n'}
+                                                value={'n'}
                                             >
-                                                否
+                                                未出勤
                                             </Option>
                                         </Select>
                                     )}
@@ -590,7 +590,7 @@ class CountFilter extends Component {
                 params['start'] = this.state.start;
                 params['end'] = this.state.end;
             }
-            params['chuqin'] = values.chuqin;
+            params['checkin'] = values.checkin;
             params['status'] = values.status;
             params['group'] = values.group;
             params['role'] = values.role;
