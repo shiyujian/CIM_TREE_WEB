@@ -5,7 +5,13 @@ import {loadFooterYear, loadFooterCompany} from 'APP/api';
 
 export default class Footer extends Component {
     render () {
-        const {match: {params: {module = ''} = {}} = {}} = this.props;
+        const {
+            location: {pathname = ''} = {},
+            match: {params: {module = ''} = {}} = {}
+        } = this.props;
+        console.log('module', module);
+        console.log('this.props', this.props);
+        console.log('pathname', pathname);
         const ignore = Footer.ignoreModules.some(m => m === module);
         if (ignore) {
             return null;

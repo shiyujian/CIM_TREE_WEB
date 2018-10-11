@@ -100,7 +100,7 @@ class Filter extends Component {
                                 新增
                             </Button>
                         )}
-                        {Doc.length === 0 ? (
+                        {(Doc.length === 0 || !this.props.isTreeSelected) ? (
                             <Button
                                 style={{ marginRight: 10 }}
                                 disabled

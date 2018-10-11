@@ -11,7 +11,6 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-// import { Filter, Table, Addition, Updatemodal, Tree, ImageInfo } from '../components/Redios'
 import {
     Filter,
     Table,
@@ -42,15 +41,6 @@ export const Datumcode = window.DeathCode.DATUM_GCYX;
         )
     })
 )
-// @connect(
-// 	state => {
-// 		const {datum = {}, platform} = state || {};
-// 		return {...datum, platform};
-// 	},
-// 	dispatch => ({
-// 		actions: bindActionCreators({...actions, ...platformActions,...previewActions}, dispatch)
-// 	})
-// )
 export default class Redios extends Component {
     constructor (props) {
         super(props);
