@@ -52,7 +52,7 @@ class Menu extends Component {
         const { record } = this.props;
         return (
             <div className='menu' style={{marginTop: 10}}>
-                <Card title={'发布时间：'}>
+                <Card title={'发布时间：' + record.UpdateTime.split(' ')[0]}>
                     <Row>
                         <Col span={4}>
                             <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='150px' height='100px' />
@@ -69,8 +69,8 @@ class Menu extends Component {
                         </Col>
                         <Col span={11}>
                             {
-                                dataList.map(item => {
-                                    return <p>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
+                                dataList.map((item, index) => {
+                                    return <p key={index}>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
                                 })
                             }
                         </Col>

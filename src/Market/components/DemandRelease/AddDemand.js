@@ -107,7 +107,6 @@ class AddDemand extends Component {
         }];
     }
     componentDidMount () {
-        console.log(this.state.PurchaseDescribe, 'dddd');
         const { getTreeTypes, getRegionCodes, getWpunittree, getPurchaseById, getPurchaseStandard } = this.props.actions;
         // 获得所有项目
         getWpunittree().then(rep => {
@@ -160,7 +159,6 @@ class AddDemand extends Component {
             this.setState({
                 TreeTypeList: TREETYPENO
             });
-            console.log(this.state.TreeTypeList, '树种');
         });
         // 获取施工方的责任人电话
         const { id, org_code, phone, name } = getUser();
@@ -174,7 +172,6 @@ class AddDemand extends Component {
         this.purchaseid = this.props.addDemandKey;
         if (typeof this.purchaseid === 'string') {
             getPurchaseById({id: this.purchaseid}).then(rep => {
-                console.log(rep, '采购单详情');
                 this.setState({
                     purchaseInfo: rep,
                     ProjectName: rep.ProjectName,
@@ -217,7 +214,6 @@ class AddDemand extends Component {
     }
     renderCard () {
         let card = [];
-        console.log(this.state.dataList, '数据');
         this.state.dataList.map((item, index) => {
             let str = '';
             this.treeTypeList.map(row => {
@@ -570,7 +566,6 @@ class AddDemand extends Component {
         });
     }
     handleTreeTypes (cardKey, value, selectedOptions) {
-        console.log(value);
         if (selectedOptions.length === 2) {
             this.setState({
                 TreeTypeName: selectedOptions[1].TreeTypeName,

@@ -52,7 +52,6 @@ class Menu extends Component {
         if (record) {
             UpdateTime = record.UpdateTime.split(' ')[0];
         }
-        console.log(this.props.record.TreeTypeName);
         return (
             <div className='menu'>
                 <Card bodyStyle={{ padding: 0 }} bordered={false}>
@@ -60,8 +59,8 @@ class Menu extends Component {
                         <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='100%' height='150' />
                     </div>
                     <div style={{padding: '0 10px', height: 120}}>
-                        <h3>
-                            {record.TreeTypeName}（{record.SKU}株）
+                        <h3 style={{fontSize: 14, color: '#2db7f5'}}>
+                            {record.TreeTypeName}({record.SKU}株)
                             <span style={{float: 'right', fontSize: 12, color: '#888'}}>{UpdateTime}</span>
                         </h3>
                         <p>{param}：{minParam}-{maxParam}厘米</p>
