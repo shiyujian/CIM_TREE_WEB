@@ -132,7 +132,7 @@ class PurchaseDetails extends Component {
                                 <Card key={index}>
                                     <header>
                                         <span>柏树</span>
-                                        <span style={{marginLeft: 20}}>胸径{item.DBH};地经{item.GroundDiameter};自然高{item.Height};冠幅{item.CrownWidth};培育方式：{item.name};{item.Num}棵</span>
+                                        <span style={{marginLeft: 20}}>胸径{item.DBH}cm 地经{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.name} {item.Num}棵</span>
                                         <Button type='primary' style={{marginLeft: 20}} onClick={this.toOffer}>我要报价</Button>
                                         <span style={{marginLeft: 20}}>已有5人报价</span>
                                     </header>
