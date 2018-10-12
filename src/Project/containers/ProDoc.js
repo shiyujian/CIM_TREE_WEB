@@ -41,7 +41,8 @@ export default class ProDoc extends Component {
             treeSelectData: '',
             addDelPanel: '',
             treeSelected: false,
-            userButtonPermission: false,
+            userButtonAddPermission: false,
+            userButtonDelPermission: false,
             currentpk: '',
             currentcode: '',
             isAdmin: false,
@@ -51,49 +52,57 @@ export default class ProDoc extends Component {
         };
     }
 
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
-            actions: { getworkTree, savepk, addDir }
+            actions: { getworkTree, savepk, addDir, getOrgParent }
         } = this.props;
-        let user = window.localStorage.getItem('QH_USER_DATA');
-        user = JSON.parse(user);
-        console.log('user', user);
-        let isAdmin = false;
-        let orgCode = '';
-        let userButtonPermission = false;
-        if (user && user.username === 'admin') {
-            userButtonPermission = true;
-            isAdmin = true;
-        } else {
-            orgCode = user && user.account && user.account.org_code;
-        }
-        this.setState({
-            user: user,
-            userButtonPermission,
-            isAdmin,
-            orgCode
-        });
-        getworkTree({ code: Datumcode }).then(rst => {
+        try {
+            let user = window.localStorage.getItem('QH_USER_DATA');
+            user = JSON.parse(user);
+            console.log('user', user);
+            let isAdmin = false;
+            let parentOrgCode = '';
+            let userButtonAddPermission = false;
+            if (user && user.username === 'admin') {
+                userButtonAddPermission = true;
+                isAdmin = true;
+            } else {
+                let orgCode = user && user.account && user.account.org_code;
+                let orgData = await getOrgParent({code: orgCode});
+                let parent = orgData && orgData.parent;
+                parentOrgCode = parent.code;
+            }
+            this.setState({
+                user: user,
+                userButtonAddPermission,
+                isAdmin,
+                orgCode: parentOrgCode
+            });
+
+            let rst = await getworkTree({ code: Datumcode });
             if (!rst.pk) {
-                addDir(
+                let data = await addDir(
                     {},
                     {
                         status: 'A',
                         obj_type: 'C_DIR',
                         code: Datumcode,
-                        name: '制度规范',
+                        name: '工程文档',
                         basic_params: {
                             permitted_orgs: [],
                             model_name: ''
                         }
                     }
-                ).then(rst => {
-                    savepk(rst.pk);
-                });
+                );
+                if (data && data.pk) {
+                    savepk(data.pk);
+                }
             } else {
                 savepk(rst.pk);
             }
-        });
+        } catch (e) {
+            console.log('e', e);
+        }
     }
 
     selectStandardDir (keys = [], info) {
@@ -101,44 +110,47 @@ export default class ProDoc extends Component {
             isAdmin,
             orgCode
         } = this.state;
-        console.log('info', info);
-        console.log('keys', keys);
         let treeSelected = info.selected;
         this.setState({
             addDelPanel: '',
             treeSelected
         });
-        let userButtonPermission = false;
+        let userButtonAddPermission = false;
+        let userButtonDelPermission = false;
         if (treeSelected) {
             let treeSelectData = info.node.props.data;
             let extraOrgCode = treeSelectData.extra_params.orgCode ? treeSelectData.extra_params.orgCode : '';
-            console.log('treeSelectData', treeSelectData);
             const [code] = keys;
-            console.log('code', code);
             if (isAdmin) {
-                userButtonPermission = true;
+                userButtonAddPermission = true;
+                userButtonDelPermission = true;
             } else {
                 if (extraOrgCode === orgCode) {
-                    userButtonPermission = true;
+                    userButtonAddPermission = true;
+                    if (treeSelectData && treeSelectData.extra_params && treeSelectData.extra_params.orgDel) {
+                        userButtonDelPermission = true;
+                    }
                 }
             }
             let extraOrgLeaf = treeSelectData.extra_params.orgLeaf ? treeSelectData.extra_params.orgLeaf : '';
             this.setState({
                 currentpk: code.split('--')[0],
                 currentcode: code.split('--')[1],
-                userButtonPermission,
+                userButtonAddPermission,
+                userButtonDelPermission,
                 treeSelectData,
                 extraOrgLeaf,
                 extraOrgCode
             });
         } else {
             if (isAdmin) {
-                userButtonPermission = true;
+                userButtonAddPermission = true;
             }
             this.setState({
                 currentpk: '',
                 currentcode: '',
-                userButtonPermission,
+                userButtonAddPermission,
+                userButtonDelPermission,
                 treeSelectData: '',
                 extraOrgLeaf: false,
                 extraOrgCode: ''
@@ -151,7 +163,8 @@ export default class ProDoc extends Component {
             worktree = []
         } = this.props;
         const {
-            userButtonPermission,
+            userButtonAddPermission,
+            userButtonDelPermission,
             addDelPanel,
             treeSelected
         } = this.state;
@@ -167,13 +180,13 @@ export default class ProDoc extends Component {
                     >
                         <Button
                             onClick={this.handleAddDir.bind(this)}
-                            disabled={!userButtonPermission}
+                            disabled={!userButtonAddPermission}
                         >
                             新增目录
                         </Button>
                         <Button
                             onClick={this.handleDelDir.bind(this)}
-                            disabled={!userButtonPermission || !treeSelected}
+                            disabled={!userButtonDelPermission}
                         >
                             删除目录
                         </Button>
@@ -185,7 +198,7 @@ export default class ProDoc extends Component {
                 </Sidebar>
                 <Content>
                     {
-                        !userButtonPermission
+                        !userButtonAddPermission
                             ? null
                             : addDelPanel === 'ADD'
                                 ? (
@@ -223,18 +236,20 @@ export default class ProDoc extends Component {
         const {
             isAdmin
         } = this.state;
-        let userButtonPermission = false;
+        let userButtonAddPermission = false;
+        // 删除后没有选中节点，删除权限取消
+        let userButtonDelPermission = false;
         if (isAdmin) {
-            userButtonPermission = true;
+            userButtonAddPermission = true;
         }
-        console.log('userButtonPermission', userButtonPermission);
         this.setState({
             addDelPanel: '',
             currentpk: '',
             currentcode: '',
             treeSelectData: '',
             treeSelected: false,
-            userButtonPermission,
+            userButtonAddPermission,
+            userButtonDelPermission,
             extraOrgLeaf: false,
             extraOrgCode: ''
         });

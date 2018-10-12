@@ -14,6 +14,7 @@ import riskFactorReducer, {actions as riskFactorActions} from './riskFactor';
 import riskEvaluationReducer, {actions as riskEvaluationActions} from './riskEvaluation';
 import proDocReducer, {actions as proDocActions} from './proDoc';
 import nurseryManagementRducer, {actions as nurseryManagementActions} from './nurseryManagement';
+import auxiliaryAcceptanceRducer, {actions as auxiliaryAcceptanceActions} from './auxiliaryAcceptance';
 
 export default handleActions({
     [combineActions(...actionsMap(standardActions))]: (state = {}, action) => ({
@@ -71,5 +72,9 @@ export default handleActions({
     [combineActions(...actionsMap(nurseryManagementActions))]: (state = {}, action) => ({
         ...state,
         nurseryManagement: nurseryManagementRducer(state.nurseryManagement, action)
+    }),
+    [combineActions(...actionsMap(auxiliaryAcceptanceActions))]: (state = {}, action) => ({
+        ...state,
+        auxiliaryAcceptance: auxiliaryAcceptanceRducer(state.auxiliaryAcceptance, action)
     })
 }, {});

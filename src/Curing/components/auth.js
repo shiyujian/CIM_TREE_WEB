@@ -489,7 +489,6 @@ export const handleAreaLayerData = async (eventKey, treeNodeName, getTreearea) =
     let handleKey = eventKey.split('-');
     let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
     let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-    let treearea = [];
     try {
         let rst = await getTreearea({}, { no: no });
         if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {

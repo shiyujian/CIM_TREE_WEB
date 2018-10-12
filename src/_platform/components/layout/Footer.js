@@ -9,11 +9,11 @@ export default class Footer extends Component {
             location: {pathname = ''} = {},
             match: {params: {module = ''} = {}} = {}
         } = this.props;
-        console.log('module', module);
-        console.log('this.props', this.props);
-        console.log('pathname', pathname);
         const ignore = Footer.ignoreModules.some(m => m === module);
         if (ignore) {
+            return null;
+        }
+        if (pathname === '/project/auxiliaryacceptance') {
             return null;
         }
         return (
