@@ -1,0 +1,87 @@
+.AuxiliaryAcceptanceGis-container {
+    display: flex;
+    position: absolute;
+    top: 80px;
+    width: calc(~'100% - 160px');
+    height: calc(~'100% - 80px');
+    left: 160px;
+
+    .AuxiliaryAcceptanceGis-r-main {
+        flex:1 1 auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 解决树loading抖动问题 */
+    .ant-tree li span.ant-tree-icon_loading {
+        left: 20px;
+        background-image: none;
+    }
+    .ant-tree-icon_loading + .ant-tree-title {
+        margin-left: 20px;
+    }
+}
+
+.l-map {
+    position:relative;
+    .leaflet-popup-content h2 {
+      font-weight: 400 !important;
+      font-size: 12px !important;
+    }
+  
+    .AuxiliaryAcceptanceGis-menuPanel {
+      position: absolute;
+      height: 100%;
+      width: 260px;
+      transition: all 0.3s;
+      z-index: 980;
+
+      .AuxiliaryAcceptanceGis-aside {
+          position: absolute;
+          left: 0;
+          width: 100%;
+          top: 0;
+          bottom: 0;
+          background-color: rgba(255,255,255, 0.9);
+          color: #333;
+          z-index: 999;
+          overflow-x: hidden;
+          overflow-y: auto;
+
+          .AuxiliaryAcceptanceGis-asideTree {
+              margin-top: 20px;
+              margin-left: 20px;
+          }
+      }
+  }
+    #mapid{
+      cursor: pointer;
+    }
+
+    .treeControl {
+      position: absolute;
+      z-index: 960;
+      top: 6px;
+      right: 50px;
+    }
+    /*修改菜单边距*/
+    .aside .ant-collapse-content {
+      padding: 0 8px;
+    }
+  
+    .foldBtn {
+      position: absolute;
+      top: 50%;
+      left: 200px;
+      width: 24px;
+      border: solid #EEE;
+      border-width: 1px 1px 1px 0;
+      border-radius: 0 5px 5px 0;
+      background: #fff;
+      padding: 12px 5px;
+      cursor: pointer;
+      z-index: 500;
+      margin-top: -20px;
+      transition: all .3s;
+    }
+}

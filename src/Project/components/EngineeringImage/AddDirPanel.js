@@ -24,8 +24,9 @@ class AddDirPanel extends Component {
         } = this.props;
         validateFields((err, values) => {
             console.log('values', values);
+            console.log('currentcode', currentcode);
             if (!err) {
-                console.log('currentcode', currentcode);
+                // 没有选中树节点，在第一层创建目录
                 if (!currentcode) {
                     addDir(
                         {},
@@ -41,7 +42,8 @@ class AddDirPanel extends Component {
                             },
                             extra_params: {
                                 orgLeaf: values.dirOrgLeaf,
-                                orgCode: values.dirOrgCode
+                                orgCode: values.dirOrgCode,
+                                orgDel: false
                             }
                         }
                     ).then(rst => {
@@ -56,10 +58,14 @@ class AddDirPanel extends Component {
                     });
                 } else {
                     let orgLeaf = true;
+                    // 删除权限，只有非管理员可以创建的模块可以被用户删除
+                    let orgDel = true;
                     let orgCode = extraOrgCode;
                     if (isAdmin && !extraOrgLeaf) {
                         orgLeaf = values.dirOrgLeaf;
                         orgCode = values.dirOrgCode;
+                        // 当只有管理员可以进行操作时，不能被用户删除
+                        orgDel = false;
                     }
                     addDir(
                         {},
@@ -75,7 +81,8 @@ class AddDirPanel extends Component {
                             },
                             extra_params: {
                                 orgLeaf: orgLeaf,
-                                orgCode: orgCode
+                                orgCode: orgCode,
+                                orgDel: orgDel
                             }
                         }
                     ).then(rst => {

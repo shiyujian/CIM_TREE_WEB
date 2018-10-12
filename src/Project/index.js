@@ -9,17 +9,25 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-11 14:22:58
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-26 16:09:54
+ * @Last Modified time: 2018-10-11 16:29:41
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import { Route, Redirect, Switch } from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
+import AsideComponent from './components/Aside';
 import Submenu from '_platform/components/panels/Submenu';
 import ContainerRouters from '_platform/components/panels/ContainerRouters';
 import { Icon } from 'react-fa';
 
 export default class Project extends Component {
+    constructor (props) {
+        super(props);
+        this.state = {
+            defaultOpenKeys: ['nursery']
+        };
+    }
+
     async componentDidMount () {
         const { default: reducer } = await import('./store');
         const Containers = await import('./containers');
@@ -30,25 +38,68 @@ export default class Project extends Component {
     }
 
     render () {
-        const { Create } = this.state || {};
-        return (
-            <Body>
-                <Aside>
-                    <Submenu
-                        {...this.props}
-                        menus={Project.menus}
-                        defaultOpenKeys={Project.defaultOpenKeys}
-                    />
-                </Aside>
-                <Main>
-                    <ContainerRouters
-                        menus={Project.menus}
-                        containers={this.state}
-                    />
-                    {/* <Redirect path="/" to={{pathname: '/project/nurserymanagement'}} /> */}
-                </Main>
-            </Body>
-        );
+        const {
+            location: {pathname = ''} = {},
+            match: {params: {module = ''} = {}} = {}
+        } = this.props;
+        console.log('this.props2222222222222', this.props);
+        console.log('pathname22222222222222', pathname);
+        const {
+            AuxiliaryAcceptance,
+            defaultOpenKeys
+        } = this.state || {};
+        if (pathname === '/project/auxiliaryacceptance') {
+            return (
+                <Body>
+                    <AsideComponent>
+                        <Submenu
+                            {...this.props}
+                            menus={Project.menus}
+                            getOnOpenKeys={this.getOnOpenKeys.bind(this)}
+                            defaultOpenKeys={defaultOpenKeys}
+                        />
+                    </AsideComponent>
+                    <Main>
+                        <Switch>
+                            {AuxiliaryAcceptance && (
+                                <Route
+                                    path='/project/auxiliaryAcceptance'
+                                    component={AuxiliaryAcceptance}
+                                />
+                            )}
+                        </Switch>
+                    </Main>
+                </Body>
+            );
+        } else {
+            return (
+                <Body>
+                    <Aside>
+                        <Submenu
+                            {...this.props}
+                            menus={Project.menus}
+                            getOnOpenKeys={this.getOnOpenKeys.bind(this)}
+                            // defaultOpenKeys={Project.defaultOpenKeys}
+                            defaultOpenKeys={defaultOpenKeys}
+                        />
+                    </Aside>
+                    <Main>
+                        <ContainerRouters
+                            menus={Project.menus}
+                            containers={this.state}
+                        />
+                    </Main>
+                </Body>
+            );
+        }
+    }
+
+    getOnOpenKeys (openKeys) {
+        console.log('openKeys', openKeys);
+        console.log('openKeys', openKeys);
+        this.setState({
+            defaultOpenKeys: openKeys
+        });
     }
 
     static menus = [
@@ -208,8 +259,15 @@ export default class Project extends Component {
                     icon: <Icon name='tag' />
                 }
             ]
+        },
+        {
+            key: 'auxiliaryAcceptance',
+            name: '辅助验收',
+            id: 'PROJECT.AUXILIARYACCEPTANCE',
+            path: '/project/auxiliaryacceptance',
+            icon: <Icon name='check' />
         }
     ];
 
-    static defaultOpenKeys = ['landArea', 'nursery'];
+    static defaultOpenKeys = ['nursery'];
 }
