@@ -1,9 +1,7 @@
 
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
 import { FOREST_API } from '_platform/api';
 import { Form, Button, InputNumber, Row, Col } from 'antd';
-import { searchToObj } from '_platform/auth';
 import './SupplyDetails.less';
 const myButton = {
     height: 22,

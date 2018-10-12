@@ -224,6 +224,7 @@ class Tablelevel extends Component {
                             <Option value={0}>未审核</Option>
                             <Option value={1}>审核通过</Option>
                             <Option value={2}>审核不通过</Option>
+                            <Option value={''}>全部</Option>
                         </Select>
                     </Col>
                 </Row>
@@ -369,7 +370,7 @@ class Tablelevel extends Component {
         const { page, status, suppliername } = this.state;
         const { getSupplierList } = this.props.actions;
         const param = {
-            status,
+            status: status === undefined ? '' : status,
             suppliername,
             size: 10,
             page

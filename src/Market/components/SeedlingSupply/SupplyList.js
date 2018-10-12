@@ -31,7 +31,7 @@ class DataList extends Component {
                     <FormItem
                         label='苗木名称'
                     >
-                        <Input value={treetypename} onChange={this.handleTreeTypeName} className='input-width'
+                        <Input value={treetypename} onChange={this.handleTreeTypeName} className='search-input'
                             placeholder='请输入苗木名称' />
                     </FormItem>
                     <FormItem className='search-left'
@@ -46,7 +46,7 @@ class DataList extends Component {
                             {
                                 dataList.length > 0 ? dataList.map((item, index) => {
                                     return (
-                                        <Col span='6' key={index} onClick={this.toSupplyDetails.bind(this, item.ID)}>
+                                        <Col span='6' key={index} onClick={this.toSupplyDetails.bind(this, item.ID)} style={{marginBottom: 10}}>
                                             <Menu record={item} />
                                         </Col>
                                     );

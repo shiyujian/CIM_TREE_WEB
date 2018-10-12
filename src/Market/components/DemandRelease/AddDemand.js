@@ -11,7 +11,7 @@ const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const TextArea = Input.TextArea;
 const { RangePicker } = DatePicker;
-const dateFormat = 'YYYY/MM/DD';
+const dateFormat = 'YYYY-MM-DD';
 class AddDemand extends Component {
     constructor (props) {
         super(props);
@@ -22,14 +22,12 @@ class AddDemand extends Component {
             TreeTypeList: [], // 树种类型
             RegionCodeList: [], // 行政区划树列表
             RegionCode: '', // 行政区划
-            Contacter: '', // 联系人
-            Phone: '', // 联系电话
             treeNames: [], // 树木名称数组
             ProjectName: '', // 项目名称
             Section: '', // 标段
             TreeTypeID: '', // 树木ID
             length: 0, // 树种个数
-            Describe: '', // 求购描述
+            PurchaseDescribe: '', // 求购描述
             dataList: [] // 数组
         };
         this.Creater = ''; // 发布者
@@ -109,7 +107,7 @@ class AddDemand extends Component {
         }];
     }
     componentDidMount () {
-        console.log(this.state.Describe, 'dddd');
+        console.log(this.state.PurchaseDescribe, 'dddd');
         const { getTreeTypes, getRegionCodes, getWpunittree, getPurchaseById, getPurchaseStandard } = this.props.actions;
         // 获得所有项目
         getWpunittree().then(rep => {
@@ -164,6 +162,14 @@ class AddDemand extends Component {
             });
             console.log(this.state.TreeTypeList, '树种');
         });
+        // 获取施工方的责任人电话
+        const { id, org_code, phone, name } = getUser();
+        this.Creater = id;
+        this.CreaterOrg = org_code;
+        this.props.form.setFieldsValue({
+            Contacter: name,
+            Phone: phone
+        });
         // 编辑采购单
         this.purchaseid = this.props.addDemandKey;
         if (typeof this.purchaseid === 'string') {
@@ -176,7 +182,7 @@ class AddDemand extends Component {
                     StartTime: rep.StartTime,
                     EndTime: rep.EndTime,
                     RegionCode: rep.UseNurseryRegionCode,
-                    Describe: rep.Describe || ''
+                    PurchaseDescribe: rep.PurchaseDescribe || ''
                 });
                 this.UseNurseryAddress = rep.UseNurseryAddress;
             });
@@ -208,14 +214,6 @@ class AddDemand extends Component {
                 });
             });
         }
-        // 获取施工方的责任人电话
-        const { id, org_code, phone, name } = getUser();
-        this.Creater = id;
-        this.CreaterOrg = org_code;
-        this.setState({
-            Contacter: name,
-            Phone: phone
-        });
     }
     renderCard () {
         let card = [];
@@ -242,7 +240,7 @@ class AddDemand extends Component {
         return card;
     }
     render () {
-        const { purchaseInfo, Contacter, Phone, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime, Describe } = this.state;
+        const { purchaseInfo, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime, PurchaseDescribe } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='addDemand' style={{padding: '0 20px'}}>
@@ -289,10 +287,14 @@ class AddDemand extends Component {
                                 )}
                             </FormItem>
                             <FormItem label='联系人'>
-                                <Input value={Contacter} />
+                                {getFieldDecorator('Contacter')(
+                                    <Input className='search-input' />
+                                )}
                             </FormItem>
                             <FormItem label='联系电话'>
-                                <Input value={Phone} />
+                                {getFieldDecorator('Phone')(
+                                    <Input className='search-input' />
+                                )}
                             </FormItem>
                             <FormItem label='报价起止日期'>
                                 <RangePicker value={
@@ -306,7 +308,7 @@ class AddDemand extends Component {
                                 this.renderCard()
                             }
                             <FormItem label='求购描述' className='label-block'>
-                                <TextArea rows={4} style={{width: 750}} value={Describe} onChange={this.handleDescribe} />
+                                <TextArea rows={4} style={{width: 750}} value={PurchaseDescribe} onChange={this.handleDescribe} />
                             </FormItem>
                             <FormItem style={{width: 800, textAlign: 'center'}}>
                                 <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
@@ -378,7 +380,8 @@ class AddDemand extends Component {
         }
     }
     toCheck () {
-        const { ProjectName, Section, RegionCode, Contacter, Phone } = this.state;
+        const { ProjectName, Section, RegionCode } = this.state;
+        const { Contacter, Phone } = this.props.form.getFieldsValue();
         if (ProjectName === '' && Section === '') {
             message.error('请先选择项目和标段');
             return;
@@ -394,7 +397,8 @@ class AddDemand extends Component {
         this.toRelease(1);
     }
     toRelease (Status) {
-        const { purchaseInfo, Contacter, Phone, RegionCode, StartTime, EndTime, dataList, ProjectName, Section, Describe } = this.state;
+        const { purchaseInfo, RegionCode, StartTime, EndTime, dataList, ProjectName, Section, PurchaseDescribe } = this.state;
+        const { Contacter, Phone } = this.props.form.getFieldsValue();
         const { postPurchase, putPurchase } = this.props.actions;
         let Specs = [];
         dataList.map(item => {
@@ -422,12 +426,17 @@ class AddDemand extends Component {
                 Phone,
                 StartTime,
                 EndTime,
-                Describe
+                Status,
+                PurchaseDescribe
             }).then(rep => {
                 if (rep.code === 1 && Status === 1) {
                     message.success('编辑成功');
+                    this.props.actions.changeAddDemandVisible(false);
                 } else if (rep.code === 1 && Status === 0) {
                     message.success('暂存成功');
+                    this.props.actions.changeAddDemandVisible(false);
+                } else {
+                    message.error('操作失败');
                 }
             });
         } else {
@@ -443,12 +452,15 @@ class AddDemand extends Component {
                 Section,
                 UseNurseryRegionCode: RegionCode,
                 Specs,
-                Describe
+                Status,
+                PurchaseDescribe
             }).then(rep => {
                 if (rep.code === 1 && Status === 1) {
                     message.success('发布成功');
+                    this.props.actions.changeAddDemandVisible(false);
                 } else if (rep.code === 1 && Status === 0) {
                     message.success('暂存成功');
+                    this.props.actions.changeAddDemandVisible(false);
                 } else {
                     message.error('操作失败');
                 }
@@ -574,7 +586,7 @@ class AddDemand extends Component {
     }
     handleDescribe (e) {
         this.setState({
-            Describe: e.target.value
+            PurchaseDescribe: e.target.value
         });
     }
     toDelete (record, index) {

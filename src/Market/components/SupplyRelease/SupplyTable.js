@@ -31,7 +31,7 @@ class SupplyTable extends Component {
                     <FormItem
                         label='苗木名称'
                     >
-                        <Input className='input-width' placeholder='请输入苗木名称' onChange={this.handleTreeType} />
+                        <Input className='search-input' placeholder='请输入苗木名称' onChange={this.handleTreeType} />
                     </FormItem>
                     <FormItem
                         label='状态'

@@ -31,9 +31,8 @@ export default class SeedlingSupply extends Component {
 
     render () {
         const {
-            supplyDetailsVisible, supplyDetailsKey
+            supplyDetailsVisible
         } = this.props;
-        console.log(supplyDetailsVisible, supplyDetailsKey);
         return (
             <Body>
                 <Main>

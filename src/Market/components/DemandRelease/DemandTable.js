@@ -24,35 +24,29 @@ class DemandTable extends Component {
         getWpunittree().then(rep => {
             this.setState({
                 projectList: rep
+            }, () => {
+                this.toSearch();
             });
         });
-        this.toSearch();
     }
     render () {
         const { getFieldDecorator } = this.props.form;
         const { dataList, projectList } = this.state;
-        const {
-            addDemandVisible
-        } = this.props;
-        let display = 'block';
-        if (addDemandVisible) {
-            display = 'none';
-        }
         return (
-            <div className='demandTable' style={{display: display, padding: '0 20px'}}>
+            <div className='demandTable' style={{padding: '0 20px'}}>
                 <Form layout='inline'>
                     <FormItem
                         label='采购编号'
                     >
                         {getFieldDecorator('purchaseno')(
-                            <Input className='input-width' placeholder='请输入采购编号' />
+                            <Input className='search-input' placeholder='请输入采购编号' />
                         )}
                     </FormItem>
                     <FormItem
                         label='采购名称'
                     >
                         {getFieldDecorator('projectname')(
-                            <Input className='input-width' placeholder='请输入采购名称' />
+                            <Input className='search-input' placeholder='请输入采购名称' />
                         )}
                     </FormItem>
                     <FormItem

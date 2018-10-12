@@ -31,17 +31,15 @@ export default class SeedlingPurchase extends Component {
 
     render () {
         const {
-            purchaseDetailsVisible, purchaseDetailsKey
+            purchaseDetailsVisible
         } = this.props;
-        console.log(purchaseDetailsVisible, purchaseDetailsKey);
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='苗木求购' {...this.props} />
                     <Content>
-                        <PurchaseList {...this.props} />
                         {
-                            purchaseDetailsVisible ? <PurchaseDetails {...this.props} /> : ''
+                            purchaseDetailsVisible ? <PurchaseDetails {...this.props} /> : <PurchaseList {...this.props} />
                         }
                     </Content>
                 </Main>

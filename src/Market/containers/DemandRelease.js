@@ -31,17 +31,15 @@ export default class DemandRelease extends Component {
 
     render () {
         const {
-            addDemandVisible, addDemandKey
+            addDemandVisible
         } = this.props;
-        console.log(addDemandVisible, addDemandKey);
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='需求发布' {...this.props} />
                     <Content>
-                        <DemandTable {...this.props} />
                         {
-                            addDemandVisible ? <AddDemand {...this.props} /> : ''
+                            addDemandVisible ? <AddDemand {...this.props} /> : <DemandTable {...this.props} />
                         }
                     </Content>
                 </Main>

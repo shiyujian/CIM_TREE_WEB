@@ -31,7 +31,7 @@ export default class SupplyRelease extends Component {
 
     render () {
         const {
-            addSeedlingVisible, addSeedlingKey
+            addSeedlingVisible
         } = this.props;
         return (
             <Body>

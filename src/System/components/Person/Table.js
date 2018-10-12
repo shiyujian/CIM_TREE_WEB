@@ -506,7 +506,7 @@ class Users extends Component {
                                 </label>
                                 <Input
                                     id='NurseryData'
-                                    className='search_input'
+                                    className='search-input'
                                 />
                             </Col>
                             <Col span={7}>

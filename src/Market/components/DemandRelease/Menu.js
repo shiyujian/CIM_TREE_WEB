@@ -1,12 +1,13 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Card, Row, Col, message } from 'antd';
+import { Form, Button, Card, Row, Col, message, Tag } from 'antd';
 
 class Menu extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            a: 1
+            dataList: [],
+            TreeTypes: []
         };
         this.toSoldOut = this.toSoldOut.bind(this); // 需求详情
     }
@@ -33,30 +34,82 @@ class Menu extends Component {
                 }
             });
         }
+        // 根据采购单id获取采购单
+        const { getPurchaseStandard } = this.props.actions;
+        getPurchaseStandard({}, {
+            purchaseid: this.props.record.ID
+        }).then(rep => {
+            let dataList = [];
+            let TreeTypes = [];
+            rep.map(item => {
+                if (!TreeTypes.includes(item.TreeTypeName)) {
+                    TreeTypes.push(item.TreeTypeName);
+                }
+            });
+            TreeTypes.map(item => {
+                let arr = [];
+                rep.map(row => {
+                    if (row.TreeTypeName === item) {
+                        arr.push({...row});
+                    }
+                });
+                dataList.push({name: item, children: arr});
+            });
+            this.setState({
+                dataList,
+                TreeTypes
+            });
+        });
+    }
+    componentWillReceiveProps (nextProps) {
     }
     render () {
-        const { StartTime, EndTime, ProjectName, Section } = this.state;
+        const { dataList, TreeTypes, StartTime, EndTime, ProjectName, Section } = this.state;
         const { record } = this.props;
         return (
             <div className='menu' style={{marginTop: 10}}>
                 <Card title={'发布时间：'}>
                     <Row>
-                        <Col span={8}>
-                            <h3>{ProjectName}{Section}<span>({record.SKU})</span></h3>
+                        <Col span={6}>
+                            <h3>{ProjectName}{Section}采购单<Tag style={{marginLeft: 10}} color='#87d068'>{record.Status === 1 ? '报价中' : '未发布'}</Tag></h3>
                             <p>报价起止时间：{StartTime}至{EndTime}</p>
                             <p>用苗地：{record.UseNurseryAddress}</p>
-                            <p>采购品种：{record.TreeTypes}</p>
+                            <p>采购品种：
+                                {TreeTypes}
+                            </p>
                             <p>联系方式：{record.Phone}({record.Contacter})</p>
                         </Col>
-                        <Col span={8}>
-                            <p>采购品种：采购品种：采购品种：</p>
+                        <Col span={12}>
+                            {
+                                dataList.map((item, index) => {
+                                    return (
+                                        <div>
+                                            <Tag color='blue-inverse'>{index}</Tag>
+                                            <span>{item.name}</span>
+                                            <span style={{display: 'inline-block', marginLeft: 10}}>
+                                                {
+                                                    item.children.map(row => {
+                                                        return <p>胸径{row.DBH}cm 地径{row.GroundDiameter}cm 自然高{row.Height}cm 冠幅{row.CrownWidth}cm 培育方式：{row.CultivationMode} ￥{row.Price}（{row.Num}株)</p>;
+                                                    })
+                                                }
+                                            </span>
+                                        </div>
+                                    );
+                                })
+                            }
                         </Col>
-                        <Col span={8} style={{paddingTop: 40}}>
+                        <Col span={6} style={{paddingTop: 40}}>
                             <Button onClick={this.toEditInfo}>查看报价</Button>
-                            <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)} style={{marginLeft: 15}}>编辑需求</Button>
-                            <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>
+                            <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)} style={{marginLeft: 15}}>编辑</Button>
+                            <Button type='primary' onClick={this.toSoldOut} style={{marginLeft: 15}}>
                                 {record.Status === 1 ? '下架' : '上架'}
                             </Button>
+                            {
+                                record.Status === 1 || record.Status === 2 ? '' : <Button type='primary' onClick={this.toDelete.bind(this)} style={{marginLeft: 15}}>
+                                    删除
+                                </Button>
+                            }
+                            
                         </Col>
                     </Row>
                 </Card>
@@ -77,6 +130,15 @@ class Menu extends Component {
                 this.props.toSearch();
             } else {
                 message.success('上下架失败');
+            }
+        });
+    }
+    toDelete () {
+        const { deletePurchase } = this.props.actions;
+        deletePurchase({id: this.props.record.ID}).then(rep => {
+            if (rep.code === 1) {
+                message.success('删除成功');
+                this.props.toSearch();
             }
         });
     }

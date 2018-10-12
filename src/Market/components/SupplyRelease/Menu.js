@@ -1,17 +1,19 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Card, Row, Col, message } from 'antd';
+import { Form, Button, Card, Row, Col, Tag, message } from 'antd';
 import { FOREST_API, TREETYPENO } from '_platform/api';
 
 class Menu extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            TreeTypeName: '' // 类型名称
+            TreeTypeName: '', // 类型名称
+            dataList: [] // 规格列表
         };
         this.toSoldOut = this.toSoldOut.bind(this); // 上下架
     }
     componentDidMount () {
+        const { getInventoryList } = this.props.actions;
         const { record } = this.props;
         if (record.TreeTypeNo) {
             TREETYPENO.map(item => {
@@ -22,28 +24,59 @@ class Menu extends Component {
                 }
             });
         }
+        // 根据商品id获取规格
+        getInventoryList({}, {
+            spuid: this.props.record.ID
+        }).then(rep => {
+            let dataList = [];
+            if (rep.code === 200) {
+                let Suppliers = [];
+                rep.content.map(item => {
+                    if (!Suppliers.includes(item.SupplierID)) {
+                        Suppliers.push(item.SupplierID);
+                    }
+                });
+                rep.content.map(item => {
+                    if (item.SupplierID === Suppliers[0]) {
+                        dataList.push(item);
+                    }
+                });
+                this.setState({
+                    dataList
+                });
+            }
+        });
     }
     render () {
+        const { dataList } = this.state;
         const { record } = this.props;
         return (
             <div className='menu' style={{marginTop: 10}}>
                 <Card title={'发布时间：'}>
                     <Row>
+                        <Col span={4}>
+                            <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='150px' height='100px' />
+                        </Col>
                         <Col span={5}>
-                            <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='180px' height='120px' />
-                        </Col>
-                        <Col span={7}>
-                            <h3>{record.TreeTypeName}<span>({record.SKU})</span></h3>
+                            <h3>
+                                {record.TreeTypeName}
+                                <span>({record.SKU}株)</span>
+                                <Tag style={{marginLeft: 10}} color='#87d068'>{record.Status === 1 ? '上架中' : '未上架'}</Tag>
+                            </h3>
                             <p>类型：{this.state.TreeTypeName}</p>
-                            <p>价格：￥{record.MinPrice}-{record.MaxPrice}</p>
-                            <p>商品备注：{record.TreeDescribe}</p>
+                            <p>上车价：￥{record.MinPrice}-{record.MaxPrice}</p>
+                            <p>联系方式：{record.Phone}</p>
                         </Col>
-                        <Col span={6}>
-                            <p>采购品种：采购品种：采购品种：</p>
+                        <Col span={11}>
+                            {
+                                dataList.map(item => {
+                                    return <p>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
+                                })
+                            }
                         </Col>
-                        <Col span={6} style={{paddingTop: 30}}>
-                            <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)}>修改信息</Button>
-                            <Button type='primary' onClick={this.toSoldOut} style={{width: 82, marginLeft: 15}}>
+                        <Col span={4} style={{paddingTop: 30}}>
+                            <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)}>修改</Button>
+                            <Button type='primary' onClick={this.toSoldOut} style={{marginLeft: 15}}>
                                 {
                                     record.Status === 1 ? '下架' : '上架'
                                 }
