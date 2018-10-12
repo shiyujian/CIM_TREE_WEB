@@ -25,18 +25,16 @@ class DataList extends Component {
     }
     render () {
         const { dataList, treetypename } = this.state;
-        let display = this.props.supplyDetailsVisible ? 'none' : 'block';
-        console.log(display);
         return (
-            <div className='seedling-supply' style={{display: display, padding: '0 20px'}}>
+            <div className='seedling-supply content-padding'>
                 <Form layout='inline'>
                     <FormItem
                         label='苗木名称'
                     >
-                        <Input value={treetypename} onChange={this.handleTreeTypeName}
-                            style={{width: '200px'}} placeholder='请输入苗木名称' />
+                        <Input value={treetypename} onChange={this.handleTreeTypeName} className='input-width'
+                            placeholder='请输入苗木名称' />
                     </FormItem>
-                    <FormItem style={{marginLeft: 150}}
+                    <FormItem className='search-left'
                     >
                         <Button type='primary' onClick={this.onSearch}>查询</Button>
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>

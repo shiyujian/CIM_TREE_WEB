@@ -13,7 +13,7 @@ class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            status: 0, // 审核状态
+            status: 1, // 审核状态
             nurseryname: '', // 苗圃名称
             total: 0,
             page: 1,
@@ -34,6 +34,7 @@ class Tablelevel extends Component {
         this.toAdd = this.toAdd.bind(this); // 新增苗圃弹框
         this.handleAudit = this.handleAudit.bind(this); // 苗圃审核
         this.handleCancel = this.handleCancel.bind(this); // 隐藏弹框
+        this.handlePage = this.handlePage.bind(this); // 换页
     }
     componentDidMount () {
         const { getRegionCodes, getSupplierList } = this.props.actions;
@@ -137,7 +138,7 @@ class Tablelevel extends Component {
         }
     ];
     render () {
-        const { nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options, nurseryname } = this.state;
+        const { status, nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options, nurseryname } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='table-level'>
@@ -154,7 +155,7 @@ class Tablelevel extends Component {
                         <Input className='search_input' value={nurseryname} onChange={this.handleName} />
                         <Button
                             type='primary'
-                            onClick={()=>{this.onSearch()}}
+                            onClick={this.onSearch}
                             style={{minWidth: 30, marginRight: 20}}
                         >
                             查询
@@ -183,7 +184,7 @@ class Tablelevel extends Component {
                         >
                             状态:
                         </label>
-                        <Select defaultValue={0} allowClear style={{width: 150}} onChange={this.handleStatus}>
+                        <Select defaultValue={status} allowClear style={{width: 150}} onChange={this.handleStatus}>
                             <Option value={0}>未审核</Option>
                             <Option value={1}>审核通过</Option>
                             <Option value={2}>审核不通过</Option>
@@ -195,7 +196,7 @@ class Tablelevel extends Component {
                         <Table columns={this.columns} bordered dataSource={nurseryList}
                             scroll={{ x: 1300 }} pagination={false} rowKey='ID' />
                         <Pagination total={total} page={page} pageSize={10} style={{marginTop: '10px'}}
-                            showQuickJumper onChange={this.onSearch} />
+                            showQuickJumper onChange={this.handlePage} />
                     </Col>
                 </Row>
                 <Modal title='查看' visible={seeVisible}
@@ -249,6 +250,13 @@ class Tablelevel extends Component {
             </div>
         );
     }
+    handlePage (page) {
+        this.setState({
+            page
+        }, () => {
+            this.onSearch();
+        });
+    }
     onClear () {
         this.setState({
             nurseryname: ''
@@ -260,13 +268,13 @@ class Tablelevel extends Component {
             LeaderCard
         });
     }
-    onSearch (page = 1, pageSize = 10) {
-        const { status, nurseryname } = this.state;
+    onSearch () {
+        const { page, status, nurseryname } = this.state;
         const { getNurseryList } = this.props.actions;
         const param = {
             status,
             nurseryname,
-            size: pageSize,
+            size: 10,
             page
         };
         getNurseryList({}, param).then((rep) => {

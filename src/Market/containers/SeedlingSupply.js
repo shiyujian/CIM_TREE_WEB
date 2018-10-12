@@ -39,9 +39,8 @@ export default class SeedlingSupply extends Component {
                 <Main>
                     <DynamicTitle title='苗木供应' {...this.props} />
                     <Content>
-                        <SupplyList {...this.props} />
                         {
-                            supplyDetailsVisible ? <SupplyDetails {...this.props} /> : ''
+                            supplyDetailsVisible ? <SupplyDetails {...this.props} /> : <SupplyList {...this.props} />
                         }
                     </Content>
                 </Main>

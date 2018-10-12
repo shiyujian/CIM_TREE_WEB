@@ -32,6 +32,7 @@ class CountFilter extends Component {
             groupArray: [],
             start:'',
             end:'',
+            statusArray:[],
         };
     }
 
@@ -378,11 +379,44 @@ class CountFilter extends Component {
         })
     }
 
+    onCheckinChange(value){    //出勤选择下拉框和状态选择下拉框联动
+        const {
+            form: { setFieldsValue }
+        } = this.props;
+        setFieldsValue({
+            status: undefined
+        });
+        let statusArray = [];
+        if(value == "y"){   //出勤时可以选择的状态有正常打卡,迟到,和早退
+            let arr = [{label:'正常打卡',value:4},{label:'迟到',value:2},{label:'早退',value:3}];
+            arr.map(p =>{
+                statusArray.push(
+                    <Option key={p.value} value={p.value}>
+                        {p.label}
+                    </Option>
+                );
+            })
+
+        }else if(value == "n"){  //缺勤时可以选择的状态有打卡一次
+            let arr = [{label:'打卡一次',value:1}];
+            arr.map(p =>{
+                statusArray.push(
+                    <Option key={p.value} value={p.value}>
+                        {p.label}
+                    </Option>
+                );
+            })
+        }
+        this.setState({
+            statusArray: statusArray
+        });
+    }
+
     render () {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { projectArray, sectionArray, groupArray } = this.state;
+        const { projectArray, sectionArray, groupArray,statusArray } = this.state;
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
@@ -454,7 +488,9 @@ class CountFilter extends Component {
                                     {getFieldDecorator('checkin', {
                                 
                                     })(
-                                        <Select placeholder='请选择是否出勤'>
+                                        <Select placeholder='请选择是否出勤' onChange={this.onCheckinChange.bind(
+                                                this
+                                            )}>
                                             <Option
                                                 key={'y'}
                                                 value={'y'}
@@ -465,7 +501,7 @@ class CountFilter extends Component {
                                                 key={'n'}
                                                 value={'n'}
                                             >
-                                                未出勤
+                                                缺勤
                                             </Option>
                                         </Select>
                                     )}
@@ -477,24 +513,7 @@ class CountFilter extends Component {
         
                                     })(
                                         <Select  placeholder='请选择状态'>
-                                            <Option
-                                                key={'迟到'}
-                                                value={'迟到'}
-                                            >
-                                                迟到
-                                            </Option>
-                                            <Option
-                                                key={'早退'}
-                                                value={'早退'}
-                                            >
-                                                早退
-                                            </Option>
-                                            <Option
-                                                key={'正常'}
-                                                value={'正常'}
-                                            >
-                                                正常
-                                            </Option>
+                                           {statusArray}
                                         </Select>
                                     )}
                                 </FormItem>
@@ -591,7 +610,13 @@ class CountFilter extends Component {
                 params['end'] = this.state.end;
             }
             params['checkin'] = values.checkin;
-            params['status'] = values.status;
+            if(values.status == 2){   //迟到默认可查询状态5
+                params['status'] = values.status + ',5';
+            }else if(values.status == 3){  //早退默认可查询状态5
+                params['status'] = values.status + ',5';
+            }else{
+                params['status'] = values.status;
+            }
             params['group'] = values.group;
             params['role'] = values.role;
             params['duty'] = values.duty;
