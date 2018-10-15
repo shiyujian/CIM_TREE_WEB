@@ -9,14 +9,16 @@ export default class DatumTree extends Component {
         this.state = {};
         this.parent = '';
     }
+
     static loop (data = []) {
         return data.map(item => {
             if (item.children && item.children.length) {
                 this.parent = item.name;
                 return (
                     <TreeNode
-                        key={`${item.pk}--${item.code}--children`}
+                        key={JSON.stringify(item)}
                         title={item.name}
+                        selectable={false}
                     >
                         {DatumTree.loop(item.children)}
                     </TreeNode>
@@ -24,9 +26,7 @@ export default class DatumTree extends Component {
             }
             return (
                 <TreeNode
-                    key={`${item.pk}--${item.code}--${item.obj_type_hum}--${
-                        this.parent
-                    }`}
+                    key={JSON.stringify(item)}
                     title={item.name}
                 />
             );
