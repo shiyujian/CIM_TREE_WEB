@@ -10,6 +10,7 @@ class Menu extends Component {
             TreeTypes: []
         };
         this.toSoldOut = this.toSoldOut.bind(this); // 需求详情
+        this.renderButton = this.renderButton.bind(this); // 显示按钮
     }
     componentDidMount () {
         if (this.props.record) {
@@ -70,7 +71,7 @@ class Menu extends Component {
             <div className='menu' style={{marginTop: 10}}>
                 <Card title={'发布时间：'}>
                     <Row>
-                        <Col span={6}>
+                        <Col span={8}>
                             <h3>{ProjectName}{Section}采购单<Tag style={{marginLeft: 10}} color='#87d068'>{record.Status === 1 ? '报价中' : '未发布'}</Tag></h3>
                             <p>报价起止时间：{StartTime}至{EndTime}</p>
                             <p>用苗地：{record.UseNurseryAddress}</p>
@@ -83,13 +84,13 @@ class Menu extends Component {
                             {
                                 dataList.map((item, index) => {
                                     return (
-                                        <div>
+                                        <div key={index}>
                                             <Tag color='blue-inverse'>{index}</Tag>
                                             <span>{item.name}</span>
                                             <span style={{display: 'inline-block', marginLeft: 10}}>
                                                 {
-                                                    item.children.map(row => {
-                                                        return <p>胸径{row.DBH}cm 地径{row.GroundDiameter}cm 自然高{row.Height}cm 冠幅{row.CrownWidth}cm 培育方式：{row.CultivationMode} ￥{row.Price}（{row.Num}株)</p>;
+                                                    item.children.map((row, number) => {
+                                                        return <p key={number} style={{fontSize: 10}}>胸径{row.DBH}cm 地径{row.GroundDiameter}cm 自然高{row.Height}cm 冠幅{row.CrownWidth}cm 培育方式：{row.CultivationMode} ￥{row.Price}（{row.Num}株)</p>;
                                                     })
                                                 }
                                             </span>
@@ -98,23 +99,39 @@ class Menu extends Component {
                                 })
                             }
                         </Col>
-                        <Col span={6} style={{paddingTop: 40}}>
-                            <Button onClick={this.toEditInfo}>查看报价</Button>
-                            <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)} style={{marginLeft: 15}}>编辑</Button>
-                            <Button type='primary' onClick={this.toSoldOut} style={{marginLeft: 15}}>
-                                {record.Status === 1 ? '下架' : '上架'}
-                            </Button>
+                        <Col span={4} style={{paddingTop: 30}}>
                             {
-                                record.Status === 1 || record.Status === 2 ? '' : <Button type='primary' onClick={this.toDelete.bind(this)} style={{marginLeft: 15}}>
-                                    删除
-                                </Button>
+                                this.renderButton()
                             }
-                            
                         </Col>
                     </Row>
                 </Card>
             </div>
         );
+    }
+    renderButton () {
+        let arr = [];
+        let seeButton = <Button type='primary' onClick={this.toEditInfo}>查看报价</Button>;
+        let overButton = <Button type='primary' onClick={this.toEditInfo}>提前结束报价</Button>;
+        let upButton = <Button type='primary' onClick={this.toSoldOut} style={{marginLeft: 15}}>上架</Button>;
+        // let downButton = <Button type='primary' onClick={this.toSoldOut} style={{marginLeft: 15}}>下架</Button>;
+        let editButton = <Button type='primary' onClick={this.toEditInfo} style={{marginLeft: 15}}>编辑</Button>;
+        let deleteButton = <Button type='primary' onClick={this.toDelete.bind(this)} style={{marginLeft: 15}}>删除</Button>;
+        switch (this.props.record.Status) {
+            case 0:
+                arr.push(editButton, upButton);
+                break;
+            case 1:
+                arr.push(seeButton, overButton);
+                break;
+            case 2:
+                arr.push(seeButton);
+                break;
+            case 3:
+                arr.push(seeButton, deleteButton);
+                break;
+        }
+        return arr;
     }
     toEditInfo (key) {
         this.props.toAddDemand(key);

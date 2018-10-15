@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal, Table, Checkbox, Notification, Row
+    Button, Modal, Table, Checkbox, Notification, Row, Form, Col, Select, Input, TreeSelect, Tree
 } from 'antd';
 import { getUser } from '_platform/auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+const FormItem = Form.Item;
+const { Option, OptGroup } = Select;
+const TreeNode = TreeSelect.TreeNode;
 window.config = window.config || {};
 
-export default class AddMember extends Component {
+class AddMember extends Component {
+    static layout = {
+        labelCol: { span: 6 },
+        wrapperCol: { span: 18 }
+    };
     constructor (props) {
         super(props);
         this.state = {
@@ -15,7 +22,8 @@ export default class AddMember extends Component {
             roles: [],
             dataSource: [],
             RelationMem: [],
-            totalUserData: []
+            totalUserData: [],
+            orgTree: []
         };
         this.user = null;
     }
@@ -24,7 +32,8 @@ export default class AddMember extends Component {
         const {
             actions: {
                 getRoles,
-                getForestAllUsersData
+                getForestAllUsersData,
+                getOrgTree
             }
         } = this.props;
         this.user = getUser();
@@ -54,9 +63,28 @@ export default class AddMember extends Component {
             roles: roles
         });
         await this._queryMember();
+
+        getOrgTree().then(rst => {
+            if (rst && rst.children) {
+                // 目前只针对业主的单位，name为建设单位   所以对建设单位进行loop
+                if (rst.children && rst.children instanceof Array && rst.children.length > 0) {
+                    rst.children.map((item) => {
+                        if (item.name === '建设单位') {
+                            if (item && item.children) {
+                                let data = AddMember.orgloop(item.children);
+                                this.setState({
+                                    orgTree:data
+                                })
+                                
+                            }
+                        }
+                    });
+                }
+            }
+        });
     };
     // 查找人员
-    _queryMember = async () => {
+    _queryMember = async (params) => {
         const {
             roles = []
         } = this.state;
@@ -83,11 +111,24 @@ export default class AddMember extends Component {
         try {
             let postdata = {};
             postdata = {
-                roles: roles,
-                sections: sections,
-                is_active: true
+                // roles: roles,
+                // sections: sections,
+                is_active: true,
             };
-
+            if(params){
+                if(params.keyword){
+                    postdata['keyword'] = params.keyword;
+                }
+                if(params.role){
+                    postdata['role'] = params.role;
+                }
+                if(params.organization){
+                    postdata['organization'] = params.organization;
+                }
+                if(params.duty){
+                    postdata['duty'] = params.duty;
+                }
+            }
             let users = await getUsers({}, postdata);
             console.log('users', users);
             this.setState({
@@ -111,13 +152,257 @@ export default class AddMember extends Component {
             this._getRelMem();
         }
     }
+
+    renderContent () {
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const {
+            platform: { roles = [] }
+        } = this.props;
+        var systemRoles = [];
+        if (user.is_superuser) {
+            systemRoles.push({
+                name: '苗圃角色',
+                value: roles.filter(role => role.grouptype === 0)
+            });
+            systemRoles.push({
+                name: '施工角色',
+                value: roles.filter(role => role.grouptype === 1)
+            });
+            systemRoles.push({
+                name: '监理角色',
+                value: roles.filter(role => role.grouptype === 2)
+            });
+            systemRoles.push({
+                name: '业主角色',
+                value: roles.filter(role => role.grouptype === 3)
+            });
+            systemRoles.push({
+                name: '养护角色',
+                value: roles.filter(role => role.grouptype === 4)
+            });
+            systemRoles.push({
+                name: '苗圃基地角色',
+                value: roles.filter(role => role.grouptype === 5)
+            });
+            systemRoles.push({
+                name: '供应商角色',
+                value: roles.filter(role => role.grouptype === 6)
+            });
+        } else {
+            for (let i = 0; i < user.groups.length; i++) {
+                const rolea = user.groups[i].grouptype;
+                switch (rolea) {
+                    case 0:
+                        systemRoles.push({
+                            name: '苗圃角色',
+                            value: roles.filter(role => role.grouptype === 0)
+                        });
+                        break;
+                    case 1:
+                        systemRoles.push({
+                            name: '苗圃角色',
+                            value: roles.filter(role => role.grouptype === 0)
+                        });
+                        systemRoles.push({
+                            name: '施工角色',
+                            value: roles.filter(role => role.grouptype === 1)
+                        });
+                        systemRoles.push({
+                            name: '养护角色',
+                            value: roles.filter(role => role.grouptype === 4)
+                        });
+                        break;
+                    case 2:
+                        systemRoles.push({
+                            name: '监理角色',
+                            value: roles.filter(role => role.grouptype === 2)
+                        });
+                        break;
+                    case 3:
+                        systemRoles.push({
+                            name: '业主角色',
+                            value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 4:
+                        systemRoles.push({
+                            name: '养护角色',
+                            value: roles.filter(role => role.grouptype === 4)
+                        });
+                        break;
+                    case 5:
+                        systemRoles.push({
+                            name: '苗圃基地角色',
+                            value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 6:
+                        systemRoles.push({
+                            name: '供应商角色',
+                            value: roles.filter(role => role.grouptype === 4)
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        const objs = systemRoles.map(roless => {
+            return (
+                <OptGroup label={roless.name} key={roless.name}>
+                    {roless.value.map(role => {
+                        return (
+                            <Option key={role.id} value={String(role.id)}>
+                                {role.name}
+                            </Option>
+                        );
+                    })}
+                </OptGroup>
+            );
+        });
+        return objs;
+    }
+    renderTitle () {
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const {
+            platform: { roles = [] }
+        } = this.props;
+        var systemRoles = [];
+        if (user.is_superuser) {
+            systemRoles.push({
+                name: '苗圃职务',
+                children: ['苗圃'],
+                value: roles.filter(role => role.grouptype === 0)
+            });
+            systemRoles.push({
+                name: '施工职务',
+                children: [
+                    '施工领导',
+                    '协调调度人',
+                    '质量负责人',
+                    '安全负责人',
+                    '文明负责人',
+                    '普通员工',
+                    '施工文书',
+                    '测量员'
+                ],
+                value: roles.filter(role => role.grouptype === 1)
+            });
+            systemRoles.push({
+                name: '监理职务',
+                children: ['总监', '监理组长', '普通监理', '监理文书'],
+                value: roles.filter(role => role.grouptype === 2)
+            });
+            systemRoles.push({
+                name: '业主职务',
+                children: ['业主', '业主文书', '业主领导'],
+                value: roles.filter(role => role.grouptype === 3)
+            });
+            systemRoles.push({
+                name: '苗圃基地职务',
+                children: ['苗圃基地'],
+                value: roles.filter(role => role.grouptype === 5)
+            });
+            systemRoles.push({
+                name: '供应商职务',
+                children: ['供应商'],
+                value: roles.filter(role => role.grouptype === 6)
+            });
+        } else {
+            for (let i = 0; i < user.groups.length; i++) {
+                const rolea = user.groups[i].grouptype;
+                switch (rolea) {
+                    case 0:
+                        systemRoles.push({
+                            name: '苗圃职务',
+                            children: ['苗圃'],
+                            value: roles.filter(role => role.grouptype === 0)
+                        });
+                        break;
+                    case 1:
+                        systemRoles.push({
+                            name: '苗圃职务',
+                            children: ['苗圃'],
+                            value: roles.filter(role => role.grouptype === 0)
+                        });
+                        systemRoles.push({
+                            name: '施工职务',
+                            children: [
+                                '施工领导',
+                                '协调调度人',
+                                '质量负责人',
+                                '安全负责人',
+                                '文明负责人',
+                                '普通员工',
+                                '施工文书',
+                                '测量员'
+                            ],
+                            value: roles.filter(role => role.grouptype === 1)
+                        });
+                        break;
+                    case 2:
+                        systemRoles.push({
+                            name: '监理职务',
+                            children: [
+                                '总监',
+                                '监理组长',
+                                '普通监理',
+                                '监理文书'
+                            ],
+                            value: roles.filter(role => role.grouptype === 2)
+                        });
+                        break;
+                    case 3:
+                        systemRoles.push({
+                            name: '业主职务',
+                            children: ['业主', '业主文书', '业主领导'],
+                            value: roles.filter(role => role.grouptype === 3)
+                        });
+                        break;
+                    case 5:
+                        systemRoles.push({
+                            name: '苗圃基地职务',
+                            children: ['苗圃基地'],
+                            value: roles.filter(role => role.grouptype === 5)
+                        });
+                        break;
+                    case 6:
+                        systemRoles.push({
+                            name: '供应商职务',
+                            children: ['供应商'],
+                            value: roles.filter(role => role.grouptype === 6)
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        const objs = systemRoles.map(roless => {
+            return (
+                <OptGroup label={roless.name} key={roless.name} >
+                    {roless.children.map(role => {
+                        return (
+                            <Option key={role} value={role}>
+                                {role}
+                            </Option>
+                        );
+                    })}
+                </OptGroup>
+            );
+        });
+        return objs;
+    }
+
     render () {
         const {
-            addMemVisible
+            addMemVisible,
+            form: { getFieldDecorator }
         } = this.props;
         const {
             users,
-            RelationMem
+            RelationMem,
+            orgTree
         } = this.state;
         console.log('RelationMem', RelationMem);
         return (
@@ -131,6 +416,104 @@ export default class AddMember extends Component {
                     footer={null}
                 >
                     <div>
+                        <Form style={{ marginBottom: 24 }}>
+                            <Row gutter={24}>
+                                <Col span={18}>
+                                    <Row>
+                                        <Col span={8}>
+                                            <FormItem {...AddMember.layout} label='姓名'>
+                                                {getFieldDecorator('keyword', {
+                            
+                                                })(
+                                                   <Input placeholder='请输入姓名' />
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={8}>
+                                            <FormItem {...AddMember.layout} label='角色'>
+                                                {getFieldDecorator('role', {
+                                                    
+                                                })(
+                                                    <Select
+                                                        placeholder='请选择角色'
+                                                        optionFilterProp='children'
+                                                        filterOption={(input, option) =>
+                                                            option.props.children
+                                                                .toLowerCase()
+                                                                .indexOf(
+                                                                    input.toLowerCase()
+                                                                ) >= 0
+                                                        }
+                                                        mode='multiple'
+                                                        style={{ width: '100%' }}
+                                                    >
+                                                        {this.renderContent()}
+                                                    </Select>
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={8}>
+                                            <FormItem {...AddMember.layout} label='部门'>
+                                                {getFieldDecorator('organization', {
+                        
+                                                })(
+                                                   <TreeSelect
+                                                        placeholder='请选择部门'
+                                                        showSearch
+                                                        dropdownStyle={{
+                                                            maxHeight: 300,
+                                                            overflow: 'auto'
+                                                        }}
+                                                        treeDefaultExpandAll
+                                                    >
+                                                        {orgTree}
+                                                    </TreeSelect>
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row gutter={24}>
+                                <Col span={18}>
+                                    <Row>
+                                       
+                                        <Col span={8}>
+                                            <FormItem {...AddMember.layout} label='职务'>
+                                                {getFieldDecorator('duty', {
+                                                    
+                                                })(
+                                                    <Select
+                                                        placeholder='请选择职务'
+                                                        style={{ width: '100%' }}
+                                                    >
+                                                        {this.renderTitle()}
+                                                    </Select>
+                                                )}
+                                            </FormItem>
+                                        </Col>
+
+                                    </Row>
+                                </Col>
+                                <Col span={5} offset={1}>
+                                    <Row gutter={10}>
+                                        <Col span={12}>
+                                            <Button
+                                                type='Primary'
+                                                onClick={this.query.bind(this)}
+                                            >
+                                                查询
+                                            </Button>
+                                        </Col>
+                                        <Col span={12}>
+                                            <Button onClick={this.clear.bind(this)}>
+                                                清除
+                                            </Button>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Form>
                         <Table
                             bordered
                             rowKey='id'
@@ -320,16 +703,20 @@ export default class AddMember extends Component {
             }
         },
         {
-            title: '名称',
+            title: '部门',
+            dataIndex: 'account.organization'
+        },
+        {
+            title: '姓名',
             dataIndex: 'account.person_name'
         },
         {
-            title: '用户名',
+            title: '账号',
             dataIndex: 'username'
         },
         {
-            title: '所属部门',
-            dataIndex: 'account.organization'
+            title: '角色',
+            dataIndex: 'groups[0].name'
         },
         {
             title: '职务',
@@ -354,4 +741,53 @@ export default class AddMember extends Component {
             }
         }
     ];
+
+    query () {
+        const {
+            form: { validateFields }
+        } = this.props;
+        validateFields((err, values) => {
+            let params = {};
+            params['keyword'] = values.keyword;
+            params['role'] = values.role;
+            params['duty'] = values.duty;
+            if(values.organization){
+                values.organization = JSON.parse(values.organization);
+                params['organization'] = values.organization.code;
+            }
+            this._queryMember(params);
+
+        });
+    }
+    clear () {
+        this.props.form.resetFields();
+        this._queryMember();
+    }
+
+    static orgloop (data = [], loopTimes = 0) {
+        if (data.length === 0) {
+            return;
+        }
+        return data.map((item) => {
+            if (item.children && item.children.length > 0) {
+                return (
+                    <TreeNode disabled
+                        key={`${item.code}`}
+                        value={JSON.stringify(item)}
+                        title={`${item.name}`}>
+                        {
+                            AddMember.orgloop(item.children, loopTimes + 1, item.name)
+                        }
+                    </TreeNode>
+                );
+            } else {
+                return (<TreeNode
+                    disabled={loopTimes === 0 && true}
+                    key={`${item.code}`}
+                    value={JSON.stringify(item)}
+                    title={`${item.name}`} />);
+            }
+        });
+    };
 }
+export default Form.create()(AddMember);
