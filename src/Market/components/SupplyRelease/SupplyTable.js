@@ -2,6 +2,7 @@
 import React, {Component} from 'react';
 import { Form, Button, Input, Select, Tabs } from 'antd';
 import Menu from './Menu';
+import { getUser } from '_platform/auth';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -15,13 +16,24 @@ class SupplyTable extends Component {
             treetypename: '',
             status: 1
         };
+        this.nurserybase = ''; // 苗圃基地id
         this.toSearch = this.toSearch.bind(this);
         this.onClear = this.onClear.bind(this);
         this.handleTreeType = this.handleTreeType.bind(this);
         this.handleStatus = this.handleStatus.bind(this);
     }
     componentDidMount () {
-        this.toSearch();
+        // 获取该用户所在苗圃基地的id
+        const { org_code } = getUser();
+        const { getNurseryByPk } = this.props.actions;
+        getNurseryByPk({}, {
+            pk: org_code
+        }).then(rep => {
+            if (rep.code === 200 && rep.content.length > 0) {
+                this.nurserybase = rep.content[0].ID;
+            }
+            this.toSearch();
+        });
     }
     render () {
         const { dataList, status } = this.state;
@@ -66,6 +78,7 @@ class SupplyTable extends Component {
         const { getProductList } = this.props.actions;
         getProductList({}, {
             treetypename,
+            nurserybase: status === 0 || status === 1 ? this.nurserybase : '',
             status: status === undefined ? '' : status
         }).then((rep) => {
             if (rep.code === 200) {

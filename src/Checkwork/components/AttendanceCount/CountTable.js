@@ -5,21 +5,27 @@ import {
     Row,
     Button
 } from 'antd';
-import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import moment from 'moment';
 
 export default class CountTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            seeVisible: false, // 查看弹框
+            record: null, //行数据
         };
     }
 
 
     render () {
-
+        const { seeVisible,record } = this.state;
         let allcheckrecord = this.props.allcheckrecord;
-        let dataSource = allcheckrecord;  
+        let dataSource = allcheckrecord;
+        let imgs = null;  
+        if(record){
+            imgs = record.checkin_record.imgs;
+        }
 
         const pagination = { // 设置每页显示的页数
             pageSize: 10
@@ -37,7 +43,15 @@ export default class CountTable extends Component {
                     bordered
                     rowKey='code'
                 />
+                <Modal title='查看' visible={seeVisible}
+                    onCancel={this.handleCancel}
+                    style={{textAlign: 'center'}}
+                    footer={null}
+                >
+                    <img src={FOREST_API + '/' + imgs} width='100%' height='100%' alt='图片找不到了' />
+                </Modal>
             </div>
+
         );
     }
 
@@ -106,7 +120,16 @@ export default class CountTable extends Component {
         }
     ];
 
-    previewFile(){
+    previewFile(record){
+        this.setState({
+            seeVisible: true,
+            record:record,
+        });
+    }
 
+    handleCancel () {
+        this.setState({
+            seeVisible: false,
+        });
     }
 }

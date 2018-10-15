@@ -47,9 +47,10 @@ class Menu extends Component {
     render () {
         const { StartTime, EndTime, ProjectName, Section } = this.state;
         const { record } = this.props;
+        let CreateTime = record.CreateTime ? record.CreateTime.split(' ')[0] : '';
         return (
             <div className='menu'>
-                <Card title='发布时间:'>
+                <Card title={'发布时间：' + CreateTime}>
                     <Row>
                         <Col span={18}>
                             <h3>{ProjectName}{Section}采购单</h3>

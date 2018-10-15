@@ -16,6 +16,7 @@ class AddDemand extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            isAmend: false, // 是否为编辑状态
             purchaseInfo: null, // 回显信息
             sectionList: [], // 标段
             projectList: [], // 项目列表
@@ -85,7 +86,7 @@ class AddDemand extends Component {
                 );
             }
         }, {
-            title: '库存（棵）',
+            title: '需求量（棵）',
             dataIndex: 'Num',
             key: '7',
             render: (text, record, index) => {
@@ -99,8 +100,8 @@ class AddDemand extends Component {
             render: (text, record, index) => {
                 return (
                     <span>
-                        {this.state.purchaseInfo ? <a onClick={this.toEdit.bind(this, record, index)}>保存</a> : ''}
-                        <a onClick={this.toDelete.bind(this, record, index)}>清空</a>
+                        {this.state.isAmend ? <a onClick={this.toEdit.bind(this, record, index)}>保存</a> : ''}
+                        <a onClick={this.toDelete.bind(this, record, index)}>删除</a>
                     </span>
                 );
             }
@@ -173,7 +174,7 @@ class AddDemand extends Component {
         if (typeof this.purchaseid === 'string') {
             getPurchaseById({id: this.purchaseid}).then(rep => {
                 this.setState({
-                    purchaseInfo: rep,
+                    isAmend: true,
                     ProjectName: rep.ProjectName,
                     Section: rep.Section,
                     StartTime: rep.StartTime,
@@ -210,6 +211,9 @@ class AddDemand extends Component {
                     TreeTypeID: 64
                 });
             });
+        } else {
+            // 新增树种
+            this.onAddSpecs();
         }
     }
     renderCard () {
@@ -236,7 +240,7 @@ class AddDemand extends Component {
         return card;
     }
     render () {
-        const { purchaseInfo, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime, PurchaseDescribe } = this.state;
+        const { isAmend, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime, PurchaseDescribe } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='addDemand' style={{padding: '0 20px'}}>
@@ -246,6 +250,7 @@ class AddDemand extends Component {
                         <Form layout='inline' onSubmit={this.handleSubmit}>
                             <FormItem label='项目名称'>
                                 <Select
+                                    disabled={isAmend}
                                     value={ProjectName}
                                     allowClear style={{width: 150}}
                                     onChange={this.handleProjectName}
@@ -259,6 +264,7 @@ class AddDemand extends Component {
                             </FormItem>
                             <FormItem label='标段选择'>
                                 <Select
+                                    disabled={isAmend}
                                     value={Section}
                                     allowClear style={{width: 150}}
                                     onChange={this.handleSectionName}
@@ -309,7 +315,7 @@ class AddDemand extends Component {
                             <FormItem style={{width: 800, textAlign: 'center'}}>
                                 <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
                                 {
-                                    purchaseInfo ? <Button type='primary' onClick={this.toCheck.bind(this)}>编辑</Button>
+                                    isAmend ? <Button type='primary' onClick={this.toCheck.bind(this)}>编辑</Button>
                                         : <Button type='primary' onClick={this.toCheck.bind(this)}>发布</Button>
                                 }
                             </FormItem>
@@ -393,7 +399,7 @@ class AddDemand extends Component {
         this.toRelease(1);
     }
     toRelease (Status) {
-        const { purchaseInfo, RegionCode, StartTime, EndTime, dataList, ProjectName, Section, PurchaseDescribe } = this.state;
+        const { isAmend, RegionCode, StartTime, EndTime, dataList, ProjectName, Section, PurchaseDescribe } = this.state;
         const { Contacter, Phone } = this.props.form.getFieldsValue();
         const { postPurchase, putPurchase } = this.props.actions;
         let Specs = [];
@@ -411,9 +417,9 @@ class AddDemand extends Component {
                 Specs.push(obj);
             });
         });
-        if (purchaseInfo) {
+        if (isAmend) {
             putPurchase({}, {
-                ID: purchaseInfo.ID,
+                ID: this.purchaseid,
                 ProjectName,
                 Section,
                 UseNurseryAddress: this.UseNurseryAddress,
@@ -584,20 +590,16 @@ class AddDemand extends Component {
             PurchaseDescribe: e.target.value
         });
     }
-    toDelete (record, index) {
+    toDelete (record, num) {
         const { dataList } = this.state;
-        dataList[record.cardKey][index] = {
-            CrownWidth: '',
-            CultivationMode: '',
-            DBH: '',
-            GroundDiameter: '',
-            Height: '',
-            Num: '',
-            TreeTypeID: record.TreeTypeID,
-            TreeTypeName: record.TreeTypeName,
-            cardKey: record.cardKey,
-            number: index
-        };
+        let arr = [];
+        dataList[record.cardKey].map((item, index) => {
+            if (num !== index) {
+                arr.push(item);
+            }
+        });
+        dataList[record.cardKey] = arr;
+        debugger
         this.setState({
             dataList
         });

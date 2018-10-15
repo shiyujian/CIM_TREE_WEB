@@ -15,7 +15,7 @@ const myButtonActive = {
     borderRadius: 10,
     marginRight: 10
 };
-class DataList extends Component {
+class SupplyDetails extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -33,15 +33,13 @@ class DataList extends Component {
             standardList: [], // 规格数组
             NurseryName: '',
             SKU: '', // 库存
+            number: 1, // 购买数量
             TreeTypeID: '',
-            Price: '',
-            Stock: '',
-            Height: '',
-            CrownWidth: '',
-            DBH: '',
-            GroundDiameter: '',
+            Price: 0, // 价格
+            Stock: 0, // 库存
             CultivationMode: '',
             dataList: [],
+            selectStandard: {},
             SupplierID: ''
         };
         this.spuid = ''; // 商品id
@@ -106,13 +104,9 @@ class DataList extends Component {
                     const dataList = rst.content;
                     this.setState({
                         TreeTypeID: dataList[0].TreeTypeID,
-                        dataList: dataList[0],
-                        Price: dataList[0].Price,
-                        Stock: dataList[0].Stock,
-                        Height: dataList[0].Height,
-                        CrownWidth: dataList[0].CrownWidth,
-                        DBH: dataList[0].DBH,
-                        GroundDiameter: dataList[0].GroundDiameter,
+                        dataList: dataList,
+                        Price: 0,
+                        Stock: 0,
                         CultivationMode: dataList[0].CultivationMode,
                         SupplierID: dataList[0].SupplierID
                     });
@@ -121,8 +115,8 @@ class DataList extends Component {
         });
     }
     render () {
-        const { TreeTypeName, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeDescribe, Contacter, Phone, Height, dataList,
-            UpdateTime, standardList, Stock, Price, TreePlace, NurseryName} = this.state;
+        const { TreeTypeName, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeDescribe, Contacter, Phone, dataList,
+            UpdateTime, number, standardList, Stock, Price, TreePlace, NurseryName} = this.state;
         return (
             <div className='supply-details' style={{padding: '0 20px'}}>
                 <Button type='primary' onClick={this.toReturn.bind(this)} style={{marginBottom: 5}}>返 回</Button>
@@ -141,8 +135,13 @@ class DataList extends Component {
                                             {item.name}：
                                             {
                                                 item.children.map((row, num) => {
-                                                    return row.SpecValue === dataList[item.SpecFieldName] + '' ? <Button style={myButtonActive} key={num}>{row.SpecValue}</Button>
-                                                        : <Button style={myButton} key={num}>{row.SpecValue}</Button>;
+                                                    let disabled = false;
+                                                    dataList.map(record => {
+                                                        if (record[row.SpecFieldName] + '' === row.SpecValue) {
+                                                            disabled = record.disabled;
+                                                        }
+                                                    });
+                                                    return <Button style={row.active ? myButtonActive : myButton} disabled={disabled} key={num} onClick={this.onSelectStandard.bind(this, row, num)}>{row.SpecValue}</Button>;
                                                 })
                                             }
                                         </p>
@@ -157,8 +156,8 @@ class DataList extends Component {
                             </p>
                             <div>
                                 数量：
-                                <InputNumber style={{width: 50}} min={1} max={10} defaultValue={3} />
-                                棵&nbsp;&nbsp;
+                                <InputNumber style={{width: 50}} min={1} max={Stock} value={number} onChange={this.handleNumber.bind(this)} />
+                                &nbsp;棵&nbsp;&nbsp;
                                 <span style={{fontSize: 12}}>库存：{Stock}棵</span>
                             </div>
                             <Button type='primary' style={{marginTop: 10}}>加入购物车</Button>
@@ -194,6 +193,42 @@ class DataList extends Component {
     toReturn () {
         this.props.actions.changeSupplyDetailsVisible(false);
     }
+    onSelectStandard (row, num) {
+        let { dataList, selectStandard, standardList, Price, Stock } = this.state;
+        standardList.map(item => {
+            if (item.SpecFieldName === row.SpecFieldName) {
+                item.children[num].active = true;
+            }
+        });
+        dataList.map(item => {
+            if (item[row.SpecFieldName] + '' === row.SpecValue) {
+                item.disabled = false;
+                selectStandard[row.SpecFieldName] = row.SpecValue;
+            } else {
+                item.disabled = true;
+            }
+        });
+        if (selectStandard.DBH && selectStandard.CrownWidth && selectStandard.GroundDiameter && selectStandard.Height) {
+            dataList.map(item => {
+                if (item.DBH + '' === selectStandard.DBH && item.CrownWidth + '' === selectStandard.CrownWidth && item.GroundDiameter + '' === selectStandard.GroundDiameter && item.Height + '' === selectStandard.Height) {
+                    Stock = item.Stock;
+                    Price = item.Price;
+                }
+            });
+        }
+        this.setState({
+            dataList,
+            selectStandard,
+            standardList,
+            Stock,
+            Price
+        });
+    }
+    handleNumber (value) {
+        this.setState({
+            number: value
+        });
+    }
 }
 
-export default Form.create()(DataList);
+export default Form.create()(SupplyDetails);

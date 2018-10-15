@@ -128,6 +128,7 @@ class AddSeedling extends Component {
         });
         // 获取苗圃基地的责任人电话，以及绑定的供应商
         const { id, org_code } = getUser();
+        console.log(getUser(), '---');
         this.Creater = id;
         if (org_code) {
             getNurseryByPk({}, {pk: org_code}).then((rep) => {
@@ -208,6 +209,8 @@ class AddSeedling extends Component {
                     });
                 }
             });
+        } else {
+            this.addVersion();
         }
     }
     render () {
@@ -410,14 +413,9 @@ class AddSeedling extends Component {
         this.props.actions.changeAddSeedlingVisible(false);
     }
     addVersion () {
-        let { dataList, SupplierID } = this.state;
-        if (SupplierID.length === 0) {
-            message.error('请先选择供应商');
-            return;
-        }
+        let { dataList } = this.state;
         const obj = {
             number: dataList.length,
-            SupplierID: SupplierID[0],
             SPUID: typeof this.spuid === 'string' ? this.spuid : '',
             DBH: '',
             GroundDiameter: '',
@@ -461,12 +459,14 @@ class AddSeedling extends Component {
         const { isAmend, TreeTypeID, Photo, LocalPhoto, MostPhoto, OtherPhoto, dataList, SupplierID } = this.state;
         const { postCommodity, putCommodity } = this.props.actions;
         let SKUs = [];
+        console.log(dataList);
         SupplierID.map((item) => {
             dataList.map(row => {
                 delete row.number;
                 SKUs.push({...row, SupplierID: item});
             });
         });
+        console.log(dataList);
         if (isAmend) {
             // 编辑spu,sku
             putCommodity({}, {
@@ -515,7 +515,7 @@ class AddSeedling extends Component {
                     message.success('暂存成功');
                     this.props.actions.changeAddSeedlingVisible(false);
                 } else {
-                    message.error('操作失败');
+                    message.error('操作失败,' + rep.msg);
                 }
             });
         }
