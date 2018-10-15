@@ -59,7 +59,8 @@ export default class ForestContainer extends Component {
             DataExport = null,
             SeedlingsChange = null,
             CuringInfo = null,
-            DataStatis = null
+            DataStatis = null,
+            TreeAdoptInfo = null
         } = this.state || {};
         return (
             <Body>
@@ -170,6 +171,12 @@ export default class ForestContainer extends Component {
                             component={DataStatis}
                         />
                     )}
+                    {TreeAdoptInfo && (
+                        <Route
+                            path='/forest/treeadoptinfo'
+                            component={TreeAdoptInfo}
+                        />
+                    )}
                 </Main>
             </Body>
         );
@@ -240,6 +247,12 @@ export default class ForestContainer extends Component {
                     id: 'FOREST.CURINGINFO',
                     path: '/forest/curinginfo',
                     name: '养护信息'
+                },
+                {
+                    key: 'treeadoptinfo',
+                    id: 'FOREST.TREEADOPTINFO',
+                    path: '/forest/treeadoptinfo',
+                    name: '苗木结缘信息'
                 }
             ]
         },

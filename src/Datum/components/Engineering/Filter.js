@@ -112,22 +112,23 @@ class Filter extends Component {
             form: { getFieldDecorator },
             Doc = [],
             selectDoc,
-            parent
+            parent,
+            selected
         } = this.props;
         const { projectArray, sectionArray } = this.state;
 
-        // 判断选中的是哪个节点下的文件夹
-        let canSection = false;
-        if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
-            canSection = true;
-        }
+        // // 判断选中的是哪个节点下的文件夹
+        // let canSection = false;
+        // if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
+        //     canSection = true;
+        // }
 
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
-                    <Col span={20}>
+                    <Col span={18}>
                         <Row>
-                            <Col span={8}>
+                            {/* <Col span={8}>
                                 <FormItem {...Filter.layout} label='项目'>
                                     {getFieldDecorator('searchProject', {
                                         rules: [
@@ -147,8 +148,8 @@ class Filter extends Component {
                                         </Select>
                                     )}
                                 </FormItem>
-                            </Col>
-                            {canSection ? (
+                            </Col> */}
+                            {/* {canSection ? (
                                 ''
                             ) : (
                                 <Col span={8}>
@@ -167,7 +168,7 @@ class Filter extends Component {
                                         )}
                                     </FormItem>
                                 </Col>
-                            )}
+                            )} */}
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label='名称'>
                                     {getFieldDecorator('searchName', {
@@ -180,8 +181,6 @@ class Filter extends Component {
                                     })(<Input placeholder='请输入名称' />)}
                                 </FormItem>
                             </Col>
-                            {/* </Row>
-						<Row> */}
                             <Col span={8}>
                                 <FormItem {...Filter.layout} label='编号'>
                                     {getFieldDecorator('searchCode', {
@@ -219,9 +218,22 @@ class Filter extends Component {
                         </Row>
                     </Col>
 
-                    <Col span={3} offset={1}>
+                    <Col span={5} offset={1}>
                         <Row gutter={10}>
-                            <FormItem>
+                            <Col span={12}>
+                                <Button
+                                    type='Primary'
+                                    onClick={this.query.bind(this)}
+                                >
+                                    查询
+                                </Button>
+                            </Col>
+                            <Col span={12}>
+                                <Button onClick={this.clear.bind(this)}>
+                                    清除
+                                </Button>
+                            </Col>
+                            {/* <FormItem>
                                 <Button
                                     type='Primary'
                                     onClick={this.query.bind(this)}
@@ -233,13 +245,13 @@ class Filter extends Component {
                                 <Button onClick={this.clear.bind(this)}>
                                     清除
                                 </Button>
-                            </FormItem>
+                            </FormItem> */}
                         </Row>
                     </Col>
                 </Row>
                 <Row gutter={24}>
                     <Col span={24}>
-                        {!this.props.parent ? (
+                        {!this.props.isTreeSelected ? (
                             <Button style={{ marginRight: 10 }} disabled>
                                 新增
                             </Button>
@@ -252,16 +264,7 @@ class Filter extends Component {
                                 新增
                             </Button>
                         )}
-                        {/* </Col> */}·
-                        {/* <Col span ={2}> */}
-                        {/* {
-							(Doc.length === 0 )?
-								<Button style={{marginRight: 10}} disabled>下载</Button>:
-								<Button style={{marginRight: 10}} type="primary" onClick={this.download.bind(this)}>下载</Button>
-						} */}
-                        {/* </Col> */}
-                        {/* <Col span ={2}> */}
-                        {Doc.length === 0 ? (
+                        {(selected.length === 0 || !this.props.isTreeSelected) ? (
                             <Button
                                 style={{ marginRight: 10 }}
                                 disabled
@@ -273,14 +276,12 @@ class Filter extends Component {
                             <Popconfirm
                                 title='确定要删除文件吗？'
                                 onConfirm={this.confirm.bind(this)}
-                                onCancel={this.cancel.bind(this)}
                                 okText='Yes'
                                 cancelText='No'
                             >
                                 <Button
                                     style={{ marginRight: 10 }}
                                     type='danger'
-                                    onClick={this.delete.bind(this)}
                                 >
                                     删除
                                 </Button>
@@ -294,20 +295,8 @@ class Filter extends Component {
 
     addVisible () {
         const {
-            actions: { toggleAddition },
-            currentSection,
-            currentSectionName,
-            projectName
+            actions: { toggleAddition }
         } = this.props;
-
-        if (
-            currentSection === '' &&
-            currentSectionName === '' &&
-            projectName === ''
-        ) {
-            message.error('该用户未关联标段，不能添加文档');
-            return;
-        }
         toggleAddition(true);
     }
 
@@ -320,12 +309,12 @@ class Filter extends Component {
             console.log('values', values);
             let search = {};
             console.log('err', err);
-            if (values.searchProject) {
-                search.searchProject = values.searchProject;
-            }
-            if (values.searcSection) {
-                search.searcSection = values.searcSection;
-            }
+            // if (values.searchProject) {
+            //     search.searchProject = values.searchProject;
+            // }
+            // if (values.searcSection) {
+            //     search.searcSection = values.searcSection;
+            // }
             if (values.searchName) {
                 search.searchName = values.searchName;
             }
@@ -356,8 +345,8 @@ class Filter extends Component {
             actions: { searchEnginMessage }
         } = this.props;
         this.props.form.setFieldsValue({
-            searchProject: undefined,
-            searcSection: undefined,
+            // searchProject: undefined,
+            // searcSection: undefined,
             searchName: undefined,
             searchDate: undefined,
             searchCode: undefined
@@ -366,7 +355,6 @@ class Filter extends Component {
     }
     cancel () {}
 
-    delete () {}
     confirm () {
         const {
             coded = [],
@@ -394,36 +382,6 @@ class Filter extends Component {
                 message.error('删除失败！');
                 getdocument({ code: currentcode.code }).then(() => {});
             });
-    }
-    createLink = (name, url) => {
-        // 下载
-        let link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', this);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    download () {
-        const { selected = [], file = [], files = [] } = this.props;
-        if (selected.length === 0) {
-            message.warning('没有选择无法下载');
-        }
-        selected.map(rst => {
-            file.push(rst.basic_params.files);
-        });
-        file.map(value => {
-            value.map(cot => {
-                files.push(cot.download_url);
-            });
-        });
-        files.map(down => {
-            let download =
-                STATIC_DOWNLOAD_API + '/media' + down.split('/media')[1];
-            this.createLink(this, download);
-        });
     }
 }
 export default Form.create()(Filter);

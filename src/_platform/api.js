@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-25 11:12:58
+ * @Last Modified time: 2018-10-15 14:35:53
  */
 /**
  *
@@ -659,6 +659,10 @@ export const MODULES = [
                     {
                         id: 'FOREST.CURINGINFO',
                         name: '养护信息'
+                    },
+                    {
+                        id: 'FOREST.TREEADOPTINFO',
+                        name: '苗木结缘信息'
                     }
                 ]
             },
