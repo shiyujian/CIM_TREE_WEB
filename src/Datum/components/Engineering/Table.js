@@ -30,25 +30,25 @@ export default class GeneralTable extends Component {
             parent
         } = this.props;
 
-        let canSection = false;
-        if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
-            canSection = true;
-        }
+        // let canSection = false;
+        // if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
+        //     canSection = true;
+        // }
 
         let arr = Doc.filter(
             doc =>
-                (searchengin.searchProject
-                    ? doc.extra_params.projectName.indexOf(
-                        searchengin.searchProject
-                    ) !== -1
-                    : true) &&
-                (canSection
-                    ? true
-                    : searchengin.searcSection
-                        ? doc.extra_params.currentSection.indexOf(
-                            searchengin.searcSection
-                        ) !== -1
-                        : true) &&
+                // (searchengin.searchProject
+                //     ? doc.extra_params.projectName.indexOf(
+                //         searchengin.searchProject
+                //     ) !== -1
+                //     : true) &&
+                // (canSection
+                //     ? true
+                //     : searchengin.searcSection
+                //         ? doc.extra_params.currentSection.indexOf(
+                //             searchengin.searcSection
+                //         ) !== -1
+                //         : true) &&
                 (searchengin.searchName
                     ? doc.name.indexOf(searchengin.searchName) !== -1
                     : true) &&
@@ -78,11 +78,11 @@ export default class GeneralTable extends Component {
         const { Doc = [], selectDoc, parent, searchenginvisible } = this.props;
         const { filterData = [] } = this.state;
 
-        // 是否要显示标段
-        let canSection = false;
-        if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
-            canSection = true;
-        }
+        // // 是否要显示标段
+        // let canSection = false;
+        // if (selectDoc === '综合管理性文件' || parent === '综合管理性文件') {
+        //     canSection = true;
+        // }
 
         // 数据是要搜索后的  还是   所有数据
         let dataSource = Doc;
@@ -96,7 +96,8 @@ export default class GeneralTable extends Component {
             <Table
                 rowSelection={this.rowSelection}
                 dataSource={data}
-                columns={canSection ? this.columns1 : this.columns}
+                columns={this.columns}
+                // columns={canSection ? this.columns1 : this.columns}
                 className='foresttables'
                 bordered
                 rowKey='code'

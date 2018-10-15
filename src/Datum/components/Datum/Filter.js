@@ -82,16 +82,8 @@ export default class Filter extends Component {
         const {
             actions: {
                 toggleAddition
-            },
-            currentSection,
-            currentSectionName,
-            projectName
+            }
         } = this.props;
-
-        if (currentSection === '' && currentSectionName === '' && projectName === '') {
-            message.error('该用户未关联标段，不能添加文档');
-            return;
-        }
         toggleAddition(true);
     }
 

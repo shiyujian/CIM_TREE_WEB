@@ -30,7 +30,7 @@ class AddDirPanel extends Component {
                         {},
                         {
                             name: values.dirName,
-                            code: `gcyx_${values.dirCode}`,
+                            code: `gcwd_${values.dirCode}`,
                             obj_type: 'C_DIR',
                             status: 'A',
                             parent: {
@@ -45,13 +45,13 @@ class AddDirPanel extends Component {
                             }
                         }
                     ).then(rst => {
-                        if (rst.code === '') {
-                            message.error('新增不成功');
-                        } else {
+                        if (rst && rst.code) {
                             message.success('新增目录成功！');
                             this.props.handleDirClear();
                             getworkTree({ code: Datumcode });
                             this.clear();
+                        } else {
+                            message.error('新增不成功');
                         }
                     });
                 } else {
@@ -69,7 +69,7 @@ class AddDirPanel extends Component {
                         {},
                         {
                             name: values.dirName,
-                            code: `gcyx_${values.dirCode}`,
+                            code: `gcwd_${values.dirCode}`,
                             obj_type: 'C_DIR',
                             status: 'A',
                             parent: {
@@ -84,13 +84,13 @@ class AddDirPanel extends Component {
                             }
                         }
                     ).then(rst => {
-                        if (rst.code === '') {
-                            message.error('新增不成功');
-                        } else {
+                        if (rst && rst.code) {
                             message.success('新增目录成功！');
                             this.props.handleDirClear();
                             getworkTree({ code: Datumcode });
                             this.clear();
+                        } else {
+                            message.error('新增不成功');
                         }
                     });
                 }
