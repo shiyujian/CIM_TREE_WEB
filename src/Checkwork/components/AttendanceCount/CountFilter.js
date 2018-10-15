@@ -398,7 +398,7 @@ class CountFilter extends Component {
             })
 
         }else if(value == "n"){  //缺勤时可以选择的状态有打卡一次
-            let arr = [{label:'打卡一次',value:1}];
+            let arr = [{label:'未打卡',value:1},{label:'打卡一次',value:1}];
             arr.map(p =>{
                 statusArray.push(
                     <Option key={p.value} value={p.value}>
