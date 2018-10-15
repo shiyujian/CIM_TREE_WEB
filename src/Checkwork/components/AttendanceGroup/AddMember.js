@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal, Table, Checkbox, Notification, Row, Form, Col, Select, Input
+    Button, Modal, Table, Checkbox, Notification, Row, Form, Col, Select, Input, TreeSelect, Tree
 } from 'antd';
 import { getUser } from '_platform/auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
+const TreeNode = TreeSelect.TreeNode;
 window.config = window.config || {};
 
 class AddMember extends Component {
@@ -21,7 +22,8 @@ class AddMember extends Component {
             roles: [],
             dataSource: [],
             RelationMem: [],
-            totalUserData: []
+            totalUserData: [],
+            orgTree: []
         };
         this.user = null;
     }
@@ -30,7 +32,8 @@ class AddMember extends Component {
         const {
             actions: {
                 getRoles,
-                getForestAllUsersData
+                getForestAllUsersData,
+                getOrgTree
             }
         } = this.props;
         this.user = getUser();
@@ -60,9 +63,28 @@ class AddMember extends Component {
             roles: roles
         });
         await this._queryMember();
+
+        getOrgTree().then(rst => {
+            if (rst && rst.children) {
+                // 目前只针对业主的单位，name为建设单位   所以对建设单位进行loop
+                if (rst.children && rst.children instanceof Array && rst.children.length > 0) {
+                    rst.children.map((item) => {
+                        if (item.name === '建设单位') {
+                            if (item && item.children) {
+                                let data = AddMember.orgloop(item.children);
+                                this.setState({
+                                    orgTree:data
+                                })
+                                
+                            }
+                        }
+                    });
+                }
+            }
+        });
     };
     // 查找人员
-    _queryMember = async () => {
+    _queryMember = async (params) => {
         const {
             roles = []
         } = this.state;
@@ -91,9 +113,22 @@ class AddMember extends Component {
             postdata = {
                 // roles: roles,
                 // sections: sections,
-                is_active: true
+                is_active: true,
             };
-            debugger
+            if(params){
+                if(params.keyword){
+                    postdata['keyword'] = params.keyword;
+                }
+                if(params.role){
+                    postdata['role'] = params.role;
+                }
+                if(params.organization){
+                    postdata['organization'] = params.organization;
+                }
+                if(params.duty){
+                    postdata['duty'] = params.duty;
+                }
+            }
             let users = await getUsers({}, postdata);
             console.log('users', users);
             this.setState({
@@ -366,7 +401,8 @@ class AddMember extends Component {
         } = this.props;
         const {
             users,
-            RelationMem
+            RelationMem,
+            orgTree
         } = this.state;
         console.log('RelationMem', RelationMem);
         return (
@@ -421,9 +457,17 @@ class AddMember extends Component {
                                                 {getFieldDecorator('organization', {
                         
                                                 })(
-                                                    <Select placeholder='请选择部门'>
-                                                        
-                                                    </Select>
+                                                   <TreeSelect
+                                                        placeholder='请选择部门'
+                                                        showSearch
+                                                        dropdownStyle={{
+                                                            maxHeight: 300,
+                                                            overflow: 'auto'
+                                                        }}
+                                                        treeDefaultExpandAll
+                                                    >
+                                                        {orgTree}
+                                                    </TreeSelect>
                                                 )}
                                             </FormItem>
                                         </Col>
@@ -659,16 +703,20 @@ class AddMember extends Component {
             }
         },
         {
-            title: '名称',
+            title: '部门',
+            dataIndex: 'account.organization'
+        },
+        {
+            title: '姓名',
             dataIndex: 'account.person_name'
         },
         {
-            title: '用户名',
+            title: '账号',
             dataIndex: 'username'
         },
         {
-            title: '所属部门',
-            dataIndex: 'account.organization'
+            title: '角色',
+            dataIndex: 'groups[0].name'
         },
         {
             title: '职务',
@@ -700,10 +748,46 @@ class AddMember extends Component {
         } = this.props;
         validateFields((err, values) => {
             let params = {};
+            params['keyword'] = values.keyword;
+            params['role'] = values.role;
+            params['duty'] = values.duty;
+            if(values.organization){
+                values.organization = JSON.parse(values.organization);
+                params['organization'] = values.organization.code;
+            }
+            this._queryMember(params);
+
         });
     }
     clear () {
         this.props.form.resetFields();
+        this._queryMember();
     }
+
+    static orgloop (data = [], loopTimes = 0) {
+        if (data.length === 0) {
+            return;
+        }
+        return data.map((item) => {
+            if (item.children && item.children.length > 0) {
+                return (
+                    <TreeNode disabled
+                        key={`${item.code}`}
+                        value={JSON.stringify(item)}
+                        title={`${item.name}`}>
+                        {
+                            AddMember.orgloop(item.children, loopTimes + 1, item.name)
+                        }
+                    </TreeNode>
+                );
+            } else {
+                return (<TreeNode
+                    disabled={loopTimes === 0 && true}
+                    key={`${item.code}`}
+                    value={JSON.stringify(item)}
+                    title={`${item.name}`} />);
+            }
+        });
+    };
 }
 export default Form.create()(AddMember);

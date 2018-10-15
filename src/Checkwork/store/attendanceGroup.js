@@ -77,6 +77,12 @@ export const postCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id
 // 修改所选择的群组,以便给群组增加删减人员
 export const changeCheckGroup = createAction(`${ID}_changeCheckGroup`);
 
+// 获取组织机构
+const getOrgTreeSelect = createAction(`${ID}获取组织机构TreeSelect`);
+
+//获取组织机构
+export const getOrgTree =  createFetchAction(`${SERVICE_API}/org-tree/?depth=4`, [], 'GET')
+
 
 
 export const actions = {
@@ -107,6 +113,8 @@ export const actions = {
     postCheckGroupMans,
     getCheckGroupMansOk,
     changeCheckGroup,
+    getOrgTreeSelect,
+    getOrgTree,
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({
@@ -140,5 +148,9 @@ export default handleActions({
     [getCheckGroupMansOk]: (state, {payload}) => ({
         ...state,
         checkGroupMans: payload
+    }),
+    [getOrgTreeSelect]: (state, {payload}) => ({
+        ...state,
+        orgTreeSelect: payload
     })
 }, {});
