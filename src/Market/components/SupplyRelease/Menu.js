@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, Tag, message } from 'antd';
-import { FOREST_API, TREETYPENO } from '_platform/api';
+import { FOREST_API, TREETYPENO, CULTIVATIONMODE } from '_platform/api';
 
 class Menu extends Component {
     constructor (props) {
@@ -11,6 +11,7 @@ class Menu extends Component {
             dataList: [] // 规格列表
         };
         this.toSoldOut = this.toSoldOut.bind(this); // 上下架
+        this.returnButton = this.returnButton.bind(this); // 返回按钮
     }
     componentDidMount () {
         const { getInventoryList } = this.props.actions;
@@ -50,9 +51,10 @@ class Menu extends Component {
     render () {
         const { dataList } = this.state;
         const { record } = this.props;
+        let UpdateTime = record.UpdateTime ? record.UpdateTime.split(' ')[0] : '';
         return (
             <div className='menu' style={{marginTop: 10}}>
-                <Card title={'发布时间：' + record.UpdateTime.split(' ')[0]}>
+                <Card title={'发布时间：' + UpdateTime}>
                     <Row>
                         <Col span={4}>
                             <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='150px' height='100px' />
@@ -70,17 +72,20 @@ class Menu extends Component {
                         <Col span={11}>
                             {
                                 dataList.map((item, index) => {
-                                    return <p key={index}>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
+                                    let CultivationMode = '';
+                                    CULTIVATIONMODE.map(row => {
+                                        if (item.CultivationMode === row.id) {
+                                            CultivationMode = row.name;
+                                        }
+                                    });
+                                    return <p key={index}>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
                                 })
                             }
                         </Col>
                         <Col span={4} style={{paddingTop: 30}}>
-                            <Button type='primary' onClick={this.toEditInfo.bind(this, record.ID)}>修改</Button>
-                            <Button type='primary' onClick={this.toSoldOut} style={{marginLeft: 15}}>
-                                {
-                                    record.Status === 1 ? '下架' : '上架'
-                                }
-                            </Button>
+                            {
+                                this.returnButton()
+                            }
                         </Col>
                     </Row>
                 </Card>
@@ -101,6 +106,31 @@ class Menu extends Component {
                 message.success('上下架成功');
             } else {
                 message.success('上下架失败');
+            }
+        });
+    }
+    returnButton () {
+        let arr = [];
+        let editButton = <Button style={{marginRight: 15, marginBottom: 10}} key='editButton' type='primary' onClick={this.toEditInfo.bind(this, this.props.record.ID)}>编辑</Button>;
+        let deleteButton = <Button style={{marginRight: 15, marginBottom: 10}} key='deleteButton' type='primary' onClick={this.toDelete.bind(this)}>删除</Button>;
+        let upButton = <Button style={{marginRight: 15, marginBottom: 10}} key='upButton' type='primary' onClick={this.toSoldOut}>上架</Button>;
+        let downButton = <Button style={{marginRight: 15, marginBottom: 10}} key='downButton' type='primary' onClick={this.toSoldOut}>下架</Button>;
+        switch (this.props.record.Status) {
+            case 0:
+                arr.push(editButton, upButton, deleteButton);
+                break;
+            case 1:
+                arr.push(downButton);
+                break;
+        }
+        return arr;
+    }
+    toDelete () {
+        const { deleteCommodity } = this.props.actions;
+        deleteCommodity({id: this.props.record.ID}).then(rep => {
+            if (rep.code === 1) {
+                message.success('删除成功');
+                this.props.toSearch();
             }
         });
     }

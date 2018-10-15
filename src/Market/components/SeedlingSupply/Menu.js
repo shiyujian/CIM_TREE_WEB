@@ -48,10 +48,7 @@ class Menu extends Component {
     render () {
         const { param, minParam, maxParam, NurseryName, TreePlace } = this.state;
         const { record } = this.props;
-        let UpdateTime = '';
-        if (record) {
-            UpdateTime = record.UpdateTime.split(' ')[0];
-        }
+        let UpdateTime = record.UpdateTime ? record.UpdateTime.split(' ')[0] : '';
         return (
             <div className='menu'>
                 <Card bodyStyle={{ padding: 0 }} bordered={false}>
@@ -66,7 +63,7 @@ class Menu extends Component {
                         <p>{param}：{minParam}-{maxParam}厘米</p>
                         <p>{NurseryName}</p>
                         <p>
-                            价格：<span style={{color: '#ff5b05', fontWeight: 'bold'}}>{record.MinPrice}-{record.MaxPrice}元</span>
+                            <span style={{color: '#ff5b05', fontWeight: 'bold'}}>{record.MinPrice}-{record.MaxPrice}元</span>
                             <span style={{float: 'right'}}>{TreePlace}</span>
                         </p>
                     </div>

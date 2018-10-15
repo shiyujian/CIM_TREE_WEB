@@ -2,6 +2,7 @@
 import React, {Component} from 'react';
 import { Form, Button, Input, Select, Tabs } from 'antd';
 import Menu from './Menu';
+import { getUser } from '_platform/auth';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -15,6 +16,7 @@ class DemandTable extends Component {
             projectList: [],
             a: 1
         };
+        this.org = ''; // 所在单位pk
         this.toSearch = this.toSearch.bind(this);
         this.onClear = this.onClear.bind(this);
     }
@@ -22,6 +24,9 @@ class DemandTable extends Component {
         // 获取所有项目和标段
         const { getWpunittree } = this.props.actions;
         getWpunittree().then(rep => {
+            // 获取所在单位pk
+            const { org_code } = getUser();
+            this.org = org_code;
             this.setState({
                 projectList: rep
             }, () => {
@@ -93,6 +98,7 @@ class DemandTable extends Component {
         const { getPurchaseList } = this.props.actions;
         getPurchaseList({}, {
             purchaseno: '',
+            org: this.org,
             projectname: formVal.projectname || '',
             status: formVal.status === undefined ? '' : formVal.status
         }).then((rep) => {
