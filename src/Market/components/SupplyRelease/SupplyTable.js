@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Input, Select, Tabs } from 'antd';
+import { Form, Button, Input, Select, Tabs, Spin } from 'antd';
 import Menu from './Menu';
 import { getUser } from '_platform/auth';
 
@@ -12,6 +12,7 @@ class SupplyTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            loading: true,
             dataList: [],
             treetypename: '',
             status: 1
@@ -36,7 +37,7 @@ class SupplyTable extends Component {
         });
     }
     render () {
-        const { dataList, status } = this.state;
+        const { dataList, loading, status } = this.state;
         return (
             <div className='supply-release content-padding'>
                 <Form layout='inline'>
@@ -62,12 +63,14 @@ class SupplyTable extends Component {
                 <Button type='primary' onClick={this.toAddSeedling.bind(this)}
                     style={{position: 'absolute', right: 60, zIndex: 100}}>新增供应</Button>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
-                    <TabPane tab='全 部' key='1'>
-                        {
-                            dataList.length > 0 ? dataList.map((item, index) => {
-                                return <Menu record={item} {...this.props} toSearch={this.toSearch} key={index} toAddSeedling={this.toAddSeedling} />;
-                            }) : []
-                        }
+                    <TabPane tab='全 部' key='1' style={{minHeight: 500}}>
+                        <Spin spinning={loading}>
+                            {
+                                dataList.length > 0 ? dataList.map((item, index) => {
+                                    return <Menu record={item} {...this.props} toSearch={this.toSearch} key={index} toAddSeedling={this.toAddSeedling} />;
+                                }) : []
+                            }
+                        </Spin>
                     </TabPane>
                 </Tabs>
             </div>
@@ -76,6 +79,9 @@ class SupplyTable extends Component {
     toSearch () {
         const { treetypename, status } = this.state;
         const { getProductList } = this.props.actions;
+        this.setState({
+            loading: true
+        });
         getProductList({}, {
             treetypename,
             nurserybase: status === 0 || status === 1 ? this.nurserybase : '',
@@ -83,6 +89,7 @@ class SupplyTable extends Component {
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({
+                    loading: false,
                     dataList: rep.content,
                     page: rep.pageinfo.page,
                     total: rep.pageinfo.total

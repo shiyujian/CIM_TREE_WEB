@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Input, Tabs, Row, Col } from 'antd';
+import { Form, Button, Input, Tabs, Row, Col, Spin } from 'antd';
 import Menu from './Menu';
 import './SupplyList.less';
 
@@ -11,6 +11,7 @@ class DataList extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            loading: true,
             dataList: [],
             page: 1,
             total: 0,
@@ -24,7 +25,7 @@ class DataList extends Component {
         this.onSearch();
     }
     render () {
-        const { dataList, treetypename } = this.state;
+        const { loading, dataList, treetypename } = this.state;
         return (
             <div className='seedling-supply content-padding'>
                 <Form layout='inline'>
@@ -41,18 +42,20 @@ class DataList extends Component {
                     </FormItem>
                 </Form>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
-                    <TabPane tab='全 部' key='1' style={{ background: '#ECECEC', padding: '20px' }}>
-                        <Row gutter={16}>
-                            {
-                                dataList.length > 0 ? dataList.map((item, index) => {
-                                    return (
-                                        <Col span='6' key={index} onClick={this.toSupplyDetails.bind(this, item.ID)} style={{marginBottom: 10}}>
-                                            <Menu record={item} />
-                                        </Col>
-                                    );
-                                }) : <Col span='6'>没有更多了</Col>
-                            }
-                        </Row>
+                    <TabPane tab='全 部' key='1' style={{background: '#ECECEC', padding: '20px', minHeight: 500}}>
+                        <Spin spinning={loading}>
+                            <Row gutter={16}>
+                                {
+                                    dataList.length > 0 ? dataList.map((item, index) => {
+                                        return (
+                                            <Col span='6' key={index} onClick={this.toSupplyDetails.bind(this, item.ID)} style={{marginBottom: 10}}>
+                                                <Menu record={item} />
+                                            </Col>
+                                        );
+                                    }) : <Col span='6'>没有更多了</Col>
+                                }
+                            </Row>
+                        </Spin>
                     </TabPane>
                 </Tabs>
             </div>
@@ -64,12 +67,16 @@ class DataList extends Component {
     }
     onSearch () {
         const { getProductList } = this.props.actions;
+        this.setState({
+            loading: true
+        });
         getProductList({}, {
             treetypename: this.state.treetypename || '',
             status: 1
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({
+                    loading: false,
                     page: rep.pageinfo.page,
                     total: rep.pageinfo.total,
                     dataList: rep.content

@@ -115,7 +115,6 @@ class Login extends Component {
                                 'QH_USER_DATA',
                                 JSON.stringify(rst)
                             );
-                            rst.isOwnerClerk = isOwnerClerk;
                             const {
                                 username,
                                 id,
@@ -129,8 +128,9 @@ class Login extends Component {
                                 person_code: code,
                                 org_code,
                                 sections,
-                                person_telephone: phone
+                                person_telephone
                             } = account;
+                            const isOwnerClerk = rst.isOwnerClerk;
                             setUser(
                                 username,
                                 id,
@@ -143,7 +143,7 @@ class Login extends Component {
                                 org_code,
                                 sections,
                                 isOwnerClerk,
-                                phone
+                                person_telephone
                             );
                             console.log(getUser(), 'cookie存的信息');
 
@@ -465,7 +465,6 @@ class Login extends Component {
                                 onClick={this.backLogin.bind(this)}
                                 style={{
                                     fontSize: 16,
-                                    color: 'white',
                                     marginTop: '10px',
                                     color: 'red',
                                     cursor: 'pointer',
@@ -684,14 +683,6 @@ class Login extends Component {
     }
 
     loginFunc (data, loginType, values) {
-        // const permissions2 = [
-        // 	{ id: 'HOME', value: "1" },
-        // 	{ id: 'DISPLAY', value: "0" },
-        // 	{ id: 'MANAGE', value: "1" }
-
-        // ]
-        // window.localStorage.setItem('TREE_LOGIN_USER',
-        // 	JSON.stringify(permissions2));
         const {
             actions: {
                 login,
@@ -756,7 +747,7 @@ class Login extends Component {
                                 person_code: code,
                                 org_code,
                                 sections,
-                                person_telephone: phone,
+                                person_telephone
                             } = account;
                             setUser(
                                 username,
@@ -770,9 +761,8 @@ class Login extends Component {
                                 org_code,
                                 sections,
                                 isOwnerClerk,
-                                phone
+                                person_telephone
                             );
-                            console.log(getUser(), 'cookie存的信息');
 
                             setPermissions(permissions);
 

@@ -51,8 +51,8 @@ class Menu extends Component {
         let UpdateTime = record.UpdateTime ? record.UpdateTime.split(' ')[0] : '';
         return (
             <div className='menu'>
-                <Card bodyStyle={{ padding: 0 }} bordered={false}>
-                    <div>
+                <Card bodyStyle={{padding: 0, height: 270}} bordered={false}>
+                    <div style={{height: 150}}>
                         <img src={FOREST_API + '/' + record.Photo} alt='图片找不到了' width='100%' height='150' />
                     </div>
                     <div style={{padding: '0 10px', height: 120}}>

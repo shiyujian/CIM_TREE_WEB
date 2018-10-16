@@ -32,7 +32,7 @@ class Users extends Component {
             loading: false,
             percent: 0,
             edit: true,
-            roles: [],
+            roles: [], // 角色
             selectedRowKeys: [],
             btn: '',
             fristText: '',
@@ -44,11 +44,14 @@ class Users extends Component {
             record: null,
             showModal: false,
             dataList: [], // 表格数据用户
-            page: 1,
+            userName: '', // 用户名称
+            page: 1, // 当前页
             total: 0
         };
-        this.handleAudit = this.handleAudit.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
+        this.handleAudit = this.handleAudit.bind(this); // 审核
+        this.handleCancel = this.handleCancel.bind(this); // 取消
+        this.getDataList = this.getDataList.bind(this); // 请求数据列表
+        this.handleUserName = this.handleUserName.bind(this); // 用户名
     }
     static layout = {
         labelCol: { span: 6 },
@@ -268,7 +271,7 @@ class Users extends Component {
                 node = {}
             } = {}
         } = this.props;
-        const { showModal, dataList, page, total } = this.state;
+        const { showModal, dataList, userName, page, total } = this.state;
         const systemRoles = roles.filter(role => role.grouptype === 0);
         const projectRoles = roles.filter(role => role.grouptype === 1);
         const professionRoles = roles.filter(role => role.grouptype === 2);
@@ -507,6 +510,8 @@ class Users extends Component {
                                 <Input
                                     id='NurseryData'
                                     className='search-input'
+                                    value={userName}
+                                    onChange={this.handleUserName.bind(this)}
                                 />
                             </Col>
                             <Col span={7}>
@@ -654,6 +659,12 @@ class Users extends Component {
         ) : (
             <h3>{'没有权限'}</h3>
         );
+    }
+    handleUserName (e) {
+        console.log(e.target.value);
+        this.setState({
+            userName: e.target.value
+        });
     }
     toAudit (record) {
         this.setState({
@@ -1058,21 +1069,12 @@ class Users extends Component {
             const element = user.groups[j];
             groupe.push(element.id);
         }
-        // let userblack;
-        // if (user.is_black === true) {
-        //     userblack = 1;
-        // } else if (user.is_black === false) {
-        //     userblack = 0;
-        // } else {
-        //     userblack = user.is_black;
-        // }
         putUser(
             {},
             {
                 id: user.id,
                 username: user.username,
                 email: user.email,
-                // password: addition.password, // 密码不能变？信息中没有密码
                 account: {
                     person_name: user.person_name,
                     person_type: 'C_PER',
@@ -1140,18 +1142,37 @@ class Users extends Component {
             // ...account,
         });
     }
+    getDataList () {
+        const { userName, roles, page } = this.state;
+        const {
+            sidebar: { node } = {},
+            actions: { getUsers }
+        } = this.props;
+        const org_code = Users.collect(node);
+        getUsers({}, {
+            org_code,
+            roles,
+            keyword: userName,
+            page
+        }).then(rep => {
+            this.setState({
+                loading: false,
+                dataList: rep.results
+            });
+        });
+    }
 
     del (user) {
         const {
-            sidebar: { node } = {},
             actions: { deleteUser, getUsers, getForestAllUsersData }
         } = this.props;
-        const codes = Users.collect(node);
         let text = document.getElementById('NurseryData').value;
         if (user.id) {
             deleteUser({ userID: user.id }).then(rep => {
                 if (rep.code === 1) {
                     message.success('删除用户成功');
+                    // 更新表格
+                    this.getDataList();
                 }
                 getForestAllUsersData().then((userData) => {
                     if (userData && userData.content) {
@@ -1164,12 +1185,8 @@ class Users extends Component {
                     }
                 });
                 if (this.props.getIsBtns) {
-                    getUsers({}, { org_code: codes, page: this.state.page }).then(es => {
-                        this.setState({
-                            loading: false,
-                            dataList: es.results
-                        });
-                    });
+                    // 更新表格
+                    this.getDataList();
                 } else {
                     getUsers(
                         {},

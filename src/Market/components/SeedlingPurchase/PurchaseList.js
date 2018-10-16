@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Input, Button, Tabs, Select } from 'antd';
+import { Form, Input, Button, Tabs, Select, Spin } from 'antd';
 import Menu from './Menu';
 import './PurchaseList.less';
 
@@ -14,6 +14,7 @@ class PurchaseList extends Component {
         this.state = {
             page: 1,
             total: 0,
+            loading: true,
             dataList: [],
             projectList: [], // 项目标段
             a: 1
@@ -32,7 +33,7 @@ class PurchaseList extends Component {
         this.onSearch();
     }
     render () {
-        const { dataList, projectList } = this.state;
+        const { dataList, loading, projectList } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='purchaseList' style={{padding: '0 20px'}}>
@@ -71,12 +72,14 @@ class PurchaseList extends Component {
                     </FormItem>
                 </Form>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
-                    <TabPane tab='全 部' key='1'>
-                        {
-                            dataList.map((item, index) => {
-                                return <Menu {...this.props} record={item} key={index} projectList={projectList} />;
-                            })
-                        }
+                    <TabPane tab='全 部' key='1' style={{minHeight: 500}}>
+                        <Spin spinning={loading}>
+                            {
+                                dataList.map((item, index) => {
+                                    return <Menu {...this.props} record={item} key={index} projectList={projectList} />;
+                                })
+                            }
+                        </Spin>
                     </TabPane>
                 </Tabs>
             </div>
@@ -86,6 +89,9 @@ class PurchaseList extends Component {
         const { getPurchaseList } = this.props.actions;
         const formVal = this.props.form.getFieldsValue();
         const { page } = this.state;
+        this.setState({
+            loading: true
+        });
         getPurchaseList({}, {
             purchaseno: formVal.purchaseno || '',
             projectname: formVal.projectname || '',
@@ -94,6 +100,7 @@ class PurchaseList extends Component {
         }).then(rep => {
             if (rep.code === 200) {
                 this.setState({
+                    loading: false,
                     page: rep.pageinfo.page,
                     total: rep.pageinfo.total,
                     dataList: rep.content
