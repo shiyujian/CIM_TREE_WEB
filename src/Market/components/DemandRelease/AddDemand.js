@@ -100,7 +100,6 @@ class AddDemand extends Component {
             render: (text, record, index) => {
                 return (
                     <span>
-                        {this.state.isAmend ? <a onClick={this.toEdit.bind(this, record, index)}>保存</a> : ''}
                         <a onClick={this.toDelete.bind(this, record, index)}>删除</a>
                     </span>
                 );
@@ -342,45 +341,6 @@ class AddDemand extends Component {
             dataList
         });
     }
-    toEdit (record, index, e) {
-        e.preventDefault();
-        const { postPurchaseStandard, putPurchaseStandard } = this.props.actions;
-        if (record.ID) {
-            // 编辑采购单规格
-            putPurchaseStandard({}, {
-                ID: record.ID,
-                Num: record.Num,
-                Height: record.Height,
-                CrownWidth: record.CrownWidth,
-                DBH: record.DBH,
-                GroundDiameter: record.GroundDiameter,
-                TreeTypeID: record.TreeTypeID,
-                TreeTypeName: record.TreeTypeName,
-                CultivationMode: record.CultivationMode
-            }).then(rep => {
-                if (rep.code === 1) {
-                    message.success('编辑采购单规格成功');
-                }
-            });
-        } else {
-            // 增加采购单规格
-            postPurchaseStandard({}, {
-                PurchaseID: this.purchaseid,
-                Num: record.Num,
-                Height: record.Height,
-                CrownWidth: record.CrownWidth,
-                DBH: record.DBH,
-                GroundDiameter: record.GroundDiameter,
-                TreeTypeID: record.TreeTypeID,
-                TreeTypeName: record.TreeTypeName,
-                CultivationMode: record.CultivationMode
-            }).then(rep => {
-                if (rep.code === 1) {
-                    message.success('增加采购单规格成功');
-                }
-            });
-        }
-    }
     toCheck () {
         const { ProjectName, Section, RegionCode } = this.state;
         const { Contacter, Phone } = this.props.form.getFieldsValue();
@@ -429,7 +389,8 @@ class AddDemand extends Component {
                 StartTime,
                 EndTime,
                 Status,
-                PurchaseDescribe
+                PurchaseDescribe,
+                Specs
             }).then(rep => {
                 if (rep.code === 1 && Status === 1) {
                     message.success('编辑成功');
@@ -599,7 +560,6 @@ class AddDemand extends Component {
             }
         });
         dataList[record.cardKey] = arr;
-        debugger
         this.setState({
             dataList
         });
