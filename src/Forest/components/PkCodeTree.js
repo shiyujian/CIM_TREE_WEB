@@ -22,20 +22,16 @@ export default class PkCodeTree extends Component {
         const { treeData = [] } = this.props;
         return (
             <div>
-                {treeData.length ? (
-                    <Tree
-                        showLine
-                        selectedKeys={[this.props.selectedKeys]}
-                        defaultExpandAll
-                        autoExpandParent
-                        onSelect={this.props.onSelect}
-                        onExpand={this.props.onExpand}
-                    >
-                        {PkCodeTree.loop(treeData)}
-                    </Tree>
-                ) : (
-                    ''
-                )}
+                <Tree
+                    showLine
+                    selectedKeys={[this.props.selectedKeys]}
+                    defaultExpandAll
+                    autoExpandParent
+                    onSelect={this.props.onSelect}
+                    onExpand={this.props.onExpand}
+                >
+                    {PkCodeTree.loop(treeData)}
+                </Tree>
             </div>
         );
     }

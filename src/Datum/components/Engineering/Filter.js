@@ -113,7 +113,7 @@ class Filter extends Component {
             Doc = [],
             selectDoc,
             parent,
-            selected
+            selected = []
         } = this.props;
         const { projectArray, sectionArray } = this.state;
 
@@ -264,7 +264,7 @@ class Filter extends Component {
                                 新增
                             </Button>
                         )}
-                        {(selected.length === 0 || !this.props.isTreeSelected) ? (
+                        {((selected === undefined || selected.length === 0) || !this.props.isTreeSelected) ? (
                             <Button
                                 style={{ marginRight: 10 }}
                                 disabled

@@ -90,23 +90,23 @@ export default class DataStatis extends Component {
             setkeycode('');
             // 类型
             let typeoption = [
-                <Option key={'-1'} value={''} title={'全部'}>
-                全部
+                <Option key={'全部'} value={''} title={'全部'}>
+                    全部
                 </Option>,
-                <Option key={'1'} value={'1'} title={'常绿乔木'}>
-                常绿乔木
+                <Option key={'常绿乔木'} value={'1'} title={'常绿乔木'}>
+                    常绿乔木
                 </Option>,
-                <Option key={'2'} value={'2'} title={'落叶乔木'}>
-                落叶乔木
+                <Option key={'落叶乔木'} value={'2'} title={'落叶乔木'}>
+                    落叶乔木
                 </Option>,
-                <Option key={'3'} value={'3'} title={'亚乔木'}>
-                亚乔木
+                <Option key={'亚乔木'} value={'3'} title={'亚乔木'}>
+                    亚乔木
                 </Option>,
-                <Option key={'4'} value={'4'} title={'灌木'}>
-                灌木
+                <Option key={'灌木'} value={'4'} title={'灌木'}>
+                    灌木
                 </Option>,
-                <Option key={'5'} value={'5'} title={'地被'}>
-                地被
+                <Option key={'地被'} value={'5'} title={'地被'}>
+                    地被
                 </Option>
             ];
             this.setState({ typeoption });
@@ -330,7 +330,7 @@ export default class DataStatis extends Component {
                 );
             });
             treetypeoption.unshift(
-                <Option key={-1} value={''} title={'全部'}>
+                <Option key={'全部'} value={''} title={'全部'}>
                         全部
                 </Option>
             );

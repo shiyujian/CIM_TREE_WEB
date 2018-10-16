@@ -13,7 +13,11 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { getUser } from '_platform/auth';
+import {TreeAdoptInfoTable} from '../components/TreeAdoptInfo';
+import {
+    getUser,
+    getAreaTreeData
+} from '_platform/auth';
 const Option = Select.Option;
 @connect(
     state => {
@@ -28,20 +32,22 @@ const Option = Select.Option;
     })
 )
 export default class TreeAdoptInfo extends Component {
-    biaoduan = [];
     constructor (props) {
         super(props);
         this.state = {
-            treeLists: [],
+            leftkeycode: '',
+            resetkey: 0,
+            typeoption: [],
             sectionoption: [],
             smallclassoption: [],
             thinclassoption: [],
-            leftkeycode: '',
-            resetkey: 0,
-            curingTypesOption: []
+            treetypeoption: [],
+            sectionsData: [],
+            smallClassesData: []
         };
     }
-    componentDidMount () {
+
+    componentDidMount = async () => {
         this.biaoduan = [];
         for (let i = 0; i < PROJECT_UNITS.length; i++) {
             PROJECT_UNITS[i].units.map(item => {
@@ -50,65 +56,81 @@ export default class TreeAdoptInfo extends Component {
         }
         const {
             actions: {
+                getTreeList,
                 getForestUsers,
                 getTreeNodeList,
-                getLittleBanAll,
                 setkeycode,
-                getCuringTypes
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
             },
             users,
-            littleBanAll,
+            treetypes,
             platform: { tree = {} }
         } = this.props;
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
-        getCuringTypes().then((curingTypesData) => {
-            let curingTypes = curingTypesData && curingTypesData.content;
-            let curingTypesOption = [];
-            try {
-                curingTypes.map((type) => {
-                    curingTypesOption.push(<Option title={type.Base_Name} key={type.ID} value={type.ID}>{type.Base_Name}</Option>);
-                });
-                this.setState({
-                    curingTypesOption
-                });
-            } catch (e) {
-                console.log('获取养护类型', e);
+        try {
+            // 避免反复获取森林用户数据，提高效率
+            if (!users) {
+                getForestUsers();
             }
-        });
-        if (!tree.bigTreeList) {
-            getTreeNodeList();
-        }
-        if (!littleBanAll) {
-            getLittleBanAll();
-        }
+            // 避免反复获取森林树种列表，提高效率
+            if (!treetypes) {
+                getTreeList().then(x => this.setTreeTypeOption(x));
+            }
+            if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+                let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+                let totalThinClass = data.totalThinClass || [];
+                let projectList = data.projectList || [];
+                // 获取所有的小班数据，用来计算养护任务的位置
+                await getTotalThinClass(totalThinClass);
+                // 区域地块树
+                await getThinClassTree(projectList);
+            }
 
-        setkeycode('');
+            setkeycode('');
+            // 类型
+            let typeoption = [
+                <Option key={'全部'} value={''} title={'全部'}>
+                    全部
+                </Option>,
+                <Option key={'常绿乔木'} value={'1'} title={'常绿乔木'}>
+                    常绿乔木
+                </Option>,
+                <Option key={'落叶乔木'} value={'2'} title={'落叶乔木'}>
+                    落叶乔木
+                </Option>,
+                <Option key={'亚乔木'} value={'3'} title={'亚乔木'}>
+                    亚乔木
+                </Option>,
+                <Option key={'灌木'} value={'4'} title={'灌木'}>
+                    灌木
+                </Option>,
+                <Option key={'地被'} value={'5'} title={'地被'}>
+                    地被
+                </Option>
+            ];
+            this.setState({ typeoption });
+        } catch (e) {
+            console.log('componentdidmount', e);
+        }
     }
 
     render () {
-        const { keycode } = this.props;
-        const {
-            leftkeycode,
-            sectionoption,
-            smallclassoption,
-            thinclassoption,
-            resetkey,
-            curingTypesOption
-        } = this.state;
         const {
             platform: { tree = {} }
         } = this.props;
+        const {
+            leftkeycode,
+            resetkey
+        } = this.state;
         let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
+        if (tree.thinClassTree) {
+            treeList = tree.thinClassTree;
         }
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='养护信息' {...this.props} />
+                    <DynamicTitle title='苗木结缘信息' {...this.props} />
                     <Sidebar width={190}>
                         <PkCodeTree
                             treeData={treeList}
@@ -117,109 +139,108 @@ export default class TreeAdoptInfo extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        TreeAdoptInfoTreeAdoptInfoTreeAdoptInfo
+                        <TreeAdoptInfoTable
+                            key={resetkey}
+                            {...this.props}
+                            {...this.state}
+                            sectionselect={this.sectionselect.bind(this)}
+                            smallclassselect={this.smallclassselect.bind(this)}
+                            thinclassselect={this.thinclassselect.bind(this)}
+                            resetinput={this.resetinput.bind(this)}
+                            typeselect={this.typeselect.bind(this)}
+                        />
                     </Content>
                 </Main>
             </Body>
         );
     }
-    sectionselect (value) {
+    // 树选择, 重新获取: 标段、小班、细班、树种并置空
+    onSelect (keys, info) {
         const {
-            actions: { getLittleBan }
+            platform: { tree = {} }
         } = this.props;
-        this.currentSection = value;
-        getLittleBan({ no: value }).then(rst => {
-            let smallclasses = [];
-            rst.map((item, index) => {
-                let smallname = {
-                    code: rst[index].SmallClass,
-                    name: rst[index].SmallClassName
-                        ? rst[index].SmallClassName
-                        : rst[index].SmallClass
-                };
-                smallclasses.push(smallname);
-            });
-            this.setSmallClassOption(smallclasses);
-        });
-    }
+        let treeList = tree.thinClassTree;
 
-    // 小班选择, 重新获取: 细班、树种
-    smallclassselect (value) {
+        let user = getUser();
+        let keycode = keys[0] || '';
         const {
-            actions: { getLittleBan }
+            actions: { setkeycode }
         } = this.props;
-        getLittleBan({ no: this.currentSection }).then(rst => {
-            let smallclasses = [];
-            rst.map((item, index) => {
-                if (item.SmallClass === value) {
-                    let smallname = {
-                        code: rst[index].ThinClass,
-                        name: rst[index].ThinClassName
-                            ? rst[index].ThinClassName
-                            : rst[index].ThinClass
-                    };
-                    smallclasses.push(smallname);
+        setkeycode(keycode);
+        this.setState({
+            leftkeycode: keycode,
+            resetkey: ++this.state.resetkey
+        });
+        console.log('info', info);
+        let sectionsData = [];
+        if (keycode) {
+            treeList.map((treeData) => {
+                if (keycode === treeData.No) {
+                    sectionsData = treeData.children;
                 }
             });
-            this.setThinClassOption(smallclasses);
+        }
+        this.setState({
+            sectionsData
         });
-    }
+        // 树种
+        this.typeselect('');
 
-    // 细班选择, 重新获取: 树种
-    thinclassselect (value, section) {
+        let sections = JSON.parse(user.sections);
+        // 标段
+        if (sections.length === 0) {
+            // 是admin或者业主
+            this.setSectionOption(sectionsData);
+        } else {
+            sectionsData.map((sectionData) => {
+                if (sections[0] === sectionData) {
+                    this.setSectionOption(sectionData);
+                }
+            });
+        }
     }
-
     // 设置标段选项
     setSectionOption (rst) {
         if (rst instanceof Array) {
-            let sectionList = [];
             let sectionOptions = [];
-            rst.map((item, index) => {
-                sectionList.push(item);
-            });
-            let sectionData = [...new Set(sectionList)];
-            sectionData.sort();
-            sectionData.map(sec => {
+            rst.map(sec => {
                 sectionOptions.push(
-                    <Option key={sec.code} value={sec.code} title={sec.value}>
-                        {sec.value}
+                    <Option key={sec.No} value={sec.No} title={sec.Name}>
+                        {sec.Name}
                     </Option>
                 );
             });
             this.setState({ sectionoption: sectionOptions });
         }
     }
+    // 标段选择
+    sectionselect (value) {
+        const {
+            sectionsData
+        } = this.state;
+        sectionsData.map((sectionData) => {
+            if (value === sectionData.No) {
+                let smallClassesData = sectionData.children;
+                this.setState({
+                    smallClassesData
+                });
+                this.setSmallClassOption(smallClassesData);
+            }
+        });
+    }
     // 设置小班选项
     setSmallClassOption (rst) {
         if (rst instanceof Array) {
-            let smallclassList = [];
             let smallclassOptions = [];
-            rst.map(item => {
-                if (item.name) {
-                    let smalls = {
-                        name: item.name,
-                        code: item.code
-                    };
-                    smallclassList.push(smalls);
-                }
-            });
-            let smalls = [];
-            let array = [];
-            smallclassList.map(item => {
-                if (array.indexOf(item.code) === -1) {
-                    smalls.push(item);
-                    array.push(item.code);
-                }
-            });
-            smalls.map(small => {
+            rst.map(small => {
                 smallclassOptions.push(
-                    <Option key={small.code} value={small.code} title={small.name}>
-                        {small.name}
+                    <Option key={small.No} value={small.No} title={small.Name}>
+                        {small.Name}
                     </Option>
                 );
             });
             smallclassOptions.unshift(
-                <Option key={-1} value={''} title={'全部'}>
+                <Option key={'全部'} value={''} title={'全部'}>
                     全部
                 </Option>
             );
@@ -227,44 +248,43 @@ export default class TreeAdoptInfo extends Component {
         }
     }
 
+    // 小班选择, 重新获取: 细班
+    smallclassselect (value) {
+        const {
+            smallClassesData
+        } = this.state;
+        smallClassesData.map((smallClassData) => {
+            if (value === smallClassData.No) {
+                let thinClassesData = smallClassData.children;
+                this.setState({
+                    thinClassesData
+                });
+                this.setThinClassOption(thinClassesData);
+            }
+        });
+    }
     // 设置细班选项
     setThinClassOption (rst) {
         if (rst instanceof Array) {
-            let thinclassList = [];
             let thinclassOptions = [];
-
-            // 去除重复的细班,虽然细班是最小的节点，但是只要还有其他元素组成不同，所以数组里面会有相同的细班code，需要去重
-            let array = [];
-            let data = [];
-            rst.map(item => {
-                if (item.code && array.indexOf(item.code) === -1) {
-                    let thins = {
-                        code: item.code,
-                        name: item.name
-                    };
-                    thinclassList.push(thins);
-                    array.push(item.code);
-                } else {
-                    data.push(item);
-                }
-            });
-            // 重复数据
-            console.log('data', data);
-
-            thinclassList.map(thin => {
+            rst.map(thin => {
                 thinclassOptions.push(
-                    <Option key={thin.code} value={thin.code} title={thin.name}>
-                        {thin.name}
+                    <Option key={thin.No} value={thin.No} title={thin.Name}>
+                        {thin.Name}
                     </Option>
                 );
             });
             thinclassOptions.unshift(
-                <Option key={-1} value={''} title={'全部'}>
-                    全部
+                <Option key={'全部'} value={''} title={'全部'}>
+                        全部
                 </Option>
             );
             this.setState({ thinclassoption: thinclassOptions });
         }
+    }
+
+    // 细班选择, 重新获取: 树种
+    thinclassselect (value) {
     }
 
     // 重置
@@ -274,34 +294,42 @@ export default class TreeAdoptInfo extends Component {
         });
     }
 
-    // 树选择, 重新获取: 标段、小班、细班、树种并置空
-    onSelect (value = []) {
-        let user = getUser();
-        let keycode = value[0] || '';
-        const {
-            actions: { setkeycode }
-        } = this.props;
-        setkeycode(keycode);
-        this.setState({
-            leftkeycode: keycode,
-            resetkey: ++this.state.resetkey
+    // 类型选择, 重新获取: 树种
+    typeselect (value) {
+        const { treetypes } = this.props;
+        this.setState({ bigType: value });
+        let selectTreeType = [];
+        treetypes.map(item => {
+            if (item.TreeTypeNo == null) {
+                // console.log('itemitemitemitemitem',item)
+            }
+            if (item.TreeTypeNo) {
+                try {
+                    let code = item.TreeTypeNo.substr(0, 1);
+                    if (code === value) {
+                        selectTreeType.push(item);
+                    }
+                } catch (e) {}
+            }
         });
-        let sections = JSON.parse(user.sections);
-        // 标段
-        let rst = [];
-        if (sections.length === 0) {
-            // 是admin
-            rst = this.biaoduan.filter(item => {
-                return item.code.indexOf(keycode) !== -1;
-            });
-        } else {
-            rst = this.biaoduan.filter(item => {
+        this.setTreeTypeOption(selectTreeType);
+    }
+    // 设置树种选项
+    setTreeTypeOption (rst) {
+        if (rst instanceof Array) {
+            let treetypeoption = rst.map(item => {
                 return (
-                    item.code.indexOf(keycode) !== -1 &&
-                    sections.indexOf(item.code) !== -1
+                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                        {item.TreeTypeName}
+                    </Option>
                 );
             });
+            treetypeoption.unshift(
+                <Option key={'全部'} value={''} title={'全部'}>
+                            全部
+                </Option>
+            );
+            this.setState({ treetypeoption, treetypelist: rst });
         }
-        this.setSectionOption(rst);
     }
 }
