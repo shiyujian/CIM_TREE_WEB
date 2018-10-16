@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Input, Select, Tabs } from 'antd';
+import { Form, Button, Input, Select, Tabs, Spin } from 'antd';
 import Menu from './Menu';
 import { getUser } from '_platform/auth';
 
@@ -12,6 +12,7 @@ class DemandTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            loading: true,
             dataList: [],
             projectList: [],
             a: 1
@@ -36,7 +37,7 @@ class DemandTable extends Component {
     }
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { dataList, projectList } = this.state;
+        const { dataList, loading, projectList } = this.state;
         return (
             <div className='demandTable' style={{padding: '0 20px'}}>
                 <Form layout='inline'>
@@ -77,12 +78,14 @@ class DemandTable extends Component {
                 <Button type='primary' onClick={this.toAddDemand.bind(this)}
                     style={{position: 'absolute', right: 60, zIndex: 100}}>新增需求</Button>
                 <Tabs defaultActiveKey='1' onChange={this.handlePane}>
-                    <TabPane tab='全 部' key='1'>
-                        {
-                            dataList.length > 0 ? dataList.map((item, index) => {
-                                return <Menu record={item} key={index} projectList={projectList} {...this.props} toSearch={this.toSearch} toAddDemand={this.toAddDemand} />;
-                            }) : []
-                        }
+                    <TabPane tab='全 部' key='1' style={{minHeight: 500}}>
+                        <Spin spinning={loading}>
+                            {
+                                dataList.length > 0 ? dataList.map((item, index) => {
+                                    return <Menu record={item} key={index} projectList={projectList} {...this.props} toSearch={this.toSearch} toAddDemand={this.toAddDemand} />;
+                                }) : []
+                            }
+                        </Spin>
                     </TabPane>
                 </Tabs>
             </div>
@@ -96,6 +99,9 @@ class DemandTable extends Component {
     toSearch () {
         const formVal = this.props.form.getFieldsValue();
         const { getPurchaseList } = this.props.actions;
+        this.setState({
+            loading: true
+        });
         getPurchaseList({}, {
             purchaseno: '',
             org: this.org,
@@ -104,6 +110,7 @@ class DemandTable extends Component {
         }).then((rep) => {
             if (rep.code === 200) {
                 this.setState({
+                    loading: false,
                     dataList: rep.content,
                     page: rep.pageinfo.page,
                     total: rep.pageinfo.total

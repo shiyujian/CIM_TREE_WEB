@@ -28,6 +28,7 @@ class Tablelevel extends Component {
             optionList: []
         };
         this.Checker = '';
+        this.groupId = '';
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
         this.handlePage = this.handlePage.bind(this); // 换页
@@ -39,6 +40,12 @@ class Tablelevel extends Component {
     }
     componentDidMount () {
         const { getRegionCodes, getNurseryList } = this.props.actions;
+        // 获取当前组织机构的权限
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        if (user.groups && user.groups.length > 0) {
+            this.groupId = user.groups[0].id;
+        }
+        console.log(this.groupId);
         // 获取行政区划编码
         getRegionCodes({}, {grade: 1}).then(rep => {
             let province = [];
@@ -161,8 +168,9 @@ class Tablelevel extends Component {
             render: (text, record) => {
                 return (
                     <span>
-                        <a onClick={this.toEdit.bind(this, record)}>修改</a>
-                        <span className='ant-divider' />
+                        {
+                            this.groupId === 10 || record.CheckStatus === 1 ? '' : <span><a onClick={this.toEdit.bind(this, record)}>修改</a><span className='ant-divider' /></span>
+                        }
                         {
                             record.CheckStatus === 0 ? [<a key='one' onClick={this.toAudit.bind(this, record)}>审核</a>,
                                 <span key='two' className='ant-divider' />] : []

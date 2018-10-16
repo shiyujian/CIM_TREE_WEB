@@ -38,7 +38,7 @@ class SupplyDetails extends Component {
             Price: 0, // 价格
             Stock: 0, // 库存
             CultivationMode: '',
-            dataList: [],
+            dataList: [], // 规格列表
             selectStandard: {},
             SupplierID: ''
         };
@@ -102,9 +102,21 @@ class SupplyDetails extends Component {
             }).then(rst => {
                 if (rst.content && rst.content.length > 0) {
                     const dataList = rst.content;
+                    let TreeTypeArr = [];
+                    dataList.map(item => {
+                        if (!TreeTypeArr.includes(item.SupplierID)) {
+                            TreeTypeArr.push(item.SupplierID);
+                        }
+                    });
+                    let arr = [];
+                    dataList.map(row => {
+                        if (row.SupplierID === TreeTypeArr[0]) {
+                            arr.push(row);
+                        }
+                    });
                     this.setState({
                         TreeTypeID: dataList[0].TreeTypeID,
-                        dataList: dataList,
+                        dataList: arr,
                         Price: 0,
                         Stock: 0,
                         CultivationMode: dataList[0].CultivationMode,
@@ -135,12 +147,16 @@ class SupplyDetails extends Component {
                                             {item.name}：
                                             {
                                                 item.children.map((row, num) => {
-                                                    let disabled = false;
+                                                    let arr = [];
                                                     dataList.map(record => {
-                                                        if (record[row.SpecFieldName] + '' === row.SpecValue) {
-                                                            disabled = record.disabled;
+                                                        if (!arr.includes(record[item.SpecFieldName])) {
+                                                            arr.push(record[item.SpecFieldName]);
                                                         }
                                                     });
+                                                    let disabled = false;
+                                                    if (!arr.includes(parseInt(row.SpecValue))) {
+                                                        disabled = true;
+                                                    }
                                                     return <Button style={row.active ? myButtonActive : myButton} disabled={disabled} key={num} onClick={this.onSelectStandard.bind(this, row, num)}>{row.SpecValue}</Button>;
                                                 })
                                             }
@@ -200,12 +216,11 @@ class SupplyDetails extends Component {
                 item.children[num].active = true;
             }
         });
+        let dataListFilter = [];
         dataList.map(item => {
             if (item[row.SpecFieldName] + '' === row.SpecValue) {
-                item.disabled = false;
+                dataListFilter.push(item);
                 selectStandard[row.SpecFieldName] = row.SpecValue;
-            } else {
-                item.disabled = true;
             }
         });
         if (selectStandard.DBH && selectStandard.CrownWidth && selectStandard.GroundDiameter && selectStandard.Height) {
@@ -217,7 +232,7 @@ class SupplyDetails extends Component {
             });
         }
         this.setState({
-            dataList,
+            dataList: dataListFilter,
             selectStandard,
             standardList,
             Stock,
