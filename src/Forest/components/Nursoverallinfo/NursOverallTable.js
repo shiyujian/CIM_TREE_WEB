@@ -12,9 +12,10 @@ import {
     Card
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import '../index.less';
 import { getUser } from '_platform/auth';
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 
 export default class NursOverallTable extends Component {
     constructor (props) {
@@ -287,18 +288,6 @@ export default class NursOverallTable extends Component {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
     }
-    getBiao (code) {
-        let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
-                }
-            });
-        });
-        return str;
-    }
-
     render () {
         const { seedlingMess, treeMess, flowMess, curingMess, sxm } = this.state;
         const suffix = sxm ? (
@@ -321,7 +310,7 @@ export default class NursOverallTable extends Component {
                         <Col span={2} className='forest-mrg10'>
                             <Button
                                 type='primary'
-                                onClick={this.qury.bind(this)}
+                                onClick={this.query.bind(this)}
                             >
                                 查询
                             </Button>
@@ -918,7 +907,7 @@ export default class NursOverallTable extends Component {
         });
     }
 
-    async qury () {
+    async query () {
         const { sxm = '' } = this.state;
 
         const {
@@ -927,17 +916,17 @@ export default class NursOverallTable extends Component {
                 getTreeflows,
                 getnurserys,
                 getCarpackbysxm,
-                getLittleBan,
+                getThinClassList,
                 getCuringTreeInfo,
                 getCuringTypes,
                 getCuringMessage
-            }
+            },
+            platform: { tree = {} }
         } = this.props;
         if (!sxm) {
             message.warning('请输入顺序码');
             return;
         }
-        let me = this;
         let postdata = {
             sxm
         };
@@ -967,11 +956,10 @@ export default class NursOverallTable extends Component {
             queryTreeData.SmallClass &&
             queryTreeData.ThinClass
         ) {
-            let data = {
-                no: queryTreeData.Section
-            };
-            let noList = await getLittleBan(data);
             let sections = queryTreeData.Section.split('-');
+            let parentNo = sections[0] + '-' + sections[1];
+            let noList = await getThinClassList({ no: parentNo }, {section: sections[2]});
+
             let No =
                 sections[0] +
                 '-' +
@@ -995,15 +983,10 @@ export default class NursOverallTable extends Component {
             });
         }
 
-        // let queryTreeData = {}
         let treeflowData = {};
         let nurserysData = {};
         let curingTaskArr = [];
         let curingTaskData = [];
-
-        // if(queryTreeDatas && queryTreeDatas.content && queryTreeDatas.content instanceof Array && queryTreeDatas.content.length>0){
-        // 	queryTreeData =  queryTreeDatas.content[0]
-        // }
         if (
             treeflowDatas &&
             treeflowDatas.content &&
@@ -1078,28 +1061,16 @@ export default class NursOverallTable extends Component {
 
         // 项目code
         let land = queryTreeData.Land ? queryTreeData.Land : '';
-        // 项目名称
-        let landName = '';
-        // 项目下的标段
-        let sections = [];
         // 查到的标段code
         let Section = queryTreeData.Section ? queryTreeData.Section : '';
+        // 细班树
+        let thinClassTree = tree.thinClassTree;
         // 标段名称
-        let sectionName = '';
-
-        PROJECT_UNITS.map(unit => {
-            if (land === unit.code) {
-                sections = unit.units;
-                landName = unit.value;
-            }
-        });
-        console.log('sections', sections);
-
-        sections.map(section => {
-            if (section.code === Section) {
-                sectionName = section.value;
-            }
-        });
+        let sectionName = getSectionNameBySection(Section, thinClassTree);
+        // 项目名称
+        let landName = getProjectNameBySection(Section, thinClassTree);
+        console.log('sectionName', sectionName);
+        console.log('landName', landName);
 
         let treeMess = [
             {

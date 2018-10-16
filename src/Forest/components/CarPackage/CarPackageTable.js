@@ -13,9 +13,10 @@ import {
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 const { RangePicker } = DatePicker;
 
 export default class CarPackageTable extends Component {
@@ -52,16 +53,13 @@ export default class CarPackageTable extends Component {
             status: ''
         };
     }
-    getBiao (code) {
-        let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
-                }
-            });
-        });
-        return str;
+    getBiao (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let sectionName = getSectionNameBySection(section, thinClassTree);
+        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
@@ -671,7 +669,6 @@ export default class CarPackageTable extends Component {
         const {
             sxm = '',
             section = '',
-            treetype = '',
             stime = '',
             etime = '',
             size,
@@ -696,12 +693,6 @@ export default class CarPackageTable extends Component {
             size,
             status
         };
-        // if(this.sections.length !== 0){  //不是admin，要做查询判断了
-        // 	if(section === ''){
-        // 		message.info('请选择标段信息');
-        // 		return;
-        // 	}
-        // }
 
         this.setState({
             loading: true,
@@ -714,7 +705,6 @@ export default class CarPackageTable extends Component {
             let tblData = rst.content;
             if (tblData instanceof Array) {
                 tblData.forEach((plan, i) => {
-                    let statusname = plan.statusname;
                     tblData[i].order = (page - 1) * size + i + 1;
                     tblData[i].liftertime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
@@ -733,13 +723,11 @@ export default class CarPackageTable extends Component {
     }
 
     getProject (section) {
-        let projectName = '';
-        // 获取当前标段所在的项目
-        PROJECT_UNITS.map(item => {
-            if (section.indexOf(item.code) != -1) {
-                projectName = item.value;
-            }
-        });
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let projectName = getProjectNameBySection(section, thinClassTree);
         return projectName;
     }
 
@@ -747,34 +735,30 @@ export default class CarPackageTable extends Component {
         const {
             sxm = '',
             section = '',
-            treetype = '',
             stime = '',
             etime = '',
-            size,
+            exportsize,
             status = '',
             mmtype = ''
         } = this.state;
         const {
-            actions: { getcarpackage },
+            actions: { getexportcarpackage },
             keycode = ''
         } = this.props;
+        if (section === '' && sxm === '') {
+            message.info('请选择项目及标段信息或输入车牌号');
+            return;
+        }
         let postdata = {
             licenseplate: sxm,
             section: section === '' ? keycode : section,
             isshrub: mmtype,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            page,
-            size,
+            page: 1,
+            size: exportsize,
             status
         };
-        if (this.sections.length !== 0) {
-            // 不是admin，要做查询判断了
-            if (section === '') {
-                message.info('请选择标段信息');
-                return;
-            }
-        }
 
         this.setState({ loading: true, percent: 0 });
         getexportcarpackage({}, postdata).then(rst3 => {

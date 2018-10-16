@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import { Select } from 'antd';
 import * as actions from '../store';
 import { PkCodeTree } from '../components';
-import { PROJECT_UNITS } from '_platform/api';
 import { LocmeasureTable } from '../components/Locmeasureinfo';
 import { actions as platformActions } from '_platform/store/global';
 import {
@@ -15,7 +14,10 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { getUser } from '_platform/auth';
+import {
+    getUser,
+    getAreaTreeData
+} from '_platform/auth';
 const Option = Select.Option;
 @connect(
     state => {
@@ -30,7 +32,6 @@ const Option = Select.Option;
     })
 )
 export default class Locmeasureinfo extends Component {
-    biaoduan = [];
     constructor (props) {
         super(props);
         this.state = {
@@ -45,7 +46,9 @@ export default class Locmeasureinfo extends Component {
             locationoption: [],
             leftkeycode: '',
             resetkey: 0,
-            bigType: ''
+            bigType: '',
+            sectionsData: [],
+            smallClassesData: []
         };
     }
     getbigTypeName (type) {
@@ -64,26 +67,19 @@ export default class Locmeasureinfo extends Component {
                 return '';
         }
     }
-    componentDidMount () {
-        this.biaoduan = [];
-        for (let i = 0; i < PROJECT_UNITS.length; i++) {
-            PROJECT_UNITS[i].units.map(item => {
-                this.biaoduan.push(item);
-            });
-        }
+    componentDidMount = async () => {
         const {
             actions: {
-                getTree,
-                gettreetype,
                 getTreeList,
                 getForestUsers,
                 getTreeNodeList,
-                getLittleBanAll,
-                setkeycode
+                setkeycode,
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
             },
             users,
             treetypes,
-            littleBanAll,
             platform: { tree = {} }
         } = this.props;
         // 避免反复获取森林用户数据，提高效率
@@ -94,11 +90,14 @@ export default class Locmeasureinfo extends Component {
         if (!treetypes) {
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        if (!tree.bigTreeList) {
-            getTreeNodeList();
-        }
-        if (!littleBanAll) {
-            getLittleBanAll();
+        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+            let totalThinClass = data.totalThinClass || [];
+            let projectList = data.projectList || [];
+            // 获取所有的小班数据，用来计算养护任务的位置
+            await getTotalThinClass(totalThinClass);
+            // 区域地块树
+            await getThinClassTree(projectList);
         }
 
         setkeycode('');
@@ -180,8 +179,8 @@ export default class Locmeasureinfo extends Component {
             platform: { tree = {} }
         } = this.props;
         let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
+        if (tree.thinClassTree) {
+            treeList = tree.thinClassTree;
         }
         return (
             <Body>
@@ -220,53 +219,146 @@ export default class Locmeasureinfo extends Component {
             </Body>
         );
     }
-    sectionselect (value) {
+    // 树选择, 重新获取: 标段、小班、细班、树种并置空
+    onSelect (keys = [], info) {
         const {
-            actions: { getLittleBan }
+            platform: { tree = {} }
         } = this.props;
-        this.currentSection = value;
-        getLittleBan({ no: value }).then(rst => {
-            let smallclasses = [];
-            rst.map((item, index) => {
-                let smallname = {
-                    code: rst[index].SmallClass,
-                    name: rst[index].SmallClassName
-                        ? rst[index].SmallClassName
-                        : rst[index].SmallClass
-                };
-                smallclasses.push(smallname);
-            });
-            this.setSmallClassOption(smallclasses);
-        });
-    }
+        let treeList = tree.thinClassTree;
 
-    // 小班选择, 重新获取: 细班、树种
-    smallclassselect (value) {
+        let user = getUser();
+        let keycode = keys[0] || '';
         const {
-            actions: { getLittleBan }
+            actions: { setkeycode }
         } = this.props;
-        getLittleBan({ no: this.currentSection }).then(rst => {
-            let smallclasses = [];
-            rst.map((item, index) => {
-                if (item.SmallClass === value) {
-                    let smallname = {
-                        code: rst[index].ThinClass,
-                        name: rst[index].ThinClassName
-                            ? rst[index].ThinClassName
-                            : rst[index].ThinClass
-                    };
-                    smallclasses.push(smallname);
-                }
-            });
-            this.setThinClassOption(smallclasses);
+        setkeycode(keycode);
+        this.setState({
+            leftkeycode: keycode,
+            resetkey: ++this.state.resetkey
         });
         // 树种
         this.typeselect('');
+
+        let sectionsData = [];
+        if (keycode) {
+            treeList.map((treeData) => {
+                if (keycode === treeData.No) {
+                    sectionsData = treeData.children;
+                }
+            });
+        }
+        this.setState({
+            sectionsData
+        });
+
+        // 标段
+        let sections = JSON.parse(user.sections);
+        if (sections.length === 0) {
+            // 是admin或者业主
+            this.setSectionOption(sectionsData);
+        } else {
+            sectionsData.map((sectionData) => {
+                if (sections[0] === sectionData.No) {
+                    this.setSectionOption(sectionData);
+                }
+            });
+        }
+    }
+    // 设置标段选项
+    setSectionOption (rst) {
+        let sectionOptions = [];
+        try {
+            if (rst instanceof Array) {
+                rst.map(sec => {
+                    sectionOptions.push(
+                        <Option key={sec.No} value={sec.No} title={sec.Name}>
+                            {sec.Name}
+                        </Option>
+                    );
+                });
+                this.setState({ sectionoption: sectionOptions });
+            } else {
+                sectionOptions.push(
+                    <Option key={rst.No} value={rst.No} title={rst.Name}>
+                        {rst.Name}
+                    </Option>
+                );
+                this.setState({ sectionoption: sectionOptions });
+            }
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+    sectionselect (value) {
+        const {
+            sectionsData
+        } = this.state;
+        sectionsData.map((sectionData) => {
+            if (value === sectionData.No) {
+                let smallClassesData = sectionData.children;
+                this.setState({
+                    smallClassesData
+                });
+                this.setSmallClassOption(smallClassesData);
+            }
+        });
+    }
+    // 设置小班选项
+    setSmallClassOption (rst) {
+        if (rst instanceof Array) {
+            let smallclassOptions = [];
+            rst.map(small => {
+                smallclassOptions.push(
+                    <Option key={small.No} value={small.No} title={small.Name}>
+                        {small.Name}
+                    </Option>
+                );
+            });
+            smallclassOptions.unshift(
+                <Option key={-1} value={''} title={'全部'}>
+                    全部
+                </Option>
+            );
+            this.setState({ smallclassoption: smallclassOptions });
+        }
+    }
+    // 小班选择, 重新获取: 细班
+    smallclassselect (value) {
+        const {
+            smallClassesData
+        } = this.state;
+        smallClassesData.map((smallClassData) => {
+            if (value === smallClassData.No) {
+                let thinClassesData = smallClassData.children;
+                this.setState({
+                    thinClassesData
+                });
+                this.setThinClassOption(thinClassesData);
+            }
+        });
+    }
+    // 设置细班选项
+    setThinClassOption (rst) {
+        if (rst instanceof Array) {
+            let thinclassOptions = [];
+            rst.map(thin => {
+                thinclassOptions.push(
+                    <Option key={thin.No} value={thin.No} title={thin.Name}>
+                        {thin.Name}
+                    </Option>
+                );
+            });
+            thinclassOptions.unshift(
+                <Option key={-1} value={''} title={'全部'}>
+                        全部
+                </Option>
+            );
+            this.setState({ thinclassoption: thinclassOptions });
+        }
     }
 
     // 细班选择, 重新获取: 树种
-    thinclassselect (value, section) {
-        this.typeselect('');
+    thinclassselect (value) {
     }
 
     // 类型选择, 重新获取: 树种
@@ -309,146 +401,10 @@ export default class Locmeasureinfo extends Component {
         }
     }
 
-    // 设置标段选项
-    setSectionOption (rst) {
-        let user = getUser();
-        let section = JSON.parse(user.sections);
-        if (rst instanceof Array) {
-            let sectionList = [];
-            let sectionOptions = [];
-            let sectionoption = rst.map((item, index) => {
-                sectionList.push(item);
-            });
-            let sectionData = [...new Set(sectionList)];
-            sectionData.sort();
-            sectionData.map(sec => {
-                sectionOptions.push(
-                    <Option key={sec.code} value={sec.code} title={sec.value}>
-                        {sec.value}
-                    </Option>
-                );
-            });
-            // if(section.length === 0){   //admin用户赋给全部的查阅权限
-            //     sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            // }
-            this.setState({ sectionoption: sectionOptions });
-        }
-    }
-    // 设置小班选项
-    setSmallClassOption (rst) {
-        if (rst instanceof Array) {
-            let smallclassList = [];
-            let smallclassOptions = [];
-            let smallclassoption = rst.map(item => {
-                if (item.name) {
-                    let smalls = {
-                        name: item.name,
-                        code: item.code
-                    };
-                    smallclassList.push(smalls);
-                }
-            });
-            let smalls = [];
-            let array = [];
-            smallclassList.map(item => {
-                if (array.indexOf(item.code) === -1) {
-                    smalls.push(item);
-                    array.push(item.code);
-                }
-            });
-            smalls.map(small => {
-                smallclassOptions.push(
-                    <Option key={small.code} value={small.code} title={small.name}>
-                        {small.name}
-                    </Option>
-                );
-            });
-            smallclassOptions.unshift(
-                <Option key={-1} value={''} title={'全部'}>
-                    全部
-                </Option>
-            );
-            this.setState({ smallclassoption: smallclassOptions });
-        }
-    }
-
-    // 设置细班选项
-    setThinClassOption (rst) {
-        if (rst instanceof Array) {
-            let thinclassList = [];
-            let thinclassOptions = [];
-
-            // 去除重复的细班,虽然细班是最小的节点，但是只要还有其他元素组成不同，所以数组里面会有相同的细班code，需要去重
-            let array = [];
-            let data = [];
-            rst.map(item => {
-                if (item.code && array.indexOf(item.code) === -1) {
-                    let thins = {
-                        code: item.code,
-                        name: item.name
-                    };
-                    thinclassList.push(thins);
-                    array.push(item.code);
-                } else {
-                    data.push(item);
-                }
-            });
-            // 重复数据
-            console.log('data', data);
-
-            thinclassList.map(thin => {
-                thinclassOptions.push(
-                    <Option key={thin.code} value={thin.code} title={thin.name}>
-                        {thin.name}
-                    </Option>
-                );
-            });
-            thinclassOptions.unshift(
-                <Option key={-1} value={''} title={'全部'}>
-                    全部
-                </Option>
-            );
-            this.setState({ thinclassoption: thinclassOptions });
-        }
-    }
-
     // 重置
     resetinput (leftkeycode) {
         this.setState({ resetkey: ++this.state.resetkey }, () => {
             this.onSelect([leftkeycode]);
         });
-    }
-
-    // 树选择, 重新获取: 标段、小班、细班、树种并置空
-    onSelect (value = []) {
-        let user = getUser();
-        let keycode = value[0] || '';
-        const {
-            actions: { setkeycode }
-        } = this.props;
-        setkeycode(keycode);
-        this.setState({
-            leftkeycode: keycode,
-            resetkey: ++this.state.resetkey
-        });
-        let sections = JSON.parse(user.sections);
-        // 标段
-        let rst = [];
-        if (sections.length === 0) {
-            // 是admin
-            rst = this.biaoduan.filter(item => {
-                return item.code.indexOf(keycode) !== -1;
-            });
-        } else {
-            rst = this.biaoduan.filter(item => {
-                return (
-                    item.code.indexOf(keycode) !== -1 &&
-                    sections.indexOf(item.code) !== -1
-                );
-            });
-        }
-        this.setSectionOption(rst);
-        // 树种
-        this.typeselect('');
     }
 }

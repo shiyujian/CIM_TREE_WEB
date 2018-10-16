@@ -14,9 +14,10 @@ import {
     Card
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 const { RangePicker } = DatePicker;
 
 export default class CuringTable extends Component {
@@ -29,7 +30,6 @@ export default class CuringTable extends Component {
             loading: false,
             size: 10,
             exportsize: 100,
-            leftkeycode: '',
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
             sxm: '',
@@ -41,7 +41,9 @@ export default class CuringTable extends Component {
             totalNum: '',
             imgArr: [],
             curingTypes: [],
-            curingSXM: ''
+            curingSXM: '',
+            smallclassData: '',
+            thinclassData: ''
         };
         this.columns = [
             {
@@ -82,16 +84,13 @@ export default class CuringTable extends Component {
             }
         ];
     }
-    getBiao (code) {
-        let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
-                }
-            });
-        });
-        return str;
+    getBiao (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let sectionName = getSectionNameBySection(section, thinClassTree);
+        return sectionName;
     }
     componentDidMount = async () => {
         try {
@@ -109,15 +108,6 @@ export default class CuringTable extends Component {
             this.sections = JSON.parse(user.sections);
         } catch (e) {
             console.log('getCuringTypes', e);
-        }
-    }
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode != this.state.leftkeycode) {
-            console.log('nextProps.leftkeycode', nextProps.leftkeycode);
-            console.log('this.state.leftkeycode', this.state.leftkeycode);
-            this.setState({
-                leftkeycode: nextProps.leftkeycode
-            });
         }
     }
     render () {
@@ -332,7 +322,6 @@ export default class CuringTable extends Component {
                     <Col span={2} >
                         <Button
                             type='primary'
-                            onClick={this.exportexcel.bind(this)}
                             style={{display: 'none'}}
                         >
                             导出
@@ -393,27 +382,48 @@ export default class CuringTable extends Component {
         this.setState({
             section: value || '',
             smallclass: '',
-            thinclass: ''
+            thinclass: '',
+            smallclassData: '',
+            thinclassData: ''
         });
     }
 
     onsmallclasschange (value) {
         const { smallclassselect } = this.props;
-        const { section, leftkeycode } = this.state;
-        smallclassselect(value || leftkeycode, section);
-        this.setState({
-            smallclass: value || '',
-            thinclass: ''
-        });
+        try {
+            smallclassselect(value);
+            let smallclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                smallclassData = arr[3];
+            }
+            this.setState({
+                smallclass: value,
+                smallclassData,
+                thinclass: '',
+                thinclassData: ''
+            });
+        } catch (e) {
+            console.log('onsmallclasschange', e);
+        }
     }
 
     onthinclasschange (value) {
         const { thinclassselect } = this.props;
-        const { section, smallclass } = this.state;
-        thinclassselect(value || smallclass, section);
-        this.setState({
-            thinclass: value || ''
-        });
+        try {
+            thinclassselect(value);
+            let thinclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                thinclassData = arr[4];
+            }
+            this.setState({
+                thinclass: value,
+                thinclassData
+            });
+        } catch (e) {
+            console.log('onthinclasschange', e);
+        }
     }
 
     ontypechange (value) {
@@ -441,7 +451,7 @@ export default class CuringTable extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
 
     handleCancel () {
@@ -473,7 +483,7 @@ export default class CuringTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury = async (page) => {
+    query = async (page) => {
         const {
             sxm = '',
             section = '',
@@ -481,7 +491,8 @@ export default class CuringTable extends Component {
             etime = '',
             size,
             thinclass = '',
-            curingTypeSelect = ''
+            curingTypeSelect = '',
+            thinclassData = ''
         } = this.state;
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
@@ -497,7 +508,7 @@ export default class CuringTable extends Component {
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
             curingtype: curingTypeSelect,
-            thinclass,
+            thinclass: thinclassData,
             page,
             size: size
         };
@@ -530,10 +541,6 @@ export default class CuringTable extends Component {
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
-                console.log('totalNum', totalNum);
-                console.log('pagination', pagination);
-                console.log('curingTreeData', curingTreeData);
-
                 this.setState({
                     loading: false,
                     percent: 100,
@@ -596,51 +603,11 @@ export default class CuringTable extends Component {
     }
 
     getProject (section) {
-        let projectName = '';
-        // 获取当前标段所在的项目
-        PROJECT_UNITS.map(item => {
-            if (section.indexOf(item.code) != -1) {
-                projectName = item.value;
-            }
-        });
-        return projectName;
-    }
-
-    exportexcel () {
         const {
-            sxm = '',
-            section = '',
-            stime = '',
-            etime = '',
-            exportsize,
-            thinclass = '',
-            smallclass = ''
-        } = this.state;
-        if (thinclass === '' && sxm === '') {
-            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
-            return;
-        }
-        const {
-            actions: { getexportTree }
+            platform: { tree = {} }
         } = this.props;
-        let postdata = {
-            sxm,
-            section,
-            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            page: 1,
-            size: exportsize,
-            thinclass,
-            smallclass
-        };
-        this.setState({ loading: true, percent: 0 });
-        getexportTree({}, postdata).then(rst3 => {
-            if (rst3 === '') {
-                message.info('没有符合条件的信息');
-            } else {
-                window.open(`${FOREST_API}/${rst3}`);
-            }
-            this.setState({ loading: false });
-        });
+        let thinClassTree = tree.thinClassTree;
+        let projectName = getProjectNameBySection(section, thinClassTree);
+        return projectName;
     }
 }

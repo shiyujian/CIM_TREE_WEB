@@ -183,7 +183,7 @@ class AdoptTreeMessModal extends Component {
                     <div className='adoptTreeMess-modal-top-layout'>
                         <div>
                             <img src={defaultUserImg} style={{width: 100, height: 100}} />
-                            <div className='adoptTreeMess-modal-top-name'>
+                            <div className='adoptTreeMess-modal-top-name' title={name}>
                                 {name}
                             </div>
                         </div>
@@ -195,7 +195,7 @@ class AdoptTreeMessModal extends Component {
                         </div>
                         <div>
                             <img src={defaultTreeImg} style={{width: 100, height: 100}} />
-                            <div className='adoptTreeMess-modal-top-name'>
+                            <div className='adoptTreeMess-modal-top-name' title={seedlingMess.TreeTypeName ? seedlingMess.TreeTypeName : ''}>
                                 {seedlingMess.TreeTypeName ? seedlingMess.TreeTypeName : ''}
                             </div>
                         </div>

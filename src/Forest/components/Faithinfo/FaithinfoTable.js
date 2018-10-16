@@ -2,23 +2,17 @@ import React, { Component } from 'react';
 import {
     Icon,
     Table,
-    Spin,
-    Tabs,
-    Modal,
     Row,
     Col,
     Select,
     Button,
     Input,
-    InputNumber,
     Progress,
     message
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
 
 export default class FaithinfoTable extends Component {
     constructor (props) {
@@ -45,15 +39,6 @@ export default class FaithinfoTable extends Component {
     componentWillUnmount () {
         console.log('oh why you got destroy');
     }
-    componentWillReceiveProps (nextProps) {
-        // if(nextProps.leftkeycode != this.state.leftkeycode) {
-        // 	this.setState({
-        // 		leftkeycode: nextProps.leftkeycode,
-        // 	},()=> {
-        // 		this.qury(1);
-        // 	})
-        // }
-    }
 
     render () {
         const { tblData } = this.state;
@@ -61,13 +46,10 @@ export default class FaithinfoTable extends Component {
     }
     treeTable (details) {
         const {
-            treetypeoption,
             sectionoption,
-            typeoption,
-            leftkeycode,
-            keycode
+            typeoption
         } = this.props;
-        const { factory, section, bigType, treetypename } = this.state;
+        const { factory, section, bigType } = this.state;
         // 清除
         const suffix = factory ? (
             <Icon type='close-circle' onClick={this.emitEmpty} />
@@ -101,7 +83,6 @@ export default class FaithinfoTable extends Component {
             {
                 title: '详情',
                 render: record => {
-                    // console.log('record',record)
                     return (
                         <div>
                             <a
@@ -224,14 +205,12 @@ export default class FaithinfoTable extends Component {
         const {
             actions: {
                 changeModal1,
-                getHonestyNew,
                 getHonestyNewDetail,
                 clearList,
                 nurseryName
             }
         } = this.props;
         getHonestyNewDetail({ name: name }).then(rst => {
-            console.log('rst:', rst);
             this.setState({ loading1: false });
         });
         clearList();
@@ -243,16 +222,12 @@ export default class FaithinfoTable extends Component {
         const { sectionselect } = this.props;
         sectionselect(value || '');
         this.setState({
-            section: value || '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
+            section: value || ''
         });
     }
 
     ontypechange (value) {
         const { typeselect } = this.props;
-        const { section } = this.state;
         typeselect(value || '');
         this.setState({ bigType: value || '', treetype: '', treetypename: '' });
     }
@@ -276,7 +251,7 @@ export default class FaithinfoTable extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
     handleCancel () {
         this.setState({ imgvisible: false });
@@ -287,14 +262,14 @@ export default class FaithinfoTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury (page) {
+    query (page) {
         const {
             section = '',
             bigType = '',
             treetype = '',
             factory = ''
         } = this.state;
-        if ((section === '' || bigType == '') && factory === '') {
+        if ((section === '' || bigType === '') && factory === '') {
             message.info('请选择项目,标段及类型信息或输入供应商');
             return;
         }
@@ -315,14 +290,6 @@ export default class FaithinfoTable extends Component {
             let tblData = rst.content;
             if (tblData instanceof Array) {
                 tblData.forEach((plan, i) => {
-                    // console.log('plan',plan)
-                    // let treetys = []
-                    // if(plan.treetype.length > 1) {
-                    // 	treetys = plan.treetype.join(" , ")
-                    // }else {
-                    // 	treetys = plan.treetype
-                    // }
-                    // tblData[i].treetype = treetys
                     tblData[i].order = ++i;
                 });
                 this.setState({ tblData });
@@ -338,8 +305,7 @@ export default class FaithinfoTable extends Component {
             bigType = ''
         } = this.state;
         const {
-            actions: { getHonestyNew, getexportFactoryAnalyseInfo },
-            keycode = ''
+            actions: { getexportFactoryAnalyseInfo }
         } = this.props;
         let postdata = {
             treetype,

@@ -14,7 +14,6 @@ export const getLittleBan = createFetchAction(
     `${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`,
     [getLittleBanOK]
 );
-export const getThinClassListOK = createAction('获取二维展示树小班细班信息');
 export const getThinClassList = createFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []); //
 
 export const getThinClassTree = createAction(`${ID}区域地块细班树`);
@@ -177,12 +176,6 @@ export default handleActions(
             return {
                 ...state,
                 littleClass: payload
-            };
-        },
-        [getThinClassListOK]: (state, { payload }) => {
-            return {
-                ...state,
-                thinClassList: payload
             };
         },
         [getThinClassTree]: (state, { payload }) => {

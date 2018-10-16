@@ -2,26 +2,20 @@ import React, { Component } from 'react';
 import {
     Icon,
     Table,
-    Spin,
-    Tabs,
     Modal,
     Row,
     Col,
     Select,
-    DatePicker,
     Button,
     Input,
-    InputNumber,
     Progress,
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
-const { RangePicker } = DatePicker;
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 
 export default class ContrastTable extends Component {
     constructor (props) {
@@ -33,7 +27,6 @@ export default class ContrastTable extends Component {
             loading: false,
             size: 10,
             exportsize: 100,
-            leftkeycode: '',
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
             sxm: '',
@@ -48,16 +41,13 @@ export default class ContrastTable extends Component {
             imgArr: []
         };
     }
-    getBiao (code) {
-        let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
-                }
-            });
-        });
-        return str;
+    getBiao (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let sectionName = getSectionNameBySection(section, thinClassTree);
+        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
@@ -83,15 +73,6 @@ export default class ContrastTable extends Component {
         }
         return result;
     }
-    componentWillReceiveProps (nextProps) {
-        // if(nextProps.leftkeycode != this.state.leftkeycode) {
-        // 	this.setState({
-        // 		leftkeycode: nextProps.leftkeycode,
-        // 	},()=> {
-        // 		this.qury(1);
-        // 	})
-        // }
-    }
     render () {
         const { tblData } = this.state;
         return (
@@ -107,7 +88,6 @@ export default class ContrastTable extends Component {
                     footer={null}
                 >
                     {this.state.imgArr}
-                    {/* <img style={{width:"490px"}} src={this.state.src} alt="图片"/> */}
                     <Row style={{ marginTop: 10 }}>
                         <Button
                             onClick={this.handleCancel.bind(this)}
@@ -127,8 +107,6 @@ export default class ContrastTable extends Component {
             treetypeoption,
             sectionoption,
             typeoption,
-            leftkeycode,
-            keycode,
             standardoption
         } = this.props;
         const {
@@ -549,10 +527,7 @@ export default class ContrastTable extends Component {
         const { sectionselect } = this.props;
         sectionselect(value || '');
         this.setState({
-            section: value || '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
+            section: value || ''
         });
     }
 
@@ -597,16 +572,10 @@ export default class ContrastTable extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
 
     onImgClick (data) {
-        // src = src.replace(/\/\//g,'/')
-        // src =  `${FOREST_API}/${src}`
-        // this.setState({src},() => {
-        // 	this.setState({imgvisible:true,})
-        // })
-
         let srcs = [];
         try {
             let arr = data.split(',');
@@ -642,7 +611,7 @@ export default class ContrastTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury (page) {
+    query (page) {
         const {
             sxm = '',
             section = '',
@@ -651,16 +620,8 @@ export default class ContrastTable extends Component {
             factory = '',
             nursery = '',
             isstandard = '',
-            stime = '',
-            etime = '',
             size
         } = this.state;
-        // if(this.sections.length !== 0){  //不是admin，要做查询判断了
-        // 	if(section === ''){
-        // 		message.info('请选择标段信息');
-        // 		return;
-        // 	}
-        // }
         if (section === '' && sxm === '') {
             message.info('请选择项目及标段信息或输入顺序码');
             return;
@@ -678,8 +639,6 @@ export default class ContrastTable extends Component {
             factory,
             nurseryname: nursery,
             isstandard,
-            // stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            // etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
             page,
             size
         };
@@ -720,13 +679,11 @@ export default class ContrastTable extends Component {
     }
 
     getProject (section) {
-        let projectName = '';
-        // 获取当前标段所在的项目
-        PROJECT_UNITS.map(item => {
-            if (section.indexOf(item.code) != -1) {
-                projectName = item.value;
-            }
-        });
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let projectName = getProjectNameBySection(section, thinClassTree);
         return projectName;
     }
 
@@ -738,19 +695,14 @@ export default class ContrastTable extends Component {
             factory = '',
             nurseryname: nursery,
             isstandard = '',
-            stime = '',
-            etime = '',
             exportsize
         } = this.state;
-        if (this.sections.length !== 0) {
-            // 不是admin，要做查询判断了
-            if (section === '') {
-                message.info('请选择标段信息');
-                return;
-            }
+        if (section === '' && sxm === '') {
+            message.info('请选择项目及标段信息或输入顺序码');
+            return;
         }
         const {
-            actions: { getfactoryAnalyse, getexportFactoryAnalyse },
+            actions: { getexportFactoryAnalyse },
             keycode = ''
         } = this.props;
         let postdata = {
@@ -761,8 +713,6 @@ export default class ContrastTable extends Component {
             factory,
             nurseryname: nursery,
             isstandard,
-            // stime:stime&&moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            // etime:etime&&moment(etime).format('YYYY-MM-DD HH:mm:ss'),
             page: 1,
             size: exportsize
         };

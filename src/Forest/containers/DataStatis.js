@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import { Select } from 'antd';
 import * as actions from '../store';
 import { PkCodeTree } from '../components';
-import { PROJECT_UNITS } from '_platform/api';
 import { actions as platformActions } from '_platform/store/global';
 import { DataStatisTable } from '../components/DataStatis';
 import {
@@ -48,12 +47,6 @@ export default class DataStatis extends Component {
     }
 
     componentDidMount = async () => {
-        this.biaoduan = [];
-        for (let i = 0; i < PROJECT_UNITS.length; i++) {
-            PROJECT_UNITS[i].units.map(item => {
-                this.biaoduan.push(item);
-            });
-        }
         const {
             actions: {
                 getTreeList,
@@ -111,7 +104,7 @@ export default class DataStatis extends Component {
             ];
             this.setState({ typeoption });
         } catch (e) {
-
+            console.log('e', e);
         }
     }
 
@@ -194,25 +187,35 @@ export default class DataStatis extends Component {
             this.setSectionOption(sectionsData);
         } else {
             sectionsData.map((sectionData) => {
-                if (sections[0] === sectionData) {
+                if (sections[0] === sectionData.No) {
                     this.setSectionOption(sectionData);
                 }
             });
         }
     }
-
     // 设置标段选项
     setSectionOption (rst) {
-        if (rst instanceof Array) {
-            let sectionOptions = [];
-            rst.map(sec => {
+        let sectionOptions = [];
+        try {
+            if (rst instanceof Array) {
+                rst.map(sec => {
+                    sectionOptions.push(
+                        <Option key={sec.No} value={sec.No} title={sec.Name}>
+                            {sec.Name}
+                        </Option>
+                    );
+                });
+                this.setState({ sectionoption: sectionOptions });
+            } else {
                 sectionOptions.push(
-                    <Option key={sec.No} value={sec.No} title={sec.Name}>
-                        {sec.Name}
+                    <Option key={rst.No} value={rst.No} title={rst.Name}>
+                        {rst.Name}
                     </Option>
                 );
-            });
-            this.setState({ sectionoption: sectionOptions });
+                this.setState({ sectionoption: sectionOptions });
+            }
+        } catch (e) {
+            console.log('e', e);
         }
     }
 

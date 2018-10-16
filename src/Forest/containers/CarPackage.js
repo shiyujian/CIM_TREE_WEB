@@ -4,7 +4,6 @@ import { bindActionCreators } from 'redux';
 import { Select } from 'antd';
 import * as actions from '../store';
 import { PkCodeTree } from '../components';
-import { PROJECT_UNITS } from '_platform/api';
 import { CarPackageTable } from '../components/CarPackage';
 import { actions as platformActions } from '_platform/store/global';
 import {
@@ -14,7 +13,10 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { getUser } from '_platform/auth';
+import {
+    getUser,
+    getAreaTreeData
+} from '_platform/auth';
 
 const Option = Select.Option;
 @connect(
@@ -41,33 +43,37 @@ export default class CarPackage extends Component {
             statusoption: [],
             leftkeycode: '',
             resetkey: 0,
-            mmtypeoption: []
+            mmtypeoption: [],
+            sectionsData: []
         };
     }
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
             actions: {
                 getForestUsers,
                 getTreeNodeList,
-                setkeycode
+                setkeycode,
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
             },
             users,
             platform: { tree = {} }
         } = this.props;
-        this.biaoduan = [];
-        for (let i = 0; i < PROJECT_UNITS.length; i++) {
-            PROJECT_UNITS[i].units.map(item => {
-                this.biaoduan.push(item);
-            });
-        }
 
         setkeycode('');
         // 避免反复获取森林用户数据，提高效率
         if (!users) {
             getForestUsers();
         }
-        if (!tree.bigTreeList) {
-            getTreeNodeList();
+        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+            let totalThinClass = data.totalThinClass || [];
+            let projectList = data.projectList || [];
+            // 获取所有的小班数据，用来计算养护任务的位置
+            await getTotalThinClass(totalThinClass);
+            // 区域地块树
+            await getThinClassTree(projectList);
         }
         // 状态
         let statusoption = [
@@ -132,8 +138,8 @@ export default class CarPackage extends Component {
             platform: { tree = {} }
         } = this.props;
         let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
+        if (tree.thinClassTree) {
+            treeList = tree.thinClassTree;
         }
         return (
             <Body>
@@ -163,45 +169,15 @@ export default class CarPackage extends Component {
             </Body>
         );
     }
-    // 标段选择, 重新获取: 小班、细班、树种
-    sectionselect (value) {}
-    // 设置标段选项
-    setSectionOption (rst) {
-        let user = getUser();
-        let section = JSON.parse(user.sections);
-        if (rst instanceof Array) {
-            let sectionList = [];
-            let sectionOptions = [];
-            rst.map((item, index) => {
-                sectionList.push(item);
-            });
-            let sectionData = [...new Set(sectionList)];
-            sectionData.sort();
-            sectionData.map(sec => {
-                sectionOptions.push(
-                    <Option key={sec.code} value={sec.code} title={sec.value}>
-                        {sec.value}
-                    </Option>
-                );
-            });
-            // if(section.length === 0){   //admin用户赋给全部的查阅权限
-            //     sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            // }
-            this.setState({ sectionoption: sectionOptions });
-        }
-    }
-
-    // 重置
-    resetinput (leftkeycode) {
-        this.setState({ resetkey: ++this.state.resetkey }, () => {
-            this.onSelect([leftkeycode]);
-        });
-    }
-
     // 树选择, 重新获取: 标段、小班、细班、树种并置空
-    onSelect (value = []) {
+    onSelect (keys = [], info) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let treeList = tree.thinClassTree;
+
         let user = getUser();
-        let keycode = value[0] || '';
+        let keycode = keys[0] || '';
         const {
             actions: { setkeycode }
         } = this.props;
@@ -210,22 +186,65 @@ export default class CarPackage extends Component {
             leftkeycode: keycode,
             resetkey: ++this.state.resetkey
         });
-        let sections = JSON.parse(user.sections);
-        // 标段
-        let rst = [];
-        if (sections.length === 0) {
-            // 是admin
-            rst = this.biaoduan.filter(item => {
-                return item.code.indexOf(keycode) !== -1;
-            });
-        } else {
-            rst = this.biaoduan.filter(item => {
-                return (
-                    item.code.indexOf(keycode) !== -1 &&
-                    sections.indexOf(item.code) !== -1
-                );
+        console.log('info', info);
+        let sectionsData = [];
+        if (keycode) {
+            treeList.map((treeData) => {
+                if (keycode === treeData.No) {
+                    sectionsData = treeData.children;
+                }
             });
         }
-        this.setSectionOption(rst);
+        this.setState({
+            sectionsData
+        });
+        // 标段
+        let sections = JSON.parse(user.sections);
+        // 标段
+        if (sections.length === 0) {
+            // 是admin或者业主
+            this.setSectionOption(sectionsData);
+        } else {
+            sectionsData.map((sectionData) => {
+                if (sections[0] === sectionData.No) {
+                    this.setSectionOption(sectionData);
+                }
+            });
+        }
+    }
+    // 设置标段选项
+    setSectionOption (rst) {
+        let sectionOptions = [];
+        try {
+            if (rst instanceof Array) {
+                rst.map(sec => {
+                    sectionOptions.push(
+                        <Option key={sec.No} value={sec.No} title={sec.Name}>
+                            {sec.Name}
+                        </Option>
+                    );
+                });
+                this.setState({ sectionoption: sectionOptions });
+            } else {
+                sectionOptions.push(
+                    <Option key={rst.No} value={rst.No} title={rst.Name}>
+                        {rst.Name}
+                    </Option>
+                );
+                this.setState({ sectionoption: sectionOptions });
+            }
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+
+    sectionselect (value) {
+    }
+
+    // 重置
+    resetinput (leftkeycode) {
+        this.setState({ resetkey: ++this.state.resetkey }, () => {
+            this.onSelect([leftkeycode]);
+        });
     }
 }

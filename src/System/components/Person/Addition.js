@@ -187,12 +187,12 @@ class Addition extends Component {
             });
             systemRoles.push({
                 name: '苗圃基地职务',
-                children: ['苗圃基地'],
+                children: ['苗圃基地', '苗圃文书'],
                 value: roles.filter(role => role.grouptype === 5)
             });
             systemRoles.push({
                 name: '供应商职务',
-                children: ['供应商'],
+                children: ['供应商', '供应商文书'],
                 value: roles.filter(role => role.grouptype === 6)
             });
         } else {
@@ -249,14 +249,14 @@ class Addition extends Component {
                     case 5:
                         systemRoles.push({
                             name: '苗圃基地职务',
-                            children: ['苗圃基地'],
+                            children: ['苗圃基地', '苗圃文书'],
                             value: roles.filter(role => role.grouptype === 5)
                         });
                         break;
                     case 6:
                         systemRoles.push({
                             name: '供应商职务',
-                            children: ['供应商'],
+                            children: ['供应商', '供应商文书'],
                             value: roles.filter(role => role.grouptype === 6)
                         });
                         break;

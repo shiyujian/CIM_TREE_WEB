@@ -1,19 +1,11 @@
 import React, { Component } from 'react';
 import {
-    Icon,
-    Table,
-    Spin,
     Tabs,
-    Modal,
     Row,
     Col,
     Select,
     DatePicker,
     Button,
-    Input,
-    InputNumber,
-    Progress,
-    message,
     Card
 } from 'antd';
 import moment from 'moment';
@@ -34,7 +26,6 @@ export default class DataStatisTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            leftkeycode: '',
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
             section: '',
@@ -55,14 +46,6 @@ export default class DataStatisTable extends Component {
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
-        // this.query(1);
-    }
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode != this.state.leftkeycode) {
-            this.setState({
-                leftkeycode: nextProps.leftkeycode
-            });
-        }
     }
     render () {
         const {
@@ -238,8 +221,7 @@ export default class DataStatisTable extends Component {
 
     onsmallclasschange (value) {
         const { smallclassselect } = this.props;
-        const { leftkeycode } = this.state;
-        smallclassselect(value || leftkeycode);
+        smallclassselect(value);
         this.setState({
             smallclass: value || '',
             thinclass: ''
@@ -248,8 +230,7 @@ export default class DataStatisTable extends Component {
 
     onthinclasschange (value) {
         const { thinclassselect } = this.props;
-        const { smallclass } = this.state;
-        thinclassselect(value || smallclass);
+        thinclassselect(value);
         this.setState({
             thinclass: value || ''
         });
@@ -286,17 +267,12 @@ export default class DataStatisTable extends Component {
     query = () => {
         const {
             section = '',
-            bigType = '',
             treetype = '',
             stime = '',
             etime = '',
             thinclass = '',
             smallclass = ''
         } = this.state;
-        console.log('smallclass', smallclass);
-        console.log('thinclass', thinclass);
-        console.log('section', section);
-
         const {
             actions: {
                 getTreePlanting,
@@ -311,7 +287,7 @@ export default class DataStatisTable extends Component {
                 no = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
             } else if (smallclass) {
                 let arr = smallclass.split('-');
-                no = arr[0] + '-' + arr[1] + '-' + arr[4];
+                no = arr[0] + '-' + arr[1] + '-' + arr[3];
             }
 
             let postdata = {
@@ -322,9 +298,7 @@ export default class DataStatisTable extends Component {
             this.setState({
                 queryTime: moment().unix()
             });
-            console.log('postdata', postdata);
             getTreePlanting({}, postdata).then((treePlanting) => {
-                console.log('treePlanting', treePlanting);
                 this.setState({
                     treePlanting,
                     treePlantingQueryTime: moment().unix()
