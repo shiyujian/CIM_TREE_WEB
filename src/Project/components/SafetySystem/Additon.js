@@ -11,7 +11,6 @@ import {
     message,
     Switch
 } from 'antd';
-import CodePicker from '_platform/components/panels/CodePicker';
 
 const FormItem = Form.Item;
 class Additon extends Component {

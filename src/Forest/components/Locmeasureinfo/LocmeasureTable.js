@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import {
     Icon,
     Table,
-    Spin,
-    Tabs,
     Modal,
     Row,
     Col,
@@ -11,16 +9,14 @@ import {
     DatePicker,
     Button,
     Input,
-    InputNumber,
     Progress,
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 const { RangePicker } = DatePicker;
 
 export default class LocmeasureTable extends Component {
@@ -33,7 +29,6 @@ export default class LocmeasureTable extends Component {
             loading: false,
             size: 10,
             exportsize: 100,
-            leftkeycode: '',
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
             lstime: '',
@@ -53,7 +48,9 @@ export default class LocmeasureTable extends Component {
             rolename: '',
             percent: 0,
             totalNum: '',
-            imgArr: []
+            imgArr: [],
+            smallclassData: '',
+            thinclassData: ''
         };
         this.columns = [
             {
@@ -316,87 +313,19 @@ export default class LocmeasureTable extends Component {
                     }
                 }
             }
-            // ,{
-            // 	title:<div><div>是否</div><div>截干</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.JG == 1
-            // 						? <span>是</span>
-            // 						: <span>否</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // },{
-            // 	title:<div><div>干皮有无</div><div>损伤</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.GP == 1
-            // 						? <span>有</span>
-            // 						: <span>无</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // },{
-            // 	title:<div><div>冠型完整，</div><div>不偏冠</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.GXWZ == 1
-            // 						? <span>是</span>
-            // 						: <span>否</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // },{
-            // 	title:<div><div>生长</div><div>健壮</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.SZJZ == 1
-            // 						? <span>是</span>
-            // 						: <span>否</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // },{
-            // 	title:<div><div>有无病</div><div>虫害</div></div>,
-            // 	render: (text,record) => {
-            // 		return <div>
-            // 					{
-            // 						record.BCH == 1
-            // 						? <span>有</span>
-            // 						: <span>无</span>
-            // 					}
-            // 				</div>
-            // 	}
-            // }
         ];
     }
-    getBiao (code) {
-        let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
-                }
-            });
-        });
-        return str;
+    getBiao (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let sectionName = getSectionNameBySection(section, thinClassTree);
+        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
-    }
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode != this.state.leftkeycode) {
-            console.log('nextProps.leftkeycode', nextProps.leftkeycode);
-            console.log('this.state.leftkeycode', this.state.leftkeycode);
-            this.setState({
-                leftkeycode: nextProps.leftkeycode
-            });
-        }
     }
     render () {
         const { tblData } = this.state;
@@ -413,7 +342,6 @@ export default class LocmeasureTable extends Component {
                     footer={null}
                 >
                     {this.state.imgArr}
-                    {/* <img style={{width:"490px"}} src={this.state.src} alt="图片"/> */}
                     <Row style={{ marginTop: 10 }}>
                         <Button
                             onClick={this.handleCancel.bind(this)}
@@ -434,11 +362,8 @@ export default class LocmeasureTable extends Component {
             smallclassoption,
             thinclassoption,
             typeoption,
-            leftkeycode,
-            keycode,
             statusoption,
-            locationoption,
-            users
+            locationoption
         } = this.props;
         const {
             sxm,
@@ -457,7 +382,6 @@ export default class LocmeasureTable extends Component {
         const suffix2 = rolename ? (
             <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
-        let columns = [];
         let header = '';
 
         header = (
@@ -675,35 +599,47 @@ export default class LocmeasureTable extends Component {
             section: value || '',
             smallclass: '',
             thinclass: '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
+            smallclassData: '',
+            thinclassData: ''
         });
     }
 
     onsmallclasschange (value) {
         const { smallclassselect } = this.props;
-        const { section, leftkeycode } = this.state;
-        smallclassselect(value || leftkeycode, section);
-        this.setState({
-            smallclass: value || '',
-            thinclass: '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
-        });
+        try {
+            smallclassselect(value);
+            let smallclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                smallclassData = arr[3];
+            }
+            this.setState({
+                smallclass: value,
+                smallclassData,
+                thinclass: '',
+                thinclassData: ''
+            });
+        } catch (e) {
+            console.log('onsmallclasschange', e);
+        }
     }
 
     onthinclasschange (value) {
         const { thinclassselect } = this.props;
-        const { section, smallclass } = this.state;
-        thinclassselect(value || smallclass, section);
-        this.setState({
-            thinclass: value || '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
-        });
+        try {
+            thinclassselect(value);
+            let thinclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                thinclassData = arr[4];
+            }
+            this.setState({
+                thinclass: value,
+                thinclassData
+            });
+        } catch (e) {
+            console.log('onthinclasschange', e);
+        }
     }
 
     ontypechange (value) {
@@ -760,16 +696,10 @@ export default class LocmeasureTable extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
 
     onImgClick (data) {
-        // src = src.replace(/\/\//g,'/')
-        // src =  `${FOREST_API}/${src}`
-        // this.setState({src},() => {
-        // 	this.setState({imgvisible:true,})
-        // })
-
         let srcs = [];
         try {
             let arr = data.split(',');
@@ -825,7 +755,7 @@ export default class LocmeasureTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury (page) {
+    query (page) {
         const { users } = this.props;
         const {
             sxm = '',
@@ -842,20 +772,14 @@ export default class LocmeasureTable extends Component {
             status = '',
             size,
             thinclass = '',
-            smallclass = ''
+            smallclass = '',
+            smallclassData = '',
+            thinclassData = ''
         } = this.state;
-        // if(this.sections.length !== 0){  //不是admin，要做查询判断了
-        // 	if(section === ''){
-        // 		message.info('请选择标段信息');
-        // 		return;
-        // 	}
-        // }
-
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
             return;
         }
-
         const {
             actions: { getqueryTree },
             keycode = ''
@@ -874,8 +798,8 @@ export default class LocmeasureTable extends Component {
             status,
             page,
             size: size,
-            thinclass,
-            smallclass
+            smallclass: smallclassData,
+            thinclass: thinclassData
         };
         if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
@@ -1306,13 +1230,11 @@ export default class LocmeasureTable extends Component {
     }
 
     getProject (section) {
-        let projectName = '';
-        // 获取当前标段所在的项目
-        PROJECT_UNITS.map(item => {
-            if (section.indexOf(item.code) != -1) {
-                projectName = item.value;
-            }
-        });
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let projectName = getProjectNameBySection(section, thinClassTree);
         return projectName;
     }
 
@@ -1332,20 +1254,16 @@ export default class LocmeasureTable extends Component {
             exportsize,
             thinclass = '',
             smallclass = '',
-            status = ''
+            status = '',
+            smallclassData = '',
+            thinclassData = ''
         } = this.state;
-        // if(this.sections.length !== 0){  //不是admin，要做查询判断了
-        // 	if( section === ''){
-        // 		message.info('请选择标段信息');
-        // 		return;
-        // 	}
-        // }
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
             return;
         }
         const {
-            actions: { getqueryTree, getexportTree },
+            actions: { getexportTree },
             keycode = ''
         } = this.props;
         let postdata = {
@@ -1361,8 +1279,8 @@ export default class LocmeasureTable extends Component {
             letime: letime && moment(letime).format('YYYY-MM-DD HH:mm:ss'),
             page: 1,
             size: exportsize,
-            thinclass,
-            smallclass
+            smallclass: smallclassData,
+            thinclass: thinclassData
         };
         if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });

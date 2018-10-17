@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Select } from 'antd';
 import * as actions from '../store';
-import { PROJECT_UNITS } from '_platform/api';
 import { PkCodeTree } from '../components';
 import { ContrastTable } from '../components/Contrastinfo';
 import { actions as platformActions } from '_platform/store/global';
@@ -15,7 +14,10 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { getUser } from '_platform/auth';
+import {
+    getUser,
+    getAreaTreeData
+} from '_platform/auth';
 const Option = Select.Option;
 @connect(
     state => {
@@ -42,7 +44,9 @@ export default class Contrastinfo extends Component {
             standardoption: [],
             leftkeycode: '',
             resetkey: 0,
-            bigType: ''
+            bigType: '',
+            sectionsData: [],
+            smallClassesData: []
         };
     }
     getbigTypeName (type) {
@@ -61,35 +65,32 @@ export default class Contrastinfo extends Component {
                 return '';
         }
     }
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
             actions: {
-                getTree,
                 getTreeList,
                 getTreeNodeList,
-                getLittleBanAll,
-                setkeycode
+                setkeycode,
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
             },
             treetypes,
-            littleBanAll,
             platform: { tree = {} }
         } = this.props;
-        this.biaoduan = [];
-        for (let i = 0; i < PROJECT_UNITS.length; i++) {
-            PROJECT_UNITS[i].units.map(item => {
-                this.biaoduan.push(item);
-            });
-        }
         setkeycode('');
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
             getTreeList().then(x => this.setTreeTypeOption(x));
         }
-        if (!tree.bigTreeList) {
-            getTreeNodeList();
-        }
-        if (!littleBanAll) {
-            getLittleBanAll();
+        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+            let totalThinClass = data.totalThinClass || [];
+            let projectList = data.projectList || [];
+            // 获取所有的小班数据，用来计算养护任务的位置
+            await getTotalThinClass(totalThinClass);
+            // 区域地块树
+            await getThinClassTree(projectList);
         }
         // 类型
         let typeoption = [
@@ -144,8 +145,8 @@ export default class Contrastinfo extends Component {
             platform: { tree = {} }
         } = this.props;
         let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
+        if (tree.thinClassTree) {
+            treeList = tree.thinClassTree;
         }
         return (
             <Body>
@@ -179,41 +180,76 @@ export default class Contrastinfo extends Component {
             </Body>
         );
     }
-    // 标段选择, 重新获取: 树种
-    sectionselect (value) {
+    // 树选择, 重新获取: 标段、小班、细班、树种并置空
+    onSelect (keys = [], info) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let treeList = tree.thinClassTree;
+
+        let user = getUser();
+        let keycode = keys[0] || '';
         const {
             actions: { setkeycode }
         } = this.props;
-        const { leftkeycode } = this.state;
-        setkeycode(leftkeycode);
+        setkeycode(keycode);
+        this.setState({
+            leftkeycode: keycode,
+            resetkey: ++this.state.resetkey
+        });
+        let sectionsData = [];
+        if (keycode) {
+            treeList.map((treeData) => {
+                if (keycode === treeData.No) {
+                    sectionsData = treeData.children;
+                }
+            });
+        }
+        this.setState({
+            sectionsData
+        });
+        // 标段
+        let sections = JSON.parse(user.sections);
+        if (sections.length === 0) {
+            // 是admin或者业主
+            this.setSectionOption(sectionsData);
+        } else {
+            sectionsData.map((sectionData) => {
+                if (sections[0] === sectionData.No) {
+                    this.setSectionOption(sectionData);
+                }
+            });
+        }
         // 树种
         this.typeselect('');
     }
-
     // 设置标段选项
     setSectionOption (rst) {
-        let user = getUser();
-        let section = JSON.parse(user.sections);
-        if (rst instanceof Array) {
-            let sectionList = [];
-            let sectionOptions = [];
-            let sectionoption = rst.map((item, index) => {
-                sectionList.push(item);
-            });
-            let sectionData = [...new Set(sectionList)];
-            sectionData.sort();
-            sectionData.map(sec => {
+        let sectionOptions = [];
+        try {
+            if (rst instanceof Array) {
+                rst.map(sec => {
+                    sectionOptions.push(
+                        <Option key={sec.No} value={sec.No} title={sec.Name}>
+                            {sec.Name}
+                        </Option>
+                    );
+                });
+                this.setState({ sectionoption: sectionOptions });
+            } else {
                 sectionOptions.push(
-                    <Option key={sec.code} value={sec.code} title={sec.value}>
-                        {sec.value}
+                    <Option key={rst.No} value={rst.No} title={rst.Name}>
+                        {rst.Name}
                     </Option>
                 );
-            });
-            // if (section.length === 0) {   //admin用户赋给全部的查阅权限
-            //     sectionOptions.unshift(<Option key={-1} value={''}>全部</Option>)
-            // }
-            this.setState({ sectionoption: sectionOptions });
+                this.setState({ sectionoption: sectionOptions });
+            }
+        } catch (e) {
+            console.log('e', e);
         }
+    }
+    // 标段选择, 重新获取: 树种
+    sectionselect (value) {
     }
 
     // 类型选择, 重新获取: 树种
@@ -261,38 +297,5 @@ export default class Contrastinfo extends Component {
         this.setState({ resetkey: ++this.state.resetkey }, () => {
             this.onSelect([leftkeycode]);
         });
-    }
-
-    // 树选择, 重新获取: 标段、小班、细班、树种并置空
-    onSelect (value = []) {
-        let user = getUser();
-        let keycode = value[0] || '';
-        const {
-            actions: { setkeycode }
-        } = this.props;
-        setkeycode(keycode);
-        this.setState({
-            leftkeycode: keycode,
-            resetkey: ++this.state.resetkey
-        });
-        let sections = JSON.parse(user.sections);
-        // 标段
-        let rst = [];
-        if (sections.length === 0) {
-            // 是admin
-            rst = this.biaoduan.filter(item => {
-                return item.code.indexOf(keycode) !== -1;
-            });
-        } else {
-            rst = this.biaoduan.filter(item => {
-                return (
-                    item.code.indexOf(keycode) !== -1 &&
-                    sections.indexOf(item.code) !== -1
-                );
-            });
-        }
-        this.setSectionOption(rst);
-        // 树种
-        this.typeselect('');
     }
 }

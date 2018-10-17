@@ -81,7 +81,7 @@ export const changeCheckGroup = createAction(`${ID}_changeCheckGroup`);
 const getOrgTreeSelect = createAction(`${ID}获取组织机构TreeSelect`);
 
 //获取组织机构
-export const getOrgTree =  createFetchAction(`${SERVICE_API}/org-tree/?depth=4`, [], 'GET')
+export const getOrgTrees =  createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`, [], 'GET')
 
 
 
@@ -114,7 +114,7 @@ export const actions = {
     getCheckGroupMansOk,
     changeCheckGroup,
     getOrgTreeSelect,
-    getOrgTree,
+    getOrgTrees,
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({

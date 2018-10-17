@@ -16,9 +16,10 @@ import {
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
@@ -47,32 +48,22 @@ export default class SupervisorTable extends Component {
             rolename: '',
             percent: 0,
             totalNum: '',
-            imgArr: []
+            imgArr: [],
+            smallclassData: '',
+            thinclassData: ''
         };
     }
-    getBiao (code) {
-        let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
-                }
-            });
-        });
-        return str;
+    getBiao (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let sectionName = getSectionNameBySection(section, thinClassTree);
+        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
-    }
-    componentWillReceiveProps (nextProps) {
-        // if(nextProps.leftkeycode != this.state.leftkeycode) {
-        // 	this.setState({
-        // 		leftkeycode: nextProps.leftkeycode,
-        // 	},()=> {
-        // 		this.qury(1);
-        // 	})
-        // }
     }
     render () {
         const { tblData } = this.state;
@@ -110,8 +101,6 @@ export default class SupervisorTable extends Component {
             smallclassoption,
             treetypeoption,
             thinclassoption,
-            leftkeycode,
-            keycode,
             statusoption,
             users,
             typeoption
@@ -454,21 +443,51 @@ export default class SupervisorTable extends Component {
     onsectionchange (value) {
         const { sectionselect } = this.props;
         sectionselect(value || '');
-        this.setState({ section: value || '', smallclass: '', thinclass: '' });
+        this.setState({
+            section: value || '',
+            smallclass: '',
+            thinclass: '',
+            smallclassData: '',
+            thinclassData: ''
+        });
     }
 
     onsmallclasschange (value) {
         const { smallclassselect } = this.props;
-        const { section, leftkeycode } = this.state;
-        smallclassselect(value || leftkeycode, section);
-        this.setState({ smallclass: value || '', thinclass: '' });
+        try {
+            smallclassselect(value);
+            let smallclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                smallclassData = arr[3];
+            }
+            this.setState({
+                smallclass: value,
+                smallclassData,
+                thinclass: '',
+                thinclassData: ''
+            });
+        } catch (e) {
+            console.log('onsmallclasschange', e);
+        }
     }
 
     onthinclasschange (value) {
         const { thinclassselect } = this.props;
-        const { section, smallclass } = this.state;
-        thinclassselect(value || smallclass, section);
-        this.setState({ thinclass: value || '' });
+        try {
+            thinclassselect(value);
+            let thinclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                thinclassData = arr[4];
+            }
+            this.setState({
+                thinclass: value,
+                thinclassData
+            });
+        } catch (e) {
+            console.log('onthinclasschange', e);
+        }
     }
     ontypechange (value) {
         const { typeselect } = this.props;
@@ -477,9 +496,6 @@ export default class SupervisorTable extends Component {
     }
 
     ontreetypechange (value) {
-        // const {treetypelist} = this.props;
-        // let treetype = treetypelist.find(rst => rst.TreeTypeName == value)
-        // this.setState({treetype:treetype?treetype.ID:'',treetypename:value || ''})
         this.setState({ treetype: value, treetypename: value });
     }
 
@@ -524,16 +540,10 @@ export default class SupervisorTable extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
 
     onImgClick (data) {
-        // src = src.replace(/\/\//g,'/')
-        // src =  `${FOREST_API}/${src}`
-        // this.setState({src},() => {
-        // 	this.setState({imgvisible:true,})
-        // })
-
         let srcs = [];
         try {
             let arr = data.split(',');
@@ -569,7 +579,7 @@ export default class SupervisorTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury (page) {
+    query (page) {
         const {
             sxm = '',
             section = '',
@@ -583,14 +593,10 @@ export default class SupervisorTable extends Component {
             status = '',
             size,
             bigType = '',
-            treetype = ''
+            treetype = '',
+            smallclassData = '',
+            thinclassData = ''
         } = this.state;
-        // if(this.sections.length !== 0){  //不是admin，要做查询判断了
-        // 	if(section === ''){
-        // 		message.info('请选择标段信息');
-        // 		return;
-        // 	}
-        // }
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
             return;
@@ -603,8 +609,8 @@ export default class SupervisorTable extends Component {
             no: keycode,
             sxm,
             section,
-            smallclass,
-            thinclass,
+            smallclass: smallclassData,
+            thinclass: thinclassData,
             status,
             SupervisorCheck,
             sstime: sstime && moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
@@ -677,13 +683,11 @@ export default class SupervisorTable extends Component {
     }
 
     getProject (section) {
-        let projectName = '';
-        // 获取当前标段所在的项目
-        PROJECT_UNITS.map(item => {
-            if (section.indexOf(item.code) != -1) {
-                projectName = item.value;
-            }
-        });
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let projectName = getProjectNameBySection(section, thinClassTree);
         return projectName;
     }
 

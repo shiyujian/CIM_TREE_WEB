@@ -1,33 +1,20 @@
 import React, { Component } from 'react';
 import {
-    Icon,
     Table,
-    Spin,
-    Tabs,
-    Modal,
     Row,
     Col,
     Select,
-    DatePicker,
-    Button,
-    Input,
-    InputNumber,
-    Progress,
-    message,
-    Card
+    Button
 } from 'antd';
 import moment from 'moment';
 import { getUser } from '_platform/auth';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
-const { RangePicker } = DatePicker;
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 
 export default class TreeAdoptInfoTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            leftkeycode: '',
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
             section: '',
@@ -42,7 +29,9 @@ export default class TreeAdoptInfoTable extends Component {
             treePlantingQueryTime: 0,
             locationStatQueryTime: 0,
             statByTreetypeQueryTime: 0,
-            queryTime: 0
+            queryTime: 0,
+            smallclassData: '',
+            thinclassData: ''
         };
         this.columns = [
             {
@@ -307,16 +296,17 @@ export default class TreeAdoptInfoTable extends Component {
             }
         ];
     }
+    getBiao (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let sectionName = getSectionNameBySection(section, thinClassTree);
+        return sectionName;
+    }
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
-    }
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode != this.state.leftkeycode) {
-            this.setState({
-                leftkeycode: nextProps.leftkeycode
-            });
-        }
     }
     render () {
         const {
@@ -465,27 +455,48 @@ export default class TreeAdoptInfoTable extends Component {
         this.setState({
             section: value || '',
             smallclass: '',
-            thinclass: ''
+            thinclass: '',
+            smallclassData: '',
+            thinclassData: ''
         });
     }
 
     onsmallclasschange (value) {
         const { smallclassselect } = this.props;
-        const { leftkeycode } = this.state;
-        smallclassselect(value || leftkeycode);
-        this.setState({
-            smallclass: value || '',
-            thinclass: ''
-        });
+        try {
+            smallclassselect(value);
+            let smallclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                smallclassData = arr[3];
+            }
+            this.setState({
+                smallclass: value,
+                smallclassData,
+                thinclass: '',
+                thinclassData: ''
+            });
+        } catch (e) {
+            console.log('onsmallclasschange', e);
+        }
     }
 
     onthinclasschange (value) {
         const { thinclassselect } = this.props;
-        const { smallclass } = this.state;
-        thinclassselect(value || smallclass);
-        this.setState({
-            thinclass: value || ''
-        });
+        try {
+            thinclassselect(value);
+            let thinclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                thinclassData = arr[4];
+            }
+            this.setState({
+                thinclass: value,
+                thinclassData
+            });
+        } catch (e) {
+            console.log('onthinclasschange', e);
+        }
     }
 
     ontypechange (value) {

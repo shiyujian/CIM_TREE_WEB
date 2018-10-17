@@ -2,12 +2,9 @@ import React, { Component } from 'react';
 import {
     Icon,
     Table,
-    Spin,
-    Tabs,
     Modal,
     Row,
     Col,
-    Select,
     DatePicker,
     Button,
     Input,
@@ -18,11 +15,10 @@ import {
     Divider
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const Dragger = Upload.Dragger;
@@ -53,16 +49,13 @@ export default class SeedlingsChange extends Component {
             TreatmentData: []
         };
     }
-    getBiao (code) {
-        let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
-                }
-            });
-        });
-        return str;
+    getBiao (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let sectionName = getSectionNameBySection(section, thinClassTree);
+        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
@@ -203,7 +196,7 @@ export default class SeedlingsChange extends Component {
     };
 
     render () {
-        const { tblData, remarkRecord, changeRecord, remarkInfo } = this.state;
+        const { tblData, remarkInfo } = this.state;
         return (
             <div>
                 {this.treeTable(tblData)}
@@ -217,7 +210,6 @@ export default class SeedlingsChange extends Component {
                     footer={null}
                 >
                     {this.state.imgArr}
-                    {/* <img style={{width:"490px"}} src={this.state.src} alt="图片"/> */}
                     <Row style={{ marginTop: 10 }}>
                         <Button
                             onClick={this.handleCancel.bind(this)}
@@ -231,7 +223,6 @@ export default class SeedlingsChange extends Component {
                 <Modal
                     width={522}
                     title='修改备注信息'
-                    // style={{textAlign:'center'}}
                     visible={this.state.remarkvisible}
                     onOk={this.remarkOK.bind(this)}
                     onCancel={this.remarkCancel.bind(this)}
@@ -280,7 +271,6 @@ export default class SeedlingsChange extends Component {
         );
     }
     treeTable (details) {
-        const { sxm, remark } = this.state;
         const { users } = this.props;
 
         let columns = [];
@@ -615,30 +605,7 @@ export default class SeedlingsChange extends Component {
 
     remarkDefault (record) {
         console.log('record', record);
-        let picArr = [];
         let TreatmentData = [];
-        // 显示原始图片数据，但是name无法获取
-        // if(record && record.RemarkPics){
-        // 	try{
-        // 		picArr = record.RemarkPics.split(',')
-        // 		picArr.map((pic,index)=>{
-        // 			let data = pic.split('//')
-        // 			let len = data.length
-        // 			let fileName = data[len-1]
-        // 			TreatmentData.push({
-        // 				index:index,
-        // 				fileName:fileName,
-        // 				a_file:pic
-        // 			})
-        // 		})
-
-        // 		console.log('TreatmentData',TreatmentData)
-
-        // 	}catch(e){
-
-        // 	}
-        // }
-
         this.setState({
             remarkRecord: record,
             remarkvisible: true,
@@ -722,13 +689,6 @@ export default class SeedlingsChange extends Component {
     }
 
     onImgClick (data) {
-        debugger;
-        // src = src.replace(/\/\//g,'/')
-        // src =  `${FOREST_API}/${src}`
-        // this.setState({src},() => {
-        // 	this.setState({imgvisible:true,})
-        // })
-
         let srcs = [];
         try {
             let arr = data.split(',');
@@ -812,7 +772,7 @@ export default class SeedlingsChange extends Component {
     async qury (page) {
         const { stime = '', etime = '', size } = this.state;
         const {
-            actions: { getqueryTree, getnurserys },
+            actions: { getqueryTree },
             keycode = ''
         } = this.props;
 
@@ -899,13 +859,11 @@ export default class SeedlingsChange extends Component {
     }
 
     getProject (section) {
-        let projectName = '';
-        // 获取当前标段所在的项目
-        PROJECT_UNITS.map(item => {
-            if (section.indexOf(item.code) != -1) {
-                projectName = item.value;
-            }
-        });
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let projectName = getProjectNameBySection(section, thinClassTree);
         return projectName;
     }
 }

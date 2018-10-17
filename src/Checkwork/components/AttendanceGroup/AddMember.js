@@ -33,7 +33,7 @@ class AddMember extends Component {
             actions: {
                 getRoles,
                 getForestAllUsersData,
-                getOrgTree
+                getOrgTrees
             }
         } = this.props;
         this.user = getUser();
@@ -64,20 +64,21 @@ class AddMember extends Component {
         });
         await this._queryMember();
 
-        getOrgTree().then(rst => {
+        let code = this.user.org_code.substring(0,this.user.org_code.length-6);
+        getOrgTrees({code:code}).then(rst => {
             if (rst && rst.children) {
-                // 目前只针对业主的单位，name为建设单位   所以对建设单位进行loop
+                // 目前通过登录用户的机构code来筛选组织机构
                 if (rst.children && rst.children instanceof Array && rst.children.length > 0) {
                     rst.children.map((item) => {
-                        if (item.name === '建设单位') {
+                        //if (item.name === '九号地块') {
                             if (item && item.children) {
-                                let data = AddMember.orgloop(item.children);
+                                let data = AddMember.orgloop(rst.children);
                                 this.setState({
                                     orgTree:data
                                 })
                                 
                             }
-                        }
+                        //}
                     });
                 }
             }
@@ -112,7 +113,7 @@ class AddMember extends Component {
             let postdata = {};
             postdata = {
                 // roles: roles,
-                // sections: sections,
+                sections: sections,
                 is_active: true,
             };
             if(params){

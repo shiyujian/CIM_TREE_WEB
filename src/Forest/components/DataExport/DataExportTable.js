@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import {
     Icon,
     Table,
-    Spin,
-    Tabs,
     Modal,
     Row,
     Col,
@@ -11,16 +9,14 @@ import {
     DatePicker,
     Button,
     Input,
-    InputNumber,
     Progress,
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API, PROJECT_UNITS } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
+import { getSectionNameBySection, getProjectNameBySection } from '../auth';
 const { RangePicker } = DatePicker;
 
 export default class LocmeasureTable extends Component {
@@ -33,7 +29,6 @@ export default class LocmeasureTable extends Component {
             loading: false,
             size: 10,
             exportsize: 100,
-            leftkeycode: '',
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
             lstime: '',
@@ -53,35 +48,22 @@ export default class LocmeasureTable extends Component {
             role: 'inputer',
             rolename: '',
             percent: 0,
-            positiontype: 4326 // 默认地理坐标系
+            positiontype: 4326, // 默认地理坐标系
+            smallclassData: '',
+            thinclassData: ''
         };
     }
-    getBiao (code) {
-        let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
-                }
-            });
-        });
-        return str;
+    getBiao (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let sectionName = getSectionNameBySection(section, thinClassTree);
+        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
-    }
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode != this.state.leftkeycode) {
-            this.setState(
-                {
-                    leftkeycode: nextProps.leftkeycode
-                }
-                // ,()=> {
-                // 	this.qury(1);
-                // }
-            );
-        }
     }
     render () {
         const { tblData } = this.state;
@@ -365,35 +347,47 @@ export default class LocmeasureTable extends Component {
             section: value || '',
             smallclass: '',
             thinclass: '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
+            smallclassData: '',
+            thinclassData: ''
         });
     }
 
     onsmallclasschange (value) {
         const { smallclassselect } = this.props;
-        const { section, leftkeycode } = this.state;
-        smallclassselect(value || leftkeycode, section);
-        this.setState({
-            smallclass: value || '',
-            thinclass: '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
-        });
+        try {
+            smallclassselect(value);
+            let smallclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                smallclassData = arr[3];
+            }
+            this.setState({
+                smallclass: value,
+                smallclassData,
+                thinclass: '',
+                thinclassData: ''
+            });
+        } catch (e) {
+            console.log('onsmallclasschange', e);
+        }
     }
 
     onthinclasschange (value) {
         const { thinclassselect } = this.props;
-        const { section, smallclass } = this.state;
-        thinclassselect(value || smallclass, section);
-        this.setState({
-            thinclass: value || '',
-            bigType: '',
-            treetype: '',
-            treetypename: ''
-        });
+        try {
+            thinclassselect(value);
+            let thinclassData = '';
+            if (value) {
+                let arr = value.split('-');
+                thinclassData = arr[4];
+            }
+            this.setState({
+                thinclass: value,
+                thinclassData
+            });
+        } catch (e) {
+            console.log('onthinclasschange', e);
+        }
     }
 
     ontypechange (value) {
@@ -431,10 +425,6 @@ export default class LocmeasureTable extends Component {
                 SupervisorCheck = 1;
                 CheckStatus = 1;
                 break;
-            // case "6":
-            // 	SupervisorCheck = 1;
-            // 	CheckStatus = 2;
-            // 	break;
             default:
                 break;
         }
@@ -460,7 +450,7 @@ export default class LocmeasureTable extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
 
     onImgClick (src) {
@@ -500,52 +490,36 @@ export default class LocmeasureTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury (page) {
+    query (page) {
         const {
             sxm = '',
             section = '',
-            bigType = '',
             treetype = '',
-            supervisorcheck = '',
-            checkstatus = '',
-            islocation = '',
-            role = '',
-            rolename = '',
             stime = '',
             etime = '',
-            lstime = '',
-            letime = '',
-            status = '',
             size,
             thinclass = '',
             smallclass = '',
-            positiontype
+            positiontype,
+            smallclassData = '',
+            thinclassData = ''
         } = this.state;
-        const { keycode } = this.props;
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
             return;
         }
-        console.log('keycode', keycode);
         const {
             actions: { getTreeLocations }
         } = this.props;
         let postdata = {
             sxm,
-            // no:keycode,
             section,
-            // bigType,
             treetype,
-            // supervisorcheck,
-            // checkstatus,
-            // islocation,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
             page,
             size: size,
             crs: positiontype
-            // thinclass,
-            // smallclass
         };
         if (
             postdata.stime === moment().format('YYYY-MM-DD 00:00:00') &&
@@ -554,13 +528,14 @@ export default class LocmeasureTable extends Component {
             postdata.stime = '';
             postdata.etime = '';
         }
+        let sectionArr = section.split('-');
         if (smallclass === '') {
             postdata.no = '';
         } else if (thinclass === '') {
-            postdata.no = section.substring(0, 8) + smallclass;
+            postdata.no = sectionArr[0] + '-' + sectionArr[1] + '-' + smallclassData;
         } else {
             postdata.no =
-                section.substring(0, 8) + smallclass + '-' + thinclass;
+                sectionArr[0] + '-' + sectionArr[1] + '-' + smallclassData + '-' + thinclassData;
         }
         this.setState({ loading: true, percent: 0 });
         getTreeLocations({}, postdata).then(rst => {
@@ -603,61 +578,39 @@ export default class LocmeasureTable extends Component {
     }
 
     getProject (section) {
-        let projectName = '';
-        // 获取当前标段所在的项目
-        PROJECT_UNITS.map(item => {
-            if (section.indexOf(item.code) != -1) {
-                projectName = item.value;
-            }
-        });
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let projectName = getProjectNameBySection(section, thinClassTree);
         return projectName;
     }
 
     exportexcel () {
         const {
-            sxm = '',
             section = '',
-            bigType = '',
             treetype = '',
-            supervisorcheck = '',
-            checkstatus = '',
-            locationstatus = '',
-            role = '',
-            rolename = '',
             stime = '',
-            lstime = '',
             etime = '',
-            letime = '',
-            exportsize,
             thinclass = '',
             smallclass = '',
-            status = '',
-            positiontype
+            positiontype,
+            smallclassData = '',
+            thinclassData = ''
         } = this.state;
-        if (section === '') {
-            message.info('请选择标段信息');
+        if (thinclass === '') {
+            message.info('请选择项目，标段，小班及细班信息');
             return;
         }
         const {
-            actions: { getExportTreeLocations },
-            keycode = ''
+            actions: { getExportTreeLocations }
         } = this.props;
         let postdata = {
-            // no:keycode,
-            // sxm,
             section,
             treetype,
-            // status,
-            // supervisorcheck,
-            // checkstatus,
-            // locationstatus,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            // lstime:lstime&&moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            // letime:letime&&moment(letime).format('YYYY-MM-DD HH:mm:ss'),
             crs: positiontype
-            // thinclass,
-            // smallclass
         };
         if (
             postdata.stime === moment().format('YYYY-MM-DD 00:00:00') &&
@@ -666,20 +619,21 @@ export default class LocmeasureTable extends Component {
             postdata.stime = '';
             postdata.etime = '';
         }
+        let sectionArr = section.split('-');
         if (smallclass === '') {
             postdata.no = '';
         } else if (thinclass === '') {
-            postdata.no = section.substring(0, 8) + smallclass;
+            postdata.no = sectionArr[0] + '-' + sectionArr[1] + '-' + smallclassData;
         } else {
             postdata.no =
-                section.substring(0, 8) + smallclass + '-' + thinclass;
+                sectionArr[0] + '-' + sectionArr[1] + '-' + smallclassData + '-' + thinclassData;
         }
         this.setState({ loading: true, percent: 0 });
         getExportTreeLocations({}, postdata).then(rst3 => {
             if (rst3 === '') {
                 message.info('没有符合条件的信息');
-            } else if (rst3 === '定位导出不能超过20000条记录') {
-                message.info('定位导出不能超过20000条记录');
+            } else if (rst3 === '定位导出不能超过50000条记录') {
+                message.info('定位导出不能超过50000条记录');
             } else {
                 this.createLink(this, `${FOREST_API}/${rst3}`);
             }
@@ -689,7 +643,6 @@ export default class LocmeasureTable extends Component {
 
     createLink (name, url) {
         let link = document.createElement('a');
-        // link.download = name;
         link.href = url;
         link.setAttribute('download', name);
         link.setAttribute('target', '_blank');

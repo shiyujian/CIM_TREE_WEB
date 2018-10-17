@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Input, Modal, message } from 'antd';
-import CodePicker from '_platform/components/panels/CodePicker';
 
 const FormItem = Form.Item;
 class Additon extends Component {
