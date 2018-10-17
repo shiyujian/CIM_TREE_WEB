@@ -8,8 +8,7 @@ class Menu extends Component {
         super(props);
         this.state = {
             a: 1,
-            param: '',
-
+            param: ''
         };
     }
     componentDidMount () {
@@ -60,9 +59,9 @@ class Menu extends Component {
                             {record.TreeTypeName}({record.SKU}株)
                             <span style={{float: 'right', fontSize: 12, color: '#888'}}>{UpdateTime}</span>
                         </h3>
-                        <p>{param}：{minParam}-{maxParam}厘米</p>
-                        <p>{NurseryName}</p>
-                        <p>
+                        <p className='text-p'>{param}：{minParam}-{maxParam}厘米</p>
+                        <p className='text-p'>{NurseryName}</p>
+                        <p className='text-p'>
                             <span style={{color: '#ff5b05', fontWeight: 'bold'}}>{record.MinPrice}-{record.MaxPrice}元</span>
                             <span style={{float: 'right'}}>{TreePlace}</span>
                         </p>

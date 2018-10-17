@@ -79,6 +79,14 @@ class SupplyDetails extends Component {
         // 根据id获取详细信息
         getProductById({id: this.spuid}).then((rep) => {
             this.NurseryBaseID = rep.NurseryBaseID;
+            if (rep.NurseryBase) {
+                this.setState({
+                    NurseryName: rep.NurseryBase.NurseryName,
+                    Leader: rep.NurseryBase.Leader,
+                    LeaderPhone: rep.NurseryBase.LeaderPhone,
+                    TreePlace: rep.NurseryBase.TreePlace
+                });
+            }
             this.setState({
                 productInfo: rep,
                 Photo: rep.Photo,
@@ -88,10 +96,6 @@ class SupplyDetails extends Component {
                 TreeTypeName: rep.TreeTypeName,
                 TreeDescribe: rep.TreeDescribe,
                 UpdateTime: rep.UpdateTime.split(' ')[0],
-                NurseryName: rep.NurseryBase.NurseryName,
-                Leader: rep.NurseryBase.Leader,
-                LeaderPhone: rep.NurseryBase.LeaderPhone,
-                TreePlace: rep.NurseryBase.TreePlace,
                 SKU: rep.SKU,
                 Contacter: rep.Contacter,
                 Phone: rep.Phone
@@ -139,11 +143,11 @@ class SupplyDetails extends Component {
                         </Col>
                         <Col span={5}>
                             <h2 style={{marginBottom: '0.2em'}}>{TreeTypeName}</h2>
-                            <p style={{marginTop: '0.2em'}}>发布时间：{UpdateTime}</p>
+                            <p className='text-p'>发布时间：{UpdateTime}</p>
                             {
                                 standardList ? standardList.map((item, index) => {
                                     return (
-                                        <p style={{marginTop: '0.2em'}} key={index}>
+                                        <p className='text-p' key={index}>
                                             {item.name}：
                                             {
                                                 item.children.map((row, num) => {
@@ -166,7 +170,7 @@ class SupplyDetails extends Component {
                             }
                         </Col>
                         <Col span={7}>
-                            <p style={{marginTop: 50}}>
+                            <p style={{marginTop: 50}} className='text-p'>
                                 价格：
                                 <span style={{color: '#f5222d'}}>{Price}元</span>
                             </p>
@@ -179,10 +183,10 @@ class SupplyDetails extends Component {
                             <Button type='primary' style={{marginTop: 10}}>加入购物车</Button>
                         </Col>
                         <Col span={6}>
-                            <p style={{marginTop: 50}}>供应商：{NurseryName}</p>
-                            <p>起苗地：{TreePlace}</p>
-                            <p>联系人：{Contacter}</p>
-                            <p>联系电话：{Phone}</p>
+                            <p style={{marginTop: 50}} className='text-p'>供应商：{NurseryName}</p>
+                            <p className='text-p'>起苗地：{TreePlace}</p>
+                            <p className='text-p'>联系人：{Contacter}</p>
+                            <p className='text-p'>联系电话：{Phone}</p>
                         </Col>
                     </Row>
                 </div>

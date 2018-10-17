@@ -26,7 +26,6 @@ class AddDemand extends Component {
             treeNames: [], // 树木名称数组
             ProjectName: '', // 项目名称
             Section: '', // 标段
-            TreeTypeID: '', // 树木ID
             length: 0, // 树种个数
             PurchaseDescribe: '', // 求购描述
             dataList: [] // 数组
@@ -39,7 +38,7 @@ class AddDemand extends Component {
         this.treeTypeList = []; // 所有树种类型
         this.handleProjectName = this.handleProjectName.bind(this); // 项目名称
         this.handleSectionName = this.handleSectionName.bind(this); // 标段选择
-        this.loadRegion = this.loadRegion.bind(this); // 加载市县
+        // this.loadRegion = this.loadRegion.bind(this); // 加载市县
         this.handleRegion = this.handleRegion.bind(this); // 行政区划
         this.handleRange = this.handleRange.bind(this); // 起止日期
         this.onAddSpecs = this.onAddSpecs.bind(this); // 新增树种
@@ -49,28 +48,28 @@ class AddDemand extends Component {
             dataIndex: 'DBH',
             key: '1',
             render: (text, record, index) => {
-                return <Input value={text} onChange={this.editVersion.bind(this, 'DBH', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'DBH', record)} />;
             }
         }, {
             title: '地径（cm）',
             dataIndex: 'GroundDiameter',
             key: '2',
             render: (text, record, index) => {
-                return <Input value={text} onChange={this.editVersion.bind(this, 'GroundDiameter', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'GroundDiameter', record)} />;
             }
         }, {
             title: '冠幅（cm）',
             dataIndex: 'CrownWidth',
             key: '3',
             render: (text, record, index) => {
-                return <Input value={text} onChange={this.editVersion.bind(this, 'CrownWidth', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'CrownWidth', record)} />;
             }
         }, {
             title: '自然高（cm）',
             dataIndex: 'Height',
             key: '4',
             render: (text, record, index) => {
-                return <Input value={text} onChange={this.editVersion.bind(this, 'Height', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'Height', record)} />;
             }
         }, {
             title: '培育方式',
@@ -78,7 +77,7 @@ class AddDemand extends Component {
             key: '5',
             render: (text, record, index) => {
                 return (
-                    <Select value={text} style={{ width: 100 }} onChange={this.editVersionMode.bind(this, 'CultivationMode', index, record)}>
+                    <Select value={text} style={{ width: 100 }} onChange={this.editVersionMode.bind(this, 'CultivationMode', record)}>
                         {
                             CULTIVATIONMODE.map(item => <Option value={item.id} key={item.id}>{item.name}</Option>)
                         }
@@ -90,7 +89,7 @@ class AddDemand extends Component {
             dataIndex: 'Num',
             key: '7',
             render: (text, record, index) => {
-                return <Input value={text} onChange={this.editVersion.bind(this, 'Num', index, record)} />;
+                return <Input value={text} onChange={this.editVersion.bind(this, 'Num', record)} />;
             }
         }, {
             title: '操作',
@@ -100,7 +99,7 @@ class AddDemand extends Component {
             render: (text, record, index) => {
                 return (
                     <span>
-                        <a onClick={this.toDelete.bind(this, record, index)}>删除</a>
+                        <a onClick={this.toDelete.bind(this, record)}>删除</a>
                     </span>
                 );
             }
@@ -127,14 +126,40 @@ class AddDemand extends Component {
             });
         });
         // 获取行政区划编码
-        getRegionCodes({}, {grade: 1}).then(rep => {
+        getRegionCodes().then(rep => {
+            console.log(rep);
             let RegionCodeList = [];
             rep.map(item => {
-                RegionCodeList.push({
-                    value: item.ID,
-                    label: item.Name,
-                    isLeaf: false
+                if (item.LevelType === '1') {
+                    RegionCodeList.push({
+                        value: item.ID,
+                        label: item.Name
+                    });
+                }
+            });
+            RegionCodeList.map(item => {
+                let arrCity = [];
+                rep.map(row => {
+                    if (row.LevelType === '2' && item.value === row.ParentId) {
+                        arrCity.push({
+                            value: row.ID,
+                            label: row.Name
+                        });
+                    }
                 });
+                arrCity.map(row => {
+                    let arrCounty = [];
+                    rep.map(record => {
+                        if (record.LevelType === '3' && row.value === record.ParentId) {
+                            arrCounty.push({
+                                value: record.ID,
+                                label: record.Name
+                            });
+                        }
+                    });
+                    row.children = arrCounty;
+                });
+                item.children = arrCity;
             });
             this.setState({
                 RegionCodeList
@@ -181,6 +206,10 @@ class AddDemand extends Component {
                     RegionCode: rep.UseNurseryRegionCode,
                     PurchaseDescribe: rep.PurchaseDescribe || ''
                 });
+                this.props.form.setFieldsValue({
+                    Contacter: rep.Contacter,
+                    Phone: rep.Phone
+                });
                 this.UseNurseryAddress = rep.UseNurseryAddress;
             });
             getPurchaseStandard({}, {purchaseid: this.purchaseid}).then(rep => {
@@ -193,21 +222,34 @@ class AddDemand extends Component {
                 let dataList = [];
                 arr.map((item, index) => {
                     // card数量
-                    let arrIndex = [];
+                    let children = [];
+                    let TreeTypeName = '';
                     rep.map(row => {
                         if (row.TreeTypeID === item) {
-                            row.cardKey = index;
-                            arrIndex.push(row);
+                            TreeTypeName = row.TreeTypeName;
+                            children.push({
+                                CrownWidth: row.CrownWidth,
+                                CultivationMode: row.CultivationMode,
+                                DBH: row.DBH,
+                                GroundDiameter: row.GroundDiameter,
+                                Height: row.Height,
+                                Num: row.Num
+                            });
                         }
                     });
-                    arrIndex.map((row, number) => {
-                        row.number = number;
+                    children.map((row, num) => {
+                        row.rowKey = num;
+                        row.cardKey = index;
                     });
-                    dataList.push(arrIndex);
+                    dataList.push({
+                        TreeTypeID: item,
+                        TreeTypeName,
+                        cardKey: index,
+                        children
+                    });
                 });
                 this.setState({
-                    dataList,
-                    TreeTypeID: 64
+                    dataList
                 });
             });
         } else {
@@ -219,28 +261,39 @@ class AddDemand extends Component {
         let card = [];
         this.state.dataList.map((item, index) => {
             let str = '';
+            let TreeTypeID = '';
             this.treeTypeList.map(row => {
-                if (row.ID === item[0].TreeTypeID) {
+                if (row.ID === item.TreeTypeID) {
                     str = row.TreeTypeNo.slice(0, 1);
+                    TreeTypeID = item.TreeTypeID;
                 }
             });
             card.push(
-                <Card key={index}>
+                <Card key={item.cardKey}>
                     <div style={{marginBottom: 10}}>
                         <span>树木名称：</span>
-                        <Cascader value={[str, item[0].TreeTypeID]} options={this.state.TreeTypeList} onChange={this.handleTreeTypes.bind(this, index)}
+                        <Cascader value={[str, TreeTypeID]} options={this.state.TreeTypeList} onChange={this.handleTreeTypes.bind(this, item.cardKey)}
                             placeholder='请选择苗木品种' style={{width: 200}} />
-                        <Button type='primary' onClick={this.addVersion.bind(this, index, item.length)} style={{float: 'right'}}>新增规格</Button>
+                        <span style={{float: 'right'}}>
+                            <Button type='primary' onClick={this.deleteCard.bind(this, item.cardKey)} style={{marginRight: 20}}>删除树种</Button>
+                            <Button type='primary' onClick={this.addVersion.bind(this, item.cardKey, item.children.length)}>新增规格</Button>
+                        </span>
                     </div>
-                    <Table columns={this.columns} dataSource={item} bordered style={{minWidth: 700}} pagination={false} rowKey='number' />
+                    <Table columns={this.columns} dataSource={item.children} bordered style={{minWidth: 700}} pagination={false} rowKey='rowKey' />
                 </Card>
             );
         });
         return card;
     }
     render () {
-        const { isAmend, ProjectName, Section, projectList, sectionList, RegionCodeList, StartTime, EndTime, PurchaseDescribe } = this.state;
+        const { isAmend, ProjectName, Section, projectList, sectionList, RegionCode, RegionCodeList, StartTime, EndTime, PurchaseDescribe } = this.state;
         const { getFieldDecorator } = this.props.form;
+        let provinceCode = '';
+        let sityCode = '';
+        if (RegionCode) {
+            provinceCode = RegionCode.slice(0, 2) + '0000';
+            sityCode = RegionCode.slice(0, 4) + '00';
+        }
         return (
             <div className='addDemand' style={{padding: '0 20px'}}>
                 <Button type='primary' onClick={this.toReturn.bind(this)} style={{marginBottom: 5}}>返 回</Button>
@@ -277,10 +330,10 @@ class AddDemand extends Component {
                             </FormItem>
                             <FormItem label='用苗地'>
                                 {getFieldDecorator('UseNurseryRegionCode', {
-                                    rules: [{required: true, message: '必填项'}]
+                                    rules: [{required: true, message: '必填项'}],
+                                    initialValue: [provinceCode, sityCode, RegionCode]
                                 })(
                                     <Cascader placeholder='选择您所在的城市'
-                                        loadData={this.loadRegion}
                                         options={RegionCodeList}
                                         onChange={this.handleRegion}
                                         changeOnSelect
@@ -312,11 +365,8 @@ class AddDemand extends Component {
                                 <TextArea rows={4} style={{width: 750}} value={PurchaseDescribe} onChange={this.handleDescribe} />
                             </FormItem>
                             <FormItem style={{width: 800, textAlign: 'center'}}>
-                                <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
-                                {
-                                    isAmend ? <Button type='primary' onClick={this.toCheck.bind(this)}>编辑</Button>
-                                        : <Button type='primary' onClick={this.toCheck.bind(this)}>发布</Button>
-                                }
+                                <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>{isAmend ? '保存' : '暂存'}</Button>
+                                <Button type='primary' onClick={this.toCheck.bind(this)}>发布</Button>
                             </FormItem>
                         </Form>
                     </TabPane>
@@ -324,19 +374,50 @@ class AddDemand extends Component {
             </div>
         );
     }
+    deleteCard (cardKey) {
+        const { dataList } = this.state;
+        let newDataList = [];
+        dataList.map(item => {
+            if (item.cardKey !== cardKey) {
+                newDataList.push(item);
+            }
+        });
+        newDataList.map((item, index) => {
+            item.cardKey = index;
+        });
+        this.setState({
+            dataList: newDataList
+        });
+    }
     toReturn () {
         this.props.actions.changeAddDemandVisible(false);
     }
-    editVersion (str, index, record, e) {
+    editVersion (str, record, e) {
         let { dataList } = this.state;
-        dataList[record.cardKey][index][str] = e.target.value;
+        dataList.map(item => {
+            if (item.cardKey === record.cardKey) {
+                item.children.map(row => {
+                    if (row.rowKey === record.rowKey) {
+                        row[str] = e.target.value;
+                    }
+                });
+            }
+        });
         this.setState({
             dataList
         });
     }
-    editVersionMode (str, index, record, value) {
+    editVersionMode (str, record, value) {
         let { dataList } = this.state;
-        dataList[record.cardKey][index][str] = value;
+        dataList.map(item => {
+            if (item.cardKey === record.cardKey) {
+                item.children.map(row => {
+                    if (row.rowKey === record.rowKey) {
+                        row[str] = value;
+                    }
+                });
+            }
+        });
         this.setState({
             dataList
         });
@@ -364,11 +445,12 @@ class AddDemand extends Component {
         const { postPurchase, putPurchase } = this.props.actions;
         let Specs = [];
         dataList.map(item => {
-            item.map(row => {
+            item.children.map(row => {
                 let obj = {
+                    TreeTypeID: item.TreeTypeID,
+                    TreeTypeName: item.TreeTypeName,
+                    CultivationMode: row.CultivationMode,
                     Num: row.Num,
-                    TreeTypeID: row.TreeTypeID,
-                    TreeTypeName: row.TreeTypeName,
                     Height: row.Height,
                     CrownWidth: row.CrownWidth,
                     DBH: row.DBH,
@@ -448,35 +530,7 @@ class AddDemand extends Component {
             Section: value
         });
     }
-    loadRegion (selectedOptions) {
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-        setTimeout(() => {
-            targetOption.loading = false;
-            const { getRegionCodes } = this.props.actions;
-            targetOption.children = [];
-            getRegionCodes({}, {parent: targetOption.value}).then(rep => {
-                rep.map(item => {
-                    if (item.LevelType === '3') {
-                        targetOption.children.push({
-                            MergerName: item.MergerName,
-                            value: item.ID,
-                            label: item.Name
-                        });
-                    } else {
-                        targetOption.children.push({
-                            value: item.ID,
-                            label: item.Name,
-                            isLeaf: false
-                        });
-                    }
-                });
-                this.setState({
-                    RegionCodeList: [...this.state.RegionCodeList]
-                });
-            });
-        }, 100);
-    }
+
     handleRegion (value, selectedOptions) {
         if (value.length === 3) {
             this.UseNurseryAddress = selectedOptions[2].MergerName;
@@ -494,55 +548,56 @@ class AddDemand extends Component {
     }
     addVersion (cardKey, rowKey) {
         let { dataList } = this.state;
-        if (!this.state.TreeTypeID) {
-            message.error('请选择树种');
-            return;
-        }
-        const obj = {
-            number: rowKey,
-            cardKey: cardKey,
-            TreeTypeID: dataList[cardKey][0].TreeTypeID,
-            DBH: '',
-            GroundDiameter: '',
-            CrownWidth: '',
-            Height: '',
-            CultivationMode: '',
-            Num: ''
-        };
-        dataList[cardKey].push(obj);
+        dataList.map(item => {
+            if (item.cardKey === cardKey) {
+                item.children.push({
+                    cardKey,
+                    rowKey,
+                    DBH: '',
+                    GroundDiameter: '',
+                    CrownWidth: '',
+                    Height: '',
+                    CultivationMode: '',
+                    Num: ''
+                });
+            }
+        });
         this.setState({
             dataList
         });
     }
     onAddSpecs () {
         let { dataList } = this.state;
-        dataList[dataList.length] = [{
-            number: 0,
+        dataList.push({
             cardKey: dataList.length,
             TreeTypeID: '',
             TreeTypeName: '',
-            DBH: '',
-            GroundDiameter: '',
-            CrownWidth: '',
-            Height: '',
-            CultivationMode: '',
-            Num: ''
-        }];
+            children: [{
+                cardKey: dataList.length,
+                rowKey: 0,
+                DBH: '',
+                GroundDiameter: '',
+                CrownWidth: '',
+                Height: '',
+                CultivationMode: '',
+                Num: ''
+            }]
+        });
         this.setState({
             dataList
         });
     }
     handleTreeTypes (cardKey, value, selectedOptions) {
         if (selectedOptions.length === 2) {
-            this.setState({
-                TreeTypeName: selectedOptions[1].TreeTypeName,
-                TreeTypeID: selectedOptions[1].ID
-            });
-            this.state.dataList.map((item, index) => {
+            const { dataList } = this.state;
+            dataList.map((item, index) => {
                 if (index === cardKey) {
-                    item[0].TreeTypeID = selectedOptions[1].ID;
-                    item[0].TreeTypeName = selectedOptions[1].TreeTypeName;
+                    item.TreeTypeID = selectedOptions[1].ID;
+                    item.TreeTypeName = selectedOptions[1].TreeTypeName;
                 }
+            });
+            this.setState({
+                dataList
             });
         }
     }
@@ -551,15 +606,16 @@ class AddDemand extends Component {
             PurchaseDescribe: e.target.value
         });
     }
-    toDelete (record, num) {
+    toDelete (record) {
         const { dataList } = this.state;
-        let arr = [];
-        dataList[record.cardKey].map((item, index) => {
-            if (num !== index) {
-                arr.push(item);
+        dataList.map(item => {
+            if (item.cardKey === record.cardKey) {
+                item.children.splice(record.rowKey, 1);
+                item.children.map((row, num) => {
+                    row.rowKey = num;
+                });
             }
         });
-        dataList[record.cardKey] = arr;
         this.setState({
             dataList
         });

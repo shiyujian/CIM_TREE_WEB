@@ -1,8 +1,6 @@
 
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
 import { Form, Button, Card, Row, Col, Table, Input } from 'antd';
-import { searchToObj } from '../common';
 import { CULTIVATIONMODE } from '_platform/api';
 import './PurchaseDetails.less';
 
@@ -113,14 +111,14 @@ class PurchaseDetails extends Component {
                     <Row>
                         <Col span={16}>
                             <h2>{projectName} {section} 采购单</h2>
-                            <p>报价起止时间：{StartTime} 至 {EndTime}</p>
-                            <p>用苗地址：{UseNurseryAddress}</p>
-                            <p>采购品种：{SpecsType}</p>
+                            <p className='text-p'>报价起止时间：{StartTime} 至 {EndTime}</p>
+                            <p className='text-p'>用苗地址：{UseNurseryAddress}</p>
+                            <p className='text-p'>采购品种：{SpecsType}</p>
                         </Col>
                         <Col span={8}>
-                            <p>发布单位：{organizationName}</p>
-                            <p>联系人：{Contacter}</p>
-                            <p>联系电话：{Phone}</p>
+                            <p className='text-p'>发布单位：{organizationName}</p>
+                            <p className='text-p'>联系人：{Contacter}</p>
+                            <p className='text-p'>联系电话：{Phone}</p>
                         </Col>
                     </Row>
                 </Card>
