@@ -68,19 +68,19 @@ export default class TreeAdoptInfoTable extends Component {
                     let superName = '';
                     let ownerName = '';
                     if (
-                        record.SupervisorCheck == -1 &&
-                        record.CheckStatus == -1
+                        record.SupervisorCheck === -1 &&
+                        record.CheckStatus === -1
                     ) {
                         return <span>未抽查</span>;
                     } else {
-                        if (record.SupervisorCheck == 0) { superName = '监理抽查退回'; } else if (record.SupervisorCheck === 1) {
+                        if (record.SupervisorCheck === 0) { superName = '监理抽查退回'; } else if (record.SupervisorCheck === 1) {
                             superName = '监理抽查通过';
                         }
 
-                        if (record.CheckStatus == 0) ownerName = '业主抽查退回';
-                        else if (record.CheckStatus == 1) {
+                        if (record.CheckStatus === 0) ownerName = '业主抽查退回';
+                        else if (record.CheckStatus === 1) {
                             ownerName = '业主抽查通过';
-                        } else if (record.CheckStatus == 2) {
+                        } else if (record.CheckStatus === 2) {
                             ownerName = '业主抽查退回后修改';
                         }
                         if (superName && ownerName) {
@@ -150,7 +150,7 @@ export default class TreeAdoptInfoTable extends Component {
                     </div>
                 ),
                 render: (text, record) => {
-                    if (record.GD != 0) {
+                    if (record.GD !== 0) {
                         return (
                             <a
                                 disabled={!record.GDFJ}
@@ -175,7 +175,7 @@ export default class TreeAdoptInfoTable extends Component {
                     </div>
                 ),
                 render: (text, record) => {
-                    if (record.GF != 0) {
+                    if (record.GF !== 0) {
                         return (
                             <a
                                 disabled={!record.GFFJ}
@@ -200,7 +200,7 @@ export default class TreeAdoptInfoTable extends Component {
                     </div>
                 ),
                 render: (text, record) => {
-                    if (record.XJ != 0) {
+                    if (record.XJ !== 0) {
                         return (
                             <a
                                 disabled={!record.XJFJ}
@@ -225,7 +225,7 @@ export default class TreeAdoptInfoTable extends Component {
                     </div>
                 ),
                 render: (text, record) => {
-                    if (record.DJ != 0) {
+                    if (record.DJ !== 0) {
                         return (
                             <a
                                 disabled={!record.DJFJ}
@@ -251,7 +251,7 @@ export default class TreeAdoptInfoTable extends Component {
                 ),
                 dataIndex: 'tqhd',
                 render: (text, record) => {
-                    if (record.TQHD != 0) {
+                    if (record.TQHD !== 0) {
                         return (
                             <a
                                 disabled={!record.TQHDFJ}
@@ -277,7 +277,7 @@ export default class TreeAdoptInfoTable extends Component {
                 ),
                 dataIndex: 'tqzj',
                 render: (text, record) => {
-                    if (record.TQZJ != 0) {
+                    if (record.TQZJ !== 0) {
                         return (
                             <a
                                 disabled={!record.TQHDFJ}

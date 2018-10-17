@@ -729,6 +729,7 @@ export default class NursmeasureTable extends Component {
             ispack = '',
             mmtype = ''
         } = this.state;
+        console.log('sxm', sxm);
         if (section === '' && sxm === '') {
             message.info('请选择项目及标段信息或输入顺序码');
             return;
@@ -754,10 +755,6 @@ export default class NursmeasureTable extends Component {
             checkstatus,
             ispack
         };
-        if (section === '') {
-            message.info('请选择标段信息');
-            return;
-        }
         if (keycode !== '' && keycode.indexOf('P010') !== -1) {
             // 有苗木类型选项
             postdata.foresttype = mmtype;

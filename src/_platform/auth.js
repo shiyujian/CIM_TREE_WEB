@@ -90,7 +90,6 @@ export const removePermissions = () => {
 export const getProjectUnits = (projectName) => {
     let units = [];
     PROJECT_UNITS.map((item) => {
-        // if (item.value === projectName) {
         if (projectName.indexOf(item.value) !== -1) {
             units = item.units;
         }
@@ -165,9 +164,22 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
     let projectList = [];
     // 单位工程级
     let sectionList = [];
+    // 业主和管理员
+    let userMess = window.localStorage.getItem('QH_USER_DATA');
+    userMess = JSON.parse(userMess);
+    let permission = false;
+    if (userMess.username === 'admin') {
+        permission = true;
+    }
+    let groups = userMess.groups || [];
+    groups.map((group) => {
+        if (group.name.indexOf('业主') !== -1) {
+            permission = true;
+        }
+    });
     if (rst instanceof Array && rst.length > 0) {
         rst.map(node => {
-            if (user.username === 'admin') {
+            if (permission) {
                 if (node.Type === '项目工程') {
                     projectList.push({
                         Name: node.Name,
