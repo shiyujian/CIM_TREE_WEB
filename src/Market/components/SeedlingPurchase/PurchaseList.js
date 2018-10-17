@@ -28,9 +28,10 @@ class PurchaseList extends Component {
         getWpunittree().then(rep => {
             this.setState({
                 projectList: rep
+            }, () => {
+                this.onSearch();
             });
         });
-        this.onSearch();
     }
     render () {
         const { dataList, loading, projectList } = this.state;

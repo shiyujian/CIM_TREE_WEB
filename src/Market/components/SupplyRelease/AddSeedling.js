@@ -30,6 +30,7 @@ class AddSeedling extends Component {
         super(props);
         this.state = {
             isAmend: false, // 是否修改
+            Status: 0, // 是否上架
             SupplierList: [], // 供应商列表
             SupplierID: [], // 选择的供应商
             Photo: '', // 全株照片
@@ -164,6 +165,7 @@ class AddSeedling extends Component {
                 });
                 this.setState({
                     isAmend: true,
+                    Status: rep.Status,
                     TreeTypeNo: rep.TreeTypeNo.slice(0, 1),
                     TreeTypeID: rep.TreeTypeID,
                     Photo: rep.Photo,
@@ -214,7 +216,7 @@ class AddSeedling extends Component {
         }
     }
     render () {
-        const { isAmend, dataList, treeTypeList, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeTypeID, TreeTypeNo, SupplierList, SupplierID } = this.state;
+        const { isAmend, Status, dataList, treeTypeList, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeTypeID, TreeTypeNo, SupplierList, SupplierID } = this.state;
         const { getFieldDecorator } = this.props.form;
         const props_one = {
             action: '',
@@ -332,7 +334,6 @@ class AddSeedling extends Component {
                             </FormItem>
                             <FormItem label='供应商' style={{display: 'block'}}>
                                 <Select
-                                    disabled={isAmend}
                                     mode='multiple'
                                     value={SupplierID}
                                     onChange={this.handleSupplier}
@@ -397,10 +398,13 @@ class AddSeedling extends Component {
                                 )}
                             </FormItem>
                             <FormItem style={{width: 800, textAlign: 'center'}}>
-                                <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>暂存</Button>
                                 {
-                                    isAmend ? <Button type='primary' onClick={this.toCheck.bind(this)}>编辑</Button>
-                                        : <Button type='primary' onClick={this.toCheck.bind(this)}>发布</Button>
+                                    Status === 1 ? '' : <div>
+                                        <Button style={{marginRight: 20}} onClick={this.toRelease.bind(this, 0)}>
+                                            {isAmend ? '保存' : '暂存'}
+                                        </Button>
+                                        <Button type='primary' onClick={this.toCheck.bind(this)}>发布</Button>
+                                    </div>
                                 }
                             </FormItem>
                         </Form>

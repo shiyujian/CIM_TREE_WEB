@@ -65,9 +65,9 @@ class Menu extends Component {
                                 <span>({record.SKU}株)</span>
                                 <Tag style={{marginLeft: 10}} color='#87d068'>{record.Status === 1 ? '上架中' : '未上架'}</Tag>
                             </h3>
-                            <p>类型：{this.state.TreeTypeName}</p>
-                            <p>上车价：￥{record.MinPrice}-{record.MaxPrice}</p>
-                            <p>联系方式：{record.Phone}</p>
+                            <p className='text-p'>类型：{this.state.TreeTypeName}</p>
+                            <p className='text-p'>上车价：￥{record.MinPrice}-{record.MaxPrice}</p>
+                            <p className='text-p'>联系方式：{record.Phone}</p>
                         </Col>
                         <Col span={11}>
                             {
@@ -111,6 +111,7 @@ class Menu extends Component {
     }
     returnButton () {
         let arr = [];
+        let seeButton = <Button style={{marginRight: 15, marginBottom: 10}} key='seeButton' type='primary' onClick={this.toEditInfo.bind(this, this.props.record.ID)}>查看</Button>;
         let editButton = <Button style={{marginRight: 15, marginBottom: 10}} key='editButton' type='primary' onClick={this.toEditInfo.bind(this, this.props.record.ID)}>编辑</Button>;
         let deleteButton = <Button style={{marginRight: 15, marginBottom: 10}} key='deleteButton' type='primary' onClick={this.toDelete.bind(this)}>删除</Button>;
         let upButton = <Button style={{marginRight: 15, marginBottom: 10}} key='upButton' type='primary' onClick={this.toSoldOut}>上架</Button>;
@@ -120,7 +121,7 @@ class Menu extends Component {
                 arr.push(editButton, upButton, deleteButton);
                 break;
             case 1:
-                arr.push(downButton);
+                arr.push(seeButton, downButton);
                 break;
         }
         return arr;

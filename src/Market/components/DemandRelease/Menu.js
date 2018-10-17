@@ -57,6 +57,7 @@ class Menu extends Component {
                 });
                 dataList.push({name: item, children: arr});
             });
+            console.log(dataList);
             this.setState({
                 dataList,
                 TreeTypes
@@ -75,21 +76,25 @@ class Menu extends Component {
                     <Row>
                         <Col span={8}>
                             <h3>{ProjectName}{Section}采购单<Tag style={{marginLeft: 10}} color='#87d068'>{record.Status === 1 ? '报价中' : '未发布'}</Tag></h3>
-                            <p>报价起止时间：{StartTime}至{EndTime}</p>
-                            <p>用苗地：{record.UseNurseryAddress}</p>
-                            <p>采购品种：
+                            <p className='text-p'>报价起止时间：{StartTime}至{EndTime}</p>
+                            <p className='text-p'>用苗地：{record.UseNurseryAddress}</p>
+                            <p className='text-p'>采购品种：
                                 {TreeTypes}
                             </p>
-                            <p>联系方式：{record.Phone}({record.Contacter})</p>
+                            <p className='text-p'>联系方式：{record.Phone}({record.Contacter})</p>
                         </Col>
                         <Col span={12}>
                             {
                                 dataList.map((item, index) => {
                                     return (
-                                        <div key={index}>
-                                            <Tag color='blue-inverse'>{index}</Tag>
-                                            <span>{item.name}</span>
-                                            <span style={{display: 'inline-block', marginLeft: 10}}>
+                                        <div key={index} style={{display: 'flex', padding: '5px 0', width: '90%', borderBottom: '1px solid #ccc'}}>
+                                            <div>
+                                                <Tag color='blue-inverse' style={{cursor: 'auto'}}>{index}</Tag>
+                                            </div>
+                                            <div style={{width: 50}}>
+                                                <span>{item.name}</span>
+                                            </div>
+                                            <div style={{marginLeft: 10}}>
                                                 {
                                                     item.children.map((row, number) => {
                                                         let CultivationMode = '';
@@ -98,10 +103,10 @@ class Menu extends Component {
                                                                 CultivationMode = record.name;
                                                             }
                                                         });
-                                                        return <p key={number} style={{fontSize: 10}}>胸径{row.DBH}cm 地径{row.GroundDiameter}cm 自然高{row.Height}cm 冠幅{row.CrownWidth}cm 培育方式：{CultivationMode} ￥{row.Price}（{row.Num}株)</p>;
+                                                        return <p key={number} style={{marginBottom: '0.2em', fontSize: 10}}>胸径{row.DBH}cm 地径{row.GroundDiameter}cm 自然高{row.Height}cm 冠幅{row.CrownWidth}cm 培育方式：{CultivationMode} ￥{row.Price}（{row.Num}株)</p>;
                                                     })
                                                 }
-                                            </span>
+                                            </div>
                                         </div>
                                     );
                                 })
