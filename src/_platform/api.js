@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-15 14:35:53
+ * @Last Modified time: 2018-10-16 21:13:54
  */
 /**
  *
@@ -915,10 +915,6 @@ export const MODULES = [
         ]
     }
 ];
-// const APPLABEL = 'accounts';
-
-// const CONTENTTYPE = 'appmeta';
-
 const getUrl = (template, pathnames = {}) => {
     return template.replace(/\{\{(\w+)}}/g, (literal, key) => {
         if (key in pathnames) {
@@ -975,10 +971,6 @@ export const myFetch = (
 
 export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=org`, [], 'POST');
 
-export const DOMAIN_CODES = {
-    dir: '文档222',
-    workPackage: '施工包111'
-};
 // 获取新闻发布单位
 export const DEPARTMENT = [
     {

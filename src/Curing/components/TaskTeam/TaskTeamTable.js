@@ -4,7 +4,6 @@ import {
 } from 'antd';
 import { getUser } from '_platform/auth';
 import AddMember from './AddMember';
-import { PROJECT_UNITS } from '_platform/api';
 import '../Curing.less';
 window.config = window.config || {};
 

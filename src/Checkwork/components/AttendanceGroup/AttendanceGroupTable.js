@@ -4,7 +4,6 @@ import {
 } from 'antd';
 import { getUser } from '_platform/auth';
 import AddMember from './AddMember';
-import { PROJECT_UNITS } from '_platform/api';
 window.config = window.config || {};
 
 export default class AttendanceGroupTable extends Component {
@@ -52,7 +51,7 @@ export default class AttendanceGroupTable extends Component {
         const {
             selectState
         } = this.props;
-        //let disabled = true;
+        // let disabled = true;
         let disabled = false;
         if (selectState && !relateDisabled) {
             disabled = false;
@@ -83,13 +82,13 @@ export default class AttendanceGroupTable extends Component {
         } = this.state;
         let dataSource = [];
         if (checkGroupMans && checkGroupMans instanceof Array && checkGroupMans.length > 0) {
-            //checkGroupMans.map((man) => {
-                // totalUserData.map((userData) => {
-                //     if (Number(userData.ID) === man.id) {
-                //         dataSource.push(userData);
-                //     }
-                // });
-            //});
+            // checkGroupMans.map((man) => {
+            // totalUserData.map((userData) => {
+            //     if (Number(userData.ID) === man.id) {
+            //         dataSource.push(userData);
+            //     }
+            // });
+            // });
             dataSource = checkGroupMans;
         }
         console.log('dataSource', dataSource);
@@ -132,6 +131,6 @@ export default class AttendanceGroupTable extends Component {
             title: '职务',
             dataIndex: ''
         }
-       
+
     ];
 }
