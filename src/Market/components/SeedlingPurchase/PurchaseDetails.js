@@ -16,13 +16,14 @@ class PurchaseDetails extends Component {
             UseNurseryAddress: '', // 用苗地址
             Specs: [], // 采购品种
             projectList: [], // 项目标段列表
-            dataList: [],
+            dataList: [], // 表格数据
             Contacter: '',
             Phone: '',
             organizationName: '' // 组织机构名称
         };
         this.purchaseid = ''; // 采购单ID
         this.toOffer = this.toOffer.bind(this); // 我要报价
+        this.toReturn = this.toReturn.bind(this); // 返回
     }
     componentDidMount () {
         const { getPurchaseById, getWpunittree, getOfferInventoryById, getOrgTree_new } = this.props.actions;
@@ -43,8 +44,8 @@ class PurchaseDetails extends Component {
                 purchaseInfo: rep,
                 ProjectName: rep.ProjectName,
                 Section: rep.Section,
-                StartTime: rep.StartTime,
-                EndTime: rep.EndTime,
+                StartTime: rep.StartTime.split(' ')[0],
+                EndTime: rep.EndTime.split(' ')[0],
                 UseNurseryAddress: rep.UseNurseryAddress,
                 Contacter: rep.Contacter,
                 Phone: rep.Phone,
@@ -106,7 +107,7 @@ class PurchaseDetails extends Component {
         });
         return (
             <div className='purchaseDetails' style={{padding: '0 20px'}}>
-                <Button type='primary' style={{marginBottom: 5}} onClick={this.toReturn.bind(this)}>返 回</Button>
+                <Button type='primary' style={{marginBottom: 5}} onClick={this.toReturn}>返 回</Button>
                 <Card>
                     <Row>
                         <Col span={16}>

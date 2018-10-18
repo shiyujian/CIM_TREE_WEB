@@ -78,7 +78,7 @@ class Menu extends Component {
                                             CultivationMode = row.name;
                                         }
                                     });
-                                    return <p key={index}>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
+                                    return <p key={index} className='text-p'>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
                                 })
                             }
                         </Col>

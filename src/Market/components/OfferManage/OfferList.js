@@ -1,30 +1,30 @@
-
 import React, {Component} from 'react';
 import { Form, Input, Button, Tabs, Select, Spin } from 'antd';
 import Menu from './Menu';
-import './PurchaseList.less';
+import { getUser } from '_platform/auth';
 
 const FormItem = Form.Item;
-const TabPane = Tabs.TabPane;
 const Option = Select.Option;
+const TabPane = Tabs.TabPane;
 
-class PurchaseList extends Component {
+class OfferList extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            page: 1,
-            total: 0,
             loading: true,
-            dataList: [],
-            projectList: [] // 项目标段
+            dataList: [], // 报价单列表
+            projectList: [] // 项目标段列表
         };
-        this.onSearch = this.onSearch.bind(this);
-        this.handlePane = this.handlePane.bind(this); // 切换标签页
+        this.onSearch = this.onSearch.bind(this); // 查询
         this.onClear = this.onClear.bind(this); // 清除
     }
     componentDidMount () {
+        // 获取所有项目和标段
         const { getWpunittree } = this.props.actions;
         getWpunittree().then(rep => {
+            // 获取所在单位pk
+            const { org_code } = getUser();
+            this.org = org_code;
             this.setState({
                 projectList: rep
             }, () => {
@@ -33,23 +33,16 @@ class PurchaseList extends Component {
         });
     }
     render () {
-        const { dataList, loading, projectList } = this.state;
         const { getFieldDecorator } = this.props.form;
+        const { loading, dataList, projectList } = this.state;
         return (
-            <div className='purchaseList' style={{padding: '0 20px'}}>
+            <div className='offer-list'>
                 <Form layout='inline'>
                     <FormItem
-                        label='采购编号'
+                        label='苗木名称'
                     >
                         {getFieldDecorator('purchaseno')(
-                            <Input className='search-input' placeholder='请输入采购编号' />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        label='采购名称'
-                    >
-                        {getFieldDecorator('projectname')(
-                            <Input className='search-input' placeholder='请输入采购名称' />
+                            <Input className='search-input' placeholder='请输入苗木名称' />
                         )}
                     </FormItem>
                     <FormItem
@@ -72,13 +65,15 @@ class PurchaseList extends Component {
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>
                     </FormItem>
                 </Form>
-                <Tabs defaultActiveKey='1' onChange={this.handlePane}>
-                    <TabPane tab='全 部' key='1' style={{minHeight: 500}}>
+                <Tabs defaultActiveKey='1'>
+                    <TabPane tab='全 部' key='1' style={{background: '#ECECEC', padding: '20px', minHeight: 500}}>
                         <Spin spinning={loading}>
                             {
-                                dataList.map((item, index) => {
-                                    return <Menu {...this.props} record={item} key={index} projectList={projectList} />;
-                                })
+                                dataList.length > 0 ? dataList.map((item, index) => {
+                                    return (
+                                        <Menu record={item} key={index} {...this.props} projectList={projectList} />
+                                    );
+                                }) : '没有更多了'
                             }
                         </Spin>
                     </TabPane>
@@ -86,35 +81,27 @@ class PurchaseList extends Component {
             </div>
         );
     }
+    onClear () {
+        this.props.form.resetFields();
+    }
     onSearch () {
         const { getPurchaseList } = this.props.actions;
-        const formVal = this.props.form.getFieldsValue();
-        const { page } = this.state;
         this.setState({
             loading: true
         });
+        const { treetypename, status } = this.props.form.getFieldsValue();
         getPurchaseList({}, {
-            purchaseno: formVal.purchaseno || '',
-            projectname: formVal.projectname || '',
-            status: formVal.status === undefined ? '' : formVal.status,
-            page
+            treetypename: treetypename || '',
+            status: status === undefined ? '' : status
         }).then(rep => {
             if (rep.code === 200) {
                 this.setState({
                     loading: false,
-                    page: rep.pageinfo.page,
-                    total: rep.pageinfo.total,
                     dataList: rep.content
                 });
             }
         });
     }
-    handlePane () {
-
-    }
-    onClear () {
-        this.props.form.resetFields();
-    }
 }
 
-export default Form.create()(PurchaseList);
+export default Form.create()(OfferList);
