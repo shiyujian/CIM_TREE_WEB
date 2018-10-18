@@ -14,8 +14,7 @@ class DemandTable extends Component {
         this.state = {
             loading: true,
             dataList: [],
-            projectList: [],
-            a: 1
+            projectList: []
         };
         this.org = ''; // 所在单位pk
         this.toSearch = this.toSearch.bind(this);
@@ -59,9 +58,10 @@ class DemandTable extends Component {
                         label='状态'
                     >
                         {getFieldDecorator('status', {
-                            initialValue: 1
+                            initialValue: ''
                         })(
                             <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
+                                <Option value={''}>全部</Option>
                                 <Option value={0}>未发布</Option>
                                 <Option value={1}>报价中</Option>
                                 <Option value={2}>选标中</Option>

@@ -14,6 +14,7 @@ class Menu extends Component {
         };
         this.renderButton = this.renderButton.bind(this); // 显示按钮
         this.toSeeDetails = this.toSeeDetails.bind(this); // 查看详情
+        this.returnTag = this.returnTag.bind(this); // 返回标签
     }
     componentDidMount () {
         // 开始结束时间
@@ -74,7 +75,12 @@ class Menu extends Component {
                 <Card title={'发布时间：' + CreateTime}>
                     <Row>
                         <Col span={8}>
-                            <h3>{ProjectName}{Section}采购单<Tag style={{marginLeft: 10}} color='#87d068'>{record.Status === 1 ? '报价中' : '未发布'}</Tag></h3>
+                            <h3>
+                                {ProjectName}{Section}采购单
+                                {
+                                    this.returnTag()
+                                }
+                            </h3>
                             <p className='text-p'>报价起止时间：{StartTime}至{EndTime}</p>
                             <p className='text-p'>发布单位：</p>
                             <p className='text-p'>用苗地：{record.UseNurseryAddress}</p>
@@ -120,6 +126,31 @@ class Menu extends Component {
                 </Card>
             </div>
         );
+    }
+    returnTag () {
+        let color = '';
+        let strStatus = '';
+        switch (this.props.record.Status) {
+            case 0:
+                color = '#f50';
+                strStatus = '未上架';
+                break;
+            case 1:
+                color = '#87d068';
+                strStatus = '报价中';
+                break;
+            case 2:
+                color = '#2db7f5';
+                strStatus = '选标中';
+                break;
+            case 3:
+                color = '#108ee9';
+                strStatus = '已结束';
+                break;
+        }
+        return <Tag style={{marginLeft: 10}} color={color}>
+            {strStatus}
+        </Tag>;
     }
     toSeeDetails () {
         const { changeOfferDetailsVisible, changeOfferDetailsKey } = this.props.actions;

@@ -63,7 +63,7 @@ class Menu extends Component {
                             <h3>
                                 {record.TreeTypeName}
                                 <span>({record.SKU}株)</span>
-                                <Tag style={{marginLeft: 10}} color='#87d068'>{record.Status === 1 ? '上架中' : '未上架'}</Tag>
+                                <Tag style={{marginLeft: 10}} color={record.Status === 1 ? '#87d068' : '#f50'}>{record.Status === 1 ? '上架中' : '未上架'}</Tag>
                             </h3>
                             <p className='text-p'>类型：{this.state.TreeTypeName}</p>
                             <p className='text-p'>上车价：￥{record.MinPrice}-{record.MaxPrice}</p>

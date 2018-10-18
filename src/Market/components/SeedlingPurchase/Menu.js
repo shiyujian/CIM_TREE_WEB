@@ -55,7 +55,7 @@ class Menu extends Component {
                             <h3>{ProjectName}{Section}采购单</h3>
                             <p className='text-p'>
                                 <span>发布单位：{this.state.organizationName}</span>
-                                <span style={{marginLeft: 20}}>报价起止时间：{StartTime}至{EndTime}</span>
+                                <span style={{marginLeft: 20}}>报价起止时间：{StartTime}&nbsp;至&nbsp;{EndTime}</span>
                             </p>
                             <p className='text-p'>
                                 <span>用苗地：{record.UseNurseryAddress}</span>
