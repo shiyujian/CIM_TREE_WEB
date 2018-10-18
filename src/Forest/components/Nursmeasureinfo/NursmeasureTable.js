@@ -52,14 +52,6 @@ export default class NursmeasureTable extends Component {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
     }
-    getBiao (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let sectionName = getSectionNameBySection(section, thinClassTree);
-        return sectionName;
-    }
     render () {
         const { tblData } = this.state;
         return (
@@ -142,10 +134,7 @@ export default class NursmeasureTable extends Component {
             },
             {
                 title: '标段',
-                dataIndex: 'BD',
-                render: (text, record) => {
-                    return <p>{this.getBiao(text)}</p>;
-                }
+                dataIndex: 'sectionName'
             },
             {
                 title: '树种',
@@ -394,7 +383,7 @@ export default class NursmeasureTable extends Component {
                             // suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
-                            onChange={this.sxmchange.bind(this)}
+                            onChange={this.sxmChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg10'>
@@ -404,7 +393,7 @@ export default class NursmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -416,7 +405,7 @@ export default class NursmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
-                            onChange={this.ontypechange.bind(this)}
+                            onChange={this.onTypeChange.bind(this)}
                         >
                             {typeoption}
                         </Select>
@@ -429,7 +418,7 @@ export default class NursmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
-                            onChange={this.ontreetypechange.bind(this)}
+                            onChange={this.onTreeTypeChange.bind(this)}
                         >
                             {treetypeoption}
                         </Select>
@@ -467,7 +456,7 @@ export default class NursmeasureTable extends Component {
                             suffix={suffix2}
                             value={rolename}
                             className='forest-forestcalcw4'
-                            onChange={this.onrolenamechange.bind(this)}
+                            onChange={this.onRoleNameChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg10'>
@@ -476,7 +465,7 @@ export default class NursmeasureTable extends Component {
                             allowClear
                             className='forest-forestcalcw4'
                             defaultValue='全部'
-                            onChange={this.onstatuschange.bind(this)}
+                            onChange={this.onStatusChange.bind(this)}
                             value={ispack}
                         >
                             {statusoption}
@@ -604,19 +593,19 @@ export default class NursmeasureTable extends Component {
         this.setState({ nurseryname: '' });
     };
 
-    sxmchange (value) {
+    sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || ''
         });
     }
 
-    ontypechange (value) {
+    onTypeChange (value) {
         const { typeselect } = this.props;
         typeselect(value || '');
         this.setState({ bigType: value || '', treetype: '', treetypename: '' });
@@ -629,15 +618,15 @@ export default class NursmeasureTable extends Component {
         this.setState({ tblData: [], pagination });
     }
 
-    ontreetypechange (value) {
+    onTreeTypeChange (value) {
         this.setState({ treetype: value, treetypename: value });
     }
 
-    onstatuschange (value) {
+    onStatusChange (value) {
         this.setState({ ispack: value });
     }
 
-    onrolenamechange (value) {
+    onRoleNameChange (value) {
         this.setState({ rolename: value.target.value });
     }
 
@@ -736,8 +725,11 @@ export default class NursmeasureTable extends Component {
         }
         const {
             actions: { getnurserys },
-            keycode = ''
+            keycode = '',
+            platform: { tree = {} },
+            treetypes
         } = this.props;
+        let thinClassTree = tree.thinClassTree;
         let postdata = {
             // no:keycode,
             sxm,
@@ -767,16 +759,17 @@ export default class NursmeasureTable extends Component {
             let tblData = rst.content;
             if (tblData instanceof Array) {
                 tblData.forEach((plan, i) => {
-                    tblData[i].statusname =
+                    plan.statusname =
                         plan.IsPack === 0 ? '未打包' : '已打包';
-                    tblData[i].order = (page - 1) * size + i + 1;
-                    tblData[i].liftertime1 = plan.CreateTime
+                    plan.order = (page - 1) * size + i + 1;
+                    plan.liftertime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
                         : '/';
-                    tblData[i].liftertime2 = plan.CreateTime
+                    plan.liftertime2 = plan.CreateTime
                         ? moment(plan.CreateTime).format('HH:mm:ss')
                         : '/';
-                    tblData[i].Project = this.getProject(tblData[i].BD);
+                    plan.Project = getProjectNameBySection(plan.BD, thinClassTree);
+                    plan.sectionName = getSectionNameBySection(plan.BD, thinClassTree);
                 });
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
@@ -784,15 +777,6 @@ export default class NursmeasureTable extends Component {
                 this.setState({ tblData, pagination });
             }
         });
-    }
-
-    getProject (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let projectName = getProjectNameBySection(section, thinClassTree);
-        return projectName;
     }
 
     exportexcel () {

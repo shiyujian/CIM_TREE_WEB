@@ -304,7 +304,7 @@ export default class NursOverallTable extends Component {
                                 value={sxm}
                                 className='forest-forestcalcw2'
                                 style={{width: 100}}
-                                onChange={this.sxmchange.bind(this)}
+                                onChange={this.sxmChange.bind(this)}
                             />
                         </Col>
                         <Col span={2} className='forest-mrg10'>
@@ -438,7 +438,7 @@ export default class NursOverallTable extends Component {
         this.setState({ sxm: '' });
     };
 
-    sxmchange (value) {
+    sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
 

@@ -16,7 +16,11 @@ import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-import { getSectionNameBySection, getProjectNameBySection } from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection,
+    getSmallThinNameByPlaceData
+} from '../auth';
 const { RangePicker } = DatePicker;
 
 export default class LocmeasureTable extends Component {
@@ -67,10 +71,7 @@ export default class LocmeasureTable extends Component {
             },
             {
                 title: '标段',
-                dataIndex: 'Section',
-                render: (text, record) => {
-                    return <p>{this.getBiao(text)}</p>;
-                }
+                dataIndex: 'sectionName'
             },
             {
                 title: '位置',
@@ -315,14 +316,6 @@ export default class LocmeasureTable extends Component {
             }
         ];
     }
-    getBiao (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let sectionName = getSectionNameBySection(section, thinClassTree);
-        return sectionName;
-    }
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
@@ -393,7 +386,7 @@ export default class LocmeasureTable extends Component {
                             suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
-                            onChange={this.sxmchange.bind(this)}
+                            onChange={this.sxmChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg10'>
@@ -403,7 +396,7 @@ export default class LocmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -415,7 +408,7 @@ export default class LocmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
-                            onChange={this.onsmallclasschange.bind(this)}
+                            onChange={this.onSmallClassChange.bind(this)}
                         >
                             {smallclassoption}
                         </Select>
@@ -427,7 +420,7 @@ export default class LocmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
-                            onChange={this.onthinclasschange.bind(this)}
+                            onChange={this.onThinClassChange.bind(this)}
                         >
                             {thinclassoption}
                         </Select>
@@ -439,7 +432,7 @@ export default class LocmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
-                            onChange={this.ontypechange.bind(this)}
+                            onChange={this.onTypeChange.bind(this)}
                         >
                             {typeoption}
                         </Select>
@@ -452,7 +445,7 @@ export default class LocmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
-                            onChange={this.ontreetypechange.bind(this)}
+                            onChange={this.onTreeTypeChange.bind(this)}
                         >
                             {treetypeoption}
                         </Select>
@@ -464,7 +457,7 @@ export default class LocmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={status}
-                            onChange={this.onstatuschange.bind(this)}
+                            onChange={this.onStatusChange.bind(this)}
                         >
                             {statusoption}
                         </Select>
@@ -476,7 +469,7 @@ export default class LocmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={islocation}
-                            onChange={this.onlocationchange.bind(this)}
+                            onChange={this.onLocationChange.bind(this)}
                         >
                             {locationoption}
                         </Select>
@@ -487,7 +480,7 @@ export default class LocmeasureTable extends Component {
                             suffix={suffix2}
                             value={rolename}
                             className='forest-forestcalcw4'
-                            onChange={this.onrolenamechange.bind(this)}
+                            onChange={this.onRoleNameChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg-datePicker'>
@@ -588,13 +581,13 @@ export default class LocmeasureTable extends Component {
         this.setState({ rolename: '' });
     };
 
-    sxmchange (value) {
+    sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || '',
             smallclass: '',
@@ -604,10 +597,10 @@ export default class LocmeasureTable extends Component {
         });
     }
 
-    onsmallclasschange (value) {
-        const { smallclassselect } = this.props;
+    onSmallClassChange (value) {
+        const { smallClassSelect } = this.props;
         try {
-            smallclassselect(value);
+            smallClassSelect(value);
             let smallclassData = '';
             if (value) {
                 let arr = value.split('-');
@@ -620,14 +613,14 @@ export default class LocmeasureTable extends Component {
                 thinclassData: ''
             });
         } catch (e) {
-            console.log('onsmallclasschange', e);
+            console.log('onSmallClassChange', e);
         }
     }
 
-    onthinclasschange (value) {
-        const { thinclassselect } = this.props;
+    onThinClassChange (value) {
+        const { thinClassSelect } = this.props;
         try {
-            thinclassselect(value);
+            thinClassSelect(value);
             let thinclassData = '';
             if (value) {
                 let arr = value.split('-');
@@ -638,29 +631,29 @@ export default class LocmeasureTable extends Component {
                 thinclassData
             });
         } catch (e) {
-            console.log('onthinclasschange', e);
+            console.log('onThinClassChange', e);
         }
     }
 
-    ontypechange (value) {
+    onTypeChange (value) {
         const { typeselect } = this.props;
         typeselect(value || '');
         this.setState({ bigType: value || '', treetype: '', treetypename: '' });
     }
 
-    ontreetypechange (value) {
+    onTreeTypeChange (value) {
         this.setState({ treetype: value, treetypename: value });
     }
 
-    onstatuschange (value) {
+    onStatusChange (value) {
         this.setState({ status: value || '' });
     }
 
-    onlocationchange (value) {
+    onLocationChange (value) {
         this.setState({ islocation: value || '' });
     }
 
-    onrolenamechange (value) {
+    onRoleNameChange (value) {
         this.setState({ rolename: value.target.value });
     }
 
@@ -729,26 +722,6 @@ export default class LocmeasureTable extends Component {
     handleCancel () {
         this.setState({ imgvisible: false });
     }
-    getThinClassName (no, section) {
-        const { littleBanAll } = this.props;
-        let nob = no.substring(0, 15);
-        let sectionn = section.substring(8, 10);
-        let result = '/';
-
-        if (littleBanAll) {
-            littleBanAll.map(item => {
-                if (
-                    item.No.substring(0, 15) === nob &&
-                    item.No.substring(16, 18) === sectionn
-                ) {
-                    result = item.ThinClassName;
-                }
-            });
-        } else {
-            return <p> / </p>;
-        }
-        return result;
-    }
 
     resetinput () {
         const { resetinput, leftkeycode } = this.props;
@@ -782,8 +755,11 @@ export default class LocmeasureTable extends Component {
         }
         const {
             actions: { getqueryTree },
-            keycode = ''
+            keycode = '',
+            platform: { tree = {} },
+            treetypes
         } = this.props;
+        let thinClassTree = tree.thinClassTree;
         let postdata = {
             no: keycode,
             sxm,
@@ -809,23 +785,18 @@ export default class LocmeasureTable extends Component {
             let tblData = rst.content;
             if (tblData instanceof Array) {
                 tblData.forEach((plan, i) => {
-                    tblData[i].order = (page - 1) * size + i + 1;
-                    let place = '';
-                    if (plan.Section.indexOf('P010') !== -1) {
-                        place = this.getThinClassName(plan.No, plan.Section);
-                    } else {
-                        place = `${plan.SmallClass}号小班${
-                            plan.ThinClass
-                        }号细班`;
-                    }
-                    tblData[i].place = place;
+                    plan.order = (page - 1) * size + i + 1;
+                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                    console.log('plan.place', plan.place);
                     let statusname = '';
 
-                    tblData[i].SupervisorCheck = plan.SupervisorCheck;
-                    tblData[i].CheckStatus = plan.CheckStatus;
-                    tblData[i].statusname = statusname;
+                    plan.SupervisorCheck = plan.SupervisorCheck;
+                    plan.CheckStatus = plan.CheckStatus;
+                    plan.statusname = statusname;
                     let islocation = plan.LocationTime ? '已定位' : '未定位';
-                    tblData[i].islocation = islocation;
+                    plan.islocation = islocation;
                     let createtime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
                         : '/';
@@ -838,11 +809,10 @@ export default class LocmeasureTable extends Component {
                     let createtime4 = plan.LocationTime
                         ? moment(plan.LocationTime).format('HH:mm:ss')
                         : '/';
-                    tblData[i].createtime1 = createtime1;
-                    tblData[i].createtime2 = createtime2;
-                    tblData[i].createtime3 = createtime3;
-                    tblData[i].createtime4 = createtime4;
-                    tblData[i].Project = this.getProject(tblData[i].Section);
+                    plan.createtime1 = createtime1;
+                    plan.createtime2 = createtime2;
+                    plan.createtime3 = createtime3;
+                    plan.createtime4 = createtime4;
                 });
                 let totalNum = rst.total;
                 const pagination = { ...this.state.pagination };
@@ -865,10 +835,7 @@ export default class LocmeasureTable extends Component {
                         },
                         {
                             title: '标段',
-                            dataIndex: 'Section',
-                            render: (text, record) => {
-                                return <p>{this.getBiao(text)}</p>;
-                            }
+                            dataIndex: 'sectionName'
                         },
                         {
                             title: '位置',
@@ -966,10 +933,7 @@ export default class LocmeasureTable extends Component {
                         },
                         {
                             title: '标段',
-                            dataIndex: 'Section',
-                            render: (text, record) => {
-                                return <p>{this.getBiao(text)}</p>;
-                            }
+                            dataIndex: 'sectionName'
                         },
                         {
                             title: '位置',
@@ -1227,15 +1191,6 @@ export default class LocmeasureTable extends Component {
                 });
             }
         });
-    }
-
-    getProject (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let projectName = getProjectNameBySection(section, thinClassTree);
-        return projectName;
     }
 
     exportexcel () {

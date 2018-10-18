@@ -18,7 +18,11 @@ import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-import { getSectionNameBySection, getProjectNameBySection } from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection,
+    getSmallThinNameByPlaceData
+} from '../auth';
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const Dragger = Upload.Dragger;
@@ -48,14 +52,6 @@ export default class SeedlingsChange extends Component {
             imgArr: [],
             TreatmentData: []
         };
-    }
-    getBiao (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let sectionName = getSectionNameBySection(section, thinClassTree);
-        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
@@ -290,10 +286,7 @@ export default class SeedlingsChange extends Component {
             },
             {
                 title: '标段',
-                dataIndex: 'Section',
-                render: (text, record) => {
-                    return <p>{this.getBiao(text)}</p>;
-                }
+                dataIndex: 'sectionName'
             },
             {
                 title: '位置',
@@ -715,10 +708,6 @@ export default class SeedlingsChange extends Component {
         });
     }
 
-    sxmchange (value) {
-        this.setState({ sxm: value.target.value });
-    }
-
     datepick (value) {
         this.setState({
             stime: value[0]
@@ -748,43 +737,21 @@ export default class SeedlingsChange extends Component {
         const { resetinput, leftkeycode } = this.props;
         resetinput(leftkeycode);
     }
-
-    getThinClassName (no, section) {
-        const { littleBanAll } = this.props;
-        let nob = no.substring(0, 15);
-        let sectionn = section.substring(8, 10);
-        let result = '/';
-
-        if (littleBanAll) {
-            littleBanAll.map(item => {
-                if (
-                    item.No.substring(0, 15) === nob &&
-                    item.No.substring(16, 18) === sectionn
-                ) {
-                    result = item.ThinClassName;
-                }
-            });
-        } else {
-            return <p> / </p>;
-        }
-        return result;
-    }
     async qury (page) {
         const { stime = '', etime = '', size } = this.state;
         const {
             actions: { getqueryTree },
-            keycode = ''
+            keycode = '',
+            platform: { tree = {} },
+            treetypes
         } = this.props;
+        let thinClassTree = tree.thinClassTree;
 
         let sxm = document.querySelector('#sxmID').value;
         let remark = document.querySelector('#remarkValueID').value;
         let user = getUser();
         let section = '';
-        console.log('this.sections', this.sections);
-        if (user.username != 'admin' && this.sections.length > 0) {
-            // 不是admin，要做查询判断了
-            section = this.sections[0];
-        } else if (user.username != 'admin' && this.sections.length === 0) {
+        if (user.username !== 'admin') {
             message.info('没有权限进行查询');
         }
 
@@ -810,27 +777,19 @@ export default class SeedlingsChange extends Component {
 
                 tblData.map((plan, i) => {
                     sxmArr.push(plan.ZZBM);
-
-                    // const {attrs = {}} = plan;
-                    tblData[i].order = (page - 1) * size + i + 1;
-                    let place = '';
-                    if (plan.Section.indexOf('P010') !== -1) {
-                        place = this.getThinClassName(plan.No, plan.Section);
-                    } else {
-                        place = `${plan.SmallClass}号小班${
-                            plan.ThinClass
-                        }号细班`;
-                    }
-                    tblData[i].place = place;
+                    plan.order = (page - 1) * size + i + 1;
+                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
 
                     let statusname = '';
                     if (plan.SupervisorCheck == -1) statusname = '未抽查';
                     else if (plan.SupervisorCheck == 0) { statusname = '抽查未通过'; } else if (plan.SupervisorCheck === 1) {
                         statusname = '抽查通过';
                     }
-                    tblData[i].statusname = statusname;
+                    plan.statusname = statusname;
                     let islocation = plan.LocationTime ? '已定位' : '未定位';
-                    tblData[i].islocation = islocation;
+                    plan.islocation = islocation;
                     let createtime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
                         : '/';
@@ -843,11 +802,10 @@ export default class SeedlingsChange extends Component {
                     let createtime4 = plan.LocationTime
                         ? moment(plan.LocationTime).format('HH:mm:ss')
                         : '/';
-                    tblData[i].createtime1 = createtime1;
-                    tblData[i].createtime2 = createtime2;
-                    tblData[i].createtime3 = createtime3;
-                    tblData[i].createtime4 = createtime4;
-                    tblData[i].Project = this.getProject(tblData[i].Section);
+                    plan.createtime1 = createtime1;
+                    plan.createtime2 = createtime2;
+                    plan.createtime3 = createtime3;
+                    plan.createtime4 = createtime4;
                 });
 
                 const pagination = { ...this.state.pagination };
@@ -856,14 +814,5 @@ export default class SeedlingsChange extends Component {
                 this.setState({ tblData, pagination: pagination });
             }
         });
-    }
-
-    getProject (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let projectName = getProjectNameBySection(section, thinClassTree);
-        return projectName;
     }
 }
