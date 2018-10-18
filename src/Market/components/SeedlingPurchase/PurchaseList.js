@@ -16,12 +16,11 @@ class PurchaseList extends Component {
             total: 0,
             loading: true,
             dataList: [],
-            projectList: [], // 项目标段
-            a: 1
+            projectList: [] // 项目标段
         };
         this.onSearch = this.onSearch.bind(this);
         this.handlePane = this.handlePane.bind(this); // 切换标签页
-        this.onClear = this.onClear.bind(this);
+        this.onClear = this.onClear.bind(this); // 清除
     }
     componentDidMount () {
         const { getWpunittree } = this.props.actions;
@@ -57,9 +56,10 @@ class PurchaseList extends Component {
                         label='状态'
                     >
                         {getFieldDecorator('status', {
-                            initialValue: 1
+                            initialValue: ''
                         })(
                             <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
+                                <Option value={''}>全部</Option>
                                 <Option value={0}>未发布</Option>
                                 <Option value={1}>报价中</Option>
                                 <Option value={2}>选标中</Option>

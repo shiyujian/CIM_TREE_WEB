@@ -159,10 +159,6 @@ class CountFilter extends Component {
                 value: roles.filter(role => role.grouptype === 4)
             });
             systemRoles.push({
-                name: '苗圃基地角色',
-                value: roles.filter(role => role.grouptype === 5)
-            });
-            systemRoles.push({
                 name: '供应商角色',
                 value: roles.filter(role => role.grouptype === 6)
             });
@@ -206,12 +202,6 @@ class CountFilter extends Component {
                         systemRoles.push({
                             name: '养护角色',
                             value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 5:
-                        systemRoles.push({
-                            name: '苗圃基地角色',
-                            value: roles.filter(role => role.grouptype === 3)
                         });
                         break;
                     case 6:

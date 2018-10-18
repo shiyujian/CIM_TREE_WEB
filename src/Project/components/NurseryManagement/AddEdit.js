@@ -12,27 +12,26 @@ class AddEdit extends Component {
         this.state = {
             fileList: [],
             fileListBack: [],
-            options: [],
+            RegionCodeList: [], // 行政区划option
             optionList: [], // 绑定供应商列表
             Suppliers: [], // 绑定的供应商
             record: null,
             isAmend: false,
             LeaderCard: '', // 身份证正面url
             LeaderCardBack: '', // 身份证反面url
-            RegionCode: ''
+            RegionCode: '' // 行政区划
         };
         this.toSave = this.toSave.bind(this); // 新增苗圃
         this.checkPhone = this.checkPhone.bind(this); // 校验手机号
         this.checkCardNo = this.checkCardNo.bind(this); // 校验身份证
         this.handleRegion = this.handleRegion.bind(this); // 行政区划
-        this.loadRegion = this.loadRegion.bind(this); // 加载市县
         this.handleCancel = this.handleCancel.bind(this); // 取消弹框
     }
     componentDidMount () {
         if (this.props.optionList) {
             this.setState({
                 optionList: this.props.optionList,
-                options: this.props.options
+                RegionCodeList: this.props.RegionCodeList
             });
         }
         if (this.props.record) {
@@ -44,6 +43,7 @@ class AddEdit extends Component {
             this.setState({
                 isAmend: true,
                 record: this.props.record,
+                RegionCode: this.props.record.RegionCode,
                 LeaderCard: this.props.record.LeaderCard,
                 LeaderCardBack: this.props.record.LeaderCardBack,
                 fileList: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LeaderCard}`}],
@@ -62,8 +62,14 @@ class AddEdit extends Component {
         }
     }
     render () {
-        const { fileList, fileListBack, Suppliers, options, record, isAmend, optionList } = this.state;
+        const { fileList, fileListBack, Suppliers, RegionCode, RegionCodeList, record, isAmend, optionList } = this.state;
         const { getFieldDecorator } = this.props.form;
+        let provinceCode = '';
+        let sityCode = '';
+        if (RegionCode) {
+            provinceCode = RegionCode.slice(0, 2) + '0000';
+            sityCode = RegionCode.slice(0, 4) + '00';
+        }
         const props = {
             action: `${FOREST_API}/UploadHandler.ashx?filetype=org`,
             listType: 'picture',
@@ -155,11 +161,11 @@ class AddEdit extends Component {
                                     label='行政区划'
                                 >
                                     {getFieldDecorator('RegionCode', {
-                                        rules: [{required: true, message: '必填项'}]
+                                        rules: [{required: true, message: '必填项'}],
+                                        initialValue: [provinceCode, sityCode, RegionCode]
                                     })(
                                         <Cascader placeholder='选择您所在的城市'
-                                            loadData={this.loadRegion}
-                                            options={options}
+                                            options={RegionCodeList}
                                             onChange={this.handleRegion}
                                             changeOnSelect
                                         />
@@ -381,34 +387,6 @@ class AddEdit extends Component {
         this.setState({
             RegionCode
         });
-    }
-    loadRegion (selectedOptions) {
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-        setTimeout(() => {
-            targetOption.loading = false;
-            const { getRegionCodes } = this.props.actions;
-            targetOption.children = [];
-            getRegionCodes({}, {parent: targetOption.value}).then(rep => {
-                rep.map(item => {
-                    if (item.LevelType === '3') {
-                        targetOption.children.push({
-                            value: item.ID,
-                            label: item.Name
-                        });
-                    } else {
-                        targetOption.children.push({
-                            value: item.ID,
-                            label: item.Name,
-                            isLeaf: false
-                        });
-                    }
-                });
-                this.setState({
-                    options: [...this.state.options]
-                });
-            });
-        }, 100);
     }
 }
 

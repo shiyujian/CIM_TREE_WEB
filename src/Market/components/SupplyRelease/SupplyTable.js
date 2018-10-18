@@ -15,7 +15,7 @@ class SupplyTable extends Component {
             loading: true,
             dataList: [],
             treetypename: '',
-            status: 1
+            status: ''
         };
         this.nurserybase = ''; // 苗圃基地id
         this.toSearch = this.toSearch.bind(this);
@@ -50,6 +50,7 @@ class SupplyTable extends Component {
                         label='状态'
                     >
                         <Select allowClear defaultValue={status} style={{ width: 150 }} placeholder='请选择状态' onChange={this.handleStatus}>
+                            <Option value={''}>全部</Option>
                             <Option value={0}>未上架</Option>
                             <Option value={1}>上架中</Option>
                         </Select>

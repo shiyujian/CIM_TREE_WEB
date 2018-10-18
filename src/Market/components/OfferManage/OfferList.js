@@ -1,6 +1,5 @@
-
 import React, {Component} from 'react';
-import { Form, Button, Input, Select, Tabs, Spin } from 'antd';
+import { Form, Input, Button, Tabs, Select, Spin } from 'antd';
 import Menu from './Menu';
 import { getUser } from '_platform/auth';
 
@@ -8,17 +7,16 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 
-class DemandTable extends Component {
+class OfferList extends Component {
     constructor (props) {
         super(props);
         this.state = {
             loading: true,
-            dataList: [],
-            projectList: []
+            dataList: [], // 报价单列表
+            projectList: [] // 项目标段列表
         };
-        this.org = ''; // 所在单位pk
-        this.toSearch = this.toSearch.bind(this);
-        this.onClear = this.onClear.bind(this);
+        this.onSearch = this.onSearch.bind(this); // 查询
+        this.onClear = this.onClear.bind(this); // 清除
     }
     componentDidMount () {
         // 获取所有项目和标段
@@ -30,28 +28,21 @@ class DemandTable extends Component {
             this.setState({
                 projectList: rep
             }, () => {
-                this.toSearch();
+                this.onSearch();
             });
         });
     }
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { dataList, loading, projectList } = this.state;
+        const { loading, dataList, projectList } = this.state;
         return (
-            <div className='demandTable' style={{padding: '0 20px'}}>
+            <div className='offer-list'>
                 <Form layout='inline'>
                     <FormItem
-                        label='采购编号'
+                        label='苗木名称'
                     >
                         {getFieldDecorator('purchaseno')(
-                            <Input className='search-input' placeholder='请输入采购编号' />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        label='采购名称'
-                    >
-                        {getFieldDecorator('projectname')(
-                            <Input className='search-input' placeholder='请输入采购名称' />
+                            <Input className='search-input' placeholder='请输入苗木名称' />
                         )}
                     </FormItem>
                     <FormItem
@@ -69,21 +60,20 @@ class DemandTable extends Component {
                             </Select>
                         )}
                     </FormItem>
-                    <FormItem className='search-left'
-                    >
-                        <Button type='primary' onClick={this.toSearch}>查询</Button>
+                    <FormItem className='search-left'>
+                        <Button type='primary' onClick={this.onSearch}>查询</Button>
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>
                     </FormItem>
                 </Form>
-                <Button type='primary' onClick={this.toAddDemand.bind(this)}
-                    style={{position: 'absolute', right: 60, zIndex: 100}}>新增需求</Button>
-                <Tabs defaultActiveKey='1' onChange={this.handlePane}>
-                    <TabPane tab='全 部' key='1' style={{minHeight: 500}}>
+                <Tabs defaultActiveKey='1'>
+                    <TabPane tab='全 部' key='1' style={{background: '#ECECEC', padding: '20px', minHeight: 500}}>
                         <Spin spinning={loading}>
                             {
                                 dataList.length > 0 ? dataList.map((item, index) => {
-                                    return <Menu record={item} key={index} projectList={projectList} {...this.props} toSearch={this.toSearch} toAddDemand={this.toAddDemand} />;
-                                }) : []
+                                    return (
+                                        <Menu record={item} key={index} {...this.props} projectList={projectList} />
+                                    );
+                                }) : '没有更多了'
                             }
                         </Spin>
                     </TabPane>
@@ -91,36 +81,27 @@ class DemandTable extends Component {
             </div>
         );
     }
-    toAddDemand = (key) => {
-        const { changeAddDemandVisible, changeAddDemandKey } = this.props.actions;
-        changeAddDemandVisible(true);
-        changeAddDemandKey(key);
+    onClear () {
+        this.props.form.resetFields();
     }
-    toSearch () {
-        const formVal = this.props.form.getFieldsValue();
+    onSearch () {
         const { getPurchaseList } = this.props.actions;
         this.setState({
             loading: true
         });
+        const { treetypename, status } = this.props.form.getFieldsValue();
         getPurchaseList({}, {
-            purchaseno: '',
-            org: this.org,
-            projectname: formVal.projectname || '',
-            status: formVal.status === undefined ? '' : formVal.status
-        }).then((rep) => {
+            treetypename: treetypename || '',
+            status: status === undefined ? '' : status
+        }).then(rep => {
             if (rep.code === 200) {
                 this.setState({
                     loading: false,
-                    dataList: rep.content,
-                    page: rep.pageinfo.page,
-                    total: rep.pageinfo.total
+                    dataList: rep.content
                 });
             }
         });
     }
-    onClear () {
-        this.props.form.resetFields();
-    }
 }
 
-export default Form.create()(DemandTable);
+export default Form.create()(OfferList);

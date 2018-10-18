@@ -63,7 +63,7 @@ class Menu extends Component {
                             <h3>
                                 {record.TreeTypeName}
                                 <span>({record.SKU}株)</span>
-                                <Tag style={{marginLeft: 10}} color='#87d068'>{record.Status === 1 ? '上架中' : '未上架'}</Tag>
+                                <Tag style={{marginLeft: 10}} color={record.Status === 1 ? '#87d068' : '#f50'}>{record.Status === 1 ? '上架中' : '未上架'}</Tag>
                             </h3>
                             <p className='text-p'>类型：{this.state.TreeTypeName}</p>
                             <p className='text-p'>上车价：￥{record.MinPrice}-{record.MaxPrice}</p>
@@ -78,7 +78,7 @@ class Menu extends Component {
                                             CultivationMode = row.name;
                                         }
                                     });
-                                    return <p key={index}>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
+                                    return <p key={index} className='text-p'>胸径{item.DBH}cm 地径{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{CultivationMode} ￥{item.Price}（{item.Stock}株）</p>;
                                 })
                             }
                         </Col>

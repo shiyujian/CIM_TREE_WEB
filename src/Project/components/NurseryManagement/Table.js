@@ -22,7 +22,7 @@ class Tablelevel extends Component {
             visibleTitle: '', // 弹框标题
             seeVisible: false, // 查看弹框
             auditVisible: false, // 审核弹框
-            options: [],
+            RegionCodeList: [], // 行政区划option
             record: null,
             LeaderCard: '', // 身份证正反面
             optionList: []
@@ -44,17 +44,42 @@ class Tablelevel extends Component {
             this.groupId = user.groups[0].id;
         }
         // 获取行政区划编码
-        getRegionCodes({}, {grade: 1}).then(rep => {
-            let province = [];
+        getRegionCodes().then(rep => {
+            let RegionCodeList = [];
             rep.map(item => {
-                province.push({
-                    value: item.ID,
-                    label: item.Name,
-                    isLeaf: false
+                if (item.LevelType === '1') {
+                    RegionCodeList.push({
+                        value: item.ID,
+                        label: item.Name
+                    });
+                }
+            });
+            RegionCodeList.map(item => {
+                let arrCity = [];
+                rep.map(row => {
+                    if (row.LevelType === '2' && item.value === row.ParentId) {
+                        arrCity.push({
+                            value: row.ID,
+                            label: row.Name
+                        });
+                    }
                 });
+                arrCity.map(row => {
+                    let arrCounty = [];
+                    rep.map(record => {
+                        if (record.LevelType === '3' && row.value === record.ParentId) {
+                            arrCounty.push({
+                                value: record.ID,
+                                label: record.Name
+                            });
+                        }
+                    });
+                    row.children = arrCounty;
+                });
+                item.children = arrCity;
             });
             this.setState({
-                options: province
+                RegionCodeList
             });
         });
         // 获取所有供应商
@@ -147,7 +172,7 @@ class Tablelevel extends Component {
         }
     ];
     render () {
-        const { status, nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, options, nurseryname } = this.state;
+        const { status, nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, RegionCodeList, nurseryname } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='table-level'>
@@ -250,7 +275,7 @@ class Tablelevel extends Component {
                     visible ? <AddEdit fileList={fileList} {...this.props}
                         fileListBack={fileListBack}
                         record={record}
-                        options={options}
+                        RegionCodeList={RegionCodeList}
                         visibleTitle={visibleTitle}
                         optionList={optionList}
                         handleCancel={this.handleCancel}
