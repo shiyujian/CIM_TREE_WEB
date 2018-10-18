@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Modal, Row, Col, Form, Input, Select } from 'antd';
-import { CUS_TILEMAP } from '_platform/api';
 import { getProjectUnits } from '../../../_platform/auth';
 
 const FormItem = Form.Item;
-const { Option, OptGroup } = Select;
+const { Option } = Select;
 
 class Addition extends Component {
     constructor (props) {
@@ -15,7 +14,6 @@ class Addition extends Component {
             btn: false
         };
     }
-    static propTypes = {};
     changeTitle (value) {
         console.log('value', value);
         const {
@@ -33,10 +31,14 @@ class Addition extends Component {
             actions: { changeAdditionField }
         } = this.props;
         const { type, extra_params: extra = {}, obj_type } = node || {};
+        const { extra_params } = node || {};
+        let companyVisible = false;
+        if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
+            companyVisible = true;
+        }
 
         const title = Addition.getTitle(node, parent);
         let units = this.getUnits();
-        console.log('units', units);
         return (
             <Modal
                 title={
@@ -50,11 +52,20 @@ class Addition extends Component {
                 onCancel={this.cancel.bind(this)}
             >
                 <FormItem {...Addition.layout} label={`${title}名称`}>
-                    <Input
-                        placeholder='请输入名称'
-                        value={addition.name}
-                        onChange={changeAdditionField.bind(this, 'name')}
-                    />
+                    {getFieldDecorator('name', {
+                        rules: [
+                            {
+                                required: true,
+                                message: '请输入名称'
+                            }
+                        ]
+                    })(
+                        <Input
+                            placeholder='请输入名称'
+                            value={addition.name}
+                            onChange={changeAdditionField.bind(this, 'name')}
+                        />
+                    )}
                 </FormItem>
                 <FormItem {...Addition.layout} label={`${title}编码`}>
                     {getFieldDecorator('code', {
@@ -94,6 +105,33 @@ class Addition extends Component {
                             : ''}
                     </Select>
                 </FormItem>
+                {
+                    companyVisible
+                        ? (
+                            <FormItem {...Addition.layout} label={'公司与否'}>
+                                {getFieldDecorator('companyStatus', {
+                                    rules: [
+                                        {
+                                            required: true,
+                                            message: '是否为公司'
+                                        }
+                                    ]
+                                })(
+                                    <Select
+                                        placeholder='是否为公司'
+                                        style={{ width: '100%' }}
+                                    >
+                                        <Option key={'是'} value={'公司'}>
+                                            是
+                                        </Option>
+                                        <Option key={'否'} value={'项目'}>
+                                            否
+                                        </Option>
+                                    </Select>
+                                )}
+                            </FormItem>
+                        ) : ''
+                };
                 <FormItem {...Addition.layout} label={`${title}简介`}>
                     <Input
                         placeholder='请输入简介'
@@ -117,7 +155,6 @@ class Addition extends Component {
         listStore.map((item, index) => {
             item.map(rst => {
                 if (rst.name === node.name && rst.code === node.code) {
-                    console.log('node.name', node.name);
                     projectName = listStore[index]
                         ? listStore[index][0].name
                         : '';
@@ -126,6 +163,12 @@ class Addition extends Component {
         });
         console.log('projectName', projectName);
         return getProjectUnits(projectName);
+    }
+
+    changeCompanyStatus (value) {
+        this.setState({
+            companyStatus: value
+        });
     }
 
     save () {
@@ -137,67 +180,77 @@ class Addition extends Component {
                 putOrg,
                 getOrgTree,
                 changeSidebarField,
-                clearAdditionField,
-                postRole
+                clearAdditionField
             }
         } = this.props;
-        const { type, extra_params: extra = {}, obj_type } = node || {};
-        console.log(this.props);
-        console.log(addition.introduction);
-        console.log(addition.sections);
-        const sections = addition.sections ? addition.sections.join() : [];
-
-        if (parent) {
-            postOrg(
-                {},
-                {
-                    name: addition.name,
-                    code: addition.code,
-
-                    obj_type: 'C_ORG',
-                    status: 'A',
-                    extra_params: {
-                        introduction: addition.introduction,
-                        sections: sections
-                    },
-                    parent: {
-                        pk: parent.pk,
-                        code: parent.code,
-                        obj_type: 'C_ORG'
-                    }
-                }
-            ).then(rst => {
-                if (rst.pk) {
-                    clearAdditionField();
-                    getOrgTree({}, { depth: 3 });
-                }
-            });
-        } else {
-            putOrg(
-                { code: addition.code },
-                {
-                    obj_type: 'C_ORG',
-                    status: 'A',
-                    name: addition.name,
-                    extra_params: {
-                        introduction: addition.introduction,
-                        sections: sections
-                    }
-                }
-            ).then(rst => {
-                this.forceUpdate();
-                if (rst.pk) {
-                    if (this.state.btn) {
-                        extra.sections = this.state.sections;
-                    }
-                    changeSidebarField('addition', false);
-                    parent && changeSidebarField('parent', null);
-                    addition.code && clearAdditionField();
-                    getOrgTree({}, { depth: 3 });
-                    this.forceUpdate();
-                }
-            });
+        const { extra_params: extra = {} } = node || {};
+        const { extra_params } = node || {};
+        let companyVisible = false;
+        if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
+            companyVisible = true;
         }
+        console.log('companyVisible', companyVisible);
+        let companyStatus = '';
+        const sections = addition.sections ? addition.sections.join() : [];
+        this.props.form.validateFields(async (err, values) => {
+            console.log('err', err);
+            console.log('values', values);
+            if (!err) {
+                if (parent) {
+                    postOrg(
+                        {},
+                        {
+                            name: addition.name,
+                            code: addition.code,
+
+                            obj_type: 'C_ORG',
+                            status: 'A',
+                            extra_params: {
+                                introduction: addition.introduction,
+                                sections: sections,
+                                companyStatus: companyVisible ? values.companyStatus : ''
+                            },
+                            parent: {
+                                pk: parent.pk,
+                                code: parent.code,
+                                obj_type: 'C_ORG'
+                            }
+                        }
+                    ).then(rst => {
+                        if (rst.pk) {
+                            clearAdditionField();
+                            getOrgTree({}, { depth: 3 });
+                        }
+                    });
+                } else {
+                    putOrg(
+                        { code: addition.code },
+                        {
+                            obj_type: 'C_ORG',
+                            status: 'A',
+                            name: addition.name,
+                            extra_params: {
+                                introduction: addition.introduction,
+                                sections: sections,
+                                companyStatus: companyVisible ? values.companyStatus : ''
+                            }
+                        }
+                    ).then(rst => {
+                        this.forceUpdate();
+                        if (rst.pk) {
+                            if (this.state.btn) {
+                                extra.sections = this.state.sections;
+                            }
+                            changeSidebarField('addition', false);
+                            parent && changeSidebarField('parent', null);
+                            addition.code && clearAdditionField();
+                            getOrgTree({}, { depth: 3 });
+                            this.forceUpdate();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     cancel () {

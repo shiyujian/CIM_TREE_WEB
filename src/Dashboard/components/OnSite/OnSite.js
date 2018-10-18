@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-20 17:52:25
+ * @Last Modified time: 2018-10-17 21:16:38
  */
 import React, { Component } from 'react';
 import {
@@ -52,7 +52,7 @@ import {
     getCuringMess
 } from './TreeInfo';
 import MenuSwitch from '../MenuSwitch';
-import {TREETYPENO} from '_platform/api';
+import {getCompanyDataByOrgCode} from '_platform/auth';
 // 存活率图片
 import hundredImg from '../SurvivalRateImg/90~100.png';
 import ninetyImg from '../SurvivalRateImg/80~90.png';
@@ -2055,7 +2055,7 @@ class OnSite extends Component {
                 getCuringMessage,
                 getForestUserDetail,
                 getUserDetail,
-                getOrgParent
+                getOrgTreeByCode
             },
             platform: {
                 tree = {}
@@ -2141,8 +2141,7 @@ class OnSite extends Component {
                 let userForestData = await getForestUserDetail({id: treeflowData[i].FromUser});
                 let userEcidiData = await getUserDetail({pk: userForestData.PK});
                 let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
-                let orgData = await getOrgParent({code: orgCode});
-                let parent = orgData && orgData.parent;
+                let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
                 let companyName = parent.name;
                 treeflowData[i].companyName = companyName;
                 treeflowData[i].orgData = parent;
@@ -2195,6 +2194,7 @@ class OnSite extends Component {
             treeMessModalVisible: false
         });
     }
+
     // 点击地图上的区域的成活率
     async getSurvivalRateInfo (data, x, y) {
         const {

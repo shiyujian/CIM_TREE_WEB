@@ -10,6 +10,10 @@ export default (ID, service = '') => {
     const getOrgTree = createFetchAction(`${SERVICE_API}/org-tree/`, [
         getOrgTreeOK
     ]);
+    const getOrgTreeByCode = createFetchAction(
+        `${SERVICE_API}/org-tree/code/{{code}}/`,
+        'GET'
+    );
 
     const postOrg = createFetchAction(`${SERVICE_API}/orgs/`, 'POST');
     const putOrg = createFetchAction(
@@ -38,6 +42,7 @@ export default (ID, service = '') => {
     orgReducer[`put${SERVICE}Org`] = putOrg;
     orgReducer[`delete${SERVICE}Org`] = deleteOrg;
     orgReducer[`get${SERVICE}OrgParent`] = getOrgParent;
+    orgReducer[`get${SERVICE}OrgTreeByCode`] = getOrgTreeByCode;
 
     return orgReducer;
 };

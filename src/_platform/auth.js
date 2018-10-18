@@ -90,7 +90,6 @@ export const removePermissions = () => {
 export const getProjectUnits = (projectName) => {
     let units = [];
     PROJECT_UNITS.map((item) => {
-        // if (item.value === projectName) {
         if (projectName.indexOf(item.value) !== -1) {
             units = item.units;
         }
@@ -165,9 +164,22 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
     let projectList = [];
     // 单位工程级
     let sectionList = [];
+    // 业主和管理员
+    let userMess = window.localStorage.getItem('QH_USER_DATA');
+    userMess = JSON.parse(userMess);
+    let permission = false;
+    if (userMess.username === 'admin') {
+        permission = true;
+    }
+    let groups = userMess.groups || [];
+    groups.map((group) => {
+        if (group.name.indexOf('业主') !== -1) {
+            permission = true;
+        }
+    });
     if (rst instanceof Array && rst.length > 0) {
         rst.map(node => {
-            if (user.username === 'admin') {
+            if (permission) {
                 if (node.Type === '项目工程') {
                     projectList.push({
                         Name: node.Name,
@@ -361,6 +373,45 @@ export const getThinClass = (smallClass, list) => {
     } catch (e) {
         console.log('getThinClass', e);
     }
-
     return thinClassList;
+};
+
+export const getCompanyDataByOrgCode = async (orgCode, getOrgTreeByCode) => {
+    let orgData = await getOrgTreeByCode({code: orgCode}, {reverse: true});
+    let parent = {};
+    let loopData = loopOrgCompany(orgData);
+    console.log('loopData', loopData);
+    parent = loopArrayCompany(loopData);
+    return parent;
+};
+
+export const loopOrgCompany = (orgData) => {
+    try {
+        let extra_params = orgData && orgData.extra_params;
+        let companyStatus = extra_params && extra_params.companyStatus;
+        console.log();
+        if (companyStatus && companyStatus === '公司') {
+            return orgData;
+        } else if (orgData && orgData.children && orgData.children.length > 0 &&
+            companyStatus && companyStatus === '项目') {
+            return orgData.children.map((child) => {
+                return loopOrgCompany(child);
+            });
+        }
+    } catch (e) {
+        console.log('loopOrgCompany', e);
+    }
+};
+
+export const loopArrayCompany = (loopData) => {
+    try {
+        if (loopData && loopData instanceof Array && loopData.length > 0) {
+            let parent = loopData[0];
+            return loopArrayCompany(parent);
+        } else {
+            return loopData;
+        }
+    } catch (e) {
+        console.log('loopArrayCompany', e);
+    }
 };

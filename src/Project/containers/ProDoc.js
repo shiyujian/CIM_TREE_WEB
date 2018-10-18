@@ -16,6 +16,7 @@ import reducer, { actions } from '../store/proDoc';
 import Button from 'antd/es/button/button';
 import AddDirPanel from '../components/ProDoc/AddDirPanel';
 import DelDirPanel from '../components/ProDoc/DelDirPanel';
+import { getCompanyDataByOrgCode } from '../../_platform/auth';
 export const Datumcode = window.DeathCode.DATUM_GCWD;
 
 @connect(
@@ -54,7 +55,7 @@ export default class ProDoc extends Component {
 
     componentDidMount = async () => {
         const {
-            actions: { getworkTree, savepk, addDir, getOrgParent }
+            actions: { getworkTree, savepk, addDir, getOrgTreeByCode }
         } = this.props;
         try {
             let user = window.localStorage.getItem('QH_USER_DATA');
@@ -68,8 +69,8 @@ export default class ProDoc extends Component {
                 isAdmin = true;
             } else {
                 let orgCode = user && user.account && user.account.org_code;
-                let orgData = await getOrgParent({code: orgCode});
-                let parent = orgData && orgData.parent;
+                let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
+                console.log('parent', parent);
                 parentOrgCode = parent.code;
             }
             this.setState({
