@@ -16,6 +16,7 @@ import reducer, { actions } from '../store/engineeringImage';
 import Button from 'antd/es/button/button';
 import AddDirPanel from '../components/EngineeringImage/AddDirPanel';
 import DelDirPanel from '../components/EngineeringImage/DelDirPanel';
+import { getCompanyDataByOrgCode } from '../../_platform/auth';
 export const Datumcode = window.DeathCode.DATUM_GCYX;
 
 @connect(
@@ -54,7 +55,7 @@ export default class EngineeringImage extends Component {
 
     componentDidMount = async () => {
         const {
-            actions: { getworkTree, savepk, addDir, getOrgParent }
+            actions: { getworkTree, savepk, addDir, getOrgTreeByCode }
         } = this.props;
         try {
             let user = window.localStorage.getItem('QH_USER_DATA');
@@ -68,8 +69,7 @@ export default class EngineeringImage extends Component {
                 isAdmin = true;
             } else {
                 let orgCode = user && user.account && user.account.org_code;
-                let orgData = await getOrgParent({code: orgCode});
-                let parent = orgData && orgData.parent;
+                let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
                 parentOrgCode = parent.code;
             }
             this.setState({

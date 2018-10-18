@@ -373,6 +373,45 @@ export const getThinClass = (smallClass, list) => {
     } catch (e) {
         console.log('getThinClass', e);
     }
-
     return thinClassList;
+};
+
+export const getCompanyDataByOrgCode = async (orgCode, getOrgTreeByCode) => {
+    let orgData = await getOrgTreeByCode({code: orgCode}, {reverse: true});
+    let parent = {};
+    let loopData = loopOrgCompany(orgData);
+    console.log('loopData', loopData);
+    parent = loopArrayCompany(loopData);
+    return parent;
+};
+
+export const loopOrgCompany = (orgData) => {
+    try {
+        let extra_params = orgData && orgData.extra_params;
+        let companyStatus = extra_params && extra_params.companyStatus;
+        console.log();
+        if (companyStatus && companyStatus === '公司') {
+            return orgData;
+        } else if (orgData && orgData.children && orgData.children.length > 0 &&
+            companyStatus && companyStatus === '项目') {
+            return orgData.children.map((child) => {
+                return loopOrgCompany(child);
+            });
+        }
+    } catch (e) {
+        console.log('loopOrgCompany', e);
+    }
+};
+
+export const loopArrayCompany = (loopData) => {
+    try {
+        if (loopData && loopData instanceof Array && loopData.length > 0) {
+            let parent = loopData[0];
+            return loopArrayCompany(parent);
+        } else {
+            return loopData;
+        }
+    } catch (e) {
+        console.log('loopArrayCompany', e);
+    }
 };

@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Modal, Row, Col, Form, Input, Select } from 'antd';
-import { CUS_TILEMAP } from '_platform/api';
 import { getProjectUnits } from '../../../_platform/auth';
 
 const FormItem = Form.Item;
-const { Option, OptGroup } = Select;
+const { Option } = Select;
 
 class Addition extends Component {
     constructor (props) {

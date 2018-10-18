@@ -19,7 +19,7 @@ import {
 } from '../components/Engineering';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import { getUser } from '../../_platform/auth';
+import { getUser, getCompanyDataByOrgCode } from '../../_platform/auth';
 import { PROJECT_UNITS } from '../../_platform/api';
 export const Datumcode = window.DeathCode.DATUM_GCWD;
 
@@ -111,8 +111,8 @@ export default class Engineering extends Component {
             actions: {
                 getTree,
                 searchEnginVisible,
-                getOrgParent,
-                setkeycode
+                setkeycode,
+                getOrgTreeByCode
             }
         } = this.props;
         try {
@@ -123,9 +123,7 @@ export default class Engineering extends Component {
             console.log('this.user', this.user);
             if (this.user.username !== 'admin') {
                 let orgCode = this.user.account.org_code;
-                let orgData = await getOrgParent({code: orgCode});
-                let parent = orgData && orgData.parent;
-                console.log('orgData', orgData);
+                let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
                 console.log('parent', parent);
                 this.orgCode = parent.code;
                 console.log('this.orgCode', this.orgCode);
