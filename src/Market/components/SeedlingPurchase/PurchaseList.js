@@ -52,21 +52,6 @@ class PurchaseList extends Component {
                             <Input className='search-input' placeholder='请输入采购名称' />
                         )}
                     </FormItem>
-                    <FormItem
-                        label='状态'
-                    >
-                        {getFieldDecorator('status', {
-                            initialValue: ''
-                        })(
-                            <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
-                                <Option value={''}>全部</Option>
-                                <Option value={0}>未发布</Option>
-                                <Option value={1}>报价中</Option>
-                                <Option value={2}>选标中</Option>
-                                <Option value={3}>已结束</Option>
-                            </Select>
-                        )}
-                    </FormItem>
                     <FormItem className='search-left'>
                         <Button type='primary' onClick={this.onSearch}>查询</Button>
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>
@@ -96,7 +81,7 @@ class PurchaseList extends Component {
         getPurchaseList({}, {
             purchaseno: formVal.purchaseno || '',
             projectname: formVal.projectname || '',
-            status: formVal.status === undefined ? '' : formVal.status,
+            status: 1,
             page
         }).then(rep => {
             if (rep.code === 200) {

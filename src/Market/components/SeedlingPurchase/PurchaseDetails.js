@@ -1,9 +1,10 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Card, Row, Col, Table, Input } from 'antd';
+import { Form, Button, Card, Row, Col, Table, Input, Modal, Upload, Icon, message } from 'antd';
 import { CULTIVATIONMODE } from '_platform/api';
 import './PurchaseDetails.less';
 
+const Dragger = Upload.Dragger;
 class PurchaseDetails extends Component {
     constructor (props) {
         super(props);
@@ -16,30 +17,31 @@ class PurchaseDetails extends Component {
             UseNurseryAddress: '', // 用苗地址
             Specs: [], // 采购品种
             projectList: [], // 项目标段列表
-            dataList: [], // 表格数据
             Contacter: '',
             Phone: '',
-            organizationName: '' // 组织机构名称
+            organizationName: '', // 组织机构名称
+            showModal: false
         };
         this.purchaseid = ''; // 采购单ID
-        this.toOffer = this.toOffer.bind(this); // 我要报价
         this.toReturn = this.toReturn.bind(this); // 返回
+        this.toOffer = this.toOffer.bind(this); // 我要报价
+        this.handleOk = this.handleOk.bind(this); // 完成上传
+        this.handleCancel = this.handleCancel.bind(this); // 取消上传
     }
     componentDidMount () {
-        const { getPurchaseById, getWpunittree, getOfferInventoryById, getOrgTree_new } = this.props.actions;
+        const { getPurchaseById, getWpunittree, getOrgTree_new } = this.props.actions;
         this.purchaseid = this.props.purchaseDetailsKey;
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
-            let arr = [];
             rep.Specs.map(item => {
                 CULTIVATIONMODE.map(row => {
                     if (item.CultivationMode === row.id) {
                         item.name = row.name;
                     }
                 });
-                arr.push(item.TreeTypeName);
+                item.childrenList = [];
             });
-            // CULTIVATIONMODE
+            console.log(rep.Specs, '规格数据');
             this.setState({
                 purchaseInfo: rep,
                 ProjectName: rep.ProjectName,
@@ -52,7 +54,7 @@ class PurchaseDetails extends Component {
                 OfferNun: rep.OfferNun,
                 CreaterOrg: rep.CreaterOrg,
                 Specs: rep.Specs,
-                SpecsType: arr
+                TreeTypes: rep.TreeTypes
             });
             getOrgTree_new({code: rep.CreaterOrg}).then(rep => {
                 this.setState({
@@ -66,36 +68,42 @@ class PurchaseDetails extends Component {
                 projectList: rep
             });
         });
-        // 根据id获取采购报价清单
-        getOfferInventoryById({}, {purchaseid: this.purchaseid}).then(rep => {
-            this.setState({
-                dataList: [{
-                    Price: rep.Price,
-                    Describe: rep.Describe
-                }]
-            });
-        });
     }
     columns = [
         {
-            title: '到货总价',
+            title: '到货单价',
             key: '1',
             dataIndex: 'Price',
-            render: text => <Input style={{width: 150}} />
+            render: (text, record, index) => record.isSave ? <span>{text}</span> : <Input style={{width: 100}} onChange={this.toEditOff.bind(this, record, 'Price')} />
         }, {
-            title: '报价说明',
+            title: '数量',
             key: '2',
-            dataIndex: 'Describe',
-            render: text => <Input style={{width: 200}} />
+            dataIndex: 'Num',
+            render: (text, record, index) => record.isSave ? <span>{text}</span> : <Input style={{width: 100}} onChange={this.toEditOff.bind(this, record, 'Num')} />
+        }, {
+            title: '苗源地',
+            key: '3',
+            dataIndex: 'Source',
+            render: (text, record, index) => record.isSave ? <span>{text}</span> : <Input style={{width: 100}} onChange={this.toEditOff.bind(this, record, 'Source')} />
+        }, {
+            title: '备注',
+            key: '4',
+            dataIndex: 'SpecDescribe',
+            render: (text, record, index) => record.isSave ? <span>{text}</span> : <Input style={{width: 200}} onChange={this.toEditOff.bind(this, record, 'SpecDescribe')} />
+        }, {
+            title: '附件(pdf,jpg,png)',
+            key: '5',
+            dataIndex: 'OfferFiles',
+            render: text => <a onClick={this.onUpload.bind(this)}>添加附件</a>
         }, {
             title: '操作',
-            key: '3',
+            key: '6',
             dataIndex: 'action',
-            render: (text, record) => <a onClick={this.toRelease.bind(this, record)}>报 价</a>
+            render: (text, record, index) => <a onClick={this.toSave.bind(this, record)}>保 存</a>
         }
     ];
     render () {
-        const { projectList, ProjectName, Section, StartTime, EndTime, UseNurseryAddress, Specs, SpecsType, Contacter, Phone, organizationName, dataList } = this.state;
+        const { projectList, ProjectName, Section, StartTime, EndTime, UseNurseryAddress, Specs, TreeTypes, Contacter, Phone, organizationName, showModal } = this.state;
         let projectName = '', section = '';
         projectList.map(item => {
             if (item.No === ProjectName) {
@@ -105,6 +113,22 @@ class PurchaseDetails extends Component {
                 section = item.Name;
             }
         });
+        const props = {
+            name: 'file',
+            multiple: true,
+            action: '//jsonplaceholder.typicode.com/posts/',
+            onChange (info) {
+                const status = info.file.status;
+                if (status !== 'uploading') {
+                    console.log(info.file, info.fileList);
+                }
+                if (status === 'done') {
+                    message.success(`${info.file.name} file uploaded successfully.`);
+                } else if (status === 'error') {
+                    message.error(`${info.file.name} file upload failed.`);
+                }
+            }
+        };
         return (
             <div className='purchaseDetails' style={{padding: '0 20px'}}>
                 <Button type='primary' style={{marginBottom: 5}} onClick={this.toReturn}>返 回</Button>
@@ -114,7 +138,7 @@ class PurchaseDetails extends Component {
                             <h2>{projectName} {section} 采购单</h2>
                             <p className='text-p'>报价起止时间：{StartTime}&nbsp;至&nbsp;{EndTime}</p>
                             <p className='text-p'>用苗地址：{UseNurseryAddress}</p>
-                            <p className='text-p'>采购品种：{SpecsType}</p>
+                            <p className='text-p'>采购品种：{TreeTypes}</p>
                         </Col>
                         <Col span={8}>
                             <p className='text-p'>发布单位：{organizationName}</p>
@@ -130,34 +154,130 @@ class PurchaseDetails extends Component {
                             return (
                                 <Card key={index}>
                                     <header>
-                                        <span>柏树</span>
-                                        <span style={{marginLeft: 20}}>胸径{item.DBH}cm 地经{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.name} {item.Num}棵</span>
-                                        <Button type='primary' style={{marginLeft: 20}} onClick={this.toOffer}>我要报价</Button>
-                                        <span style={{marginLeft: 20}}>已有5人报价</span>
+                                        <span style={{display: 'inline-block', width: 50}}>{item.TreeTypeName}</span>
+                                        <span style={{display: 'inline-block', width: 450, marginLeft: 20}}>胸径{item.DBH}cm 地经{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.name} {item.Num}棵</span>
+                                        <Button type='primary' style={{marginLeft: 20}} onClick={this.toOffer.bind(this, item.ID)}>我要报价</Button>
+                                        <span style={{marginLeft: 20}}>已有{item.Offers}人报价</span>
                                     </header>
-                                    <Table columns={this.columns} dataSource={dataList} />
+                                    {
+                                        item.childrenList.length > 0 ? <Table columns={this.columns} dataSource={item.childrenList} rowKey='key' pagination={false} /> : ''
+                                    }
                                 </Card>
                             );
                         })
                     }
+                    <div style={{textAlign: 'center', marginTop: 20}}>
+                        <Button type='primary' onClick={this.toSubmit.bind(this)}>提&nbsp;交</Button>
+                    </div>
                 </Card>
+                <Modal
+                    title='上 传'
+                    visible={showModal}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                >
+                    <Dragger {...props}>
+                        <p className='ant-upload-drag-icon'>
+                            <Icon type='inbox' />
+                        </p>
+                        <p className='ant-upload-text'>请将您所想上传的文件或图片拖曳至该区域</p>
+                    </Dragger>
+                </Modal>
             </div>
         );
     }
-    toOffer () {
-        const { dataList } = this.state;
-        dataList.push({
-
-        });
+    onUpload (e) {
+        e.preventDefault();
         this.setState({
-            dataList
+            showModal: true
         });
     }
-    toRelease (record, e) {
+    handleOk () {
+
+    }
+    handleCancel () {
+        this.setState({
+            showModal: false
+        });
+    }
+    toEditOff (record, str, e) {
+        const { Specs } = this.state;
+        Specs.map(item => {
+            if (item.ID === record.PurchaseSpecID) {
+                item.childrenList[0][str] = e.target.value;
+            }
+        });
+        console.log(Specs);
+        this.setState({
+            Specs
+        });
+    }
+    toOffer (id) {
+        const { Specs } = this.state;
+        Specs.map(item => {
+            if (item.ID === id) {
+                item.childrenList = [{
+                    key: 0,
+                    isSave: false,
+                    PurchaseSpecID: id,
+                    Price: '',
+                    SpecDescribe: '',
+                    Num: '',
+                    OfferFiles: '',
+                    Source: ''
+                }];
+            }
+        });
+        console.log(Specs);
+        this.setState({
+            Specs
+        });
+    }
+    toSave (record, e) {
         e.preventDefault();
+        console.log(record);
+        let { Specs } = this.state;
+        Specs.map(item => {
+            if (item.ID === record.PurchaseSpecID) {
+                item.childrenList[0].isSave = true;
+            }
+        });
+        this.setState({
+            Specs
+        });
     }
     toReturn () {
         this.props.actions.changePurchaseDetailsVisible(false);
+    }
+    toSubmit () {
+        const { Specs } = this.state;
+        const { postOffer } = this.props.actions;
+        let OfferSpecs = [];
+        Specs.map(item => {
+            item.childrenList.map(row => {
+                OfferSpecs.push({
+                    PurchaseSpecID: row.PurchaseSpecID,
+                    Price: row.Price,
+                    SpecDescribe: row.SpecDescribe,
+                    Num: row.Num,
+                    OfferFiles: row.OfferFiles,
+                    Source: row.Source
+                });
+            });
+        });
+        postOffer({}, {
+            PurchaseID: this.purchaseid,
+            OfferDescribe: '',
+            NurseryBaseID: '',
+            SupplierID: '',
+            OfferSpecs
+        }).then(rep => {
+            if (rep.code === 1) {
+                message.success('报价成功了');
+            } else {
+                message.error('报价失败,' + rep.msg);
+            }
+        });
     }
 }
 

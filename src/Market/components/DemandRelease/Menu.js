@@ -8,7 +8,7 @@ class Menu extends Component {
         super(props);
         this.state = {
             dataList: [], // 规格列表
-            TreeTypes: [], // 品种数组
+            TreeTypes: '', // 采购品种列表
             StartTime: '',
             EndTime: ''
         };
@@ -17,6 +17,7 @@ class Menu extends Component {
         this.returnTag = this.returnTag.bind(this); // 返回标签
     }
     componentDidMount () {
+        // 报价起止时间
         if (this.props.record) {
             let StartTime = this.props.record['StartTime'].split(' ')[0];
             let EndTime = this.props.record['EndTime'].split(' ')[0];
@@ -25,6 +26,7 @@ class Menu extends Component {
                 EndTime
             });
         }
+        // 项目名称和标段
         if (this.props.projectList && this.props.record) {
             this.props.projectList.map(item => {
                 if (item.No === this.props.record.ProjectName) {
@@ -61,15 +63,14 @@ class Menu extends Component {
             });
             console.log(dataList);
             this.setState({
-                dataList,
-                TreeTypes
+                dataList
             });
         });
     }
     componentWillReceiveProps (nextProps) {
     }
     render () {
-        const { dataList, TreeTypes, StartTime, EndTime, ProjectName, Section } = this.state;
+        const { dataList, StartTime, EndTime, ProjectName, Section } = this.state;
         const { record } = this.props;
         let CreateTime = record.CreateTime ? record.CreateTime.split(' ')[0] : '';
         return (
@@ -82,12 +83,11 @@ class Menu extends Component {
                                 {
                                     this.returnTag()
                                 }
-                                
                             </h3>
                             <p className='text-p'>报价起止时间：{StartTime}至{EndTime}</p>
-                            <p className='text-p'>用苗地：{record.UseNurseryAddress}</p>
+                            <p className='text-p'>用苗地址：{record.UseNurseryAddress}</p>
                             <p className='text-p'>采购品种：
-                                {TreeTypes}
+                                {record.TreeTypes}
                             </p>
                             <p className='text-p'>联系方式：{record.Phone}({record.Contacter})</p>
                         </Col>

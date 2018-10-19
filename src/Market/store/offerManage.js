@@ -2,7 +2,7 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {createFetchActionWithHeaders as myFetch} from './fetchAction';
 import {
-    FOREST_API, SEEDLING_API
+    FOREST_API, SEEDLING_API, SERVICE_API
 } from '_platform/api';
 
 export const ID = 'Market_supermarket_supplyRelease';
@@ -13,6 +13,7 @@ export const getPurchaseList = createFetchAction(`${SEEDLING_API}/purchase/purch
 export const getPurchaseById = createFetchAction(`${SEEDLING_API}/purchase/purchase/{{id}}`); // 根据ID获取采购单
 export const getPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/specs`); // 获取采购单规格
 export const getWpunittree = createFetchAction(`${FOREST_API}/tree/wpunittree`); // 获得所有项目
+export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`); // 根据pk获取组织机构
 
 export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=mall`, [], 'POST'); // 上传图片
 
@@ -26,6 +27,8 @@ export const actions = {
     getPurchaseById,
     getPurchaseStandard,
     getWpunittree,
+    getOrgTree_new,
+    postUploadImage,
     changeOfferDetailsVisible,
     changeOfferDetailsKey
 };

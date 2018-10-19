@@ -17,7 +17,7 @@ class Menu extends Component {
         this.returnTag = this.returnTag.bind(this); // 返回标签
     }
     componentDidMount () {
-        // 开始结束时间
+        // 报价起止时间
         if (this.props.record) {
             let StartTime = this.props.record['StartTime'].split(' ')[0];
             let EndTime = this.props.record['EndTime'].split(' ')[0];
@@ -25,7 +25,15 @@ class Menu extends Component {
                 StartTime,
                 EndTime
             });
+            // 获取发布单位
+            const { getOrgTree_new } = this.props.actions;
+            getOrgTree_new({code: this.props.record.CreaterOrg}).then(rep => {
+                this.setState({
+                    organizationName: rep.name
+                });
+            });
         }
+        // 项目名称和标段
         if (this.props.projectList && this.props.record) {
             this.props.projectList.map(item => {
                 if (item.No === this.props.record.ProjectName) {
@@ -83,7 +91,7 @@ class Menu extends Component {
                             </h3>
                             <p className='text-p'>报价起止时间：{StartTime}至{EndTime}</p>
                             <p className='text-p'>发布单位：</p>
-                            <p className='text-p'>用苗地：{record.UseNurseryAddress}</p>
+                            <p className='text-p'>用苗地址：{record.UseNurseryAddress}</p>
                             <p className='text-p'>采购品种：
                                 {TreeTypes}
                             </p>

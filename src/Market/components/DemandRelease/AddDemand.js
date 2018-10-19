@@ -144,7 +144,8 @@ class AddDemand extends Component {
                         if (row.LevelType === '2' && item.value === row.ParentId) {
                             arrCity.push({
                                 value: row.ID,
-                                label: row.Name
+                                label: row.Name,
+                                ParentId: row.ParentId
                             });
                         }
                     });
@@ -154,7 +155,9 @@ class AddDemand extends Component {
                             if (record.LevelType === '3' && row.value === record.ParentId) {
                                 arrCounty.push({
                                     value: record.ID,
-                                    label: record.Name
+                                    label: record.Name,
+                                    MergerName: record.MergerName,
+                                    ParentId: record.ParentId
                                 });
                             }
                         });
@@ -340,7 +343,7 @@ class AddDemand extends Component {
                                     }
                                 </Select>
                             </FormItem>
-                            <FormItem label='用苗地'>
+                            <FormItem label='用苗地址'>
                                 {getFieldDecorator('UseNurseryRegionCode', {
                                     rules: [{required: true, message: '必填项'}],
                                     initialValue: [provinceCode, sityCode, RegionCode]
