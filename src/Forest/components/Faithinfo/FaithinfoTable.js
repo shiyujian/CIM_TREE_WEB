@@ -108,7 +108,7 @@ export default class FaithinfoTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -120,7 +120,7 @@ export default class FaithinfoTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
-                            onChange={this.ontypechange.bind(this)}
+                            onChange={this.onTypeChange.bind(this)}
                         >
                             {typeoption}
                         </Select>
@@ -218,27 +218,18 @@ export default class FaithinfoTable extends Component {
         changeModal1(true);
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || ''
         });
     }
 
-    ontypechange (value) {
+    onTypeChange (value) {
         const { typeselect } = this.props;
         typeselect(value || '');
         this.setState({ bigType: value || '', treetype: '', treetypename: '' });
-    }
-
-    ontreetypechange (value) {
-        const { treetypelist } = this.props;
-        let treetype = treetypelist.find(rst => rst.TreeTypeName == value);
-        this.setState({
-            treetype: treetype ? treetype.ID : '',
-            treetypename: value || ''
-        });
     }
 
     factorychange (value) {

@@ -157,7 +157,7 @@ export default class CarPackage extends Component {
                             key={resetkey}
                             {...this.props}
                             sectionoption={sectionoption}
-                            sectionselect={this.sectionselect.bind(this)}
+                            sectionSelect={this.sectionSelect.bind(this)}
                             statusoption={statusoption}
                             mmtypeoption={mmtypeoption}
                             leftkeycode={leftkeycode}
@@ -238,7 +238,7 @@ export default class CarPackage extends Component {
         }
     }
 
-    sectionselect (value) {
+    sectionSelect (value) {
     }
 
     // 重置

@@ -31,7 +31,7 @@ export default class TreeAdoptTree extends Component {
 
     render () {
         const {
-            searchTree,
+            searchTree = [],
             searchValue
         } = this.state;
         let contents = [];
@@ -68,34 +68,43 @@ export default class TreeAdoptTree extends Component {
             }
         } = this.props;
         try {
-            let postdata = {
-                aadopter: value
-            };
-            let data = await getAdoptTreeByAdopter(postdata);
-            console.log('data', data);
-            let adoptTrees = (data && data.content) || [];
-            for (let i = 0; i < adoptTrees.length; i++) {
-                let adoptTree = adoptTrees[i];
-                let SXM = adoptTree.SXM;
-                let treeData = await getTreeLocation({sxm: SXM});
-                let treeMess = treeData && treeData.content && treeData.content[0];
-                if (treeMess && treeMess.X && treeMess.Y) {
-                    adoptTree.X = (treeMess && treeMess.X) ? treeMess.X : '';
-                    adoptTree.Y = (treeMess && treeMess.Y) ? treeMess.Y : '';
+            if (value) {
+                let postdata = {
+                    aadopter: value
+                };
+                let data = await getAdoptTreeByAdopter(postdata);
+                console.log('data', data);
+                let adoptTrees = (data && data.content) || [];
+                console.log('adoptTrees', adoptTrees);
+                for (let i = 0; i < adoptTrees.length; i++) {
+                    let adoptTree = adoptTrees[i];
+                    let SXM = adoptTree.SXM;
+                    let treeData = await getTreeLocation({sxm: SXM});
+                    let treeMess = treeData && treeData.content && treeData.content[0];
+                    if (treeMess && treeMess.X && treeMess.Y) {
+                        adoptTree.X = (treeMess && treeMess.X) ? treeMess.X : '';
+                        adoptTree.Y = (treeMess && treeMess.Y) ? treeMess.Y : '';
+                    }
                 }
-            }
-            // 去除没有定位数据的
-            for (let i = 0; i < adoptTrees.length; i++) {
-                if (!(adoptTrees[i] && adoptTrees[i].X && adoptTrees[i].Y)) {
-                    adoptTrees.splice(i, 1);
+                // 去除没有定位数据的
+                for (let i = 0; i < adoptTrees.length; i++) {
+                    if (!(adoptTrees[i] && adoptTrees[i].X && adoptTrees[i].Y)) {
+                        adoptTrees.splice(i, 1);
+                    }
                 }
+                console.log('adoptTrees', adoptTrees);
+                this.originOnCheck(adoptTrees);
+                this.setState({
+                    searchTree: adoptTrees,
+                    searchValue: value
+                });
+            } else {
+                this.originOnCheck([]);
+                this.setState({
+                    searchTree: [],
+                    searchValue: value
+                });
             }
-            console.log('adoptTrees', adoptTrees);
-            this.originOnCheck(adoptTrees);
-            this.setState({
-                searchTree: adoptTrees,
-                searchValue: value
-            });
         } catch (e) {
             console.log('searchTree', e);
         }

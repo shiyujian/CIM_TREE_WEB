@@ -148,7 +148,7 @@ class Addition extends Component {
         if (user.is_superuser) {
             systemRoles.push({
                 name: '苗圃职务',
-                children: ['苗圃'],
+                children: ['苗圃', '苗圃文书'],
                 value: roles.filter(role => role.grouptype === 0)
             });
             systemRoles.push({
@@ -176,11 +176,6 @@ class Addition extends Component {
                 value: roles.filter(role => role.grouptype === 3)
             });
             systemRoles.push({
-                name: '苗圃基地职务',
-                children: ['苗圃基地', '苗圃文书'],
-                value: roles.filter(role => role.grouptype === 5)
-            });
-            systemRoles.push({
                 name: '供应商职务',
                 children: ['供应商', '供应商文书'],
                 value: roles.filter(role => role.grouptype === 6)
@@ -192,7 +187,7 @@ class Addition extends Component {
                     case 0:
                         systemRoles.push({
                             name: '苗圃职务',
-                            children: ['苗圃'],
+                            children: ['苗圃', '苗圃文书'],
                             value: roles.filter(role => role.grouptype === 0)
                         });
                         break;
@@ -237,13 +232,6 @@ class Addition extends Component {
                         });
                         break;
                     case 5:
-                        systemRoles.push({
-                            name: '苗圃基地职务',
-                            children: ['苗圃基地', '苗圃文书'],
-                            value: roles.filter(role => role.grouptype === 5)
-                        });
-                        break;
-                    case 6:
                         systemRoles.push({
                             name: '供应商职务',
                             children: ['供应商', '供应商文书'],

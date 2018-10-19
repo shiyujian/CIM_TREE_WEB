@@ -157,15 +157,15 @@ export default class Supervisorinfo extends Component {
                             key={resetkey}
                             {...this.props}
                             sectionoption={sectionoption}
-                            sectionselect={this.sectionselect.bind(this)}
+                            sectionSelect={this.sectionSelect.bind(this)}
                             smallclassoption={smallclassoption}
-                            smallclassselect={this.smallclassselect.bind(this)}
+                            smallClassSelect={this.smallClassSelect.bind(this)}
                             thinclassoption={thinclassoption}
                             typeselect={this.typeselect.bind(this)}
                             bigType={bigType}
                             typeoption={typeoption}
                             treetypeoption={treetypeoption}
-                            thinclassselect={this.thinclassselect.bind(this)}
+                            thinClassSelect={this.thinClassSelect.bind(this)}
                             statusoption={statusoption}
                             leftkeycode={leftkeycode}
                             keycode={keycode}
@@ -245,7 +245,7 @@ export default class Supervisorinfo extends Component {
         }
     }
     // 标段选择
-    sectionselect (value) {
+    sectionSelect (value) {
         const {
             sectionsData
         } = this.state;
@@ -280,7 +280,7 @@ export default class Supervisorinfo extends Component {
     }
 
     // 小班选择, 重新获取: 细班
-    smallclassselect (value) {
+    smallClassSelect (value) {
         const {
             smallClassesData
         } = this.state;
@@ -314,7 +314,7 @@ export default class Supervisorinfo extends Component {
         }
     }
     // 细班选择, 重新获取: 树种
-    thinclassselect (value) {}
+    thinClassSelect (value) {}
     // 类型选择, 重新获取: 树种
     typeselect (value) {
         const { treetypes } = this.props;

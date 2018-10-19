@@ -198,11 +198,11 @@ export default class Locmeasureinfo extends Component {
                             key={resetkey}
                             {...this.props}
                             sectionoption={sectionoption}
-                            sectionselect={this.sectionselect.bind(this)}
+                            sectionSelect={this.sectionSelect.bind(this)}
                             smallclassoption={smallclassoption}
-                            smallclassselect={this.smallclassselect.bind(this)}
+                            smallClassSelect={this.smallClassSelect.bind(this)}
                             thinclassoption={thinclassoption}
-                            thinclassselect={this.thinclassselect.bind(this)}
+                            thinClassSelect={this.thinClassSelect.bind(this)}
                             bigType={bigType}
                             typeoption={typeoption}
                             typeselect={this.typeselect.bind(this)}
@@ -289,7 +289,7 @@ export default class Locmeasureinfo extends Component {
             console.log('e', e);
         }
     }
-    sectionselect (value) {
+    sectionSelect (value) {
         const {
             sectionsData
         } = this.state;
@@ -323,7 +323,7 @@ export default class Locmeasureinfo extends Component {
         }
     }
     // 小班选择, 重新获取: 细班
-    smallclassselect (value) {
+    smallClassSelect (value) {
         const {
             smallClassesData
         } = this.state;
@@ -358,7 +358,7 @@ export default class Locmeasureinfo extends Component {
     }
 
     // 细班选择, 重新获取: 树种
-    thinclassselect (value) {
+    thinClassSelect (value) {
     }
 
     // 类型选择, 重新获取: 树种

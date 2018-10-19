@@ -25,8 +25,8 @@ export const getSectionName = (section) => {
     }
     return sectionName;
 };
-// 点击区域地块处理细班坐标数据
-export const handleAreaLayerData = async (eventKey, treeNodeName, getTreearea) => {
+// 点击区域地块处理细班设计坐标数据
+export const handleAreaDesignLayerData = async (eventKey, treeNodeName, getTreearea) => {
     let handleKey = eventKey.split('-');
     let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
     let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
@@ -62,7 +62,47 @@ export const handleAreaLayerData = async (eventKey, treeNodeName, getTreearea) =
         console.log('await', e);
     }
 };
-
+// 点击区域地块处理细班实际坐标数据
+export const handleAreaRealLayerData = async (eventKey, treeNodeName, getTreearea) => {
+    let handleKey = eventKey.split('-');
+    let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+    let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+    try {
+        let rst = await getTreearea({}, { no: no });
+        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
+            return;
+        }
+        let coords = [];
+        let str = '';
+        let contents = rst.content;
+        let data = contents.find(content => content.Section === section);
+        // 更新后的坐标数据是否存在
+        let wkt = data.coords;
+        if (data.actualcoords) {
+            wkt = data.actualcoords;
+        }
+        if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+            let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
+            let arr = data.split('),(');
+            arr.map((a, index) => {
+                if (index === 0) {
+                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                } else if (index === arr.length - 1) {
+                    str = a.slice(0, a.indexOf(')'));
+                } else {
+                    str = a;
+                }
+                coords.push(str);
+            });
+        } else if (wkt.indexOf('POLYGON') !== -1) {
+            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+            coords.push(str);
+        }
+        return coords;
+    } catch (e) {
+        console.log('await', e);
+    }
+};
 // 获取任务中的标段，小班，细班名称
 export const getTaskThinClassName = (task, totalThinClass) => {
     try {

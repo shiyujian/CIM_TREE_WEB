@@ -28,7 +28,6 @@ export default class Roles extends Component {
         const professionRoles = roles.filter(role => role.grouptype === 2);
         const departmentRoles = roles.filter(role => role.grouptype === 3);
         const curingRoles = roles.filter(role => role.grouptype === 4);
-        const nurseryBaseRoles = roles.filter(role => role.grouptype === 5);
         const supplierRoles = roles.filter(role => role.grouptype === 6);
         const TabPane = Tabs.TabPane;
         return (
@@ -164,7 +163,7 @@ export default class Roles extends Component {
                             />
                         </Card>
                     </TabPane>
-                    <TabPane tab='供应商角色' key='7'>
+                    <TabPane tab='供应商角色' key='6'>
                         <Card
                             title='供应商角色'
                             extra={
