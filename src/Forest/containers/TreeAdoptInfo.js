@@ -138,7 +138,7 @@ export default class TreeAdoptInfo extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='苗木结缘信息' {...this.props} />
+                    <DynamicTitle title='苗木状态信息' {...this.props} />
                     <Sidebar width={190}>
                         <PkCodeTree
                             treeData={treeList}

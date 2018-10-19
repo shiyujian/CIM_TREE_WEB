@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-11 14:22:58
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-11 16:29:41
+ * @Last Modified time: 2018-10-18 19:58:16
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -42,8 +42,6 @@ export default class Project extends Component {
             location: {pathname = ''} = {},
             match: {params: {module = ''} = {}} = {}
         } = this.props;
-        console.log('this.props2222222222222', this.props);
-        console.log('pathname22222222222222', pathname);
         const {
             AuxiliaryAcceptance,
             defaultOpenKeys
