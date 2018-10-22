@@ -416,3 +416,20 @@ export const loopArrayCompany = (loopData) => {
         console.log('loopArrayCompany', e);
     }
 };
+
+// 判断用户是否为文书
+export const getUserIsDocument = () => {
+    try {
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        let groups = user.groups;
+        let userIsDocument = false;
+        groups.map((group) => {
+            if (group.name.indexOf('文书') !== -1) {
+                userIsDocument = true;
+            }
+        });
+        return userIsDocument;
+    } catch (e) {
+        console.log('getUserIsDocument', e);
+    }
+};

@@ -39,14 +39,14 @@ class Users extends Component {
             fristRoles: [],
             TreeCodes: '',
             isBtn: true,
-            objPage: '',
             objPages: '',
             record: null,
             showModal: false,
             dataList: [], // 表格数据用户
             userName: '', // 用户名称
             page: 1, // 当前页
-            total: 0
+            total: 0,
+            userStatus: '' // 状态
         };
         this.handleAudit = this.handleAudit.bind(this); // 审核
         this.handleCancel = this.handleCancel.bind(this); // 取消
@@ -63,7 +63,12 @@ class Users extends Component {
     componentWillReceiveProps (nextProps) {
         this.setState({ TreeCodes: this.props.getTreeCodes });
         if (this.state.TreeCodes !== this.props.getTreeCodes) {
-            this.setState({ roles: [] });
+            // 在重新选择树节点之后，将页数进行修改
+            this.setState({
+                roles: [],
+                userStatus: '',
+                objPages: 1
+            });
         }
         if (nextProps.platform.users) {
             this.setState({
@@ -84,6 +89,12 @@ class Users extends Component {
         changeAdditionField('roles', value);
         this.setState({
             roles: value
+        });
+    }
+
+    changeUserStatus (value) {
+        this.setState({
+            userStatus: value
         });
     }
     changeSections (value) {
@@ -130,7 +141,7 @@ class Users extends Component {
         const {
             actions: { getUsers, getTablePage, getIsBtn }
         } = this.props;
-        if (text || (this.state.roles && this.state.roles.length > 0)) {
+        if (text || (this.state.roles && this.state.roles.length > 0) || (this.state.userStatus !== '')) {
             this.setState({ loading: true });
             getUsers(
                 {},
@@ -138,6 +149,7 @@ class Users extends Component {
                     org_code: this.props.getTreeCodes,
                     keyword: text,
                     roles: this.state.roles,
+                    is_active: this.state.userStatus,
                     page: 1
                 }
             ).then(items => {
@@ -182,7 +194,8 @@ class Users extends Component {
     clear () {
         document.getElementById('NurseryData').value = '';
         this.setState({
-            roles: []
+            roles: [],
+            userStatus: ''
         });
         const {
             actions: { getUsers, getTablePage, getIsBtn }
@@ -276,6 +289,22 @@ class Users extends Component {
         const projectRoles = roles.filter(role => role.grouptype === 1);
         const professionRoles = roles.filter(role => role.grouptype === 2);
         const departmentRoles = roles.filter(role => role.grouptype === 3);
+        const userc = JSON.parse(
+            window.localStorage.getItem('QH_USER_DATA')
+        );
+        let groups = userc.groups || [];
+        // 是否为供应商文书
+        let userIsSupplierDocument = false;
+        // 是否为施工，监理，业主文书
+        let userIsProjectDocument = false;
+        groups.map((group) => {
+            if (group.name === '供应商文书') {
+                userIsSupplierDocument = true;
+            }
+            if (group.name === '业主文书' || group.name === '监理文书' || group.name === '施工文书') {
+                userIsProjectDocument = true;
+            }
+        });
         const columns = [
             {
                 title: '序号',
@@ -370,9 +399,7 @@ class Users extends Component {
                             node = {}
                         } = {}
                     } = this.props;
-                    const userc = JSON.parse(
-                        window.localStorage.getItem('QH_USER_DATA')
-                    );
+
                     let editVisible = true;
                     if (userc && userc.username !== 'admin' && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
                         editVisible = false;
@@ -434,9 +461,8 @@ class Users extends Component {
                             arr = ['/'];
                         }
                     }
-
-                    // 供应商文书权限
-                    if (userc.groups.length > 0 && userc.groups[0]['id'] === 64) {
+                    // 供应商文书权限 // 项目相关文书，施工，监理，业主文书权限
+                    if (userIsSupplierDocument || userIsProjectDocument) {
                         if (record.is_active) {
                             arr = [
                                 <a
@@ -469,21 +495,20 @@ class Users extends Component {
                 }
             }
         ];
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         let is_active = false;
-        if (user.is_superuser) {
+        if (userc.is_superuser) {
             is_active = true;
         } else {
             if (code) {
-                const ucodes = user.account.org_code.split('_');
+                const ucodes = userc.account.org_code.split('_');
                 if (ucodes.length > 5) {
                     ucodes.pop();
                     const codeu = ucodes.join();
                     const ucode = codeu.replace(/,/g, '_');
-                    is_active = this.compare(user, ucode, code, node);
+                    is_active = this.compare(userc, ucode, code, node);
                 } else {
-                    const ucode = user.account.org_code.substring(0, 9);
-                    is_active = this.compare(user, ucode, code, node);
+                    const ucode = userc.account.org_code.substring(0, 9);
+                    is_active = this.compare(userc, ucode, code, node);
                 }
             }
         }
@@ -498,7 +523,7 @@ class Users extends Component {
                 >
                     <div>
                         <Row style={{ marginBottom: '20px' }}>
-                            <Col span={9}>
+                            <Col span={6}>
                                 <label
                                     style={{
                                         minWidth: 60,
@@ -514,13 +539,13 @@ class Users extends Component {
                                     onChange={this.handleUserName.bind(this)}
                                 />
                             </Col>
-                            <Col span={7}>
+                            <Col span={5}>
                                 <Select
                                     placeholder='请选择角色'
                                     value={this.state.roles || []}
                                     onChange={this.changeRoles.bind(this)}
                                     mode='multiple'
-                                    style={{ width: '100%' }}
+                                    style={{ width: '100%', paddingRight: 20 }}
                                 >
                                     <OptGroup label='苗圃角色'>
                                         {systemRoles.map(role => {
@@ -570,6 +595,17 @@ class Users extends Component {
                                             );
                                         })}
                                     </OptGroup>
+                                </Select>
+                            </Col>
+                            <Col span={5}>
+                                <Select
+                                    placeholder='请选择状态'
+                                    value={this.state.userStatus || []}
+                                    onChange={this.changeUserStatus.bind(this)}
+                                    style={{ width: '100%' }}
+                                >
+                                    <Option key='已审核' title='已审核' value='true' >已审核</Option>
+                                    <Option key='未审核' title='未审核' value='false' >未审核</Option>
                                 </Select>
                             </Col>
                             <Col span={4}>
@@ -697,6 +733,7 @@ class Users extends Component {
                     org_code: this.props.getTreeCodes,
                     keyword: text,
                     roles: this.state.roles,
+                    is_active: this.state.userStatus,
                     page: obj.current
                 }
             ).then(e => {
@@ -718,11 +755,6 @@ class Users extends Component {
             sidebar: { node } = {},
             actions: { putUser }
         } = this.props;
-        // const roles = addition.roles || [];
-        // if (this.selectedCodes == undefined) {
-        // 	message.warn('请您选择需要添加角色的人');
-        // 	return
-        // }
         for (let i = 0; i < users.length; i++) {
             const element = users[i];
             for (let j = 0; j < this.selectedCodes.length; j++) {
@@ -731,38 +763,6 @@ class Users extends Component {
                     putUser(
                         {},
                         {
-                            /*						username: element.username,
-												email: element.email,
-												// password: addition.password, // 密码不能变？信息中没有密码
-												account: {
-													person_name: element.person_name,
-													person_type: "C_PER",
-													person_avatar_url: "",
-													// organization: {
-													// 	pk: '229356816973',
-													// 	code: "ORG_02_31_02",
-													// 	obj_type: "C_ORG",
-													// 	rel_type: "member",
-													// 	name: '施工队'
-													// },
-												},
-												tags: [{ id: tags[this.state.tag].ID, name: tags[this.state.tag].NurseryName }],
-												//sections: this.state.sections,
-												// groups: roles.map(role => +role),
-												is_active: true,
-												basic_params: {
-													info: {
-														'电话': element.person_telephone || '',
-														'性别': element.gender || '',
-														'技术职称': element.title || '',
-														'phone': element.person_telephone || '',
-														'sex': element.gender || '',
-														'duty': ''
-													}
-												},
-												extra_params: {},
-												title: element.title || '' */
-
                             id: element.id,
                             username: element.username,
                             email: element.email,
@@ -1128,12 +1128,6 @@ class Users extends Component {
         } = this.props;
         getIsActive(user.is_active);
 
-        // if (node.children && node.children.length > 0) {
-        // 	message.warn('请选择最下级组织结构目录');
-
-        // } else {
-
-        // }
         getSwitch(user.is_black);
         resetAdditionField({
             visible: true,
@@ -1153,6 +1147,7 @@ class Users extends Component {
             org_code,
             roles,
             keyword: userName,
+            is_active: this.state.userStatus,
             page
         }).then(rep => {
             this.setState({
@@ -1193,7 +1188,8 @@ class Users extends Component {
                         {
                             org_code: this.props.getTreeCodes,
                             keyword: text,
-                            roles: this.state.roles
+                            roles: this.state.roles,
+                            is_active: this.state.userStatus
                         }
                     ).then(items => {
                         if (items && items.length === 0) {

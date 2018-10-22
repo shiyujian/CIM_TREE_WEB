@@ -91,7 +91,7 @@ export const tree_menus = [
         key: 'checkwork',
         id: 'CHECKWORK',
         title: '考勤管理',
-        path: '/checkwork/electronicfence',
+        path: '/checkwork/attendancecount',
         icon: <Icon name='print' />
     },
     {

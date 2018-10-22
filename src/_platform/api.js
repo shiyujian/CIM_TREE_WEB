@@ -745,17 +745,24 @@ export const MODULES = [
         name: '考勤管理',
         children: [
             {
-                id: 'CHECKWORK.ELECTRONICFENCE',
-                name: '电子围栏'
-            },
-            {
                 id: 'CHECKWORK.ATTENDANCECOUNT',
                 name: '考勤统计'
             },
             {
-                id: 'CHECKWORK.ATTENDANCEGROUP',
-                name: '考勤群体'
-            }
+                id: 'CHECKWORK.SETUP',
+                name: '考勤设置',
+                children: [
+                    {
+                        id: 'CHECKWORK.ELECTRONICFENCE',
+                        name: '电子围栏'
+                    },
+                    {
+                        id: 'CHECKWORK.ATTENDANCEGROUP',
+                        name: '考勤群体'
+                    }
+                ]
+            },
+           
         ]
     },
     {
