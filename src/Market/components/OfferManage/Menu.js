@@ -48,30 +48,11 @@ class Menu extends Component {
             });
         }
         // 根据采购单id获取采购单规格
-        const { getPurchaseStandard } = this.props.actions;
-        getPurchaseStandard({}, {
+        const { getOffersById } = this.props.actions;
+        getOffersById({}, {
             purchaseid: this.props.record.ID
         }).then(rep => {
-            let dataList = [];
-            let TreeTypes = [];
-            rep.map(item => {
-                if (!TreeTypes.includes(item.TreeTypeName)) {
-                    TreeTypes.push(item.TreeTypeName);
-                }
-            });
-            TreeTypes.map(item => {
-                let arr = [];
-                rep.map(row => {
-                    if (row.TreeTypeName === item) {
-                        arr.push({...row});
-                    }
-                });
-                dataList.push({name: item, children: arr});
-            });
-            this.setState({
-                dataList,
-                TreeTypes
-            });
+            console.log(rep);
         });
     }
     render () {

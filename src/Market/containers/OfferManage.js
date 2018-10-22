@@ -37,7 +37,7 @@ export default class DemandRelease extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='需求发布' {...this.props} />
+                    <DynamicTitle title='报价管理' {...this.props} />
                     <Content>
                         {
                             offerDetailsVisible ? <OfferDetails {...this.props} /> : <OfferList {...this.props} />

@@ -12,6 +12,7 @@ export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], '
 export const getPurchaseList = createFetchAction(`${SEEDLING_API}/purchase/purchases`); // 获取采购列表
 export const getPurchaseById = createFetchAction(`${SEEDLING_API}/purchase/purchase/{{id}}`); // 根据ID获取采购单
 export const getPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/specs`); // 获取采购单规格
+export const getOffersById = createFetchAction(`${SEEDLING_API}/purchase/offers`); // 根据采购单ID获取采购报价清单
 export const getWpunittree = createFetchAction(`${FOREST_API}/tree/wpunittree`); // 获得所有项目
 export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`); // 根据pk获取组织机构
 
@@ -26,6 +27,7 @@ export const actions = {
     getPurchaseList,
     getPurchaseById,
     getPurchaseStandard,
+    getOffersById,
     getWpunittree,
     getOrgTree_new,
     postUploadImage,
