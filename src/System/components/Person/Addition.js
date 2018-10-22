@@ -413,6 +413,7 @@ class Addition extends Component {
             actions: { changeAdditionField },
             orgTreeSelect
         } = this.props;
+        console.log(addition, '原始数据');
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         let units = this.getUnits();
         let avatar_url = '';
@@ -524,6 +525,7 @@ class Addition extends Component {
         if (!user.is_superuser) {
             marginTops = '55px';
         }
+        console.log(addition, '编辑信息');
         return (
             <div>
                 {addition.visible && (
@@ -635,7 +637,7 @@ class Addition extends Component {
                                             }`,
                                             rules: [
                                                 {
-                                                    required: false,
+                                                    required: true,
                                                     message: '请输入身份证号码'
                                                 }
                                             ]
@@ -1209,7 +1211,8 @@ class Addition extends Component {
                 getSwitch,
                 postUploadAutograph,
                 putUserBlackList,
-                getForestAllUsersData
+                getForestAllUsersData,
+                getMobileCheck
             }
         } = this.props;
         const roles = addition.roles || [];
@@ -1338,6 +1341,7 @@ class Addition extends Component {
         if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
             message.warn('请输入英文字符、数字');
         } else {
+            debugger
             if (addition.id) {
                 for (let i = 0; i < users.length; i++) {
                     // const element = users[i];
@@ -1459,6 +1463,16 @@ class Addition extends Component {
             } else {
                 this.props.form.validateFields((err, values) => {
                     if (!err) {
+                        // 先进行实名认证再注册用户
+                        getMobileCheck({}, {
+                            idCard: addition.id_num,
+                            mobile: addition.person_telephone,
+                            name: addition.person_name
+                        }).then(rep => {
+                            debugger
+                        });
+                        console.log(addition, '注册用户');
+                        debugger
                         postUser(
                             {},
                             {
