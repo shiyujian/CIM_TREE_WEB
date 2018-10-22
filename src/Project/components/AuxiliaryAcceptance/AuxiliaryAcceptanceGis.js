@@ -9,7 +9,12 @@ import AreaTree from './AreaTree';
 import {
     handleAreaRealLayerData,
     handleCoordinates,
-    fillAreaColor
+    fillAreaColor,
+    getHandleWktData,
+    computeSignedArea,
+    getSmallThinNameByThinClassData,
+    getSectionNameBySection,
+    getProjectNameBySection
 } from '_platform/gisAuth';
 import AuxiliaryAcceptanceModal from './AuxiliaryAcceptanceModal';
 
@@ -25,11 +30,17 @@ export default class AuxiliaryAcceptanceGis extends Component {
             areaTreeLoading: false,
             areaLayerList: {}, // 区域地块图层list
             realThinClassLayerList: {}, // 实际细班种植图层
-            createBtnVisible: false,
-            coordinates: [],
+            createBtnVisible: false, // 确定，后退，撤销的visible
+            coordinates: [], // 圈选地图的坐标数组
             polygonData: '', // 圈选地图图层
-            auxiliaryModalVisible: false,
-            noLoading: true
+            auxiliaryModalVisible: false, // modal的visible
+            noLoading: true, // modal的loading效果
+            areaEventKey: '',
+            selectProjectName: '',
+            selectSectionNo: '',
+            selectSectionName: '',
+            selectThinClassNo: '',
+            selectThinClassName: ''
 
         };
         this.tileLayer = null;
@@ -448,14 +459,56 @@ export default class AuxiliaryAcceptanceGis extends Component {
     // 计算圈选区域面积
     _handleCreateBtnOk = async () => {
         const {
-            coordinates
+            coordinates,
+            areaEventKey
         } = this.state;
+        const {
+            actions: {
+                postThinClassesByRegion // 查询圈选地图内的细班
+            },
+            platform: {
+                tree = {}
+            }
+        } = this.props;
         try {
             this.setState({
                 auxiliaryModalVisible: true
             });
+            let thinClassTree = tree.thinClassTree;
+            // 坐标
+            let wkt = '';
+            // 选择面积
+            let regionArea = 0;
+            wkt = 'POLYGON(';
+            // 获取手动框选坐标wkt
+            wkt = wkt + getHandleWktData(coordinates);
+            wkt = wkt + ')';
+            regionArea = computeSignedArea(coordinates, 2);
+            regionArea = regionArea * 0.0015;
+
+            let areaEventKeyArr = areaEventKey.split('-');
+            let selectSectionNo = areaEventKeyArr[0] + '-' + areaEventKeyArr[1] + '-' + areaEventKeyArr[2];
+            let selectThinClassNo = areaEventKeyArr[0] + '-' + areaEventKeyArr[1] + '-' + areaEventKeyArr[3] + '-' + areaEventKeyArr[4];
+
+            console.log('selectSectionNo', selectSectionNo);
+            console.log('thinClassTree', thinClassTree);
+            console.log('selectThinClassNo', selectThinClassNo);
+            let selectProjectName = getProjectNameBySection(selectSectionNo, thinClassTree);
+            let selectSectionName = getSectionNameBySection(selectSectionNo, thinClassTree);
+            let selectThinClassName = getSmallThinNameByThinClassData(areaEventKey, thinClassTree);
+
+            console.log('selectProjectName', selectProjectName);
+            console.log('selectSectionName', selectSectionName);
+            console.log('selectThinClassName', selectThinClassName);
             this.setState({
-                noLoading: false
+                wkt,
+                regionArea,
+                noLoading: false,
+                selectProjectName,
+                selectSectionNo,
+                selectSectionName,
+                selectThinClassNo,
+                selectThinClassName
             });
         } catch (e) {
             console.log('e', e);

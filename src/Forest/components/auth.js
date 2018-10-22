@@ -1,43 +1,4 @@
 
-export const getSectionNameBySection = (section, thinClassTree) => {
-    try {
-        let sectionArr = section.split('-');
-        let sectionName = '';
-        if (sectionArr instanceof Array && sectionArr.length === 3) {
-            thinClassTree.map((projectData) => {
-                if (sectionArr[0] === projectData.No) {
-                    let sectionData = projectData.children;
-                    sectionData.map((child) => {
-                        if (section === child.No) {
-                            sectionName = child.Name;
-                        }
-                    });
-                }
-            });
-        }
-        return sectionName;
-    } catch (e) {
-        console.log('getSectionNameBySection', e);
-    }
-};
-
-export const getProjectNameBySection = (section, thinClassTree) => {
-    try {
-        let projectName = '';
-        let sectionArr = section.split('-');
-        if (sectionArr instanceof Array && sectionArr.length === 3) {
-            thinClassTree.map((projectData) => {
-                if (sectionArr[0] === projectData.No) {
-                    projectName = projectData.Name;
-                }
-            });
-        }
-        return projectName;
-    } catch (e) {
-        console.log('getProjectNameBySection', e);
-    }
-};
-
 // 根据标段，小班，细班的数据获取小班细班的Name
 // 此处的小班数据为 001  细班数据为001 类型   不为具体的小班细班No
 export const getSmallThinNameByPlaceData = (section, smallClass, thinClass, thinClassTree) => {

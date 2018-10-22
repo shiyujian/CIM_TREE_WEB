@@ -21,9 +21,10 @@ class AuxiliaryAcceptanceModal extends Component {
         const {
             form: { getFieldDecorator },
             regionArea = 0,
-            regionSectionName,
-            regionThinName,
-            noLoading
+            noLoading,
+            selectProjectName,
+            selectSectionName,
+            selectThinClassName
         } = this.props;
         const FormItemLayout = {
             labelCol: { span: 6 },
@@ -43,7 +44,8 @@ class AuxiliaryAcceptanceModal extends Component {
             </Button>
         ];
         let footer = noLoading ? null : arr;
-        console.log('noLoading', noLoading);
+
+
         return (
 
             <Modal
@@ -57,41 +59,11 @@ class AuxiliaryAcceptanceModal extends Component {
                 <Spin spinning={noLoading}>
                     <Form>
                         <Row>
-                            <FormItem {...FormItemLayout} label='养护类型'>
-                                {getFieldDecorator('taskType', {
+                            <FormItem {...FormItemLayout} label='项目'>
+                                {getFieldDecorator('selectProject', {
+                                    initialValue: `${selectProjectName}`,
                                     rules: [
-                                        { required: true, message: '请选择养护类型' }
-                                    ]
-                                })(
-                                    <Select placeholder={'请选择养护类型'} />
-                                )}
-                            </FormItem>
-                        </Row>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='任务时间'>
-                                {getFieldDecorator('taskTime', {
-                                    rules: [
-                                        { required: true, message: '请选择任务时间' }
-                                    ]
-                                })(
-                                    <RangePicker
-                                        showTime
-                                        format='YYYY-MM-DD HH:mm:ss'
-                                        placeholder={['计划开始时间', '计划结束时间']}
-                                        style={{
-                                            width: '100%',
-                                            height: '100%'
-                                        }}
-                                    />
-                                )}
-                            </FormItem>
-                        </Row>
-                        <Row>
-                            <FormItem {...FormItemLayout} label='面积(亩)'>
-                                {getFieldDecorator('taskTreeArea', {
-                                    initialValue: `${regionArea}`,
-                                    rules: [
-                                        { required: true, message: '请输入面积' }
+                                        { required: true, message: '请输入项目名称' }
                                     ]
                                 })(
                                     <Input readOnly />
@@ -100,8 +72,8 @@ class AuxiliaryAcceptanceModal extends Component {
                         </Row>
                         <Row>
                             <FormItem {...FormItemLayout} label='标段'>
-                                {getFieldDecorator('taskSection', {
-                                    initialValue: `${regionSectionName}`,
+                                {getFieldDecorator('selectSection', {
+                                    initialValue: `${selectSectionName}`,
                                     rules: [
                                         { required: true, message: '请输入标段名称' }
                                     ]
@@ -111,11 +83,23 @@ class AuxiliaryAcceptanceModal extends Component {
                             </FormItem>
                         </Row>
                         <Row>
-                            <FormItem {...FormItemLayout} label='细班'>
-                                {getFieldDecorator('taskThinClass', {
-                                    initialValue: `${regionThinName}`,
+                            <FormItem {...FormItemLayout} label='位置'>
+                                {getFieldDecorator('selectPlace', {
+                                    initialValue: `${selectThinClassName}`,
                                     rules: [
-                                        { required: true, message: '请输入细班名称' }
+                                        { required: true, message: '请输入小班细班名称' }
+                                    ]
+                                })(
+                                    <Input readOnly />
+                                )}
+                            </FormItem>
+                        </Row>
+                        <Row>
+                            <FormItem {...FormItemLayout} label='面积(亩)'>
+                                {getFieldDecorator('selectArea', {
+                                    initialValue: `${regionArea}`,
+                                    rules: [
+                                        { required: true, message: '请输入面积' }
                                     ]
                                 })(
                                     <Input readOnly />

@@ -194,38 +194,6 @@ export const getThinClass = (smallClass, list) => {
 
     return thinClassList;
 };
-// 查找区域面积
-export const computeSignedArea = (path, type) => {
-    let radius = 6371009;
-    let len = path.length;
-    if (len < 3) return 0;
-    let total = 0;
-    let prev = path[len - 1];
-    let indexT = 1;
-    let indexG = 0;
-    if (type === 1) {
-        indexT = 0;
-        indexG = 1;
-    }
-    let prevTanLat = Math.tan(((Math.PI / 2 - prev[indexG] / 180 * Math.PI) / 2));
-    let prevLng = (prev[indexT]) / 180 * Math.PI;
-    for (let i in path) {
-        let tanLat = Math.tan((Math.PI / 2 -
-            (path[i][indexG]) / 180 * Math.PI) / 2);
-        let lng = (path[i][indexT]) / 180 * Math.PI;
-
-        // total += this.polarTriangleArea(tanLat, lng, prevTanLat, prevLng);
-        // 上边的方法无法使用，所以把函数写在这里
-        let deltaLng = lng - prevLng;
-        let t = tanLat * prevTanLat;
-        let test = 2 * Math.atan2(t * Math.sin(deltaLng), 1 + t * Math.cos(deltaLng));
-        total += test;
-
-        prevTanLat = tanLat;
-        prevLng = lng;
-    }
-    return Math.abs(total * (radius * radius));
-};
 // 点击地图上的图标展示的内容
 export const genPopUpContent = (geo) => {
     const { properties = {} } = geo;

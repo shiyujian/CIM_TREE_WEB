@@ -15,7 +15,10 @@ import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import '../index.less';
 import { getUser } from '_platform/auth';
-import { getSectionNameBySection, getProjectNameBySection } from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
 
 export default class NursOverallTable extends Component {
     constructor (props) {

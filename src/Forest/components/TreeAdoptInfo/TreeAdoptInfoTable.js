@@ -14,11 +14,13 @@ import moment from 'moment';
 import { getUser } from '_platform/auth';
 import '../index.less';
 import {
-    getSectionNameBySection,
-    getProjectNameBySection,
     getSmallThinNameByPlaceData,
     getTreeTypeNameByTreeTypeID
 } from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
 
 export default class TreeAdoptInfoTable extends Component {

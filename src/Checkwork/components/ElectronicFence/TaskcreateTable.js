@@ -6,9 +6,6 @@ import AreaTreeCreate from '../AreaTreeCreate';
 import TaskCheckTree from '../TaskCheckTree';
 import {
     fillAreaColor,
-    getHandleWktData,
-    getWktData,
-    computeSignedArea,
     genPopUpContent,
     getIconType,
     getTaskThinClassName,
@@ -19,6 +16,11 @@ import {
     handleAreaLayerData,
     handleCoordinates
 } from '../auth';
+import {
+    getHandleWktData,
+    getWktData,
+    computeSignedArea
+} from '_platform/gisAuth';
 import TaskCreateModal from './TaskCreateModal';
 import '../Checkwork.less';
 import { getUser } from '_platform/auth';
@@ -106,11 +108,11 @@ export default class TaskCreateTable extends Component {
             },
             teamsTree
         } = this.props;
-        let section = this.section;   //用户只能看到自己标段权限下的电子围栏
+        let section = this.section; // 用户只能看到自己标段权限下的电子围栏
         let teamsTrees = [];
-        if(teamsTree){
-            for(let i=0;i<teamsTree.length;i++){
-                if(section == teamsTree[i].No){
+        if (teamsTree) {
+            for (let i = 0; i < teamsTree.length; i++) {
+                if (section == teamsTree[i].No) {
                     teamsTrees.push(teamsTree[i]);
                 }
             }
@@ -237,7 +239,7 @@ export default class TaskCreateTable extends Component {
             this.setState({
                 areaTreeLoading: true
             });
-            let data = await getAreaTreeData(getTreeNodeList, getThinClassList,getCheckGroup);
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList, getCheckGroup);
             console.log('data', data);
             let totalThinClass = data.totalThinClass || [];
             let projectList = data.projectList || [];

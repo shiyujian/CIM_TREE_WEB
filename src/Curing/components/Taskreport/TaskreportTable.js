@@ -6,8 +6,6 @@ import AreaTreeReport from '../AreaTreeReport';
 import TaskSelectTree from '../TaskSelectTree';
 import {
     fillAreaColor,
-    getHandleWktData,
-    computeSignedArea,
     genPopUpContent,
     getTaskThinClassName,
     getThinClassName,
@@ -17,6 +15,10 @@ import {
     handleAreaLayerData,
     handleCoordinates
 } from '../auth';
+import {
+    getHandleWktData,
+    computeSignedArea
+} from '_platform/gisAuth';
 import '../Curing.less';
 import {
     getUser,

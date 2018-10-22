@@ -17,10 +17,12 @@ import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
 import {
-    getSectionNameBySection,
-    getProjectNameBySection,
     getSmallThinNameByPlaceData
 } from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
 
 export default class LocmeasureTable extends Component {
