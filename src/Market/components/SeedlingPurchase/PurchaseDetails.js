@@ -20,9 +20,12 @@ class PurchaseDetails extends Component {
             Contacter: '',
             Phone: '',
             organizationName: '', // 组织机构名称
-            showModal: false
+            showModal: false,
+            PurchaseSpecID: '', // 规格id
+            fileList: [] // 文件列表
         };
         this.purchaseid = ''; // 采购单ID
+        this.grouptype = ''; // 本用户组类型
         this.toReturn = this.toReturn.bind(this); // 返回
         this.toOffer = this.toOffer.bind(this); // 我要报价
         this.handleOk = this.handleOk.bind(this); // 完成上传
@@ -31,6 +34,12 @@ class PurchaseDetails extends Component {
     componentDidMount () {
         const { getPurchaseById, getWpunittree, getOrgTree_new } = this.props.actions;
         this.purchaseid = this.props.purchaseDetailsKey;
+        const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        userData.groups.map(item => {
+            if (item.grouptype === 0 || item.grouptype === 6) {
+                this.grouptype = item.grouptype;
+            }
+        });
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
             rep.Specs.map(item => {
@@ -94,7 +103,9 @@ class PurchaseDetails extends Component {
             title: '附件(pdf,jpg,png)',
             key: '5',
             dataIndex: 'OfferFiles',
-            render: text => <a onClick={this.onUpload.bind(this)}>添加附件</a>
+            render: (text, record) => {
+                return <a onClick={this.onUpload.bind(this, record)}>添加附件</a>;
+            }
         }, {
             title: '操作',
             key: '6',
@@ -113,20 +124,16 @@ class PurchaseDetails extends Component {
                 section = item.Name;
             }
         });
+        const self = this;
         const props = {
             name: 'file',
-            multiple: true,
-            action: '//jsonplaceholder.typicode.com/posts/',
-            onChange (info) {
-                const status = info.file.status;
-                if (status !== 'uploading') {
-                    console.log(info.file, info.fileList);
-                }
-                if (status === 'done') {
-                    message.success(`${info.file.name} file uploaded successfully.`);
-                } else if (status === 'error') {
-                    message.error(`${info.file.name} file upload failed.`);
-                }
+            action: '',
+            fileList: self.state.fileList,
+            beforeUpload (file, fileList) {
+                self.setState({
+                    fileList
+                });
+                return false;
             }
         };
         return (
@@ -156,7 +163,9 @@ class PurchaseDetails extends Component {
                                     <header>
                                         <span style={{display: 'inline-block', width: 50}}>{item.TreeTypeName}</span>
                                         <span style={{display: 'inline-block', width: 450, marginLeft: 20}}>胸径{item.DBH}cm 地经{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.name} {item.Num}棵</span>
-                                        <Button type='primary' style={{marginLeft: 20}} onClick={this.toOffer.bind(this, item.ID)}>我要报价</Button>
+                                        {
+                                            this.grouptype === '' ? '' : <Button type='primary' style={{marginLeft: 20}} onClick={this.toOffer.bind(this, item.ID)}>我要报价</Button>
+                                        }
                                         <span style={{marginLeft: 20}}>已有{item.Offers}人报价</span>
                                     </header>
                                     {
@@ -167,7 +176,9 @@ class PurchaseDetails extends Component {
                         })
                     }
                     <div style={{textAlign: 'center', marginTop: 20}}>
-                        <Button type='primary' onClick={this.toSubmit.bind(this)}>提&nbsp;交</Button>
+                        {
+                            this.grouptype === '' ? '' : <Button type='primary' onClick={this.toSubmit.bind(this)}>提&nbsp;交</Button>
+                        }
                     </div>
                 </Card>
                 <Modal
@@ -186,14 +197,31 @@ class PurchaseDetails extends Component {
             </div>
         );
     }
-    onUpload (e) {
+    onUpload (record, e) {
         e.preventDefault();
         this.setState({
-            showModal: true
+            showModal: true,
+            PurchaseSpecID: record.PurchaseSpecID
         });
     }
     handleOk () {
-
+        const { fileList, PurchaseSpecID, Specs } = this.state;
+        const { postUploadImage } = this.props.actions;
+        const formdata = new FormData();
+        formdata.append('a_file', fileList[0]);
+        postUploadImage({}, formdata).then(rep => {
+            Specs.map(item => {
+                item.childrenList.map(row => {
+                    if (row.PurchaseSpecID === PurchaseSpecID) {
+                        row.OfferFiles = rep;
+                    }
+                });
+            });
+            this.setState({
+                Specs,
+                showModal: false
+            });
+        });
     }
     handleCancel () {
         this.setState({
@@ -207,7 +235,6 @@ class PurchaseDetails extends Component {
                 item.childrenList[0][str] = e.target.value;
             }
         });
-        console.log(Specs);
         this.setState({
             Specs
         });
@@ -228,14 +255,12 @@ class PurchaseDetails extends Component {
                 }];
             }
         });
-        console.log(Specs);
         this.setState({
             Specs
         });
     }
     toSave (record, e) {
         e.preventDefault();
-        console.log(record);
         let { Specs } = this.state;
         Specs.map(item => {
             if (item.ID === record.PurchaseSpecID) {
