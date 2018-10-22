@@ -164,7 +164,7 @@ export default class Contrastinfo extends Component {
                             key={resetkey}
                             {...this.props}
                             sectionoption={sectionoption}
-                            sectionselect={this.sectionselect.bind(this)}
+                            sectionSelect={this.sectionSelect.bind(this)}
                             bigType={bigType}
                             typeoption={typeoption}
                             typeselect={this.typeselect.bind(this)}
@@ -249,7 +249,7 @@ export default class Contrastinfo extends Component {
         }
     }
     // 标段选择, 重新获取: 树种
-    sectionselect (value) {
+    sectionSelect (value) {
     }
 
     // 类型选择, 重新获取: 树种

@@ -30,12 +30,10 @@ export default class MarketContainer extends Component {
     render () {
         const {
             SeedlingSupply = null,
-            SupplyDetails = null,
             SeedlingPurchase = null,
-            PurchaseDetails = null,
             SupplyRelease = null,
-            AddSeedling = null,
-            DemandRelease = null
+            DemandRelease = null,
+            OfferManage = null
         } = this.state || {};
         return (
             <Body>
@@ -53,22 +51,10 @@ export default class MarketContainer extends Component {
                             component={SeedlingSupply}
                         />
                     )}
-                    {SupplyDetails && (
-                        <Route
-                            path='/market/supplydetails'
-                            component={SupplyDetails}
-                        />
-                    )}
                     {SeedlingPurchase && (
                         <Route
                             path='/market/seedlingpurchase'
                             component={SeedlingPurchase}
-                        />
-                    )}
-                    {SeedlingPurchase && (
-                        <Route
-                            path='/market/purchasedetails'
-                            component={PurchaseDetails}
                         />
                     )}
                     {SupplyRelease && (
@@ -77,16 +63,16 @@ export default class MarketContainer extends Component {
                             component={SupplyRelease}
                         />
                     )}
-                    {AddSeedling && (
-                        <Route
-                            path='/market/addseedling'
-                            component={AddSeedling}
-                        />
-                    )}
                     {DemandRelease && (
                         <Route
                             path='/market/demandrelease'
                             component={DemandRelease}
+                        />
+                    )}
+                    {OfferManage && (
+                        <Route
+                            path='/market/offermanage'
+                            component={OfferManage}
                         />
                     )}
                 </Main>
@@ -125,6 +111,12 @@ export default class MarketContainer extends Component {
             id: 'MARKET.DEMANDRELEASE',
             path: '/market/demandrelease',
             name: '需求发布'
+        },
+        {
+            key: 'offermanage',
+            id: 'MARKET.OFFERMANAGE',
+            path: '/market/offermanage',
+            name: '报价管理'
         }
     ];
     static defaultOpenKeys = ['supermarket'];

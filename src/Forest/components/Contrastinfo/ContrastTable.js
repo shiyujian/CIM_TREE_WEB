@@ -15,7 +15,13 @@ import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-import { getSectionNameBySection, getProjectNameBySection } from '../auth';
+import {
+    getSmallThinNameByPlaceData
+} from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
 
 export default class ContrastTable extends Component {
     constructor (props) {
@@ -41,37 +47,9 @@ export default class ContrastTable extends Component {
             imgArr: []
         };
     }
-    getBiao (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let sectionName = getSectionNameBySection(section, thinClassTree);
-        return sectionName;
-    }
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
-    }
-    getThinClassName (no, section) {
-        const { littleBanAll } = this.props;
-        let nob = no.substring(0, 15);
-        let sectionn = section.substring(8, 10);
-        let result = '/';
-
-        if (littleBanAll) {
-            littleBanAll.map(item => {
-                if (
-                    item.No.substring(0, 15) === nob &&
-                    item.No.substring(16, 18) === sectionn
-                ) {
-                    result = item.ThinClassName;
-                }
-            });
-        } else {
-            return <p> / </p>;
-        }
-        return result;
     }
     render () {
         const { tblData } = this.state;
@@ -145,10 +123,7 @@ export default class ContrastTable extends Component {
             // }
             {
                 title: '标段',
-                dataIndex: 'Section',
-                render: (text, record) => {
-                    return <p>{this.getBiao(text)}</p>;
-                }
+                dataIndex: 'sectionName'
             },
             {
                 title: '位置',
@@ -370,7 +345,7 @@ export default class ContrastTable extends Component {
                             suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
-                            onChange={this.sxmchange.bind(this)}
+                            onChange={this.sxmChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg10'>
@@ -380,7 +355,7 @@ export default class ContrastTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -392,7 +367,7 @@ export default class ContrastTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
-                            onChange={this.ontypechange.bind(this)}
+                            onChange={this.onTypeChange.bind(this)}
                         >
                             {typeoption}
                         </Select>
@@ -405,7 +380,7 @@ export default class ContrastTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
-                            onChange={this.ontreetypechange.bind(this)}
+                            onChange={this.onTreeTypeChange.bind(this)}
                         >
                             {treetypeoption}
                         </Select>
@@ -519,25 +494,25 @@ export default class ContrastTable extends Component {
     emitEmpty3 = () => {
         this.setState({ nursery: '' });
     };
-    sxmchange (value) {
+    sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || ''
         });
     }
 
-    ontypechange (value) {
+    onTypeChange (value) {
         const { typeselect } = this.props;
         typeselect(value || '');
         this.setState({ bigType: value || '', treetype: '', treetypename: '' });
     }
 
-    ontreetypechange (value) {
+    onTreeTypeChange (value) {
         this.setState({ treetype: value, treetypename: value });
     }
 
@@ -628,8 +603,10 @@ export default class ContrastTable extends Component {
         }
         const {
             actions: { getfactoryAnalyse },
-            keycode = ''
+            keycode = '',
+            platform: { tree = {} }
         } = this.props;
+        let thinClassTree = tree.thinClassTree;
         let postdata = {
             no: keycode,
             sxm,
@@ -649,26 +626,19 @@ export default class ContrastTable extends Component {
             let tblData = rst.content;
             if (tblData instanceof Array) {
                 tblData.forEach((plan, i) => {
-                    // const {attrs = {}} = plan;
-                    tblData[i].order = (page - 1) * size + i + 1;
-                    let place = '';
-                    if (plan.Section.indexOf('P010') !== -1) {
-                        place = this.getThinClassName(plan.No, plan.Section);
-                    } else {
-                        place = `${plan.SmallClass}号小班${
-                            plan.ThinClass
-                        }号细班`;
-                    }
-                    tblData[i].place = place;
+                    plan.order = (page - 1) * size + i + 1;
+                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                    console.log('plan.place', plan.place);
+                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                    console.log('plan.sectionName', plan.sectionName);
                     let liftertime1 = plan.LifterTime
                         ? moment(plan.LifterTime).format('YYYY-MM-DD')
                         : '/';
                     let liftertime2 = plan.LifterTime
                         ? moment(plan.LifterTime).format('HH:mm:ss')
                         : '/';
-                    tblData[i].liftertime1 = liftertime1;
-                    tblData[i].liftertime2 = liftertime2;
-                    // tblData[i].Project = this.getProject(tblData[i].Section)
+                    plan.liftertime1 = liftertime1;
+                    plan.liftertime2 = liftertime2;
                 });
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
@@ -676,15 +646,6 @@ export default class ContrastTable extends Component {
                 this.setState({ tblData, pagination: pagination });
             }
         });
-    }
-
-    getProject (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let projectName = getProjectNameBySection(section, thinClassTree);
-        return projectName;
     }
 
     exportexcel () {

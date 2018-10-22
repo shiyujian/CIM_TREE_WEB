@@ -4,12 +4,24 @@ import {
     Row,
     Col,
     Select,
-    Button
+    Button,
+    Input,
+    DatePicker,
+    Progress,
+    message
 } from 'antd';
 import moment from 'moment';
 import { getUser } from '_platform/auth';
 import '../index.less';
-import { getSectionNameBySection, getProjectNameBySection } from '../auth';
+import {
+    getSmallThinNameByPlaceData,
+    getTreeTypeNameByTreeTypeID
+} from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
+const { RangePicker } = DatePicker;
 
 export default class TreeAdoptInfoTable extends Component {
     constructor (props) {
@@ -31,7 +43,14 @@ export default class TreeAdoptInfoTable extends Component {
             statByTreetypeQueryTime: 0,
             queryTime: 0,
             smallclassData: '',
-            thinclassData: ''
+            thinclassData: '',
+            sxm: '',
+            pagination: {},
+            percent: 0,
+            loading: false,
+            size: 10,
+            tblData: [],
+            totalNum: ''
         };
         this.columns = [
             {
@@ -40,7 +59,7 @@ export default class TreeAdoptInfoTable extends Component {
             },
             {
                 title: '顺序码',
-                dataIndex: 'ZZBM'
+                dataIndex: 'SXM'
             },
             {
                 title: '项目',
@@ -48,10 +67,7 @@ export default class TreeAdoptInfoTable extends Component {
             },
             {
                 title: '标段',
-                dataIndex: 'Section',
-                render: (text, record) => {
-                    return <p>{this.getBiao(text)}</p>;
-                }
+                dataIndex: 'sectionName'
             },
             {
                 title: '位置',
@@ -59,61 +75,27 @@ export default class TreeAdoptInfoTable extends Component {
             },
             {
                 title: '树种',
-                dataIndex: 'TreeTypeObj.TreeTypeName'
+                dataIndex: 'treeTypeName'
             },
             {
                 title: '状态',
                 dataIndex: 'statusname',
                 render: (text, record) => {
-                    let superName = '';
-                    let ownerName = '';
-                    if (
-                        record.SupervisorCheck === -1 &&
-                        record.CheckStatus === -1
-                    ) {
-                        return <span>未抽查</span>;
-                    } else {
-                        if (record.SupervisorCheck === 0) { superName = '监理抽查退回'; } else if (record.SupervisorCheck === 1) {
-                            superName = '监理抽查通过';
-                        }
-
-                        if (record.CheckStatus === 0) ownerName = '业主抽查退回';
-                        else if (record.CheckStatus === 1) {
-                            ownerName = '业主抽查通过';
-                        } else if (record.CheckStatus === 2) {
-                            ownerName = '业主抽查退回后修改';
-                        }
-                        if (superName && ownerName) {
-                            return (
-                                <div>
-                                    <div>{superName}</div>
-                                    <div>{ownerName}</div>
-                                </div>
-                            );
-                        } else if (superName) {
-                            return <span>{superName}</span>;
-                        } else {
-                            return <span>{ownerName}</span>;
-                        }
+                    if (record.Status === 0) {
+                        return <span>死亡</span>;
+                    } else if (record.Status === 1) {
+                        return <span>结缘入库</span>;
                     }
                 }
-            },
-            {
-                title: '定位',
-                dataIndex: 'islocation'
             },
             {
                 title: '测量人',
                 dataIndex: 'Inputer',
                 render: (text, record) => {
+                    const { Full_Name = '', User_Name = '' } = record;
                     return (
                         <span>
-                            {users && users[text]
-                                ? users[text].Full_Name +
-                                  '(' +
-                                  users[text].User_Name +
-                                  ')'
-                                : ''}
+                            {Full_Name + '(' + User_Name + ')'}
                         </span>
                     );
                 }
@@ -121,188 +103,16 @@ export default class TreeAdoptInfoTable extends Component {
             {
                 title: '测量时间',
                 render: (text, record) => {
-                    const { createtime1 = '', createtime2 = '' } = record;
+                    const { inputTime1 = '', inputTime2 = '' } = record;
                     return (
                         <div>
-                            <div>{createtime1}</div>
-                            <div>{createtime2}</div>
+                            <div>{inputTime1}</div>
+                            <div>{inputTime2}</div>
                         </div>
                     );
-                }
-            },
-            {
-                title: '定位时间',
-                render: (text, record) => {
-                    const { createtime3 = '', createtime4 = '' } = record;
-                    return (
-                        <div>
-                            <div>{createtime3}</div>
-                            <div>{createtime4}</div>
-                        </div>
-                    );
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>高度</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.GD !== 0) {
-                        return (
-                            <a
-                                disabled={!record.GDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.GDFJ
-                                )}
-                            >
-                                {record.GD}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>冠幅</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.GF !== 0) {
-                        return (
-                            <a
-                                disabled={!record.GFFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.GFFJ
-                                )}
-                            >
-                                {record.GF}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>胸径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.XJ !== 0) {
-                        return (
-                            <a
-                                disabled={!record.XJFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.XJFJ
-                                )}
-                            >
-                                {record.XJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>地径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.DJ !== 0) {
-                        return (
-                            <a
-                                disabled={!record.DJFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.DJFJ
-                                )}
-                            >
-                                {record.DJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>土球厚度</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                dataIndex: 'tqhd',
-                render: (text, record) => {
-                    if (record.TQHD !== 0) {
-                        return (
-                            <a
-                                disabled={!record.TQHDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.TQHDFJ
-                                )}
-                            >
-                                {record.TQHD}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>土球直径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                dataIndex: 'tqzj',
-                render: (text, record) => {
-                    if (record.TQZJ !== 0) {
-                        return (
-                            <a
-                                disabled={!record.TQHDFJ}
-                                onClick={this.onImgClick.bind(
-                                    this,
-                                    record.TQHDFJ
-                                )}
-                            >
-                                {record.TQZJ}
-                            </a>
-                        );
-                    } else {
-                        return <span>/</span>;
-                    }
                 }
             }
         ];
-    }
-    getBiao (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let sectionName = getSectionNameBySection(section, thinClassTree);
-        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
@@ -314,18 +124,29 @@ export default class TreeAdoptInfoTable extends Component {
             sectionoption,
             smallclassoption,
             thinclassoption,
-            typeoption
+            typeoption,
+            statusoption
         } = this.props;
         const {
             section,
             smallclass,
             thinclass,
             bigType,
-            treetypename
+            treetypename,
+            sxm,
+            tblData = []
         } = this.state;
         return (
             <div>
                 <Row className='forest-search-layout'>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>顺序码：</span>
+                        <Input
+                            value={sxm}
+                            className='forest-forestcalcw4'
+                            onChange={this.sxmChange.bind(this)}
+                        />
+                    </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>标段：</span>
                         <Select
@@ -333,7 +154,7 @@ export default class TreeAdoptInfoTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -345,7 +166,7 @@ export default class TreeAdoptInfoTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
-                            onChange={this.onsmallclasschange.bind(this)}
+                            onChange={this.onSmallClassChange.bind(this)}
                         >
                             {smallclassoption}
                         </Select>
@@ -357,7 +178,7 @@ export default class TreeAdoptInfoTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
-                            onChange={this.onthinclasschange.bind(this)}
+                            onChange={this.onThinClassChange.bind(this)}
                         >
                             {thinclassoption}
                         </Select>
@@ -369,7 +190,7 @@ export default class TreeAdoptInfoTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
-                            onChange={this.ontypechange.bind(this)}
+                            onChange={this.onTypeChange.bind(this)}
                         >
                             {typeoption}
                         </Select>
@@ -382,13 +203,25 @@ export default class TreeAdoptInfoTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
-                            onChange={this.ontreetypechange.bind(this)}
+                            onChange={this.onTreeTypeChange.bind(this)}
                         >
                             {treetypeoption}
                         </Select>
                     </div>
-                    {/* <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>载植时间：</span>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>状态：</span>
+                        <Select
+                            allowClear
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={status}
+                            onChange={this.onStatusChange.bind(this)}
+                        >
+                            {statusoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg-datePicker'>
+                        <span className='forest-search-span'>记录时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
                             defaultValue={[
@@ -401,18 +234,22 @@ export default class TreeAdoptInfoTable extends Component {
                             onChange={this.datepick.bind(this)}
                             onOk={this.datepick.bind(this)}
                         />
-                    </div> */}
+                    </div>
                 </Row>
                 <Row style={{marginTop: 10, marginBottom: 10}}>
                     <Col span={2} >
                         <Button
                             type='primary'
-                            onClick={this.query.bind(this)}
+                            onClick={this.handleTableChange.bind(this, {
+                                current: 1
+                            })}
                         >
                             查询
                         </Button>
                     </Col>
-                    <Col span={20} />
+                    <Col span={20} className='forest-quryrstcnt'>
+                        <span>此次查询共有苗木：{this.state.totalNum}棵</span>
+                    </Col>
                     <Col span={2} >
                         <Button
                             type='primary'
@@ -428,19 +265,19 @@ export default class TreeAdoptInfoTable extends Component {
                         className='foresttable'
                         columns={this.columns}
                         rowKey='order'
-                        // loading={{
-                        //     tip: (
-                        //         <Progress
-                        //             style={{ width: 200 }}
-                        //             percent={this.state.percent}
-                        //             status='active'
-                        //             strokeWidth={5}
-                        //         />
-                        //     ),
-                        //     spinning: this.state.loading
-                        // }}
+                        loading={{
+                            tip: (
+                                <Progress
+                                    style={{ width: 200 }}
+                                    percent={this.state.percent}
+                                    status='active'
+                                    strokeWidth={5}
+                                />
+                            ),
+                            spinning: this.state.loading
+                        }}
                         locale={{ emptyText: '当天无现场测量信息' }}
-                        dataSource={[]}
+                        dataSource={tblData}
                         onChange={this.handleTableChange.bind(this)}
                         pagination={this.state.pagination}
                     />
@@ -449,9 +286,13 @@ export default class TreeAdoptInfoTable extends Component {
         );
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    sxmChange = (value) => {
+        this.setState({ sxm: value.target.value });
+    }
+
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || '',
             smallclass: '',
@@ -461,10 +302,10 @@ export default class TreeAdoptInfoTable extends Component {
         });
     }
 
-    onsmallclasschange (value) {
-        const { smallclassselect } = this.props;
+    onSmallClassChange (value) {
+        const { smallClassSelect } = this.props;
         try {
-            smallclassselect(value);
+            smallClassSelect(value);
             let smallclassData = '';
             if (value) {
                 let arr = value.split('-');
@@ -477,14 +318,14 @@ export default class TreeAdoptInfoTable extends Component {
                 thinclassData: ''
             });
         } catch (e) {
-            console.log('onsmallclasschange', e);
+            console.log('onSmallClassChange', e);
         }
     }
 
-    onthinclasschange (value) {
-        const { thinclassselect } = this.props;
+    onThinClassChange (value) {
+        const { thinClassSelect } = this.props;
         try {
-            thinclassselect(value);
+            thinClassSelect(value);
             let thinclassData = '';
             if (value) {
                 let arr = value.split('-');
@@ -495,18 +336,22 @@ export default class TreeAdoptInfoTable extends Component {
                 thinclassData
             });
         } catch (e) {
-            console.log('onthinclasschange', e);
+            console.log('onThinClassChange', e);
         }
     }
 
-    ontypechange (value) {
+    onTypeChange (value) {
         const { typeselect } = this.props;
         typeselect(value || '');
         this.setState({ bigType: value || '', treetype: '', treetypename: '' });
     }
 
-    ontreetypechange (value) {
+    onTreeTypeChange (value) {
         this.setState({ treetype: value, treetypename: value });
+    }
+
+    onStatusChange (value) {
+        this.setState({ status: value || '' });
     }
 
     datepick (value) {
@@ -533,10 +378,87 @@ export default class TreeAdoptInfoTable extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
 
-    query = () => {
-
+    query = (page) => {
+        const {
+            sxm = '',
+            section = '',
+            bigType = '',
+            treetype = '',
+            stime = '',
+            etime = '',
+            status = '',
+            size,
+            thinclass = '',
+            smallclass = '',
+            smallclassData = '',
+            thinclassData = ''
+        } = this.state;
+        if (thinclass === '' && sxm === '') {
+            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+            return;
+        }
+        const {
+            actions: { getTreeStatuss },
+            keycode = '',
+            platform: { tree = {} },
+            treetypes
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let postdata = {
+            no: keycode,
+            sxm,
+            section,
+            bigType,
+            treetype,
+            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+            status,
+            page,
+            size: size,
+            smallclass: smallclassData,
+            thinclass: thinclassData
+        };
+        this.setState({ loading: true, percent: 0 });
+        getTreeStatuss({}, postdata).then(rst => {
+            this.setState({ loading: false, percent: 100 });
+            if (!rst) return;
+            let tblData = rst.content;
+            if (tblData instanceof Array) {
+                tblData.forEach((plan, i) => {
+                    plan.order = (page - 1) * size + i + 1;
+                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                    console.log('plan.Project', plan.Project);
+                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                    console.log('plan.place', plan.place);
+                    plan.treeTypeName = getTreeTypeNameByTreeTypeID(plan.TreeType, treetypes);
+                    console.log('plan.sectionName', plan.sectionName);
+                    // plan.place = this.getThinClassName(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                    let inputerObj = plan && plan.InputerObj;
+                    plan.Full_Name = inputerObj && inputerObj.Full_Name;
+                    plan.User_Name = inputerObj && inputerObj.User_Name;
+                    let inputTime1 = plan.InputTime
+                        ? moment(plan.InputTime).format('YYYY-MM-DD')
+                        : '/';
+                    let inputTime2 = plan.InputTime
+                        ? moment(plan.InputTime).format('HH:mm:ss')
+                        : '/';
+                    plan.inputTime1 = inputTime1;
+                    plan.inputTime2 = inputTime2;
+                });
+                let totalNum = rst.total;
+                const pagination = { ...this.state.pagination };
+                pagination.total = rst.pageinfo.total;
+                pagination.pageSize = size;
+                this.setState({
+                    tblData,
+                    pagination: pagination,
+                    totalNum: totalNum
+                });
+            }
+        });
     }
 }

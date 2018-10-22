@@ -16,12 +16,11 @@ class PurchaseList extends Component {
             total: 0,
             loading: true,
             dataList: [],
-            projectList: [], // 项目标段
-            a: 1
+            projectList: [] // 项目标段
         };
         this.onSearch = this.onSearch.bind(this);
         this.handlePane = this.handlePane.bind(this); // 切换标签页
-        this.onClear = this.onClear.bind(this);
+        this.onClear = this.onClear.bind(this); // 清除
     }
     componentDidMount () {
         const { getWpunittree } = this.props.actions;
@@ -53,20 +52,6 @@ class PurchaseList extends Component {
                             <Input className='search-input' placeholder='请输入采购名称' />
                         )}
                     </FormItem>
-                    <FormItem
-                        label='状态'
-                    >
-                        {getFieldDecorator('status', {
-                            initialValue: 1
-                        })(
-                            <Select allowClear style={{ width: 150 }} placeholder='请选择状态'>
-                                <Option value={0}>未发布</Option>
-                                <Option value={1}>报价中</Option>
-                                <Option value={2}>选标中</Option>
-                                <Option value={3}>已结束</Option>
-                            </Select>
-                        )}
-                    </FormItem>
                     <FormItem className='search-left'>
                         <Button type='primary' onClick={this.onSearch}>查询</Button>
                         <Button style={{marginLeft: 20}} onClick={this.onClear}>清除</Button>
@@ -96,7 +81,7 @@ class PurchaseList extends Component {
         getPurchaseList({}, {
             purchaseno: formVal.purchaseno || '',
             projectname: formVal.projectname || '',
-            status: formVal.status === undefined ? '' : formVal.status,
+            status: 1,
             page
         }).then(rep => {
             if (rep.code === 200) {

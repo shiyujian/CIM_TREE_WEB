@@ -733,6 +733,10 @@ export const MODULES = [
             {
                 id: 'MARKET.DEMANDRELEASE',
                 name: '需求发布'
+            },
+            {
+                id: 'MARKET.OFFERMANAGE',
+                name: '报价管理'
             }
         ]
     },

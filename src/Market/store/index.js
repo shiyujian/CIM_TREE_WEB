@@ -4,6 +4,7 @@ import seedlingSupplyReducer, { actions as seedlingSupplyActions } from './seedl
 import seedlingPurchaseReducer, { actions as seedlingPurchaseActions } from './seedlingPurchase';
 import supplyReleaseReducer, { actions as supplyReleaseActions } from './supplyRelease';
 import demandReleaseReducer, { actions as demandReleaseActions } from './demandRelease';
+import offerManageReducer, { actions as offerManageActions } from './offerManage';
 
 export default handleActions(
     {
@@ -34,6 +35,13 @@ export default handleActions(
         ) => ({
             ...state,
             demandRelease: demandReleaseReducer(state.demandRelease, action)
+        }),
+        [combineActions(...actionsMap(offerManageActions))]: (
+            state = {},
+            action
+        ) => ({
+            ...state,
+            offerManage: offerManageReducer(state.offerManage, action)
         })
     },
     {}

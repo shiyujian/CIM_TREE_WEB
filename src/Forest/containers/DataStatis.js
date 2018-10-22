@@ -136,9 +136,9 @@ export default class DataStatis extends Component {
                             key={resetkey}
                             {...this.props}
                             {...this.state}
-                            sectionselect={this.sectionselect.bind(this)}
-                            smallclassselect={this.smallclassselect.bind(this)}
-                            thinclassselect={this.thinclassselect.bind(this)}
+                            sectionSelect={this.sectionSelect.bind(this)}
+                            smallClassSelect={this.smallClassSelect.bind(this)}
+                            thinClassSelect={this.thinClassSelect.bind(this)}
                             resetinput={this.resetinput.bind(this)}
                             typeselect={this.typeselect.bind(this)}
                         />
@@ -219,7 +219,7 @@ export default class DataStatis extends Component {
         }
     }
 
-    sectionselect (value) {
+    sectionSelect (value) {
         const {
             sectionsData
         } = this.state;
@@ -255,7 +255,7 @@ export default class DataStatis extends Component {
     }
 
     // 小班选择, 重新获取: 细班
-    smallclassselect (value) {
+    smallClassSelect (value) {
         const {
             smallClassesData
         } = this.state;
@@ -291,7 +291,7 @@ export default class DataStatis extends Component {
     }
 
     // 细班选择, 重新获取: 树种
-    thinclassselect (value) {
+    thinClassSelect (value) {
     }
 
     // 重置

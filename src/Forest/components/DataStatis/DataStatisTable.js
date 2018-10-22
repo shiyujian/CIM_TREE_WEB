@@ -72,7 +72,7 @@ export default class DataStatisTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -84,7 +84,7 @@ export default class DataStatisTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
-                            onChange={this.onsmallclasschange.bind(this)}
+                            onChange={this.onSmallClassChange.bind(this)}
                         >
                             {smallclassoption}
                         </Select>
@@ -96,7 +96,7 @@ export default class DataStatisTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
-                            onChange={this.onthinclasschange.bind(this)}
+                            onChange={this.onThinClassChange.bind(this)}
                         >
                             {thinclassoption}
                         </Select>
@@ -108,7 +108,7 @@ export default class DataStatisTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
-                            onChange={this.ontypechange.bind(this)}
+                            onChange={this.onTypeChange.bind(this)}
                         >
                             {typeoption}
                         </Select>
@@ -121,7 +121,7 @@ export default class DataStatisTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
-                            onChange={this.ontreetypechange.bind(this)}
+                            onChange={this.onTreeTypeChange.bind(this)}
                         >
                             {treetypeoption}
                         </Select>
@@ -209,9 +209,9 @@ export default class DataStatisTable extends Component {
         );
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || '',
             smallclass: '',
@@ -219,30 +219,30 @@ export default class DataStatisTable extends Component {
         });
     }
 
-    onsmallclasschange (value) {
-        const { smallclassselect } = this.props;
-        smallclassselect(value);
+    onSmallClassChange (value) {
+        const { smallClassSelect } = this.props;
+        smallClassSelect(value);
         this.setState({
             smallclass: value || '',
             thinclass: ''
         });
     }
 
-    onthinclasschange (value) {
-        const { thinclassselect } = this.props;
-        thinclassselect(value);
+    onThinClassChange (value) {
+        const { thinClassSelect } = this.props;
+        thinClassSelect(value);
         this.setState({
             thinclass: value || ''
         });
     }
 
-    ontypechange (value) {
+    onTypeChange (value) {
         const { typeselect } = this.props;
         typeselect(value || '');
         this.setState({ bigType: value || '', treetype: '', treetypename: '' });
     }
 
-    ontreetypechange (value) {
+    onTreeTypeChange (value) {
         this.setState({ treetype: value, treetypename: value });
     }
 

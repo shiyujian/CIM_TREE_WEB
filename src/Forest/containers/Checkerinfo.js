@@ -62,7 +62,6 @@ export default class Checkerinfo extends Component {
             },
             users,
             treetypes,
-            littleBanAll,
             platform: { tree = {} }
         } = this.props;
 
@@ -159,15 +158,15 @@ export default class Checkerinfo extends Component {
                             key={resetkey}
                             {...this.props}
                             sectionoption={sectionoption}
-                            sectionselect={this.sectionselect.bind(this)}
+                            sectionSelect={this.sectionSelect.bind(this)}
                             smallclassoption={smallclassoption}
-                            smallclassselect={this.smallclassselect.bind(this)}
+                            smallClassSelect={this.smallClassSelect.bind(this)}
                             thinclassoption={thinclassoption}
                             typeselect={this.typeselect.bind(this)}
                             bigType={bigType}
                             treetypeoption={treetypeoption}
                             typeoption={typeoption}
-                            thinclassselect={this.thinclassselect.bind(this)}
+                            thinClassSelect={this.thinClassSelect.bind(this)}
                             statusoption={statusoption}
                             leftkeycode={leftkeycode}
                             keycode={keycode}
@@ -248,7 +247,7 @@ export default class Checkerinfo extends Component {
         }
     }
     // 标段选择, 重新获取: 小班、细班、树种
-    sectionselect (value) {
+    sectionSelect (value) {
         const {
             sectionsData
         } = this.state;
@@ -283,7 +282,7 @@ export default class Checkerinfo extends Component {
     }
 
     // 小班选择, 重新获取: 细班、树种
-    smallclassselect (value) {
+    smallClassSelect (value) {
         const {
             smallClassesData
         } = this.state;
@@ -318,7 +317,7 @@ export default class Checkerinfo extends Component {
     }
 
     // 细班选择, 重新获取: 树种
-    thinclassselect (value) {}
+    thinClassSelect (value) {}
     // 类型选择, 重新获取: 树种
     typeselect (value) {
         const { treetypes } = this.props;

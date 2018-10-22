@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store/demandRelease';
+import * as actions from '../store/offerManage';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
@@ -9,11 +9,11 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { DemandTable, AddDemand } from '../components/DemandRelease';
+import { OfferList, OfferDetails } from '../components/OfferManage';
 @connect(
     state => {
-        const { market: { demandRelease = {} }, platform } = state;
-        return { ...demandRelease, platform };
+        const { market: { offerManage = {} }, platform } = state;
+        return { ...offerManage, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -31,16 +31,16 @@ export default class DemandRelease extends Component {
 
     render () {
         const {
-            addDemandVisible
+            offerDetailsVisible
         } = this.props;
-        console.log(addDemandVisible);
+        console.log(offerDetailsVisible);
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='需求发布' {...this.props} />
+                    <DynamicTitle title='报价管理' {...this.props} />
                     <Content>
                         {
-                            addDemandVisible ? <AddDemand {...this.props} /> : <DemandTable {...this.props} />
+                            offerDetailsVisible ? <OfferDetails {...this.props} /> : <OfferList {...this.props} />
                         }
                     </Content>
                 </Main>

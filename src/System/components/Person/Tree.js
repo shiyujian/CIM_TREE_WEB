@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import SimpleTree from '_platform/components/panels/SimpleTree';
 import { TreeSelect } from 'antd';
+import {getCompanyDataByOrgCode} from '_platform/auth';
 const TreeNode = TreeSelect.TreeNode;
 
 const addGroupSupplier = (supplier_list, str) => {
@@ -65,8 +66,10 @@ export default class Tree extends Component {
         super(props);
         this.state = {
             childList: [],
-            listVisible: true
+            listVisible: true,
+            orgTreeData: []
         };
+        this.orgTreeDataArr = [];
     }
 
     render () {
@@ -110,11 +113,31 @@ export default class Tree extends Component {
             window.sessionStorage.setItem('nursery_regionCode', JSON.stringify(obj));
         });
     }
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
-            actions: { getOrgTree, changeSidebarField, getUsers, getTreeModal, getOrgTreeSelect }
+            actions: {
+                getOrgTree,
+                changeSidebarField,
+                getUsers,
+                getTreeModal,
+                getOrgTreeSelect,
+                getOrgTreeByCode
+            }
         } = this.props;
-        getOrgTree({}, { depth: 3 }).then(rst => {
+        try {
+            const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+            if (user && user.username !== 'admin') {
+                let org_code = user.account.org_code;
+                let parentOrgData = await getCompanyDataByOrgCode(org_code, getOrgTreeByCode);
+                console.log('parentOrgData', parentOrgData);
+                let parentOrgCode = parentOrgData.code;
+                let orgTreeData = await getOrgTreeByCode({code: parentOrgCode});
+                let orgTreeSelectData = Tree.orgloop([orgTreeData]);
+                this.orgTreeDataArr = [];
+                await getOrgTreeSelect(orgTreeSelectData);
+                this.orgArrLoop([orgTreeData], 0);
+            }
+            let rst = await getOrgTree({}, { depth: 3 });
             if (rst && rst.children) {
                 rst.children.map(item => {
                     if (item.name === '供应商') {
@@ -124,28 +147,17 @@ export default class Tree extends Component {
                     }
                 });
                 this.getList(rst.children);
-                // 目前只针对业主的单位，name为建设单位   所以对建设单位进行loop
-                if (rst.children && rst.children instanceof Array && rst.children.length > 0) {
-                    rst.children.map((item) => {
-                        if (item.name === '建设单位') {
-                            if (item && item.children) {
-                                let data = Tree.orgloop(item.children);
-                                getOrgTreeSelect(data);
-                            }
-                        }
-                    });
-                }
             }
-
             const { children: [first] = [] } = rst || {};
             if (first) {
-                changeSidebarField('node', first);
+                await changeSidebarField('node', first);
                 const codes = Tree.collect(first);
-                getUsers({}, { org_code: codes, page: 1 }).then(e => {
-                    getTreeModal(false);
-                });
+                await getUsers({}, { org_code: codes, page: 1 });
+                await getTreeModal(false);
             }
-        });
+        } catch (e) {
+            console.log('e', e);
+        }
     }
 
     // 将二维数组传入store中
@@ -200,7 +212,7 @@ export default class Tree extends Component {
         }
     }
 
-    select (s, node) {
+    select = async (s, node) => {
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         const { node: { props: { eventKey = '' } = {} } = {} } = node || {};
         const {
@@ -215,44 +227,32 @@ export default class Tree extends Component {
                 getIsBtn
             }
         } = this.props;
-        const o = Tree.loop(children, eventKey);
-        let ucode;
-        const ucodes = user.account.org_code.split('_');
-        if (ucodes.length > 5) {
-            ucodes.pop();
-            const codeu = ucodes.join();
-            ucode = codeu.replace(/,/g, '_');
-        } else {
-            ucode = user.account.org_code.substring(0, 9);
-        }
-        if (this.compare(user, ucode, o)) {
-            if (o.code) {
-                getTreeModal(true);
-            } else {
-                getTreeModal(false);
-            }
-            changeSidebarField('node', o);
-            const codes = Tree.collect(o);
 
-            getTreeCode(codes);
-            getUsers({}, { org_code: codes, page: 1 }).then(e => {
-                let pagination = {
-                    current: 1,
-                    total: e.count
-                };
-                getTreeModal(false);
-                setUpdate(true);
-                getTablePage(pagination);
-                // 控制是否通过角色条件分页
-                getIsBtn(true);
-            });
+        const topProject = Tree.loop(children, eventKey);
+        console.log('topProject', topProject);
+        if (this.compare(user, topProject, eventKey)) {
+            if (topProject.code) {
+                await getTreeModal(true);
+            } else {
+                await getTreeModal(false);
+            }
+            await changeSidebarField('node', topProject);
+            const codes = Tree.collect(topProject);
+
+            await getTreeCode(codes);
+            let e = await getUsers({}, { org_code: codes, page: 1 });
+            let pagination = {
+                current: 1,
+                total: e.count
+            };
+            await getTreeModal(false);
+            await setUpdate(true);
+            await getTablePage(pagination);
+            // 控制是否通过角色条件分页
+            await getIsBtn(true);
         }
     }
-    compare (user, l1, o) {
-        let s;
-        if (o && o.code) {
-            s = o.code;
-        }
+    compare (user, topProject, eventKey) {
         let groups = user.groups;
         let isClericalStaff = false;
         groups.map((group) => {
@@ -260,20 +260,19 @@ export default class Tree extends Component {
                 isClericalStaff = true;
             }
         });
-        if (isClericalStaff && (o.topParent === '苗圃基地' || o.topParent === '供应商')) {
+        if (isClericalStaff && (topProject.topParent === '苗圃基地' || topProject.topParent === '供应商')) {
             return true;
         }
         if (user.is_superuser) {
             return true;
         }
-        if (l1 === undefined || s === undefined) {
-            return false;
-        }
-        if (s.startsWith(l1)) {
-            return true;
-        }
-
-        return false;
+        let status = false;
+        this.orgTreeDataArr.map((code) => {
+            if (code === eventKey) {
+                status = true;
+            }
+        });
+        return status;
     }
     static loop = (list, code, loopTimes = 0, topParent) => {
         let rst = null;
@@ -302,10 +301,12 @@ export default class Tree extends Component {
         rst.push(code);
         return rst;
     };
+    // 设置登录用户所在的公司的部门项
     static orgloop (data = [], loopTimes = 0) {
         if (data.length === 0) {
             return;
         }
+        console.log('data', data);
         return data.map((item) => {
             if (item.children && item.children.length > 0) {
                 return (
@@ -327,4 +328,22 @@ export default class Tree extends Component {
             }
         });
     };
+    // 设置登录用户所在公司的所有部门选项数组
+    orgArrLoop (data = [], loopTimes = 0) {
+        try {
+            if (data.length === 0) {
+                return;
+            }
+            return data.map((item) => {
+                if (item.children && item.children.length > 0) {
+                    this.orgTreeDataArr.push(item.code);
+                    this.orgArrLoop(item.children, loopTimes + 1);
+                } else {
+                    this.orgTreeDataArr.push(item.code);
+                }
+            });
+        } catch (e) {
+            console.log('orgArrLoop', e);
+        }
+    }
 }

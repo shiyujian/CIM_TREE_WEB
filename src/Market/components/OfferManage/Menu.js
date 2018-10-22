@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Card, Row, Col, message, Tag } from 'antd';
+import { Form, Button, Card, Row, Col, Tag } from 'antd';
 import { CULTIVATIONMODE } from '_platform/api';
 
 class Menu extends Component {
@@ -8,12 +8,12 @@ class Menu extends Component {
         super(props);
         this.state = {
             dataList: [], // 规格列表
-            TreeTypes: '', // 采购品种列表
+            TreeTypes: [], // 品种数组
             StartTime: '',
             EndTime: ''
         };
         this.renderButton = this.renderButton.bind(this); // 显示按钮
-        this.toEditInfo = this.toEditInfo.bind(this); // 修改
+        this.toSeeDetails = this.toSeeDetails.bind(this); // 查看详情
         this.returnTag = this.returnTag.bind(this); // 返回标签
     }
     componentDidMount () {
@@ -24,6 +24,13 @@ class Menu extends Component {
             this.setState({
                 StartTime,
                 EndTime
+            });
+            // 获取发布单位
+            const { getOrgTree_new } = this.props.actions;
+            getOrgTree_new({code: this.props.record.CreaterOrg}).then(rep => {
+                this.setState({
+                    organizationName: rep.name
+                });
             });
         }
         // 项目名称和标段
@@ -41,40 +48,19 @@ class Menu extends Component {
             });
         }
         // 根据采购单id获取采购单规格
-        const { getPurchaseStandard } = this.props.actions;
-        getPurchaseStandard({}, {
+        const { getOffersById } = this.props.actions;
+        getOffersById({}, {
             purchaseid: this.props.record.ID
         }).then(rep => {
-            let dataList = [];
-            let TreeTypes = [];
-            rep.map(item => {
-                if (!TreeTypes.includes(item.TreeTypeName)) {
-                    TreeTypes.push(item.TreeTypeName);
-                }
-            });
-            TreeTypes.map(item => {
-                let arr = [];
-                rep.map(row => {
-                    if (row.TreeTypeName === item) {
-                        arr.push({...row});
-                    }
-                });
-                dataList.push({name: item, children: arr});
-            });
-            console.log(dataList);
-            this.setState({
-                dataList
-            });
+            console.log(rep);
         });
     }
-    componentWillReceiveProps (nextProps) {
-    }
     render () {
-        const { dataList, StartTime, EndTime, ProjectName, Section } = this.state;
+        const { TreeTypes, dataList, StartTime, EndTime, ProjectName, Section } = this.state;
         const { record } = this.props;
         let CreateTime = record.CreateTime ? record.CreateTime.split(' ')[0] : '';
         return (
-            <div className='menu' style={{marginTop: 10}}>
+            <div className='menu'>
                 <Card title={'发布时间：' + CreateTime}>
                     <Row>
                         <Col span={8}>
@@ -85,11 +71,11 @@ class Menu extends Component {
                                 }
                             </h3>
                             <p className='text-p'>报价起止时间：{StartTime}至{EndTime}</p>
+                            <p className='text-p'>发布单位：</p>
                             <p className='text-p'>用苗地址：{record.UseNurseryAddress}</p>
                             <p className='text-p'>采购品种：
-                                {record.TreeTypes}
+                                {TreeTypes}
                             </p>
-                            <p className='text-p'>联系方式：{record.Phone}({record.Contacter})</p>
                         </Col>
                         <Col span={12}>
                             {
@@ -155,55 +141,21 @@ class Menu extends Component {
             {strStatus}
         </Tag>;
     }
+    toSeeDetails () {
+        const { changeOfferDetailsVisible, changeOfferDetailsKey } = this.props.actions;
+        changeOfferDetailsVisible(true);
+        console.log(this.props.record.ID);
+        changeOfferDetailsKey(this.props.record.ID);
+    }
     renderButton () {
         let arr = [];
-        let seeButton = <Button style={{marginRight: 15, marginBottom: 10}} key='seeButton' type='primary' onClick={this.toEditInfo}>查看报价</Button>;
-        let overButton = <Button style={{marginRight: 15, marginBottom: 10}} key='overButton' type='primary' onClick={this.toSoldOut.bind(this, 3)}>提前结束报价</Button>;
-        let upButton = <Button style={{marginRight: 15, marginBottom: 10}} key='upButton' type='primary' onClick={this.toSoldOut.bind(this, 1)}>上架</Button>;
-        let downButton = <Button style={{marginRight: 15, marginBottom: 10}} key='downButton' type='primary' onClick={this.toSoldOut.bind(this, 0)}>下架</Button>;
-        let editButton = <Button style={{marginRight: 15, marginBottom: 10}} key='editButton' type='primary' onClick={this.toEditInfo}>编辑</Button>;
-        let deleteButton = <Button style={{marginRight: 15, marginBottom: 10}} key='deleteButton' type='primary' onClick={this.toDelete.bind(this)}>删除</Button>;
+        let seeButton = <Button style={{marginRight: 15, marginBottom: 10}} key='seeButton' type='primary' onClick={this.toSeeDetails}>查看详情</Button>;
         switch (this.props.record.Status) {
-            case 0:
-                arr.push(editButton, upButton, deleteButton);
-                break;
             case 1:
-                arr.push(seeButton, downButton, overButton);
-                break;
-            case 2:
                 arr.push(seeButton);
-                break;
-            case 3:
-                arr.push(seeButton, deleteButton);
                 break;
         }
         return arr;
-    }
-    toEditInfo () {
-        this.props.toAddDemand(this.props.record.ID);
-    }
-    toSoldOut (status) {
-        const { changeStatus } = this.props.actions;
-        changeStatus({}, {
-            id: this.props.record.ID,
-            status: status
-        }).then(rep => {
-            if (rep.code === 1) {
-                message.success('操作成功');
-                this.props.toSearch();
-            } else {
-                message.success('操作失败');
-            }
-        });
-    }
-    toDelete () {
-        const { deletePurchase } = this.props.actions;
-        deletePurchase({id: this.props.record.ID}).then(rep => {
-            if (rep.code === 1) {
-                message.success('删除成功');
-                this.props.toSearch();
-            }
-        });
     }
 }
 

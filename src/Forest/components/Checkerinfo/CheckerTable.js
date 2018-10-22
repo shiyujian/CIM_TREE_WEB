@@ -16,7 +16,11 @@ import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-import { getSectionNameBySection, getProjectNameBySection } from '../auth';
+import { getSmallThinNameByPlaceData } from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
 
 export default class CheckerTable extends Component {
@@ -49,14 +53,6 @@ export default class CheckerTable extends Component {
             smallclassData: '',
             thinclassData: ''
         };
-    }
-    getBiao (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let sectionName = getSectionNameBySection(section, thinClassTree);
-        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
@@ -134,10 +130,7 @@ export default class CheckerTable extends Component {
             },
             {
                 title: '标段',
-                dataIndex: 'Section',
-                render: (text, record) => {
-                    return <p>{this.getBiao(text)}</p>;
-                }
+                dataIndex: 'sectionName'
             },
             {
                 title: '位置',
@@ -233,7 +226,7 @@ export default class CheckerTable extends Component {
                             suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
-                            onChange={this.sxmchange.bind(this)}
+                            onChange={this.sxmChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg10'>
@@ -243,7 +236,7 @@ export default class CheckerTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -255,7 +248,7 @@ export default class CheckerTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
-                            onChange={this.onsmallclasschange.bind(this)}
+                            onChange={this.onSmallClassChange.bind(this)}
                         >
                             {smallclassoption}
                         </Select>
@@ -267,7 +260,7 @@ export default class CheckerTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
-                            onChange={this.onthinclasschange.bind(this)}
+                            onChange={this.onThinClassChange.bind(this)}
                         >
                             {thinclassoption}
                         </Select>
@@ -279,7 +272,7 @@ export default class CheckerTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={bigType}
-                            onChange={this.ontypechange.bind(this)}
+                            onChange={this.onTypeChange.bind(this)}
                         >
                             {typeoption}
                         </Select>
@@ -292,7 +285,7 @@ export default class CheckerTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
-                            onChange={this.ontreetypechange.bind(this)}
+                            onChange={this.onTreeTypeChange.bind(this)}
                         >
                             {treetypeoption}
                         </Select>
@@ -304,7 +297,7 @@ export default class CheckerTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={status}
-                            onChange={this.onstatuschange.bind(this)}
+                            onChange={this.onStatusChange.bind(this)}
                         >
                             {statusoption}
                         </Select>
@@ -315,7 +308,7 @@ export default class CheckerTable extends Component {
                             suffix={suffix2}
                             value={rolename}
                             className='forest-forestcalcw4'
-                            onChange={this.onrolenamechange.bind(this)}
+                            onChange={this.onRoleNameChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg-datePicker6'>
@@ -412,13 +405,13 @@ export default class CheckerTable extends Component {
         this.setState({ rolename: '' });
     };
 
-    sxmchange (value) {
+    sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || '',
             smallclass: '',
@@ -428,10 +421,10 @@ export default class CheckerTable extends Component {
         });
     }
 
-    onsmallclasschange (value) {
-        const { smallclassselect } = this.props;
+    onSmallClassChange (value) {
+        const { smallClassSelect } = this.props;
         try {
-            smallclassselect(value);
+            smallClassSelect(value);
             let smallclassData = '';
             if (value) {
                 let arr = value.split('-');
@@ -444,14 +437,14 @@ export default class CheckerTable extends Component {
                 thinclassData: ''
             });
         } catch (e) {
-            console.log('onsmallclasschange', e);
+            console.log('onSmallClassChange', e);
         }
     }
 
-    onthinclasschange (value) {
-        const { thinclassselect } = this.props;
+    onThinClassChange (value) {
+        const { thinClassSelect } = this.props;
         try {
-            thinclassselect(value);
+            thinClassSelect(value);
             let thinclassData = '';
             if (value) {
                 let arr = value.split('-');
@@ -462,20 +455,20 @@ export default class CheckerTable extends Component {
                 thinclassData
             });
         } catch (e) {
-            console.log('onthinclasschange', e);
+            console.log('onThinClassChange', e);
         }
     }
-    ontypechange (value) {
+    onTypeChange (value) {
         const { typeselect } = this.props;
         typeselect(value || '');
         this.setState({ bigType: value || '', treetype: '', treetypename: '' });
     }
 
-    ontreetypechange (value) {
+    onTreeTypeChange (value) {
         this.setState({ treetype: value, treetypename: value });
     }
 
-    onstatuschange (value) {
+    onStatusChange (value) {
         console.log('value', value);
         let CheckStatus = '';
         switch (value) {
@@ -494,11 +487,11 @@ export default class CheckerTable extends Component {
         this.setState({ CheckStatus, status: value || '' });
     }
 
-    onlocationchange (value) {
+    onLocationChange (value) {
         this.setState({ locationstatus: value });
     }
 
-    onrolenamechange (value) {
+    onRoleNameChange (value) {
         this.setState({ rolename: value.target.value });
     }
 
@@ -550,26 +543,6 @@ export default class CheckerTable extends Component {
             imgArr: imgArr
         });
     }
-    getThinClassName (no, section) {
-        const { littleBanAll } = this.props;
-        let nob = no.substring(0, 15);
-        let sectionn = section.substring(8, 10);
-        let result = '/';
-
-        if (littleBanAll) {
-            littleBanAll.map(item => {
-                if (
-                    item.No.substring(0, 15) === nob &&
-                    item.No.substring(16, 18) === sectionn
-                ) {
-                    result = item.ThinClassName;
-                }
-            });
-        } else {
-            return <p> / </p>;
-        }
-        return result;
-    }
 
     handleCancel () {
         this.setState({ imgvisible: false });
@@ -601,8 +574,10 @@ export default class CheckerTable extends Component {
         }
         const {
             actions: { getqueryTree },
-            keycode = ''
+            keycode = '',
+            platform: { tree = {} }
         } = this.props;
+        let thinClassTree = tree.thinClassTree;
         let postdata = {
             no: keycode,
             sxm,
@@ -626,25 +601,20 @@ export default class CheckerTable extends Component {
             if (tblData instanceof Array) {
                 tblData.forEach((plan, i) => {
                     // const {attrs = {}} = plan;
-                    tblData[i].order = (page - 1) * size + i + 1;
-                    let place = '';
-                    if (plan.Section.indexOf('P010') !== -1) {
-                        place = this.getThinClassName(plan.No, plan.Section);
-                    } else {
-                        place = `${plan.SmallClass}号小班${
-                            plan.ThinClass
-                        }号细班`;
-                    }
-                    tblData[i].place = place;
+                    plan.order = (page - 1) * size + i + 1;
+                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                    console.log('plan.place', plan.place);
+                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                     let statusname = '';
-                    tblData[i].SupervisorCheck = plan.SupervisorCheck;
-                    tblData[i].CheckStatus = plan.CheckStatus;
-                    tblData[i].statusname = statusname;
+                    plan.SupervisorCheck = plan.SupervisorCheck;
+                    plan.CheckStatus = plan.CheckStatus;
+                    plan.statusname = statusname;
 
                     let locationstatus = plan.LocationTime
                         ? '已定位'
                         : '未定位';
-                    tblData[i].locationstatus = locationstatus;
+                    plan.locationstatus = locationstatus;
                     // 改为验收时间
                     let checktime1 = plan.CheckTime
                         ? moment(plan.CheckTime).format('YYYY-MM-DD')
@@ -652,9 +622,8 @@ export default class CheckerTable extends Component {
                     let checktime2 = plan.CheckTime
                         ? moment(plan.CheckTime).format('HH:mm:ss')
                         : '/';
-                    tblData[i].checktime1 = checktime1;
-                    tblData[i].checktime2 = checktime2;
-                    tblData[i].Project = this.getProject(tblData[i].Section);
+                    plan.checktime1 = checktime1;
+                    plan.checktime2 = checktime2;
                 });
                 const pagination = { ...this.state.pagination };
                 let totalNum = rst.total;
@@ -667,15 +636,6 @@ export default class CheckerTable extends Component {
                 });
             }
         });
-    }
-
-    getProject (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let projectName = getProjectNameBySection(section, thinClassTree);
-        return projectName;
     }
 
     exportexcel () {

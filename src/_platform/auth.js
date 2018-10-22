@@ -375,7 +375,7 @@ export const getThinClass = (smallClass, list) => {
     }
     return thinClassList;
 };
-
+// 根据登录用户的部门code获取所在公司
 export const getCompanyDataByOrgCode = async (orgCode, getOrgTreeByCode) => {
     let orgData = await getOrgTreeByCode({code: orgCode}, {reverse: true});
     let parent = {};
@@ -385,6 +385,7 @@ export const getCompanyDataByOrgCode = async (orgCode, getOrgTreeByCode) => {
     return parent;
 };
 
+// 对获取的组织机构树进行遍历，返回数组
 export const loopOrgCompany = (orgData) => {
     try {
         let extra_params = orgData && orgData.extra_params;
@@ -402,7 +403,7 @@ export const loopOrgCompany = (orgData) => {
         console.log('loopOrgCompany', e);
     }
 };
-
+// 对返回的数组进行遍历，获取内部的Object
 export const loopArrayCompany = (loopData) => {
     try {
         if (loopData && loopData instanceof Array && loopData.length > 0) {
@@ -413,5 +414,22 @@ export const loopArrayCompany = (loopData) => {
         }
     } catch (e) {
         console.log('loopArrayCompany', e);
+    }
+};
+
+// 判断用户是否为文书
+export const getUserIsDocument = () => {
+    try {
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        let groups = user.groups;
+        let userIsDocument = false;
+        groups.map((group) => {
+            if (group.name.indexOf('文书') !== -1) {
+                userIsDocument = true;
+            }
+        });
+        return userIsDocument;
+    } catch (e) {
+        console.log('getUserIsDocument', e);
     }
 };

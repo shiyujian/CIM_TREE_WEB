@@ -16,7 +16,10 @@ import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-import { getSectionNameBySection, getProjectNameBySection } from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
 
 export default class CarPackageTable extends Component {
@@ -52,14 +55,6 @@ export default class CarPackageTable extends Component {
             checkstatus: '',
             status: ''
         };
-    }
-    getBiao (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let sectionName = getSectionNameBySection(section, thinClassTree);
-        return sectionName;
     }
     componentDidMount () {
         let user = getUser();
@@ -310,10 +305,7 @@ export default class CarPackageTable extends Component {
             },
             {
                 title: '标段',
-                dataIndex: 'Section',
-                render: (text, record) => {
-                    return <p>{this.getBiao(text)}</p>;
-                }
+                dataIndex: 'sectionName'
             },
             {
                 title: '苗木类型',
@@ -431,7 +423,7 @@ export default class CarPackageTable extends Component {
                             suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
-                            onChange={this.sxmchange.bind(this)}
+                            onChange={this.sxmChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg10'>
@@ -441,7 +433,7 @@ export default class CarPackageTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -465,7 +457,7 @@ export default class CarPackageTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={status}
-                            onChange={this.onstatuschange.bind(this)}
+                            onChange={this.onStatusChange.bind(this)}
                         >
                             {statusoption}
                         </Select>
@@ -583,11 +575,11 @@ export default class CarPackageTable extends Component {
             let tblData1 = rst.content;
             if (tblData1 instanceof Array) {
                 tblData1.forEach((plan, i) => {
-                    tblData1[i].order = (page - 1) * size + i + 1;
-                    tblData1[i].liftertime1 = plan.CreateTime
+                    plan.order = (page - 1) * size + i + 1;
+                    plan.liftertime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
                         : '/';
-                    tblData1[i].liftertime2 = plan.CreateTime
+                    plan.liftertime2 = plan.CreateTime
                         ? moment(plan.CreateTime).format('HH:mm:ss')
                         : '/';
                 });
@@ -603,13 +595,13 @@ export default class CarPackageTable extends Component {
         this.setState({ sxm: '' });
     };
 
-    sxmchange (value) {
+    sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || '',
             bigType: '',
@@ -622,7 +614,7 @@ export default class CarPackageTable extends Component {
         this.setState({ mmtype: value });
     }
 
-    onstatuschange (value) {
+    onStatusChange (value) {
         this.setState({ status: value });
     }
 
@@ -681,8 +673,10 @@ export default class CarPackageTable extends Component {
         }
         const {
             actions: { getcarpackage },
-            keycode = ''
+            keycode = '',
+            platform: { tree = {} }
         } = this.props;
+        let thinClassTree = tree.thinClassTree;
         let postdata = {
             licenseplate: sxm,
             section: section === '' ? keycode : section,
@@ -705,14 +699,15 @@ export default class CarPackageTable extends Component {
             let tblData = rst.content;
             if (tblData instanceof Array) {
                 tblData.forEach((plan, i) => {
-                    tblData[i].order = (page - 1) * size + i + 1;
-                    tblData[i].liftertime1 = plan.CreateTime
+                    plan.order = (page - 1) * size + i + 1;
+                    plan.liftertime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
                         : '/';
-                    tblData[i].liftertime2 = plan.CreateTime
+                    plan.liftertime2 = plan.CreateTime
                         ? moment(plan.CreateTime).format('HH:mm:ss')
                         : '/';
-                    tblData[i].Project = this.getProject(tblData[i].Section);
+                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                 });
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
@@ -720,15 +715,6 @@ export default class CarPackageTable extends Component {
                 this.setState({ tblData, pagination });
             }
         });
-    }
-
-    getProject (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let projectName = getProjectNameBySection(section, thinClassTree);
-        return projectName;
     }
 
     exportexcel () {

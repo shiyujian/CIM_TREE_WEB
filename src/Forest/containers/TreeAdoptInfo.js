@@ -42,7 +42,8 @@ export default class TreeAdoptInfo extends Component {
             thinclassoption: [],
             treetypeoption: [],
             sectionsData: [],
-            smallClassesData: []
+            smallClassesData: [],
+            statusoption: []
         };
     }
 
@@ -103,6 +104,20 @@ export default class TreeAdoptInfo extends Component {
                 </Option>
             ];
             this.setState({ typeoption });
+
+            // 状态
+            let statusoption = [
+                <Option key={'-1'} value={''} title={'全部'}>
+                    全部
+                </Option>,
+                <Option key={'死亡'} value={'0'} title={'死亡'}>
+                    死亡
+                </Option>,
+                <Option key={'结缘入库'} value={'1'} title={'结缘入库'}>
+                    结缘入库
+                </Option>
+            ];
+            this.setState({ statusoption });
         } catch (e) {
             console.log('componentdidmount', e);
         }
@@ -123,7 +138,7 @@ export default class TreeAdoptInfo extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='苗木结缘信息' {...this.props} />
+                    <DynamicTitle title='苗木状态信息' {...this.props} />
                     <Sidebar width={190}>
                         <PkCodeTree
                             treeData={treeList}
@@ -136,9 +151,9 @@ export default class TreeAdoptInfo extends Component {
                             key={resetkey}
                             {...this.props}
                             {...this.state}
-                            sectionselect={this.sectionselect.bind(this)}
-                            smallclassselect={this.smallclassselect.bind(this)}
-                            thinclassselect={this.thinclassselect.bind(this)}
+                            sectionSelect={this.sectionSelect.bind(this)}
+                            smallClassSelect={this.smallClassSelect.bind(this)}
+                            thinClassSelect={this.thinClassSelect.bind(this)}
                             resetinput={this.resetinput.bind(this)}
                             typeselect={this.typeselect.bind(this)}
                         />
@@ -219,7 +234,7 @@ export default class TreeAdoptInfo extends Component {
         }
     }
     // 标段选择
-    sectionselect (value) {
+    sectionSelect (value) {
         const {
             sectionsData
         } = this.state;
@@ -254,7 +269,7 @@ export default class TreeAdoptInfo extends Component {
     }
 
     // 小班选择, 重新获取: 细班
-    smallclassselect (value) {
+    smallClassSelect (value) {
         const {
             smallClassesData
         } = this.state;
@@ -289,7 +304,7 @@ export default class TreeAdoptInfo extends Component {
     }
 
     // 细班选择, 重新获取: 树种
-    thinclassselect (value) {
+    thinClassSelect (value) {
     }
 
     // 重置

@@ -17,7 +17,13 @@ import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
-import { getSectionNameBySection, getProjectNameBySection } from '../auth';
+import {
+    getSmallThinNameByPlaceData
+} from '../auth';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
 
 export default class CuringTable extends Component {
@@ -60,10 +66,7 @@ export default class CuringTable extends Component {
             },
             {
                 title: '标段',
-                dataIndex: 'Section',
-                render: (text, record) => {
-                    return <p>{this.getBiao(text)}</p>;
-                }
+                dataIndex: 'sectionName'
             },
             {
                 title: '位置',
@@ -83,14 +86,6 @@ export default class CuringTable extends Component {
                 }
             }
         ];
-    }
-    getBiao (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let sectionName = getSectionNameBySection(section, thinClassTree);
-        return sectionName;
     }
     componentDidMount = async () => {
         try {
@@ -238,7 +233,7 @@ export default class CuringTable extends Component {
                             suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
-                            onChange={this.sxmchange.bind(this)}
+                            onChange={this.sxmChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg10'>
@@ -248,7 +243,7 @@ export default class CuringTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
-                            onChange={this.onsectionchange.bind(this)}
+                            onChange={this.onSectionChange.bind(this)}
                         >
                             {sectionoption}
                         </Select>
@@ -260,7 +255,7 @@ export default class CuringTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
-                            onChange={this.onsmallclasschange.bind(this)}
+                            onChange={this.onSmallClassChange.bind(this)}
                         >
                             {smallclassoption}
                         </Select>
@@ -272,7 +267,7 @@ export default class CuringTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
-                            onChange={this.onthinclasschange.bind(this)}
+                            onChange={this.onThinClassChange.bind(this)}
                         >
                             {thinclassoption}
                         </Select>
@@ -284,7 +279,7 @@ export default class CuringTable extends Component {
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={curingTypeSelect}
-                            onChange={this.ontypechange.bind(this)}
+                            onChange={this.onTypeChange.bind(this)}
                         >
                             {curingTypesOption}
                         </Select>
@@ -372,13 +367,13 @@ export default class CuringTable extends Component {
         this.setState({ sxm: '' });
     };
 
-    sxmchange (value) {
+    sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
 
-    onsectionchange (value) {
-        const { sectionselect } = this.props;
-        sectionselect(value || '');
+    onSectionChange (value) {
+        const { sectionSelect } = this.props;
+        sectionSelect(value || '');
         this.setState({
             section: value || '',
             smallclass: '',
@@ -388,10 +383,10 @@ export default class CuringTable extends Component {
         });
     }
 
-    onsmallclasschange (value) {
-        const { smallclassselect } = this.props;
+    onSmallClassChange (value) {
+        const { smallClassSelect } = this.props;
         try {
-            smallclassselect(value);
+            smallClassSelect(value);
             let smallclassData = '';
             if (value) {
                 let arr = value.split('-');
@@ -404,14 +399,14 @@ export default class CuringTable extends Component {
                 thinclassData: ''
             });
         } catch (e) {
-            console.log('onsmallclasschange', e);
+            console.log('onSmallClassChange', e);
         }
     }
 
-    onthinclasschange (value) {
-        const { thinclassselect } = this.props;
+    onThinClassChange (value) {
+        const { thinClassSelect } = this.props;
         try {
-            thinclassselect(value);
+            thinClassSelect(value);
             let thinclassData = '';
             if (value) {
                 let arr = value.split('-');
@@ -422,11 +417,11 @@ export default class CuringTable extends Component {
                 thinclassData
             });
         } catch (e) {
-            console.log('onthinclasschange', e);
+            console.log('onThinClassChange', e);
         }
     }
 
-    ontypechange (value) {
+    onTypeChange (value) {
         this.setState({
             curingTypeSelect: value || ''
         });
@@ -457,26 +452,6 @@ export default class CuringTable extends Component {
     handleCancel () {
         this.setState({ curingModalvisible: false });
     }
-    getThinClassName (no, section) {
-        const { littleBanAll } = this.props;
-        let nob = no.substring(0, 15);
-        let sectionn = section.substring(8, 10);
-        let result = '/';
-
-        if (littleBanAll) {
-            littleBanAll.map(item => {
-                if (
-                    item.No.substring(0, 15) === nob &&
-                    item.No.substring(16, 18) === sectionn
-                ) {
-                    result = item.ThinClassName;
-                }
-            });
-        } else {
-            return <p> / </p>;
-        }
-        return result;
-    }
 
     resetinput () {
         const { resetinput, leftkeycode } = this.props;
@@ -500,8 +475,10 @@ export default class CuringTable extends Component {
         }
 
         const {
-            actions: { getCuringTreeInfo, getqueryTree }
+            actions: { getCuringTreeInfo, getqueryTree },
+            platform: { tree = {} }
         } = this.props;
+        let thinClassTree = tree.thinClassTree;
         let postdata = {
             sxm,
             section,
@@ -526,16 +503,9 @@ export default class CuringTable extends Component {
                     curingTree.order = (page - 1) * size + i + 1;
                     let data = await getqueryTree({}, {sxm: curingTree.SXM});
                     let treeMess = data && data.content && data.content[0];
-                    let place = '';
-                    if (treeMess.Section.indexOf('P010') !== -1) {
-                        place = this.getThinClassName(treeMess.No, treeMess.Section);
-                    } else {
-                        place = `${treeMess.SmallClass}号小班${
-                            treeMess.ThinClass
-                        }号细班`;
-                    }
-                    curingTree.place = place;
-                    curingTree.Project = this.getProject(treeMess.Section);
+                    curingTree.sectionName = getSectionNameBySection(curingTree.Section, thinClassTree);
+                    curingTree.Project = getProjectNameBySection(curingTree.Section, thinClassTree);
+                    curingTree.place = getSmallThinNameByPlaceData(treeMess.Section, treeMess.SmallClass, treeMess.ThinClass, thinClassTree);
                 };
                 let totalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
@@ -600,14 +570,5 @@ export default class CuringTable extends Component {
             console.log('处理图片', e);
         }
         return srcs;
-    }
-
-    getProject (section) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let projectName = getProjectNameBySection(section, thinClassTree);
-        return projectName;
     }
 }

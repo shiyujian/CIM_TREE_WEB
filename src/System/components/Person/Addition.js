@@ -13,8 +13,8 @@ import {
     Switch,
     TreeSelect
 } from 'antd';
-import { getProjectUnits } from '../../../_platform/auth';
-import { base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { getProjectUnits, getUserIsDocument } from '../../../_platform/auth';
+import { base, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API } from '../../../_platform/api';
 let fileTypes =
     'application/jpeg,application/gif,application/png,image/jpeg,image/gif,image/png,image/jpg';
 
@@ -68,10 +68,6 @@ class Addition extends Component {
                 value: roles.filter(role => role.grouptype === 4)
             });
             systemRoles.push({
-                name: '苗圃基地角色',
-                value: roles.filter(role => role.grouptype === 5)
-            });
-            systemRoles.push({
                 name: '供应商角色',
                 value: roles.filter(role => role.grouptype === 6)
             });
@@ -117,12 +113,6 @@ class Addition extends Component {
                             value: roles.filter(role => role.grouptype === 4)
                         });
                         break;
-                    case 5:
-                        systemRoles.push({
-                            name: '苗圃基地角色',
-                            value: roles.filter(role => role.grouptype === 3)
-                        });
-                        break;
                     case 6:
                         systemRoles.push({
                             name: '供应商角色',
@@ -158,7 +148,7 @@ class Addition extends Component {
         if (user.is_superuser) {
             systemRoles.push({
                 name: '苗圃职务',
-                children: ['苗圃'],
+                children: ['苗圃', '苗圃文书'],
                 value: roles.filter(role => role.grouptype === 0)
             });
             systemRoles.push({
@@ -186,11 +176,6 @@ class Addition extends Component {
                 value: roles.filter(role => role.grouptype === 3)
             });
             systemRoles.push({
-                name: '苗圃基地职务',
-                children: ['苗圃基地', '苗圃文书'],
-                value: roles.filter(role => role.grouptype === 5)
-            });
-            systemRoles.push({
                 name: '供应商职务',
                 children: ['供应商', '供应商文书'],
                 value: roles.filter(role => role.grouptype === 6)
@@ -202,7 +187,7 @@ class Addition extends Component {
                     case 0:
                         systemRoles.push({
                             name: '苗圃职务',
-                            children: ['苗圃'],
+                            children: ['苗圃', '苗圃文书'],
                             value: roles.filter(role => role.grouptype === 0)
                         });
                         break;
@@ -247,13 +232,6 @@ class Addition extends Component {
                         });
                         break;
                     case 5:
-                        systemRoles.push({
-                            name: '苗圃基地职务',
-                            children: ['苗圃基地', '苗圃文书'],
-                            value: roles.filter(role => role.grouptype === 5)
-                        });
-                        break;
-                    case 6:
                         systemRoles.push({
                             name: '供应商职务',
                             children: ['供应商', '供应商文书'],
@@ -436,6 +414,9 @@ class Addition extends Component {
             orgTreeSelect
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        // 用户是否为文书
+        let userIsDocument = getUserIsDocument();
+
         let units = this.getUnits();
         let avatar_url = '';
         let avatar_urlName;
@@ -443,7 +424,7 @@ class Addition extends Component {
         let fileList = [];
         if (
             addition.person_avatar_url &&
-            addition.person_avatar_url !== 'http://47.104.160.65:6511'
+            addition.person_avatar_url !== STATIC_UPLOAD_API
         ) {
             avatar_urlName = addition.person_avatar_url.split('/').pop();
             avatar_url =
@@ -463,11 +444,10 @@ class Addition extends Component {
             ];
         }
         // 上传用户签名
-
         let autographList = [];
         if (
             addition.relative_signature_url &&
-            addition.relative_signature_url !== 'http://47.104.160.65:6511'
+            addition.relative_signature_url !== STATIC_UPLOAD_API
         ) {
             const avatar_urlName3 = addition.relative_signature_url
                 .split('/')
@@ -495,7 +475,6 @@ class Addition extends Component {
         if (addition.id_image && addition.id_image[0]) {
             if (addition.id_image[0].name && addition.id_image[0].filepath) {
                 id_image_urlName = addition.id_image[0].name;
-                // filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
                 const id_img = addition.id_image[0].filepath.split('/media')[1];
                 const id_imgs =
                     window.config.STATIC_FILE_IP +
@@ -671,7 +650,7 @@ class Addition extends Component {
                                             />
                                         )}
                                     </FormItem>
-                                    {(user.is_superuser || user.isOwnerClerk) ? (
+                                    {(user.is_superuser) ? (
                                         <FormItem
                                             {...Addition.layout}
                                             label='部门编码'
@@ -741,7 +720,7 @@ class Addition extends Component {
                                             onChange={this.changeRolea.bind(
                                                 this
                                             )}
-                                            mode='multiple'
+                                            // mode='multiple'
                                             style={{ width: '100%' }}
                                         >
                                             {units
@@ -940,7 +919,7 @@ class Addition extends Component {
                                             </Select>
                                         )}
                                     </FormItem>
-                                    {(user.is_superuser || user.isOwnerClerk) ? (
+                                    {(user.is_superuser || userIsDocument) ? (
                                         addition.id
                                             ? (<FormItem
                                                 {...Addition.layout}
@@ -1177,8 +1156,9 @@ class Addition extends Component {
         const {
             actions: { changeAdditionField, getSection }
         } = this.props;
-        getSection(value);
-        changeAdditionField('sections', value);
+        console.log('value', value);
+        getSection([value]);
+        changeAdditionField('sections', [value]);
     }
     changeblack (checked) {
         const {

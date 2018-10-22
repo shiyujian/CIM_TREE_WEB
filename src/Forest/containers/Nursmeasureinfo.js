@@ -183,7 +183,7 @@ export default class Nursmeasureinfo extends Component {
                             key={resetkey}
                             {...this.props}
                             sectionoption={sectionoption}
-                            sectionselect={this.sectionselect.bind(this)}
+                            sectionSelect={this.sectionSelect.bind(this)}
                             bigType={bigType}
                             typeoption={typeoption}
                             mmtypeoption={mmtypeoption}
@@ -270,7 +270,7 @@ export default class Nursmeasureinfo extends Component {
         }
     }
     // 标段选择, 重新获取: 树种
-    sectionselect (value) {
+    sectionSelect (value) {
         const {
             actions: { setkeycode }
         } = this.props;

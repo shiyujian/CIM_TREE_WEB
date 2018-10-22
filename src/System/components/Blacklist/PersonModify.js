@@ -10,7 +10,7 @@ import {
     Upload
 } from 'antd';
 import './PersonModify.less';
-import { PROJECT_UNITS } from '_platform/api';
+import { PROJECT_UNITS, STATIC_UPLOAD_API } from '_platform/api';
 
 const { Option, OptGroup } = Select;
 const FormItem = Form.Item;
@@ -65,7 +65,7 @@ class PersonModify extends Component {
         console.log('addition', addition);
         if (
             addition.account.person_avatar_url &&
-            addition.account.person_avatar_url != 'http://47.104.160.65:6511'
+            addition.account.person_avatar_url != STATIC_UPLOAD_API
         ) {
             const avatar_urlName = addition.account.person_avatar_url
                 .split('/')
@@ -90,7 +90,7 @@ class PersonModify extends Component {
         let fileList1 = [];
         if (
             addition.account.person_signature_url &&
-            addition.account.person_signature_url != 'http://47.104.160.65:6511'
+            addition.account.person_signature_url != STATIC_UPLOAD_API
         ) {
             const avatar_urlName3 = addition.account.person_signature_url
                 .split('/')

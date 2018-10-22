@@ -20,13 +20,12 @@ class AddDemand extends Component {
             purchaseInfo: null, // 回显信息
             sectionList: [], // 标段
             projectList: [], // 项目列表
-            TreeTypeList: [], // 树种类型
-            RegionCodeList: [], // 行政区划树列表
             RegionCode: '', // 行政区划
             treeNames: [], // 树木名称数组
             ProjectName: '', // 项目名称
             Section: '', // 标段
             length: 0, // 树种个数
+            treeTypeList: [], // 未分组树种
             PurchaseDescribe: '', // 求购描述
             dataList: [] // 数组
         };
@@ -35,10 +34,10 @@ class AddDemand extends Component {
         this.SectionList = []; // 标段列表
         this.UseNurseryAddress = ''; // 行政区划地址
         this.purchaseid = ''; // 采购单ID
-        this.treeTypeList = []; // 所有树种类型
+        this.TreeTypeList = []; // 树种类型树列表
+        this.RegionCodeList = []; // 行政区划树列表
         this.handleProjectName = this.handleProjectName.bind(this); // 项目名称
         this.handleSectionName = this.handleSectionName.bind(this); // 标段选择
-        // this.loadRegion = this.loadRegion.bind(this); // 加载市县
         this.handleRegion = this.handleRegion.bind(this); // 行政区划
         this.handleRange = this.handleRange.bind(this); // 起止日期
         this.onAddSpecs = this.onAddSpecs.bind(this); // 新增树种
@@ -126,65 +125,80 @@ class AddDemand extends Component {
             });
         });
         // 获取行政区划编码
-        getRegionCodes().then(rep => {
-            console.log(rep);
-            let RegionCodeList = [];
-            rep.map(item => {
-                if (item.LevelType === '1') {
-                    RegionCodeList.push({
-                        value: item.ID,
-                        label: item.Name
-                    });
-                }
-            });
-            RegionCodeList.map(item => {
-                let arrCity = [];
-                rep.map(row => {
-                    if (row.LevelType === '2' && item.value === row.ParentId) {
-                        arrCity.push({
-                            value: row.ID,
-                            label: row.Name
+        if (window.localStorage.getItem('RegionCodeList')) {
+            this.RegionCodeList = JSON.parse(window.localStorage.getItem('RegionCodeList'));
+        } else {
+            getRegionCodes().then(rep => {
+                let RegionCodeList = [];
+                rep.map(item => {
+                    if (item.LevelType === '1') {
+                        RegionCodeList.push({
+                            value: item.ID,
+                            label: item.Name
                         });
                     }
                 });
-                arrCity.map(row => {
-                    let arrCounty = [];
-                    rep.map(record => {
-                        if (record.LevelType === '3' && row.value === record.ParentId) {
-                            arrCounty.push({
-                                value: record.ID,
-                                label: record.Name
+                RegionCodeList.map(item => {
+                    let arrCity = [];
+                    rep.map(row => {
+                        if (row.LevelType === '2' && item.value === row.ParentId) {
+                            arrCity.push({
+                                value: row.ID,
+                                label: row.Name,
+                                ParentId: row.ParentId
                             });
                         }
                     });
-                    row.children = arrCounty;
+                    arrCity.map(row => {
+                        let arrCounty = [];
+                        rep.map(record => {
+                            if (record.LevelType === '3' && row.value === record.ParentId) {
+                                arrCounty.push({
+                                    value: record.ID,
+                                    label: record.Name,
+                                    MergerName: record.MergerName,
+                                    ParentId: record.ParentId
+                                });
+                            }
+                        });
+                        row.children = arrCounty;
+                    });
+                    item.children = arrCity;
                 });
-                item.children = arrCity;
+                window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
+                this.RegionCodeList = RegionCodeList;
             });
-            this.setState({
-                RegionCodeList
-            });
-        });
+        }
         // 获取树种类型
-        getTreeTypes().then(rep => {
-            this.treeTypeList = rep;
-            TREETYPENO.map(item => {
-                item.value = item.id;
-                item.label = item.name;
-                item.isLeaf = false;
-                item.children = [];
-                rep.map(row => {
-                    row.value = row.ID;
-                    row.label = row.TreeTypeName;
-                    if (item.id === row.TreeTypeNo.slice(0, 1)) {
-                        item.children.push(row);
-                    }
+        if (window.localStorage.getItem('TreeTypeList')) {
+            this.TreeTypeList = JSON.parse(window.localStorage.getItem('TreeTypeList'));
+            getTreeTypes().then(rep => {
+                this.setState({
+                    treeTypeList: rep
                 });
             });
-            this.setState({
-                TreeTypeList: TREETYPENO
+        } else {
+            getTreeTypes().then(rep => {
+                TREETYPENO.map(item => {
+                    item.value = item.id;
+                    item.label = item.name;
+                    item.isLeaf = false;
+                    item.children = [];
+                    rep.map(row => {
+                        row.value = row.ID;
+                        row.label = row.TreeTypeName;
+                        if (item.id === row.TreeTypeNo.slice(0, 1)) {
+                            item.children.push(row);
+                        }
+                    });
+                });
+                window.localStorage.setItem('TreeTypeList', JSON.stringify(TREETYPENO));
+                this.TreeTypeList = TREETYPENO;
+                this.setState({
+                    treeTypeList: rep
+                });
             });
-        });
+        }
         // 获取施工方的责任人电话
         const { id, org_code, phone, name } = getUser();
         this.Creater = id;
@@ -212,6 +226,7 @@ class AddDemand extends Component {
                 });
                 this.UseNurseryAddress = rep.UseNurseryAddress;
             });
+            // 根据采购单id获取采购单规格
             getPurchaseStandard({}, {purchaseid: this.purchaseid}).then(rep => {
                 let arr = [];
                 rep.map(item => {
@@ -260,11 +275,11 @@ class AddDemand extends Component {
     renderCard () {
         let card = [];
         this.state.dataList.map((item, index) => {
-            let str = '';
+            let TreeType = '';
             let TreeTypeID = '';
-            this.treeTypeList.map(row => {
+            this.state.treeTypeList.map(row => {
                 if (row.ID === item.TreeTypeID) {
-                    str = row.TreeTypeNo.slice(0, 1);
+                    TreeType = row.TreeTypeNo.slice(0, 1);
                     TreeTypeID = item.TreeTypeID;
                 }
             });
@@ -272,7 +287,7 @@ class AddDemand extends Component {
                 <Card key={item.cardKey}>
                     <div style={{marginBottom: 10}}>
                         <span>树木名称：</span>
-                        <Cascader value={[str, TreeTypeID]} options={this.state.TreeTypeList} onChange={this.handleTreeTypes.bind(this, item.cardKey)}
+                        <Cascader value={[TreeType, TreeTypeID]} options={this.TreeTypeList} onChange={this.handleTreeTypes.bind(this, item.cardKey)}
                             placeholder='请选择苗木品种' style={{width: 200}} />
                         <span style={{float: 'right'}}>
                             <Button type='primary' onClick={this.deleteCard.bind(this, item.cardKey)} style={{marginRight: 20}}>删除树种</Button>
@@ -286,7 +301,7 @@ class AddDemand extends Component {
         return card;
     }
     render () {
-        const { isAmend, ProjectName, Section, projectList, sectionList, RegionCode, RegionCodeList, StartTime, EndTime, PurchaseDescribe } = this.state;
+        const { isAmend, ProjectName, Section, projectList, sectionList, RegionCode, StartTime, EndTime, PurchaseDescribe } = this.state;
         const { getFieldDecorator } = this.props.form;
         let provinceCode = '';
         let sityCode = '';
@@ -328,15 +343,16 @@ class AddDemand extends Component {
                                     }
                                 </Select>
                             </FormItem>
-                            <FormItem label='用苗地'>
+                            <FormItem label='用苗地址'>
                                 {getFieldDecorator('UseNurseryRegionCode', {
                                     rules: [{required: true, message: '必填项'}],
                                     initialValue: [provinceCode, sityCode, RegionCode]
                                 })(
                                     <Cascader placeholder='选择您所在的城市'
-                                        options={RegionCodeList}
+                                        options={this.RegionCodeList}
                                         onChange={this.handleRegion}
                                         changeOnSelect
+                                        style={{width: 200}}
                                     />
                                 )}
                             </FormItem>
@@ -596,6 +612,7 @@ class AddDemand extends Component {
                     item.TreeTypeName = selectedOptions[1].TreeTypeName;
                 }
             });
+            console.log(dataList);
             this.setState({
                 dataList
             });

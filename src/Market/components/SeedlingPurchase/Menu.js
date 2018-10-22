@@ -55,17 +55,18 @@ class Menu extends Component {
                             <h3>{ProjectName}{Section}采购单</h3>
                             <p className='text-p'>
                                 <span>发布单位：{this.state.organizationName}</span>
-                                <span style={{marginLeft: 20}}>报价起止时间：{StartTime}至{EndTime}</span>
+                                <span style={{marginLeft: 20}}>报价起止时间：{StartTime}&nbsp;至&nbsp;{EndTime}</span>
                             </p>
                             <p className='text-p'>
-                                <span>用苗地：{record.UseNurseryAddress}</span>
+                                <span>用苗地址：{record.UseNurseryAddress}</span>
                                 <span style={{marginLeft: 20}}>采购品种：{record.TreeTypes}</span>
                             </p>
                             <p className='text-p'>联系方式：{record.Phone}（{record.Contacter}）</p>
                         </Col>
                         <Col span={6} style={{textAlign: 'center'}}>
-                            <p style={{marginTop: 22}}>已有 {record.OfferNun} 人报价</p>
-                            <Button type='primary' onClick={this.toPurchaseDetails.bind(this, record.ID)}>需求详情</Button>
+                            {}
+                            <Button type='primary' style={{marginTop: 22}} onClick={this.toPurchaseDetails.bind(this, record.ID)}>需求详情</Button>
+                            <p>已有 {record.OfferNum} 人报价</p>
                         </Col>
                     </Row>
                 </Card>

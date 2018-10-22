@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-25 10:51:59
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-25 11:03:29
+ * @Last Modified time: 2018-10-18 16:50:35
  */
 /**
  *
@@ -224,12 +224,12 @@ export default class ForestContainer extends Component {
                     path: '/forest/checkerinfo',
                     name: '业主抽查信息'
                 },
-                {
-                    key: 'contrastinfo',
-                    id: 'FOREST.CONTRASTINFO',
-                    path: '/forest/contrastinfo',
-                    name: '苗木对比信息'
-                },
+                // {
+                //     key: 'contrastinfo',
+                //     id: 'FOREST.CONTRASTINFO',
+                //     path: '/forest/contrastinfo',
+                //     name: '苗木对比信息'
+                // },
                 {
                     key: 'faithinfo',
                     id: 'FOREST.FAITHINFO',
@@ -252,7 +252,7 @@ export default class ForestContainer extends Component {
                     key: 'treeadoptinfo',
                     id: 'FOREST.TREEADOPTINFO',
                     path: '/forest/treeadoptinfo',
-                    name: '苗木结缘信息'
+                    name: '苗木状态信息'
                 }
             ]
         },

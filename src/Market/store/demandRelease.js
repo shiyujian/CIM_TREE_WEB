@@ -47,10 +47,13 @@ export const actions = {
     changeAddDemandKey
 };
 export default handleActions({
-    [changeAddDemandVisible]: (state, {payload}) => ({
-        ...state,
-        addDemandVisible: payload
-    }),
+    [changeAddDemandVisible]: (state, {payload}) => {
+        console.log(payload);
+        return ({
+            ...state,
+            addDemandVisible: payload
+        });
+    },
     [changeAddDemandKey]: (state, {payload}) => ({
         ...state,
         addDemandKey: payload
