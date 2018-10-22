@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-19 11:22:54
+ * @Last Modified time: 2018-10-20 11:44:06
  */
 import React, { Component } from 'react';
 import {
@@ -35,7 +35,6 @@ import AdoptTreeMessModal from './AdoptTreeMessModal';
 import GetMenuTree from './GetMenuTree';
 import {
     genPopUpContent,
-    computeSignedArea,
     getIconType,
     fillAreaColor,
     getTaskThinClassName,
@@ -46,6 +45,9 @@ import {
     handleCoordinates,
     handleCuringTaskMess
 } from '../auth';
+import {
+    computeSignedArea
+} from '_platform/gisAuth';
 import {
     getSeedlingMess,
     getTreeMessFun,

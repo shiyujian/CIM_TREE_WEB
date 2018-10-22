@@ -78,7 +78,6 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList, getChec
     console.log('projectList', projectList);
     console.log('totalThinClass', totalThinClass);
 
-
     let teamsTree = [];
     PROJECT_UNITS.map(async project => {
         if (project.units) {
@@ -99,7 +98,6 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList, getChec
     });
 
     console.log('teamsTree', teamsTree);
-
 
     return {
         totalThinClass: totalThinClass,
@@ -344,73 +342,6 @@ export const getIconType = (type) => {
 export const fillAreaColor = (index) => {
     let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
     return colors[index % 5];
-};
-// 获取手动框选坐标wkt
-export const getHandleWktData = (coords) => {
-    let wkt = '';
-    let len = coords.length;
-    for (let i = 0; i < coords.length; i++) {
-        if (i === 0) {
-            wkt = '(' + wkt + coords[i][1] + ' ' + coords[i][0] + ',';
-        } else if (i === len - 1) {
-            wkt = wkt + coords[i][1] + ' ' + coords[i][0] + ',' + coords[0][1] + ' ' + coords[0][0] + ')';
-        } else {
-            wkt = wkt + coords[i][1] + ' ' + coords[i][0] + ',';
-        }
-    }
-    return wkt;
-};
-// 获取细班选择坐标wkt
-export const getWktData = (coords) => {
-    let wkt = '';
-    let len = coords.length;
-    for (let i = 0; i < coords.length; i++) {
-        if (i === 0) {
-            wkt = '(' + wkt + coords[i][0] + ' ' + coords[i][1] + ',';
-        } else if (i === len - 1) {
-            wkt = wkt + coords[i][0] + ' ' + coords[i][1] + ',' + coords[0][0] + ' ' + coords[0][1] + ')';
-        } else {
-            wkt = wkt + coords[i][0] + ' ' + coords[i][1] + ',';
-        }
-    }
-    return wkt;
-};
-// 查找区域面积
-export const computeSignedArea = (path, type) => {
-    let radius = 6371009;
-    let len = path.length;
-    if (len < 3) return 0;
-    let total = 0;
-    let prev = path[len - 1];
-    let indexT = 1;
-    let indexG = 0;
-    if (type === 1) {
-        indexT = 0;
-        indexG = 1;
-    }
-    let prevTanLat = Math.tan(((Math.PI / 2 - prev[indexG] / 180 * Math.PI) / 2));
-    let prevLng = (prev[indexT]) / 180 * Math.PI;
-    for (let i in path) {
-        let tanLat = Math.tan((Math.PI / 2 -
-            (path[i][indexG]) / 180 * Math.PI) / 2);
-        let lng = (path[i][indexT]) / 180 * Math.PI;
-
-        // total += this.polarTriangleArea(tanLat, lng, prevTanLat, prevLng);
-        // 上边的方法无法使用，所以把函数写在这里
-        let deltaLng = lng - prevLng;
-        let t = tanLat * prevTanLat;
-        let test = 2 * Math.atan2(t * Math.sin(deltaLng), 1 + t * Math.cos(deltaLng));
-        total += test;
-
-        prevTanLat = tanLat;
-        prevLng = lng;
-    }
-    return Math.abs(total * (radius * radius));
-};
-export const polarTriangleArea = (tanLat, lng, prevTanLat, prevLng) => {
-    let deltaLng = lng - prevLng;
-    let t = tanLat * prevTanLat;
-    return 2 * Math.atan2(t * Math.sin(deltaLng), 1 + t * Math.cos(deltaLng));
 };
 // 获取任务中的标段，小班，细班名称
 export const getTaskThinClassName = (task, totalThinClass) => {
@@ -739,11 +670,11 @@ export const handleAreaLayerData = async (eventKey, treeNodeName, getCheckScope)
         let wkt = rst[0].boundary;
         let arr = [];
         let arrs = '';
-        for(let i=0;i<wkt.length;i++){
+        for (let i = 0; i < wkt.length; i++) {
             arr.push(wkt[i].lat + ' ' + wkt[i].lng);
         }
-        for(let j=0;j<arr.length;j++){
-            arrs = arrs + ','+ arr[j]; 
+        for (let j = 0; j < arr.length; j++) {
+            arrs = arrs + ',' + arr[j];
         }
         arrs = arrs.substr(1);
         coords.push(arrs);
