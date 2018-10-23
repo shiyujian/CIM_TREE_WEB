@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Form, Button, Card, Row, Col, Table, Input } from 'antd';
+import { Form, Button, Card, Row, Col, Table } from 'antd';
 import { CULTIVATIONMODE } from '_platform/api';
 
 class OfferDetails extends Component {
@@ -11,7 +11,6 @@ class OfferDetails extends Component {
             ProjectName: '', // 项目名称
             Section: '', // 标段
             projectList: [], // 项目标段列表
-
             treetypename: ''
         };
         this.purchaseid = ''; // 采购单ID
@@ -19,11 +18,11 @@ class OfferDetails extends Component {
         this.columns = [{
             title: '树种',
             key: '1',
-            dataIndex: 'Price'
+            dataIndex: 'TreeTypeName'
         }, {
             title: '规格',
             key: '2',
-            dataIndex: 'Price'
+            dataIndex: 'ID'
         }, {
             title: '到货单价',
             key: '3',
@@ -31,27 +30,38 @@ class OfferDetails extends Component {
         }, {
             title: '数量',
             key: '4',
-            dataIndex: 'Price'
+            dataIndex: 'Num'
         }, {
             title: '苗源地',
             key: '5',
-            dataIndex: 'Price'
+            dataIndex: 'Source'
         }, {
             title: '备注',
             key: '6',
-            dataIndex: 'Price'
+            dataIndex: 'SpecDescribe'
         }, {
             title: '附件',
             key: '7',
-            dataIndex: 'Price'
+            dataIndex: 'OfferFiles'
         }, {
             title: '状态',
             key: '8',
-            dataIndex: 'Price'
+            dataIndex: 'WinNum',
+            render: (text) => {
+                let str = '';
+                switch (text) {
+                    case 0:
+                        str = '落选';
+                        break;
+                    default:
+                        str = '选标中';
+                }
+                return str;
+            }
         }];
     }
     componentDidMount () {
-        const { getPurchaseById, getWpunittree } = this.props.actions;
+        const { getPurchaseById, getWpunittree, getOffersById } = this.props.actions;
         this.purchaseid = this.props.offerDetailsKey;
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
@@ -76,6 +86,31 @@ class OfferDetails extends Component {
                 OfferNun: rep.OfferNun,
                 CreaterOrg: rep.CreaterOrg,
                 SpecsType
+            });
+        });
+        // 根据id获取报价单信息
+        getOffersById({}, {
+            id: this.purchaseid
+        }).then(rep => {
+            console.log(rep);
+            let dataList = [];
+            rep.map(item => {
+                item.DetailOfferSpecs.map(row => {
+                    dataList.push({
+                        TreeTypeName: row.TreeTypeName,
+                        ID: row.ID,
+                        Price: row.Price,
+                        Num: row.Num,
+                        Source: row.Source,
+                        SpecDescribe: row.SpecDescribe,
+                        OfferFiles: row.OfferFiles,
+                        WinNum: row.WinNum
+                    });
+                });
+            });
+            console.log(dataList, '表格数据');
+            this.setState({
+                dataList
             });
         });
         // 获得所有项目
@@ -116,7 +151,7 @@ class OfferDetails extends Component {
                     </Row>
                 </Card>
                 <Card>
-                    <Table columns={this.columns} dataSource={dataList} />
+                    <Table columns={this.columns} dataSource={dataList} rowKey='ID' />
                 </Card>
             </div>
         );

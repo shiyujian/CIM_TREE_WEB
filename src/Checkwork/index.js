@@ -30,8 +30,8 @@ export default class CheckworkContainer extends Component {
 
     render () {
         const {
-            ElectronicFence,
             AttendanceCount,
+            ElectronicFence,
             AttendanceGroup
         } = this.state || {};
         return (
@@ -44,16 +44,16 @@ export default class CheckworkContainer extends Component {
                     />
                 </Aside>
                 <Main>
-                    {ElectronicFence && (
-                        <Route
-                            path='/checkwork/electronicfence'
-                            component={ElectronicFence}
-                        />
-                    )}
                     {AttendanceCount && (
                         <Route
                             path='/checkwork/attendancecount'
                             component={AttendanceCount}
+                        />
+                    )}
+                    {ElectronicFence && (
+                        <Route
+                            path='/checkwork/electronicfence'
+                            component={ElectronicFence}
                         />
                     )}
                     {AttendanceGroup && (
@@ -69,23 +69,31 @@ export default class CheckworkContainer extends Component {
 
     static menus = [
         {
-            key: 'electronicfence',
-            id: 'CHECKWORK.ELECTRONICFENCE',
-            path: '/checkwork/electronicfence',
-            name: '电子围栏'
-        },
-        {
-            key: 'supplyrelease',
+            key: 'attendancecount',
             id: 'CHECKWORK.ATTENDANCECOUNT',
             path: '/checkwork/attendancecount',
             name: '考勤统计'
         },
         {
-            key: 'demandrelease',
-            id: 'CHECKWORK.ATTENDANCEGROUP',
-            path: '/checkwork/attendancegroup',
-            name: '考勤群体'
-        }
+            key: 'checkworksetup',
+            id: 'CHECKWORK.SETUP',
+            name: '考勤设置',
+            children: [
+                {
+                    key: 'electronicfence',
+                    id: 'CHECKWORK.ELECTRONICFENCE',
+                    path: '/checkwork/electronicfence',
+                    name: '电子围栏'
+                },
+                {
+                    key: 'attendancegroup',
+                    id: 'CHECKWORK.ATTENDANCEGROUP',
+                    path: '/checkwork/attendancegroup',
+                    name: '考勤群体'
+                }
+            ]
+        },
+       
     ];
-    static defaultOpenKeys = ['electronicfence'];
+    static defaultOpenKeys = ['checkworksetup'];
 }

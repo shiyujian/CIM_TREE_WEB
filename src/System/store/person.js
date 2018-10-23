@@ -50,6 +50,8 @@ const getSupplierList = createFetchAction(`${FOREST_API}/system/suppliers`); // 
 const getNurseryList = createFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃列表
 const getRegionCodes = createFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
 
+const getMobileCheck = createFetchAction(`http(s)://phonethird.market.alicloudapi.com/mobileCheck`); // 实名认证
+
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
 const filterReducer = fieldFactory(ID, 'filter');
@@ -85,7 +87,8 @@ export const actions = {
     getOrgTreeDataArr,
     getSupplierList,
     getNurseryList,
-    getRegionCodes
+    getRegionCodes,
+    getMobileCheck
 };
 
 export default handleActions({

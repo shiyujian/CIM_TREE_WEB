@@ -27,6 +27,7 @@ export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{
 // 修改选择地图的方式
 export const changeAddDemandVisible = createAction(`${ID}_changeAddDemandVisible`);
 export const changeAddDemandKey = createAction(`${ID}_changeAddDemandKey`);
+export const changeSeeOfferVisible = createAction(`${ID}_changeSeeOfferVisible`); // 查看报价
 
 export const actions = {
     getCuring,
@@ -44,14 +45,20 @@ export const actions = {
     getTreeTypes,
     getOrgTree_new,
     changeAddDemandVisible,
-    changeAddDemandKey
+    changeAddDemandKey,
+    changeSeeOfferVisible
 };
 export default handleActions({
     [changeAddDemandVisible]: (state, {payload}) => {
-        console.log(payload);
         return ({
             ...state,
             addDemandVisible: payload
+        });
+    },
+    [changeSeeOfferVisible]: (state, {payload}) => {
+        return ({
+            ...state,
+            seeOfferVisible: payload
         });
     },
     [changeAddDemandKey]: (state, {payload}) => ({

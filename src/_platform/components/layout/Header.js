@@ -131,7 +131,7 @@ export default class Header extends Component {
                 key: 'checkwork',
                 id: 'CHECKWORK',
                 title: '考勤管理',
-                path: '/checkwork/electronicfence',
+                path: '/checkwork/attendancecount',
                 icon: <Icon name='print' />
             },
             {
