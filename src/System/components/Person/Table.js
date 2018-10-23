@@ -112,7 +112,10 @@ class Users extends Component {
         return ops;
     }
     // 人员标段和组织机构标段比较器，如果满足条件返回true
-    compare (user, l1, s, node) {
+    compare (user, node, eventKey) {
+        const {
+            orgTreeDataArr
+        } = this.props;
         let groups = user.groups;
         let isClericalStaff = false;
         groups.map((group) => {
@@ -123,17 +126,16 @@ class Users extends Component {
         if (isClericalStaff && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
             return true;
         }
-
         if (user.is_superuser) {
             return true;
         }
-        if (l1 == undefined || s == undefined) {
-            return false;
-        }
-
-        if (s.startsWith(l1)) {
-            return true;
-        }
+        let status = false;
+        orgTreeDataArr.map((code) => {
+            if (code === eventKey) {
+                status = true;
+            }
+        });
+        return status;
     }
 
     search () {
@@ -495,24 +497,16 @@ class Users extends Component {
                 }
             }
         ];
-        let is_active = false;
+
+        let permissionStatus = false;
         if (userc.is_superuser) {
-            is_active = true;
+            permissionStatus = true;
         } else {
             if (code) {
-                const ucodes = userc.account.org_code.split('_');
-                if (ucodes.length > 5) {
-                    ucodes.pop();
-                    const codeu = ucodes.join();
-                    const ucode = codeu.replace(/,/g, '_');
-                    is_active = this.compare(userc, ucode, code, node);
-                } else {
-                    const ucode = userc.account.org_code.substring(0, 9);
-                    is_active = this.compare(userc, ucode, code, node);
-                }
+                permissionStatus = this.compare(userc, node, code);
             }
         }
-        return is_active ? (
+        return permissionStatus ? (
             <div>
                 <Spin
                     tip='加载中'

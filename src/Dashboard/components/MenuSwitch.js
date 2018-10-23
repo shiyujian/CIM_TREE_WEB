@@ -51,30 +51,29 @@ export default class MenuSwitch extends Component {
     options = [
         {
             label: '树木信息',
-            value: 'geojsonFeature_treeMess',
-            IconName: 'square'
+            value: 'geojsonFeature_treeMess'
         },
         {
             label: '树种筛选',
-            value: 'geojsonFeature_treetype',
-            IconName: 'square'
+            value: 'geojsonFeature_treetype'
+        },
+        {
+            label: '辅助管理',
+            value: 'geojsonFeature_auxiliaryManagement'
         },
         {
             label: '安全隐患',
-            value: 'geojsonFeature_risk',
-            IconName: 'warning'
+            value: 'geojsonFeature_risk'
         },
         {
             label: '巡检路线',
-            value: 'geojsonFeature_track',
-            IconName: 'universal-access'
+            value: 'geojsonFeature_track'
         }
     ];
     options1 = [
         {
             label: '养护任务',
-            value: 'geojsonFeature_curingTask',
-            IconName: 'curingTask'
+            value: 'geojsonFeature_curingTask'
         },
         {
             label: '成活率',
