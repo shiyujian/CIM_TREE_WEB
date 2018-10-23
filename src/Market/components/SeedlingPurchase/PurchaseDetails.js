@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Card, Row, Col, Table, Input, Modal, Upload, Icon, message } from 'antd';
+import { Form, Button, Card, Row, Col, Table, Input, Modal, Upload, Icon, InputNumber, message } from 'antd';
 import { CULTIVATIONMODE } from '_platform/api';
 import './PurchaseDetails.less';
 
@@ -25,6 +25,7 @@ class PurchaseDetails extends Component {
             fileList: [] // 文件列表
         };
         this.purchaseid = ''; // 采购单ID
+        this.org_code = ''; // 组织机构code
         this.grouptype = ''; // 本用户组类型
         this.toReturn = this.toReturn.bind(this); // 返回
         this.toOffer = this.toOffer.bind(this); // 我要报价
@@ -34,12 +35,17 @@ class PurchaseDetails extends Component {
     componentDidMount () {
         const { getPurchaseById, getWpunittree, getOrgTree_new } = this.props.actions;
         this.purchaseid = this.props.purchaseDetailsKey;
+        // 获得登陆用户的 苗圃基地/供应商的code
         const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        userData.groups.map(item => {
-            if (item.grouptype === 0 || item.grouptype === 6) {
-                this.grouptype = item.grouptype;
-            }
-        });
+        if (userData && userData.account && userData.groups.length > 0) {
+            userData.groups.map(item => {
+                if (item.grouptype === 0 || item.grouptype === 6) {
+                    this.grouptype = item.grouptype;
+                }
+            });
+            this.org_code = userData.account.org_code;
+        }
+        console.log(userData);
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
             rep.Specs.map(item => {
@@ -88,7 +94,7 @@ class PurchaseDetails extends Component {
             title: '数量',
             key: '2',
             dataIndex: 'Num',
-            render: (text, record, index) => record.isSave ? <span>{text}</span> : <Input style={{width: 100}} onChange={this.toEditOff.bind(this, record, 'Num')} />
+            render: (text, record, index) => record.isSave ? <span>{text}</span> : <InputNumber min={1} max={record.Max} style={{width: 100}} onChange={this.toEditOffValue.bind(this, record, 'Num')} />
         }, {
             title: '苗源地',
             key: '3',
@@ -161,7 +167,7 @@ class PurchaseDetails extends Component {
                             return (
                                 <Card key={index}>
                                     <header>
-                                        <span style={{display: 'inline-block', width: 50}}>{item.TreeTypeName}</span>
+                                        <span style={{display: 'inline-block', width: 70}}>{item.TreeTypeName}</span>
                                         <span style={{display: 'inline-block', width: 450, marginLeft: 20}}>胸径{item.DBH}cm 地经{item.GroundDiameter}cm 自然高{item.Height}cm 冠幅{item.CrownWidth}cm 培育方式：{item.name} {item.Num}棵</span>
                                         {
                                             this.grouptype === '' ? '' : <Button type='primary' style={{marginLeft: 20}} onClick={this.toOffer.bind(this, item.ID)}>我要报价</Button>
@@ -239,6 +245,17 @@ class PurchaseDetails extends Component {
             Specs
         });
     }
+    toEditOffValue (record, str, value) {
+        const { Specs } = this.state;
+        Specs.map(item => {
+            if (item.ID === record.PurchaseSpecID) {
+                item.childrenList[0][str] = value;
+            }
+        });
+        this.setState({
+            Specs
+        });
+    }
     toOffer (id) {
         const { Specs } = this.state;
         Specs.map(item => {
@@ -250,6 +267,7 @@ class PurchaseDetails extends Component {
                     Price: '',
                     SpecDescribe: '',
                     Num: '',
+                    Max: item.Num,
                     OfferFiles: '',
                     Source: ''
                 }];

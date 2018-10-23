@@ -1041,7 +1041,7 @@ class Users extends Component {
                     });
                     // 刷新列表
                     this.clear();
-                    message.success('审核成功');
+                    message.success('操作成功');
                 }
             });
         });

@@ -15,12 +15,32 @@ import {
 } from 'antd';
 import { getProjectUnits, getUserIsDocument } from '../../../_platform/auth';
 import { base, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API } from '../../../_platform/api';
+import { Promise } from 'es6-promise';
 let fileTypes =
     'application/jpeg,application/gif,application/png,image/jpeg,image/gif,image/png,image/jpg';
 
 window.config = window.config || {};
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
+
+const RealName = (addition) => {
+    return new Promise((resolve) => {
+        fetch(`http://phonethird.market.alicloudapi.com/mobileCheck?idCard=${addition.id_num}&mobile=${addition.person_telephone}&name=${addition.person_name}`, {
+            headers: {
+                'Authorization': 'APPCODE ' + 'c091fa7360bc48ff87a3471f028d5645'
+            }
+        }).then(rep => {
+            return rep.json();
+        }).then(rst => {
+            if (rst.status === '01') {
+                message.success('实名认证通过');
+                resolve();
+            } else {
+                message.warning('实名认证失败，请确认信息是否正确');
+            }
+        });
+    });
+};
 
 // export default class Addition extends Component {
 class Addition extends Component {
@@ -1343,7 +1363,6 @@ class Addition extends Component {
         if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
             message.warn('请输入英文字符、数字');
         } else {
-            debugger
             if (addition.id) {
                 for (let i = 0; i < users.length; i++) {
                     // const element = users[i];
@@ -1466,135 +1485,128 @@ class Addition extends Component {
                 this.props.form.validateFields((err, values) => {
                     if (!err) {
                         // 先进行实名认证再注册用户
-                        getMobileCheck({}, {
-                            idCard: addition.id_num,
-                            mobile: addition.person_telephone,
-                            name: addition.person_name
-                        }).then(rep => {
-                            debugger
-                        });
-                        console.log(addition, '注册用户');
-                        debugger
-                        postUser(
-                            {},
-                            {
-                                is_person: true,
-                                username: addition.username,
-                                email: addition.email || '',
-                                password: addition.password,
-                                account: {
-                                    person_code: addition.code,
-                                    person_name: addition.person_name,
-                                    person_type: 'C_PER',
-                                    person_avatar_url:
-                                        this.props.fileList || '',
-                                    person_signature_url:
-                                        this.props.postUploadAutographs || '',
-                                    organization: {
-                                        pk: node.pk,
-                                        code: node.code,
-                                        obj_type: 'C_ORG',
-                                        rel_type: 'member',
-                                        name: node.name
-                                    }
-                                },
-                                tags: addition.tags,
-                                sections: addition.id
-                                    ? addition.sections
-                                    : this.props.isSection,
-                                groups: roles.map(role => +role),
-                                is_active: true,
-                                // black_remark: addition.black_remark,
-                                id_num: addition.id_num,
-                                // is_black: 0,
-                                // 取消身份证照片限制
-                                // id_image: [UploadFilesNums, UploadNegatives],
-                                id_image: [],
-                                basic_params: {
-                                    info: {
-                                        电话: addition.person_telephone || '',
-                                        性别: addition.gender || '',
-                                        技术职称: addition.title || '',
-                                        phone: addition.person_telephone || '',
-                                        sex: addition.gender || '',
-                                        duty: ''
-                                    }
-                                },
-                                extra_params: {},
-                                title: addition.title || ''
-                            }
-                        ).then(rst => {
-                            if (rst.code === 1) {
-                                const msgs = JSON.parse(rst.msg);
-                                if (
-                                    msgs.status === 400 &&
-                                    msgs.error === 'This id_num is blacklist'
-                                ) {
-                                    message.warning('身份证号已经加入黑名单');
-                                    return;
-                                } else {
-                                    message.info('新增人员成功');
-                                    getForestAllUsersData().then((userData) => {
-                                        console.log('userData', userData);
-                                        if (userData && userData.content) {
-                                            window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
-                                            let content = userData.content;
-                                            window.localStorage.setItem(
-                                                'LZ_TOTAL_USER_DATA',
-                                                JSON.stringify(content)
-                                            );
+                        RealName(addition).then(() => {
+                            postUser(
+                                {},
+                                {
+                                    is_person: true,
+                                    username: addition.username,
+                                    email: addition.email || '',
+                                    password: addition.password,
+                                    account: {
+                                        person_code: addition.code,
+                                        person_name: addition.person_name,
+                                        person_type: 'C_PER',
+                                        person_avatar_url:
+                                            this.props.fileList || '',
+                                        person_signature_url:
+                                            this.props.postUploadAutographs || '',
+                                        organization: {
+                                            pk: node.pk,
+                                            code: node.code,
+                                            obj_type: 'C_ORG',
+                                            rel_type: 'member',
+                                            name: node.name
                                         }
-                                    });
+                                    },
+                                    tags: addition.tags,
+                                    sections: addition.id
+                                        ? addition.sections
+                                        : this.props.isSection,
+                                    groups: roles.map(role => +role),
+                                    is_active: true,
+                                    // black_remark: addition.black_remark,
+                                    id_num: addition.id_num,
+                                    // is_black: 0,
+                                    // 取消身份证照片限制
+                                    // id_image: [UploadFilesNums, UploadNegatives],
+                                    id_image: [],
+                                    basic_params: {
+                                        info: {
+                                            电话: addition.person_telephone || '',
+                                            性别: addition.gender || '',
+                                            技术职称: addition.title || '',
+                                            phone: addition.person_telephone || '',
+                                            sex: addition.gender || '',
+                                            duty: ''
+                                        }
+                                    },
+                                    extra_params: {},
+                                    title: addition.title || ''
                                 }
-                                let sectiona = [];
-                                getSection(sectiona);
-                                clearAdditionField();
-                                postUploadFilesImg();
-                                postUploadFilesNum();
-                                postUploadNegative();
-                                postUploadAutograph();
-                                getAutographBtn();
-                                getImgBtn();
-                                getImgNumBtn();
-                                getImgNegative();
-                                const codes = Addition.collect(node);
-                                let paget = '';
-                                const totals = this.props.getTablePages.total;
-                                if (totals >= 9) {
-                                    if (totals.toString().length > 1) {
-                                        const strs1 = totals.toString();
-                                        const strs2 = strs1.substring(
-                                            0,
-                                            strs1.length - 1
-                                        );
-                                        paget = strs2 * 1 + 1;
+                            ).then(rst => {
+                                if (rst.code === 1) {
+                                    const msgs = JSON.parse(rst.msg);
+                                    if (
+                                        msgs.status === 400 &&
+                                        msgs.error === 'This id_num is blacklist'
+                                    ) {
+                                        message.warning('身份证号已经加入黑名单');
+                                        return;
+                                    } else {
+                                        message.info('新增人员成功');
+                                        getForestAllUsersData().then((userData) => {
+                                            console.log('userData', userData);
+                                            if (userData && userData.content) {
+                                                window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
+                                                let content = userData.content;
+                                                window.localStorage.setItem(
+                                                    'LZ_TOTAL_USER_DATA',
+                                                    JSON.stringify(content)
+                                                );
+                                            }
+                                        });
+                                    }
+                                    let sectiona = [];
+                                    getSection(sectiona);
+                                    clearAdditionField();
+                                    postUploadFilesImg();
+                                    postUploadFilesNum();
+                                    postUploadNegative();
+                                    postUploadAutograph();
+                                    getAutographBtn();
+                                    getImgBtn();
+                                    getImgNumBtn();
+                                    getImgNegative();
+                                    const codes = Addition.collect(node);
+                                    let paget = '';
+                                    const totals = this.props.getTablePages.total;
+                                    if (totals >= 9) {
+                                        if (totals.toString().length > 1) {
+                                            const strs1 = totals.toString();
+                                            const strs2 = strs1.substring(
+                                                0,
+                                                strs1.length - 1
+                                            );
+                                            paget = strs2 * 1 + 1;
+                                        } else {
+                                            paget = 1;
+                                        }
                                     } else {
                                         paget = 1;
                                     }
+                                    getUsers(
+                                        {},
+                                        { org_code: codes, page: paget }
+                                    ).then(rest => {
+                                        let pagination = {
+                                            current: paget,
+                                            total: rest.count
+                                        };
+                                        getTablePage(pagination);
+                                    });
+                                    this.setState({
+                                        newKey: Math.random(),
+                                        checkedBtn: null
+                                    });
                                 } else {
-                                    paget = 1;
+                                    if (rst.code === 2) {
+                                        message.warn('用户名已存在！');
+                                    } else {
+                                        message.warn('服务器端报错！');
+                                    }
                                 }
-                                getUsers(
-                                    {},
-                                    { org_code: codes, page: paget }
-                                ).then(rest => {
-                                    let pagination = {
-                                        current: paget,
-                                        total: rest.count
-                                    };
-                                    getTablePage(pagination);
-                                });
-                                this.setState({
-                                    newKey: Math.random(),
-                                    checkedBtn: null
-                                });
-                            } else {
-                                if (rst.code === 2) {
-                                    message.warn('用户名已存在！');
-                                } else {
-                                    message.warn('服务器端报错！');
-                                }
-                            }
+                            });
                         });
                     }
                 });
