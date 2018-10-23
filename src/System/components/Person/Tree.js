@@ -123,7 +123,8 @@ export default class Tree extends Component {
                 getUsers,
                 getTreeModal,
                 getOrgTreeSelect,
-                getOrgTreeByCode
+                getOrgTreeByCode,
+                getOrgTreeDataArr
             }
         } = this.props;
         try {
@@ -131,13 +132,13 @@ export default class Tree extends Component {
             if (user && user.username !== 'admin') {
                 let org_code = user.account.org_code;
                 let parentOrgData = await getCompanyDataByOrgCode(org_code, getOrgTreeByCode);
-                console.log('parentOrgData', parentOrgData);
                 let parentOrgCode = parentOrgData.code;
                 let orgTreeData = await getOrgTreeByCode({code: parentOrgCode});
                 let orgTreeSelectData = Tree.orgloop([orgTreeData]);
                 this.orgTreeDataArr = [];
                 await getOrgTreeSelect(orgTreeSelectData);
-                this.orgArrLoop([orgTreeData], 0);
+                await this.orgArrLoop([orgTreeData], 0);
+                await getOrgTreeDataArr(this.orgTreeDataArr);
             }
             let rst = await getOrgTree({}, { depth: 3 });
             if (rst && rst.children) {

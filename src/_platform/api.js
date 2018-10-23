@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-16 21:13:54
+ * @Last Modified time: 2018-10-23 11:34:30
  */
 /**
  *
@@ -618,12 +618,22 @@ export const MODULES = [
         children: [
             {
                 id: 'FOREST.INFO.NONE',
-                name: '苗木大数据',
+                name: '苗木综合信息',
                 children: [
                     {
                         id: 'FOREST.NURSOVERALLINFO',
                         name: '苗木综合信息'
                     },
+                    {
+                        id: 'FOREST.DATASTATIS',
+                        name: '数据统计'
+                    }
+                ]
+            },
+            {
+                id: 'FOREST.BUILDING.NONE',
+                name: '建设期信息',
+                children: [
                     {
                         id: 'FOREST.NURSMEASUREINFO',
                         name: '苗圃测量信息'
@@ -643,33 +653,31 @@ export const MODULES = [
                     {
                         id: 'FOREST.OWNERINFO',
                         name: '业主抽查信息'
-                    },
-                    {
-                        id: 'FOREST.CONTRASTINFO',
-                        name: '苗木对比信息'
-                    },
-                    {
-                        id: 'FOREST.FAITHINFO',
-                        name: '供应商诚信信息'
-                    },
-                    {
-                        id: 'FOREST.SEEDLINGSCHANGE',
-                        name: '苗木信息修改'
-                    },
+                    }
+                ]
+            },
+            {
+                id: 'FOREST.MANAGEMENT.NONE',
+                name: '养管护信息',
+                children: [
                     {
                         id: 'FOREST.CURINGINFO',
                         name: '养护信息'
                     },
                     {
                         id: 'FOREST.TREEADOPTINFO',
-                        name: '苗木结缘信息'
+                        name: '苗木状态信息'
                     }
                 ]
             },
             {
-                id: 'FOREST.FOREST.IMPORT.NONE',
-                name: '定位数据信息',
+                id: 'FOREST.IMPORT.NONE',
+                name: '数据信息维护',
                 children: [
+                    {
+                        id: 'FOREST.SEEDLINGSCHANGE',
+                        name: '苗木信息修改'
+                    },
                     {
                         id: 'FOREST.DATAIMPORT',
                         name: '定位数据导入'
@@ -679,10 +687,6 @@ export const MODULES = [
                         name: '定位数据导出'
                     }
                 ]
-            },
-            {
-                id: 'FOREST.DATASTATIS',
-                name: '数据统计'
             }
         ]
     },

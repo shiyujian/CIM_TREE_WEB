@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-25 10:51:59
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-18 16:50:35
+ * @Last Modified time: 2018-10-23 11:25:33
  */
 /**
  *
@@ -182,11 +182,112 @@ export default class ForestContainer extends Component {
         );
     }
 
+    // static menus = [
+    //     {
+    //         key: 'info',
+    //         id: 'FOREST.INFO',
+    //         name: '苗木大数据',
+    //         children: [
+    //             {
+    //                 key: 'nursoverallinfo',
+    //                 id: 'FOREST.NURSOVERALLINFO',
+    //                 path: '/forest/nursoverallinfo',
+    //                 name: '苗木综合信息'
+    //             },
+    //             {
+    //                 key: 'nursmeasureinfo',
+    //                 id: 'FOREST.NURSMEASUREINFO',
+    //                 path: '/forest/nursmeasureinfo',
+    //                 name: '苗圃测量信息'
+    //             },
+    //             {
+    //                 key: 'carpackage',
+    //                 id: 'FOREST.CARPACKAGE',
+    //                 path: '/forest/carpackage',
+    //                 name: '车辆打包信息'
+    //             },
+    //             {
+    //                 key: 'locmeasureinfo',
+    //                 id: 'FOREST.LOCMEASUREINFO',
+    //                 path: '/forest/locmeasureinfo',
+    //                 name: '现场测量信息'
+    //             },
+    //             {
+    //                 key: 'supervisorinfo',
+    //                 id: 'FOREST.SUPERVISORINFO',
+    //                 path: '/forest/supervisorinfo',
+    //                 name: '监理抽查信息'
+    //             },
+    //             {
+    //                 key: 'ownerinfo',
+    //                 id: 'FOREST.OWNERINFO',
+    //                 path: '/forest/checkerinfo',
+    //                 name: '业主抽查信息'
+    //             },
+    //             // {
+    //             //     key: 'contrastinfo',
+    //             //     id: 'FOREST.CONTRASTINFO',
+    //             //     path: '/forest/contrastinfo',
+    //             //     name: '苗木对比信息'
+    //             // },
+    //             {
+    //                 key: 'faithinfo',
+    //                 id: 'FOREST.FAITHINFO',
+    //                 path: '/forest/faithinfo',
+    //                 name: '供应商诚信信息'
+    //             },
+    //             {
+    //                 key: 'seedlingschange',
+    //                 id: 'FOREST.SEEDLINGSCHANGE',
+    //                 path: '/forest/seedlingschange',
+    //                 name: '苗木信息修改'
+    //             },
+    //             {
+    //                 key: 'curinginfo',
+    //                 id: 'FOREST.CURINGINFO',
+    //                 path: '/forest/curinginfo',
+    //                 name: '养护信息'
+    //             },
+    //             {
+    //                 key: 'treeadoptinfo',
+    //                 id: 'FOREST.TREEADOPTINFO',
+    //                 path: '/forest/treeadoptinfo',
+    //                 name: '苗木状态信息'
+    //             }
+    //         ]
+    //     },
+    //     {
+    //         key: 'import',
+    //         id: 'FOREST.IMPORT',
+    //         name: '定位数据信息',
+    //         children: [
+    //             {
+    //                 key: 'dataimport',
+    //                 id: 'FOREST.DATAIMPORT',
+    //                 path: '/forest/dataimport',
+    //                 name: '定位数据导入'
+    //             },
+    //             {
+    //                 key: 'dataexport',
+    //                 id: 'FOREST.DATAEXPORT',
+    //                 path: '/forest/dataexport',
+    //                 name: '定位数据导出'
+    //             }
+    //         ]
+    //     },
+    //     {
+    //         key: 'datastatis',
+    //         id: 'FOREST.DATASTATIS',
+    //         path: '/forest/datastatis',
+    //         name: '数据统计'
+    //     }
+    // ];
+
     static menus = [
         {
             key: 'info',
             id: 'FOREST.INFO',
-            name: '苗木大数据',
+            name: '苗木综合信息',
             children: [
                 {
                     key: 'nursoverallinfo',
@@ -194,6 +295,19 @@ export default class ForestContainer extends Component {
                     path: '/forest/nursoverallinfo',
                     name: '苗木综合信息'
                 },
+                {
+                    key: 'datastatis',
+                    id: 'FOREST.DATASTATIS',
+                    path: '/forest/datastatis',
+                    name: '数据统计'
+                }
+            ]
+        },
+        {
+            key: 'building',
+            id: 'FOREST.BUILDING',
+            name: '建设期信息',
+            children: [
                 {
                     key: 'nursmeasureinfo',
                     id: 'FOREST.NURSMEASUREINFO',
@@ -223,25 +337,14 @@ export default class ForestContainer extends Component {
                     id: 'FOREST.OWNERINFO',
                     path: '/forest/checkerinfo',
                     name: '业主抽查信息'
-                },
-                // {
-                //     key: 'contrastinfo',
-                //     id: 'FOREST.CONTRASTINFO',
-                //     path: '/forest/contrastinfo',
-                //     name: '苗木对比信息'
-                // },
-                {
-                    key: 'faithinfo',
-                    id: 'FOREST.FAITHINFO',
-                    path: '/forest/faithinfo',
-                    name: '供应商诚信信息'
-                },
-                {
-                    key: 'seedlingschange',
-                    id: 'FOREST.SEEDLINGSCHANGE',
-                    path: '/forest/seedlingschange',
-                    name: '苗木信息修改'
-                },
+                }
+            ]
+        },
+        {
+            key: 'management',
+            id: 'FOREST.MANAGEMENT',
+            name: '养管护信息',
+            children: [
                 {
                     key: 'curinginfo',
                     id: 'FOREST.CURINGINFO',
@@ -256,38 +359,17 @@ export default class ForestContainer extends Component {
                 }
             ]
         },
-        // {
-        // 	key: 'analyze',
-        // 	id: 'FOREST.ANALYZE',
-        // 	name: '数据分析',
-        // 	children: [{
-        // 		key: 'enteranalyze',
-        // 		id: 'ENTERANALYZE',
-        // 		path: '/forest/enteranalyze',
-        // 		name: '苗木进场分析',
-        // 	},{
-        // 		key: 'scheduleanalyze',
-        // 		id: 'SCHEDULEANALYZE',
-        // 		path: '/forest/scheduleanalyze',
-        // 		name: '种植进度分析',
-        // 	},{
-        // 		key: 'qualityanalyze',
-        // 		id: 'QUALITYANALYZE',
-        // 		path: '/forest/qualityanalyze',
-        // 		name: '种植质量分析',
-        // 	},{
-        // 		key: 'faithanalyze',
-        // 		id: 'FAITHANALYZE',
-        // 		path: '/forest/faithanalyze',
-        // 		name: '诚信供应商分析',
-        // 	}
-        // 	]
-        // },
         {
             key: 'import',
             id: 'FOREST.IMPORT',
-            name: '定位数据信息',
+            name: '数据信息维护',
             children: [
+                {
+                    key: 'seedlingschange',
+                    id: 'FOREST.SEEDLINGSCHANGE',
+                    path: '/forest/seedlingschange',
+                    name: '苗木信息修改'
+                },
                 {
                     key: 'dataimport',
                     id: 'FOREST.DATAIMPORT',
@@ -301,13 +383,7 @@ export default class ForestContainer extends Component {
                     name: '定位数据导出'
                 }
             ]
-        },
-        {
-            key: 'datastatis',
-            id: 'FOREST.DATASTATIS',
-            path: '/forest/datastatis',
-            name: '数据统计'
         }
     ];
-    static defaultOpenKeys = ['info', 'analyze', 'import'];
+    static defaultOpenKeys = ['info', 'import'];
 }

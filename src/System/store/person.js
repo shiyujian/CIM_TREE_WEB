@@ -15,6 +15,7 @@ const getTreeCode = createAction(`${ID}点击tree的节点code`);
 const getIsBtn = createAction(`${ID}控制是否根据角色进行分页`);
 const getIsActive = createAction(`${ID}控制是否根据角色是否禁用启用`);
 const getOrgTreeSelect = createAction(`${ID}获取组织机构TreeSelect`);
+const getOrgTreeDataArr = createAction(`${ID}获取登录用户所在公司的所有部门的code数组`);
 
 // 设置上传的文件列表
 export const postUploadFilesImg = createAction('xhy设置上传的文件列表');
@@ -83,6 +84,7 @@ export const actions = {
     postUploadNegative,
     getImgNegative,
     getOrgTreeSelect,
+    getOrgTreeDataArr,
     getSupplierList,
     getNurseryList,
     getRegionCodes,
@@ -181,5 +183,9 @@ export default handleActions({
     [getOrgTreeSelect]: (state, {payload}) => ({
         ...state,
         orgTreeSelect: payload
+    }),
+    [getOrgTreeDataArr]: (state, {payload}) => ({
+        ...state,
+        orgTreeDataArr: payload
     })
 }, {});

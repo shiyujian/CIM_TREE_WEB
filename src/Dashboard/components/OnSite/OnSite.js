@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-20 11:44:06
+ * @Last Modified time: 2018-10-23 11:18:28
  */
 import React, { Component } from 'react';
 import {
@@ -166,15 +166,6 @@ class OnSite extends Component {
         this.tileSurvivalRateLayerFilter = null; // 成活率范围和标段筛选图层
         this.map = null;
         this.userDetailList = {}; // 人员信息List
-        /* 菜单宽度调整 */
-        this.menu = {
-            startPos: 0,
-            isStart: false,
-            tempMenuWidth: 0,
-            count: 0,
-            minWidth: 260,
-            maxWidth: 500
-        };
     }
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -184,32 +175,27 @@ class OnSite extends Component {
         1: window.config.IMG_W,
         2: window.config.VEC_W
     };
-    // 左侧菜单栏
+    // 左侧菜单栏的Tree型数据
     options = [
         // {
         //     label: '区域地块',
-        //     value: 'geojsonFeature_treeMess',
-        //     IconName: 'square'
+        //     value: 'geojsonFeature_treeMess'
         // },
         {
             label: '巡检路线',
-            value: 'geojsonFeature_track',
-            IconName: 'universal-access'
+            value: 'geojsonFeature_track'
         },
         {
             label: '安全隐患',
-            value: 'geojsonFeature_risk',
-            IconName: 'warning'
+            value: 'geojsonFeature_risk'
         },
         {
             label: '树种筛选',
-            value: 'geojsonFeature_treetype',
-            IconName: 'square'
+            value: 'geojsonFeature_treetype'
         },
         {
             label: '养护任务',
-            value: 'geojsonFeature_curingTask',
-            IconName: 'curingTask'
+            value: 'geojsonFeature_curingTask'
         },
         {
             label: '成活率',
@@ -329,9 +315,6 @@ class OnSite extends Component {
     }
     // 切换全部细班时，将其余图层去除，加载最初始图层
     componentDidUpdate = async (prevProps, prevState) => {
-        // const {
-        //     areaRadioValue = '全部细班'
-        // } = this.state;
         const {
             dashboardCompomentMenu,
             dashboardAreaTreeLayer,
@@ -363,12 +346,12 @@ class OnSite extends Component {
             }
         }
         // 去除树图层
-        if (dashboardAreaTreeLayer && dashboardAreaTreeLayer === 'removeTileTreeLayerBasic' && prevProps.dashboardAreaTreeLayer !== dashboardAreaTreeLayer) {
+        if (
+            dashboardAreaTreeLayer && dashboardAreaTreeLayer === 'removeTileTreeLayerBasic' &&
+            prevProps.dashboardAreaTreeLayer !== dashboardAreaTreeLayer
+        ) {
             this.removeTileTreeLayerBasic();
         }
-        // if (areaRadioValue === '全部细班' && areaRadioValue !== prevState.areaRadioValue && dashboardCompomentMenu === 'geojsonFeature_treeMess') {
-        //     this.getTileLayerTreeBasic();
-        // }
         // 加载树图层
         // 需要考虑选择实际定位时，需要获取筛选图层
         // 需要考虑选择成活率时，需要获取成活率图层
@@ -376,9 +359,9 @@ class OnSite extends Component {
         if (
             dashboardAreaTreeLayer && dashboardAreaTreeLayer === 'tileTreeLayerBasic' &&
             prevProps.dashboardAreaTreeLayer !== dashboardAreaTreeLayer &&
-            // !(areaRadioValue === '实际定位' && dashboardCompomentMenu === 'geojsonFeature_treeMess') &&
             dashboardCompomentMenu !== 'geojsonFeature_survivalRate' &&
             dashboardCompomentMenu !== 'geojsonFeature_treetype' &&
+            dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
             dashboardCompomentMenu !== ''
         ) {
             this.getTileLayerTreeBasic();
@@ -599,10 +582,6 @@ class OnSite extends Component {
     removeAllLayer = () => {
         const {
             areaLayerList, // 区域地块图层list
-            riskMarkerLayerList, // 安全隐患图标图层List
-            curingTaskPlanLayerList, // 养护任务计划养护区域图层List
-            curingTaskRealLayerList, // 养护任务实际养护区域图层List
-            curingTaskMarkerLayerList, // 养护任务图标图层List
             survivalRateMarkerLayerList, // 成活率图标图层List
             treeMarkerLayer,
             realThinClassLayerList,
@@ -624,9 +603,6 @@ class OnSite extends Component {
                 for (let i in realThinClassLayerList) {
                     this.map.removeLayer(realThinClassLayerList[i]);
                 }
-                // this.setState({
-                //     areaRadioValue: '全部细班'
-                // });
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_track') {
                 this.handleRemoveAllTrackLayer();
@@ -660,6 +636,9 @@ class OnSite extends Component {
                 for (let t in adoptTreeMarkerLayerList) {
                     this.map.removeLayer(adoptTreeMarkerLayerList[t]);
                 }
+            }
+            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement') {
+                this.handleRemoveRealThinClassLayer();
             }
         } catch (e) {
             console.log('去除所有图层', e);
@@ -708,6 +687,15 @@ class OnSite extends Component {
             this.map.removeLayer(curingTaskMarkerLayerList[v]);
         }
     }
+    // 去除细班实际区域的图层
+    handleRemoveRealThinClassLayer = () => {
+        const {
+            realThinClassLayerList
+        } = this.state;
+        for (let i in realThinClassLayerList) {
+            this.map.removeLayer(realThinClassLayerList[i]);
+        }
+    }
     /* 渲染菜单panel */
     renderPanel (option) {
         const {
@@ -735,10 +723,6 @@ class OnSite extends Component {
                 case 'geojsonFeature_treeMess':
                     return (
                         <div>
-                            {/* <RadioGroup onChange={this.handleAreaRadioChange.bind(this)} value={this.state.areaRadioValue} style={{marginBottom: 10}}>
-                                <Radio value={'全部细班'}>全部细班</Radio>
-                                <Radio value={'实际定位'}>实际定位</Radio>
-                            </RadioGroup> */}
                             {/* <PkCodeTree
                                 {...this.props}
                                 treeData={tree.thinClassTree || []}
@@ -1054,19 +1038,15 @@ class OnSite extends Component {
             </div>
         );
     }
-    // 选择点击全部细班或实际定位
-    handleAreaRadioChange = async (e) => {
-        this.setState({
-            areaRadioValue: e.target.value
-        });
-    }
     /* 细班选择处理 */
     _handleAreaSelect = async (keys, info) => {
         const {
             areaLayerList,
-            areaRadioValue,
             realThinClassLayerList
         } = this.state;
+        const {
+            dashboardCompomentMenu
+        } = this.props;
         let me = this;
         // 当前选中的节点
         let areaEventTitle = info.node.props.title;
@@ -1099,18 +1079,12 @@ class OnSite extends Component {
                         await me._addAreaLayer(eventKey, treeNodeName);
                     }
                 }
-                if (areaRadioValue === '实际定位') {
+                if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement') {
                     let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
                     if (me.tileTreeLayerBasic) {
                         me.map.removeLayer(me.tileTreeLayerBasic);
                     }
-                    if (me.tileTreeTypeLayerFilter) {
-                        me.map.removeLayer(me.tileTreeTypeLayerFilter);
-                        me.tileTreeTypeLayerFilter = null;
-                    }
-                    for (let i in realThinClassLayerList) {
-                        me.map.removeLayer(realThinClassLayerList[i]);
-                    }
+                    me.handleRemoveRealThinClassLayer();
                     if (realThinClassLayerList[eventKey]) {
                         realThinClassLayerList[eventKey].addTo(me.map);
                     } else {
