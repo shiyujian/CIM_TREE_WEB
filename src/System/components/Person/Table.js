@@ -697,7 +697,6 @@ class Users extends Component {
         );
     }
     handleUserName (e) {
-        console.log(e.target.value);
         this.setState({
             userName: e.target.value
         });
@@ -822,7 +821,6 @@ class Users extends Component {
 
     rowSelection = {
         onChange: selectedRowKeys => {
-            console.log('selectedRowKeys', selectedRowKeys);
             this.setState({ selectedRowKeys: selectedRowKeys });
             this.selectedCodes = selectedRowKeys;
         },

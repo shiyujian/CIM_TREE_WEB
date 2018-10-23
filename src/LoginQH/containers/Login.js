@@ -763,7 +763,7 @@ class Login extends Component {
                                 isOwnerClerk,
                                 person_telephone
                             );
-                            console.log(getUser(), 'cookie存的信息');
+                            console.log(getUser(), 'cookie存的信息2');
 
                             setPermissions(permissions);
 

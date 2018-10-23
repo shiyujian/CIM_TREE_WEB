@@ -433,7 +433,6 @@ class Addition extends Component {
             actions: { changeAdditionField },
             orgTreeSelect
         } = this.props;
-        console.log(addition, '原始数据');
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         // 用户是否为文书
         let userIsDocument = getUserIsDocument();
@@ -546,7 +545,6 @@ class Addition extends Component {
         if (!user.is_superuser) {
             marginTops = '55px';
         }
-        console.log(addition, '编辑信息');
         return (
             <div>
                 {addition.visible && (
@@ -1178,7 +1176,6 @@ class Addition extends Component {
         const {
             actions: { changeAdditionField, getSection }
         } = this.props;
-        console.log('value', value);
         getSection([value]);
         changeAdditionField('sections', [value]);
     }
@@ -1546,7 +1543,6 @@ class Addition extends Component {
                                     } else {
                                         message.info('新增人员成功');
                                         getForestAllUsersData().then((userData) => {
-                                            console.log('userData', userData);
                                             if (userData && userData.content) {
                                                 window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
                                                 let content = userData.content;

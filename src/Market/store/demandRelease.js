@@ -12,6 +12,7 @@ export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], '
 export const getNurseryByPk = createFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃基地列表
 export const getPurchaseList = createFetchAction(`${SEEDLING_API}/purchase/purchases`); // 获取采购列表
 export const getPurchaseById = createFetchAction(`${SEEDLING_API}/purchase/purchase/{{id}}`); // 根据ID获取采购单
+export const getOffersListById = createFetchAction(`${SEEDLING_API}/purchase/offers`); // 根据采购单ID获取报价单
 export const postPurchase = createFetchAction(`${SEEDLING_API}/purchase/purchase`, [], 'POST'); // 增加采购单
 export const putPurchase = createFetchAction(`${SEEDLING_API}/purchase/purchase`, [], 'PUT'); // 编辑采购单
 export const deletePurchase = createFetchAction(`${SEEDLING_API}/purchase/purchase/{{id}}`, [], 'DELETE'); // 删除采购单
@@ -25,7 +26,7 @@ export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); /
 export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`); // 根据code获取组织机构
 
 // 修改选择地图的方式
-export const changeAddDemandVisible = createAction(`${ID}_changeAddDemandVisible`);
+export const changeAddDemandVisible = createAction(`${ID}_changeAddDemandVisible`); // 新增需求
 export const changeAddDemandKey = createAction(`${ID}_changeAddDemandKey`);
 export const changeSeeOfferVisible = createAction(`${ID}_changeSeeOfferVisible`); // 查看报价
 
@@ -33,6 +34,7 @@ export const actions = {
     getCuring,
     getPurchaseList,
     getPurchaseById,
+    getOffersListById,
     postPurchase,
     putPurchase,
     deletePurchase,

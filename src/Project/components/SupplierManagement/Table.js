@@ -13,7 +13,7 @@ class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            status: 1, // 审核状态
+            status: '', // 审核状态
             suppliername: '', // 供应商名称
             total: 0,
             page: 1,
