@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Card, Row, Col, Table, InputNumber, Tag } from 'antd';
-import { CULTIVATIONMODE } from '_platform/api';
+import { Form, Button, Card, Row, Col, Table, InputNumber, Tag, Modal } from 'antd';
+import { CULTIVATIONMODE, FOREST_API } from '_platform/api';
 
 class OfferDetails extends Component {
     constructor (props) {
@@ -28,6 +28,7 @@ class OfferDetails extends Component {
         this.org_code = ''; // 组织机构code
         this.grouptype = ''; // 本用户组类型
         this.toReturn = this.toReturn.bind(this); // 返回
+        this.handleCancel = this.handleCancel.bind(this); // 取消弹框
     }
     componentDidMount () {
         const { getPurchaseById, getWpunittree, getOrgTree_new, getOffersListById } = this.props.actions;
@@ -60,39 +61,30 @@ class OfferDetails extends Component {
             getOffersListById({}, {
                 purchaseid: this.purchaseid
             }).then(rst => {
-                console.log(rst, '报价清单');
                 rst.map(item => {
                     getOrgTree_new({code: item.SupplierID || item.NurseryBaseID}).then(response => {
-                        item.name = response.name;
-                    });
-                });
-                rep.Specs.map(item => {
-                    rst.map(row => {
-                        row.DetailOfferSpecs.map(record => {
-                            if (item.ID === record.ID) {
-                                item.childrenList.push({
-                                    Status: rep.Status,
-                                    org_code: row.SupplierID || row.PurchaseID,
-                                    Price: record.Price,
-                                    OfferNum: record.OfferNum,
-                                    Source: record.Source,
-                                    SpecDescribe: record.SpecDescribe,
-                                    OfferFiles: record.OfferFiles
-                                });
-                            }
+                        return response.name;
+                    }).then((name) => {
+                        console.log(rep, '采购单信息');
+                        console.log(item, '报价清单');
+                        item.DetailOfferSpecs.map(row => {
+                            rep.Specs.map(record => {
+                                if (record.ID === row.ID) {
+                                    record.childrenList.push({
+                                        name: name,
+                                        Price: row.Price,
+                                        OfferNum: row.OfferNum,
+                                        Source: row.Source,
+                                        SpecDescribe: row.SpecDescribe,
+                                        OfferFiles: row.OfferFiles
+                                    });
+                                }
+                            });
+                        });
+                        this.setState({
+                            Specs: rep.Specs
                         });
                     });
-                });
-                rep.Specs.map(item => {
-                    item.childrenList.map(row => {
-                        getOrgTree_new({code: row.org_code}).then(response => {
-                            row.name = response.name;
-                        });
-                    });
-                });
-                console.log(rep.Specs, '1');
-                this.setState({
-                    Specs: rep.Specs
                 });
             });
             // 获取发布单位
@@ -110,7 +102,7 @@ class OfferDetails extends Component {
         });
     }
     render () {
-        const { projectList, ProjectName, Section, StartTime, EndTime, UseNurseryAddress, TreeTypes, Contacter, Phone, Specs, organizationName, Status } = this.state;
+        const { projectList, ProjectName, Section, StartTime, EndTime, UseNurseryAddress, TreeTypes, Contacter, Phone, Specs, organizationName, Status, showModal, OfferFiles } = this.state;
         let projectName = '', section = '';
         projectList.map(item => {
             if (item.No === ProjectName) {
@@ -135,9 +127,10 @@ class OfferDetails extends Component {
             key: '3',
             dataIndex: 'OfferNum',
             render: (text, record) => {
-                console.log(record.Status, '---');
-                if (record.Status === 2) {
-                    return <InputNumber min={1} max={text} onChange={this.handleWinNum.bind(this, record)}>{text}</InputNumber>;
+                if (this.state.Status === 2) {
+                    return <InputNumber
+                        min={1} max={text} defaultValue={text}
+                        onChange={this.handleWinNum.bind(this, record)}>{text}</InputNumber>;
                 } else {
                     return text;
                 }
@@ -155,14 +148,17 @@ class OfferDetails extends Component {
         }, {
             title: '附件',
             key: '6',
-            dataIndex: 'OfferFiles'
+            dataIndex: 'OfferFiles',
+            render: (text, record) => {
+                return <a onClick={this.toSeeFile.bind(this, text)}>查看</a>;
+            }
         }];
         let columnsAction = columns.concat({
             title: '选标',
             key: '7',
             dataIndex: 'OfferFiles',
             render: (text, record) => {
-                return <Button>保存</Button>;
+                return <Button onClick={this.toPurchaseSelect.bind(this)}>提 交</Button>;
             }
         });
         let columnsStatus = columns.concat({
@@ -205,13 +201,21 @@ class OfferDetails extends Component {
                                     {
                                         item.childrenList.length > 0 ? <Table columns={
                                             Status === 1 ? columns : (Status === 2 ? columnsAction : columnsStatus)
-                                        } dataSource={item.childrenList} rowKey='org_code' pagination={false} /> : ''
+                                        } dataSource={item.childrenList} rowKey='name' pagination={false} /> : ''
                                     }
                                 </Card>
                             );
                         })
                     }
                 </Card>
+                <Modal
+                    title='查 看'
+                    visible={showModal}
+                    onOk={this.handleCancel}
+                    onCancel={this.handleCancel}
+                >
+                    <img width='100%' src={FOREST_API + '/' + OfferFiles} alt='文件没找到' />
+                </Modal>
             </div>
         );
     }
@@ -221,6 +225,24 @@ class OfferDetails extends Component {
     handleWinNum (record, value) {
         const { Specs } = this.state;
         console.log(record, Specs);
+    }
+    toSeeFile (OfferFiles, e) {
+        e.preventDefault();
+        this.setState({
+            showModal: true,
+            OfferFiles
+        });
+    }
+    handleCancel () {
+        this.setState({
+            showModal: false
+        });
+    }
+    toPurchaseSelect () {
+        const { postPurchaseSelect } = this.props.actions;
+        postPurchaseSelect().then(rep => {
+
+        });
     }
 }
 

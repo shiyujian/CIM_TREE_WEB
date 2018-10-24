@@ -20,6 +20,7 @@ export const changeStatus = createFetchAction(`${SEEDLING_API}/purchase/changest
 export const getPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/specs`); // 获取采购单规格
 export const postPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/spec`, [], 'POST'); // 增加采购单规格
 export const putPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/spec`, [], 'PUT'); // 采购单规格变更
+export const postPurchaseSelect = createFetchAction(`${SEEDLING_API}/purchase/purchaseselect`, [], 'POST'); // 选标
 export const getWpunittree = createFetchAction(`${FOREST_API}/tree/wpunittree`); // 获得所有项目
 export const getRegionCodes = createFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
 export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); // 获取苗木品种
@@ -46,6 +47,7 @@ export const actions = {
     getRegionCodes,
     getTreeTypes,
     getOrgTree_new,
+    postPurchaseSelect,
     changeAddDemandVisible,
     changeAddDemandKey,
     changeSeeOfferVisible

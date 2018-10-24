@@ -63,7 +63,9 @@ class Tablelevel extends Component {
             <div className='relevance-table'>
                 <Form layout='inline'>
                     <FormItem label='供应商名称'>
-                        <Select style={{width: 200}} value={supplierid} placeholder='请选择供应商' onChange={this.handleSupplier.bind(this)}>
+                        <Select style={{width: 200}} allowClear
+                            value={supplierid} placeholder='请选择供应商'
+                            onChange={this.handleSupplier.bind(this)}>
                             {
                                 SupplierList.map(item => {
                                     return <Option value={item.ID}>{item.SupplierName}</Option>;
@@ -72,7 +74,9 @@ class Tablelevel extends Component {
                         </Select>
                     </FormItem>
                     <FormItem label='苗圃名称'>
-                        <Select style={{width: 200}} value={nurserybaseid} placeholder='请选择苗圃基地' onChange={this.handleNursery.bind(this)}>
+                        <Select style={{width: 200}} allowClear
+                            value={nurserybaseid} placeholder='请选择苗圃基地'
+                            onChange={this.handleNursery.bind(this)}>
                             {
                                 NurseryList.map(item => {
                                     return <Option value={item.ID}>{item.NurseryName}</Option>;

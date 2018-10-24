@@ -33,7 +33,7 @@ class PurchaseDetails extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 取消上传
     }
     componentDidMount () {
-        const { getPurchaseById, getWpunittree, getOrgTree_new } = this.props.actions;
+        const { getPurchaseById, getWpunittree, getOrgTree_new, getOfferInventoryById } = this.props.actions;
         this.purchaseid = this.props.purchaseDetailsKey;
         // 获得登陆用户的 苗圃基地/供应商的code
         const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -45,7 +45,6 @@ class PurchaseDetails extends Component {
             });
             this.org_code = userData.account.org_code;
         }
-        console.log(userData);
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
             rep.Specs.map(item => {
@@ -57,6 +56,31 @@ class PurchaseDetails extends Component {
                 item.childrenList = [];
             });
             console.log(rep.Specs, '规格数据');
+            // 根据采购单ID获取报价清单
+            getOfferInventoryById({}, {
+                purchaseid: this.purchaseid
+            }).then(rst => {
+                rst.map(item => {
+                    item.DetailOfferSpecs.map(row => {
+                        rep.Specs.map(record => {
+                            if (row.ID === record.ID) {
+                                record.childrenList.push({
+                                    isSave: true,
+                                    OfferFiles: row.OfferFiles,
+                                    OfferNum: row.OfferNum,
+                                    Source: row.Source,
+                                    SpecDescribe: row.SpecDescribe,
+                                    Price: row.Price
+                                });
+                            }
+                        });
+                    });
+                });
+                console.log(rep.Specs, '规格数据');
+                this.setState({
+                    Specs: rep.Specs
+                });
+            });
             this.setState({
                 purchaseInfo: rep,
                 ProjectName: rep.ProjectName,
@@ -68,9 +92,9 @@ class PurchaseDetails extends Component {
                 Phone: rep.Phone,
                 OfferNun: rep.OfferNun,
                 CreaterOrg: rep.CreaterOrg,
-                Specs: rep.Specs,
                 TreeTypes: rep.TreeTypes
             });
+            // 获取发布单位名称
             getOrgTree_new({code: rep.CreaterOrg}).then(rep => {
                 this.setState({
                     organizationName: rep.name
@@ -93,8 +117,8 @@ class PurchaseDetails extends Component {
         }, {
             title: '数量',
             key: '2',
-            dataIndex: 'Num',
-            render: (text, record, index) => record.isSave ? <span>{text}</span> : <InputNumber min={1} max={record.Max} style={{width: 100}} onChange={this.toEditOffValue.bind(this, record, 'Num')} />
+            dataIndex: 'OfferNum',
+            render: (text, record, index) => record.isSave ? <span>{text}</span> : <InputNumber min={1} max={record.Max} style={{width: 100}} onChange={this.toEditOffValue.bind(this, record, 'OfferNum')} />
         }, {
             title: '苗源地',
             key: '3',
@@ -110,13 +134,13 @@ class PurchaseDetails extends Component {
             key: '5',
             dataIndex: 'OfferFiles',
             render: (text, record) => {
-                return <a onClick={this.onUpload.bind(this, record)}>添加附件</a>;
+                return record.isSave ? <span>{text}</span> : <a onClick={this.onUpload.bind(this, record)}>添加附件</a>;
             }
         }, {
             title: '操作',
             key: '6',
             dataIndex: 'action',
-            render: (text, record, index) => <a onClick={this.toSave.bind(this, record)}>保 存</a>
+            render: (text, record, index) => record.isSave ? '' : <a onClick={this.toSave.bind(this, record)}>保 存</a>
         }
     ];
     render () {
@@ -206,6 +230,7 @@ class PurchaseDetails extends Component {
     onUpload (record, e) {
         e.preventDefault();
         this.setState({
+            fileList: [],
             showModal: true,
             PurchaseSpecID: record.PurchaseSpecID
         });
@@ -302,7 +327,7 @@ class PurchaseDetails extends Component {
                     PurchaseSpecID: row.PurchaseSpecID,
                     Price: row.Price,
                     SpecDescribe: row.SpecDescribe,
-                    Num: row.Num,
+                    Num: row.OfferNum,
                     OfferFiles: row.OfferFiles,
                     Source: row.Source
                 });

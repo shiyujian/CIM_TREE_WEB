@@ -8,9 +8,9 @@ class Menu extends Component {
         super(props);
         this.state = {
             dataList: [], // 规格列表
-            TreeTypes: [], // 品种数组
-            StartTime: '',
-            EndTime: ''
+            StartTime: '', // 报价开始时间
+            EndTime: '', // 报价结束时间
+            organizationName: '' // 发布单位名称
         };
         this.renderButton = this.renderButton.bind(this); // 显示按钮
         this.toSeeDetails = this.toSeeDetails.bind(this); // 查看详情
@@ -27,6 +27,7 @@ class Menu extends Component {
             });
             // 获取发布单位
             const { getOrgTree_new } = this.props.actions;
+            console.log(this.props.record.CreaterOrg, '1');
             getOrgTree_new({code: this.props.record.CreaterOrg}).then(rep => {
                 this.setState({
                     organizationName: rep.name
@@ -52,11 +53,10 @@ class Menu extends Component {
         getOffersById({}, {
             purchaseid: this.props.record.ID
         }).then(rep => {
-            console.log(rep);
         });
     }
     render () {
-        const { TreeTypes, dataList, StartTime, EndTime, ProjectName, Section } = this.state;
+        const { dataList, StartTime, EndTime, ProjectName, Section, organizationName } = this.state;
         const { record } = this.props;
         let CreateTime = record.CreateTime ? record.CreateTime.split(' ')[0] : '';
         return (
@@ -71,11 +71,9 @@ class Menu extends Component {
                                 }
                             </h3>
                             <p className='text-p'>报价起止时间：{StartTime}至{EndTime}</p>
-                            <p className='text-p'>发布单位：</p>
+                            <p className='text-p'>发布单位：{organizationName}</p>
                             <p className='text-p'>用苗地址：{record.UseNurseryAddress}</p>
-                            <p className='text-p'>采购品种：
-                                {TreeTypes}
-                            </p>
+                            <p className='text-p'>采购品种：{record.TreeTypes}</p>
                         </Col>
                         <Col span={12}>
                             {
