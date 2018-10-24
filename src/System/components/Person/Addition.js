@@ -13,7 +13,8 @@ import {
     Switch,
     TreeSelect
 } from 'antd';
-import { getProjectUnits, getUserIsDocument } from '../../../_platform/auth';
+import { getUserIsDocument } from '../../../_platform/auth';
+import {getSectionNameBySection} from '_platform/gisAuth';
 import { base, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API } from '../../../_platform/api';
 import { Promise } from 'es6-promise';
 let fileTypes =
@@ -57,7 +58,8 @@ class Addition extends Component {
             checkedBtn: null,
             OriginalBlack: null,
             change_alValue: null,
-            black_remarkValue: null
+            black_remarkValue: null,
+            section: ''
         };
     }
     renderContent () {
@@ -394,6 +396,7 @@ class Addition extends Component {
         const {
             sidebar,
             addition,
+            isSection,
             actions: { changeAdditionField }
         } = this.props;
         if (addition && addition.visible && prevProps.addition === undefined) {
@@ -424,6 +427,11 @@ class Addition extends Component {
             changeAdditionField('organizationName', name);
             changeAdditionField('organizationPk', pk);
         }
+        if (isSection && isSection instanceof Array && isSection.length > 0 && isSection !== prevProps.isSection) {
+            this.setState({
+                section: isSection[0]
+            });
+        }
     }
 
     render () {
@@ -431,14 +439,17 @@ class Addition extends Component {
             form: { getFieldDecorator },
             addition = {},
             actions: { changeAdditionField },
-            orgTreeSelect
+            orgTreeSelect,
+            isSection = []
         } = this.props;
-        console.log(addition, '原始数据');
+        const {
+            section
+        } = this.state;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         // 用户是否为文书
         let userIsDocument = getUserIsDocument();
 
-        let units = this.getUnits();
+        let units = this.getUnits(isSection);
         let avatar_url = '';
         let avatar_urlName;
         // 上传用户头像
@@ -546,7 +557,6 @@ class Addition extends Component {
         if (!user.is_superuser) {
             marginTops = '55px';
         }
-        console.log(addition, '编辑信息');
         return (
             <div>
                 {addition.visible && (
@@ -737,9 +747,9 @@ class Addition extends Component {
                                             value={
                                                 addition.id
                                                     ? addition.sections
-                                                    : this.props.isSection
+                                                    : section
                                             }
-                                            onChange={this.changeRolea.bind(
+                                            onChange={this.changeSection.bind(
                                                 this
                                             )}
                                             // mode='multiple'
@@ -752,7 +762,7 @@ class Addition extends Component {
                                                             key={item.code}
                                                             value={item.code}
                                                         >
-                                                            {item.value}
+                                                            {item.name}
                                                         </Option>
                                                     );
                                                 })
@@ -1133,19 +1143,20 @@ class Addition extends Component {
     }
 
     // 获取项目的标段
-    getUnits () {
-        const { sidebar: { node = {} } = {}, listStore = [] } = this.props;
-        let projectName = '';
-        listStore.map((item, index) => {
-            item.map(rst => {
-                if (rst.name === node.name && rst.code === node.code) {
-                    projectName = listStore[index]
-                        ? listStore[index][0].name
-                        : '';
-                }
+    getUnits (sections) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let bigTreeList = tree.bigTreeList;
+        let units = [];
+        sections.map((section) => {
+            let name = getSectionNameBySection(section, bigTreeList);
+            units.push({
+                code: section,
+                name: name
             });
         });
-        return getProjectUnits(projectName);
+        return units;
     }
 
     componentDidMount () {
@@ -1174,12 +1185,13 @@ class Addition extends Component {
         } = this.props;
         changeAdditionField('roles', value);
     }
-    changeRolea (value) {
+    changeSection (value) {
         const {
-            actions: { changeAdditionField, getSection }
+            actions: { changeAdditionField }
         } = this.props;
-        console.log('value', value);
-        getSection([value]);
+        this.setState({
+            section: value
+        });
         changeAdditionField('sections', [value]);
     }
     changeblack (checked) {
@@ -1226,7 +1238,6 @@ class Addition extends Component {
                 getImgNegative,
                 getAutographBtn,
                 putUser,
-                getSection,
                 getTablePage,
                 postUploadFilesNum,
                 getImgNumBtn,
@@ -1237,6 +1248,9 @@ class Addition extends Component {
                 getMobileCheck
             }
         } = this.props;
+        const {
+            section
+        } = this.state;
         const roles = addition.roles || [];
         // 取消身份证照片限制
         // if (!addition.id_image || !addition.id_image.length) {
@@ -1420,7 +1434,7 @@ class Addition extends Component {
                                         name: addition.organizationName
                                     }
                                 },
-                                tags: addition.tags,
+                                tags: addition.tags || [],
                                 sections: addition.sections,
                                 groups: roles.map(role => +role),
                                 // black_remark: addition.black_remark,
@@ -1455,8 +1469,6 @@ class Addition extends Component {
                                 postUploadAutograph();
                                 // 控制是否通过角色条件分页
                                 // getIsBtn(true)
-                                let sectiona = [];
-                                getSection(sectiona);
                                 clearAdditionField();
                                 // 之前不修改人员的部门   所以不需要重新获取人员列表 但是现在要修改部门   所以要重新获取人员列表
                                 const codes = node.code;
@@ -1509,10 +1521,10 @@ class Addition extends Component {
                                             name: node.name
                                         }
                                     },
-                                    tags: addition.tags,
+                                    tags: addition.tags || [],
                                     sections: addition.id
                                         ? addition.sections
-                                        : this.props.isSection,
+                                        : [section],
                                     groups: roles.map(role => +role),
                                     is_active: true,
                                     // black_remark: addition.black_remark,
@@ -1546,7 +1558,6 @@ class Addition extends Component {
                                     } else {
                                         message.info('新增人员成功');
                                         getForestAllUsersData().then((userData) => {
-                                            console.log('userData', userData);
                                             if (userData && userData.content) {
                                                 window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
                                                 let content = userData.content;
@@ -1557,8 +1568,6 @@ class Addition extends Component {
                                             }
                                         });
                                     }
-                                    let sectiona = [];
-                                    getSection(sectiona);
                                     clearAdditionField();
                                     postUploadFilesImg();
                                     postUploadFilesNum();

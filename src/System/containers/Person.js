@@ -5,6 +5,9 @@ import { Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions } from '../store/person';
 import { actions as platformActions } from '_platform/store/global';
 import { Tree, Table, Addition } from '../components/Person';
+import {
+    getAreaTreeData
+} from '_platform/auth';
 
 @connect(
     state => {
@@ -35,10 +38,22 @@ export default class Person extends Component {
             </div>
         );
     }
-    componentDidMount () {
+    // componentDidMount () {
+    //     const {
+    //         actions: { getTags }
+    //     } = this.props;
+    //     getTags({});
+    // }
+
+    componentDidMount = async () => {
         const {
-            actions: { getTags }
+            actions: {
+                getTreeNodeList
+            },
+            platform: { tree = {} }
         } = this.props;
-        getTags({});
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
     }
 }

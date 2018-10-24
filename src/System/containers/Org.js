@@ -26,15 +26,6 @@ import { Tree, Info, Participant, Addition } from '../components/Org';
     })
 )
 
-// @connect(
-// 	state => {
-// 		const {platform, system: {org = {}} = {}} = state;
-// 		return {platform, ...org};
-// 	},
-// 	dispatch => ({
-// 		actions: bindActionCreators({...platformActions, ...actions}, dispatch),
-// 	}),
-// )
 export default class Org extends Component {
     static propTypes = {};
 
@@ -52,5 +43,17 @@ export default class Org extends Component {
                 <Addition {...this.props} />
             </div>
         );
+    }
+
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getTreeNodeList
+            },
+            platform: { tree = {} }
+        } = this.props;
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
     }
 }

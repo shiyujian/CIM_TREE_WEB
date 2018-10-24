@@ -14,7 +14,7 @@ import {
     Form,
     Spin
 } from 'antd';
-import { PROJECT_UNITS } from './../../../_platform/api';
+import {getSectionNameBySection} from '_platform/gisAuth';
 import { formItemLayout } from '../common';
 import { getUser } from '_platform/auth';
 import './index.less';
@@ -27,7 +27,6 @@ class Users extends Component {
         super(props);
         this.state = {
             sections: [],
-            tag: null,
             searchList: [],
             loading: false,
             percent: 0,
@@ -99,10 +98,6 @@ class Users extends Component {
     }
     changeSections (value) {
         this.setState({ sections: value });
-    }
-
-    changeTagss (value) {
-        this.setState({ tag: value });
     }
     initopthins (list) {
         const ops = [];
@@ -251,25 +246,6 @@ class Users extends Component {
             );
         }
     }
-    query (value) {
-        if (value && value.tags) {
-            const { tags = [] } = this.props;
-            let array = value.tags || [];
-            let defaultNurse = [];
-            array.map(item => {
-                tags.map(rst => {
-                    if (rst && rst.ID) {
-                        if (rst.ID.toString() === item) {
-                            defaultNurse.push(
-                                rst.NurseryName + '-' + rst.Factory
-                            );
-                        }
-                    }
-                });
-            });
-            return defaultNurse;
-        }
-    }
     setColor (record, i) {
         if (record.is_black === 1 || record.is_black === true) {
             return 'background';
@@ -373,15 +349,16 @@ class Users extends Component {
                 title: '标段',
                 key: '8',
                 render: (text, record) => {
-                    let str = '';
-                    PROJECT_UNITS.map(item => {
-                        item.units.map(row => {
-                            if (record.account && row.code === record.account.sections[0]) {
-                                str = row.value;
-                            }
-                        });
-                    });
-                    return str;
+                    const {
+                        platform: { tree = {} }
+                    } = this.props;
+                    let bigTreeList = tree.bigTreeList;
+                    if (record && record.account && record.account.sections && record.account.sections.length > 0) {
+                        let name = getSectionNameBySection(record.account.sections[0], bigTreeList);
+                        return name;
+                    } else {
+                        return '/';
+                    }
                 }
             },
             {
@@ -691,7 +668,6 @@ class Users extends Component {
         );
     }
     handleUserName (e) {
-        console.log(e.target.value);
         this.setState({
             userName: e.target.value
         });
@@ -773,7 +749,7 @@ class Users extends Component {
                                     name: element.organization
                                 }
                             },
-                            tags: element.tags,
+                            tags: element.tags || [],
                             sections: element.sections,
                             // groups: [7],
                             groups: [1],
@@ -797,13 +773,9 @@ class Users extends Component {
                     ).then(rst => {
                         // if (rst.id) {
                         // 	clearAdditionField();
-                        // 	console.log("element", element)
-                        // 	// console.log("Addition",Addition)
                         // 	// const codes = element.collect(node);
-                        // 	// console.log("codes", codes)
                         // 	// getUsers({}, { org_code: element.org_code });
                         // } else {
-                        // 	console.log("111")
                         // 	message.warn('服务器端报错！');
                         // }
                     });
@@ -816,7 +788,6 @@ class Users extends Component {
 
     rowSelection = {
         onChange: selectedRowKeys => {
-            console.log('selectedRowKeys', selectedRowKeys);
             this.setState({ selectedRowKeys: selectedRowKeys });
             this.selectedCodes = selectedRowKeys;
         },
@@ -824,13 +795,6 @@ class Users extends Component {
             disabled: record.name === 'Disabled User' // Column configuration not to be checked
         })
     };
-    changeTags (record, value) {
-        record.tags = value;
-        const {
-            actions: { changeAdditionField }
-        } = this.props;
-        changeAdditionField('tags', value);
-    }
 
     append () {
         const {
@@ -856,7 +820,6 @@ class Users extends Component {
     }
 
     remove () {
-        console.log('this.state.selectedRowKeys', this.state.selectedRowKeys);
         if (this.state.selectedRowKeys.length === 0) {
             message.warn('请选择需要删除的数据！');
         } else {
@@ -943,7 +906,7 @@ class Users extends Component {
                         name: user.organization
                     }
                 },
-                tags: user.tags,
+                tags: user.tags || [],
                 sections: user.sections,
                 // groups: [7],
                 groups: groupe,
@@ -1008,7 +971,7 @@ class Users extends Component {
                         name: record.organization
                     }
                 },
-                tags: record.tags,
+                tags: record.tags || [],
                 sections: record.sections,
                 groups: groupe,
                 is_active,
@@ -1082,7 +1045,7 @@ class Users extends Component {
                         name: user.organization
                     }
                 },
-                tags: user.tags,
+                tags: user.tags || [],
                 sections: user.sections,
                 // groups: [7],
                 groups: groupe,

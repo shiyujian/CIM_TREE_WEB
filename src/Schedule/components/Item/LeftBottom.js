@@ -3,9 +3,6 @@ import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
 import {
-    PROJECT_UNITS,
-    TREETYPENO,
-    ECHARTSCOLOR,
     SCHEDULRPROJECT
 } from '../../../_platform/api';
 import moment from 'moment';
