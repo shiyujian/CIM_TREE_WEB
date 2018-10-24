@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table } from 'antd';
+import { Table, Card } from 'antd';
 import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -98,7 +98,7 @@ export default class Datum extends Component {
         const { workflowData } = this.state;
 
         return (
-            <Blade title='待办任务'>
+            <Blade title='待办任务' >
                 <Link to='/selfcare/task'>
                     <span style={{ float: 'right', marginTop: '-30px' }}>
                         MORE
@@ -114,7 +114,6 @@ export default class Datum extends Component {
                         columns={this.columns}
                         pagination={{ showQuickJumper: true, pageSize: 5 }}
                         rowKey='pk'
-                        pagination={{ pageSize: 8 }}
                     />
                 </div>
             </Blade>

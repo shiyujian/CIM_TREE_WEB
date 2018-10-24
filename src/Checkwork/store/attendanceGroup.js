@@ -80,10 +80,11 @@ export const changeCheckGroup = createAction(`${ID}_changeCheckGroup`);
 // 获取组织机构
 const getOrgTreeSelect = createAction(`${ID}获取组织机构TreeSelect`);
 
-//获取组织机构
-export const getOrgTrees =  createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`, [], 'GET')
+//通过code获取组织机构
+export const getOrgTrees =  createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`, [], 'GET');
 
-
+//获取全部组织机构
+export const getAllOrgTree = createFetchAction(`${SERVICE_API}/org-tree/?depth=4`, [], 'GET');
 
 export const actions = {
     getCuring,
@@ -115,6 +116,7 @@ export const actions = {
     changeCheckGroup,
     getOrgTreeSelect,
     getOrgTrees,
+    getAllOrgTree,
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({
@@ -152,5 +154,5 @@ export default handleActions({
     [getOrgTreeSelect]: (state, {payload}) => ({
         ...state,
         orgTreeSelect: payload
-    })
+    }),
 }, {});

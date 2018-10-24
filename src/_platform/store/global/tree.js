@@ -49,60 +49,36 @@ export const getForestUserDetail = createFetchAction(
 export default handleActions(
     {
         [getTreeNodeListOK]: (state, { payload }) => {
-            let user = getUser();
-            if (user && user.sections) {
-                if (JSON.parse(user.sections).length === 0) {
-                    let root = [];
-                    if (payload instanceof Array && payload.length > 0) {
-                        let level2 = [];
-                        root = payload.filter(node => {
-                            return node.Type === '项目工程';
+            let projectList = [];
+            let sectionList = [];
+            if (payload instanceof Array && payload.length > 0) {
+                payload.map(node => {
+                    if (node.Type === '项目工程') {
+                        projectList.push({
+                            Name: node.Name,
+                            No: node.No
                         });
+                    } else if (node.Type === '单位工程') {
+                        let noArr = node.No.split('-');
+                        if (noArr && noArr instanceof Array && noArr.length === 3) {
+                            sectionList.push({
+                                Name: node.Name,
+                                No: node.No,
+                                Parent: noArr[0]
+                            });
+                        }
                     }
-                    return {
-                        ...state,
-                        bigTreeList: root
-                    };
-                } else {
-                    let sections = JSON.parse(user.sections);
-                    let proj = sections[0].substr(0, 4);
-                    let unitProj = [];
-                    sections.map(item => {
-                        unitProj.push(item.substr(0, 7));
+                });
+                for (let i = 0; i < projectList.length; i++) {
+                    projectList[i].children = sectionList.filter(node => {
+                        return node.Parent === projectList[i].No;
                     });
-                    let root = [];
-                    if (payload instanceof Array && payload.length > 0) {
-                        let level2 = [];
-                        root = payload.filter(node => {
-                            return node.Type === '项目工程' && node.No === proj;
-                        });
-                    }
-                    return {
-                        ...state,
-                        bigTreeList: root
-                    };
                 }
-            } else {
-                let root = [];
-                if (payload instanceof Array && payload.length > 0) {
-                    let level2 = [];
-                    root = payload.filter(node => {
-                        return node.Type === '项目工程';
-                    });
-                    level2 = payload.filter(node => {
-                        return node.Type === '子项目工程';
-                    });
-                    for (let i = 0; i < root.length; i++) {
-                        root[i].children = level2.filter(node => {
-                            return node.Parent === root[i].No;
-                        });
-                    }
-                }
-                return {
-                    ...state,
-                    bigTreeList: root
-                };
             }
+            return {
+                ...state,
+                bigTreeList: projectList
+            };
         },
         [getProjectListOK]: (state, { payload }) => {
             let nodeLevel = [];

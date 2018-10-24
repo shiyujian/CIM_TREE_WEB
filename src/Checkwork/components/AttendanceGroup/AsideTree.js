@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Spin, Button, Popconfirm, Modal, Form, Row, Input, Notification } from 'antd';
-import { getUser } from '_platform/auth';
+import { getUser,getCompanyDataByOrgCode } from '_platform/auth';
 import { PROJECT_UNITS } from '_platform/api';
 import { getSectionName } from '../auth';
 import moment from 'moment';
@@ -20,10 +20,15 @@ class AsideTree extends Component {
             dirData: '', // 目录树
             addDisabled: true, // 是否能够添加群体
             selected: false, // 是否选中节点
-            selectKey: '' // 选中节点的key
+            selectKey: '', // 选中节点的key
+            parent: '',
+            projectName: '', // 当前用户的项目信息
+            currentSection: '',  //当前标段
+            currentSectionName: '', //当前标段名称
         };
         this.section = '';
         this.project_code = '';
+        this.orgCode = '';
     }
 
     componentDidMount = async () => {
@@ -37,7 +42,81 @@ class AsideTree extends Component {
             // 然后查看有没有关联标段，没有关联的人无法获取列表
             this._getSectionData();
         }
+
+        // const {
+        //     actions: {
+        //         getOrgTreeByCode
+        //     }
+        // } = this.props;
+        // try {
+        //     this.getSection();
+        //     this.setState({ loading: true });
+        //     if (this.user.username !== 'admin') {
+        //         let orgCode = this.user.account.org_code;
+        //         let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
+        //         console.log('parent', parent);
+        //         this.orgCode = parent.code;
+        //         console.log('this.orgCode', this.orgCode);
+        //     }
+        //     this.setState({ loading: false });
+        // } catch (e) {
+        //     console.log('e', e);
+        // }
+
+
     }
+
+    // 获取当前登陆用户的标段
+    getSection () {
+        let user = getUser();
+        let sections = user.sections;
+        let currentSectionName = '';
+        let projectName = '';
+
+        sections = JSON.parse(sections);
+        if (sections && sections instanceof Array && sections.length > 0) {
+            let section = sections[0];
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                PROJECT_UNITS.map((item) => {
+                    if (code[0] === item.code) {
+                        projectName = item.value;
+                        let units = item.units;
+                        units.map((unit) => {
+                            // 获取当前标段的名字
+                            if (unit.code === section) {
+                                currentSectionName = unit.value;
+                            }
+                        });
+                    }
+                });
+            }
+            this.setState({
+                currentSection: section,
+                currentSectionName: currentSectionName,
+                projectName: projectName
+            });
+        }
+    }
+
+    onSelect (keys = [], e) {
+        let [value] = keys;
+        debugger
+        if (e.selected) {
+            let folder = JSON.parse(value);
+            console.log('folder', folder);
+            let org_code = folder.extra_params.orgCode;
+            let code = folder.code;
+            if ((this.user && this.user.username === 'admin') || this.orgCode === org_code) {
+                this.setState({
+                    selected: e.selected,
+                    selectKey: org_code,
+                });
+            }
+        }
+    }
+
     // 非管理员，获取文档数据
     _getSectionData = async () => {
         let sections = this.user.sections;
@@ -79,48 +158,70 @@ class AsideTree extends Component {
             teamsTree
         });
     }
-    static loop (data = [], parent) {
-        if (data) {
-            if (data.children) {
+    // static loop (data = [], parent) {
+    //     if (data) {
+    //         if (data.children) {
+    //             return (
+    //                 <TreeNode
+    //                     key={data.ID}
+    //                     title={data.GroupName}
+    //                     disabled
+    //                 >
+    //                     {data.children &&
+    //                     data.children.map(m => {
+    //                         return AsideTree.loop(m, data);
+    //                     })}
+    //                 </TreeNode>
+    //             );
+    //         } else if (parent) {
+    //             return (
+    //                 <TreeNode
+    //                     key={`${data.id}^^${parent.ID}`}
+    //                     title={data.name}
+    //                 >
+    //                     {data.children &&
+    //                     data.children.map(m => {
+    //                         return AsideTree.loop(m);
+    //                     })}
+    //                 </TreeNode>
+    //             );
+    //         } else {
+    //             return (
+    //                 <TreeNode
+    //                     key={data.id}
+    //                     title={data.name}
+    //                 >
+    //                     {data.children &&
+    //                     data.children.map(m => {
+    //                         return AsideTree.loop(m);
+    //                     })}
+    //                 </TreeNode>
+    //             );
+    //         }
+    //     }
+    // }
+
+    static loop (data = []) {
+        return data.map(item => {
+            if (item.children && item.children.length) {
                 return (
                     <TreeNode
-                        key={data.ID}
-                        title={data.GroupName}
-                        disabled
+                        key={`${item.pk}--${item.code}--children`}
+                        title={item.name}
                     >
-                        {data.children &&
-                        data.children.map(m => {
-                            return AsideTree.loop(m, data);
-                        })}
-                    </TreeNode>
-                );
-            } else if (parent) {
-                return (
-                    <TreeNode
-                        key={`${data.id}^^${parent.ID}`}
-                        title={data.name}
-                    >
-                        {data.children &&
-                        data.children.map(m => {
-                            return AsideTree.loop(m);
-                        })}
-                    </TreeNode>
-                );
-            } else {
-                return (
-                    <TreeNode
-                        key={data.id}
-                        title={data.name}
-                    >
-                        {data.children &&
-                        data.children.map(m => {
-                            return AsideTree.loop(m);
-                        })}
+                        {AsideTree.loop(item.children)}
                     </TreeNode>
                 );
             }
-        }
+            return (
+                <TreeNode
+                    key={`${item.pk}--${item.code}--${item.obj_type_hum}`}
+                    title={item.name}
+                />
+            );
+        });
     }
+
 
     render () {
         const {
@@ -130,7 +231,8 @@ class AsideTree extends Component {
             selected
         } = this.state;
         const {
-            form: { getFieldDecorator }
+            form: { getFieldDecorator },
+            allorgtree = [],
         } = this.props;
         const FormItemLayout = {
             labelCol: { span: 6 },
@@ -165,7 +267,7 @@ class AsideTree extends Component {
                     </Popconfirm>
                     <div className='aside-main'>
                         <div className='aside'>
-                            {teamsTree.length ? (
+                            {/*{teamsTree.length ? (
                                 <Tree
                                     showLine
                                     defaultExpandAll
@@ -174,6 +276,18 @@ class AsideTree extends Component {
                                     {teamsTree.map(p => {
                                         return AsideTree.loop(p);
                                     })}
+                                </Tree>
+                            ) : (
+                                ''
+                            )}*/}
+                            {allorgtree.length ? (
+                                <Tree
+                                    showLine
+                                    selectedKeys={[this.props.selectedKeys]}
+                                    defaultExpandAll
+                                    onSelect={this.onSelect.bind(this)}
+                                >
+                                    {AsideTree.loop(allorgtree)}
                                 </Tree>
                             ) : (
                                 ''

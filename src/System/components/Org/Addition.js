@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Modal, Row, Col, Form, Input, Select } from 'antd';
-import { getProjectUnits } from '../../../_platform/auth';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -97,8 +96,8 @@ class Addition extends Component {
                         {units
                             ? units.map(item => {
                                 return (
-                                    <Option key={item.code} value={item.code}>
-                                        {item.value}
+                                    <Option key={item.No} value={item.No}>
+                                        {item.Name}
                                     </Option>
                                 );
                             })
@@ -150,19 +149,38 @@ class Addition extends Component {
 
     // 获取项目的标段
     getUnits () {
-        const { sidebar: { node = {} } = {}, listStore = [] } = this.props;
-        let projectName = '';
-        listStore.map((item, index) => {
-            item.map(rst => {
-                if (rst.name === node.name && rst.code === node.code) {
-                    projectName = listStore[index]
-                        ? listStore[index][0].name
-                        : '';
+        try {
+            const {
+                sidebar: { node = {} } = {},
+                listStore = [],
+                platform: { tree = {} }
+            } = this.props;
+            let bigTreeList = tree.bigTreeList || [];
+            let projectName = '';
+            listStore.map((item, index) => {
+                item.map(rst => {
+                    if (rst.name === node.name && rst.code === node.code) {
+                        projectName = listStore[index]
+                            ? listStore[index][0].name
+                            : '';
+                    }
+                });
+            });
+            console.log('projectName', projectName);
+            let units = [];
+            bigTreeList.map((item) => {
+                let itemNameArr = item.Name.split('项目');
+                let name = itemNameArr[0];
+                console.log('name', name);
+                if (projectName.indexOf(name) !== -1) {
+                    units = item.children;
                 }
             });
-        });
-        console.log('projectName', projectName);
-        return getProjectUnits(projectName);
+            console.log('units', units);
+            return units;
+        } catch (e) {
+            console.log('getUnits', e);
+        }
     }
 
     changeCompanyStatus (value) {
@@ -190,7 +208,6 @@ class Addition extends Component {
             companyVisible = true;
         }
         console.log('companyVisible', companyVisible);
-        let companyStatus = '';
         const sections = addition.sections ? addition.sections.join() : [];
         this.props.form.validateFields(async (err, values) => {
             console.log('err', err);

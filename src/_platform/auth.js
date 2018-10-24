@@ -1,5 +1,4 @@
 import cookie from 'js-cookie';
-import {PROJECT_UNITS} from './api';
 
 export default () => {
     return !!cookie.get('id');
@@ -85,16 +84,6 @@ export const getPermissions = () => {
 
 export const removePermissions = () => {
     window.localStorage.removeItem('permissions');
-};
-
-export const getProjectUnits = (projectName) => {
-    let units = [];
-    PROJECT_UNITS.map((item) => {
-        if (projectName.indexOf(item.value) !== -1) {
-            units = item.units;
-        }
-    });
-    return units;
 };
 
 // 校验手机号 以13等开头9位,以0554-4418039
