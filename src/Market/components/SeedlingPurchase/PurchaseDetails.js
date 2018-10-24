@@ -308,11 +308,12 @@ class PurchaseDetails extends Component {
                 });
             });
         });
+        console.log(this.grouptype, this.org_code, '提交code');
         postOffer({}, {
             PurchaseID: this.purchaseid,
             OfferDescribe: '',
-            NurseryBaseID: '',
-            SupplierID: '',
+            NurseryBaseID: this.grouptype === 0 ? this.org_code : '',
+            SupplierID: this.grouptype === 6 ? this.org_code : '',
             OfferSpecs
         }).then(rep => {
             if (rep.code === 1) {

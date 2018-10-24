@@ -99,6 +99,8 @@ export default class Tree extends Component {
             window.sessionStorage.setItem('regionCode_province', JSON.stringify(obj));
         });
         getSupplierList().then(rst => {
+            console.log(rst, '苗圃');
+            window.sessionStorage.setItem('Supplier_list', JSON.stringify(rst.content));
             let obj = {};
             rst.content.map(item => {
                 obj[item.OrgPK] = item.RegionCode;

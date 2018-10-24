@@ -9,7 +9,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { DemandTable, AddDemand } from '../components/DemandRelease';
+import { DemandTable, AddDemand, OfferDetails } from '../components/DemandRelease';
 @connect(
     state => {
         const { market: { demandRelease = {} }, platform } = state;
@@ -31,16 +31,21 @@ export default class DemandRelease extends Component {
 
     render () {
         const {
-            addDemandVisible
+            addDemandVisible, seeOfferVisible
         } = this.props;
-        console.log(addDemandVisible);
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='需求发布' {...this.props} />
                     <Content>
                         {
-                            addDemandVisible ? <AddDemand {...this.props} /> : <DemandTable {...this.props} />
+                            addDemandVisible || seeOfferVisible ? '' : <DemandTable {...this.props} />
+                        }
+                        {
+                            addDemandVisible ? <AddDemand {...this.props} /> : ''
+                        }
+                        {
+                            seeOfferVisible ? <OfferDetails {...this.props} /> : ''
                         }
                     </Content>
                 </Main>

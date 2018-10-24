@@ -33,7 +33,6 @@ export default class DemandRelease extends Component {
         const {
             offerDetailsVisible
         } = this.props;
-        console.log(offerDetailsVisible);
         return (
             <Body>
                 <Main>
