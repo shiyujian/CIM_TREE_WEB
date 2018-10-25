@@ -358,12 +358,12 @@ class AddDemand extends Component {
                             </FormItem>
                             <FormItem label='联系人'>
                                 {getFieldDecorator('Contacter')(
-                                    <Input className='search-input' />
+                                    <Input style={{width: 150}} />
                                 )}
                             </FormItem>
                             <FormItem label='联系电话'>
                                 {getFieldDecorator('Phone')(
-                                    <Input className='search-input' />
+                                    <Input style={{width: 150}} />
                                 )}
                             </FormItem>
                             <FormItem label='报价起止日期'>

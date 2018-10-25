@@ -15,10 +15,23 @@ class OfferList extends Component {
             dataList: [], // 报价单列表
             projectList: [] // 项目标段列表
         };
+        this.org_code = ''; // 组织机构code
+        this.grouptype = ''; // 组织机构类型
         this.onSearch = this.onSearch.bind(this); // 查询
         this.onClear = this.onClear.bind(this); // 清除
     }
     componentDidMount () {
+        // 获取该用户所在机构类型和code
+        const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        if (userData && userData.account && userData.groups.length > 0) {
+            userData.groups.map(item => {
+                if (item.grouptype === 0 || item.grouptype === 6) {
+                    this.grouptype = item.grouptype;
+                }
+            });
+            this.org_code = userData.account.org_code;
+        }
+        console.log(this.org_code, this.grouptype);
         // 获取所有项目和标段
         const { getWpunittree } = this.props.actions;
         getWpunittree().then(rep => {
@@ -91,6 +104,8 @@ class OfferList extends Component {
         });
         const { treetypename, status } = this.props.form.getFieldsValue();
         getPurchaseList({}, {
+            nurserybase: this.grouptype === 0 ? this.org_code : '',
+            supplier: this.grouptype === 6 ? this.org_code : '',
             treetypename: treetypename || '',
             status: status === undefined ? '' : status
         }).then(rep => {

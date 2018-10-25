@@ -1,6 +1,6 @@
 
 import React, {Component} from 'react';
-import { Form, Button, Card, Row, Col, Table, InputNumber, Tag, Modal } from 'antd';
+import { Form, Button, Card, Row, Col, Table, InputNumber, Tag, Modal, message } from 'antd';
 import { CULTIVATIONMODE, FOREST_API } from '_platform/api';
 
 class OfferDetails extends Component {
@@ -25,6 +25,7 @@ class OfferDetails extends Component {
             Status: '' // 状态
         };
         this.purchaseid = ''; // 采购单ID
+        this.Selecter = ''; // 选标人ID
         this.org_code = ''; // 组织机构code
         this.grouptype = ''; // 本用户组类型
         this.toReturn = this.toReturn.bind(this); // 返回
@@ -33,6 +34,11 @@ class OfferDetails extends Component {
     componentDidMount () {
         const { getPurchaseById, getWpunittree, getOrgTree_new, getOffersListById } = this.props.actions;
         this.purchaseid = this.props.addDemandKey;
+        // 获得登陆用户的ID
+        const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        if (userData) {
+            this.Selecter = userData.id;
+        }
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
             rep.Specs.map(item => {
@@ -65,14 +71,15 @@ class OfferDetails extends Component {
                     getOrgTree_new({code: item.SupplierID || item.NurseryBaseID}).then(response => {
                         return response.name;
                     }).then((name) => {
-                        console.log(rep, '采购单信息');
-                        console.log(item, '报价清单');
                         item.DetailOfferSpecs.map(row => {
                             rep.Specs.map(record => {
                                 if (record.ID === row.ID) {
                                     record.childrenList.push({
+                                        isSave: false,
+                                        ID: item.ID,
                                         name: name,
                                         Price: row.Price,
+                                        WinNum: row.OfferNum,
                                         OfferNum: row.OfferNum,
                                         Source: row.Source,
                                         SpecDescribe: row.SpecDescribe,
@@ -125,11 +132,11 @@ class OfferDetails extends Component {
             title: '数量',
             width: 100,
             key: '3',
-            dataIndex: 'OfferNum',
+            dataIndex: 'WinNum',
             render: (text, record) => {
                 if (this.state.Status === 2) {
                     return <InputNumber
-                        min={1} max={text} defaultValue={text}
+                        min={1} max={text} value={text}
                         onChange={this.handleWinNum.bind(this, record)}>{text}</InputNumber>;
                 } else {
                     return text;
@@ -153,19 +160,26 @@ class OfferDetails extends Component {
                 return <a onClick={this.toSeeFile.bind(this, text)}>查看</a>;
             }
         }];
-        let columnsAction = columns.concat({
-            title: '选标',
-            key: '7',
-            dataIndex: 'OfferFiles',
-            render: (text, record) => {
-                return <Button onClick={this.toPurchaseSelect.bind(this)}>提 交</Button>;
-            }
-        });
         let columnsStatus = columns.concat({
             title: '状态',
             key: '8',
-            dataIndex: 'OfferFiles'
+            dataIndex: 'WinNum',
+            render: (text, record) => {
+                console.log(record, '111');
+                if (text) {
+                    return <span style={{color: '#1890ff'}}>中标</span>;
+                }
+            }
         });
+        const rowSelection = {
+            onSelect: (record) => {
+                console.log(record);
+                record.isSave = true;
+                this.setState({
+                    Specs: [...this.state.Specs]
+                });
+            }
+        };
         return (
             <div className='offerDetails' style={{padding: '0 20px'}}>
                 <Button type='primary' style={{marginBottom: 5}} onClick={this.toReturn}>返 回</Button>
@@ -200,12 +214,17 @@ class OfferDetails extends Component {
                                     </header>
                                     {
                                         item.childrenList.length > 0 ? <Table columns={
-                                            Status === 1 ? columns : (Status === 2 ? columnsAction : columnsStatus)
-                                        } dataSource={item.childrenList} rowKey='name' pagination={false} /> : ''
+                                            Status === 3 ? columnsStatus : columns
+                                        } rowSelection={Status === 2 ? rowSelection : null} dataSource={item.childrenList} rowKey='name' pagination={false} /> : ''
                                     }
                                 </Card>
                             );
                         })
+                    }
+                    {
+                        Status === 2 ? <div style={{marginTop: 10, textAlign: 'center'}}>
+                            <Button onClick={this.onSubmit.bind(this)} type='primary'>提交</Button>
+                        </div> : ''
                     }
                 </Card>
                 <Modal
@@ -224,7 +243,16 @@ class OfferDetails extends Component {
     }
     handleWinNum (record, value) {
         const { Specs } = this.state;
-        console.log(record, Specs);
+        Specs.map(item => {
+            item.childrenList.map(row => {
+                if (row.ID === record.ID) {
+                    row.WinNum = value;
+                }
+            });
+        });
+        this.setState({
+            Specs
+        });
     }
     toSeeFile (OfferFiles, e) {
         e.preventDefault();
@@ -238,10 +266,40 @@ class OfferDetails extends Component {
             showModal: false
         });
     }
-    toPurchaseSelect () {
+    onSubmit () {
         const { postPurchaseSelect } = this.props.actions;
-        postPurchaseSelect().then(rep => {
-
+        const { Specs } = this.state;
+        let OfferSpecs = [];
+        Specs.map(item => {
+            item.childrenList.map(row => {
+                if (row.isSave) {
+                    OfferSpecs.push({
+                        ID: item.ID,
+                        WinNum: row.WinNum,
+                        PurchaseOfferID: row.ID
+                    });
+                }
+            });
+        });
+        // debugger
+        // console.log({
+        //     PurchaseID: this.purchaseid,
+        //     Selecter: this.Selecter,
+        //     OfferSpecs: OfferSpecs
+        // });
+        // debugger
+        
+        postPurchaseSelect({}, {
+            PurchaseID: this.purchaseid,
+            Selecter: this.Selecter,
+            OfferSpecs
+        }).then(rep => {
+            if (rep.code === 1) {
+                message.success('选标成功');
+                this.props.actions.changeSeeOfferVisible(false);
+            } else {
+                message.error('选标失败');
+            }
         });
     }
 }

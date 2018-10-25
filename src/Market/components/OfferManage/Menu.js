@@ -152,6 +152,9 @@ class Menu extends Component {
             case 1:
                 arr.push(seeButton);
                 break;
+            case 3:
+                arr.push(seeButton);
+                break;
         }
         return arr;
     }

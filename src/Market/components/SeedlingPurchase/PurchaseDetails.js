@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, Table, Input, Modal, Upload, Icon, InputNumber, message } from 'antd';
-import { CULTIVATIONMODE } from '_platform/api';
+import { CULTIVATIONMODE, FOREST_API } from '_platform/api';
 import './PurchaseDetails.less';
 
 const Dragger = Upload.Dragger;
@@ -20,9 +20,11 @@ class PurchaseDetails extends Component {
             Contacter: '',
             Phone: '',
             organizationName: '', // 组织机构名称
-            showModal: false,
+            showModal: false, // 上传弹框
+            showSeeModal: false, // 查看弹框
             PurchaseSpecID: '', // 规格id
-            fileList: [] // 文件列表
+            fileList: [], // 文件列表
+            OfferFiles: '' // 文件url
         };
         this.purchaseid = ''; // 采购单ID
         this.org_code = ''; // 组织机构code
@@ -134,7 +136,7 @@ class PurchaseDetails extends Component {
             key: '5',
             dataIndex: 'OfferFiles',
             render: (text, record) => {
-                return record.isSave ? <span>{text}</span> : <a onClick={this.onUpload.bind(this, record)}>添加附件</a>;
+                return record.isSave ? <a onClick={this.toSeeFile.bind(this, record)}>查看</a> : <a onClick={this.onUpload.bind(this, record)}>添加附件</a>;
             }
         }, {
             title: '操作',
@@ -144,7 +146,7 @@ class PurchaseDetails extends Component {
         }
     ];
     render () {
-        const { projectList, ProjectName, Section, StartTime, EndTime, UseNurseryAddress, Specs, TreeTypes, Contacter, Phone, organizationName, showModal } = this.state;
+        const { projectList, ProjectName, Section, StartTime, EndTime, UseNurseryAddress, Specs, TreeTypes, Contacter, Phone, organizationName, showModal, showSeeModal, OfferFiles } = this.state;
         let projectName = '', section = '';
         projectList.map(item => {
             if (item.No === ProjectName) {
@@ -224,8 +226,24 @@ class PurchaseDetails extends Component {
                         <p className='ant-upload-text'>请将您所想上传的文件或图片拖曳至该区域</p>
                     </Dragger>
                 </Modal>
+                <Modal
+                    title='查 看'
+                    visible={showSeeModal}
+                    onOk={this.handleCancel}
+                    onCancel={this.handleCancel}
+                >
+                    <img width='100%' src={FOREST_API + '/' + OfferFiles} alt='图片没找到' />
+                </Modal>
             </div>
         );
+    }
+    toSeeFile (record, e) {
+        e.preventDefault();
+        console.log(record, '行数据');
+        this.setState({
+            showSeeModal: true,
+            OfferFiles: record.OfferFiles
+        });
     }
     onUpload (record, e) {
         e.preventDefault();
@@ -256,7 +274,8 @@ class PurchaseDetails extends Component {
     }
     handleCancel () {
         this.setState({
-            showModal: false
+            showModal: false,
+            showSeeModal: false
         });
     }
     toEditOff (record, str, e) {
@@ -343,6 +362,7 @@ class PurchaseDetails extends Component {
         }).then(rep => {
             if (rep.code === 1) {
                 message.success('报价成功了');
+                this.props.actions.changePurchaseDetailsVisible(false);
             } else {
                 message.error('报价失败,' + rep.msg);
             }

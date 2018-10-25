@@ -170,7 +170,7 @@ class Menu extends Component {
                 arr.push(seeButton, downButton, overButton);
                 break;
             case 2:
-                arr.push(seeButton);
+                arr.push(seeButton, deleteButton);
                 break;
             case 3:
                 arr.push(seeButton, deleteButton);

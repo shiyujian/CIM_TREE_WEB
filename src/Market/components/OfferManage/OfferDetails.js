@@ -73,6 +73,7 @@ class OfferDetails extends Component {
             dataIndex: 'WinNum',
             render: (text) => {
                 let strStatus = '';
+                console.log(text, '中标数');
                 switch (this.state.Status) {
                     case 1:
                         strStatus = <span style={{color: '#ff4d4f'}}>报价中</span>;
