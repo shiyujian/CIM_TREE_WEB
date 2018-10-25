@@ -6,7 +6,8 @@ import {
     Select,
     DatePicker,
     Button,
-    Card
+    Card,
+    Notification
 } from 'antd';
 import moment from 'moment';
 import TopLeft from './TopLeft';
@@ -281,6 +282,13 @@ export default class DataStatisTable extends Component {
             }
         } = this.props;
         try {
+            if (!section) {
+                Notification.info({
+                    message: '请选择标段进行查询',
+                    duration: 3
+                });
+                return;
+            }
             let no = '';
             if (thinclass) {
                 let arr = thinclass.split('-');

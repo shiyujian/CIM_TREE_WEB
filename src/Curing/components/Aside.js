@@ -30,7 +30,7 @@ export default class Aside extends Component {
                     float: 'left',
                     width: 160,
                     position: 'absolute',
-                    // height: 'calc(100% - 80px)',
+                    height: 'calc(100% - 80px)',
                     minHeight: this.state.minHeight
                 }}
                 className='platform-aside'
@@ -38,8 +38,8 @@ export default class Aside extends Component {
                 <div
                     style={{
                         width: '100%',
-                        // height: '100%',
-                        height: '950px',
+                        height: 'calc(100% + 80px)',
+                        // height: '950px',
                         position: 'absolute',
                         left: 0,
                         top: 0,

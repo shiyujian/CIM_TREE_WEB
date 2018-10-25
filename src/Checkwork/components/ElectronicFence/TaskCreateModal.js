@@ -23,8 +23,7 @@ class TaskCreateModal extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getCuringTypes,
-                getForestAllUsersData
+                getCuringTypes
             }
         } = this.props;
         let curingTypes = await getCuringTypes();
@@ -38,35 +37,11 @@ class TaskCreateModal extends Component {
         this.setState({
             typeOptionArr
         });
-        // 获取林总数据库中所有的人员
-        let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
-        totalUserData = JSON.parse(totalUserData);
-        if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
-
-        } else {
-            let userData = await getForestAllUsersData();
-            totalUserData = userData && userData.content;
-        }
-        let user = getUser();
-        let signUser = '';
-        totalUserData.map((userData) => {
-            if (userData && userData.PK && Number(userData.PK) === user.id) {
-                signUser = userData;
-            }
-        });
-        this.setState({
-            signUser
-        });
     };
     componentDidUpdate (prevProps, prevState) {
         const {
             noLoading
         } = this.props;
-        if (noLoading && noLoading !== prevProps.noLoading) {
-            this.setState({
-                loading: false
-            });
-        }
     }
 
     render () {
@@ -112,9 +87,7 @@ class TaskCreateModal extends Component {
                 maskClosable={false}
             >
                 <Spin spinning={this.state.loading}>
-                    <Form>
-                        
-                    </Form>
+                    <Form />
                 </Spin>
             </Modal>
 
@@ -180,10 +153,10 @@ class TaskCreateModal extends Component {
             });
             return;
         }
-        if(checkedKeys.length == 0){
+        if (checkedKeys.length == 0) {
             Notification.error({
-                 message: '请先选择群体',
-                 duration: 2
+                message: '请先选择群体',
+                duration: 2
             });
             return;
         }
@@ -195,16 +168,16 @@ class TaskCreateModal extends Component {
                 try {
                     let wkt = groupwkt;
                     let boundary = [];
-                    for(let i=0;i<wkt.length;i++){
+                    for (let i = 0; i < wkt.length; i++) {
                         boundary.push({
-                            lat:wkt[i][1],
-                            lng:wkt[i][0]
-                        })
+                            lat: wkt[i][1],
+                            lng: wkt[i][0]
+                        });
                     }
                     let postData = {
-                        'boundary': boundary,
+                        'boundary': boundary
                     };
-                    let taskData = await postCheckScope({id:checkedKeys[0]}, postData);
+                    let taskData = await postCheckScope({id: checkedKeys[0]}, postData);
                     console.log('taskData', taskData);
                     if (taskData) {
                         Notification.success({

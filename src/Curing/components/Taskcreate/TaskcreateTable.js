@@ -323,14 +323,10 @@ export default class TaskCreateTable extends Component {
             <div className='Curing-container'>
                 <div
                     ref='appendBody'
-                    className='l-map r-main'
+                    className='Curing-map Curing-r-main'
                 >
                     <div
-                        className={`menuPanel ${
-                            this.state.isNotThree ? '' : 'hide'
-                        } ${
-                            this.state.menuIsExtend ? 'animExtend' : 'animFold'
-                        }`}
+                        className={`Curing-menuPanel`}
                         style={
                             this.state.menuIsExtend
                                 ? {
@@ -345,7 +341,7 @@ export default class TaskCreateTable extends Component {
                                 }
                         }
                     >
-                        <aside className='aside' draggable='false'>
+                        <aside className='Curing-aside' draggable='false'>
                             <div style={{margin: 10}}>
                                 <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
                                 <Checkbox checked={this.state.curingLayerChecked} onChange={this.curingLayerChange.bind(this)}>展示养护图层</Checkbox>
@@ -368,7 +364,7 @@ export default class TaskCreateTable extends Component {
                         </aside>
                         {this.state.menuIsExtend ? (
                             <div
-                                className='foldBtn'
+                                className='Curing-foldBtn'
                                 style={{ left: this.state.menuWidth }}
                                 onClick={this._extendAndFold.bind(this)}
                             >
@@ -376,7 +372,7 @@ export default class TaskCreateTable extends Component {
                             </div>
                         ) : (
                             <div
-                                className='foldBtn'
+                                className='Curing-foldBtn'
                                 style={{ left: this.state.menuWidth }}
                                 onClick={this._extendAndFold.bind(this)}
                             >
@@ -386,7 +382,7 @@ export default class TaskCreateTable extends Component {
                     </div>
                     {
                         createBtnVisible ? (
-                            <div className='treeControl2'>
+                            <div className='Curing-treeControl2'>
                                 <div>
                                     <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
                                     {RetreatDisplay ? '' : <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
@@ -405,7 +401,7 @@ export default class TaskCreateTable extends Component {
                             />
                         ) : ''
                     }
-                    <div className='treeControl'>
+                    <div className='Curing-treeControl'>
                         <div>
                             <Button
                                 type={

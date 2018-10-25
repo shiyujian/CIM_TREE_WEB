@@ -5,9 +5,6 @@ import { Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions } from '../store/person';
 import { actions as platformActions } from '_platform/store/global';
 import { Tree, Table, Addition } from '../components/Person';
-import {
-    getAreaTreeData
-} from '_platform/auth';
 
 @connect(
     state => {
