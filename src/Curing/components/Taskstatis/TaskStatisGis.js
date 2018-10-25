@@ -103,11 +103,10 @@ export default class TaskStatisGis extends Component {
             <div className='Curing-container' style={{display: display}}>
                 <div
                     ref='appendBody'
-                    className='l-map r-main'
+                    className='Curing-map Curing-r-main'
                 >
                     {this.state.isVisibleMapBtn ? (
-                        <div className='treeControl'>
-                            {/* <iframe allowTransparency={true} className={styles.btnCtro}/> */}
+                        <div className='Curing-treeControl'>
                             <div>
                                 <Button
                                     type={
@@ -134,11 +133,11 @@ export default class TaskStatisGis extends Component {
                     ) : (
                         ''
                     )}
-                    <div className='treeControl3'>
-                        <div className='buttonStyle'>
+                    <div className='Curing-treeControl3'>
+                        <div className='Curing-buttonStyle'>
                             <Button type='primary' style={{marginRight: 10}} onClick={this._handleReturnTable.bind(this)}>返回</Button>
                         </div>
-                        <div className='buttonStyle'>
+                        <div className='Curing-buttonStyle'>
                             <Button type={this.state.treeLayerChecked ? 'primary' : 'info'} onClick={this.treeLayerChange.bind(this)}>{this.state.treeLayerChecked ? '取消树图层' : '展示树图层'}</Button>
                         </div>
                     </div>

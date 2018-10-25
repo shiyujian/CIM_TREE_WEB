@@ -30,19 +30,8 @@ export const getSectionName = (section) => {
 export const genPopUpContent = (geo) => {
     const { properties = {} } = geo;
     switch (geo.type) {
-        case 'danger': {
-            return `<div>
-                    <h2><span>隐患内容：</span>${properties.name}</h2>
-                    <h2><span>隐患类型：</span>${properties.riskType}</h2>
-                    <h2><span>隐患描述：</span>${properties.Problem}</h2>
-                    <h2><span>整改状态：</span>${properties.status}</h2>
-                    <h2 class="btnRow">
-                        <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                    </h2>
-                </div>`;
-        }
         case 'task': {
-            return `<div class="popupBox">
+            return `<div class="Curing-popupBox">
                     <h2><span>养护类型：</span>${properties.typeName}</h2>
                     <h2><span>状态：</span>${properties.status}</h2>
                     <h2><span>养护人：</span>${properties.CuringMans}</h2>
@@ -56,12 +45,12 @@ export const genPopUpContent = (geo) => {
                     <h2><span>实际开始时间：</span>${properties.StartTime}</h2>
                     <h2><span>实际结束时间：</span>${properties.EndTime}</h2>
                 </div>`;
-            // <h2 class="btnRow">
-            //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
+            // <h2 class="Curing-btnRow">
+            //     <a href="javascript:;" class="Curing-btnViewTask" data-id=${properties.ID}>查看详情</a>
             // </h2>
         }
         case 'realTask': {
-            return `<div class="popupBox">
+            return `<div class="Curing-popupBox">
                     <h2><span>养护类型：</span>${properties.typeName}</h2>
                     <h2><span>状态：</span>${properties.status}</h2>
                     <h2><span>养护人：</span>${properties.CuringMans}</h2>
@@ -75,8 +64,8 @@ export const genPopUpContent = (geo) => {
                     <h2><span>实际开始时间：</span>${properties.StartTime}</h2>
                     <h2><span>实际结束时间：</span>${properties.EndTime}</h2>
                 </div>`;
-            // <h2 class="btnRow">
-            //     <a href="javascript:;" class="btnViewTask" data-id=${properties.ID}>查看详情</a>
+            // <h2 class="Curing-btnRow">
+            //     <a href="javascript:;" class="Curing-btnViewTask" data-id=${properties.ID}>查看详情</a>
             // </h2>
         }
         default: {
@@ -87,18 +76,10 @@ export const genPopUpContent = (geo) => {
 // 获取对应的ICON
 export const getIconType = (type) => {
     switch (type) {
-        case 'people':
-            return 'peopleIcon';
-        case 'safety':
-            return 'cameraIcon';
-        case 'danger':
-            return 'dangerIcon';
-        case 'tree':
-            return 'treeIcon';
         case 'task':
-            return 'taskIcon';
+            return 'Curing-taskIcon';
         case 'realTask':
-            return 'taskIcon';
+            return 'Curing-taskIcon';
         default:
             break;
     }
@@ -418,7 +399,7 @@ export const getCuringTaskReportTreeData = async (getCuringTypes, getCuring) => 
     };
 };
 // 点击区域地块处理细班坐标数据
-export const handleAreaLayerData = async (eventKey, treeNodeName, getTreearea) => {
+export const handleAreaLayerData = async (eventKey, getTreearea) => {
     let handleKey = eventKey.split('-');
     let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
     let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];

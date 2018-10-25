@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import { Tree, Spin, Button, Popconfirm, Modal, Form, Row, Input, Notification } from 'antd';
-import { getUser,getCompanyDataByOrgCode } from '_platform/auth';
-import { PROJECT_UNITS } from '_platform/api';
-import { getSectionName } from '../auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import './AttendanceGroupTable.less';
@@ -21,408 +18,220 @@ class AsideTree extends Component {
             addDisabled: true, // 是否能够添加群体
             selected: false, // 是否选中节点
             selectKey: '', // 选中节点的key
-            parent: '',
-            projectName: '', // 当前用户的项目信息
-            currentSection: '',  //当前标段
-            currentSectionName: '', //当前标段名称
+            parent: ''
         };
-        this.section = '';
-        this.project_code = '';
-        this.orgCode = '';
     }
 
     componentDidMount = async () => {
-        this.user = getUser();
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
-        // 首先查看是否为管理员，是的话，获取全部信息
-        if (this.user.username === 'admin') {
-            this._getAdminData();
-        } else if (sections && sections instanceof Array && sections.length > 0) {
-            // 然后查看有没有关联标段，没有关联的人无法获取列表
-            this._getSectionData();
-        }
-
-        // const {
-        //     actions: {
-        //         getOrgTreeByCode
-        //     }
-        // } = this.props;
-        // try {
-        //     this.getSection();
-        //     this.setState({ loading: true });
-        //     if (this.user.username !== 'admin') {
-        //         let orgCode = this.user.account.org_code;
-        //         let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-        //         console.log('parent', parent);
-        //         this.orgCode = parent.code;
-        //         console.log('this.orgCode', this.orgCode);
-        //     }
-        //     this.setState({ loading: false });
-        // } catch (e) {
-        //     console.log('e', e);
-        // }
-
-
-    }
-
-    // 获取当前登陆用户的标段
-    getSection () {
-        let user = getUser();
-        let sections = user.sections;
-        let currentSectionName = '';
-        let projectName = '';
-
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
-            let code = section.split('-');
-            if (code && code.length === 3) {
-                // 获取当前标段所在的项目
-                PROJECT_UNITS.map((item) => {
-                    if (code[0] === item.code) {
-                        projectName = item.value;
-                        let units = item.units;
-                        units.map((unit) => {
-                            // 获取当前标段的名字
-                            if (unit.code === section) {
-                                currentSectionName = unit.value;
-                            }
-                        });
-                    }
-                });
-            }
+        let user = localStorage.getItem('QH_USER_DATA');
+        user = JSON.parse(user);
+        if (user && user.username !== 'admin') {
             this.setState({
-                currentSection: section,
-                currentSectionName: currentSectionName,
-                projectName: projectName
+                addDisabled: false
             });
         }
     }
 
-    onSelect (keys = [], e) {
-        let [value] = keys;
-        debugger
-        if (e.selected) {
-            let folder = JSON.parse(value);
-            console.log('folder', folder);
-            let org_code = folder.extra_params.orgCode;
-            let code = folder.code;
-            if ((this.user && this.user.username === 'admin') || this.orgCode === org_code) {
-                this.setState({
-                    selected: e.selected,
-                    selectKey: org_code,
-                });
-            }
-        }
-    }
-
-    // 非管理员，获取文档数据
-    _getSectionData = async () => {
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
-        // 使目录树和标段相关联
-        this.section = sections[0];
-        this.project_code = this.section.substr(0, 4);
-        await this._getSectionTeams();
-        this.setState({
-            addDisabled: false
-        });
-    }
-    // 获取文档列表
-    async _docList (section) {
-        if (this.user.username === 'admin') {
-            this._getAdminTeams(section);
-        } else {
-            this._getSectionTeams();
-        }
-    }
-    // 非管理员获取文档树结构
-    _getSectionTeams = async () => {
-        const {
-            actions: {
-                getCheckGroup
-            }
-        } = this.props;
-        let taskTeams = await getCheckGroup({}, {section: this.section});
-        console.log('taskTeams', taskTeams);
-        let sectionName = await getSectionName(this.section);
-        let teamsTree = [
-            {
-                ID: this.section,
-                GroupName: sectionName,
-                children: taskTeams
-            }
-        ];
-        this.setState({
-            teamsTree
-        });
-    }
-    // static loop (data = [], parent) {
-    //     if (data) {
-    //         if (data.children) {
-    //             return (
-    //                 <TreeNode
-    //                     key={data.ID}
-    //                     title={data.GroupName}
-    //                     disabled
-    //                 >
-    //                     {data.children &&
-    //                     data.children.map(m => {
-    //                         return AsideTree.loop(m, data);
-    //                     })}
-    //                 </TreeNode>
-    //             );
-    //         } else if (parent) {
-    //             return (
-    //                 <TreeNode
-    //                     key={`${data.id}^^${parent.ID}`}
-    //                     title={data.name}
-    //                 >
-    //                     {data.children &&
-    //                     data.children.map(m => {
-    //                         return AsideTree.loop(m);
-    //                     })}
-    //                 </TreeNode>
-    //             );
-    //         } else {
-    //             return (
-    //                 <TreeNode
-    //                     key={data.id}
-    //                     title={data.name}
-    //                 >
-    //                     {data.children &&
-    //                     data.children.map(m => {
-    //                         return AsideTree.loop(m);
-    //                     })}
-    //                 </TreeNode>
-    //             );
-    //         }
-    //     }
-    // }
-
-    static loop (data = []) {
-        return data.map(item => {
-            if (item.children && item.children.length) {
+    loop (data) {
+        if (data) {
+            if (data.children && data.children instanceof Array) {
                 return (
                     <TreeNode
-                        key={`${item.pk}--${item.code}--children`}
-                        title={item.name}
+                        key={data.id}
+                        title={data.name}
+                        disabled
                     >
-                        {AsideTree.loop(item.children)}
+                        {
+                            data.children &&
+                            data.children.map(m => {
+                                return this.loop(m);
+                            })
+                        }
                     </TreeNode>
                 );
+            } else {
+                return (
+                    <TreeNode
+                        key={data.id}
+                        title={data.name}
+                    />
+                );
             }
-            return (
-                <TreeNode
-                    key={`${item.pk}--${item.code}--${item.obj_type_hum}`}
-                    title={item.name}
-                />
-            );
-        });
+        } else {
+            return '';
+        }
     }
-
 
     render () {
         const {
-            teamsTree = [],
             teamVisible,
             addDisabled,
             selected
         } = this.state;
         const {
             form: { getFieldDecorator },
-            allorgtree = [],
+            asideTreeLoading = false,
+            parentData,
+            checkGroupsData = []
         } = this.props;
         const FormItemLayout = {
             labelCol: { span: 6 },
             wrapperCol: { span: 18 }
         };
 
+        let groupsTree = this.handleGroupDataWithCompany();
         return (
-            <div className='total-main'>
-                <div className='test'>
-                    <Button
-                        className='buttonStyle'
-                        // style={{marginRight: 10, marginBottom: 10, left: 10}}
-                        type='primary'
-                        onClick={this._handleModalVisible.bind(this)}
-                        disabled={addDisabled}
-                    >
-                    新增群体
-                    </Button>
-                    <Popconfirm
-                        onConfirm={this._handleDelDoc.bind(this)}
-                        title='确定要删除该群体么'
-                        okText='确定'
-                        cancelText='取消' >
+            <div className='checkWork-total-main'>
+                <Spin spinning={asideTreeLoading}>
+                    <div className='checkWork-test'>
                         <Button
-                            // style={{marginBottom: 10, left: 10}}
-                            className='buttonStyle'
-                            type='danger'
-                            disabled={!selected}
+                            className='checkWork-buttonStyle'
+                            type='primary'
+                            onClick={this._handleModalVisible.bind(this)}
+                            disabled={addDisabled}
                         >
-                    删除群体
+                            新增群体
                         </Button>
-                    </Popconfirm>
-                    <div className='aside-main'>
-                        <div className='aside'>
-                            {/*{teamsTree.length ? (
-                                <Tree
-                                    showLine
-                                    defaultExpandAll
-                                    onSelect={this._handleTreeSelect.bind(this)}
-                                >
-                                    {teamsTree.map(p => {
-                                        return AsideTree.loop(p);
-                                    })}
-                                </Tree>
-                            ) : (
-                                ''
-                            )}*/}
-                            {allorgtree.length ? (
-                                <Tree
-                                    showLine
-                                    selectedKeys={[this.props.selectedKeys]}
-                                    defaultExpandAll
-                                    onSelect={this.onSelect.bind(this)}
-                                >
-                                    {AsideTree.loop(allorgtree)}
-                                </Tree>
-                            ) : (
-                                ''
-                            )}
+                        <Popconfirm
+                            onConfirm={this._handleDelGroup.bind(this)}
+                            title='确定要删除该群体么'
+                            okText='确定'
+                            cancelText='取消' >
+                            <Button
+                                className='checkWork-buttonStyle'
+                                type='danger'
+                                disabled={!selected}
+                            >
+                            删除群体
+                            </Button>
+                        </Popconfirm>
+                        <div className='checkWork-aside-main'>
+                            <div className='checkWork-aside'>
+                                {checkGroupsData.length ? (
+                                    <Tree
+                                        showLine
+                                        defaultExpandAll
+                                        onSelect={this._handleTreeSelect.bind(this)}
+                                    >
+                                        {
+                                            groupsTree.map((group) => {
+                                                return this.loop(group);
+                                            })
+                                        }
+                                    </Tree>
+                                ) : (
+                                    ''
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-                {
-                    teamVisible
-                        ? (<Modal
-                            title='添加群体'
-                            visible={teamVisible}
-                            maskClosable={false}
-                            onOk={this._handleAddTeam.bind(this)}
-                            onCancel={this._handleCancelModal.bind(this)}
-                        >
-                            <Row>
-                                <FormItem {...FormItemLayout} label='群体名称'>
-                                    {getFieldDecorator('name', {
-                                        rules: [
-                                            { required: true, message: '请输入群体名称' }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入群体名称'
-                                        />
-                                    )}
-                                </FormItem>
-                            </Row>
-                            <Row>
-                                <FormItem {...FormItemLayout} label='群体描述'>
-                                    {getFieldDecorator('desc', {
-                                        rules: [
-                                            { required: true, message: '请输入群体描述' }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入群体描述'
-                                        />
-                                    )}
-                                </FormItem>
-                            </Row>
-                        </Modal>) : ''
-                }
+                    {
+                        teamVisible
+                            ? (<Modal
+                                title='添加群体'
+                                visible={teamVisible}
+                                maskClosable={false}
+                                onOk={this._handleAddGroup.bind(this)}
+                                onCancel={this._handleCancelModal.bind(this)}
+                            >
+                                <Row>
+                                    <FormItem {...FormItemLayout} label='群体名称'>
+                                        {getFieldDecorator('groupName', {
+                                            rules: [
+                                                { required: true, message: '请输入群体名称' }
+                                            ]
+                                        })(
+                                            <Input
+                                                placeholder='请输入群体名称'
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Row>
+                                <Row>
+                                    <FormItem {...FormItemLayout} label='公司名称'>
+                                        {getFieldDecorator('groupcompanyName', {
+                                            rules: [
+                                                { required: true, message: '请输入公司名称' }
+                                            ],
+                                            initialValue: `${parentData && parentData.name}`
+                                        })(
+                                            <Input
+                                                placeholder='请输入公司名称' readOnly
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Row>
+                                <Row>
+                                    <FormItem {...FormItemLayout} label='群体描述'>
+                                        {getFieldDecorator('groupDesc', {
+                                            rules: [
+                                                { required: true, message: '请输入群体描述' }
+                                            ]
+                                        })(
+                                            <Input
+                                                placeholder='请输入群体描述'
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Row>
+                            </Modal>) : ''
+                    }
+                </Spin>
             </div>
         );
     }
-    // 初始化时获取admin文档树数据
-    _getAdminData = async () => {
+    // 为群体信息添加公司名称
+    handleGroupDataWithCompany = () => {
+        const {
+            checkGroupsData = [],
+            parentData
+        } = this.props;
+        let name = (parentData && parentData.name) || '公司名称';
+        let groupsTree = [];
+        if (checkGroupsData && checkGroupsData.length > 0) {
+            groupsTree.push({
+                // id: moment().unix,
+                id: 1,
+                name: name,
+                children: checkGroupsData
+            });
+        }
+        return groupsTree;
+    }
+    // 添加群体
+    _handleAddGroup = async () => {
         const {
             actions: {
+                postCheckGroup,
                 getCheckGroup,
-                changeSelectSection,
-            }
-        } = this.props;
-        let teamsTree = [];
-        let loopTime = 0;
-        PROJECT_UNITS.map(async project => {
-            if (project.units) {
-                let units = project.units;
-                let projectName = project.value;
-                units.map(async unit => {
-                    let sectionName = projectName + unit.value;
-                    let taskTeams = await getCheckGroup({}, {section: unit.code});
-                    if (taskTeams && taskTeams.length > 0) {
-                        loopTime = loopTime + 1;
-                        if (loopTime === 1) {
-                            changeSelectSection(unit.code);
-                        }
-                        teamsTree.push({
-                            ID: unit.code,
-                            GroupName: sectionName,
-                            children: taskTeams
-                        });
-                        this.setState({
-                            teamsTree
-                        });
-                    }
-                });
-            }
-        });
-    }
-    // 删除或增加文档后管理员更新树结构
-    _getAdminTeams = async (section) => {
-        const {
-            actions: {
-                getCheckGroup
-            }
-        } = this.props;
-        const {
-            teamsTree
-        } = this.state;
-        teamsTree.map(async (data, index) => {
-            if (data && data.ID && data.ID === section) {
-                let sectionName = data.name;
-                let taskTeams = await getCheckGroup({}, {section: section});
-                if (taskTeams && taskTeams.length > 0) {
-                    data = {
-                        key: section,
-                        name: sectionName,
-                        children: taskTeams
-                    };
-                    teamsTree[index] = data;
-                } else {
-                    teamsTree.splice(index, 1);
-                }
-                this.setState({
-                    teamsTree
-                });
-            }
-        });
-    }
-    // 添加文档
-    _handleAddTeam = async () => {
-        const {
-            actions: {
-                postCheckGroup
-            }
+                changeAsideTreeLoading
+            },
+            user,
+            companyOrgCode
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
-                let name = values.name;
-                let desc = values.desc;
-                let keyArr = this.user.sections;
-                keyArr = keyArr.replace(/\[|]/g,'').replace(/\"/g,'');
-                let section = keyArr;
-                let project_code = keyArr.substr(0,4);
+                if (!companyOrgCode) {
+                    Notification.error({
+                        message: '该用户非公司人员，不能添加群体',
+                        duration: 3
+                    });
+                }
+                let groupName = values.groupName;
+                let groupcompanyName = values.groupcompanyName;
+                let groupDesc = values.groupDesc;
+                let section = (user && user.account && user.account.sections && user.account.sections[0]) || '';
+                let projectCode = section && section.split('-')[0];
                 let postData = {
-                    name: name,
-                    section: this.section!=''?this.section:section,
-                    project_code: this.project_code!=''?this.project_code:project_code,
-                    desc: desc
+                    name: groupName,
+                    desc: groupDesc,
+                    section: section,
+                    project_code: projectCode,
+                    project_name: '',
+                    org_name: groupcompanyName,
+                    org_code: companyOrgCode
                 };
                 let checkgroup = await postCheckGroup({}, postData);
-                console.log('checkgroup', checkgroup);
                 if (checkgroup && checkgroup.id) {
                     Notification.success({
                         message: '新增群体成功',
@@ -431,7 +240,9 @@ class AsideTree extends Component {
                     this.setState({
                         teamVisible: false
                     });
-                    this._docList(this.section);
+                    await changeAsideTreeLoading(true);
+                    await getCheckGroup({}, {org_code: companyOrgCode});
+                    await changeAsideTreeLoading(false);
                 } else {
                     Notification.error({
                         message: '新增群体失败',
@@ -441,15 +252,17 @@ class AsideTree extends Component {
             }
         });
     }
-    // 删除文档
-    _handleDelDoc = async () => {
+    // 删除群体
+    _handleDelGroup = async () => {
         const {
             actions: {
                 deleteCheckGroup,
-                changeSelectMemTeam,
+                changeSelectMemGroup,
                 changeSelectState,
-                getCheckGroupMansOk
-            }
+                changeAsideTreeLoading,
+                getCheckGroup
+            },
+            companyOrgCode
         } = this.props;
         const {
             selectKey,
@@ -457,28 +270,25 @@ class AsideTree extends Component {
         } = this.state;
         if (selected && selectKey) {
             try {
-                let keyArr = selectKey.split('^^');
-                if (keyArr && keyArr.length === 2) {
-                    let delData = await deleteCheckGroup({id: keyArr[0]});
-                    console.log('delData', delData);
-                    if (delData == '') {
-                        Notification.success({
-                            message: '删除群体成功',
-                            dutation: 3
-                        });
-                        changeSelectState(false);
-                        changeSelectMemTeam();
-                        getCheckGroupMansOk([]);
-                        this._docList(keyArr[1]);
-                        this.setState({
-                            selected: false
-                        });
-                    } else {
-                        Notification.error({
-                            message: '删除群体失败',
-                            dutation: 3
-                        });
-                    }
+                let delData = await deleteCheckGroup({id: selectKey});
+                if (delData === '') {
+                    Notification.success({
+                        message: '删除群体成功',
+                        dutation: 3
+                    });
+                    changeSelectState(false);
+                    changeSelectMemGroup();
+                    this.setState({
+                        selected: false
+                    });
+                    await changeAsideTreeLoading(true);
+                    await getCheckGroup({}, {org_code: companyOrgCode});
+                    await changeAsideTreeLoading(false);
+                } else {
+                    Notification.error({
+                        message: '删除群体失败',
+                        dutation: 3
+                    });
                 }
             } catch (e) {
 
@@ -494,59 +304,22 @@ class AsideTree extends Component {
     _handleTreeSelect = async (key, info) => {
         const {
             actions: {
-                changeSelectSection,
-                changeSelectMemTeam,
                 changeSelectState,
-                getCheckGroupMans,
-                changeCheckGroup,
-                getCheckGroupMansOk,
+                changeSelectMemGroup
             }
         } = this.props;
-        const {
-            teamsTree
-        } = this.state;
         let selected = info && info.selected;
-        let selectKey = key && key[0];
-        console.log('selectKey', selectKey);
-        console.log('info', info);
-        console.log('teamsTree', teamsTree);
+        let selectKey = (key && key[0]) || '';
         try {
-            let keyArr = selectKey.split('^^');
-            if (keyArr && keyArr.length === 2) {
-                // 将section上传，根据section获取人员列表
-                console.log('keyArr', keyArr);
-                let section = keyArr[1];
-                console.log('section', section);
-                await changeSelectSection(section);
-                await changeCheckGroup(keyArr[0]);
-                // 将班组信息上传至redux
-                teamsTree.map((list) => {
-                    if (list.ID === keyArr[1]) {
-                        let taskTeams = list.children;
-                        taskTeams.map(async (team) => {
-                            console.log('team.id', team.id);
-                            console.log('keyArr[0]', keyArr[0]);
-                            if (team.id === Number(keyArr[0])) {
-                                await changeSelectMemTeam(team);
-                            }
-                        });
-                    }
-                });
-                let postData = {
-                    id: keyArr[0]
-                };
-                let data = await getCheckGroupMans(postData);
-                await getCheckGroupMansOk(data);
-                console.log('data', data);
-            }
+            await changeSelectMemGroup(selectKey);
+            await changeSelectState(selected);
+            this.setState({
+                selected,
+                selectKey
+            });
         } catch (e) {
             console.log('点击节点', e);
         }
-        await changeSelectState(selected);
-        this.setState({
-            selected,
-            selectKey
-        });
     }
     // 关闭Modal
     _handleCancelModal = () => {

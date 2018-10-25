@@ -7,152 +7,86 @@ import {
     base
 } from '_platform/api';
 export const ID = 'Checkwork_attendancegroup';
-// 示例action
-// 苗木养护查询
-export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
 // 修改选择地图的方式
 export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 
 export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 
-// 创建文档目录
-export const postDocDir = createFetchAction(`${SERVICE_API}/directories/`, [], 'POST');
-// 获取文档目录
-export const getDocDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`, [], 'GET');
-// 删除文档目录
-export const delDocDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?this=true`, [], 'DELETE');
-// 查看文档
-export const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'GET');
-// 创建文档
-export const postDocument = createFetchAction(`${SERVICE_API}/documents/`, [], 'POST');
-// 删除文档
-export const delDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
-// 获取文档列表
-export const getDocList = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [], 'GET');
+// 修改左侧树的loading
+export const changeAsideTreeLoading = createAction(`${ID}_changeAsideTreeLoading`);
 
 // 修改关联用户Modal的visible
 export const changeAddMemVisible = createAction(`${ID}_changeAddMemVisible`);
-// 修改所选择标段，以查找人员
-export const changeSelectSection = createAction(`${ID}_changeSelectSection`);
 // 修改所选节点的状态
 export const changeSelectState = createAction(`${ID}_changeSelectState`);
-// 养护班组新增
-export const postCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggroup`, [], 'POST');
-// 获取养护班组
-export const getCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggroups`, [], 'GET');
-// 删除养护班组
-export const deleteCuringGroup = createFetchAction(`${FOREST_API}/curing/curinggroup/{{ID}}`, [], 'DELETE');
-// 修改所选择节点的班组
-export const changeSelectMemTeam = createAction(`${ID}_changeSelectMemTeam`);
-// 养护班组新增人员
-export const postCuringGroupMan = createFetchAction(`${FOREST_API}/curing/curinggroupman`, [], 'POST');
-// 将人员信息上传至redux
-export const getCuringGroupMansOk = createAction(`${ID}_getCuringGroupMansOk`);
-// 获取养护班组人员
-export const getCuringGroupMans = createFetchAction(`${FOREST_API}/curing/curinggroupmans?groupid={{groupid}}`, [getCuringGroupMansOk], 'GET');
-// 获取养护班组
-export const deleteCuringGroupMan = createFetchAction(`${FOREST_API}/curing/curinggroupman/{{id}}`, [], 'DELETE');
-
-//获取考勤群体
-export const getCheckGroup = createFetchAction(`${base}/main/api/check-group/`, [], 'GET');
-
-//增加考勤群体
+// 修改所选择节点的群体
+export const changeSelectMemGroup = createAction(`${ID}_changeSelectMemGroup`);
+// 获取考勤群体
+export const getCheckGroupOK = createAction(`${ID}_getCheckGroup`);
+export const getCheckGroup = createFetchAction(`${base}/main/api/check-group/`, [getCheckGroupOK], 'GET');
+// 增加考勤群体
 export const postCheckGroup = createFetchAction(`${base}/main/api/check-group/`, [], 'POST');
-
-
-//删除考勤群体
+// 删除考勤群体
 export const deleteCheckGroup = createFetchAction(`${base}/main/api/check-group/{{id}}/`, [], 'DELETE');
-
-//获取群体成员
-export const getCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [getCheckGroupMansOk], 'GET');
-
 // 将人员信息上传至redux
 export const getCheckGroupMansOk = createAction(`${ID}_getCheckGroupMansOk`);
+// 获取群体成员
+export const getCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [getCheckGroupMansOk], 'GET');
+// 获取群体成员的ID列表
+export const getCheckGroupMansIDList = createFetchAction(`${base}/main/api/group/{{id}}/members/id-list/`, [], 'GET');
 
-//增加群体成员/删除群体成员
+// 增加群体成员/删除群体成员
 export const postCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id}}/members/`, [], 'POST');
-
-
-
-// 修改所选择的群组,以便给群组增加删减人员
-export const changeCheckGroup = createAction(`${ID}_changeCheckGroup`);
-
-// 获取组织机构
-const getOrgTreeSelect = createAction(`${ID}获取组织机构TreeSelect`);
-
-//通过code获取组织机构
-export const getOrgTrees =  createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`, [], 'GET');
-
-//获取全部组织机构
-export const getAllOrgTree = createFetchAction(`${SERVICE_API}/org-tree/?depth=4`, [], 'GET');
+// 群组增加删减人员后，需要对redux中群体人员的信息进行更新，根据这个状态判断是否需要更新
+export const checkGroupMemChangeStatus = createAction(`${ID}_checkGroupMemChangeStatus`);
 
 export const actions = {
-    getCuring,
     getTreearea,
-    delDocDir,
-    getDocList,
-    postDocDir,
-    getDocDir,
-    getDocument,
-    delDocument,
-    postDocument,
+    changeAsideTreeLoading,
     changeAddMemVisible,
-    changeSelectSection,
-    changeSelectMemTeam,
+    changeSelectMemGroup,
     changeSelectState,
-    postCuringGroup,
-    getCuringGroup,
-    deleteCuringGroup,
-    postCuringGroupMan,
-    getCuringGroupMans,
-    getCuringGroupMansOk,
-    deleteCuringGroupMan,
+    getCheckGroupOK,
     getCheckGroup,
     postCheckGroup,
     deleteCheckGroup,
     getCheckGroupMans,
     postCheckGroupMans,
     getCheckGroupMansOk,
-    changeCheckGroup,
-    getOrgTreeSelect,
-    getOrgTrees,
-    getAllOrgTree,
+    getCheckGroupMansIDList,
+    checkGroupMemChangeStatus
 };
 export default handleActions({
     [changeSelectMap]: (state, {payload}) => ({
         ...state,
         selectMap: payload
     }),
+    [changeAsideTreeLoading]: (state, {payload}) => ({
+        ...state,
+        asideTreeLoading: payload
+    }),
     [changeAddMemVisible]: (state, {payload}) => ({
         ...state,
         addMemVisible: payload
     }),
-    [changeSelectSection]: (state, {payload}) => ({
+    [checkGroupMemChangeStatus]: (state, {payload}) => ({
         ...state,
-        selectSection: payload
+        memberChangeStatus: payload
     }),
-    [changeCheckGroup]: (state, {payload}) => ({
+    [changeSelectMemGroup]: (state, {payload}) => ({
         ...state,
-        checkGroup: payload
-    }),
-    [changeSelectMemTeam]: (state, {payload}) => ({
-        ...state,
-        selectMemTeam: payload
+        selectMemGroup: payload
     }),
     [changeSelectState]: (state, {payload}) => ({
         ...state,
         selectState: payload
     }),
-    [getCuringGroupMansOk]: (state, {payload}) => ({
+    [getCheckGroupOK]: (state, {payload}) => ({
         ...state,
-        curingGroupMans: payload
+        checkGroupsData: payload
     }),
     [getCheckGroupMansOk]: (state, {payload}) => ({
         ...state,
         checkGroupMans: payload
-    }),
-    [getOrgTreeSelect]: (state, {payload}) => ({
-        ...state,
-        orgTreeSelect: payload
-    }),
+    })
 }, {});

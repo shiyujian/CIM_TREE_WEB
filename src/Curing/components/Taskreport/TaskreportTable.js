@@ -176,7 +176,7 @@ export default class TaskReportTable extends Component {
             .addEventListener('click', async function (e) {
                 let target = e.target;
                 // 绑定隐患详情点击事件
-                if (target.getAttribute('class') === 'btnViewTask') {
+                if (target.getAttribute('class') === 'Curing-btnViewTask') {
                     me._handleCreateTaskOk();
                 }
             });
@@ -260,14 +260,10 @@ export default class TaskReportTable extends Component {
             <div className='Curing-container'>
                 <div
                     ref='appendBody'
-                    className='l-map r-main'
+                    className='Curing-map Curing-r-main'
                 >
                     <div
-                        className={`menuPanel ${
-                            this.state.isNotThree ? '' : 'hide'
-                        } ${
-                            this.state.menuIsExtend ? 'animExtend' : 'animFold'
-                        }`}
+                        className={`Curing-menuPanel`}
                         style={
                             this.state.menuIsExtend
                                 ? {
@@ -282,7 +278,7 @@ export default class TaskReportTable extends Component {
                                 }
                         }
                     >
-                        <aside className='aside' draggable='false'>
+                        <aside className='Curing-aside' draggable='false'>
                             <div style={{margin: 10}}>
                                 <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
                             </div>
@@ -304,7 +300,7 @@ export default class TaskReportTable extends Component {
                         </aside>
                         {this.state.menuIsExtend ? (
                             <div
-                                className='foldBtn'
+                                className='Curing-foldBtn'
                                 style={{ left: this.state.menuWidth }}
                                 onClick={this._extendAndFold.bind(this)}
                             >
@@ -312,7 +308,7 @@ export default class TaskReportTable extends Component {
                             </div>
                         ) : (
                             <div
-                                className='foldBtn'
+                                className='Curing-foldBtn'
                                 style={{ left: this.state.menuWidth }}
                                 onClick={this._extendAndFold.bind(this)}
                             >
@@ -320,7 +316,7 @@ export default class TaskReportTable extends Component {
                             </div>
                         )}
                     </div>
-                    <div className='treeControl'>
+                    <div className='Curing-treeControl'>
                         <div>
                             <Button
                                 type={
@@ -344,8 +340,8 @@ export default class TaskReportTable extends Component {
                             </Button>
                         </div>
                     </div>
-                    <div className='treeControl2'>
-                        <div className='buttonStyle'>
+                    <div className='Curing-treeControl2'>
+                        <div className='Curing-buttonStyle'>
                             {
                                 selected
                                     ? <Button type='primary' style={{marginRight: 10}} onClick={this._handleCreateTaskOk.bind(this)}>上报</Button>
@@ -354,7 +350,7 @@ export default class TaskReportTable extends Component {
                             {
                                 createBtnVisible
                                     ? (
-                                        <div className='buttonStyle'>
+                                        <div className='Curing-buttonStyle'>
                                             <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>
                                             <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
                                         </div>

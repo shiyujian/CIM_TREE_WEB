@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-01 16:58:31
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-09-30 15:46:22
+ * @Last Modified time: 2018-10-24 11:34:15
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -92,8 +92,7 @@ export default class CheckworkContainer extends Component {
                     name: '考勤群体'
                 }
             ]
-        },
-       
+        }
     ];
     static defaultOpenKeys = ['checkworksetup'];
 }

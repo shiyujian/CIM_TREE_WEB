@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal, Table
+    Button, Table
 } from 'antd';
-import { getUser } from '_platform/auth';
 import AddMember from './AddMember';
 window.config = window.config || {};
 
@@ -10,53 +9,55 @@ export default class AttendanceGroupTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            addMemberVisible: false,
-            relateDisabled: true,
-            totalUserData: []
+            page: 1, // 当前页
+            total: 0,
+            dataSource: []
         };
     }
 
-    async componentDidMount () {
+    componentDidMount = async () => {
         const {
             actions: {
-                getForestAllUsersData
-            }
+                getRoles
+            },
+            platform: { roles = [] }
         } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
-        // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (sections && sections instanceof Array && sections.length > 0) {
-            this.setState({
-                relateDisabled: false
-            });
+        if (!(roles && roles.length > 0)) {
+            await getRoles();
         }
-        let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
-        totalUserData = JSON.parse(totalUserData);
-        if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
-
-        } else {
-            let userData = await getForestAllUsersData();
-            totalUserData = userData && userData.content;
-        }
-        this.setState({
-            totalUserData
-        });
     };
+
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            addMemVisible,
+            memberChangeStatus = 0,
+            selectMemGroup
+        } = this.props;
+        if (!addMemVisible && addMemVisible !== prevProps.addMemVisible && memberChangeStatus) {
+            this.getCheckGroupMember();
+        }
+        if (selectMemGroup && selectMemGroup !== prevProps.selectMemGroup) {
+            console.log('sssssssssssss');
+            this.getCheckGroupMember();
+        }
+    }
 
     render () {
         const {
-            relateDisabled
-        } = this.state;
-        const {
-            selectState
+            selectState,
+            addMemVisible
         } = this.props;
-        // let disabled = true;
-        let disabled = false;
-        if (selectState && !relateDisabled) {
+        const {
+            dataSource,
+            page = 1,
+            total = 0
+        } = this.state;
+        let disabled = true;
+        let tableData = [];
+        if (selectState) {
             disabled = false;
+            tableData = dataSource;
         }
-        let dataSource = this._getRelMemMess();
 
         return (
             <div>
@@ -65,44 +66,61 @@ export default class AttendanceGroupTable extends Component {
                     style={{width: '100%'}}
                     columns={this.columns}
                     bordered
-                    // rowKey='id'
-                    dataSource={dataSource}
+                    rowKey='id'
+                    dataSource={tableData}
+                    onChange={this.changePage.bind(this)}
+                    pagination={{current: page, total: total}}
                 />
-                <AddMember {...this.props} />
+                {addMemVisible ? <AddMember {...this.props} {...this.state} /> : ''}
             </div>
 
         );
     }
-    _getRelMemMess = () => {
-        const {
-            checkGroupMans = []
-        } = this.props;
-        const {
-            totalUserData = []
-        } = this.state;
-        let dataSource = [];
-        if (checkGroupMans && checkGroupMans instanceof Array && checkGroupMans.length > 0) {
-            // checkGroupMans.map((man) => {
-            // totalUserData.map((userData) => {
-            //     if (Number(userData.ID) === man.id) {
-            //         dataSource.push(userData);
-            //     }
-            // });
-            // });
-            dataSource = checkGroupMans;
-        }
-        console.log('dataSource', dataSource);
-        return dataSource;
-    }
-    _addMemberModal () {
+
+    _addMemberModal = async () => {
         const {
             actions: {
-                changeAddMemVisible
+                changeAddMemVisible,
+                checkGroupMemChangeStatus
             }
         } = this.props;
-        changeAddMemVisible(true);
-        console.log('addMemberVisible', this.props);
+        await checkGroupMemChangeStatus();
+        await changeAddMemVisible(true);
     }
+
+    changePage = (obj) => {
+        let current = obj.current;
+        this.setState({
+            page: current
+        }, () => {
+            this.getCheckGroupMember(current);
+        });
+    }
+
+    getCheckGroupMember = async (current = 1) => {
+        const {
+            actions: {
+                getCheckGroupMans
+            },
+            selectMemGroup
+        } = this.props;
+        try {
+            let postData = {
+                id: selectMemGroup
+            };
+            let data = await getCheckGroupMans(postData, {page: current});
+            console.log('data', data);
+            let dataSource = (data && data.results) || [];
+            this.setState({
+                total: data.count || 0,
+                page: current,
+                dataSource
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+
     columns = [
         {
             title: '序号',
@@ -125,11 +143,21 @@ export default class AttendanceGroupTable extends Component {
         },
         {
             title: '角色',
-            dataIndex: 'account.title'
+            dataIndex: 'groups',
+            render: (text, record, index) => {
+                let name = '/';
+                if (text && text instanceof Array) {
+                    name = '';
+                    text.map((data) => {
+                        name = name + data.name;
+                    });
+                }
+                return name;
+            }
         },
         {
             title: '职务',
-            dataIndex: ''
+            dataIndex: 'account.title'
         }
 
     ];

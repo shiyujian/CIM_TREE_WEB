@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 import {
-    Button, Modal, Table, Checkbox, Notification, Row, Form, Col, Select, Input, TreeSelect, Tree
+    Button, Modal, Table, Checkbox, Notification, Row, Form, Col, Select, Input, TreeSelect, Spin
 } from 'antd';
-import { getUser } from '_platform/auth';
-import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
-const TreeNode = TreeSelect.TreeNode;
 window.config = window.config || {};
 
 class AddMember extends Component {
@@ -15,143 +12,116 @@ class AddMember extends Component {
         labelCol: { span: 6 },
         wrapperCol: { span: 18 }
     };
+    static layoutT = {
+        labelCol: { span: 0 },
+        wrapperCol: { span: 24 }
+    };
     constructor (props) {
         super(props);
         this.state = {
-            modalVisible: false,
             roles: [],
             dataSource: [],
-            RelationMem: [],
-            totalUserData: [],
-            orgTree: []
+            relationMem: [],
+            loading: false,
+            page: 1, // 当前页
+            total: 0
         };
-        this.user = null;
     }
 
-    async componentDidMount () {
+    columns = [
+        {
+            title: '序号',
+            dataIndex: 'index',
+            render: (text, record, index) => {
+                return index + 1;
+            }
+        },
+        {
+            title: '部门',
+            dataIndex: 'account.organization'
+        },
+        {
+            title: '姓名',
+            dataIndex: 'account.person_name'
+        },
+        {
+            title: '账号',
+            dataIndex: 'username'
+        },
+        {
+            title: '角色',
+            dataIndex: 'groups[0].name'
+        },
+        {
+            title: '职务',
+            dataIndex: 'account.title'
+        },
+        {
+            title: '手机号码',
+            dataIndex: 'account.person_telephone'
+        },
+        {
+            title: '关联',
+            render: user => {
+                const { relationMem = [] } = this.state;
+                const checked = relationMem.some(memberID => Number(memberID) === user.id);
+
+                return (
+                    <Checkbox
+                        checked={checked}
+                        onChange={this._check.bind(this, user)}
+                    />
+                );
+            }
+        }
+    ];
+
+    componentDidMount = async () => {
         const {
             actions: {
-                getRoles,
-                getForestAllUsersData,
-                getOrgTrees
-            }
+                getCheckGroupMansIDList
+            },
+            selectMemGroup
         } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
-        // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (!(this.sections && this.sections instanceof Array && this.sections.length > 0) && (this.user.username !== 'admin')) {
-            return;
+        try {
+            let relationMem = await getCheckGroupMansIDList({id: selectMemGroup});
+            console.log('relationMem', relationMem);
+            this.setState({
+                relationMem: relationMem || []
+            }, async () => {
+                await this.getInitialUserData();
+            });
+        } catch (e) {
+            console.log('e', e);
         }
-        let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
-        totalUserData = JSON.parse(totalUserData);
-        console.log('totalUserData', totalUserData);
-        if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
-
-        } else {
-            let userData = await getForestAllUsersData();
-            totalUserData = userData && userData.content;
-        }
-        this.setState({
-            totalUserData
-        });
-        // 需要找到是养护角色的人
-        let role = await getRoles();
-        const curingRoles = role.filter(rst => rst.grouptype === 4);
-        let roles = curingRoles.map(item => { return item.id; });
-        this.setState({
-            roles: roles
-        });
-        await this._queryMember();
-
-        let code = this.user.org_code.substring(0,this.user.org_code.length-6);
-        getOrgTrees({code:code}).then(rst => {
-            if (rst && rst.children) {
-                // 目前通过登录用户的机构code来筛选组织机构
-                if (rst.children && rst.children instanceof Array && rst.children.length > 0) {
-                    rst.children.map((item) => {
-                        //if (item.name === '九号地块') {
-                            if (item && item.children) {
-                                let data = AddMember.orgloop(rst.children);
-                                this.setState({
-                                    orgTree:data
-                                })
-                                
-                            }
-                        //}
-                    });
-                }
-            }
-        });
     };
-    // 查找人员
-    _queryMember = async (params) => {
+    // 获取最开始的初始值，用于最开始获取人员数据，或清空搜索条件
+    getInitialUserData = async () => {
         const {
-            roles = []
-        } = this.state;
-        const {
+            userOrgCode,
             actions: {
                 getUsers
             },
-            selectSection
-        } = this.props;
-        if (roles.length === 0) {
-            return;
-        }
-        let sections = [];
-        if (this.user.username === 'admin') {
-            // 如果没有点击节点，则获取全部养护人员，为防止人员列表过长，需要禁止
-            if (!selectSection) {
-                return;
+            form: {
+                setFieldsValue
             }
-            sections.push(selectSection);
-        } else {
-            sections = this.sections;
-        }
-        console.log('sections', sections);
-        try {
-            let postdata = {};
-            postdata = {
-                // roles: roles,
-                sections: sections,
-                is_active: true,
-            };
-            if(params){
-                if(params.keyword){
-                    postdata['keyword'] = params.keyword;
-                }
-                if(params.role){
-                    postdata['role'] = params.role;
-                }
-                if(params.organization){
-                    postdata['organization'] = params.organization;
-                }
-                if(params.duty){
-                    postdata['duty'] = params.duty;
-                }
-            }
-            let users = await getUsers({}, postdata);
-            console.log('users', users);
-            this.setState({
-                users
-            });
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        const {
-            selectSection,
-            // isGetMem,
-            addMemVisible
         } = this.props;
-        if (selectSection !== prevProps.selectSection) {
-            this._queryMember();
-        }
-        if (addMemVisible !== prevProps.addMemVisible && addMemVisible) {
-            this._getRelMem();
-        }
+        setFieldsValue({
+            organization: userOrgCode
+        });
+        let postData = {
+            org_code: userOrgCode,
+            is_active: true,
+            page: 1
+        };
+        let userData = await getUsers({}, postData);
+        console.log('userData', userData);
+        let dataSource = (userData && userData.results) || [];
+        this.setState({
+            total: userData.count || 0,
+            page: 1,
+            dataSource
+        });
     }
 
     renderContent () {
@@ -253,160 +223,30 @@ class AddMember extends Component {
         });
         return objs;
     }
-    renderTitle () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        const {
-            platform: { roles = [] }
-        } = this.props;
-        var systemRoles = [];
-        if (user.is_superuser) {
-            systemRoles.push({
-                name: '苗圃职务',
-                children: ['苗圃'],
-                value: roles.filter(role => role.grouptype === 0)
-            });
-            systemRoles.push({
-                name: '施工职务',
-                children: [
-                    '施工领导',
-                    '协调调度人',
-                    '质量负责人',
-                    '安全负责人',
-                    '文明负责人',
-                    '普通员工',
-                    '施工文书',
-                    '测量员'
-                ],
-                value: roles.filter(role => role.grouptype === 1)
-            });
-            systemRoles.push({
-                name: '监理职务',
-                children: ['总监', '监理组长', '普通监理', '监理文书'],
-                value: roles.filter(role => role.grouptype === 2)
-            });
-            systemRoles.push({
-                name: '业主职务',
-                children: ['业主', '业主文书', '业主领导'],
-                value: roles.filter(role => role.grouptype === 3)
-            });
-            systemRoles.push({
-                name: '苗圃基地职务',
-                children: ['苗圃基地'],
-                value: roles.filter(role => role.grouptype === 5)
-            });
-            systemRoles.push({
-                name: '供应商职务',
-                children: ['供应商'],
-                value: roles.filter(role => role.grouptype === 6)
-            });
-        } else {
-            for (let i = 0; i < user.groups.length; i++) {
-                const rolea = user.groups[i].grouptype;
-                switch (rolea) {
-                    case 0:
-                        systemRoles.push({
-                            name: '苗圃职务',
-                            children: ['苗圃'],
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        break;
-                    case 1:
-                        systemRoles.push({
-                            name: '苗圃职务',
-                            children: ['苗圃'],
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        systemRoles.push({
-                            name: '施工职务',
-                            children: [
-                                '施工领导',
-                                '协调调度人',
-                                '质量负责人',
-                                '安全负责人',
-                                '文明负责人',
-                                '普通员工',
-                                '施工文书',
-                                '测量员'
-                            ],
-                            value: roles.filter(role => role.grouptype === 1)
-                        });
-                        break;
-                    case 2:
-                        systemRoles.push({
-                            name: '监理职务',
-                            children: [
-                                '总监',
-                                '监理组长',
-                                '普通监理',
-                                '监理文书'
-                            ],
-                            value: roles.filter(role => role.grouptype === 2)
-                        });
-                        break;
-                    case 3:
-                        systemRoles.push({
-                            name: '业主职务',
-                            children: ['业主', '业主文书', '业主领导'],
-                            value: roles.filter(role => role.grouptype === 3)
-                        });
-                        break;
-                    case 5:
-                        systemRoles.push({
-                            name: '苗圃基地职务',
-                            children: ['苗圃基地'],
-                            value: roles.filter(role => role.grouptype === 5)
-                        });
-                        break;
-                    case 6:
-                        systemRoles.push({
-                            name: '供应商职务',
-                            children: ['供应商'],
-                            value: roles.filter(role => role.grouptype === 6)
-                        });
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-        const objs = systemRoles.map(roless => {
-            return (
-                <OptGroup label={roless.name} key={roless.name} >
-                    {roless.children.map(role => {
-                        return (
-                            <Option key={role} value={role}>
-                                {role}
-                            </Option>
-                        );
-                    })}
-                </OptGroup>
-            );
-        });
-        return objs;
-    }
 
     render () {
         const {
-            addMemVisible,
-            form: { getFieldDecorator }
+            form: { getFieldDecorator },
+            orgTreeSelectData
         } = this.props;
         const {
-            users,
-            RelationMem,
-            orgTree
+            relationMem,
+            loading = false,
+            page,
+            total,
+            dataSource
         } = this.state;
-        console.log('RelationMem', RelationMem);
+        console.log('relationMem', relationMem);
         return (
             <div>
                 <Modal
                     title={'关联用户'}
-                    visible={addMemVisible}
+                    visible
                     width='90%'
-                    // onOk={this._handleAddMem.bind(this)}
                     onCancel={this._handleCancel.bind(this)}
                     footer={null}
                 >
-                    <div>
+                    <Spin spinning={loading}>
                         <Form style={{ marginBottom: 24 }}>
                             <Row gutter={24}>
                                 <Col span={18}>
@@ -414,16 +254,22 @@ class AddMember extends Component {
                                         <Col span={8}>
                                             <FormItem {...AddMember.layout} label='姓名'>
                                                 {getFieldDecorator('keyword', {
-                            
+                                                    rules: [
+                                                        { required: false, message: '请输入姓名' }
+                                                    ]
                                                 })(
-                                                   <Input placeholder='请输入姓名' />
+                                                    <Input
+                                                        placeholder='请输入姓名'
+                                                    />
                                                 )}
                                             </FormItem>
                                         </Col>
                                         <Col span={8}>
                                             <FormItem {...AddMember.layout} label='角色'>
                                                 {getFieldDecorator('role', {
-                                                    
+                                                    rules: [
+                                                        { required: false, message: '请选择角色' }
+                                                    ]
                                                 })(
                                                     <Select
                                                         placeholder='请选择角色'
@@ -446,103 +292,60 @@ class AddMember extends Component {
                                         <Col span={8}>
                                             <FormItem {...AddMember.layout} label='部门'>
                                                 {getFieldDecorator('organization', {
-                        
+                                                    rules: [
+                                                        { required: false, message: '请选择部门' }
+                                                    ]
                                                 })(
-                                                   <TreeSelect
-                                                        placeholder='请选择部门'
-                                                        showSearch
-                                                        dropdownStyle={{
-                                                            maxHeight: 300,
-                                                            overflow: 'auto'
-                                                        }}
+                                                    <TreeSelect
                                                         treeDefaultExpandAll
                                                     >
-                                                        {orgTree}
+                                                        {orgTreeSelectData}
                                                     </TreeSelect>
                                                 )}
                                             </FormItem>
                                         </Col>
                                     </Row>
                                 </Col>
-                            </Row>
-                            <Row gutter={24}>
-                                <Col span={18}>
-                                    <Row>
-                                       
-                                        <Col span={8}>
-                                            <FormItem {...AddMember.layout} label='职务'>
-                                                {getFieldDecorator('duty', {
-                                                    
-                                                })(
-                                                    <Select
-                                                        placeholder='请选择职务'
-                                                        style={{ width: '100%' }}
-                                                    >
-                                                        {this.renderTitle()}
-                                                    </Select>
-                                                )}
-                                            </FormItem>
-                                        </Col>
+                                <Col span={6}>
+                                    <FormItem {...AddMember.layoutT} >
+                                        {getFieldDecorator('button', {
+                                        })(
+                                            <div>
+                                                <Button
+                                                    type='primary'
+                                                    style={{marginRight: 30}}
+                                                    onClick={this.query.bind(this, 1)}
+                                                >
+                                                            查询
+                                                </Button>
+                                                <Button onClick={this.clear.bind(this)}>
+                                                            清除
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </FormItem>
 
-                                    </Row>
-                                </Col>
-                                <Col span={5} offset={1}>
-                                    <Row gutter={10}>
-                                        <Col span={12}>
-                                            <Button
-                                                type='Primary'
-                                                onClick={this.query.bind(this)}
-                                            >
-                                                查询
-                                            </Button>
-                                        </Col>
-                                        <Col span={12}>
-                                            <Button onClick={this.clear.bind(this)}>
-                                                清除
-                                            </Button>
-                                        </Col>
-                                    </Row>
                                 </Col>
                             </Row>
+                            <Row gutter={24} />
                         </Form>
                         <Table
                             bordered
                             rowKey='id'
                             size='small'
                             columns={this.columns}
-                            dataSource={users}
+                            dataSource={dataSource}
+                            onChange={this.changePage.bind(this)}
+                            pagination={{current: page, total: total}}
                         />
                         <Row style={{marginTop: 10}}>
                             <Button onClick={this._handleCancel.bind(this)} style={{float: 'right'}}type='primary'>关闭</Button>
                         </Row>
-                    </div>
+                    </Spin>
                 </Modal>
             </div>
 
         );
-    }
-
-    _getRelMem = async () => {
-        const {
-            checkGroupMans
-        } = this.props;
-        const {
-            totalUserData
-        } = this.state;
-        let RelationMem = [];
-        if (checkGroupMans && checkGroupMans instanceof Array && checkGroupMans.length > 0) {
-            checkGroupMans.map((man) => {
-                // totalUserData.map((userData) => {
-                //     if (Number(userData.ID) === man.id) {
-                //         RelationMem.push(Number(userData.PK));
-                //     }
-                // });
-                RelationMem.push(Number(man.id));
-            });
-        }
-        this.setState({
-            RelationMem: RelationMem
-        });
     }
 
     _handleCancel = async () => {
@@ -552,233 +355,84 @@ class AddMember extends Component {
             }
         } = this.props;
         changeAddMemVisible(false);
-        await this.getRelatedMans();
     }
 
     _check = async (user, e) => {
         const {
-            RelationMem = [],
-            totalUserData = []
+            relationMem = []
         } = this.state;
         const {
             actions: {
                 postCheckGroupMans,
-                deleteCheckGroupMans,
-                getCheckGroupMans,
+                checkGroupMemChangeStatus
             },
-            selectMemTeam,
-            checkGroupMans,
-            checkGroup,
+            memberChangeStatus = 0,
+            selectMemGroup
         } = this.props;
-        let checked = e.target.checked;
         console.log('user', user);
-        try {
-            let pk = user.id;
-            let checkUserId = '';
-            totalUserData.map((userData) => {
-                if (userData && userData.PK && Number(userData.PK) === pk) {
-                    checkUserId = userData && userData.ID;
+        let checked = e.target.checked;
+        if (checked) {
+            relationMem.push(user.id);
+            let postData = {
+                members: relationMem
+            };
+            await postCheckGroupMans({id: selectMemGroup}, postData);
+            await checkGroupMemChangeStatus(memberChangeStatus + 1);
+        } else {
+            relationMem.map((memberID, index) => {
+                if (memberID === user.id) {
+                    relationMem.splice(index, 1); // 删除该元素
                 }
             });
-            console.log('checkUserId', checkUserId);
-            let id = checkGroup;
-            let members = await getCheckGroupMans({id:id});
-            let membersArr = [];
-            let Arr = [];
-            if(members.length>0){
-                for(let i=0;i<members.length;i++){
-                    membersArr.push(members[i].id);
-                }
-            }
-
-            if (membersArr.length > 0) {
-                for (let i = 0; i < membersArr.length; i++) {
-                    if (pk === membersArr[i]) {
-                        membersArr.splice(i, 1);
-                        Arr = [
-                            ...membersArr
-                        ];
-                    } else {
-                        Arr = [
-                            ...membersArr,
-                            pk
-                        ];
-                    }
-                }
-            } else {
-                Arr = [
-                    pk
-                ];
-            }
-            if (checked) {
-                try {
-                    if (checkUserId) {
-                        let postAddData = {
-                            members:Arr,
-                        };
-                        let addData = await postCheckGroupMans({id:id}, postAddData);
-                        console.log('addData', addData);
-                        if (addData) {
-                            await this.getRelatedMans();
-                            RelationMem.push(user.id);
-                            Notification.success({
-                                message: '关联用户成功',
-                                duration: 1
-                            });
-                        } else {
-                            Notification.error({
-                                message: '关联用户失败',
-                                duration: 2
-                            });
-                        }
-                    } else {
-                        Notification.error({
-                            message: '关联用户失败',
-                            duration: 2
-                        });
-                    }
-                } catch (e) {
-                    console.log('e', e);
-                }
-            } else {
-                let postAddData = {
-                    members:Arr,
-                };
-                let deleteData = await postCheckGroupMans({id:id}, postAddData);
-                if (deleteData) {
-                    await this.getRelatedMans();
-                    RelationMem.map((memberID, index) => {
-                        if (memberID === user.id) {
-                            RelationMem.splice(index, 1); // 删除该元素
-                        }
-                    });
-                    Notification.success({
-                        message: '取消关联用户成功',
-                        duration: 1
-                    });
-                } else {
-                    Notification.error({
-                        message: '取消关联用户失败',
-                        duration: 2
-                    });
-                }
-                console.log('ddddddddddd', deleteData);
-            }
-        } catch (e) {
-            console.log('ssss', e);
+            let postData = {
+                members: relationMem
+            };
+            await postCheckGroupMans({id: selectMemGroup}, postData);
+            await checkGroupMemChangeStatus(memberChangeStatus + 1);
         }
         this.setState({
-            RelationMem
+            relationMem
         });
     }
 
-    getRelatedMans = async () => {
+    changePage = (obj) => {
+        let current = obj.current;
+        this.setState({
+            page: current
+        }, () => {
+            this.query(current);
+        });
+    }
+
+    query (current = 1) {
         const {
+            form: { validateFields },
             actions: {
-                getCheckGroupMans
-            },
-            selectMemTeam
+                getUsers
+            }
         } = this.props;
-        let postGetData = {
-            id: selectMemTeam.id
-        };
-        await getCheckGroupMans(postGetData);
-    }
-
-    columns = [
-        {
-            title: '序号',
-            dataIndex: 'index',
-            render: (text, record, index) => {
-                return index + 1;
+        validateFields(async (err, values) => {
+            if (!err) {
+                let postData = {
+                    org_code: values.organization ? values.organization : '',
+                    keyword: values.keyword ? values.keyword : '',
+                    roles: values.role ? values.role : '',
+                    is_active: true,
+                    page: current
+                };
+                let userData = await getUsers({}, postData);
+                let dataSource = (userData && userData.results) || [];
+                this.setState({
+                    total: userData.count || 0,
+                    page: current,
+                    dataSource
+                });
             }
-        },
-        {
-            title: '部门',
-            dataIndex: 'account.organization'
-        },
-        {
-            title: '姓名',
-            dataIndex: 'account.person_name'
-        },
-        {
-            title: '账号',
-            dataIndex: 'username'
-        },
-        {
-            title: '角色',
-            dataIndex: 'groups[0].name'
-        },
-        {
-            title: '职务',
-            dataIndex: 'account.title'
-        },
-        {
-            title: '手机号码',
-            dataIndex: 'account.person_telephone'
-        },
-        {
-            title: '关联',
-            render: user => {
-                const { RelationMem = [] } = this.state;
-                const checked = RelationMem.some(memberID => Number(memberID) === user.id);
-
-                return (
-                    <Checkbox
-                        checked={checked}
-                        onChange={this._check.bind(this, user)}
-                    />
-                );
-            }
-        }
-    ];
-
-    query () {
-        const {
-            form: { validateFields }
-        } = this.props;
-        validateFields((err, values) => {
-            let params = {};
-            params['keyword'] = values.keyword;
-            params['role'] = values.role;
-            params['duty'] = values.duty;
-            if(values.organization){
-                values.organization = JSON.parse(values.organization);
-                params['organization'] = values.organization.code;
-            }
-            this._queryMember(params);
-
         });
     }
-    clear () {
+    clear = async () => {
         this.props.form.resetFields();
-        this._queryMember();
+        await this.getInitialUserData();
     }
-
-    static orgloop (data = [], loopTimes = 0) {
-        if (data.length === 0) {
-            return;
-        }
-        return data.map((item) => {
-            if (item.children && item.children.length > 0) {
-                return (
-                    <TreeNode disabled
-                        key={`${item.code}`}
-                        value={JSON.stringify(item)}
-                        title={`${item.name}`}>
-                        {
-                            AddMember.orgloop(item.children, loopTimes + 1, item.name)
-                        }
-                    </TreeNode>
-                );
-            } else {
-                return (<TreeNode
-                    disabled={loopTimes === 0 && true}
-                    key={`${item.code}`}
-                    value={JSON.stringify(item)}
-                    title={`${item.name}`} />);
-            }
-        });
-    };
 }
 export default Form.create()(AddMember);

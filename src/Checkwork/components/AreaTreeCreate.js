@@ -8,22 +8,8 @@ export default class AreaTreeCreate extends Component {
         super(props);
         this.originOnCheck = this.props.onCheck;
         this.state = {
-            checkkeys: [],
-            radioValue: '标段选择'
+            checkkeys: []
         };
-    }
-
-    componentDidMount = async () => {
-        const {
-            actions: {
-                changeSelectMap
-            }
-        } = this.props;
-        try {
-            // await changeSelectMap('细班选择');
-        } catch (e) {
-
-        }
     }
 
     onCheck (keys, info) {
@@ -37,7 +23,6 @@ export default class AreaTreeCreate extends Component {
     }
 
     loop (p, loopTime) {
-        let me = this;
         const that = this;
         let disableCheckbox = false;
         if (loopTime) {
@@ -45,14 +30,14 @@ export default class AreaTreeCreate extends Component {
         } else {
             loopTime = 1;
         }
-        if (loopTime <= 1) {
+        if (loopTime <= 2) {
             disableCheckbox = true;
         }
         if (p) {
             return (
                 <TreeNode
-                    title={p.Name?p.Name:p.name}
-                    key={p.No?p.No:p.id}
+                    title={p.Name ? p.Name : p.name}
+                    key={p.No ? p.No : p.id}
                     disableCheckbox={disableCheckbox}
                     selectable={false}
                 >
@@ -77,10 +62,6 @@ export default class AreaTreeCreate extends Component {
         }
         return (
             <div>
-                <RadioGroup onChange={this.handleRadioChange.bind(this)} value={this.state.radioValue} style={{marginBottom: 10}}>
-                    <Radio value={'标段选择'}>标段选择</Radio>
-                    <Radio value={'手动框选'}>手动框选</Radio>
-                </RadioGroup>
                 <Tree
                     checkable
                     checkedKeys={this.props.checkedKeys}
@@ -94,18 +75,5 @@ export default class AreaTreeCreate extends Component {
 
             </div>
         );
-    }
-
-    handleRadioChange = async (e) => {
-        const {
-            actions: {
-                changeSelectMap
-            }
-        } = this.props;
-        console.log('radio checked', e.target.value);
-        await changeSelectMap(e.target.value);
-        this.setState({
-            radioValue: e.target.value
-        });
     }
 }
