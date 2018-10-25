@@ -371,10 +371,10 @@ class Tablelevel extends Component {
         const { deleteNursery } = this.props.actions;
         deleteNursery({ID: record.ID}).then((rep) => {
             if (rep.code === 1) {
-                message.success('删除成功');
+                message.warning('如未删除成功，请确认该组织机构下无用户');
                 this.onSearch();
             } else {
-                message.success('删除失败，请确认本机构下无用户');
+                message.error('删除失败，请确认本机构下无用户');
             }
         });
     }

@@ -31,11 +31,17 @@ class AddEdit extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 取消弹框
     }
     componentDidMount () {
+        // 获取本用户的姓名，电话作为联系人，联系方式
+        const user = JSON.parse(localStorage.getItem('QH_USER_DATA'));
+        if (user.account) {
+            this.Contacter = user.account.person_name;
+            this.ContacterPhone = user.account.person_telephone;
+        }
         this.setState({
             options: this.props.options,
             optionList: this.props.optionList
         });
-        // 修改
+        // 修改信息回显
         if (this.props.record) {
             const { getNb2ss } = this.props.actions;
             const fileList = {
@@ -356,6 +362,8 @@ class AddEdit extends Component {
                 USCC: values.USCC,
                 RegionCode,
                 Address: values.Address,
+                Contacter: this.Contacter,
+                ContacterPhone: this.ContacterPhone,
                 LegalPerson: values.LegalPerson,
                 LegalPersonPhone: values.LegalPersonPhone,
                 LegalPersonCardNo: values.LegalPersonCardNo,

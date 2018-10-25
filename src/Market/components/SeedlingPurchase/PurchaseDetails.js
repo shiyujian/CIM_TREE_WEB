@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, Table, Input, Modal, Upload, Icon, InputNumber, message } from 'antd';
-import { CULTIVATIONMODE } from '_platform/api';
+import { CULTIVATIONMODE, FOREST_API } from '_platform/api';
 import './PurchaseDetails.less';
 
 const Dragger = Upload.Dragger;
@@ -20,9 +20,11 @@ class PurchaseDetails extends Component {
             Contacter: '',
             Phone: '',
             organizationName: '', // 组织机构名称
-            showModal: false,
+            showModal: false, // 上传弹框
+            showSeeModal: false, // 查看弹框
             PurchaseSpecID: '', // 规格id
-            fileList: [] // 文件列表
+            fileList: [], // 文件列表
+            OfferFiles: '' // 文件url
         };
         this.purchaseid = ''; // 采购单ID
         this.org_code = ''; // 组织机构code
@@ -33,7 +35,7 @@ class PurchaseDetails extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 取消上传
     }
     componentDidMount () {
-        const { getPurchaseById, getWpunittree, getOrgTree_new } = this.props.actions;
+        const { getPurchaseById, getWpunittree, getOrgTree_new, getOfferInventoryById } = this.props.actions;
         this.purchaseid = this.props.purchaseDetailsKey;
         // 获得登陆用户的 苗圃基地/供应商的code
         const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -45,7 +47,6 @@ class PurchaseDetails extends Component {
             });
             this.org_code = userData.account.org_code;
         }
-        console.log(userData);
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
             rep.Specs.map(item => {
@@ -57,6 +58,31 @@ class PurchaseDetails extends Component {
                 item.childrenList = [];
             });
             console.log(rep.Specs, '规格数据');
+            // 根据采购单ID获取报价清单
+            getOfferInventoryById({}, {
+                purchaseid: this.purchaseid
+            }).then(rst => {
+                rst.map(item => {
+                    item.DetailOfferSpecs.map(row => {
+                        rep.Specs.map(record => {
+                            if (row.ID === record.ID) {
+                                record.childrenList.push({
+                                    isSave: true,
+                                    OfferFiles: row.OfferFiles,
+                                    OfferNum: row.OfferNum,
+                                    Source: row.Source,
+                                    SpecDescribe: row.SpecDescribe,
+                                    Price: row.Price
+                                });
+                            }
+                        });
+                    });
+                });
+                console.log(rep.Specs, '规格数据');
+                this.setState({
+                    Specs: rep.Specs
+                });
+            });
             this.setState({
                 purchaseInfo: rep,
                 ProjectName: rep.ProjectName,
@@ -68,9 +94,9 @@ class PurchaseDetails extends Component {
                 Phone: rep.Phone,
                 OfferNun: rep.OfferNun,
                 CreaterOrg: rep.CreaterOrg,
-                Specs: rep.Specs,
                 TreeTypes: rep.TreeTypes
             });
+            // 获取发布单位名称
             getOrgTree_new({code: rep.CreaterOrg}).then(rep => {
                 this.setState({
                     organizationName: rep.name
@@ -93,8 +119,8 @@ class PurchaseDetails extends Component {
         }, {
             title: '数量',
             key: '2',
-            dataIndex: 'Num',
-            render: (text, record, index) => record.isSave ? <span>{text}</span> : <InputNumber min={1} max={record.Max} style={{width: 100}} onChange={this.toEditOffValue.bind(this, record, 'Num')} />
+            dataIndex: 'OfferNum',
+            render: (text, record, index) => record.isSave ? <span>{text}</span> : <InputNumber min={1} max={record.Max} style={{width: 100}} onChange={this.toEditOffValue.bind(this, record, 'OfferNum')} />
         }, {
             title: '苗源地',
             key: '3',
@@ -110,17 +136,17 @@ class PurchaseDetails extends Component {
             key: '5',
             dataIndex: 'OfferFiles',
             render: (text, record) => {
-                return <a onClick={this.onUpload.bind(this, record)}>添加附件</a>;
+                return record.isSave ? <a onClick={this.toSeeFile.bind(this, record)}>查看</a> : <a onClick={this.onUpload.bind(this, record)}>添加附件</a>;
             }
         }, {
             title: '操作',
             key: '6',
             dataIndex: 'action',
-            render: (text, record, index) => <a onClick={this.toSave.bind(this, record)}>保 存</a>
+            render: (text, record, index) => record.isSave ? '' : <a onClick={this.toSave.bind(this, record)}>保 存</a>
         }
     ];
     render () {
-        const { projectList, ProjectName, Section, StartTime, EndTime, UseNurseryAddress, Specs, TreeTypes, Contacter, Phone, organizationName, showModal } = this.state;
+        const { projectList, ProjectName, Section, StartTime, EndTime, UseNurseryAddress, Specs, TreeTypes, Contacter, Phone, organizationName, showModal, showSeeModal, OfferFiles } = this.state;
         let projectName = '', section = '';
         projectList.map(item => {
             if (item.No === ProjectName) {
@@ -200,12 +226,29 @@ class PurchaseDetails extends Component {
                         <p className='ant-upload-text'>请将您所想上传的文件或图片拖曳至该区域</p>
                     </Dragger>
                 </Modal>
+                <Modal
+                    title='查 看'
+                    visible={showSeeModal}
+                    onOk={this.handleCancel}
+                    onCancel={this.handleCancel}
+                >
+                    <img width='100%' src={FOREST_API + '/' + OfferFiles} alt='图片没找到' />
+                </Modal>
             </div>
         );
+    }
+    toSeeFile (record, e) {
+        e.preventDefault();
+        console.log(record, '行数据');
+        this.setState({
+            showSeeModal: true,
+            OfferFiles: record.OfferFiles
+        });
     }
     onUpload (record, e) {
         e.preventDefault();
         this.setState({
+            fileList: [],
             showModal: true,
             PurchaseSpecID: record.PurchaseSpecID
         });
@@ -231,7 +274,8 @@ class PurchaseDetails extends Component {
     }
     handleCancel () {
         this.setState({
-            showModal: false
+            showModal: false,
+            showSeeModal: false
         });
     }
     toEditOff (record, str, e) {
@@ -302,7 +346,7 @@ class PurchaseDetails extends Component {
                     PurchaseSpecID: row.PurchaseSpecID,
                     Price: row.Price,
                     SpecDescribe: row.SpecDescribe,
-                    Num: row.Num,
+                    Num: row.OfferNum,
                     OfferFiles: row.OfferFiles,
                     Source: row.Source
                 });
@@ -318,6 +362,7 @@ class PurchaseDetails extends Component {
         }).then(rep => {
             if (rep.code === 1) {
                 message.success('报价成功了');
+                this.props.actions.changePurchaseDetailsVisible(false);
             } else {
                 message.error('报价失败,' + rep.msg);
             }

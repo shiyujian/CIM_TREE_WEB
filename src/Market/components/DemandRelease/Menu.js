@@ -61,7 +61,6 @@ class Menu extends Component {
                 });
                 dataList.push({name: item, children: arr});
             });
-            console.log(dataList);
             this.setState({
                 dataList
             });
@@ -158,7 +157,7 @@ class Menu extends Component {
     renderButton () {
         let arr = [];
         let seeButton = <Button style={{marginRight: 15, marginBottom: 10}} key='seeButton' type='primary' onClick={this.toSeeOffer.bind(this)}>查看报价</Button>;
-        let overButton = <Button style={{marginRight: 15, marginBottom: 10}} key='overButton' type='primary' onClick={this.toSoldOut.bind(this, 3)}>提前结束报价</Button>;
+        let overButton = <Button style={{marginRight: 15, marginBottom: 10}} key='overButton' type='primary' onClick={this.toSoldOut.bind(this, 2)}>提前结束报价</Button>;
         let upButton = <Button style={{marginRight: 15, marginBottom: 10}} key='upButton' type='primary' onClick={this.toSoldOut.bind(this, 1)}>上架</Button>;
         let downButton = <Button style={{marginRight: 15, marginBottom: 10}} key='downButton' type='primary' onClick={this.toSoldOut.bind(this, 0)}>下架</Button>;
         let editButton = <Button style={{marginRight: 15, marginBottom: 10}} key='editButton' type='primary' onClick={this.toEditInfo}>编辑</Button>;
@@ -171,7 +170,7 @@ class Menu extends Component {
                 arr.push(seeButton, downButton, overButton);
                 break;
             case 2:
-                arr.push(seeButton);
+                arr.push(seeButton, deleteButton);
                 break;
             case 3:
                 arr.push(seeButton, deleteButton);

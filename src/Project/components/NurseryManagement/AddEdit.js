@@ -16,11 +16,13 @@ class AddEdit extends Component {
             optionList: [], // 绑定供应商列表
             Suppliers: [], // 绑定的供应商
             record: null,
-            isAmend: false,
+            isAmend: false, // 是否编辑
             LeaderCard: '', // 身份证正面url
             LeaderCardBack: '', // 身份证反面url
             RegionCode: '' // 行政区划
         };
+        this.Contacter = ''; // 联系人
+        this.ContacterPhone = ''; // 联系方式
         this.toSave = this.toSave.bind(this); // 新增苗圃
         this.checkPhone = this.checkPhone.bind(this); // 校验手机号
         this.checkCardNo = this.checkCardNo.bind(this); // 校验身份证
@@ -28,12 +30,19 @@ class AddEdit extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 取消弹框
     }
     componentDidMount () {
+        // 获取本用户的姓名，电话作为联系人，联系方式
+        const user = JSON.parse(localStorage.getItem('QH_USER_DATA'));
+        if (user.account) {
+            this.Contacter = user.account.person_name;
+            this.ContacterPhone = user.account.person_telephone;
+        }
         if (this.props.optionList) {
             this.setState({
                 optionList: this.props.optionList,
                 RegionCodeList: this.props.RegionCodeList
             });
         }
+        // 修改信息回显
         if (this.props.record) {
             const { getNb2ss } = this.props.actions;
             const fileList = {
@@ -320,6 +329,8 @@ class AddEdit extends Component {
                 TreePlace: values.TreePlace,
                 RegionCode: RegionCode,
                 Address: values.Address || '',
+                Contacter: this.Contacter,
+                ContacterPhone: this.ContacterPhone,
                 Leader: values.Leader,
                 LeaderPhone: values.LeaderPhone,
                 LeaderCardNo: values.LeaderCardNo,
