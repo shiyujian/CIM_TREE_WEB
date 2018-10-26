@@ -141,6 +141,7 @@ export default class Tree extends Component {
                 await getOrgTreeDataArr(this.orgTreeDataArr);
             }
             let rst = await getOrgTree({}, { depth: 3 });
+            console.log(rst, '11111');
             if (rst && rst.children) {
                 rst.children.map(item => {
                     if (item.name === '供应商') {

@@ -18,6 +18,7 @@ import {getSectionNameBySection} from '_platform/gisAuth';
 import { formItemLayout } from '../common';
 import { getUser } from '_platform/auth';
 import './index.less';
+import moment from 'moment';
 const { Option, OptGroup } = Select;
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -47,6 +48,7 @@ class Users extends Component {
             total: 0,
             userStatus: '' // 状态
         };
+        this.Checker = ''; // 登陆用户ID
         this.handleAudit = this.handleAudit.bind(this); // 审核
         this.handleCancel = this.handleCancel.bind(this); // 取消
         this.getDataList = this.getDataList.bind(this); // 请求数据列表
@@ -57,7 +59,7 @@ class Users extends Component {
         wrapperCol: { span: 18 }
     };
     componentDidMount () {
-        this.Checker = getUser().id; // 登陆用户
+        this.Checker = getUser().id;
     }
     componentWillReceiveProps (nextProps) {
         this.setState({ TreeCodes: this.props.getTreeCodes });
@@ -940,68 +942,98 @@ class Users extends Component {
     }
     handleAudit () {
         const { record } = this.state;
-        const {
-            sidebar: { node } = {},
-            actions: { putUser }
-        } = this.props;
-        let groupe = [];
-        for (let j = 0; j < record.groups.length; j++) {
-            const element = record.groups[j];
-            groupe.push(element.id);
-        }
+        const { checkUsers } = this.props.actions;
+
+        console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
         this.props.form.validateFields((err, values) => {
             if (err) {
                 return;
+            } else {
+                checkUsers({}, {
+                    ID: record.id + '',
+                    Checker: this.Checker,
+                    CheckTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+                    CheckInfo: values.CheckInfo,
+                    CheckStatus: values.CheckStatus
+                }).then(rep => {
+                    if (rep.code === 1) {
+                        message.success('审核成功');
+                        this.setState({
+                            showModal: false,
+                            record: null
+                        });
+                        // 刷新列表
+                        this.search();
+                    } else {
+                        message.success('审核失败');
+                    }
+                });
             }
-            let is_active = values['CheckStatus'] === 1;
-            const param = {
-                id: record.id,
-                username: record.username,
-                email: record.email,
-                account: {
-                    person_name: record.person_name,
-                    person_type: 'C_PER',
-                    person_avatar_url: record.person_avatar_url || '',
-                    person_signature_url: record.person_signature_url || '',
-                    organization: {
-                        pk: node.pk,
-                        code: record.org_code,
-                        obj_type: 'C_ORG',
-                        rel_type: 'member',
-                        name: record.organization
-                    }
-                },
-                tags: record.tags || [],
-                sections: record.sections,
-                groups: groupe,
-                is_active,
-                id_num: record.id_num,
-                id_image: record.id_image,
-                basic_params: {
-                    info: {
-                        电话: record.person_telephone || '',
-                        性别: record.gender || '',
-                        技术职称: record.title || '',
-                        phone: record.person_telephone || '',
-                        sex: record.gender || '',
-                        duty: ''
-                    }
-                },
-                extra_params: {},
-                title: record.title || ''
-            };
-            putUser({}, param).then((rep) => {
-                if (rep.code === 1) {
-                    this.setState({
-                        showModal: false,
-                        record: null
-                    });
-                    // 刷新列表
-                    this.clear();
-                    message.success('操作成功');
-                }
-            });
         });
+
+        // const { record } = this.state;
+        // const {
+        //     sidebar: { node } = {},
+        //     actions: { putUser }
+        // } = this.props;
+        // let groupe = [];
+        // for (let j = 0; j < record.groups.length; j++) {
+        //     const element = record.groups[j];
+        //     groupe.push(element.id);
+        // }
+        // this.props.form.validateFields((err, values) => {
+        //     if (err) {
+        //         return;
+        //     }
+        //     let is_active = values['CheckStatus'] === 1;
+        //     const param = {
+        //         id: record.id,
+        //         username: record.username,
+        //         email: record.email,
+        //         account: {
+        //             person_name: record.person_name,
+        //             person_type: 'C_PER',
+        //             person_avatar_url: record.person_avatar_url || '',
+        //             person_signature_url: record.person_signature_url || '',
+        //             organization: {
+            //             pk: node.pk,
+            //             code: record.org_code,
+            //             obj_type: 'C_ORG',
+            //             rel_type: 'member',
+            //             name: record.organization
+            //         }
+            //     },
+            //     tags: record.tags || [],
+            //     sections: record.sections,
+            //     groups: groupe,
+            //     is_active,
+            //     id_num: record.id_num,
+            //     id_image: record.id_image,
+            //     basic_params: {
+            //         info: {
+            //             电话: record.person_telephone || '',
+            //             性别: record.gender || '',
+            //             技术职称: record.title || '',
+            //             phone: record.person_telephone || '',
+            //             sex: record.gender || '',
+            //             duty: ''
+            //         }
+            //     },
+            //     extra_params: {},
+            //     title: record.title || ''
+            // };
+            // putUser({}, param).then((rep) => {
+        //         if (rep.code === 1) {
+        //             this.setState({
+        //                 showModal: false,
+        //                 record: null
+        //             });
+        //             // 刷新列表
+        //             this.clear();
+        //             message.success('操作成功');
+        //         }
+        //     });
+        // });
     }
     disable (user, event) {
         const {

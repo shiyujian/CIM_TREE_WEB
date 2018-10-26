@@ -944,7 +944,7 @@ class Addition extends Component {
                                                 onChange={this.changeRoles.bind(
                                                     this
                                                 )}
-                                                mode='multiple'
+                                                // mode='multiple'
                                                 style={{ width: '100%' }}
                                             >
                                                 {this.renderContent()}
@@ -1183,7 +1183,7 @@ class Addition extends Component {
         const {
             actions: { changeAdditionField }
         } = this.props;
-        changeAdditionField('roles', value);
+        changeAdditionField('roles', [value]);
     }
     changeSection (value) {
         const {
