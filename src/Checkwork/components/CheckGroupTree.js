@@ -6,7 +6,6 @@ export default class CheckGroupTree extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            checkkeys: []
         };
     }
 
@@ -48,7 +47,8 @@ export default class CheckGroupTree extends Component {
 
     render () {
         let {
-            content = []
+            content = [],
+            groupSelectKey
         } = this.props;
         let contents = [];
         for (let j = 0; j < content.length; j++) {
@@ -57,11 +57,13 @@ export default class CheckGroupTree extends Component {
                 contents.push(element);
             }
         }
+        console.log('groupSelectKey', groupSelectKey);
         return (
             <div>
                 <Tree
                     onSelect={this.onSelect.bind(this)}
                     showLine
+                    selectedKeys={[groupSelectKey]}
                 >
                     {contents.map(p => {
                         return this.loop(p);

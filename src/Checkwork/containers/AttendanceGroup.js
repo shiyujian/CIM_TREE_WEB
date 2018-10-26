@@ -8,7 +8,7 @@ import {
     AsideTree
 } from '../components/AttendanceGroup';
 import { TreeSelect } from 'antd';
-import { getUser, getCompanyDataByOrgCode } from '_platform/auth';
+import { getCompanyDataByOrgCode } from '_platform/auth';
 import './index.less';
 const TreeNode = TreeSelect.TreeNode;
 @connect(
@@ -80,7 +80,7 @@ export default class AttendanceGroup extends Component {
                 let postData = {
                     org_code: companyOrgCode
                 };
-                let groupData = await getCheckGroup({}, postData);
+                await getCheckGroup({}, postData);
                 // 在关联人员时需要根据各个部门来查找人员，所以需要根据公司的code查找公司内的组织机构
                 companyDatas = await getOrgTreeByCode({code: companyOrgCode});
                 // 获取组织机构后，构建成TreeSelect
@@ -103,9 +103,9 @@ export default class AttendanceGroup extends Component {
 
     render () {
         return (
-            <div className='taskTeam-Layout'>
-                <AsideTree {...this.props} {...this.state} className='aside-Layout' />
-                <div className='table-Layout'>
+            <div className='AttendanceGroup-Layout'>
+                <AsideTree {...this.props} {...this.state} className='AttendanceGroup-aside-Layout' />
+                <div className='AttendanceGroup-table-Layout'>
                     <AttendanceGroupTable {...this.props} {...this.state} />
                 </div>
             </div>

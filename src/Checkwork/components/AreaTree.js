@@ -1,25 +1,16 @@
 import React, { Component } from 'react';
-import { Tree, Radio } from 'antd';
+import { Tree } from 'antd';
 const TreeNode = Tree.TreeNode;
-const RadioGroup = Radio.Group;
 
-export default class AreaTreeCreate extends Component {
+export default class AreaTree extends Component {
     constructor (props) {
         super(props);
-        this.originOnCheck = this.props.onCheck;
         this.state = {
-            checkkeys: []
         };
     }
 
     onCheck (keys, info) {
-        const {
-            actions: {
-                changeCheckedKeys
-            }
-        } = this.props;
-        changeCheckedKeys(keys);
-        this.originOnCheck(keys, info);
+        this.props.onCheck(keys, info);
     }
 
     loop (p, loopTime) {
@@ -56,7 +47,7 @@ export default class AreaTreeCreate extends Component {
         let contents = [];
         for (let j = 0; j < content.length; j++) {
             const element = content[j];
-            if (element != undefined) {
+            if (element !== undefined) {
                 contents.push(element);
             }
         }
@@ -64,7 +55,6 @@ export default class AreaTreeCreate extends Component {
             <div>
                 <Tree
                     checkable
-                    checkedKeys={this.props.checkedKeys}
                     onCheck={this.onCheck.bind(that)}
                     showLine
                 >

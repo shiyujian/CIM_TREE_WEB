@@ -134,7 +134,8 @@ export default class TreeAdoptInfoTable extends Component {
             bigType,
             treetypename,
             sxm,
-            tblData = []
+            tblData = [],
+            status
         } = this.state;
         return (
             <div>
@@ -351,7 +352,8 @@ export default class TreeAdoptInfoTable extends Component {
     }
 
     onStatusChange (value) {
-        this.setState({ status: value || '' });
+        console.log('value', value);
+        this.setState({ status: value });
     }
 
     datepick (value) {
@@ -449,7 +451,7 @@ export default class TreeAdoptInfoTable extends Component {
                     plan.inputTime1 = inputTime1;
                     plan.inputTime2 = inputTime2;
                 });
-                let totalNum = rst.total;
+                let totalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;

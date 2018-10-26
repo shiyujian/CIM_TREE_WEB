@@ -68,6 +68,7 @@ export const SUSER_API = `${SDOMAIN}`;
 export const SERVICE_API = `${base}/service/construction/api`;
 export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
+export const MAIN_API = `${base}/main/api`;
 export const PDF_FILE_API = `${STATIC_FILE_IP}:${
     window.config.STATIC_PREVIEW_PORT
 }`;
@@ -765,8 +766,8 @@ export const MODULES = [
                         name: '考勤群体'
                     }
                 ]
-            },
-           
+            }
+
         ]
     },
     {

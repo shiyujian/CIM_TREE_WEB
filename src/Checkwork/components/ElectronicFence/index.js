@@ -1,1 +1,1 @@
-export TaskCreateTable from './TaskCreateTable';
+export ScopeCreateTable from './ScopeCreateTable';

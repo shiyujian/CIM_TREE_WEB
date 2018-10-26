@@ -107,7 +107,7 @@ export default class TreeAdoptInfo extends Component {
 
             // 状态
             let statusoption = [
-                <Option key={'-1'} value={''} title={'全部'}>
+                <Option key={'全部'} value={''} title={'全部'}>
                     全部
                 </Option>,
                 <Option key={'死亡'} value={'0'} title={'死亡'}>

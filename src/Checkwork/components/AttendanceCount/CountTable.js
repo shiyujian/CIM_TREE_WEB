@@ -13,17 +13,16 @@ export default class CountTable extends Component {
         super(props);
         this.state = {
             seeVisible: false, // 查看弹框
-            record: null, //行数据
+            record: null // 行数据
         };
     }
 
-
     render () {
-        const { seeVisible,record } = this.state;
+        const { seeVisible, record } = this.state;
         let allcheckrecord = this.props.allcheckrecord;
         let dataSource = allcheckrecord;
-        let imgs = null;  
-        if(record){
+        let imgs = null;
+        if (record) {
             imgs = record.checkin_record.imgs;
         }
 
@@ -45,7 +44,7 @@ export default class CountTable extends Component {
                 />
                 <Modal title='查看' visible={seeVisible}
                     onCancel={this.handleCancel}
-                    style={{textAlign: 'center'}}
+                    style={{ textAlign: 'center' }}
                     footer={null}
                 >
                     <img src={FOREST_API + '/' + imgs} width='100%' height='100%' alt='图片找不到了' />
@@ -120,16 +119,16 @@ export default class CountTable extends Component {
         }
     ];
 
-    previewFile(record){
+    previewFile (record) {
         this.setState({
             seeVisible: true,
-            record:record,
+            record: record
         });
     }
 
     handleCancel () {
         this.setState({
-            seeVisible: false,
+            seeVisible: false
         });
     }
 }
