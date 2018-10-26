@@ -21,6 +21,9 @@ class Tablelevel extends Component {
         };
         this.Checker = ''; // 登陆用户
         this.org_code = ''; // 所在组织机构
+        this.name = ''; // 登陆用户姓名
+        this.SupplierList = []; // 供应商列表
+        this.NurseryList = []; // 苗圃列表
         this.handleCancel = this.handleCancel.bind(this); // 取消
         this.handleOk = this.handleOk.bind(this); // 审核
     }
@@ -29,12 +32,20 @@ class Tablelevel extends Component {
         const { id, org_code } = getUser();
         this.Checker = id;
         this.org_code = org_code;
+        // 获取当前组织机构的权限
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        if (user.account) {
+            this.name = user.account.person_name;
+        }
+        // 获取供应商列表
         getSupplierList().then(rep => {
+            this.SupplierList = rep.content;
             this.setState({
                 SupplierList: rep.content
             });
         });
         getNurseryList().then(rep => {
+            this.NurseryList = rep.content;
             this.setState({
                 NurseryList: rep.content
             });
@@ -52,7 +63,7 @@ class Tablelevel extends Component {
             key: '2'
         }, {
             title: '绑定人',
-            dataIndex: 'Checker',
+            dataIndex: 'Binder',
             key: '3'
         }, {
             title: '操作',
@@ -70,8 +81,11 @@ class Tablelevel extends Component {
             <div className='relevance-table'>
                 <Form layout='inline'>
                     <FormItem label='供应商名称'>
-                        <Select style={{width: 200}} allowClear
+                        <Select style={{width: 200}}
                             value={supplierid} placeholder='请选择供应商'
+                            showSearch
+                            filterOption={false}
+                            onSearch={this.searchSupplier.bind(this)}
                             onChange={this.handleSupplier.bind(this)}>
                             {
                                 SupplierList.map(item => {
@@ -81,8 +95,11 @@ class Tablelevel extends Component {
                         </Select>
                     </FormItem>
                     <FormItem label='苗圃名称'>
-                        <Select style={{width: 200}} allowClear
+                        <Select style={{width: 200}}
                             value={nurserybaseid} placeholder='请选择苗圃基地'
+                            showSearch
+                            filterOption={false}
+                            onSearch={this.searchNursery.bind(this)}
                             onChange={this.handleNursery.bind(this)}>
                             {
                                 NurseryList.map(item => {
@@ -153,9 +170,31 @@ class Tablelevel extends Component {
             showModal: true
         });
     }
+    searchSupplier (value) {
+        let SupplierList = [];
+        this.SupplierList.map(item => {
+            if (item.SupplierName.includes(value)) {
+                SupplierList.push(item);
+            }
+        });
+        this.setState({
+            SupplierList
+        });
+    }
     handleSupplier (value) {
         this.setState({
             supplierid: value
+        });
+    }
+    searchNursery (value) {
+        let NurseryList = [];
+        this.NurseryList.map(item => {
+            if (item.NurseryName.includes(value)) {
+                NurseryList.push(item);
+            }
+        });
+        this.setState({
+            NurseryList
         });
     }
     handleNursery (value) {
@@ -192,7 +231,13 @@ class Tablelevel extends Component {
             if (err) {
                 return;
             }
+            console.log({
+                Binder: this.name === undefined ? '' : this.name,
+                SupplierID: values.supplier,
+                NurseryBaseID: values.nursery
+            });
             postNb22s({}, {
+                Binder: this.name === undefined ? '' : this.name,
                 SupplierID: values.supplier,
                 NurseryBaseID: values.nursery
             }).then(rep => {
@@ -202,6 +247,8 @@ class Tablelevel extends Component {
                     this.setState({
                         showModal: false
                     });
+                } else {
+                    message.success('绑定失败');
                 }
             });
         });
