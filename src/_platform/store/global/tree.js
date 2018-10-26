@@ -15,8 +15,10 @@ export const getLittleBan = createFetchAction(
     [getLittleBanOK]
 );
 export const getThinClassList = createFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []); //
-
-export const getThinClassTree = createAction(`${ID}区域地块细班树`);
+// 设置区域地块树，对于所有人员获取所有的数据
+export const getOnSiteThinClassTree = createAction(`${ID}所有的区域地块细班树`);
+// 设置区域地块树，对于施工监理只获取自己标段的数据
+export const getThinClassTree = createAction(`${ID}关于标段的区域地块细班树`);
 export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
 
 export const getProjectListOK = createAction(`${ID}获取进度管理左侧项目工程节点信息`);
@@ -154,6 +156,12 @@ export default handleActions(
             return {
                 ...state,
                 littleClass: payload
+            };
+        },
+        [getOnSiteThinClassTree]: (state, { payload }) => {
+            return {
+                ...state,
+                onSiteThinClassTree: payload
             };
         },
         [getThinClassTree]: (state, { payload }) => {

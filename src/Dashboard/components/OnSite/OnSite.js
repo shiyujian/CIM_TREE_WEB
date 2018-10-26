@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-23 11:18:28
+ * @Last Modified time: 2018-10-26 23:22:23
  */
 import React, { Component } from 'react';
 import {
@@ -26,7 +26,7 @@ import RiskTree from './RiskTree';
 import TrackTree from './TrackTree';
 import TreeTypeTree from './TreeTypeTree';
 import RiskDetail from './RiskDetail';
-import PkCodeTree from './PkCodeTree';
+import onSiteAreaTree from './onSiteAreaTree';
 import TreeMessModal from './TreeMessModal';
 import CuringTaskTree from './CuringTaskTree';
 import SurvivalRateTree from './SurvivalRateTree';
@@ -719,18 +719,6 @@ class OnSite extends Component {
         }
         if (option && option.value) {
             switch (option.value) {
-                // 区域地块
-                case 'geojsonFeature_treeMess':
-                    return (
-                        <div>
-                            {/* <PkCodeTree
-                                {...this.props}
-                                treeData={tree.thinClassTree || []}
-                                // selectedKeys={this.state.areaEventKey}
-                                onSelect={this._handleAreaSelect.bind(this)}
-                            /> */}
-                        </div>
-                    );
                 // 巡检路线
                 case 'geojsonFeature_track':
                     return (
@@ -821,6 +809,12 @@ class OnSite extends Component {
         if (coordinates.length <= 0) {
             createMeasureBackDisplay = true;
         }
+        let onSiteAreaTreeData = [];
+        if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
+            onSiteAreaTreeData = tree.thinClassTree;
+        } else if (tree.onSiteThinClassTree && tree.onSiteThinClassTree instanceof Array && tree.onSiteThinClassTree.length > 0) {
+            onSiteAreaTreeData = tree.onSiteThinClassTree;
+        }
         return (
             <div className={fullScreenState === 'fullScreen' ? 'map-containerFullScreen' : 'map-container'}>
                 <div
@@ -855,9 +849,9 @@ class OnSite extends Component {
                                 <div className='dashboard-rightAreaMenu'>
                                     <aside className='dashboard-rightAreaMenu-aside' draggable='false'>
                                         <div className='dashboard-rightAreaMenu-areaTree'>
-                                            <PkCodeTree
+                                            <onSiteAreaTree
                                                 {...this.props}
-                                                treeData={tree.thinClassTree || []}
+                                                treeData={onSiteAreaTreeData || []}
                                                 // selectedKeys={this.state.areaEventKey}
                                                 onSelect={this._handleAreaSelect.bind(this)}
                                             />

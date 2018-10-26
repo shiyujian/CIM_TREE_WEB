@@ -28,10 +28,16 @@ export default class GetMenuTree extends Component {
                 getSurvivalRateTreeLoading
             }
         } = this.props;
-        if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0) {
+        if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
+            console.log('tree.thinClassTree');
+            await getAreaTreeLoading(false);
+            await getSurvivalRateTreeLoading(false);
+        } else if (tree && tree.onSiteThinClassTree && tree.onSiteThinClassTree instanceof Array && tree.onSiteThinClassTree.length > 0) {
+            console.log('tree.onSiteThinClassTree');
             await getAreaTreeLoading(false);
             await getSurvivalRateTreeLoading(false);
         } else {
+            console.log('loadAreaData');
             await this.loadAreaData();
         }
         if (treetypesTree && treetypesTree instanceof Array && treetypesTree.length > 0) {
@@ -61,7 +67,7 @@ export default class GetMenuTree extends Component {
             actions: {
                 getTreeNodeList,
                 getThinClassList,
-                getThinClassTree,
+                getOnSiteThinClassTree,
                 getSurvivalRateTree,
                 getTotalThinClass,
                 getAreaTreeLoading,
@@ -82,7 +88,7 @@ export default class GetMenuTree extends Component {
             // 标段树
             await getSurvivalRateTree(survivalRateTree);
             // 区域地块树
-            await getThinClassTree(projectList);
+            await getOnSiteThinClassTree(projectList);
             // loading结束
             await getAreaTreeLoading(false);
             await getSurvivalRateTreeLoading(false);
