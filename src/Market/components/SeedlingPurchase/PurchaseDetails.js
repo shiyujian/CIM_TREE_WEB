@@ -68,6 +68,9 @@ class PurchaseDetails extends Component {
                             if (row.ID === record.ID) {
                                 record.childrenList.push({
                                     isSave: true,
+                                    key: 0,
+                                    ID: row.ID,
+                                    SOID: row.SOID,
                                     OfferFiles: row.OfferFiles,
                                     OfferNum: row.OfferNum,
                                     Source: row.Source,
@@ -302,19 +305,31 @@ class PurchaseDetails extends Component {
     }
     toOffer (id) {
         const { Specs } = this.state;
+        console.log(Specs, id, '数');
+        debugger
         Specs.map(item => {
             if (item.ID === id) {
-                item.childrenList = [{
-                    key: 0,
-                    isSave: false,
-                    PurchaseSpecID: id,
-                    Price: '',
-                    SpecDescribe: '',
-                    Num: '',
-                    Max: item.Num,
-                    OfferFiles: '',
-                    Source: ''
-                }];
+                if (item.childrenList.length === 0) {
+                    item.childrenList = [{
+                        key: 0,
+                        isSave: false,
+                        PurchaseSpecID: id,
+                        Price: '',
+                        SpecDescribe: '',
+                        Num: '',
+                        Max: item.Num,
+                        OfferFiles: '',
+                        Source: ''
+                    }];
+                } else {
+                    item.childrenList = [{
+                        ...item.childrenList[0],
+                        key: 0,
+                        isSave: false,
+                        PurchaseSpecID: id,
+                        Max: item.Num
+                    }];
+                }
             }
         });
         this.setState({

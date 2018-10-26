@@ -167,8 +167,8 @@ class Tablelevel extends Component {
         const { getNb2ss } = this.props.actions;
         const { supplierid, nurserybaseid } = this.state;
         getNb2ss({}, {
-            supplierid,
-            nurserybaseid
+            supplierid: supplierid === undefined ? '' : supplierid,
+            nurserybaseid: nurserybaseid === undefined ? '' : nurserybaseid
         }).then(rep => {
             this.setState({
                 dataList: rep

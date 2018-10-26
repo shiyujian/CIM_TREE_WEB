@@ -27,7 +27,6 @@ class Menu extends Component {
             });
             // 获取发布单位
             const { getOrgTree_new } = this.props.actions;
-            console.log(this.props.record.CreaterOrg, '1');
             getOrgTree_new({code: this.props.record.CreaterOrg}).then(rep => {
                 this.setState({
                     organizationName: rep.name
@@ -142,7 +141,6 @@ class Menu extends Component {
     toSeeDetails () {
         const { changeOfferDetailsVisible, changeOfferDetailsKey } = this.props.actions;
         changeOfferDetailsVisible(true);
-        console.log(this.props.record.ID);
         changeOfferDetailsKey(this.props.record.ID);
     }
     renderButton () {

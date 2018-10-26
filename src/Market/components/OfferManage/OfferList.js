@@ -31,7 +31,6 @@ class OfferList extends Component {
             });
             this.org_code = userData.account.org_code;
         }
-        console.log(this.org_code, this.grouptype);
         // 获取所有项目和标段
         const { getWpunittree } = this.props.actions;
         getWpunittree().then(rep => {
