@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { Row, Col, Icon, Input, Button, Select, Modal, Form, Upload, Cascader, notification, message } from 'antd';
+import { Row, Col, Icon, Input, Button, Select, Modal, Form, Upload, Cascader, Switch, notification, message } from 'antd';
 import { checkTel, isCardNo, layoutT } from '../common';
 import { FOREST_API } from '../../../_platform/api';
 const FormItem = Form.Item;
@@ -13,7 +13,7 @@ class AddEdit extends Component {
             fileList: [],
             fileListBack: [],
             fileListLicense: [],
-            options: [], // 行政区划
+            RegionCodeList: [], // 行政区划option
             optionList: [], // 绑定苗圃基地列表
             Nurserys: [], // 绑定的苗圃基地
             record: null,
@@ -21,13 +21,13 @@ class AddEdit extends Component {
             LegalPersonCard: '', // 身份证正面url
             LegalPersonCardBack: '', // 身份证反面url
             BusinessLicense: '',
-            RegionCode: ''
+            RegionCode: '', // 行政编码
+            isSwitch: true // true为法人，false为自然人
         };
         this.toSave = this.toSave.bind(this); // 新增供应商
         this.checkPhone = this.checkPhone.bind(this); // 校验手机号
         this.checkCardNo = this.checkCardNo.bind(this); // 校验身份证
         this.handleRegion = this.handleRegion.bind(this); // 行政区划
-        this.loadRegion = this.loadRegion.bind(this); // 加载市县
         this.handleCancel = this.handleCancel.bind(this); // 取消弹框
     }
     componentDidMount () {
@@ -37,9 +37,10 @@ class AddEdit extends Component {
             this.Contacter = user.account.person_name;
             this.ContacterPhone = user.account.person_telephone;
         }
+        console.log(this.props.RegionCodeList, '111');
         this.setState({
-            options: this.props.options,
-            optionList: this.props.optionList
+            optionList: this.props.optionList,
+            RegionCodeList: this.props.RegionCodeList
         });
         // 修改信息回显
         if (this.props.record) {
@@ -48,15 +49,22 @@ class AddEdit extends Component {
                 uid: '-1',
                 status: 'done'
             };
+            console.log(this.props.record.BusinessLicense, this.props.record.Facade, '111');
+            if (this.props.record.Facade) {
+                this.setState({
+                    isSwitch: false
+                });
+            }
             this.setState({
                 isAmend: true,
                 record: this.props.record,
+                RegionCode: this.props.record.RegionCode,
                 LegalPersonCard: this.props.record.LegalPersonCard,
                 LegalPersonCardBack: this.props.record.LegalPersonCardBack,
-                BusinessLicense: this.props.record.BusinessLicense,
+                BusinessLicense: this.props.record.BusinessLicense || this.props.record.Facade,
                 fileList: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LegalPersonCard}`}],
                 fileListBack: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LegalPersonCardBack}`}],
-                fileListLicense: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.BusinessLicense}`}]
+                fileListLicense: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.BusinessLicense || this.props.record.Facade}`}]
             });
             // 根据供应商id获取绑定苗圃
             getNb2ss({}, {supplierid: this.props.record.ID}).then(rep => {
@@ -71,9 +79,15 @@ class AddEdit extends Component {
         }
     }
     render () {
-        const { fileList, fileListBack, fileListLicense, options, optionList, record, isAmend, Nurserys } = this.state;
+        const { fileList, fileListBack, fileListLicense, RegionCodeList, optionList, record, isAmend, Nurserys, isSwitch, RegionCode } = this.state;
         const { getFieldDecorator } = this.props.form;
         console.log(record);
+        let provinceCode = '';
+        let sityCode = '';
+        if (RegionCode) {
+            provinceCode = RegionCode.slice(0, 2) + '0000';
+            sityCode = RegionCode.slice(0, 4) + '00';
+        }
         const props = {
             action: '',
             listType: 'picture',
@@ -162,6 +176,14 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
+                                    label='法人/负责人'
+                                >
+                                    <Switch checkedChildren='法人' unCheckedChildren='负责人' checked={isSwitch} onChange={this.onSwitch.bind(this)} />
+                                </FormItem>
+                            </Col>
+                            <Col span={12}>
+                                <FormItem
+                                    {...layoutT}
                                     label='供应商名称'
                                 >
                                     {getFieldDecorator('SupplierName', {
@@ -179,7 +201,7 @@ class AddEdit extends Component {
                                 >
                                     {getFieldDecorator('USCC', {
                                         initialValue: record && record.USCC,
-                                        rules: [{required: true, message: '必填项'}]
+                                        rules: [{required: isSwitch, message: '必填项'}]
                                     })(
                                         <Input placeholder='请输入社会统一信用码' />
                                     )}
@@ -191,11 +213,11 @@ class AddEdit extends Component {
                                     label='行政区划'
                                 >
                                     {getFieldDecorator('RegionCode', {
-                                        rules: [{required: true, message: '必填项'}]
+                                        rules: [{required: true, message: '必填项'}],
+                                        initialValue: [provinceCode, sityCode, RegionCode]
                                     })(
                                         <Cascader placeholder='选择您所在的城市'
-                                            loadData={this.loadRegion}
-                                            options={options}
+                                            options={RegionCodeList}
                                             onChange={this.handleRegion}
                                             changeOnSelect
                                         />
@@ -217,39 +239,39 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='法人代表'
+                                    label={isSwitch ? '法人姓名' : '负责人姓名'}
                                 >
                                     {getFieldDecorator('LegalPerson', {
                                         initialValue: record && record.LegalPerson,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入负责人姓名' disabled={isAmend} />
+                                        <Input placeholder={isSwitch ? '请输入法人姓名' : '请输入负责人姓名'} disabled={isAmend} />
                                     )}
                                 </FormItem>
                             </Col>
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='法人手机号'
+                                    label={isSwitch ? '法人手机号' : '负责人手机号'}
                                 >
                                     {getFieldDecorator('LegalPersonPhone', {
                                         initialValue: record && record.LegalPersonPhone,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入负责人手机号' maxLength='11' onBlur={this.checkPhone} />
+                                        <Input placeholder={isSwitch ? '请输入法人手机号' : '请输入负责人手机号'} maxLength='11' onBlur={this.checkPhone} />
                                     )}
                                 </FormItem>
                             </Col>
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='法人身份证号'
+                                    label={isSwitch ? '法人身份证号' : '负责人身份证号'}
                                 >
                                     {getFieldDecorator('LegalPersonCardNo', {
                                         initialValue: record && record.LegalPersonCardNo,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入负责人身份证号' maxLength='18' disabled={isAmend} onBlur={this.checkCardNo} />
+                                        <Input placeholder={isSwitch ? '请输入法人身份证号' : '请输入负责人身份证号'} maxLength='18' disabled={isAmend} onBlur={this.checkCardNo} />
                                     )}
                                 </FormItem>
                             </Col>
@@ -276,7 +298,7 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='法人身份证正面'
+                                    label={isSwitch ? '法人身份证正面' : '负责人身份证正面'}
                                 >
                                     <Upload {...props}>
                                         <Button>
@@ -288,7 +310,7 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='法人身份证反面'
+                                    label={isSwitch ? '法人身份证反面' : '负责人身份证反面'}
                                 >
                                     <Upload {...propsBack}>
                                         <Button>
@@ -300,7 +322,7 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='营业执照'
+                                    label={isSwitch ? '营业执照' : '门店照片'}
                                 >
                                     <Upload {...propsLicense}>
                                         <Button>
@@ -314,6 +336,12 @@ class AddEdit extends Component {
                 </Modal>
             </div>
         );
+    }
+    onSwitch (boolean) {
+        console.log(boolean);
+        this.setState({
+            isSwitch: boolean
+        });
     }
     handleNursery (value) {
         this.setState({
@@ -344,7 +372,7 @@ class AddEdit extends Component {
             if (err) {
                 return;
             }
-            const { LegalPersonCard, LegalPersonCardBack, BusinessLicense, RegionCode, record, Nurserys } = this.state;
+            const { LegalPersonCard, LegalPersonCardBack, BusinessLicense, RegionCode, record, Nurserys, isSwitch } = this.state;
             if (!LegalPersonCard || !LegalPersonCardBack || !BusinessLicense) {
                 message.error('请上传身份证正反面');
                 return;
@@ -369,9 +397,13 @@ class AddEdit extends Component {
                 LegalPersonCardNo: values.LegalPersonCardNo,
                 LegalPersonCard,
                 LegalPersonCardBack,
-                BusinessLicense,
                 NB2Ss: arr
             };
+            if (isSwitch) {
+                postdata.BusinessLicense = BusinessLicense;
+            } else {
+                postdata.Facade = BusinessLicense;
+            }
             if (record) {
                 postdata.ID = record.ID;
                 putSupplier({}, postdata).then(rep => {
@@ -431,34 +463,6 @@ class AddEdit extends Component {
         this.setState({
             RegionCode
         });
-    }
-    loadRegion (selectedOptions) {
-        const targetOption = selectedOptions[selectedOptions.length - 1];
-        targetOption.loading = true;
-        setTimeout(() => {
-            targetOption.loading = false;
-            const { getRegionCodes } = this.props.actions;
-            targetOption.children = [];
-            getRegionCodes({}, {parent: targetOption.value}).then(rep => {
-                rep.map(item => {
-                    if (item.LevelType === '3') {
-                        targetOption.children.push({
-                            value: item.ID,
-                            label: item.Name
-                        });
-                    } else {
-                        targetOption.children.push({
-                            value: item.ID,
-                            label: item.Name,
-                            isLeaf: false
-                        });
-                    }
-                });
-                this.setState({
-                    options: [...this.state.options]
-                });
-            });
-        }, 100);
     }
 }
 

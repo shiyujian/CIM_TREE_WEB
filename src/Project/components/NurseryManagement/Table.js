@@ -5,6 +5,7 @@ import { FOREST_API } from '_platform/api';
 import AddEdit from './AddEdit';
 import { getUser, formItemLayout } from '_platform/auth';
 
+const confirm = Modal.confirm;
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -27,6 +28,7 @@ class Tablelevel extends Component {
             LeaderCard: '', // 身份证正反面
             optionList: []
         };
+        this.username = ''; // 用户名
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
         this.handleStatus = this.handleStatus.bind(this); // 状态
@@ -43,47 +45,57 @@ class Tablelevel extends Component {
         if (user.groups && user.groups.length > 0) {
             this.groupId = user.groups[0].id;
         }
+        this.username = user.username;
         // 获取行政区划编码
-        getRegionCodes().then(rep => {
-            let RegionCodeList = [];
-            rep.map(item => {
-                if (item.LevelType === '1') {
-                    RegionCodeList.push({
-                        value: item.ID,
-                        label: item.Name
-                    });
-                }
-            });
-            RegionCodeList.map(item => {
-                let arrCity = [];
-                rep.map(row => {
-                    if (row.LevelType === '2' && item.value === row.ParentId) {
-                        arrCity.push({
-                            value: row.ID,
-                            label: row.Name
-                        });
-                    }
-                });
-                arrCity.map(row => {
-                    let arrCounty = [];
-                    rep.map(record => {
-                        if (record.LevelType === '3' && row.value === record.ParentId) {
-                            arrCounty.push({
-                                value: record.ID,
-                                label: record.Name
-                            });
-                        }
-                    });
-                    row.children = arrCounty;
-                });
-                item.children = arrCity;
-            });
+        const RegionCodeList = JSON.parse(localStorage.getItem('RegionCodeList'));
+        if (RegionCodeList) {
             this.setState({
                 RegionCodeList
             });
-        });
+        } else {
+            getRegionCodes().then(rep => {
+                let RegionCodeList = [];
+                rep.map(item => {
+                    if (item.LevelType === '1') {
+                        RegionCodeList.push({
+                            value: item.ID,
+                            label: item.Name
+                        });
+                    }
+                });
+                RegionCodeList.map(item => {
+                    let arrCity = [];
+                    rep.map(row => {
+                        if (row.LevelType === '2' && item.value === row.ParentId) {
+                            arrCity.push({
+                                value: row.ID,
+                                label: row.Name
+                            });
+                        }
+                    });
+                    arrCity.map(row => {
+                        let arrCounty = [];
+                        rep.map(record => {
+                            if (record.LevelType === '3' && row.value === record.ParentId) {
+                                arrCounty.push({
+                                    value: record.ID,
+                                    label: record.Name
+                                });
+                            }
+                        });
+                        row.children = arrCounty;
+                    });
+                    item.children = arrCity;
+                });
+                this.setState({
+                    RegionCodeList
+                });
+            });
+        }
         // 获取所有供应商
-        getSupplierList().then(rep => {
+        getSupplierList({}, {
+            status: 1
+        }).then(rep => {
             this.setState({
                 optionList: rep.content
             });
@@ -153,21 +165,32 @@ class Tablelevel extends Component {
             fixed: 'right',
             dataIndex: 'action',
             render: (text, record) => {
-                return (
-                    <span>
-                        {
-                            this.groupId === 10 || record.CheckStatus === 1 ? '' : <span>
-                                <a onClick={this.toEdit.bind(this, record)}>修改</a>
-                                <span className='ant-divider' />
-                            </span>
-                        }
-                        {
-                            record.CheckStatus === 0 ? [<a key='one' onClick={this.toAudit.bind(this, record)}>审核</a>,
-                                <span key='two' className='ant-divider' />] : []
-                        }
-                        <a onClick={this.toDelete.bind(this, record)}>删除</a>
-                    </span>
-                );
+                if (this.username === 'admin') {
+                    return (
+                        <span>
+                            {
+                                [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                    <span key='2' className='ant-divider' />]
+                            }
+                            {
+                                record.CheckStatus === 0 ? [<a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>,
+                                    <span key='4' className='ant-divider' />] : []
+                            }
+                            <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                        </span>
+                    );
+                } else {
+                    return (
+                        <span>
+                            {
+                                record.CheckStatus === 1 ? '' : <span>
+                                    <a onClick={this.toEdit.bind(this, record)}>修改</a>
+                                    <span className='ant-divider' />
+                                </span>
+                            }
+                        </span>
+                    );
+                }
             }
         }
     ];
@@ -369,12 +392,24 @@ class Tablelevel extends Component {
     toDelete (record, e) {
         e.preventDefault();
         const { deleteNursery } = this.props.actions;
-        deleteNursery({ID: record.ID}).then((rep) => {
-            if (rep.code === 1) {
-                message.warning('如未删除成功，请确认该组织机构下无用户');
-                this.onSearch();
-            } else {
-                message.error('删除失败，请确认本机构下无用户');
+        const self = this;
+        confirm({
+            title: '此操作会删除该苗圃下 所有的绑定关系，你确定继续吗?',
+            content: '详情请查看绑定管理',
+            okType: 'danger',
+            onOk () {
+                deleteNursery({ID: record.ID}).then((rep) => {
+                    if (rep.code === 1) {
+                        message.warning('如未删除成功，请确认该组织机构下无用户');
+                        self.onSearch();
+                    } else {
+                        message.error('删除失败，请确认本机构下无用户');
+                        self.onSearch();
+                    }
+                });
+            },
+            onCancel () {
+
             }
         });
     }
