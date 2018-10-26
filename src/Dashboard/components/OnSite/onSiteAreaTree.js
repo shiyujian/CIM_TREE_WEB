@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree, Spin } from 'antd';
 const TreeNode = Tree.TreeNode;
 
-export default class PkCodeTree extends Component {
+export default class onSiteAreaTree extends Component {
     static propTypes = {};
 
     loop (data = [], loopTime) {

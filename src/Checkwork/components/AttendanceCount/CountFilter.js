@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
-import { STATIC_DOWNLOAD_API,PROJECT_UNITS } from '../../../_platform/api';
+import { PROJECT_UNITS } from '../../../_platform/api';
 import {
     Form,
     Input,
     Button,
     Row,
     Col,
-    message,
-    Popconfirm,
     DatePicker,
     Select
 } from 'antd';
-import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -30,12 +27,11 @@ class CountFilter extends Component {
             sectionArray: [],
             projectArray: [],
             groupArray: [],
-            start:'',
-            end:'',
-            statusArray:[],
+            start: '',
+            end: '',
+            statusArray: []
         };
     }
-
 
     componentDidMount () {
         this.getSection();
@@ -86,13 +82,13 @@ class CountFilter extends Component {
         });
     }
 
-    async getCheckGroup(){
+    async getCheckGroup () {
         const {
             actions: { getCheckGroup }
         } = this.props;
         let groupArray = [];
         let data = await getCheckGroup();
-        data.map(p =>{
+        data.map(p => {
             groupArray.push(
                 <Option key={p.id} value={p.id}>
                     {p.name}
@@ -100,12 +96,11 @@ class CountFilter extends Component {
             );
         });
         this.setState({
-            groupArray: groupArray,
+            groupArray: groupArray
         });
     }
 
-
-     // 项目选择函数
+    // 项目选择函数
     onSelectChange (value) {
         const {
             form: { setFieldsValue }
@@ -364,12 +359,12 @@ class CountFilter extends Component {
 
     changeFormDate (value, results) {
         this.setState({
-            start:results[0],
-            end:results[1]
-        })
+            start: results[0],
+            end: results[1]
+        });
     }
 
-    onCheckinChange(value){    //出勤选择下拉框和状态选择下拉框联动
+    onCheckinChange (value) { // 出勤选择下拉框和状态选择下拉框联动
         const {
             form: { setFieldsValue }
         } = this.props;
@@ -377,25 +372,24 @@ class CountFilter extends Component {
             status: undefined
         });
         let statusArray = [];
-        if(value == "y"){   //出勤时可以选择的状态有正常打卡,迟到,和早退
-            let arr = [{label:'正常打卡',value:4},{label:'迟到',value:2},{label:'早退',value:3}];
-            arr.map(p =>{
+        if (value === 'y') { // 出勤时可以选择的状态有正常打卡,迟到,和早退
+            let arr = [{label: '正常打卡', value: 4}, {label: '迟到', value: 2}, {label: '早退', value: 3}];
+            arr.map(p => {
                 statusArray.push(
                     <Option key={p.value} value={p.value}>
                         {p.label}
                     </Option>
                 );
-            })
-
-        }else if(value == "n"){  //缺勤时可以选择的状态有打卡一次
-            let arr = [{label:'未打卡',value:1},{label:'打卡一次',value:1}];
-            arr.map(p =>{
+            });
+        } else if (value === 'n') { // 缺勤时可以选择的状态有打卡一次
+            let arr = [{label: '未打卡', value: 1}, {label: '打卡一次', value: 1}];
+            arr.map(p => {
                 statusArray.push(
                     <Option key={p.value} value={p.value}>
                         {p.label}
                     </Option>
                 );
-            })
+            });
         }
         this.setState({
             statusArray: statusArray
@@ -406,7 +400,7 @@ class CountFilter extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { projectArray, sectionArray, groupArray,statusArray } = this.state;
+        const { projectArray, sectionArray, groupArray, statusArray } = this.state;
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
@@ -415,7 +409,7 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='项目'>
                                     {getFieldDecorator('project_code', {
-                
+
                                     })(
                                         <Select
                                             placeholder='请选择项目'
@@ -431,7 +425,7 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='标段'>
                                     {getFieldDecorator('section', {
-            
+
                                     })(
                                         <Select placeholder='请选择标段'>
                                             {sectionArray}
@@ -442,9 +436,9 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='姓名'>
                                     {getFieldDecorator('name', {
-                                   
+
                                     })(
-                                      <Input placeholder='请输入姓名' />
+                                        <Input placeholder='请输入姓名' />
                                     )}
                                 </FormItem>
                             </Col>
@@ -454,10 +448,10 @@ class CountFilter extends Component {
                 <Row gutter={24}>
                     <Col span={18}>
                         <Row>
-                           <Col span={8}>
+                            <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='时间'>
                                     {getFieldDecorator('searchDate', {
-                    
+
                                     })(
                                         <RangePicker
                                             onChange={this.changeFormDate.bind(
@@ -476,11 +470,11 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='出勤'>
                                     {getFieldDecorator('checkin', {
-                                
+
                                     })(
                                         <Select placeholder='请选择是否出勤' onChange={this.onCheckinChange.bind(
-                                                this
-                                            )}>
+                                            this
+                                        )}>
                                             <Option
                                                 key={'y'}
                                                 value={'y'}
@@ -500,10 +494,10 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='状态'>
                                     {getFieldDecorator('status', {
-        
+
                                     })(
-                                        <Select  placeholder='请选择状态'>
-                                           {statusArray}
+                                        <Select placeholder='请选择状态'>
+                                            {statusArray}
                                         </Select>
                                     )}
                                 </FormItem>
@@ -534,10 +528,10 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='考勤群体'>
                                     {getFieldDecorator('group', {
-                                       
+
                                     })(
-                                        <Select  placeholder='请选择考勤群体'>
-                                           {groupArray}
+                                        <Select placeholder='请选择考勤群体'>
+                                            {groupArray}
                                         </Select>
                                     )}
                                 </FormItem>
@@ -545,7 +539,7 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='角色'>
                                     {getFieldDecorator('role', {
-                                        
+
                                     })(
                                         <Select
                                             placeholder='请选择角色'
@@ -568,7 +562,7 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='职务'>
                                     {getFieldDecorator('duty', {
-                                        
+
                                     })(
                                         <Select
                                             placeholder='请选择职务'
@@ -591,20 +585,21 @@ class CountFilter extends Component {
             form: { validateFields }
         } = this.props;
         validateFields((err, values) => {
+            console.log('err', err);
             let params = {};
             params['project_code'] = values.project_code;
             params['section'] = values.section;
             params['name'] = values.name;
-            if(values.searchDate){
+            if (values.searchDate) {
                 params['start'] = this.state.start;
                 params['end'] = this.state.end;
             }
             params['checkin'] = values.checkin;
-            if(values.status == 2){   //迟到默认可查询状态5
+            if (values.status === 2) { // 迟到默认可查询状态5
                 params['status'] = values.status + ',5';
-            }else if(values.status == 3){  //早退默认可查询状态5
+            } else if (values.status === 3) { // 早退默认可查询状态5
                 params['status'] = values.status + ',5';
-            }else{
+            } else {
                 params['status'] = values.status;
             }
             params['group'] = values.group;
@@ -616,6 +611,5 @@ class CountFilter extends Component {
     clear () {
         this.props.form.resetFields();
     }
-
 }
 export default Form.create()(CountFilter);

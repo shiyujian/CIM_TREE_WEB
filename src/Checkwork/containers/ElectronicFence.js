@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/electronicFence';
 import { actions as platformActions } from '_platform/store/global';
-import { TaskCreateTable } from '../components/ElectronicFence';
+import { ScopeCreateTable } from '../components/ElectronicFence';
 import { getCompanyDataByOrgCode, getAreaTreeData } from '_platform/auth';
 @connect(
     state => {
@@ -130,7 +130,7 @@ export default class ElectronicFence extends Component {
 
     render () {
         return (
-            <TaskCreateTable {...this.props} {...this.state} />
+            <ScopeCreateTable {...this.props} {...this.state} />
         );
     }
 }

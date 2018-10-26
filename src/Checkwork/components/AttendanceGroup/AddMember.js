@@ -85,7 +85,6 @@ class AddMember extends Component {
         } = this.props;
         try {
             let relationMem = await getCheckGroupMansIDList({id: selectMemGroup});
-            console.log('relationMem', relationMem);
             this.setState({
                 relationMem: relationMem || []
             }, async () => {
@@ -115,7 +114,6 @@ class AddMember extends Component {
             page: 1
         };
         let userData = await getUsers({}, postData);
-        console.log('userData', userData);
         let dataSource = (userData && userData.results) || [];
         this.setState({
             total: userData.count || 0,
@@ -236,7 +234,6 @@ class AddMember extends Component {
             total,
             dataSource
         } = this.state;
-        console.log('relationMem', relationMem);
         return (
             <div>
                 <Modal
@@ -369,7 +366,6 @@ class AddMember extends Component {
             memberChangeStatus = 0,
             selectMemGroup
         } = this.props;
-        console.log('user', user);
         let checked = e.target.checked;
         if (checked) {
             relationMem.push(user.id);

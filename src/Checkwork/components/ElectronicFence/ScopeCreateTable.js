@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {
-    Button, Collapse, Notification, Spin, Checkbox
+    Button, Collapse, Notification, Spin, Checkbox, Popconfirm
 } from 'antd';
-import AreaTreeCreate from '../AreaTreeCreate';
+import AreaTree from '../AreaTree';
 import CheckGroupTree from '../CheckGroupTree';
 import {
     fillAreaColor,
@@ -10,17 +10,15 @@ import {
     handleCoordinates
 } from '../auth';
 import {
-    getHandleWktData,
-    getWktData,
     computeSignedArea
 } from '_platform/gisAuth';
-import TaskCreateModal from './TaskCreateModal';
+import ScopeCreateModal from './ScopeCreateModal';
 import '../Checkwork.less';
 
 const Panel = Collapse.Panel;
 window.config = window.config || {};
 
-export default class TaskCreateTable extends Component {
+export default class ScopeCreateTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -32,22 +30,22 @@ export default class TaskCreateTable extends Component {
             treeLayerChecked: true,
             // 考勤管理树
             groupSelected: false, // 考勤群体是否被选中
-            groupSelectKey: '', // 考勤群体选中节点
-            groupFenceData: [], // 考勤群体选中节点电子围栏数据
-            groupFenceStatus: false, // 考勤群体选中节点是否存在电子围栏
+            groupSelectKey: '', // 考勤群体选中节点的KEY
+            groupSelectTitle: '', // 考勤群体选中节点的名字
+            groupScopeDataList: {}, // 考勤群体选中节点电子围栏数据
+            groupScopeStatus: false, // 考勤群体选中节点是否存在电子围栏
             // 手动框选
             coordinates: [], // 圈选地图各个点的坐标
-            areaLayerList: {}, // 选择各个细班的图层列表
             createBtnVisible: false, // 控制圈选地图的按钮的Visible
             polygonData: '', // 圈选地图图层
-            // 框选地图内的数据
-            // treeNum: 0, // 圈选地图内的树木数量
-            regionThinClass: [], // 圈选地图内的细班
+            // 图层数据
+            areaLayerList: {}, // 选择各个细班的图层列表
+            groupScopeLayerList: {}, // 各个群体的图层列表
             regionArea: 0, // 圈选区域内面积
-            // 下发任务Modal数据
-            wkt: '',
-            groupwkt: '',
-            noLoading: false
+            // 创建电子围栏的Modal数据
+            noLoading: false,
+            scopeModalVisible: false, // 创建电子围栏的Modal的visible
+            scopeAddStatus: '创建' // 是创建电子围栏，还是更新电子围栏
         };
         this.tileLayer = null;
         this.tileTreeLayerBasic = null;
@@ -65,8 +63,8 @@ export default class TaskCreateTable extends Component {
     }
 
     options = [
-        { label: '区域地块', value: 'geojsonFeature_area' },
-        { label: '考勤管理', value: 'geojsonFeature_checkWork' }
+        { label: '考勤管理', value: 'geojsonFeature_checkWork' },
+        { label: '区域地块', value: 'geojsonFeature_area' }
     ];
     subDomains = ['7'];
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -121,7 +119,9 @@ export default class TaskCreateTable extends Component {
                 });
                 return;
             }
-            coordinates.push([e.latlng.lat, e.latlng.lng]);
+            // 此处圈选区域的数组与其他地方不一样，因林总不需要lat，lng这两个字段，院内api需要
+            coordinates.push(e.latlng);
+            // coordinates.push([e.latlng.lat, e.latlng.lng]);
             if (me.state.polygonData) {
                 me.map.removeLayer(me.state.polygonData);
             }
@@ -155,14 +155,13 @@ export default class TaskCreateTable extends Component {
             ).addTo(this.map);
         }
     }
-
     render () {
         const {
             createBtnVisible,
-            taskModalVisible,
+            scopeModalVisible,
             coordinates,
             groupSelected,
-            groupFenceStatus
+            groupScopeStatus
         } = this.state;
         let okDisplay = false;
         if (coordinates.length <= 2) {
@@ -237,15 +236,21 @@ export default class TaskCreateTable extends Component {
                             <div className='checkWork-treeControl2'>
                                 <div>
                                     {
-                                        groupFenceStatus
+                                        groupScopeStatus
                                             ? (
                                                 <div>
-                                                    <Button type='primary' style={{marginRight: 10}} onClick={this._handlePutFence.bind(this)}>修改</Button>
-                                                    <Button type='danger' onClick={this._handleDelectFence.bind(this)}>删除</Button>
+                                                    <Button type='primary' style={{marginRight: 10}} onClick={this._handlePutScope.bind(this)}>修改</Button>
+                                                    <Popconfirm
+                                                        onConfirm={this._handleDelectScope.bind(this)}
+                                                        title='确定要删除该群体的电子围栏么'
+                                                        okText='确定'
+                                                        cancelText='取消'>
+                                                        <Button type='danger'>删除</Button>
+                                                    </Popconfirm>
                                                 </div>
                                             )
                                             : (
-                                                <Button type='primary' style={{marginRight: 10}} onClick={this._handleAddFence.bind(this)}>创建</Button>
+                                                <Button type='primary' style={{marginRight: 10}} onClick={this._handleAddScope.bind(this)}>创建</Button>
                                             )
                                     }
                                 </div>
@@ -256,20 +261,20 @@ export default class TaskCreateTable extends Component {
                         createBtnVisible ? (
                             <div className='checkWork-treeControl2'>
                                 <div>
-                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
-                                    <Button type='info' style={{marginRight: 10}} disabled={retreatDisplay} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>
-                                    <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
+                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateScopeOk.bind(this)}>确定</Button>
+                                    <Button type='info' style={{marginRight: 10}} disabled={retreatDisplay} onClick={this._handleCreateScopeRetreat.bind(this)}>上一步</Button>
+                                    <Button type='danger' onClick={this._handleCreateScopeCancel.bind(this)}>撤销</Button>
                                 </div>
                             </div>
                         ) : ''
                     }
                     {
-                        taskModalVisible ? (
-                            <TaskCreateModal
+                        scopeModalVisible ? (
+                            <ScopeCreateModal
                                 {...this.props}
                                 {...this.state}
-                                onOk={this.handleTaskModalOk.bind(this)}
-                                onCancel={this.handleTaskModalCancel.bind(this)}
+                                onOk={this.handleScopeModalOk.bind(this)}
+                                onCancel={this.handleScopeModalCancel.bind(this)}
                             />
                         ) : ''
                     }
@@ -338,7 +343,7 @@ export default class TaskCreateTable extends Component {
                 case 'geojsonFeature_area':
                     return (
                         <Spin spinning={areaTreeLoading}>
-                            <AreaTreeCreate
+                            <AreaTree
                                 {...this.props}
                                 {...this.state}
                                 onCheck={this.handleAreaCheck.bind(this)}
@@ -384,9 +389,6 @@ export default class TaskCreateTable extends Component {
         } = this.state;
         let me = this;
         try {
-            console.log('info', info);
-            console.log('info.node.props', info.node.props);
-
             // 当前选中的节点
             let eventKey = info.node.props.eventKey;
             let children = info.node.props.children;
@@ -453,9 +455,6 @@ export default class TaskCreateTable extends Component {
                 getTreearea
             }
         } = this.props;
-        console.log('areaLayerList', areaLayerList);
-        console.log('getTreearea', getTreearea);
-
         try {
             let coords = await handleAreaLayerData(eventKey, getTreearea);
             if (coords && coords instanceof Array && coords.length > 0) {
@@ -477,8 +476,6 @@ export default class TaskCreateTable extends Component {
                     } else {
                         areaLayerList[eventKey] = [layer];
                     }
-                    console.log('treearea', treearea);
-                    console.log('coords', coords);
                 }
 
                 this.setState({
@@ -496,28 +493,58 @@ export default class TaskCreateTable extends Component {
                 getCheckScope
             }
         } = this.props;
+        const {
+            groupScopeLayerList,
+            groupScopeDataList
+        } = this.state;
         try {
-            console.log('keys', keys);
-            console.log('info', info);
+            // 节点的点击状态
             let selected = info.selected;
+            // 节点的具体信息
             let node = info.node.props;
+            // 点击节点的key
             let eventKey = (keys && keys[0]) || '';
-            let groupFenceData = [];
-            let groupFenceStatus = false;
+            // 点击节点是否存在电子围栏数据
+            let groupScopeStatus = false;
+            // 群体的名称
+            let groupSelectTitle = '';
+            for (let i in groupScopeLayerList) {
+                this.map.removeLayer(groupScopeLayerList[i]);
+            }
             if (selected) {
-                let data = await getCheckScope({id: eventKey});
-                console.log('data', data);
-                // 存在数据  说明有电子围栏
-                if (data && data instanceof Array && data.length > 0) {
-                    groupFenceStatus = true;
-                    groupFenceData = data;
+                // 群体名称
+                groupSelectTitle = node.title;
+                // 如果之前获取过数据  则直接加载
+                if (groupScopeLayerList[eventKey]) {
+                    groupScopeLayerList[eventKey].addTo(this.map);
+                    this.map.fitBounds(groupScopeLayerList[eventKey].getBounds());
+                    groupScopeStatus = true;
+                } else {
+                    // 否则重新获取
+                    let data = await getCheckScope({id: eventKey});
+                    // 存在数据  说明有电子围栏
+                    if (data && data instanceof Array && data.length > 0) {
+                        groupScopeStatus = true;
+                        // 点击群体的电子围栏的坐标数据
+                        let groupScopeData = data && data[0] && data[0].boundary;
+                        let groupScopeLayer = L.polygon(groupScopeData, {
+                            color: 'yellow',
+                            fillColor: 'yellow',
+                            fillOpacity: 0.3
+                        }).addTo(this.map);
+                        this.map.fitBounds(groupScopeLayer.getBounds());
+                        groupScopeLayerList[eventKey] = groupScopeLayer;
+                        groupScopeDataList[eventKey] = data[0];
+                    }
                 }
             }
             this.setState({
                 groupSelectKey: eventKey,
                 groupSelected: selected,
-                groupFenceStatus,
-                groupFenceData
+                groupSelectTitle,
+                groupScopeStatus,
+                groupScopeDataList,
+                groupScopeLayerList
             });
         } catch (e) {
             console.log('e', e);
@@ -525,21 +552,7 @@ export default class TaskCreateTable extends Component {
     }
     /* 在地图上添加marker和polygan */
     _createMarker (geo) {
-        if (geo.properties.type === 'task') {
-            let layer = L.polygon(geo.geometry.coordinates, {
-                color: 'blue',
-                fillColor: '#93B9F2',
-                fillOpacity: 0.2
-            }).addTo(this.map);
-            return layer;
-        } else if (geo.properties.type === 'realTask') {
-            let layer = L.polygon(geo.geometry.coordinates, {
-                color: 'yellow',
-                fillColor: 'yellow',
-                fillOpacity: 0.3
-            }).addTo(this.map);
-            return layer;
-        } else if (geo.properties.type === 'area') {
+        if (geo.properties.type === 'area') {
             // 创建区域图形
             let layer = L.polygon(geo.geometry.coordinates, {
                 color: '#201ffd',
@@ -549,50 +562,71 @@ export default class TaskCreateTable extends Component {
             return layer;
         }
     }
-    // 更新电子围栏
-    _handlePutFence = async () => {
+    // 更新电子围栏按钮
+    _handlePutScope = async () => {
         this.setState({
-            createBtnVisible: true
+            createBtnVisible: true,
+            scopeAddStatus: '更新'
         });
     }
-    // 增加电子围栏
-    _handleAddFence = async () => {
+    // 增加电子围栏按钮
+    _handleAddScope = async () => {
         this.setState({
-            createBtnVisible: true
+            createBtnVisible: true,
+            scopeAddStatus: '创建'
         });
     }
-    // 删除电子围栏
-    _handleDelectFence = async () => {
-
+    // 删除电子围栏按钮
+    _handleDelectScope = async () => {
+        const {
+            groupScopeDataList,
+            groupSelectKey
+        } = this.state;
+        const {
+            actions: {
+                deleteCheckScope
+            }
+        } = this.props;
+        try {
+            // 删除选中群体的电子围栏
+            let data = await deleteCheckScope({id: groupScopeDataList[groupSelectKey].id});
+            if (data) {
+                Notification.error({
+                    message: '电子围栏删除失败',
+                    duration: 3
+                });
+                return;
+            } else {
+                Notification.success({
+                    message: '电子围栏删除成功',
+                    duration: 3
+                });
+                this.deleteGroupSelectScope();
+            }
+        } catch (e) {
+            console.log('delete', e);
+        }
     }
     // 确定圈选地图
-    _handleCreateTaskOk = async () => {
+    _handleCreateScopeOk = async () => {
         const {
             coordinates
         } = this.state;
-        // this.setState({
-        //     taskModalVisible: true
-        // });
-        let coords = [];
-        coords = coordinates;
+        this.setState({
+            scopeModalVisible: true
+        });
         try {
-            console.log('coordinates', coordinates);
             // 坐标
-            let wkt = '';
+            let coords = [];
+            coordinates.map((data) => {
+                coords.push([data.lat, data.lng]);
+            });
             // 选择面积
             let regionArea = 0;
-            wkt = 'POLYGON(';
-            // 获取手动框选坐标wkt
-            wkt = wkt + getHandleWktData(coords);
-            wkt = wkt + ')';
             regionArea = computeSignedArea(coords, 2);
 
             regionArea = regionArea * 0.0015;
-            console.log('wkt', wkt);
-            console.log('regionArea', regionArea);
             this.setState({
-                wkt,
-                groupwkt: coords,
                 regionArea,
                 noLoading: true
             });
@@ -601,7 +635,7 @@ export default class TaskCreateTable extends Component {
         }
     }
     // 圈选图层返回上一步
-    _handleCreateTaskRetreat = async () => {
+    _handleCreateScopeRetreat = async () => {
         const {
             coordinates
         } = this.state;
@@ -628,7 +662,7 @@ export default class TaskCreateTable extends Component {
         });
     }
     // 撤销圈选图层
-    _handleCreateTaskCancel =() => {
+    _handleCreateScopeCancel =() => {
         const {
             areaLayerList,
             polygonData
@@ -641,44 +675,73 @@ export default class TaskCreateTable extends Component {
                 this.map.removeLayer(layer);
             });
         }
-        this.resetButState();
+        this.reSetButState();
     }
     // 确认下发任务
-    handleTaskModalOk = () => {
+    handleScopeModalOk = async () => {
         const {
             polygonData
         } = this.state;
         if (polygonData) {
             this.map.removeLayer(polygonData);
         }
-        this.resetModalState();
-        this.resetButState();
+        await this.deleteGroupSelectScope();
+        // 取消下发任务时清空之前存储的state
+        await this.reSetModalState();
+        // 取消圈选地图和按钮的visible
+        await this.reSetButState();
+        // 更新电子围栏之后，需要重新点击获取电子围栏，所以需要将选中的节点设置为未选中状态
+        await this.reSetGroupTreeSelect();
     }
-    // 取消下发任务
-    handleTaskModalCancel = () => {
-        this.resetModalState();
-    }
-    // 取消下发任务时清空之前存储的state
-    resetModalState = () => {
+    // 在增加，更新，或删除电子围栏之后，需要将地图上的信息去除，存储的信息去除
+    deleteGroupSelectScope = () => {
+        const {
+            groupScopeDataList,
+            groupScopeLayerList,
+            groupSelectKey
+        } = this.state;
+        // 删除选中的电子围栏坐标数据
+        if (groupScopeDataList[groupSelectKey]) {
+            delete groupScopeDataList[groupSelectKey];
+        }
+        // 删除选中的电子围栏图层数据
+        if (groupScopeLayerList[groupSelectKey]) {
+            this.map.removeLayer(groupScopeLayerList[groupSelectKey]);
+            delete groupScopeLayerList[groupSelectKey];
+        }
         this.setState({
-            taskModalVisible: false,
-            noLoading: false,
-            // treeNum: 0,
-            regionThinClass: [],
-            regionArea: 0,
-            wkt: ''
+            groupScopeStatus: false,
+            groupScopeDataList,
+            groupScopeLayerList
         });
     }
-    // 取消圈选和按钮的功能
-    resetButState = () => {
+    // 更新电子围栏之后，需要重新点击获取电子围栏，所以需要将选中的节点设置为未选中状态
+    reSetGroupTreeSelect = () => {
+        this.setState({
+            groupSelectKey: '',
+            groupSelected: false,
+            groupSelectTitle: ''
+        });
+    }
+    // 取消下发任务
+    handleScopeModalCancel = () => {
+        this.reSetModalState();
+    }
+    // 取消下发任务时清空之前存储的state
+    reSetModalState = () => {
+        this.setState({
+            scopeModalVisible: false,
+            noLoading: false,
+            regionArea: 0
+        });
+    }
+    // 取消圈选地图和按钮的visible
+    reSetButState = () => {
         this.setState({
             createBtnVisible: false,
             polygonData: '',
             coordinates: []
         });
-    }
-    componentDidUpdate (prevProps, prevState) {
-
     }
     /* 菜单展开收起 */
     _extendAndFold () {

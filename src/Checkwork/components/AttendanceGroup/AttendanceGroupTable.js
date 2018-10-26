@@ -37,7 +37,6 @@ export default class AttendanceGroupTable extends Component {
             this.getCheckGroupMember();
         }
         if (selectMemGroup && selectMemGroup !== prevProps.selectMemGroup) {
-            console.log('sssssssssssss');
             this.getCheckGroupMember();
         }
     }
@@ -109,7 +108,6 @@ export default class AttendanceGroupTable extends Component {
                 id: selectMemGroup
             };
             let data = await getCheckGroupMans(postData, {page: current});
-            console.log('data', data);
             let dataSource = (data && data.results) || [];
             this.setState({
                 total: data.count || 0,
