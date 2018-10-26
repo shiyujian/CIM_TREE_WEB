@@ -9,9 +9,6 @@ import {
 export const ID = 'Checkwork_attendancegroup';
 // 修改选择地图的方式
 export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
-
-export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
-
 // 修改左侧树的loading
 export const changeAsideTreeLoading = createAction(`${ID}_changeAsideTreeLoading`);
 
@@ -41,7 +38,6 @@ export const postCheckGroupMans = createFetchAction(`${base}/main/api/group/{{id
 export const checkGroupMemChangeStatus = createAction(`${ID}_checkGroupMemChangeStatus`);
 
 export const actions = {
-    getTreearea,
     changeAsideTreeLoading,
     changeAddMemVisible,
     changeSelectMemGroup,

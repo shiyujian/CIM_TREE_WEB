@@ -46,6 +46,8 @@ export const getForestUserDetail = createFetchAction(
     'GET'
 );
 
+export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
+
 export default handleActions(
     {
         [getTreeNodeListOK]: (state, { payload }) => {

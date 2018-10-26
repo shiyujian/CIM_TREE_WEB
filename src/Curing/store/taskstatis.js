@@ -6,8 +6,6 @@ import {
 } from '_platform/api';
 
 export const ID = 'Forest_curing_taskcreate';
-export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
-
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
 // 获取养护轨迹
@@ -24,7 +22,6 @@ export const changeTaskStatisSelectTask = createAction(`${ID}_changeTaskStatisSe
 export const getcCuringStat = createFetchAction(`${FOREST_API}/curing/curingstat`, [], 'GET');
 
 export const actions = {
-    getTreearea,
     getCuring,
     getCuringPositions,
     getCuringGroup,

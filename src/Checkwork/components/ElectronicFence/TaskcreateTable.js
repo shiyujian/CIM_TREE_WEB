@@ -574,10 +574,9 @@ export default class TaskCreateTable extends Component {
         //     taskModalVisible: true
         // });
         let coords = [];
-        let groupwkt = '';
         coords = coordinates;
-        groupwkt = coords;
         try {
+            console.log('coordinates', coordinates);
             // 坐标
             let wkt = '';
             // 选择面积
@@ -589,9 +588,11 @@ export default class TaskCreateTable extends Component {
             regionArea = computeSignedArea(coords, 2);
 
             regionArea = regionArea * 0.0015;
+            console.log('wkt', wkt);
+            console.log('regionArea', regionArea);
             this.setState({
                 wkt,
-                groupwkt,
+                groupwkt: coords,
                 regionArea,
                 noLoading: true
             });
