@@ -525,7 +525,6 @@ export default class TaskCreateTable extends Component {
             // 如果选中的是细班，则直接添加图层
             if (handleKey.length === 5) {
                 if (checked) {
-                    const treeNodeName = info && info.node && info.node.props && info.node.props.title;
                     // 如果之前添加过，直接将添加过的再次添加，不用再次请求
                     if (areaLayerList[eventKey]) {
                         areaLayerList[eventKey].map((layer) => {
@@ -537,7 +536,7 @@ export default class TaskCreateTable extends Component {
                         });
                     } else {
                         // 如果不是添加过，需要请求数据
-                        me._addAreaLayer(eventKey, treeNodeName);
+                        me._addAreaLayer(eventKey);
                     }
                 } else {
                     if (areaLayerList[eventKey]) {
@@ -552,7 +551,7 @@ export default class TaskCreateTable extends Component {
         }
     }
     // 选中细班，则在地图上加载细班图层
-    async _addAreaLayer (eventKey, treeNodeName) {
+    async _addAreaLayer (eventKey) {
         const {
             areaLayerList,
             treeCoords
@@ -563,7 +562,7 @@ export default class TaskCreateTable extends Component {
             }
         } = this.props;
         try {
-            let coords = await handleAreaLayerData(eventKey, treeNodeName, getTreearea);
+            let coords = await handleAreaLayerData(eventKey, getTreearea);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
@@ -571,7 +570,7 @@ export default class TaskCreateTable extends Component {
                     let message = {
                         key: 3,
                         type: 'Feature',
-                        properties: {name: treeNodeName, type: 'area'},
+                        properties: {name: '', type: 'area'},
                         geometry: { type: 'Polygon', coordinates: treearea }
                     };
                     let layer = this._createMarker(message);

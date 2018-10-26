@@ -5,11 +5,9 @@ import { FOREST_API, base } from '_platform/api';
 
 export const ID = 'formmanage';
 export const getworkTreeOK = createAction(`${ID}_文档目录树`);
-export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 
 export const actions = {
-    getworkTreeOK,
-    getTreearea
+    getworkTreeOK
 };
 
 export default handleActions({

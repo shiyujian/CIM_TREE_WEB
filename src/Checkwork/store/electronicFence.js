@@ -7,9 +7,6 @@ import {
 } from '_platform/api';
 
 export const ID = 'Checkwork_electronicfence';
-
-export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
-
 // 根据范围查询细班
 export const postThinClassesByRegion = createFetchAction(`${FOREST_API}/curing/thinclassesbyregion`, [], 'POST');
 // 获取范围内栽植的树木数量
@@ -30,7 +27,6 @@ export const getCheckScope = createFetchAction(`${base}/main/api/group/{{id}}/sc
 export const postCheckScope = createFetchAction(`${base}/main/api/group/{{id}}/scope/`, [], 'POST');
 
 export const actions = {
-    getTreearea,
     postThinClassesByRegion,
     postTreeLocationNumByRegion,
     changeSelectMap,

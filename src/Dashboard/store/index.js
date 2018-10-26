@@ -5,7 +5,6 @@ import {
     FOREST_API
 } from '_platform/api';
 const ID = 'dashboard';
-export const getTreearea = createFetchAction(`${FOREST_API}/route/thinclasses?`);
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`, []);
 export const getRiskContactSheet = createFetchAction(`${FOREST_API}/tree/patrolevent/{{ID}}`, []);
 // 获取巡检路线
@@ -55,7 +54,6 @@ export const getCuringTaskTreeLoading = createAction(`${ID}养护任务树加载
 export const getSurvivalRateTreeLoading = createAction(`${ID}成活率树加载loading`);
 
 export const actions = {
-    getTreearea,
     getRisk,
     getRiskContactSheet,
     getInspectRouter,

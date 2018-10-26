@@ -527,7 +527,7 @@ export const getThinClassName = (thinClass, section, totalThinClass) => {
 };
 
 // 点击区域地块处理细班坐标数据
-export const handleAreaLayerData = async (eventKey, treeNodeName, getTreearea) => {
+export const handleAreaLayerData = async (eventKey, getTreearea) => {
     let handleKey = eventKey.split('-');
     let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
     let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
