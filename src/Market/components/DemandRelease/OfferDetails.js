@@ -76,6 +76,7 @@ class OfferDetails extends Component {
                                 if (record.ID === row.ID) {
                                     record.childrenList.push({
                                         isSave: false,
+                                        SOID: row.SOID,
                                         ID: item.ID,
                                         name: name,
                                         Price: row.Price,
@@ -165,7 +166,6 @@ class OfferDetails extends Component {
             key: '8',
             dataIndex: 'WinNum',
             render: (text, record) => {
-                console.log(record, '111');
                 if (text) {
                     return <span style={{color: '#1890ff'}}>中标</span>;
                 }
@@ -173,7 +173,6 @@ class OfferDetails extends Component {
         });
         const rowSelection = {
             onSelect: (record) => {
-                console.log(record);
                 record.isSave = true;
                 this.setState({
                     Specs: [...this.state.Specs]
@@ -243,13 +242,7 @@ class OfferDetails extends Component {
     }
     handleWinNum (record, value) {
         const { Specs } = this.state;
-        Specs.map(item => {
-            item.childrenList.map(row => {
-                if (row.ID === record.ID) {
-                    row.WinNum = value;
-                }
-            });
-        });
+        record.WinNum = value;
         this.setState({
             Specs
         });
@@ -274,21 +267,13 @@ class OfferDetails extends Component {
             item.childrenList.map(row => {
                 if (row.isSave) {
                     OfferSpecs.push({
-                        ID: item.ID,
+                        ID: row.SOID,
                         WinNum: row.WinNum,
                         PurchaseOfferID: row.ID
                     });
                 }
             });
         });
-        // debugger
-        // console.log({
-        //     PurchaseID: this.purchaseid,
-        //     Selecter: this.Selecter,
-        //     OfferSpecs: OfferSpecs
-        // });
-        // debugger
-        
         postPurchaseSelect({}, {
             PurchaseID: this.purchaseid,
             Selecter: this.Selecter,

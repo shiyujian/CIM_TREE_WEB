@@ -54,6 +54,13 @@ class Tablelevel extends Component {
             title: '绑定人',
             dataIndex: 'Checker',
             key: '3'
+        }, {
+            title: '操作',
+            dataIndex: 'actions',
+            key: '4',
+            render: (text, record) => {
+                return <a onClick={this.toDelete.bind(this, record)}>解 除</a>;
+            }
         }
     ]
     render () {
@@ -180,16 +187,14 @@ class Tablelevel extends Component {
         });
     }
     handleOk () {
-        const { putSupplier } = this.props.actions;
+        const { postNb22s } = this.props.actions;
         this.props.form.validateFields((err, values) => {
             if (err) {
                 return;
             }
-            putSupplier({}, {
-                ID: values.supplier,
-                NB2Ss: [{
-                    NurseryBaseID: values.nursery
-                }]
+            postNb22s({}, {
+                SupplierID: values.supplier,
+                NurseryBaseID: values.nursery
             }).then(rep => {
                 if (rep.code === 1) {
                     message.success('绑定成功');
@@ -199,6 +204,20 @@ class Tablelevel extends Component {
                     });
                 }
             });
+        });
+    }
+    toDelete (record, e) {
+        e.preventDefault();
+        const { deleteNb22s } = this.props.actions;
+        deleteNb22s({
+            ID: record.ID
+        }).then(rep => {
+            if (rep.code === 1) {
+                message.success('解除绑定成功');
+                this.toSearch();
+            } else {
+                message.error('解除绑定失败');
+            }
         });
     }
 }
