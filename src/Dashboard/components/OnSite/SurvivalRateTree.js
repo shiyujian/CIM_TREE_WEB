@@ -41,15 +41,23 @@ export default class SurvivalRateTree extends Component {
             survivalRateTree = [],
             survivalRateTreeLoading
         } = this.props;
+        let treeData = [
+            {
+                Name: '全部',
+                No: '全部',
+                children: survivalRateTree
+            }
+        ];
         return (
             <div>
                 <Spin spinning={survivalRateTreeLoading}>
                     <Tree
                         showLine
                         checkable
+                        defaultCheckedKeys={['全部']}
                         onCheck={this.onCheck.bind(this)}
                     >
-                        {survivalRateTree.map(p => {
+                        {treeData.map(p => {
                             return this.loop(p);
                         })}
                     </Tree>
