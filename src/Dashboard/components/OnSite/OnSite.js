@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-26 23:22:23
+ * @Last Modified time: 2018-10-27 00:47:10
  */
 import React, { Component } from 'react';
 import {
@@ -26,7 +26,7 @@ import RiskTree from './RiskTree';
 import TrackTree from './TrackTree';
 import TreeTypeTree from './TreeTypeTree';
 import RiskDetail from './RiskDetail';
-import onSiteAreaTree from './onSiteAreaTree';
+import OnSiteAreaTree from './OnSiteAreaTree';
 import TreeMessModal from './TreeMessModal';
 import CuringTaskTree from './CuringTaskTree';
 import SurvivalRateTree from './SurvivalRateTree';
@@ -133,13 +133,13 @@ class OnSite extends Component {
             adoptTreeModalVisible: false,
             adoptTreeMess: '',
             // 成活率范围的点击状态，展示是否选中的图片
-            survivalRateHundred: false,
-            survivalRateNinety: false,
-            survivalRateEighty: false,
-            survivalRateSeventy: false,
-            survivalRateSixty: false,
-            survivalRateFifty: false,
-            survivalRateFourty: false,
+            survivalRateHundred: true,
+            survivalRateNinety: true,
+            survivalRateEighty: true,
+            survivalRateSeventy: true,
+            survivalRateSixty: true,
+            survivalRateFifty: true,
+            survivalRateFourty: true,
             // 安全隐患类型的点击状态，展示是否选中的图片
             riskTypeQuality: false,
             riskTypeDanger: false,
@@ -623,7 +623,7 @@ class OnSite extends Component {
                 this.removeTileTreeSurvivalRateLayer();
                 this.survivalRateOptions.map((option) => {
                     this.setState({
-                        [option.id]: false
+                        [option.id]: true
                     });
                 });
                 this.setState({
@@ -699,9 +699,6 @@ class OnSite extends Component {
     /* 渲染菜单panel */
     renderPanel (option) {
         const {
-            platform: {
-                tree = {}
-            },
             treetypesTree
         } = this.props;
         let treetypes = [];
@@ -849,7 +846,7 @@ class OnSite extends Component {
                                 <div className='dashboard-rightAreaMenu'>
                                     <aside className='dashboard-rightAreaMenu-aside' draggable='false'>
                                         <div className='dashboard-rightAreaMenu-areaTree'>
-                                            <onSiteAreaTree
+                                            <OnSiteAreaTree
                                                 {...this.props}
                                                 treeData={onSiteAreaTreeData || []}
                                                 // selectedKeys={this.state.areaEventKey}
@@ -1346,12 +1343,24 @@ class OnSite extends Component {
     /* 树种筛选多选树节点 */
     handleTreeTypeCheck = async (keys, info) => {
         let queryData = '';
+        let selectAllStatus = false;
         for (let i = 0; i < keys.length; i++) {
-            if (keys[i] > 6) {
+            if (keys[i] === '全部') {
+                selectAllStatus = true;
+            }
+            // 字符串中不获取‘全部’的字符串
+            if (keys[i] > 6 && keys[i] !== '全部') {
                 queryData = queryData + keys[i];
                 if (i < keys.length - 1) {
                     queryData = queryData + ',';
                 }
+            }
+        }
+        // 如果选中全部，并且最后一位为逗号，则去除最后一位的逗号
+        if (selectAllStatus) {
+            let data = queryData.substr(queryData.length - 1, 1);
+            if (data === ',') {
+                queryData = queryData.substr(0, queryData.length - 1);
             }
         }
         await this.removeTileTreeLayerBasic();
@@ -1636,8 +1645,8 @@ class OnSite extends Component {
     _handleSurvivalRateCheck = async (keys, info) => {
         try {
             let queryData = '';
-            if (keys.length > 0) {
-                for (let i = 0; i < keys.length; i++) {
+            for (let i = 0; i < keys.length; i++) {
+                if (keys.length > 0 && keys[i] !== '全部') {
                     let eventKey = keys[i];
                     if (eventKey.indexOf('-') !== -1) {
                         queryData = queryData + `'` + eventKey + `'`;
@@ -1647,6 +1656,12 @@ class OnSite extends Component {
                     }
                 }
             }
+            // 如果queryData最后一位为逗号，则去除最后一位的逗号
+            let data = queryData.substr(queryData.length - 1, 1);
+            if (data === ',') {
+                queryData = queryData.substr(0, queryData.length - 1);
+            }
+            
             this.setState({
                 survivalRateSectionData: queryData
             }, () => {
@@ -1698,15 +1713,21 @@ class OnSite extends Component {
         try {
             await this.removeTileTreeSurvivalRateLayer();
             let url = '';
+            // 之前任意一种状态存在 都可以进行搜索
+            // if (survivalRateRateData && survivalRateSectionData) {
+            //     url = window.config.DASHBOARD_TREETYPE +
+            //     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
+            // } else if (survivalRateRateData && !survivalRateSectionData) {
+            //     url = window.config.DASHBOARD_TREETYPE +
+            //     `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
+            // } else if (!survivalRateRateData && survivalRateSectionData) {
+            //     url = window.config.DASHBOARD_TREETYPE +
+            //     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})`;
+            // }
+            // 只有两种状态都存在，才能进行搜索
             if (survivalRateRateData && survivalRateSectionData) {
                 url = window.config.DASHBOARD_TREETYPE +
                 `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
-            } else if (survivalRateRateData && !survivalRateSectionData) {
-                url = window.config.DASHBOARD_TREETYPE +
-                `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
-            } else if (!survivalRateRateData && survivalRateSectionData) {
-                url = window.config.DASHBOARD_TREETYPE +
-                `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})`;
             }
             if (url) {
                 this.tileSurvivalRateLayerFilter = L.tileLayer.wms(url,
@@ -1719,7 +1740,7 @@ class OnSite extends Component {
                     }
                 ).addTo(this.map);
             } else {
-                await this.getTileTreeSurvivalRateBasic();
+                // await this.getTileTreeSurvivalRateBasic();
             }
         } catch (e) {
             console.log('addSurvivalRateLayer', e);
@@ -2140,7 +2161,6 @@ class OnSite extends Component {
                 let iconType = L.divIcon({
                     className: getIconType('tree')
                 });
-                console.log('y, x', y, x);
                 let treeMarkerLayer = L.marker([y, x], {
                     icon: iconType,
                     title: postdata.sxm
@@ -2224,7 +2244,6 @@ class OnSite extends Component {
                 let content = (adoptData && adoptData.content) || [];
                 if (content && content.length > 0) {
                     adoptTreeMess = content[0];
-                    console.log('adoptTreeMess', adoptTreeMess);
                     this.setState({
                         adoptTreeMess
                     });

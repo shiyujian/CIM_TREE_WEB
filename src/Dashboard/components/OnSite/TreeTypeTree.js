@@ -57,6 +57,10 @@ export default class TreeAdoptTree extends Component {
         }
     }
 
+    componentDidMount () {
+        console.log('sssssssssssssss');
+    }
+
     render () {
         let {
             treetypesTree = [],
@@ -77,6 +81,15 @@ export default class TreeAdoptTree extends Component {
                 }
             }
         }
+        let treeData = [
+            {
+                properties: {
+                    name: '全部'
+                },
+                key: '全部',
+                children: contents
+            }
+        ];
         return (
             <div>
                 <Spin spinning={treetypesTreeLoading}>
@@ -89,10 +102,11 @@ export default class TreeAdoptTree extends Component {
                         <Tree
                             checkable
                             showIcon
+                            defaultCheckedKeys={['全部']}
                             onCheck={this.onCheck.bind(this)}
                             showLine
                         >
-                            {contents.map(p => {
+                            {treeData.map(p => {
                                 return this.loop(p);
                             })}
                         </Tree>
