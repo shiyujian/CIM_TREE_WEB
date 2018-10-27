@@ -187,7 +187,7 @@ class AddEdit extends Component {
                                     label='地址'
                                 >
                                     {getFieldDecorator('Address', {
-                                        initialValue: record && record.TreePlace
+                                        initialValue: record && record.Address
                                     })(
                                         <Input placeholder='请输入地址' />
                                     )}
