@@ -27,7 +27,8 @@ class AddDemand extends Component {
             length: 0, // 树种个数
             treeTypeList: [], // 未分组树种
             PurchaseDescribe: '', // 求购描述
-            dataList: [] // 数组
+            dataList: [], // 数组
+            RegionCodeList: [] // 行政区划树
         };
         this.Creater = ''; // 发布者
         this.CreaterOrg = ''; // 发布者所在单位org
@@ -35,7 +36,6 @@ class AddDemand extends Component {
         this.UseNurseryAddress = ''; // 行政区划地址
         this.purchaseid = ''; // 采购单ID
         this.TreeTypeList = []; // 树种类型树列表
-        this.RegionCodeList = []; // 行政区划树列表
         this.handleProjectName = this.handleProjectName.bind(this); // 项目名称
         this.handleSectionName = this.handleSectionName.bind(this); // 标段选择
         this.handleRegion = this.handleRegion.bind(this); // 行政区划
@@ -125,8 +125,11 @@ class AddDemand extends Component {
             });
         });
         // 获取行政区划编码
-        if (window.localStorage.getItem('RegionCodeList')) {
-            this.RegionCodeList = JSON.parse(window.localStorage.getItem('RegionCodeList'));
+        const RegionCodeList = JSON.parse(window.localStorage.getItem('RegionCodeList'));
+        if (RegionCodeList) {
+            this.setState({
+                RegionCodeList
+            });
         } else {
             getRegionCodes().then(rep => {
                 let RegionCodeList = [];
@@ -165,8 +168,9 @@ class AddDemand extends Component {
                     });
                     item.children = arrCity;
                 });
-                window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
-                this.RegionCodeList = RegionCodeList;
+                this.setState({
+                    RegionCodeList
+                });
             });
         }
         // 获取树种类型
@@ -349,7 +353,7 @@ class AddDemand extends Component {
                                     initialValue: [provinceCode, sityCode, RegionCode]
                                 })(
                                     <Cascader placeholder='选择您所在的城市'
-                                        options={this.RegionCodeList}
+                                        options={this.state.RegionCodeList}
                                         onChange={this.handleRegion}
                                         changeOnSelect
                                         style={{width: 200}}

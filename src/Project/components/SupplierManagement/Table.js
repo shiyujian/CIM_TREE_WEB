@@ -48,7 +48,7 @@ class Tablelevel extends Component {
             this.groupId = user.groups[0].id;
         }
         this.username = user.username;
-        const RegionCodeList = JSON.parse(localStorage.getItem('RegionCodeList'));
+        const RegionCodeList = JSON.parse(window.localStorage.getItem('RegionCodeList'));
         if (RegionCodeList) {
             this.setState({
                 RegionCodeList
@@ -89,6 +89,7 @@ class Tablelevel extends Component {
                     });
                     item.children = arrCity;
                 });
+                window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
                 this.setState({
                     RegionCodeList
                 });
