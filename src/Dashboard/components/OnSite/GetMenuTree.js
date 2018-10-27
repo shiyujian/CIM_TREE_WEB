@@ -194,7 +194,6 @@ export default class GetMenuTree extends Component {
             if (data3 && data3.content) {
                 content = content.concat(data3.content);
             }
-            console.log('content', content);
             let risks = handleRiskData(content);
             await getRiskTree(risks);
             // loading结束
@@ -251,6 +250,7 @@ export default class GetMenuTree extends Component {
             let curingTaskTreeData = [];
             if (curingTypesData && curingTypesData.length > 0) {
                 let curingTasks = [];
+                // 有效和退回的任务都是都是属于未完成的任务，上报的任务才属于完成了的任务
                 // 状态为有效
                 let postdata1 = {
                     status: 0

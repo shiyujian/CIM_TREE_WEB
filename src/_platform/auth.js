@@ -225,9 +225,6 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
         });
         section.children = smallClassList;
     }
-    console.log('projectList', projectList);
-    console.log('totalThinClass', totalThinClass);
-
     return {
         totalThinClass: totalThinClass,
         projectList: projectList
@@ -251,7 +248,6 @@ export const getSmallClass = (smallClassList) => {
             let noArr = list.No.split('-');
             // 如果小于5 说明没有标段  不符合规则
             if (noArr.length < 5) {
-                console.log('rst', list);
                 return;
             }
             // 项目 + 区块 + 标段 + 小班
@@ -325,7 +321,6 @@ export const getThinClass = (smallClass, list) => {
             let noArr = rst.No.split('-');
             // 如果小于5 说明没有标段  不符合规则
             if (noArr.length < 5) {
-                console.log('rst', rst);
                 return;
             }
             // 暂时去掉重复的节点
@@ -369,7 +364,6 @@ export const getCompanyDataByOrgCode = async (orgCode, getOrgTreeByCode) => {
     let orgData = await getOrgTreeByCode({code: orgCode}, {reverse: true});
     let parent = {};
     let loopData = loopOrgCompany(orgData);
-    console.log('loopData', loopData);
     parent = loopArrayCompany(loopData);
     return parent;
 };
@@ -379,7 +373,6 @@ export const loopOrgCompany = (orgData) => {
     try {
         let extra_params = orgData && orgData.extra_params;
         let companyStatus = extra_params && extra_params.companyStatus;
-        console.log();
         if (companyStatus && companyStatus === '公司') {
             return orgData;
         } else if (orgData && orgData.children && orgData.children.length > 0 &&

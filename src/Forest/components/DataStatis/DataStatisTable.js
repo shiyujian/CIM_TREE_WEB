@@ -279,12 +279,14 @@ export default class DataStatisTable extends Component {
                 getTreePlanting,
                 getLocationStat,
                 getStatByTreetype
-            }
+            },
+            leftkeycode
         } = this.props;
         try {
-            if (!section) {
+            console.log('leftkeycode', leftkeycode);
+            if (!leftkeycode) {
                 Notification.info({
-                    message: '请选择标段进行查询',
+                    message: '请选择项目',
                     duration: 3
                 });
                 return;
@@ -296,6 +298,8 @@ export default class DataStatisTable extends Component {
             } else if (smallclass) {
                 let arr = smallclass.split('-');
                 no = arr[0] + '-' + arr[1] + '-' + arr[3];
+            } else if (leftkeycode) {
+                no = leftkeycode;
             }
 
             let postdata = {

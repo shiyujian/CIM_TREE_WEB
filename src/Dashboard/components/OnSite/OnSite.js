@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-27 00:47:10
+ * @Last Modified time: 2018-10-27 10:13:38
  */
 import React, { Component } from 'react';
 import {
@@ -1137,7 +1137,6 @@ class OnSite extends Component {
             console.log('加载细班图层', e);
         }
     }
-
     // 巡检路线多选树节点
     handleTrackCheck = async (keys, info) => {
         // 当前的选中状态
@@ -1560,9 +1559,10 @@ class OnSite extends Component {
             if (isFocus) {
                 this.map.fitBounds(layer.getBounds());
             }
-            if (!index) {
-                return;
-            }
+            // // 如果是一个任务多个区域的话，只在最后一个任务显示任务总结
+            // if (!index) {
+            //     return;
+            // }
             // 设置任务中间的图标
             let centerData = layer.getCenter();
             let iconType = L.divIcon({
@@ -1615,9 +1615,10 @@ class OnSite extends Component {
             if (isFocus) {
                 this.map.fitBounds(layer.getBounds());
             }
-            if (!index) {
-                return;
-            }
+            // // 如果是一个任务多个区域的话，只在最后一个任务显示任务总结
+            // if (!index) {
+            //     return;
+            // }
             // 设置任务中间的图标
             let centerData = layer.getCenter();
             let iconType = L.divIcon({
@@ -1661,7 +1662,7 @@ class OnSite extends Component {
             if (data === ',') {
                 queryData = queryData.substr(0, queryData.length - 1);
             }
-            
+
             this.setState({
                 survivalRateSectionData: queryData
             }, () => {
@@ -1683,6 +1684,7 @@ class OnSite extends Component {
             console.log('handleSurvivalRateButton', e);
         }
     }
+    // 成活率选择成活范围后对数据进行处理
     handleSurvivalRateRateData = () => {
         let survivalRateRateData = '';
         this.survivalRateOptions.map((option) => {
@@ -1819,7 +1821,6 @@ class OnSite extends Component {
             console.log('_handleAdoptSelect', e);
         }
     }
-
     // 切换为2D
     toggleTileLayer (index) {
         this.tileLayer.setUrl(this.tileUrls[index]);
@@ -2182,7 +2183,6 @@ class OnSite extends Component {
             treeMessModalVisible: false
         });
     }
-
     // 点击地图上的区域的成活率
     async getSurvivalRateInfo (data, x, y) {
         const {
