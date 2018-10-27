@@ -37,7 +37,6 @@ class AddEdit extends Component {
             this.Contacter = user.account.person_name;
             this.ContacterPhone = user.account.person_telephone;
         }
-        console.log(this.props.RegionCodeList, '111');
         this.setState({
             optionList: this.props.optionList,
             RegionCodeList: this.props.RegionCodeList
@@ -49,7 +48,6 @@ class AddEdit extends Component {
                 uid: '-1',
                 status: 'done'
             };
-            console.log(this.props.record.BusinessLicense, this.props.record.Facade, '111');
             if (this.props.record.Facade) {
                 this.setState({
                     isSwitch: false
@@ -81,7 +79,6 @@ class AddEdit extends Component {
     render () {
         const { fileList, fileListBack, fileListLicense, RegionCodeList, optionList, record, isAmend, Nurserys, isSwitch, RegionCode } = this.state;
         const { getFieldDecorator } = this.props.form;
-        console.log(record);
         let provinceCode = '';
         let sityCode = '';
         if (RegionCode) {
@@ -93,7 +90,6 @@ class AddEdit extends Component {
             listType: 'picture',
             fileList: fileList,
             beforeUpload: (file, fileList) => {
-                console.log(fileList, '----');
                 const formdata = new FormData();
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
@@ -113,7 +109,6 @@ class AddEdit extends Component {
                 });
             }
         };
-        console.log(props.defaultFileList, '---');
         const propsBack = {
             action: '',
             listType: 'picture',
@@ -338,7 +333,6 @@ class AddEdit extends Component {
         );
     }
     onSwitch (boolean) {
-        console.log(boolean);
         this.setState({
             isSwitch: boolean
         });

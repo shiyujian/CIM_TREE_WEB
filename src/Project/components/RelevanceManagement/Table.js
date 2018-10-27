@@ -34,6 +34,8 @@ class Tablelevel extends Component {
         this.org_code = org_code;
         // 获取当前组织机构的权限
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        console.log(getUser());
+        console.log(user);
         if (user.account) {
             this.name = user.account.person_name;
         }
@@ -183,7 +185,8 @@ class Tablelevel extends Component {
     }
     handleSupplier (value) {
         this.setState({
-            supplierid: value
+            supplierid: value,
+            SupplierList: this.SupplierList
         });
     }
     searchNursery (value) {
@@ -199,7 +202,8 @@ class Tablelevel extends Component {
     }
     handleNursery (value) {
         this.setState({
-            nurserybaseid: value
+            nurserybaseid: value,
+            NurseryList: this.NurseryList
         });
     }
     toSearch () {
