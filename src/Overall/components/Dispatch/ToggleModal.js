@@ -11,7 +11,6 @@ import {
     message,
     TreeSelect,
     Checkbox,
-    Table,
     Progress
 } from 'antd';
 import { getUser } from '../../../_platform/auth';
@@ -115,7 +114,6 @@ class ToggleModal extends Component {
         // 	this.setState({
         // 		content: toggleData.editData.body_rich
         // 	});
-        // 	console.log('content',content)
         // 	editor.txt.html(toggleData.editData.body_rich)
         // 	setFieldsValue({
         // 		'title': toggleData.editData.title,

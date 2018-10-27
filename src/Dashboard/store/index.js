@@ -5,7 +5,9 @@ import {
     FOREST_API
 } from '_platform/api';
 const ID = 'dashboard';
+// 获取隐患列表
 export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents`, []);
+// 获取隐患详情
 export const getRiskContactSheet = createFetchAction(`${FOREST_API}/tree/patrolevent/{{ID}}`, []);
 // 获取巡检路线
 export const getInspectRouter = createFetchAction(`${FOREST_API}/tree/patrolroutes`, [], 'GET');
@@ -19,7 +21,9 @@ export const getNurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
 export const getCarpackbysxm = createFetchAction(`${FOREST_API}/tree/carpackbysxm/{{sxm}}`, []);
 // 获取树木现场种植的信息
 export const getTreeMess = createFetchAction(`${FOREST_API}/tree/tree/{{sxm}}`, []);
+// 获取人员的具体详情
 export const getUserDetail = createFetchAction(`${USER_API}/users/{{pk}}/`, []);
+// 获取树的树种类型
 export const getTreeTypeAction = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
@@ -45,7 +49,6 @@ export const switchDashboardFullScreenState = createAction(`${ID}切换二维展
 export const switchDashboardAreaTreeLayer = createAction(`${ID}切换二维展示树图层`);
 export const switchDashboardAreaMeasure = createAction(`${ID}切换二维展示面积计算`);
 export const switchDashboardFocus = createAction(`${ID}切换二维展示聚焦初始位置`);
-// export const switchRiskTreeTimeType = createAction(`${ID}切换安全隐患时间筛选条件`);
 export const getAreaTreeLoading = createAction(`${ID}区域地块树加载loading`);
 export const getRiskTreeLoading = createAction(`${ID}安全隐患树加载loading`);
 export const getTrackTreeLoading = createAction(`${ID}巡检路线树加载loading`);
@@ -84,7 +87,6 @@ export const actions = {
     switchDashboardAreaTreeLayer,
     switchDashboardAreaMeasure,
     switchDashboardFocus,
-    // switchRiskTreeTimeType
     getAreaTreeLoading,
     getRiskTreeLoading,
     getTrackTreeLoading,
@@ -220,12 +222,6 @@ export default handleActions(
                 survivalRateTreeLoading: payload
             };
         }
-        // [switchRiskTreeTimeType]: (state, { payload }) => {
-        //     return {
-        //         ...state,
-        //         riskTreeTimeType: payload
-        //     };
-        // }
     },
     {}
 );
