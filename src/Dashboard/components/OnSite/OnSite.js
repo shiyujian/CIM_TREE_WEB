@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-27 10:13:38
+ * @Last Modified time: 2018-10-29 15:42:05
  */
 import React, { Component } from 'react';
 import {
@@ -609,12 +609,22 @@ class OnSite extends Component {
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_risk') {
                 this.handleRemoveAllRiskLayer();
+                this.riskTypeOptions.map((option) => {
+                    this.setState({
+                        [option.id]: false
+                    });
+                });
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treetype') {
                 this.removeTileTreeTypeLayerFilter();
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_curingTask') {
                 this.handleRemoveAllCuringTaskLayer();
+                this.curingTaskTypeOptions.map((option) => {
+                    this.setState({
+                        [option.id]: false
+                    });
+                });
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_survivalRate') {
                 for (let v in survivalRateMarkerLayerList) {
@@ -662,7 +672,10 @@ class OnSite extends Component {
         const {
             riskMarkerLayerList // 安全隐患图标图层List
         } = this.state;
+        console.log('handleRemoveAllRiskLayer');
+        console.log('riskMarkerLayerList', riskMarkerLayerList);
         for (let v in riskMarkerLayerList) {
+            console.log('riskMarkerLayerList[v]', riskMarkerLayerList[v]);
             this.map.removeLayer(riskMarkerLayerList[v]);
         }
     }
@@ -721,6 +734,7 @@ class OnSite extends Component {
                     return (
                         <TrackTree
                             {...this.props}
+                            {...this.state}
                             onRemoveAllLayer={this.handleRemoveAllTrackLayer.bind(this)}
                             onLocation={this.handleTrackLocation.bind(this)}
                             onCheck={this.handleTrackCheck.bind(this)}
@@ -732,6 +746,7 @@ class OnSite extends Component {
                     return (
                         <RiskTree
                             {...this.props}
+                            {...this.state}
                             onSearchData={this.handleRiskSearchData.bind(this)}
                             featureName={option.value}
                         />
@@ -741,6 +756,7 @@ class OnSite extends Component {
                     return (
                         <TreeTypeTree
                             {...this.props}
+                            {...this.state}
                             onCheck={this.handleTreeTypeCheck.bind(this)}
                             featureName={option.value}
                             treetypes={treetypes}
@@ -751,6 +767,7 @@ class OnSite extends Component {
                     return (
                         <CuringTaskTree
                             {...this.props}
+                            {...this.state}
                             onSearchData={this.handleCuringTaskSearchData.bind(this)}
                         />
                     );
@@ -759,6 +776,7 @@ class OnSite extends Component {
                     return (
                         <SurvivalRateTree
                             {...this.props}
+                            {...this.state}
                             onCheck={this._handleSurvivalRateCheck.bind(this)}
                         />
                     );
@@ -767,6 +785,7 @@ class OnSite extends Component {
                     return (
                         <TreeAdoptTree
                             {...this.props}
+                            {...this.state}
                             onCheck={this._handleAdoptCheck.bind(this)}
                             onSelect={this._handleAdoptSelect.bind(this)}
                         />
@@ -840,7 +859,7 @@ class OnSite extends Component {
                                 })
                             ) : ''
                     }
-                    {
+                    { // 右侧菜单当选择区域地块时，显示区域地块树
                         dashboardRightMenu && dashboardRightMenu === 'area'
                             ? (
                                 <div className='dashboard-rightAreaMenu'>

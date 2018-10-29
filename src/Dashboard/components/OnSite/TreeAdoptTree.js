@@ -82,8 +82,8 @@ export default class TreeAdoptTree extends Component {
                     let treeData = await getTreeLocation({sxm: SXM});
                     let treeMess = treeData && treeData.content && treeData.content[0];
                     if (treeMess && treeMess.X && treeMess.Y) {
-                        adoptTree.X = (treeMess && treeMess.X) ? treeMess.X : '';
-                        adoptTree.Y = (treeMess && treeMess.Y) ? treeMess.Y : '';
+                        adoptTree.X = treeMess.X;
+                        adoptTree.Y = treeMess.Y;
                     }
                 }
                 // 去除没有定位数据的
