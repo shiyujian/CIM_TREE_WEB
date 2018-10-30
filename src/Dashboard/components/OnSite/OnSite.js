@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-29 15:42:05
+ * @Last Modified time: 2018-10-30 11:57:09
  */
 import React, { Component } from 'react';
 import {
@@ -111,6 +111,8 @@ class OnSite extends Component {
             treeMarkerLayer: '',
             areaLayerList: {}, // 区域地块图层list
             realThinClassLayerList: {}, // 实际细班种植图层
+
+            treeTypeTreeMarkerLayer: '', // 树种筛选树节点图层
 
             trackLayerList: {}, // 轨迹图层List
             trackMarkerLayerList: {}, // 轨迹图标图层List
@@ -758,6 +760,8 @@ class OnSite extends Component {
                             {...this.props}
                             {...this.state}
                             onCheck={this.handleTreeTypeCheck.bind(this)}
+                            onLocation={this.treeTypeTreeLocation.bind(this)}
+                            cancelLocation={this.treeTypeTreeCancelLocation.bind(this)}
                             featureName={option.value}
                             treetypes={treetypes}
                         />
@@ -780,7 +784,7 @@ class OnSite extends Component {
                             onCheck={this._handleSurvivalRateCheck.bind(this)}
                         />
                     );
-                // 成活率
+                // 苗木结缘
                 case 'geojsonFeature_treeAdopt':
                     return (
                         <TreeAdoptTree
@@ -1312,6 +1316,7 @@ class OnSite extends Component {
             console.log('handleRiskTypeButton', e);
         }
     }
+    // 安全隐患加载图层
     handleRiskTypeAddLayer = async () => {
         const {
             riskSrarchData,
@@ -1395,6 +1400,39 @@ class OnSite extends Component {
                 transparent: true
             }
         ).addTo(this.map);
+    }
+    // 树种筛选模块搜索树然后进行定位
+    treeTypeTreeLocation = async (data) => {
+        const {
+            treeTypeTreeMarkerLayer
+        } = this.state;
+        if (treeTypeTreeMarkerLayer) {
+            this.map.removeLayer(treeTypeTreeMarkerLayer);
+        }
+        let iconType = L.divIcon({
+            className: getIconType('treeType')
+        });
+        let marker = L.marker([data.Y, data.X], {
+            icon: iconType
+        });
+        console.log('marker', marker);
+        marker.addTo(this.map);
+        this.map.panTo([data.Y, data.X]);
+        this.setState({
+            treeTypeTreeMarkerLayer: marker
+        });
+    }
+    // 取消树节点定位
+    treeTypeTreeCancelLocation = async () => {
+        const {
+            treeTypeTreeMarkerLayer
+        } = this.state;
+        if (treeTypeTreeMarkerLayer) {
+            this.map.removeLayer(treeTypeTreeMarkerLayer);
+        }
+        this.setState({
+            treeTypeTreeMarkerLayer: ''
+        });
     }
     // 搜索之后的养护任务数据
     handleCuringTaskSearchData = (srarchData) => {
@@ -1564,6 +1602,8 @@ class OnSite extends Component {
         try {
             let totalThinClass = tree.totalThinClass || [];
             let message = handleCuringTaskMess(str, taskMess, totalThinClass, curingTypes);
+            console.log('message', message);
+            console.log('isFocus', isFocus);
             let layer = this._createMarker(message);
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
             if (curingTaskPlanLayerList[eventKey]) {
@@ -1574,10 +1614,10 @@ class OnSite extends Component {
             this.setState({
                 curingTaskPlanLayerList
             });
-            // 多选的话，只需要聚焦最后一个
-            if (isFocus) {
-                this.map.fitBounds(layer.getBounds());
-            }
+            // // 多选的话，只需要聚焦最后一个
+            // if (isFocus) {
+            //     this.map.fitBounds(layer.getBounds());
+            // }
             // // 如果是一个任务多个区域的话，只在最后一个任务显示任务总结
             // if (!index) {
             //     return;
@@ -1585,7 +1625,7 @@ class OnSite extends Component {
             // 设置任务中间的图标
             let centerData = layer.getCenter();
             let iconType = L.divIcon({
-                className: getIconType(message.properties.type)
+                className: getIconType(message.properties.typeName)
             });
             let marker = L.marker([centerData.lat, centerData.lng], {
                 icon: iconType,
@@ -1598,6 +1638,10 @@ class OnSite extends Component {
             );
             marker.addTo(this.map);
             curingTaskMarkerLayerList[eventKey] = marker;
+            // 多选的话，只需要聚焦最后一个
+            if (isFocus) {
+                this.map.fitBounds(layer.getBounds());
+            }
             this.setState({
                 curingTaskMarkerLayerList
             });
@@ -1630,10 +1674,10 @@ class OnSite extends Component {
             this.setState({
                 curingTaskRealLayerList
             });
-            // 多选的话，只需要聚焦最后一个
-            if (isFocus) {
-                this.map.fitBounds(layer.getBounds());
-            }
+            // // 多选的话，只需要聚焦最后一个
+            // if (isFocus) {
+            //     this.map.fitBounds(layer.getBounds());
+            // }
             // // 如果是一个任务多个区域的话，只在最后一个任务显示任务总结
             // if (!index) {
             //     return;
@@ -1641,7 +1685,7 @@ class OnSite extends Component {
             // 设置任务中间的图标
             let centerData = layer.getCenter();
             let iconType = L.divIcon({
-                className: getIconType(message.properties.type)
+                className: getIconType(message.properties.typeName)
             });
             let marker = L.marker([centerData.lat, centerData.lng], {
                 icon: iconType,
@@ -1654,6 +1698,10 @@ class OnSite extends Component {
             );
             marker.addTo(this.map);
             curingTaskMarkerLayerList[eventKey] = marker;
+            // 多选的话，只需要聚焦最后一个
+            if (isFocus) {
+                this.map.fitBounds(layer.getBounds());
+            }
             this.setState({
                 curingTaskMarkerLayerList
             });
