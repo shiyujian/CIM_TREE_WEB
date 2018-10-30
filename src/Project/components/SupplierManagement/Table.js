@@ -287,7 +287,7 @@ class Tablelevel extends Component {
                     <Col span={24}>
                         <Table columns={this.columns} bordered dataSource={supplierList}
                             scroll={{ x: 1700 }} pagination={false} rowKey='ID' />
-                        <Pagination total={total} page={page} pageSize={10} style={{marginTop: '10px'}}
+                        <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
                             showQuickJumper onChange={this.handlePage} />
                     </Col>
                 </Row>

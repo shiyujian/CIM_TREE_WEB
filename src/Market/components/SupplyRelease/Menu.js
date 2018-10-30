@@ -72,6 +72,12 @@ class Menu extends Component {
                         <Col span={11}>
                             {
                                 dataList.map((item, index) => {
+                                    if (index === 4) {
+                                        return '......';
+                                    }
+                                    if (index > 4) {
+                                        return;
+                                    }
                                     let CultivationMode = '';
                                     CULTIVATIONMODE.map(row => {
                                         if (item.CultivationMode === row.id) {
