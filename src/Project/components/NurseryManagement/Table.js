@@ -254,8 +254,8 @@ class Tablelevel extends Component {
                     <Col span={24}>
                         <Table columns={this.columns} bordered dataSource={nurseryList}
                             scroll={{ x: 1300 }} pagination={false} rowKey='ID' />
-                        <Pagination total={total} page={page} pageSize={10} style={{marginTop: '10px'}}
-                            showQuickJumper onChange={this.handlePage} />
+                        <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
+                            showQuickJumper page='1' onChange={this.handlePage} />
                     </Col>
                 </Row>
                 <Modal title='查看' visible={seeVisible}

@@ -29,7 +29,7 @@ class Tablelevel extends Component {
             optionList: []
         };
         this.Checker = '';
-        this.groupId = '';
+        this.groupId = ''; // 用户分组ID
         this.username = ''; // 用户名
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
@@ -113,15 +113,10 @@ class Tablelevel extends Component {
             fixed: 'left',
             dataIndex: 'SupplierName'
         }, {
-            title: '行政区划',
-            key: 1,
-            width: 120,
-            fixed: 'left',
-            dataIndex: 'Address'
-        }, {
             title: '行政区划编码',
             key: 2,
             width: 100,
+            fixed: 'left',
             dataIndex: 'RegionCode'
         }, {
             title: '详细地址',
@@ -129,20 +124,10 @@ class Tablelevel extends Component {
             width: 120,
             dataIndex: 'Address'
         }, {
-            title: '工商注册号',
-            key: 4,
-            width: 100,
-            dataIndex: 'TreePlace'
-        }, {
             title: '统一信用代码',
             key: 5,
             width: 100,
             dataIndex: 'USCC'
-        }, {
-            title: '组织机构代码',
-            key: 6,
-            width: 100,
-            dataIndex: 'TreePlace'
         }, {
             title: '法人姓名',
             key: 7,
@@ -231,6 +216,7 @@ class Tablelevel extends Component {
     render () {
         const { getFieldDecorator } = this.props.form;
         const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, RegionCodeList, suppliername, status } = this.state;
+        console.log(supplierList, '列表');
         return (
             <div className='table-level'>
                 <Row>
@@ -286,8 +272,8 @@ class Tablelevel extends Component {
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <Table columns={this.columns} bordered dataSource={supplierList}
-                            scroll={{ x: 1700 }} pagination={false} rowKey='ID' />
-                        <Pagination total={total} page={page} pageSize={10} style={{marginTop: '10px'}}
+                            scroll={{ x: 1380 }} pagination={false} rowKey='ID' />
+                        <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
                             showQuickJumper onChange={this.handlePage} />
                     </Col>
                 </Row>

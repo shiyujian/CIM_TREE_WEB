@@ -222,12 +222,12 @@ class AddEdit extends Component {
                             <Col span={12}>
                                 <FormItem
                                     {...layoutT}
-                                    label='地址'
+                                    label='详细地址'
                                 >
                                     {getFieldDecorator('Address', {
                                         initialValue: record && record.Address
                                     })(
-                                        <Input placeholder='请输入地址' />
+                                        <Input placeholder='请输入详细地址' />
                                     )}
                                 </FormItem>
                             </Col>

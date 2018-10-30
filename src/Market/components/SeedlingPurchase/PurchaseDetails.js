@@ -57,9 +57,10 @@ class PurchaseDetails extends Component {
                 });
                 item.childrenList = [];
             });
-            console.log(rep.Specs, '规格数据');
             // 根据采购单ID获取报价清单
             getOfferInventoryById({}, {
+                supplier: this.grouptype === 6 ? this.org_code : '',
+                nurserybase: this.grouptype === 0 ? this.org_code : '',
                 purchaseid: this.purchaseid
             }).then(rst => {
                 rst.map(item => {
@@ -305,8 +306,6 @@ class PurchaseDetails extends Component {
     }
     toOffer (id) {
         const { Specs } = this.state;
-        console.log(Specs, id, '数');
-        debugger
         Specs.map(item => {
             if (item.ID === id) {
                 if (item.childrenList.length === 0) {
