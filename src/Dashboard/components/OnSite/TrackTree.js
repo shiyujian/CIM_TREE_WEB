@@ -13,8 +13,9 @@ export default class TrackTree extends Component {
             stime: '',
             etime: '',
             timeType: 'all',
-            searchData: [],
-            checkedKeys: []
+            searchDateData: [],
+            searchNameData: [],
+            searchName: ''
         };
     }
     componentDidMount = async () => {
@@ -90,25 +91,32 @@ export default class TrackTree extends Component {
             timeType,
             stime,
             etime,
-            searchData,
-            checkedKeys
+            searchDateData,
+            searchNameData,
+            searchName
         } = this.state;
         let contents = [];
-        if (etime && stime) {
-            for (let j = 0; j < searchData.length; j++) {
-                const element = searchData[j];
-                if (element != undefined) {
+        console.log('searchName', searchName);
+        console.log('searchNameData', searchNameData);
+
+        if (searchName) {
+            contents = searchNameData;
+        } else if (etime && stime) {
+            for (let j = 0; j < searchDateData.length; j++) {
+                const element = searchDateData[j];
+                if (element !== undefined) {
                     contents.push(element);
                 }
             }
         } else {
             for (let j = 0; j < trackTree.length; j++) {
                 const element = trackTree[j];
-                if (element != undefined) {
+                if (element !== undefined) {
                     contents.push(element);
                 }
             }
         };
+        console.log('contents', contents);
         return (
             <div>
                 <Spin spinning={trackTreeLoading}>
@@ -197,32 +205,39 @@ export default class TrackTree extends Component {
         const {
             stime,
             etime,
-            searchData
+            searchDateData
         } = this.state;
+        // 如果没有搜索数据，则展示全部数据，并将地图上的图层清空
         if (!value) {
+            this.setState({
+                searchNameData: [],
+                searchName: ''
+            });
+            this.props.onLocation([]);
             return;
         }
         let contents = [];
         if (etime && stime) {
-            for (let j = 0; j < searchData.length; j++) {
-                const element = searchData[j];
-                if (element != undefined) {
+            for (let j = 0; j < searchDateData.length; j++) {
+                const element = searchDateData[j];
+                if (element !== undefined) {
                     contents.push(element);
                 }
             }
         } else {
             for (let j = 0; j < trackTree.length; j++) {
                 const element = trackTree[j];
-                if (element != undefined) {
+                if (element !== undefined) {
                     contents.push(element);
                 }
             }
         };
-        console.log('contents', contents);
         let ckeckedData = [];
+        let searchNameData = [];
         contents.map((content) => {
             let name = content.Full_Name;
             if (name.indexOf(value) !== -1) {
+                searchNameData.push(content);
                 if (content && content.children) {
                     ckeckedData = ckeckedData.concat(content.children);
                 }
@@ -230,6 +245,10 @@ export default class TrackTree extends Component {
         });
         console.log('ckeckedData', ckeckedData);
         this.props.onLocation(ckeckedData);
+        this.setState({
+            searchNameData,
+            searchName: value
+        });
     }
 
     handleTimeChange = (e) => {
@@ -299,10 +318,11 @@ export default class TrackTree extends Component {
             };
             let routes = await getInspectRouter({}, postdata);
             console.log('routes', routes);
-            let searchData = handleTrackData(routes);
+            let searchDateData = handleTrackData(routes);
+            console.log('searchDateData', searchDateData);
             await getTrackTreeLoading(false);
             this.setState({
-                searchData
+                searchDateData
             });
         } catch (e) {
             console.log('queryRisk', e);

@@ -27,6 +27,9 @@ export const getUserDetail = createFetchAction(`${USER_API}/users/{{pk}}/`, []);
 export const getTreeTypeAction = createFetchAction(`${FOREST_API}/tree/treetypes`, []);
 // 苗木养护查询
 export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
+export const getAdoptTreeOk = createAction(`${ID}苗木结缘树`);
+// 获取领养树的全部数据
+export const getAdoptTreeData = createFetchAction(`${FOREST_API}/adopt/adopttrees`, [getAdoptTreeOk], 'GET');
 // 根据领养人名称获取领养树
 export const getAdoptTreeByAdopter = createFetchAction(`${FOREST_API}/adopt/adopttrees?aadopter={{aadopter}}`, [], 'GET');
 // 苗木定位位置地理坐标系查询
@@ -55,6 +58,7 @@ export const getTrackTreeLoading = createAction(`${ID}巡检路线树加载loadi
 export const getTreetypesTreeLoading = createAction(`${ID}树种筛选树加载loading`);
 export const getCuringTaskTreeLoading = createAction(`${ID}养护任务树加载loading`);
 export const getSurvivalRateTreeLoading = createAction(`${ID}成活率树加载loading`);
+export const getAdoptTreeLoading = createAction(`${ID}苗木结缘树加载loading`);
 
 export const actions = {
     getRisk,
@@ -68,6 +72,8 @@ export const actions = {
     getUserDetail,
     getTreeTypeAction,
     getCuring,
+    getAdoptTreeOk,
+    getAdoptTreeData,
     getAdoptTreeByAdopter,
     getTreeLocation,
     getAdoptTrees,
@@ -92,7 +98,8 @@ export const actions = {
     getTrackTreeLoading,
     getTreetypesTreeLoading,
     getCuringTaskTreeLoading,
-    getSurvivalRateTreeLoading
+    getSurvivalRateTreeLoading,
+    getAdoptTreeLoading
 };
 export default handleActions(
     {
@@ -136,6 +143,12 @@ export default handleActions(
             return {
                 ...state,
                 survivalRateTree: payload
+            };
+        },
+        [getAdoptTreeOk]: (state, { payload }) => {
+            return {
+                ...state,
+                adoptTree: payload
             };
         },
         [getCuringTypeData]: (state, { payload }) => {
@@ -220,6 +233,12 @@ export default handleActions(
             return {
                 ...state,
                 survivalRateTreeLoading: payload
+            };
+        },
+        [getAdoptTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                adoptTreeLoading: payload
             };
         }
     },
