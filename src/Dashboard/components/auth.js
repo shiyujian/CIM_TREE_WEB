@@ -304,7 +304,6 @@ export const genPopUpContent = (geo) => {
 };
 // 获取对应的ICON
 export const getIconType = (type) => {
-    console.log('type', type);
     switch (type) {
         case 'track':
             return 'dashboard-peopleIcon';
@@ -324,6 +323,24 @@ export const getIconType = (type) => {
             return 'dashboard-treeIcon';
         case 'adopt':
             return 'dashboard-adoptIcon';
+        case 'treeType':
+            return 'dashboard-treeIcon';
+        case '施肥':
+            return 'dashboard-curingTaskFeedImg';
+        case '排涝':
+            return 'dashboard-curingTaskDrainImg';
+        case '补植':
+            return 'dashboard-curingTaskReplantingImg';
+        case '病虫害防治':
+            return 'dashboard-curingTaskWormImg';
+        case '修剪':
+            return 'dashboard-curingTaskTrimImg';
+        case '除草':
+            return 'dashboard-curingTaskWeedImg';
+        case '浇水':
+            return 'dashboard-curingTaskWatering';
+        case '其他':
+            return 'dashboard-curingTaskOther';
         default:
             break;
     }

@@ -10,7 +10,6 @@ export default class TreeAdoptTree extends Component {
             searchValue: ''
         };
         this.originOnSelect = this.props.onSelect;
-        this.originOnCheck = this.props.onCheck;
     }
 
     onSelect (keys, info) {
@@ -93,13 +92,13 @@ export default class TreeAdoptTree extends Component {
                     }
                 }
                 console.log('adoptTrees', adoptTrees);
-                this.originOnCheck(adoptTrees);
+                this.props.onCheck(adoptTrees);
                 this.setState({
                     searchTree: adoptTrees,
                     searchValue: value
                 });
             } else {
-                this.originOnCheck([]);
+                this.props.onCheck([]);
                 this.setState({
                     searchTree: [],
                     searchValue: value
