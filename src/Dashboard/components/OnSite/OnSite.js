@@ -9,17 +9,14 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-30 11:57:09
+ * @Last Modified time: 2018-10-31 19:19:59
  */
 import React, { Component } from 'react';
 import {
     Button,
     Modal,
     Form,
-    Row,
-    // DatePicker,
-    Radio,
-    Spin
+    Row
 } from 'antd';
 import './OnSite.less';
 import RiskTree from './RiskTree';
@@ -76,9 +73,6 @@ import curingTaskTrimImg from './CuringTaskImg/trim.png';
 import curingTaskWateringImg from './CuringTaskImg/watering.png';
 import curingTaskWeedImg from './CuringTaskImg/weed.png';
 import curingTaskWormImg from './CuringTaskImg/worm.png';
-
-const RadioGroup = Radio.Group;
-// const { RangePicker } = DatePicker;
 
 window.config = window.config || {};
 class OnSite extends Component {
@@ -143,18 +137,18 @@ class OnSite extends Component {
             survivalRateFifty: true,
             survivalRateFourty: true,
             // 安全隐患类型的点击状态，展示是否选中的图片
-            riskTypeQuality: false,
-            riskTypeDanger: false,
-            riskTypeOther: false,
+            riskTypeQuality: true,
+            riskTypeDanger: true,
+            riskTypeOther: true,
             // 养护任务类型的点击状态，展示是否选中的图片
-            curingTaskFeed: false,
-            curingTaskDrain: false,
-            curingTaskReplanting: false,
-            curingTaskWorm: false,
-            curingTaskTrim: false,
-            curingTaskWeed: false,
-            curingTaskWatering: false,
-            curingTaskOther: false,
+            curingTaskFeed: true,
+            curingTaskDrain: true,
+            curingTaskReplanting: true,
+            curingTaskWorm: true,
+            curingTaskTrim: true,
+            curingTaskWeed: true,
+            curingTaskWatering: true,
+            curingTaskOther: true,
             // 子组件搜索的树数据
             riskSrarchData: '',
             curingTaskSrarchData: ''
@@ -179,10 +173,6 @@ class OnSite extends Component {
     };
     // 左侧菜单栏的Tree型数据
     options = [
-        // {
-        //     label: '区域地块',
-        //     value: 'geojsonFeature_treeMess'
-        // },
         {
             label: '巡检路线',
             value: 'geojsonFeature_track'
@@ -321,6 +311,7 @@ class OnSite extends Component {
             dashboardCompomentMenu,
             dashboardAreaTreeLayer,
             dashboardFocus,
+            dashboardTreeMess,
             platform: {
                 tabs = {}
             },
@@ -334,15 +325,43 @@ class OnSite extends Component {
             await this.map.setZoom(window.config.initLeaflet.zoom);
             await switchDashboardFocus('');
         }
+        // 去除树木信息图标图层
+        if (dashboardTreeMess && dashboardTreeMess === 'unTreeMess' && dashboardTreeMess !== prevProps.dashboardTreeMess) {
+            await this.handleRemoveTreeMarkerLayer();
+        }
+        // 在各个菜单之间切换时需要处理的图层
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             await this.removeAllLayer();
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
                 // 选择成活率菜单
+                await this.handleRemoveTreeMarkerLayer();
                 await this.removeTileTreeLayerBasic();
                 await this.getTileTreeSurvivalRateBasic();
+                await this.survivalRateOptions.map(async (option) => {
+                    await this.setState({
+                        [option.id]: true
+                    });
+                });
             } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+                await this.handleRemoveTreeMarkerLayer();
                 await this.removeTileTreeLayerBasic();
                 await this.getTileTreeAdoptBasic();
+            } else if (dashboardCompomentMenu === 'geojsonFeature_curingTask') {
+                await this.curingTaskTypeOptions.map(async (option) => {
+                    await this.setState({
+                        [option.id]: true
+                    });
+                });
+                await this.getTileLayerTreeBasic();
+                await this.handleCuringTaskTypeAddLayer();
+            } else if (dashboardCompomentMenu === 'geojsonFeature_risk') {
+                await this.riskTypeOptions.map(async (option) => {
+                    await this.setState({
+                        [option.id]: true
+                    });
+                });
+                await this.getTileLayerTreeBasic();
+                await this.handleRiskTypeAddLayer();
             } else {
                 await this.getTileLayerTreeBasic();
             }
@@ -468,7 +487,8 @@ class OnSite extends Component {
             } = me.state;
             const {
                 dashboardCompomentMenu,
-                dashboardAreaMeasure
+                dashboardAreaMeasure,
+                dashboardTreeMess
             } = me.props;
             if (dashboardAreaMeasure === 'areaMeasure') {
                 coordinates.push([e.latlng.lat, e.latlng.lng]);
@@ -484,9 +504,9 @@ class OnSite extends Component {
                     coordinates,
                     polygonData: polygonData
                 });
-            } else if (dashboardCompomentMenu === 'geojsonFeature_treeMess') {
-                // getThinClass(e.latlng.lng,e.latlng.lat);
-                me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_treeMess');
+            } else if (dashboardTreeMess === 'treeMess') {
+                console.log('aaaaaaaaaaaaaaaaa', dashboardTreeMess);
+                // me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
             } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
                 me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
             } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
@@ -583,29 +603,14 @@ class OnSite extends Component {
     // 去除所有后来添加的图层
     removeAllLayer = () => {
         const {
-            areaLayerList, // 区域地块图层list
             survivalRateMarkerLayerList, // 成活率图标图层List
             treeMarkerLayer,
-            realThinClassLayerList,
             adoptTreeMarkerLayerList
         } = this.state;
         const {
             dashboardCompomentMenu
         } = this.props;
         try {
-            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treeMess') {
-                for (let v in areaLayerList) {
-                    areaLayerList[v].map((layer) => {
-                        this.map.removeLayer(layer);
-                    });
-                }
-                if (treeMarkerLayer) {
-                    this.map.removeLayer(treeMarkerLayer);
-                }
-                for (let i in realThinClassLayerList) {
-                    this.map.removeLayer(realThinClassLayerList[i]);
-                }
-            }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_track') {
                 this.handleRemoveAllTrackLayer();
             }
@@ -635,7 +640,7 @@ class OnSite extends Component {
                 this.removeTileTreeSurvivalRateLayer();
                 this.survivalRateOptions.map((option) => {
                     this.setState({
-                        [option.id]: true
+                        [option.id]: false
                     });
                 });
                 this.setState({
@@ -656,6 +661,12 @@ class OnSite extends Component {
             console.log('去除所有图层', e);
         }
     }
+    // 去除树木信息图标图层
+    handleRemoveTreeMarkerLayer = () => {
+        if (this.state.treeMarkerLayer) {
+            this.map.removeLayer(this.state.treeMarkerLayer);
+        }
+    }
     // 去除全部巡检路线图层
     handleRemoveAllTrackLayer = () => {
         const {
@@ -674,10 +685,7 @@ class OnSite extends Component {
         const {
             riskMarkerLayerList // 安全隐患图标图层List
         } = this.state;
-        console.log('handleRemoveAllRiskLayer');
-        console.log('riskMarkerLayerList', riskMarkerLayerList);
         for (let v in riskMarkerLayerList) {
-            console.log('riskMarkerLayerList[v]', riskMarkerLayerList[v]);
             this.map.removeLayer(riskMarkerLayerList[v]);
         }
     }
@@ -699,7 +707,9 @@ class OnSite extends Component {
             });
         }
         for (let v in curingTaskMarkerLayerList) {
-            this.map.removeLayer(curingTaskMarkerLayerList[v]);
+            curingTaskMarkerLayerList[v].map((layer) => {
+                this.map.removeLayer(layer);
+            });
         }
     }
     // 去除细班实际区域的图层
@@ -930,19 +940,25 @@ class OnSite extends Component {
                             ? (
                                 <div className='dashboard-menuSwitchCuringTaskTypeLayout'>
                                     {
-                                        this.curingTaskTypeOptions.map((option) => {
-                                            return (
-                                                <div style={{display: 'inlineBlock', marginTop: 5}} key={option.id}>
-                                                    <img src={option.img}
-                                                        title={option.label}
-                                                        className='dashboard-rightMenuCuringTaskTypeImgLayout' />
-                                                    <a className={this.state[option.id] ? 'dashboard-rightMenuCuringTaskTypeSelLayout' : 'dashboard-rightMenuCuringTaskTypeUnSelLayout'}
-                                                        title={option.label}
-                                                        key={option.id}
-                                                        onClick={this.handleCuringTaskTypeButton.bind(this, option)} />
-                                                </div>
-                                            );
-                                        })
+                                        <div>
+                                            <div style={{display: 'inlineBlock', marginTop: 8}} />
+                                            {
+                                                this.curingTaskTypeOptions.map((option) => {
+                                                    return (
+                                                        <div style={{display: 'inlineBlock'}} key={option.id}>
+                                                            <img src={option.img}
+                                                                title={option.label}
+                                                                className='dashboard-rightMenuCuringTaskTypeImgLayout' />
+                                                            <a className={this.state[option.id] ? 'dashboard-rightMenuCuringTaskTypeSelLayout' : 'dashboard-rightMenuCuringTaskTypeUnSelLayout'}
+                                                                title={option.label}
+                                                                key={option.id}
+                                                                onClick={this.handleCuringTaskTypeButton.bind(this, option)} />
+                                                        </div>
+                                                    );
+                                                })
+                                            }
+                                        </div>
+                                        
                                     }
                                 </div>
                             ) : ''
@@ -1297,9 +1313,9 @@ class OnSite extends Component {
         }
     }
     // 搜索之后的安全隐患数据
-    handleRiskSearchData = (srarchData) => {
+    handleRiskSearchData = (searchData) => {
         this.setState({
-            riskSrarchData: srarchData
+            riskSearchData: searchData
         }, () => {
             this.handleRiskTypeAddLayer();
         });
@@ -1319,7 +1335,7 @@ class OnSite extends Component {
     // 安全隐患加载图层
     handleRiskTypeAddLayer = async () => {
         const {
-            riskSrarchData,
+            riskSearchData,
             riskMarkerLayerList
         } = this.state;
         const {
@@ -1334,8 +1350,8 @@ class OnSite extends Component {
                 }
             });
             let checkedData = [];
-            if (riskSrarchData) {
-                checkedData = riskSrarchData;
+            if (riskSearchData) {
+                checkedData = riskSearchData;
             } else {
                 checkedData = riskTree;
             }
@@ -1435,9 +1451,9 @@ class OnSite extends Component {
         });
     }
     // 搜索之后的养护任务数据
-    handleCuringTaskSearchData = (srarchData) => {
+    handleCuringTaskSearchData = (searchData) => {
         this.setState({
-            curingTaskSrarchData: srarchData
+            curingTaskSrarchData: searchData
         }, () => {
             this.handleCuringTaskTypeAddLayer();
         });
@@ -1451,7 +1467,7 @@ class OnSite extends Component {
                 this.handleCuringTaskTypeAddLayer();
             });
         } catch (e) {
-            console.log('handleRiskTypeButton', e);
+            console.log('handleCuringTaskTypeButton', e);
         }
     }
     // 加载某个类型的养护任务图层
@@ -1470,6 +1486,7 @@ class OnSite extends Component {
                     checkedKeys.push(option.label);
                 }
             });
+            console.log('checkedKeys', checkedKeys);
             let checkedData = [];
             if (curingTaskSrarchData) {
                 checkedData = curingTaskSrarchData;
@@ -1510,7 +1527,9 @@ class OnSite extends Component {
                 }
             });
             if (curingTaskMarkerLayerList[eventKey]) {
-                curingTaskMarkerLayerList[eventKey].addTo(this.map);
+                curingTaskMarkerLayerList[eventKey].map((layer) => {
+                    layer.addTo(this.map);
+                });
             }
             if (curingTaskRealLayerList[eventKey]) {
                 curingTaskRealLayerList[eventKey].map((layer) => {
@@ -1602,8 +1621,6 @@ class OnSite extends Component {
         try {
             let totalThinClass = tree.totalThinClass || [];
             let message = handleCuringTaskMess(str, taskMess, totalThinClass, curingTypes);
-            console.log('message', message);
-            console.log('isFocus', isFocus);
             let layer = this._createMarker(message);
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
             if (curingTaskPlanLayerList[eventKey]) {
@@ -1637,7 +1654,11 @@ class OnSite extends Component {
                 )
             );
             marker.addTo(this.map);
-            curingTaskMarkerLayerList[eventKey] = marker;
+            if (curingTaskMarkerLayerList[eventKey]) {
+                curingTaskMarkerLayerList[eventKey].push(marker);
+            } else {
+                curingTaskMarkerLayerList[eventKey] = [marker];
+            }
             // 多选的话，只需要聚焦最后一个
             if (isFocus) {
                 this.map.fitBounds(layer.getBounds());
@@ -1697,7 +1718,11 @@ class OnSite extends Component {
                 )
             );
             marker.addTo(this.map);
-            curingTaskMarkerLayerList[eventKey] = marker;
+            if (curingTaskMarkerLayerList[eventKey]) {
+                curingTaskMarkerLayerList[eventKey].push(marker);
+            } else {
+                curingTaskMarkerLayerList[eventKey] = [marker];
+            }
             // 多选的话，只需要聚焦最后一个
             if (isFocus) {
                 this.map.fitBounds(layer.getBounds());
@@ -2020,6 +2045,7 @@ class OnSite extends Component {
     }
     // 根据点击的地图坐标与实际树的定位进行对比,根据树节点获取树节点信息
     getSxmByLocation (x, y, that, type) {
+        console.log('type', type);
         var resolutions = [
             0.703125,
             0.3515625,
@@ -2084,7 +2110,7 @@ class OnSite extends Component {
         }
         jQuery.getJSON(url, null, async function (data) {
             if (data.features && data.features.length) {
-                if (type === 'geojsonFeature_treeMess') {
+                if (type === 'treeMess') {
                     await that.getTreeMessData(data, x, y);
                     await that.handleOkTreeMessModal(data, x, y);
                 } else if (type === 'geojsonFeature_survivalRate') {
@@ -2118,7 +2144,7 @@ class OnSite extends Component {
                 tree = {}
             },
             curingTypes,
-            dashboardCompomentMenu
+            dashboardTreeMess
         } = this.props;
         try {
             let postdata = {
@@ -2128,7 +2154,7 @@ class OnSite extends Component {
             let totalThinClass = tree.totalThinClass || [];
             let queryTreeData = await getTreeMess(postdata);
             let treeflowDatas = {};
-            if (dashboardCompomentMenu === 'geojsonFeature_treeMess') {
+            if (dashboardTreeMess === 'treeMess') {
                 treeflowDatas = await getTreeflows({}, postdata);
             }
             let nurserysDatas = await getNurserys({}, postdata);
@@ -2196,12 +2222,14 @@ class OnSite extends Component {
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData);
             for (let i = 0; i < treeflowData.length; i++) {
                 let userForestData = await getForestUserDetail({id: treeflowData[i].FromUser});
-                let userEcidiData = await getUserDetail({pk: userForestData.PK});
-                let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
-                let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                let companyName = parent.name;
-                treeflowData[i].companyName = companyName;
-                treeflowData[i].orgData = parent;
+                if (userForestData && userForestData.PK) {
+                    let userEcidiData = await getUserDetail({pk: userForestData.PK});
+                    let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
+                    let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
+                    let companyName = parent.name;
+                    treeflowData[i].companyName = companyName;
+                    treeflowData[i].orgData = parent;
+                }
             }
             let flowMess = treeflowData;
             let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);

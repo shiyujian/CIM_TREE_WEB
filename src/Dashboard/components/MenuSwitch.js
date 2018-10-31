@@ -50,10 +50,6 @@ export default class MenuSwitch extends Component {
 
     options = [
         {
-            label: '树木信息',
-            value: 'geojsonFeature_treeMess'
-        },
-        {
             label: '树种筛选',
             value: 'geojsonFeature_treetype'
         },
@@ -94,6 +90,29 @@ export default class MenuSwitch extends Component {
         return isFullScreen;
     }
 
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            dashboardCompomentMenu,
+            dashboardAreaMeasure,
+            dashboardTreeMess,
+            actions: {
+                switchDashboardTreeMess,
+                switchDashboardAreaMeasure
+            }
+        } = this.props;
+        if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
+            if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' || dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+                await switchDashboardTreeMess('unTreeMess');
+            }
+        }
+        if (dashboardAreaMeasure && dashboardAreaMeasure === 'areaMeasure' && dashboardAreaMeasure !== prevProps.dashboardAreaMeasure) {
+            await switchDashboardTreeMess('unTreeMess');
+        }
+        if (dashboardTreeMess && dashboardTreeMess === 'treeMess' && dashboardTreeMess !== prevProps.dashboardTreeMess) {
+            await switchDashboardAreaMeasure('unAreaMeasure');
+        }
+    }
+
     render () {
         const {
             dashboardCompomentMenu,
@@ -102,6 +121,7 @@ export default class MenuSwitch extends Component {
             dashboardAreaTreeLayer,
             dashboardAreaMeasure,
             dashboardFocus,
+            dashboardTreeMess,
             platform: {
                 tabs = {}
             }
@@ -163,6 +183,10 @@ export default class MenuSwitch extends Component {
                         id='mapFoucs'
                         title='初始位置'
                         onClick={this.handleMapFoucsButton.bind(this)} />
+                    <a className={dashboardTreeMess === 'treeMess' ? 'menuSwitch-rightMenuTreeMessButtonSelLayout' : 'menuSwitch-rightMenuTreeMessButtonUnSelLayout'}
+                        id='treeMess'
+                        title='树木信息'
+                        onClick={this.handleTreeMessButton.bind(this)} />
                     <a className={dashboardAreaTreeLayer === 'removeTileTreeLayerBasic' ? 'menuSwitch-rightMenuTileLayer2ButtonSelLayout' : 'menuSwitch-rightMenuTileLayer2ButtonUnSelLayout'}
                         id='removeTileTreeLayerBasic'
                         title='图层控制'
@@ -236,6 +260,27 @@ export default class MenuSwitch extends Component {
         let buttonID = target.getAttribute('id');
         if (dashboardFocus !== buttonID) {
             await switchDashboardFocus(buttonID);
+        }
+    }
+    // 树木信息
+    handleTreeMessButton = async (e) => {
+        const {
+            actions: {
+                switchDashboardTreeMess
+            },
+            dashboardTreeMess,
+            dashboardCompomentMenu
+        } = this.props;
+        // 当处于成活率和苗木结缘模块时，不能点击
+        if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' || dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+            return;
+        }
+        let target = e.target;
+        let buttonID = target.getAttribute('id');
+        if (dashboardTreeMess === buttonID) {
+            await switchDashboardTreeMess('unTreeMess');
+        } else {
+            await switchDashboardTreeMess(buttonID);
         }
     }
     // 图层控制

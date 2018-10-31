@@ -130,13 +130,17 @@ export default class Tree extends Component {
         try {
             const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
             if (user && user.username !== 'admin') {
+                // 获取登录用户的公司的信息
                 let org_code = user.account.org_code;
                 let parentOrgData = await getCompanyDataByOrgCode(org_code, getOrgTreeByCode);
                 let parentOrgCode = parentOrgData.code;
+                // 获取公司线下的所有部门信息
                 let orgTreeData = await getOrgTreeByCode({code: parentOrgCode});
+                // 将公司下的所有部门设置为Select的选项
                 let orgTreeSelectData = Tree.orgloop([orgTreeData]);
                 this.orgTreeDataArr = [];
                 await getOrgTreeSelect(orgTreeSelectData);
+                // 将公司的部门的code全部进行存储
                 await this.orgArrLoop([orgTreeData], 0);
                 await getOrgTreeDataArr(this.orgTreeDataArr);
             }
@@ -233,7 +237,6 @@ export default class Tree extends Component {
         } = this.props;
 
         const topProject = Tree.loop(children, eventKey);
-        console.log('topProject', topProject);
         if (this.compare(user, topProject, eventKey)) {
             if (topProject.code) {
                 await getTreeModal(true);

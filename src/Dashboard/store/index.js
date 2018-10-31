@@ -52,6 +52,7 @@ export const switchDashboardFullScreenState = createAction(`${ID}切换二维展
 export const switchDashboardAreaTreeLayer = createAction(`${ID}切换二维展示树图层`);
 export const switchDashboardAreaMeasure = createAction(`${ID}切换二维展示面积计算`);
 export const switchDashboardFocus = createAction(`${ID}切换二维展示聚焦初始位置`);
+export const switchDashboardTreeMess = createAction(`${ID}切换二维展示树木信息`);
 export const getAreaTreeLoading = createAction(`${ID}区域地块树加载loading`);
 export const getRiskTreeLoading = createAction(`${ID}安全隐患树加载loading`);
 export const getTrackTreeLoading = createAction(`${ID}巡检路线树加载loading`);
@@ -93,6 +94,7 @@ export const actions = {
     switchDashboardAreaTreeLayer,
     switchDashboardAreaMeasure,
     switchDashboardFocus,
+    switchDashboardTreeMess,
     getAreaTreeLoading,
     getRiskTreeLoading,
     getTrackTreeLoading,
@@ -197,6 +199,12 @@ export default handleActions(
             return {
                 ...state,
                 dashboardFocus: payload
+            };
+        },
+        [switchDashboardTreeMess]: (state, { payload }) => {
+            return {
+                ...state,
+                dashboardTreeMess: payload
             };
         },
         [getAreaTreeLoading]: (state, { payload }) => {

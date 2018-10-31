@@ -65,7 +65,10 @@ class Addition extends Component {
     renderContent () {
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         const {
-            platform: { roles = [] }
+            platform: { roles = [] },
+            sidebar: {
+                node = {}
+            } = {}
         } = this.props;
         var systemRoles = [];
         if (user.is_superuser) {
@@ -104,10 +107,13 @@ class Addition extends Component {
                         });
                         break;
                     case 1:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
+                        // 对于非苗圃基地的部门，施工方不能选择苗圃角色
+                        if (node && node.topParent === '苗圃基地') {
+                            systemRoles.push({
+                                name: '苗圃角色',
+                                value: roles.filter(role => role.grouptype === 0)
+                            });
+                        }
                         systemRoles.push({
                             name: '施工角色',
                             value: roles.filter(role => role.grouptype === 1)
