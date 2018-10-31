@@ -943,8 +943,6 @@ class Users extends Component {
     handleAudit () {
         const { record } = this.state;
         const { checkUsers } = this.props.actions;
-
-        console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
         this.props.form.validateFields((err, values) => {
             if (err) {
                 return;
@@ -953,7 +951,7 @@ class Users extends Component {
                     ID: record.id + '',
                     Checker: this.Checker,
                     CheckTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-                    CheckInfo: values.CheckInfo,
+                    CheckInfo: values.CheckInfo || '用户信息填写有误',
                     CheckStatus: values.CheckStatus
                 }).then(rep => {
                     if (rep.code === 1) {
