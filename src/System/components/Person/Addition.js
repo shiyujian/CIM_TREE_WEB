@@ -144,7 +144,7 @@ class Addition extends Component {
                     case 6:
                         systemRoles.push({
                             name: '供应商角色',
-                            value: roles.filter(role => role.grouptype === 4)
+                            value: roles.filter(role => role.grouptype === 6)
                         });
                         break;
                     default:
