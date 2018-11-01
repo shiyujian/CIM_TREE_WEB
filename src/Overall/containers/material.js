@@ -61,9 +61,12 @@ export default class Material extends Component {
 
     async componentDidMount () {
         const {
-            actions: { getScheduleTaskList },
+            actions: { getScheduleTaskList, getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
 
         if (!tree.scheduleTaskList) {
             let data = await getScheduleTaskList();

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Spin, Button, Popconfirm, Modal, Form, Row, Input, Notification } from 'antd';
 import { getUser } from '_platform/auth';
-import { PROJECT_UNITS } from '_platform/api';
 import { getSectionName } from '../auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -26,15 +25,24 @@ class AsideTree extends Component {
     }
 
     componentDidMount = async () => {
+        const {
+            actions: {
+                getTreeNodeList
+            },
+            platform: { tree = {} }
+        } = this.props;
         this.user = getUser();
         let sections = this.user.sections;
         sections = JSON.parse(sections);
         // 首先查看是否为管理员，是的话，获取全部信息
         if (this.user.username === 'admin') {
-            this._getAdminData();
+            if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+                await getTreeNodeList();
+            }
+            await this._getAdminData();
         } else if (sections && sections instanceof Array && sections.length > 0) {
             // 然后查看有没有关联标段，没有关联的人无法获取列表
-            this._getSectionData();
+            await this._getSectionData();
         }
     }
     // 非管理员，获取文档数据
@@ -61,11 +69,12 @@ class AsideTree extends Component {
         const {
             actions: {
                 getCuringGroup
-            }
+            },
+            platform: { tree = {} }
         } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let taskTeams = await getCuringGroup({}, {section: this.section});
-        console.log('taskTeams', taskTeams);
-        let sectionName = await getSectionName(this.section);
+        let sectionName = await getSectionName(this.section, sectionData);
         let teamsTree = [
             {
                 ID: this.section,
@@ -224,24 +233,26 @@ class AsideTree extends Component {
             actions: {
                 getCuringGroup,
                 changeSelectSection
-            }
+            },
+            platform: { tree = {} }
         } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let teamsTree = [];
         let loopTime = 0;
-        PROJECT_UNITS.map(async project => {
-            if (project.units) {
-                let units = project.units;
-                let projectName = project.value;
+        sectionData.map(async project => {
+            if (project && project.children) {
+                let units = project.children;
+                let projectName = project.Name;
                 units.map(async unit => {
-                    let sectionName = projectName + unit.value;
-                    let taskTeams = await getCuringGroup({}, {section: unit.code});
+                    let sectionName = projectName + unit.Name;
+                    let taskTeams = await getCuringGroup({}, {section: unit.No});
                     if (taskTeams && taskTeams.length > 0) {
                         loopTime = loopTime + 1;
                         if (loopTime === 1) {
-                            changeSelectSection(unit.code);
+                            changeSelectSection(unit.No);
                         }
                         teamsTree.push({
-                            ID: unit.code,
+                            ID: unit.No,
                             GroupName: sectionName,
                             children: taskTeams
                         });
@@ -300,7 +311,6 @@ class AsideTree extends Component {
                     Remark: teamDesc
                 };
                 let curinggroup = await postCuringGroup({}, postData);
-                console.log('curinggroup', curinggroup);
                 if (curinggroup && curinggroup.code && curinggroup.code === 1) {
                     Notification.success({
                         message: '新增班组成功',
@@ -338,7 +348,6 @@ class AsideTree extends Component {
                 let keyArr = selectKey.split('^^');
                 if (keyArr && keyArr.length === 2) {
                     let delData = await deleteCuringGroup({ID: keyArr[0]});
-                    console.log('delData', delData);
                     if (delData && delData.code && delData.code === 1) {
                         Notification.success({
                             message: '删除班组成功',
@@ -383,24 +392,17 @@ class AsideTree extends Component {
         } = this.state;
         let selected = info && info.selected;
         let selectKey = key && key[0];
-        console.log('selectKey', selectKey);
-        console.log('info', info);
-        console.log('teamsTree', teamsTree);
         try {
             let keyArr = selectKey.split('^^');
             if (keyArr && keyArr.length === 2) {
                 // 将section上传，根据section获取人员列表
-                console.log('keyArr', keyArr);
                 let section = keyArr[1];
-                console.log('section', section);
                 await changeSelectSection(section);
                 // 将班组信息上传至redux
                 teamsTree.map((list) => {
                     if (list.ID === keyArr[1]) {
                         let taskTeams = list.children;
                         taskTeams.map(async (team) => {
-                            console.log('team.ID', team.ID);
-                            console.log('keyArr[0]', keyArr[0]);
                             if (team.ID === Number(keyArr[0])) {
                                 await changeSelectMemTeam(team);
                             }
@@ -410,8 +412,7 @@ class AsideTree extends Component {
                 let postData = {
                     groupid: keyArr[0]
                 };
-                let data = await getCuringGroupMans(postData);
-                console.log('data', data);
+                await getCuringGroupMans(postData);
             }
         } catch (e) {
             console.log('点击节点', e);

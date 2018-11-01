@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { STATIC_DOWNLOAD_API, PROJECT_UNITS } from '../../../_platform/api';
 import {
     Form,
     Input,
@@ -40,6 +39,10 @@ class Filter extends Component {
     }
 
     async getSection () {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
         let projectArray = [];
         let sectionArray = [];
@@ -50,18 +53,18 @@ class Filter extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map(item => {
-                    if (code[0] === item.code) {
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
                         projectArray.push(
-                            <Option key={item.value} value={item.value}>
-                                {item.value}
+                            <Option key={item.Name} value={item.Name}>
+                                {item.Name}
                             </Option>
                         );
-                        let units = item.units;
+                        let units = item.children;
                         units.map(unit => {
                             sectionArray.push(
-                                <Option key={unit.code} value={unit.code}>
-                                    {unit.value}
+                                <Option key={unit.No} value={unit.No}>
+                                    {unit.Name}
                                 </Option>
                             );
                         });
@@ -69,10 +72,10 @@ class Filter extends Component {
                 });
             }
         } else {
-            PROJECT_UNITS.map(project => {
+            sectionData.map(project => {
                 projectArray.push(
-                    <Option key={project.value} value={project.value}>
-                        {project.value}
+                    <Option key={project.Name} Name={project.Name}>
+                        {project.Name}
                     </Option>
                 );
             });
@@ -85,19 +88,21 @@ class Filter extends Component {
     // 项目选择函数
     onSelectChange (value) {
         const {
-            form: { setFieldsValue }
+            form: { setFieldsValue },
+            platform: { tree = {} }
         } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         setFieldsValue({
             searcSection: ''
         });
         let sectionArray = [];
-        PROJECT_UNITS.map(project => {
-            if (project.value === value) {
-                let units = project.units;
+        sectionData.map(project => {
+            if (project.Name === value) {
+                let units = project.children;
                 units.map(unit => {
                     sectionArray.push(
-                        <Option key={unit.code} value={unit.code}>
-                            {unit.value}
+                        <Option key={unit.No} value={unit.No}>
+                            {unit.Name}
                         </Option>
                     );
                 });

@@ -37,7 +37,6 @@ export default class AddMember extends Component {
         }
         let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
         totalUserData = JSON.parse(totalUserData);
-        console.log('totalUserData', totalUserData);
         if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
 
         } else {
@@ -80,7 +79,6 @@ export default class AddMember extends Component {
         } else {
             sections = this.sections;
         }
-        console.log('sections', sections);
         try {
             let postdata = {};
             postdata = {
@@ -90,7 +88,6 @@ export default class AddMember extends Component {
             };
 
             let users = await getUsers({}, postdata);
-            console.log('users', users);
             this.setState({
                 users
             });
@@ -120,7 +117,6 @@ export default class AddMember extends Component {
             users,
             RelationMem
         } = this.state;
-        console.log('RelationMem', RelationMem);
         return (
             <div>
                 <Modal
@@ -195,7 +191,6 @@ export default class AddMember extends Component {
             curingGroupMans
         } = this.props;
         let checked = e.target.checked;
-        console.log('user', user);
         try {
             let pk = user.id;
             let checkUserId = '';
@@ -204,7 +199,6 @@ export default class AddMember extends Component {
                     checkUserId = userData && userData.ID;
                 }
             });
-            console.log('checkUserId', checkUserId);
             if (checked) {
                 try {
                     if (checkUserId) {
@@ -215,7 +209,6 @@ export default class AddMember extends Component {
                             'FullName': user.account.person_name || user.username // 用户姓名
                         };
                         let addData = await postCuringGroupMan({}, postAddData);
-                        console.log('addData', addData);
                         if (addData && addData.code && addData.code === 1) {
                             await this.getRelatedMans();
                             RelationMem.push(user.id);
@@ -266,7 +259,6 @@ export default class AddMember extends Component {
                         duration: 2
                     });
                 }
-                console.log('ddddddddddd', deleteData);
             }
         } catch (e) {
             console.log('ssss', e);

@@ -9,7 +9,6 @@ import {
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
-import { PROJECT_UNITS } from '../../../_platform/api';
 import '../../../Datum/components/Datum/index.less';
 import SearchInfo from './SearchInfo';
 import DetailModal from './DetailModal';
@@ -251,10 +250,14 @@ class TableInfo extends Component {
     }
     // 获取项目code
     getProjectCode (projectName) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let projectCode = '';
-        PROJECT_UNITS.map(item => {
-            if (projectName === item.value) {
-                projectCode = item.code;
+        sectionData.map(item => {
+            if (projectName === item.Name) {
+                projectCode = item.No;
             }
         });
 

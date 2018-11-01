@@ -18,7 +18,6 @@ import './index.less';
 import Preview from '../../../_platform/components/layout/Preview';
 import {
     SOURCE_API,
-    PROJECT_UNITS,
     STATIC_DOWNLOAD_API,
     WORKFLOW_CODE
 } from '../../../_platform/api';
@@ -337,10 +336,14 @@ class GeneralTable extends Component {
     }
     // 获取项目code
     getProjectCode (projectName) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let projectCode = '';
-        PROJECT_UNITS.map(item => {
-            if (projectName === item.value) {
-                projectCode = item.code;
+        sectionData.map(item => {
+            if (projectName === item.Name) {
+                projectCode = item.No;
             }
         });
 

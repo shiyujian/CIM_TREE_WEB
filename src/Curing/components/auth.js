@@ -1,21 +1,20 @@
 import './Curing.less';
-import { PROJECT_UNITS } from '_platform/api';
 import { getUser } from '_platform/auth';
 
 // 获取标段名称
-export const getSectionName = (section) => {
+export const getSectionName = (section, sectionData) => {
     let sectionName = '';
     try {
         let arr = section.split('-');
         if (arr && arr.length === 3) {
-            PROJECT_UNITS.map(project => {
-                if (project.code === arr[0]) {
-                    let units = project.units;
-                    sectionName = project.value;
+            sectionData.map(project => {
+                if (project.No === arr[0]) {
+                    let units = project.children;
+                    sectionName = project.Name;
                     units.map(unit => {
-                        if (unit.code === section) {
+                        if (unit.No === section) {
                             sectionName =
-                            sectionName + unit.value;
+                            sectionName + unit.Name;
                         }
                     });
                 }

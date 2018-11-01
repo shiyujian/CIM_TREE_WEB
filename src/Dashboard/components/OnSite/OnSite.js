@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-01 15:27:01
+ * @Last Modified time: 2018-11-01 18:27:26
  */
 import React, { Component } from 'react';
 import {
@@ -34,7 +34,6 @@ import {
     genPopUpContent,
     getIconType,
     fillAreaColor,
-    getTaskThinClassName,
     getThinClassName,
     getSectionName,
     getAreaData,
@@ -2161,6 +2160,7 @@ class OnSite extends Component {
                 // sxm: 'ATH0619'
             };
             let totalThinClass = tree.totalThinClass || [];
+            let sectionData = (tree && tree.bigTreeList) || [];
             let queryTreeData = await getTreeMess(postdata);
             let treeflowDatas = {};
             if (dashboardTreeMess === 'treeMess') {
@@ -2228,7 +2228,7 @@ class OnSite extends Component {
                 });
             }
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
-            let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData);
+            let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, sectionData);
             for (let i = 0; i < treeflowData.length; i++) {
                 let userForestData = await getForestUserDetail({id: treeflowData[i].FromUser});
                 if (userForestData && userForestData.PK) {

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { PROJECT_UNITS } from '../../../_platform/api';
 import {
     Form,
     Input,
@@ -16,8 +15,7 @@ import { getUser } from '../../../_platform/auth';
 import ResourceAddition from './ResourceAddition';
 
 const FormItem = Form.Item;
-const Search = Input.Search;
-const TabPane = Tabs.TabPane;
+const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 export default class ResourceFilter extends Component {
@@ -47,7 +45,11 @@ export default class ResourceFilter extends Component {
     }
 
     async getSection () {
-        const { leftkeycode } = this.props;
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         console.log('leftkeycode', leftkeycode);
         let user = getUser();
         let optionArray = [];
@@ -58,17 +60,17 @@ export default class ResourceFilter extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map(item => {
-                    if (code[0] === item.code) {
-                        let units = item.units;
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        let units = item.children;
                         units.map(unit => {
                             // 获取当前标段的名字
-                            if (unit.code == section) {
-                                let currentSectionName = unit.value;
+                            if (unit.No === section) {
+                                let currentSectionName = unit.Name;
                                 console.log('unitunitunit', unit);
                                 optionArray.push(
                                     <Option
-                                        key={unit.code}
+                                        key={unit.No}
                                         value={currentSectionName}
                                     >
                                         {currentSectionName}
@@ -80,13 +82,13 @@ export default class ResourceFilter extends Component {
                 });
             }
         } else {
-            PROJECT_UNITS.map(project => {
-                if (leftkeycode === project.code) {
-                    let units = project.units;
+            sectionData.map(project => {
+                if (leftkeycode === project.No) {
+                    let units = project.children;
                     units.map(d =>
                         optionArray.push(
-                            <Option key={d.value} value={d.value}>
-                                {d.value}
+                            <Option key={d.Name} value={d.Name}>
+                                {d.Name}
                             </Option>
                         )
                     );

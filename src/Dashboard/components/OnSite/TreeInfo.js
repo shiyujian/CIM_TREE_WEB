@@ -1,4 +1,4 @@
-import { PROJECT_UNITS, FOREST_API } from '_platform/api';
+import { FOREST_API } from '_platform/api';
 import moment from 'moment';
 export const getSeedlingMess = (queryTreeData, carData, nurserysData) => {
     let seedlingMess = {
@@ -53,7 +53,7 @@ export const getSeedlingMess = (queryTreeData, carData, nurserysData) => {
     return seedlingMess;
 };
 
-export const getTreeMessFun = (SmallClassName, ThinClassName, queryTreeData, nurserysData) => {
+export const getTreeMessFun = (SmallClassName, ThinClassName, queryTreeData, nurserysData, sectionData = []) => {
     // 项目code
     let land = queryTreeData.Land ? queryTreeData.Land : '';
     // 项目名称
@@ -67,15 +67,15 @@ export const getTreeMessFun = (SmallClassName, ThinClassName, queryTreeData, nur
     // 标段名称
     let sectionName = '';
 
-    PROJECT_UNITS.map(unit => {
-        if (land === unit.code) {
-            sections = unit.units;
-            landName = unit.value;
+    sectionData.map(unit => {
+        if (land === unit.No) {
+            sections = unit.children;
+            landName = unit.Name;
         }
     });
     sections.map(section => {
-        if (section.code === Section) {
-            sectionName = section.value;
+        if (section.No === Section) {
+            sectionName = section.Name;
         }
     });
     let treeMess = {

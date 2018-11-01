@@ -22,7 +22,6 @@ import {
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import { getUser, getCompanyDataByOrgCode } from '../../_platform/auth';
-import { PROJECT_UNITS } from '../../_platform/api';
 export const Datumcode = window.DeathCode.DATUM_GCYX;
 
 @connect(
@@ -83,15 +82,20 @@ export default class Redios extends Component {
     }
     componentDidMount = async () => {
         const {
+            platform: { tree = {} },
             actions: {
                 getTree,
                 getSearchRedioVisible,
                 getOrgTreeByCode,
-                setkeycode
+                setkeycode,
+                getTreeNodeList
             }
         } = this.props;
         try {
-            this.getSection();
+            if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+                await getTreeNodeList();
+            }
+            await this.getSection();
             this.setState({ loading: true });
             this.user = localStorage.getItem('QH_USER_DATA');
             this.user = JSON.parse(this.user);
@@ -114,6 +118,10 @@ export default class Redios extends Component {
 
     // 获取当前登陆用户的标段
     getSection () {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
         let sections = user.sections;
         let currentSectionName = '';
@@ -125,14 +133,14 @@ export default class Redios extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map((item) => {
-                    if (code[0] === item.code) {
-                        projectName = item.value;
-                        let units = item.units;
+                sectionData.map((item) => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        let units = item.children;
                         units.map((unit) => {
                             // 获取当前标段的名字
-                            if (unit.code === section) {
-                                currentSectionName = unit.value;
+                            if (unit.No === section) {
+                                currentSectionName = unit.Name;
                             }
                         });
                     }
