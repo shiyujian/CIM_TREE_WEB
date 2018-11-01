@@ -1619,7 +1619,8 @@ class OnSite extends Component {
         } = this.props;
         try {
             let totalThinClass = tree.totalThinClass || [];
-            let message = handleCuringTaskMess(str, taskMess, totalThinClass, curingTypes);
+            let bigTreeList = (tree && tree.bigTreeList) || [];
+            let message = handleCuringTaskMess(str, taskMess, totalThinClass, curingTypes, bigTreeList);
             let layer = this._createMarker(message);
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
             if (curingTaskPlanLayerList[eventKey]) {
@@ -1683,7 +1684,8 @@ class OnSite extends Component {
         } = this.props;
         try {
             let totalThinClass = tree.totalThinClass || [];
-            let message = handleCuringTaskMess(str, task, totalThinClass, curingTypes);
+            let bigTreeList = (tree && tree.bigTreeList) || [];
+            let message = handleCuringTaskMess(str, task, totalThinClass, curingTypes, bigTreeList);
             let layer = this._createMarker(message);
             // 因为有可能会出现多个图形的情况，所以要设置为数组，去除的话，需要遍历数组，全部去除
             if (curingTaskRealLayerList[eventKey]) {
@@ -2160,7 +2162,7 @@ class OnSite extends Component {
                 // sxm: 'ATH0619'
             };
             let totalThinClass = tree.totalThinClass || [];
-            let sectionData = (tree && tree.bigTreeList) || [];
+            let bigTreeList = (tree && tree.bigTreeList) || [];
             let queryTreeData = await getTreeMess(postdata);
             let treeflowDatas = {};
             if (dashboardTreeMess === 'treeMess') {
@@ -2194,7 +2196,7 @@ class OnSite extends Component {
                             queryTreeData.SmallClass +
                             '-' +
                             queryTreeData.ThinClass;
-                let regionData = getThinClassName(No, queryTreeData.Section, totalThinClass);
+                let regionData = getThinClassName(No, queryTreeData.Section, totalThinClass, bigTreeList);
                 SmallClassName = regionData.SmallName;
                 ThinClassName = regionData.ThinName;
             }
@@ -2228,7 +2230,7 @@ class OnSite extends Component {
                 });
             }
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
-            let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, sectionData);
+            let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
             for (let i = 0; i < treeflowData.length; i++) {
                 let userForestData = await getForestUserDetail({id: treeflowData[i].FromUser});
                 if (userForestData && userForestData.PK) {
@@ -2299,12 +2301,13 @@ class OnSite extends Component {
         } = this.state;
         let totalThinClass = tree.totalThinClass || [];
         try {
+            let bigTreeList = (tree && tree.bigTreeList) || [];
             if (data && data.features && data.features.length > 0 && data.features[0].properties) {
                 let properties = data.features[0].properties;
                 for (let i in survivalRateMarkerLayerList) {
                     this.map.removeLayer(survivalRateMarkerLayerList[i]);
                 }
-                let areaData = getThinClassName(properties.no, properties.Section, totalThinClass);
+                let areaData = getThinClassName(properties.no, properties.Section, totalThinClass, bigTreeList);
                 let iconData = {
                     geometry: {
                         coordinates: [y, x],

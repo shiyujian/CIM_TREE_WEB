@@ -1,5 +1,5 @@
 import './OnSite/OnSite.less';
-import { PROJECT_UNITS, FOREST_API } from '_platform/api';
+import { FOREST_API } from '_platform/api';
 
 export const getAreaData = async (getTreeNodeList, getThinClassList) => {
     let rst = await getTreeNodeList();
@@ -352,19 +352,19 @@ export const fillAreaColor = (index) => {
 };
 
 // 获取标段名称
-export const getSectionName = (section) => {
+export const getSectionName = (section, bigTreeList = []) => {
     let sectionName = '';
     try {
         let arr = section.split('-');
         if (arr && arr.length === 3) {
-            PROJECT_UNITS.map(project => {
-                if (project.code === arr[0]) {
-                    let units = project.units;
-                    sectionName = project.value;
+            bigTreeList.map(project => {
+                if (project.No === arr[0]) {
+                    let units = project.children;
+                    sectionName = project.Name;
                     units.map(unit => {
-                        if (unit.code === section) {
+                        if (unit.No === section) {
                             sectionName =
-                            sectionName + unit.value;
+                            sectionName + unit.Name;
                         }
                     });
                 }
@@ -392,7 +392,7 @@ export const onImgClick = (data) => {
 };
 
 // 获取任务中的标段，小班，细班名称
-export const getTaskThinClassName = (task, totalThinClass) => {
+export const getTaskThinClassName = (task, totalThinClass, bigTreeList = []) => {
     try {
         let thinClass = task.ThinClass;
         let section = task.Section;
@@ -440,7 +440,7 @@ export const getTaskThinClassName = (task, totalThinClass) => {
                                         }
                                         // 找到符合条件的数据的name
                                         let thinName = thinClass.Name;
-                                        let sectionName = getSectionName(section);
+                                        let sectionName = getSectionName(section, bigTreeList);
                                         regionSectionName = sectionName;
                                         if (index === 0) {
                                             regionThinName = regionThinName + thinName;
@@ -469,7 +469,7 @@ export const getTaskThinClassName = (task, totalThinClass) => {
 };
 
 // 获取成活率的标段，小班，细班名称
-export const getThinClassName = (thinClass, section, totalThinClass) => {
+export const getThinClassName = (thinClass, section, totalThinClass, bigTreeList = []) => {
     try {
         let thinClassList = thinClass.split(',');
         let SectionName = '';
@@ -515,7 +515,7 @@ export const getThinClassName = (thinClass, section, totalThinClass) => {
                                         }
                                         // 找到符合条件的数据的name
                                         let thinName = thinClass.Name;
-                                        let sectionName = getSectionName(section);
+                                        let sectionName = getSectionName(section, bigTreeList);
                                         SectionName = sectionName;
                                         if (index === 0) {
                                             ThinName = ThinName + thinName;
@@ -760,7 +760,7 @@ export const handleCuringTaskData = async (curingTypesData, curingTasks) => {
     return curingTaskTreeData;
 };
 
-export const handleCuringTaskMess = (str, taskMess, totalThinClass, curingTypes) => {
+export const handleCuringTaskMess = (str, taskMess, totalThinClass, curingTypes, bigTreeList) => {
     let target = str.split(',').map(item => {
         return item.split(' ').map(_item => _item - 0);
     });
@@ -776,7 +776,7 @@ export const handleCuringTaskMess = (str, taskMess, totalThinClass, curingTypes)
     if (taskMess.Status === 2) {
         status = '已上报';
     }
-    let regionData = getTaskThinClassName(taskMess, totalThinClass);
+    let regionData = getTaskThinClassName(taskMess, totalThinClass, bigTreeList);
     let sectionName = regionData.regionSectionName;
     let smallClassName = regionData.regionSmallName;
     let thinClassName = regionData.regionThinName;

@@ -663,6 +663,7 @@ export default class TaskCreateTable extends Component {
         } = this.state;
         try {
             let totalThinClass = tree.totalThinClass || [];
+            let bigTreeList = (tree && tree.bigTreeList) || [];
             let typeName = '';
             curingTypes.map((type) => {
                 if (type.ID === taskMess.CuringType) {
@@ -670,7 +671,7 @@ export default class TaskCreateTable extends Component {
                 }
             });
             let status = getTaskStatus(taskMess);
-            let regionData = getTaskThinClassName(taskMess, totalThinClass);
+            let regionData = getTaskThinClassName(taskMess, totalThinClass, bigTreeList);
             let sectionName = regionData.regionSectionName;
             let smallClassName = regionData.regionSmallName;
             let thinClassName = regionData.regionThinName;
@@ -904,6 +905,7 @@ export default class TaskCreateTable extends Component {
         }
         try {
             let totalThinClass = tree.totalThinClass || [];
+            let bigTreeList = (tree && tree.bigTreeList) || [];
             // 坐标
             let wkt = '';
             // 选择面积
@@ -937,7 +939,7 @@ export default class TaskCreateTable extends Component {
             regionArea = regionArea * 0.0015;
             // 包括的细班号
             let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
-            let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections);
+            let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections, bigTreeList);
             // let sectionBool = regionData.sectionBool;
             // if (!sectionBool) {
             //     Notification.error({
