@@ -111,7 +111,7 @@ class Addition extends Component {
                                 {getFieldDecorator('companyStatus', {
                                     rules: [
                                         {
-                                            required: {companyVisible},
+                                            required: false,
                                             message: '是否为公司'
                                         }
                                     ]
