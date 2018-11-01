@@ -121,22 +121,21 @@ class Tablelevel extends Component {
         }, {
             title: '详细地址',
             key: 3,
-            width: 120,
+            width: 200,
             dataIndex: 'Address'
         }, {
             title: '统一信用代码',
             key: 5,
-            width: 100,
+            width: 200,
             dataIndex: 'USCC'
         }, {
             title: '法人姓名',
             key: 7,
-            width: 100,
             dataIndex: 'LegalPerson'
         }, {
             title: '法人手机',
             key: 8,
-            width: 140,
+            width: 150,
             dataIndex: 'LegalPersonPhone'
         }, {
             title: '法人身份证号',
@@ -146,7 +145,6 @@ class Tablelevel extends Component {
         }, {
             title: '身份证正面',
             key: 10,
-            width: 80,
             dataIndex: 'LegalPersonCard',
             render: (text) => {
                 return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
@@ -154,7 +152,6 @@ class Tablelevel extends Component {
         }, {
             title: '身份证反面',
             key: 11,
-            width: 80,
             dataIndex: 'LegalPersonCardBack',
             render: (text) => {
                 return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
@@ -162,7 +159,6 @@ class Tablelevel extends Component {
         }, {
             title: '营业执照',
             key: 12,
-            width: 80,
             dataIndex: 'BusinessLicense',
             render: (text) => {
                 return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
@@ -170,7 +166,6 @@ class Tablelevel extends Component {
         }, {
             title: '状态',
             key: 13,
-            width: 100,
             dataIndex: 'CheckStatus',
             render: (text) => {
                 if (text === 0) {
@@ -272,7 +267,7 @@ class Tablelevel extends Component {
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <Table columns={this.columns} bordered dataSource={supplierList}
-                            scroll={{ x: 1380 }} pagination={false} rowKey='ID' />
+                            scroll={{ x: 1550 }} pagination={false} rowKey='ID' />
                         <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
                             showQuickJumper onChange={this.handlePage} />
                     </Col>
