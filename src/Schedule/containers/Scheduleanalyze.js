@@ -56,10 +56,12 @@ export default class Scheduleanalyze extends Component {
 
     async componentDidMount () {
         const {
-            actions: { getProjectList },
+            actions: { getProjectList, getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
-
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
         if (!tree.projectList) {
             let data = await getProjectList();
             if (data && data instanceof Array && data.length > 0) {
@@ -97,11 +99,7 @@ export default class Scheduleanalyze extends Component {
 
     render () {
         const {
-            sectionoption,
-            leftkeycode,
-            smallclassoption,
-            section,
-            smallclass
+            leftkeycode
         } = this.state;
         const {
             platform: { tree = {} },

@@ -2,13 +2,10 @@ import {handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 
 import safetySystemReducer, {actions as safetySystemActions} from './safetySystem';
-import dynamicReportReducer, {actions as dynamicReportActions} from './dynamicReport';
 import riskFactorReducer, {actions as riskFactorActions} from './riskFactor';
 import unbearableReducer, {actions as unbearableActions} from './unbearable';
 import riskEvaluationReducer, {actions as riskEvaluationActions} from './riskEvaluation';
-import safetyTrendReducer, {actions as  safetyTrendActions} from './safetyTrend';
-import educationRegisterReducer, {actions as educationRegisterActions} from './educationRegister';
-import educationRegistersReducer, {actions as educationRegistersActions} from './educationRegisters';
+import safetyTrendReducer, {actions as safetyTrendActions} from './safetyTrend';
 import hiddenDangerReducer, {actions as hiddenDangerActions} from './hiddenDanger';
 import trendReducer, {actions as trendActions} from './trend';
 
@@ -16,10 +13,6 @@ export default handleActions({
 	[combineActions(...actionsMap(safetySystemActions))]: (state = {}, action) => ({
 		...state,
 		safetySystem: safetySystemReducer(state.safetySystem, action),
-	}),
-	[combineActions(...actionsMap(dynamicReportActions))]: (state = {}, action) => ({
-		...state,
-		dynamicReport: dynamicReportReducer(state.dynamicReport, action),
 	}),
 	[combineActions(...actionsMap(riskFactorActions))]: (state = {}, action) => ({
 		...state,
@@ -36,14 +29,6 @@ export default handleActions({
 	[combineActions(...actionsMap(safetyTrendActions))]: (state = {}, action) => ({
 		...state,
 		safetyTrend: safetyTrendReducer(state.safetyTrend, action),
-	}),
-	[combineActions(...actionsMap(educationRegisterActions))]: (state = {}, action) => ({
-		...state,
-		educationRegister: educationRegisterReducer(state.educationRegister, action),
-	}),
-	[combineActions(...actionsMap(educationRegistersActions))]: (state = {}, action) => ({
-		...state,
-		educationRegisters: educationRegistersReducer(state.educationRegisters, action),
 	}),
 	[combineActions(...actionsMap(hiddenDangerActions))]: (state, action) => ({
 		...state,

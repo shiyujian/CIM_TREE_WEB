@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
 import {
-    FILE_API,
     base,
-    SOURCE_API,
-    DATASOURCECODE,
-    SERVICE_API,
-    PROJECT_UNITS,
     WORKFLOW_CODE
 } from '../../../_platform/api';
 import {
@@ -17,7 +12,6 @@ import {
     Upload,
     Icon,
     Table,
-    DatePicker,
     Select,
     Checkbox,
     Popconfirm,
@@ -32,9 +26,6 @@ import { getNextStates } from '../../../_platform/components/Progress/util';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const Option = Select.Option;
-const { RangePicker } = DatePicker;
-const fileTypes =
-    'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
 class AddModal extends Component {
     static propTypes = {};
     constructor (props) {
@@ -562,10 +553,13 @@ class AddModal extends Component {
 
     // 获取当前登陆用户的标段
     getSection () {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
 
         let sections = user.sections;
-        let sectionSchedule = [];
         let currentSectionName = '';
         let projectName = '';
 
@@ -576,14 +570,14 @@ class AddModal extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map(item => {
-                    if (code[0] === item.code) {
-                        projectName = item.value;
-                        let units = item.units;
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        let units = item.children;
                         units.map(unit => {
                             // 获取当前标段的名字
-                            if (unit.code == section) {
-                                currentSectionName = unit.value;
+                            if (unit.No === section) {
+                                currentSectionName = unit.Name;
                                 console.log(
                                     'currentSectionName',
                                     currentSectionName

@@ -22,7 +22,6 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
     WORKFLOW_CODE,
-    PROJECT_UNITS,
     TREETYPENO
 } from '../../../_platform/api';
 import { getNextStates } from '../../../_platform/components/Progress/util';
@@ -243,21 +242,28 @@ class Stagereporttab extends Component {
     }
     // 获取项目code
     getProjectCode (projectName) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let projectCode = '';
-        PROJECT_UNITS.map(item => {
-            if (projectName === item.value) {
-                projectCode = item.code;
+        sectionData.map(item => {
+            if (projectName === item.Name) {
+                projectCode = item.No;
             }
         });
-
+        console.log('projectCode', projectCode);
         return projectCode;
     }
     // 获取当前登陆用户的标段
     getSection () {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
 
         let sections = user.sections;
-        let sectionSchedule = [];
         let currentSectionName = '';
         let projectName = '';
 
@@ -268,16 +274,16 @@ class Stagereporttab extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map(item => {
-                    if (code[0] === item.code) {
-                        projectName = item.value;
-                        let units = item.units;
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        let units = item.children;
                         units.map(unit => {
                             // 获取当前标段的名字
-                            if (unit.code == section) {
-                                currentSectionName = unit.value;
+                            if (unit.No === section) {
+                                currentSectionName = unit.Name;
                                 console.log(
-                                    'currentSectionName',
+                                    'currentSectionNameaaaaaaaaaaaaaaaaa',
                                     currentSectionName
                                 );
                                 console.log('projectName', projectName);

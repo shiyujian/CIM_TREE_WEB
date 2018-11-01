@@ -3,7 +3,6 @@ import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
 import {
-    PROJECT_UNITS,
     TREETYPENO,
     ECHARTSCOLOR,
     SCHEDULRPROJECT
@@ -187,27 +186,27 @@ export default class Warning extends Component {
         const {
             etime,
             stime,
-            // project,
             treetypeAll
         } = this.state;
-        const { leftkeycode } = this.props;
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let patams = {
             etime: etime,
             stime: stime
-            // project:project
         };
-        console.log('LeftTopaaaaa', patams);
         this.setState({
             loading: true
         });
         const {
-            actions: { progressdata, progressalldata }
+            actions: { progressalldata }
         } = this.props;
         let gpshtnum = [];
         let times = [];
         let time = [];
         let legend = ['总数'];
-        let total = [];
         let datas = [];
         progressalldata({}, patams).then(rst => {
             console.log('LeftTop', rst);
@@ -218,7 +217,6 @@ export default class Warning extends Component {
                         content.push(item);
                     }
                 });
-                // let content = rst.content.filter((item)=> item.ProgressType && item.ProgressType==='日实际')
                 // 将获取的数据按照 ProgressTime 时间排序
                 content.sort(function (a, b) {
                     if (a.ProgressTime < b.ProgressTime) {
@@ -229,7 +227,6 @@ export default class Warning extends Component {
                         return 0;
                     }
                 });
-                console.log('LeftTopcontent', content);
                 // 将 ProgressTime 单独列为一个数组
                 for (let i = 0; i < content.length; i++) {
                     let a = moment(content[i].ProgressTime).format(
@@ -250,11 +247,11 @@ export default class Warning extends Component {
                 console.log('LeftTopdatas', datas);
 
                 if (content && content instanceof Array) {
-                    PROJECT_UNITS.map(project => {
+                    sectionData.map(project => {
                         // 获取正确的项目
-                        if (leftkeycode.indexOf(project.code) > -1) {
+                        if (leftkeycode.indexOf(project.No) > -1) {
                             // 获取项目下的标段
-                            let sections = project.units;
+                            let sections = project.children;
                             // 将各个标段的数据设置为0
                             sections.map((section, index) => {
                                 // 定义一个二维数组，分为多个标段
@@ -262,13 +259,13 @@ export default class Warning extends Component {
                                 datas.map(projectData => {
                                     projectData.value[index] = new Array();
                                 });
-                                legend.push(section.value);
+                                legend.push(section.Name);
                             });
 
                             content.map(item => {
                                 if (item && item.UnitProject) {
                                     sections.map((section, index) => {
-                                        if (item.UnitProject === section.code) {
+                                        if (item.UnitProject === section.No) {
                                             gpshtnum[index].push(item);
                                         }
                                     });

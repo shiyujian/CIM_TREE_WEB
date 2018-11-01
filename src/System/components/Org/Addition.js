@@ -14,7 +14,6 @@ class Addition extends Component {
         };
     }
     changeTitle (value) {
-        console.log('value', value);
         const {
             actions: { changeAdditionField }
         } = this.props;
@@ -29,13 +28,14 @@ class Addition extends Component {
             addition = {},
             actions: { changeAdditionField }
         } = this.props;
-        const { type, extra_params: extra = {}, obj_type } = node || {};
         const { extra_params } = node || {};
         let companyVisible = false;
         if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
             companyVisible = true;
         }
-
+        if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
+            companyVisible = true;
+        }
         const title = Addition.getTitle(node, parent);
         let units = this.getUnits();
         return (
@@ -111,7 +111,7 @@ class Addition extends Component {
                                 {getFieldDecorator('companyStatus', {
                                     rules: [
                                         {
-                                            required: true,
+                                            required: {companyVisible},
                                             message: '是否为公司'
                                         }
                                     ]
@@ -166,17 +166,14 @@ class Addition extends Component {
                     }
                 });
             });
-            console.log('projectName', projectName);
             let units = [];
             bigTreeList.map((item) => {
                 let itemNameArr = item.Name.split('项目');
                 let name = itemNameArr[0];
-                console.log('name', name);
                 if (projectName.indexOf(name) !== -1) {
                     units = item.children;
                 }
             });
-            console.log('units', units);
             return units;
         } catch (e) {
             console.log('getUnits', e);
@@ -189,7 +186,7 @@ class Addition extends Component {
         });
     }
 
-    save () {
+    save = async () => {
         const {
             sidebar: { node = {}, parent } = {},
             addition = {},
@@ -198,7 +195,8 @@ class Addition extends Component {
                 putOrg,
                 getOrgTree,
                 changeSidebarField,
-                clearAdditionField
+                clearAdditionField,
+                changeOrgTreeDataStatus
             }
         } = this.props;
         const { extra_params: extra = {} } = node || {};
@@ -207,14 +205,16 @@ class Addition extends Component {
         if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
             companyVisible = true;
         }
-        console.log('companyVisible', companyVisible);
+        if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
+            companyVisible = true;
+        }
         const sections = addition.sections ? addition.sections.join() : [];
         this.props.form.validateFields(async (err, values) => {
             console.log('err', err);
             console.log('values', values);
             if (!err) {
                 if (parent) {
-                    postOrg(
+                    let rst = await postOrg(
                         {},
                         {
                             name: addition.name,
@@ -233,14 +233,14 @@ class Addition extends Component {
                                 obj_type: 'C_ORG'
                             }
                         }
-                    ).then(rst => {
-                        if (rst.pk) {
-                            clearAdditionField();
-                            getOrgTree({}, { depth: 3 });
-                        }
-                    });
+                    );
+                    if (rst.pk) {
+                        await clearAdditionField();
+                        await getOrgTree({}, { depth: 4 });
+                        await changeOrgTreeDataStatus(true);
+                    }
                 } else {
-                    putOrg(
+                    let rst = await putOrg(
                         { code: addition.code },
                         {
                             obj_type: 'C_ORG',
@@ -252,19 +252,19 @@ class Addition extends Component {
                                 companyStatus: companyVisible ? values.companyStatus : ''
                             }
                         }
-                    ).then(rst => {
-                        this.forceUpdate();
-                        if (rst.pk) {
-                            if (this.state.btn) {
-                                extra.sections = this.state.sections;
-                            }
-                            changeSidebarField('addition', false);
-                            parent && changeSidebarField('parent', null);
-                            addition.code && clearAdditionField();
-                            getOrgTree({}, { depth: 3 });
-                            this.forceUpdate();
+                    );
+                    await this.forceUpdate();
+                    if (rst.pk) {
+                        if (this.state.btn) {
+                            extra.sections = this.state.sections;
                         }
-                    });
+                        await changeSidebarField('addition', false);
+                        parent && await changeSidebarField('parent', null);
+                        addition.code && await clearAdditionField();
+                        await getOrgTree({}, { depth: 4 });
+                        await changeOrgTreeDataStatus(true);
+                        await this.forceUpdate();
+                    }
                 }
             }
         });

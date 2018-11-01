@@ -20,8 +20,7 @@ import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import {
-    base,
-    PROJECT_UNITS
+    base
 } from '../../../_platform/api';
 import queryString from 'query-string';
 // import {fileTypes} from '../../../_platform/store/global/file';
@@ -164,6 +163,10 @@ class OverallNormalFormRefill extends Component {
 
     // 获取当前登陆用户的标段
     getSection () {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
 
         let sections = user.sections;
@@ -176,14 +179,14 @@ class OverallNormalFormRefill extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map(item => {
-                    if (code[0] === item.code) {
-                        projectName = item.value;
-                        let units = item.units;
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        let units = item.children;
                         units.map(unit => {
                             // 获取当前标段的名字
-                            if (unit.code == section) {
-                                currentSectionName = unit.value;
+                            if (unit.No === section) {
+                                currentSectionName = unit.Name;
                                 console.log(
                                     'currentSectionName',
                                     currentSectionName

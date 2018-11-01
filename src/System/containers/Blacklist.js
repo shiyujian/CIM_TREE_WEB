@@ -25,12 +25,16 @@ import { actions } from '../store/blacklist';
     })
 )
 export default class Blacklist extends Component {
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
-            actions: { getTags, getRoles }
+            actions: { getTags, getRoles, getTreeNodeList },
+            platform: { tree = {} }
         } = this.props;
-        getTags({});
-        getRoles();
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
+        await getTags({});
+        await getRoles();
     }
     render () {
         const { Modvisible } = this.props;

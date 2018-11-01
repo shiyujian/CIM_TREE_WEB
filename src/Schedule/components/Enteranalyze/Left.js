@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
-import { Row, Col, Input, Icon, DatePicker, Select, Spin } from 'antd';
-import { Cards, SumTotal, DateImg } from '../../components';
-import { FOREST_API, TREETYPENO, PROJECT_UNITS } from '../../../_platform/api';
+import { DatePicker, Spin } from 'antd';
+import { Cards } from '../../components';
 import moment from 'moment';
-import { groupBy } from 'lodash';
 var echarts = require('echarts');
-const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 export default class Left extends Component {
@@ -105,6 +102,7 @@ export default class Left extends Component {
     // 苗木进场总数
     async query (no) {
         const {
+            platform: { tree = {} },
             leftkeycode,
             actions: { gettreetype }
         } = this.props;
@@ -112,6 +110,7 @@ export default class Left extends Component {
         if (!leftkeycode) {
             return;
         }
+        let sectionData = (tree && tree.bigTreeList) || [];
         let postdata = {};
         this.setState({
             loading: true
@@ -126,21 +125,21 @@ export default class Left extends Component {
         let data = [];
 
         if (rst && rst instanceof Array) {
-            PROJECT_UNITS.map(project => {
+            sectionData.map(project => {
                 // 获取正确的项目
-                if (leftkeycode.indexOf(project.code) > -1) {
+                if (leftkeycode.indexOf(project.No) > -1) {
                     // 获取项目下的标段
-                    let sections = project.units;
+                    let sections = project.children;
                     // 将各个标段的数据设置为0
                     sections.map((section, index) => {
                         data[index] = 0;
-                        units.push(section.value);
+                        units.push(section.Name);
                     });
 
                     rst.map(item => {
                         if (item && item.Section) {
                             sections.map((section, index) => {
-                                if (item.Section === section.code) {
+                                if (item.Section === section.No) {
                                     data[index] = data[index] + item.Num;
                                 }
                             });

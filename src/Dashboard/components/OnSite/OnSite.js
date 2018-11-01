@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-31 20:32:56
+ * @Last Modified time: 2018-11-01 15:27:01
  */
 import React, { Component } from 'react';
 import {
@@ -125,6 +125,7 @@ class OnSite extends Component {
             // 成活率选项
             survivalRateRateData: '',
             survivalRateSectionData: '',
+            switchSurvivalRateFirst: false, // 第一次切换至成活率模块时，因标段数据初始化太麻烦，所以用此字段代表未曾选择过标段数据，只需要根据成活率范围查找
             // 苗木结缘弹窗
             adoptTreeModalVisible: false,
             adoptTreeMess: '',
@@ -342,6 +343,7 @@ class OnSite extends Component {
                         [option.id]: true
                     });
                 });
+                await this.getSurvivalRateRateDataDefault();
             } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
                 await this.handleRemoveTreeMarkerLayer();
                 await this.removeTileTreeLayerBasic();
@@ -505,8 +507,7 @@ class OnSite extends Component {
                     polygonData: polygonData
                 });
             } else if (dashboardTreeMess === 'treeMess') {
-                console.log('aaaaaaaaaaaaaaaaa', dashboardTreeMess);
-                // me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
+                me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
             } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
                 me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
             } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
@@ -565,8 +566,8 @@ class OnSite extends Component {
         } else {
             this.tileTreeAdoptLayerBasic = L.tileLayer(
                 window.config.DASHBOARD_ONSITE +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Aalladopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                // '/geoserver/gwc/service/wmts?layer=xatree%3Aadopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                // '/geoserver/gwc/service/wmts?layer=xatree%3Aalladopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                '/geoserver/gwc/service/wmts?layer=xatree%3Aadopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
@@ -645,7 +646,8 @@ class OnSite extends Component {
                 });
                 this.setState({
                     survivalRateSectionData: '',
-                    survivalRateRateData: ''
+                    survivalRateRateData: '',
+                    switchSurvivalRateFirst: false
                 });
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treeAdopt') {
@@ -958,7 +960,7 @@ class OnSite extends Component {
                                                 })
                                             }
                                         </div>
-                                        
+
                                     }
                                 </div>
                             ) : ''
@@ -1431,7 +1433,6 @@ class OnSite extends Component {
         let marker = L.marker([data.Y, data.X], {
             icon: iconType
         });
-        console.log('marker', marker);
         marker.addTo(this.map);
         this.map.panTo([data.Y, data.X]);
         this.setState({
@@ -1486,7 +1487,6 @@ class OnSite extends Component {
                     checkedKeys.push(option.label);
                 }
             });
-            console.log('checkedKeys', checkedKeys);
             let checkedData = [];
             if (curingTaskSrarchData) {
                 checkedData = curingTaskSrarchData;
@@ -1734,14 +1734,28 @@ class OnSite extends Component {
             console.log('Realstr', e);
         }
     }
+    // 切换到成活率模块后对成活率标段数据进行处理
+    getSurvivalRateRateDataDefault = () => {
+        let survivalRateRateData = this.handleSurvivalRateRateData();
+        console.log('survivalRateRateData', survivalRateRateData);
+        this.setState({
+            survivalRateRateData,
+            switchSurvivalRateFirst: true
+        });
+    }
     // 成活率选择标段
     _handleSurvivalRateCheck = async (keys, info) => {
+        const {
+            switchSurvivalRateFirst
+        } = this.state;
         try {
+            console.log('keys', keys);
             let queryData = '';
             for (let i = 0; i < keys.length; i++) {
                 if (keys.length > 0 && keys[i] !== '全部') {
                     let eventKey = keys[i];
-                    if (eventKey.indexOf('-') !== -1) {
+                    let eventKeyArr = eventKey.split('-');
+                    if (eventKeyArr && eventKeyArr.length === 3) {
                         queryData = queryData + `'` + eventKey + `'`;
                         if (i < keys.length - 1) {
                             queryData = queryData + ',';
@@ -1754,7 +1768,12 @@ class OnSite extends Component {
             if (data === ',') {
                 queryData = queryData.substr(0, queryData.length - 1);
             }
-
+            // 在选择标段数据后，将首次切换至成活率字段改为false
+            if (switchSurvivalRateFirst) {
+                this.setState({
+                    switchSurvivalRateFirst: false
+                });
+            }
             this.setState({
                 survivalRateSectionData: queryData
             }, () => {
@@ -1770,13 +1789,23 @@ class OnSite extends Component {
             this.setState({
                 [option.id]: !this.state[option.id]
             }, () => {
-                this.handleSurvivalRateRateData();
+                this.getSurvivalRateRateData();
             });
         } catch (e) {
             console.log('handleSurvivalRateButton', e);
         }
     }
-    // 成活率选择成活范围后对数据进行处理
+    // 在获取成活率数据处理后，加载图层
+    getSurvivalRateRateData = () => {
+        let survivalRateRateData = this.handleSurvivalRateRateData();
+        console.log('survivalRateRateData', survivalRateRateData);
+        this.setState({
+            survivalRateRateData
+        }, () => {
+            this.addSurvivalRateLayer();
+        });
+    }
+    // 根据选择的成活范围对成活率数据进行处理
     handleSurvivalRateRateData = () => {
         let survivalRateRateData = '';
         this.survivalRateOptions.map((option) => {
@@ -1792,19 +1821,19 @@ class OnSite extends Component {
                 }
             }
         });
-        this.setState({
-            survivalRateRateData
-        }, () => {
-            this.addSurvivalRateLayer();
-        });
+        return survivalRateRateData;
     }
     // 成活率加载图层
     addSurvivalRateLayer = async () => {
         const {
             survivalRateSectionData,
-            survivalRateRateData
+            survivalRateRateData,
+            switchSurvivalRateFirst
         } = this.state;
         try {
+            console.log('survivalRateSectionData', survivalRateSectionData);
+            console.log('switchSurvivalRateFirst', switchSurvivalRateFirst);
+            await this.removeTileTreeLayerBasic();
             await this.removeTileTreeSurvivalRateLayer();
             let url = '';
             // 之前任意一种状态存在 都可以进行搜索
@@ -1815,11 +1844,15 @@ class OnSite extends Component {
             //     url = window.config.DASHBOARD_TREETYPE +
             //     `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
             // } else if (!survivalRateRateData && survivalRateSectionData) {
-            //     url = window.config.DASHBOARD_TREETYPE +
-            //     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})`;
+            //      url = window.config.DASHBOARD_TREETYPE +
+            //      `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})`;
             // }
-            // 只有两种状态都存在，才能进行搜索
-            if (survivalRateRateData && survivalRateSectionData) {
+            // 初次进入成活率模块，没有对标段数据进行处理，选择了范围数据直接对图层进行更改
+            if (switchSurvivalRateFirst) {
+                url = window.config.DASHBOARD_TREETYPE +
+                `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
+            } else if (survivalRateRateData && survivalRateSectionData) {
+                // 在点击过标段数据之后，只有两种状态都存在，才能进行搜索
                 url = window.config.DASHBOARD_TREETYPE +
                 `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
             }
@@ -1861,29 +1894,6 @@ class OnSite extends Component {
                         icon: iconType
                         // title: adoptTree.SXM // 如果有title字段  无法点击图标 进行查询树木信息的操作
                     });
-                    // let popupData = {
-                    //     type: 'adoptTree',
-                    //     key: adoptTree.ID,
-                    //     properties: {
-                    //         ID: adoptTree.ID,
-                    //         Aadopter: adoptTree.Aadopter,
-                    //         AdoptTime: adoptTree.AdoptTime,
-                    //         CreateTime: adoptTree.CreateTime,
-                    //         EndTime: adoptTree.EndTime,
-                    //         SXM: adoptTree.SXM,
-                    //         StartTime: adoptTree.StartTime,
-                    //         type: 'adoptTree'
-                    //     },
-                    //     geometry: {
-                    //         type: 'Point',
-                    //         coordinates: [adoptTree.Y, adoptTree.X]
-                    //     }
-                    // };
-                    // adoptTreeMarkerLayer.bindPopup(
-                    //     L.popup({ maxWidth: 240 }).setContent(
-                    //         genPopUpContent(popupData)
-                    //     )
-                    // );
                     adoptTreeMarkerLayer.addTo(this.map);
                     adoptTreeDataList[ID] = adoptTree;
                     adoptTreeMarkerLayerList[ID] = adoptTreeMarkerLayer;
@@ -2045,7 +2055,6 @@ class OnSite extends Component {
     }
     // 根据点击的地图坐标与实际树的定位进行对比,根据树节点获取树节点信息
     getSxmByLocation (x, y, that, type) {
-        console.log('type', type);
         var resolutions = [
             0.703125,
             0.3515625,

@@ -52,10 +52,12 @@ export default class Enteranalyze extends Component {
 
     async componentDidMount () {
         const {
-            actions: { getProjectList },
+            actions: { getProjectList, getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
-
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
         if (!tree.projectList) {
             let data = await getProjectList();
             if (data && data instanceof Array && data.length > 0) {

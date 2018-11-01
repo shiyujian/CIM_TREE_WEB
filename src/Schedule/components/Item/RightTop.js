@@ -3,7 +3,6 @@ import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
 import {
-    PROJECT_UNITS,
     TREETYPENO,
     ECHARTSCOLOR,
     SCHEDULRPROJECT
@@ -126,20 +125,24 @@ export default class Warning extends Component {
     }
 
     getSection () {
-        const { leftkeycode } = this.props;
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let sections = [];
-        PROJECT_UNITS.map(project => {
-            if (project.code === leftkeycode) {
-                let units = project.units;
+        sectionData.map(project => {
+            if (project.No === leftkeycode) {
+                let units = project.children;
                 units.map(unit => {
                     sections.push(
-                        <Option key={unit.code} value={unit.code}>
-                            {unit.value}
+                        <Option key={unit.No} value={unit.No}>
+                            {unit.Name}
                         </Option>
                     );
                 });
                 this.setState({
-                    currentSection: units && units[0] && units[0].code
+                    currentSection: units && units[0] && units[0].No
                 });
             }
         });
@@ -234,7 +237,11 @@ export default class Warning extends Component {
             // unitproject,
             treetypeAll
         } = this.state;
-        const { leftkeycode } = this.props;
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let params = {
             stime: stime,
             etime: etime
@@ -291,11 +298,11 @@ export default class Warning extends Component {
                 console.log('RightTopdatas', datas);
 
                 if (content && content instanceof Array) {
-                    PROJECT_UNITS.map(project => {
+                    sectionData.map(project => {
                         // 获取正确的项目
-                        if (leftkeycode.indexOf(project.code) > -1) {
+                        if (leftkeycode.indexOf(project.No) > -1) {
                             // 获取项目下的标段
-                            let sections = project.units;
+                            let sections = project.children;
                             // 将各个标段的数据设置为0
                             sections.map((section, index) => {
                                 // 定义一个二维数组，分为多个标段
@@ -308,7 +315,7 @@ export default class Warning extends Component {
                             content.map(item => {
                                 if (item && item.UnitProject) {
                                     sections.map((section, index) => {
-                                        if (item.UnitProject === section.code) {
+                                        if (item.UnitProject === section.No) {
                                             gpshtnum[index].push(item);
                                         }
                                     });
@@ -441,13 +448,15 @@ export default class Warning extends Component {
     filterProjectData () {
         const {
             times,
-            gpshtnum,
             datas,
             project,
-            treetypeAll,
             currentSection
         } = this.state;
-        const { leftkeycode } = this.props;
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
 
         // 当查不出数据时，使横坐标不为空
         let a = moment()
@@ -480,14 +489,14 @@ export default class Warning extends Component {
         });
 
         console.log('currentProjectData', currentProjectData);
-        PROJECT_UNITS.map(item => {
+        sectionData.map(item => {
             // 获取正确的项目
-            if (leftkeycode.indexOf(item.code) > -1) {
+            if (leftkeycode.indexOf(item.No) > -1) {
                 // 获取项目下的标段
-                let sections = item.units;
+                let sections = item.children;
                 // 查找当前标段
                 sections.map((section, index) => {
-                    if (section.code === currentSection) {
+                    if (section.No === currentSection) {
                         currentData = currentProjectData[index];
                     }
                 });

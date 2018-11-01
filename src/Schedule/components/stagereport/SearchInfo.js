@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-import { PROJECT_UNITS } from '../../../_platform/api';
 import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -33,7 +32,11 @@ export default class SearchInfo extends Component {
     }
 
     async getSection () {
-        const { leftkeycode } = this.props;
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         console.log('leftkeycode', leftkeycode);
         let user = getUser();
         let optionArray = [];
@@ -44,17 +47,17 @@ export default class SearchInfo extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map(item => {
-                    if (code[0] === item.code) {
-                        let units = item.units;
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        let units = item.children;
                         units.map(unit => {
                             // 获取当前标段的名字
-                            if (unit.code == section) {
-                                let currentSectionName = unit.value;
+                            if (unit.No === section) {
+                                let currentSectionName = unit.Name;
                                 console.log('unitunitunit', unit);
                                 optionArray.push(
                                     <Option
-                                        key={unit.code}
+                                        key={unit.No}
                                         value={currentSectionName}
                                     >
                                         {currentSectionName}
@@ -66,13 +69,13 @@ export default class SearchInfo extends Component {
                 });
             }
         } else {
-            PROJECT_UNITS.map(project => {
-                if (leftkeycode === project.code) {
-                    let units = project.units;
+            sectionData.map(project => {
+                if (leftkeycode === project.No) {
+                    let units = project.children;
                     units.map(d =>
                         optionArray.push(
-                            <Option key={d.value} value={d.value}>
-                                {d.value}
+                            <Option key={d.Name} value={d.Name}>
+                                {d.Name}
                             </Option>
                         )
                     );

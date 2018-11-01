@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-23 11:34:30
+ * @Last Modified time: 2018-11-01 17:20:03
  */
 /**
  *
@@ -885,10 +885,6 @@ export const MODULES = [
                     {
                         id: 'PROJECT.RISKEVALUATION',
                         name: '危险源风险评价'
-                    },
-                    {
-                        id: 'PROJECT.EDUCATIONREGISTER',
-                        name: '安全教育'
                     }
                 ]
             },

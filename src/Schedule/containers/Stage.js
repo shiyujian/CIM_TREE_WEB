@@ -49,10 +49,15 @@ export default class Stage extends Component {
     async componentDidMount () {
         const {
             actions: {
-                getScheduleTaskList
+                getScheduleTaskList,
+                getTreeNodeList
             },
             platform: { tree = {} }
         } = this.props;
+
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
 
         if (!tree.scheduleTaskList) {
             let data = await getScheduleTaskList();
@@ -131,23 +136,5 @@ export default class Stage extends Component {
             actions: { getTreeList, gettreetype }
         } = this.props;
         this.setState({ leftkeycode: keycode });
-    }
-}
-
-// 连接树children
-function getNewTreeData (treeData, curKey, child) {
-    const loop = data => {
-        data.forEach(item => {
-            if (curKey == item.No) {
-                item.children = child;
-            } else {
-                if (item.children) loop(item.children);
-            }
-        });
-    };
-    try {
-        loop(treeData);
-    } catch (e) {
-        console.log(e);
     }
 }

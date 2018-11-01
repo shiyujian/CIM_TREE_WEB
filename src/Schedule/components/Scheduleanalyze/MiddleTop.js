@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
-import { PROJECT_UNITS } from '../../../_platform/api';
+import { DatePicker, Spin } from 'antd';
 import { Cards, SumTotal, DateImg } from '../../components';
 import moment from 'moment';
-const RadioGroup = Radio.Group;
-const Option = Select.Option;
-const RadioButton = Radio.Button;
-const { RangePicker } = DatePicker;
 
 export default class MiddleTop extends Component {
     static propTypes = {};
@@ -79,16 +74,14 @@ export default class MiddleTop extends Component {
 
     async query () {
         const {
-            actions: {
-                gettreetypeAll,
-                gettreetypeSection,
-                gettreetypeSmallClass,
-                gettreetypeThinClass
+            actions: {    
+                gettreetypeSection
             },
             leftkeycode,
-            sectionoption
+            platform: { tree = {} }
         } = this.props;
         const { etime, stime } = this.state;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let param = {};
 
         param.no = leftkeycode;
@@ -110,14 +103,14 @@ export default class MiddleTop extends Component {
             rst.map(item => {
                 complete.push(item.Complete);
                 unComplete.push(item.UnComplete);
-                PROJECT_UNITS.map(project => {
+                sectionData.map(project => {
                     // 获取正确的项目
-                    if (leftkeycode.indexOf(project.code) > -1) {
+                    if (leftkeycode.indexOf(project.No) > -1) {
                         // 获取项目下的标段
-                        let sections = project.units;
+                        let sections = project.children;
                         sections.map((section, index) => {
-                            if (section.code === item.Label) {
-                                label.push(section.value);
+                            if (section.No === item.Label) {
+                                label.push(section.Name);
                             }
                         });
                     }

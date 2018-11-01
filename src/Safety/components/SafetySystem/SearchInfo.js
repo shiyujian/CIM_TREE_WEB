@@ -1,89 +1,91 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-import {FILE_API,base, SOURCE_API, DATASOURCECODE,SERVICE_API,PROJECT_UNITS,WORKFLOW_CODE } from '../../../_platform/api';
+import { WORKFLOW_CODE } from '../../../_platform/api';
 import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 class SearchInfo extends Component {
-    constructor(props) {
-		super(props);
-		this.state = {
-            optionArray:[]
-		};
-	}
+    constructor (props) {
+        super(props);
+        this.state = {
+            optionArray: []
+        };
+    }
     static propType = {};
     static layout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 18 },
     };
 
-    async componentDidMount(){
+    async componentDidMount () {
         this.getSection()
-     }
- 
- 
-     async componentDidUpdate(prevProps, prevState){
-         const {
-             leftkeycode
-         }=this.props
-         //地块修改，则修改标段
-         if(leftkeycode != prevProps.leftkeycode ){
-             this.getSection()
-         }
-     }
- 
-     async getSection(){
-         const{
-             leftkeycode
-         }=this.props
-         console.log('leftkeycode',leftkeycode)
-         let user = getUser()
-         let optionArray = []
-         let sections = user.sections
-         sections = JSON.parse(sections)
-         if(sections && sections instanceof Array && sections.length>0){
-             let section = sections[0]
-             let code = section.split('-')
-             if(code && code.length === 3){
-                //获取当前标段所在的项目
-                PROJECT_UNITS.map((item)=>{
-                    if(code[0] === item.code){
-                        let units = item.units
-                        units.map((unit)=>{
-                            //获取当前标段的名字
-                            if(unit.code == section){
-                                let currentSectionName = unit.value
-                                console.log('unitunitunit',unit)
-                                optionArray.push(<Option key={unit.code} value={currentSectionName}>{currentSectionName}</Option>)
+    }
+
+
+    async componentDidUpdate (prevProps, prevState) {
+        const {
+            leftkeycode
+        } = this.props;
+        // 地块修改，则修改标段
+        if (leftkeycode !== prevProps.leftkeycode) {
+            this.getSection();
+        }
+    }
+
+    async getSection () {
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
+        console.log('leftkeycode', leftkeycode);
+        let user = getUser();;
+        let optionArray = [];
+        let sections = user.sections;
+        sections = JSON.parse(sections);
+        if (sections && sections instanceof Array && sections.length > 0) {
+            let section = sections[0];
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map((item) => {
+                    if (code[0] === item.No) {
+                        let units = item.children;
+                        units.map((unit) => {
+                            // 获取当前标段的名字
+                            if (unit.No === section) {
+                                let currentSectionName = unit.Name;
+                                console.log('unitunitunit', unit);
+                                optionArray.push(<Option key={unit.No} value={currentSectionName}>{currentSectionName}</Option>)
                             }
                         })
 
                     }
                 })
-             }
-         }else{
-             PROJECT_UNITS.map((project)=>{
-                 if(leftkeycode === project.code){
-                     let units = project.units
-                     units.map(d =>  optionArray.push(<Option key={d.value} value={d.value}>{d.value}</Option>))
-                 }
-             })
-         }
-         this.setState({
-             optionArray:optionArray
-         })
-     }
+            }
+        } else {
+            sectionData.map((project) => {
+                if (leftkeycode === project.No) {
+                    let units = project.children;
+                    units.map(d => optionArray.push(<Option key={d.Name} value={d.Name}>{d.Name}</Option>))
+                }
+            })
+        }
+        this.setState({
+            optionArray: optionArray
+        })
+    }
 
-    render() {
+    render () {
         const {
             form: { getFieldDecorator }
-        } = this.props
-        const{
+        } = this.props;
+        const {
             optionArray
-        }=this.state
+        } = this.state;
 
         return (
             <Form>
@@ -99,7 +101,7 @@ class SearchInfo extends Component {
                                             ]
                                         })
                                             (<Select placeholder='请选择标段' allowClear>
-                                                  {optionArray}
+                                                {optionArray}
                                             </Select>)
                                     }
                                 </FormItem>
@@ -138,11 +140,11 @@ class SearchInfo extends Component {
                                                 { required: false, message: '请选择文档类型' }
                                             ]
                                         })
-                                        (<Select placeholder='请选择文档类型' >
-                                            <Option key={'安全管理体系'} value={'安全管理体系'}>安全管理体系</Option>
-                                            <Option key={'安全应急预案'} value={'安全应急预案'}>安全应急预案</Option>
-                                            <Option key={'安全专项方案'} value={'安全专项方案'}>安全专项方案</Option>
-                                        </Select>)
+                                            (<Select placeholder='请选择文档类型' >
+                                                <Option key={'安全管理体系'} value={'安全管理体系'}>安全管理体系</Option>
+                                                <Option key={'安全应急预案'} value={'安全应急预案'}>安全应急预案</Option>
+                                                <Option key={'安全专项方案'} value={'安全专项方案'}>安全专项方案</Option>
+                                            </Select>)
                                     }
                                 </FormItem>
                             </Col>
@@ -154,7 +156,7 @@ class SearchInfo extends Component {
                                                 { type: 'array', required: false, message: '请选择日期' }
                                             ]
                                         })
-                                            (<RangePicker size='default' format='YYYY-MM-DD'  style={{ width: '100%', height: '100%' }}/>)
+                                            (<RangePicker size='default' format='YYYY-MM-DD' style={{ width: '100%', height: '100%' }} />)
                                     }
                                 </FormItem>
                             </Col>
@@ -193,20 +195,19 @@ class SearchInfo extends Component {
         )
     }
 
-    query() {
-
+    query () {
         this.props.gettaskSchedule()
 
         // const{
-		// 	actions:{
-		// 		getTaskSafety
-		// 	}
+        // 	actions:{
+        // 		getTaskSafety
+        // 	}
         // }=this.props
         // let reqData={};
         // this.props.form.validateFields((err, values) => {
-		// 	console.log("安全体系报批流程", values);
+        // 	console.log("安全体系报批流程", values);
         //     console.log("err", err);
-            
+
         //     values.SSection?reqData.subject_sectionName__contains = values.SSection : '';
         //     values.SSafeName?reqData.subject_Safename__contains = values.SSafeName : '';
         //     values.SNumbercode?reqData.subject_numbercode__contains = values.SNumbercode : '';
@@ -216,7 +217,7 @@ class SearchInfo extends Component {
         //     values.SStatus?reqData.status = values.SStatus : (values.SStatus === 0? reqData.SStatus = 0 : '');
         // })
         // let tmpData = Object.assign({}, reqData);
-		// getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程},tmpData)
+        // getTaskSafety({code:WORKFLOW_CODE.安全体系报批流程},tmpData)
     }
 
     clear() {
