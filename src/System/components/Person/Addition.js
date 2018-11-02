@@ -454,7 +454,7 @@ class Addition extends Component {
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         // 用户是否为文书
         let userIsDocument = getUserIsDocument();
-
+        console.log('isSection', isSection);
         let units = this.getUnits(isSection);
         let avatar_url = '';
         let avatar_urlName;

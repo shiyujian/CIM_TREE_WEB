@@ -811,6 +811,7 @@ class Users extends Component {
             } else {
                 sectiona = node.extra_params.sections.split(',');
             }
+            console.log('sectiona', sectiona);
             getSection(sectiona);
         }
 
@@ -945,7 +946,7 @@ class Users extends Component {
         const { checkUsers } = this.props.actions;
         this.props.form.validateFields((err, values) => {
             if (err) {
-                return;
+
             } else {
                 checkUsers({}, {
                     ID: record.id + '',
@@ -1049,6 +1050,21 @@ class Users extends Component {
         if (user.is_black === 1 || user.is_black === true) {
             message.warn('用户已加入黑名单,不可编辑');
             return;
+        }
+        const {
+            sidebar: { node } = {},
+            actions: { getSection }
+        } = this.props;
+        let sectiona = [];
+        getSection(sectiona);
+        if (node.extra_params.sections) {
+            if (node.extra_params.sections instanceof Array) {
+                sectiona = node.extra_params.sections;
+            } else {
+                sectiona = node.extra_params.sections.split(',');
+            }
+            console.log('sectiona', sectiona);
+            getSection(sectiona);
         }
 
         event.preventDefault();

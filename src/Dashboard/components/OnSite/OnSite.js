@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-01 18:27:26
+ * @Last Modified time: 2018-11-02 14:22:54
  */
 import React, { Component } from 'react';
 import {
@@ -36,7 +36,6 @@ import {
     fillAreaColor,
     getThinClassName,
     getSectionName,
-    getAreaData,
     handleAreaLayerData,
     handleCoordinates,
     handleCuringTaskMess

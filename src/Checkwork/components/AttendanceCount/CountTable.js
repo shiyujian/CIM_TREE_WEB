@@ -19,8 +19,15 @@ export default class CountTable extends Component {
 
     render () {
         const { seeVisible, record } = this.state;
-        let allcheckrecord = this.props.allcheckrecord;
-        let dataSource = allcheckrecord;
+        const {
+            allcheckrecord = []
+        } = this.props;
+        console.log('allcheckrecord', allcheckrecord);
+        let dataSource = [];
+        allcheckrecord.map((data) => {
+            dataSource.push(data.user);
+        });
+        console.log('dataSource', dataSource);
         let imgs = null;
         if (record) {
             imgs = record.checkin_record.imgs;
@@ -34,16 +41,16 @@ export default class CountTable extends Component {
             <div>
                 <div>此次查询人数:</div>
                 <Table
-                    rowSelection={this.rowSelection}
-                    dataSource={dataSource}
+                    dataSource={allcheckrecord}
                     columns={this.columns}
-                    pagination={pagination}
+                    // pagination={pagination}
                     className='foresttables'
                     bordered
-                    rowKey='code'
+                    rowKey='id'
                 />
-                <Modal title='查看' visible={seeVisible}
-                    onCancel={this.handleCancel}
+                <Modal title='查看'
+                    visible={seeVisible}
+                    onCancel={this.handleCancel.bind(this)}
                     style={{ textAlign: 'center' }}
                     footer={null}
                 >
@@ -57,64 +64,137 @@ export default class CountTable extends Component {
     columns = [
         {
             title: '部门',
-            dataIndex: 'extra_params.projectName',
-            key: 'extra_params.projectName'
+            dataIndex: 'user.account.organization',
+            key: 'user.account.organization',
+            render: (text, record, index) => {
+                let organization = (record && record.user && record.user.account && record.user.account.organization) || '';
+                let company = '';
+                if (record && record.check_group && record.check_group.length > 0) {
+                    company = record.check_group[0].org_name;
+                }
+                console.log('record', record);
+                console.log('text', text);
+                return <span>{company}{organization}</span>;
+            }
         },
         {
             title: '姓名',
-            dataIndex: 'name',
-            key: 'name'
+            dataIndex: 'user.account.person_name',
+            key: 'user.account.person_name'
         },
         {
             title: '账号',
-            dataIndex: 'extra_params.type',
-            key: 'extra_params.type'
+            dataIndex: 'user.username',
+            key: 'user.username'
         },
         {
             title: '角色',
-            dataIndex: 'extra_params.role',
-            key: 'extra_params.role'
+            render: (text, record, index) => {
+                console.log('record', record);
+                console.log('text', text);
+
+                if (record && record.user && record.user.groups && record.user.groups.length > 0) {
+                    return <span>{record.user.groups[0].name}</span>;
+                }
+            }
         },
         {
             title: '职务',
-            dataIndex: 'extra_params.duty',
-            key: 'extra_params.duty'
+            dataIndex: 'user.account.title',
+            key: 'user.account.title'
         },
         {
             title: '考勤群体',
-            dataIndex: 'extra_params.group',
-            key: 'extra_params.group'
+            render: (text, record, index) => {
+                if (record && record.check_group && record.check_group.length > 0) {
+                    let name = '';
+                    record.check_group.map((group, index) => {
+                        if (index > 0) {
+                            name = ',' + name + group.name;
+                        } else {
+                            name = name + group.name;
+                        }
+                    });
+                    return name;
+                } else {
+                    return <span>/</span>;
+                }
+            }
         },
         {
             title: '上班时间',
-            dataIndex: 'extra_params.starttime',
-            key: 'extra_params.starttime'
+            dataIndex: 'checkin_record.check_time',
+            key: 'checkin_record.check_time',
+            render: (text, record, index) => {
+                if (record && record.checkin_record && record.checkin_record.check_time) {
+                    return <div style={{textAlign: 'Center'}}>
+                        <div>
+                            {moment(text).format('YYYY-MM-DD')}
+                        </div>
+                        <div>
+                            {moment(text).format('hh:mm:ss')}
+                        </div>
+                    </div>;
+                } else {
+                    return <span>/</span>;
+                }
+            }
         },
         {
             title: '下班时间',
-            dataIndex: 'extra_params.endtime',
-            key: 'extra_params.endtime'
-        },
-        {
-            title: '出勤情况',
-            dataIndex: 'extra_params.checkin',
-            key: 'extra_params.checkin'
+            dataIndex: 'checkout_record.check_time',
+            key: 'checkout_record.check_time',
+            render: (text, record, index) => {
+                if (record && record.checkout_record && record.checkout_record.check_time) {
+                    return <div style={{textAlign: 'Center'}}>
+                        <div>
+                            {moment(text).format('YYYY-MM-DD')}
+                        </div>
+                        <div>
+                            {moment(text).format('hh:mm:ss')}
+                        </div>
+                    </div>;
+                } else {
+                    return <span>/</span>;
+                }
+            }
         },
         {
             title: '状态',
-            dataIndex: 'extra_params.status',
-            key: 'extra_params.status'
+            dataIndex: 'status',
+            key: 'status',
+            render: (text) => {
+                if (text) {
+                    if (text === 1) {
+                        return <span>缺勤</span>;
+                    } else if (text === 2) {
+                        return <span>迟到</span>;
+                    } else if (text === 3) {
+                        return <span>早退</span>;
+                    } else if (text === 4) {
+                        return <span>正常</span>;
+                    } else if (text === 5) {
+                        return <span>迟到,早退</span>;
+                    }
+                } else {
+                    return <span>/</span>;
+                }
+            }
         },
         {
             title: '照片',
-            render: (record, index) => {
-                return (
-                    <div>
-                        <a onClick={this.previewFile.bind(this, record)}>
-                            查看
-                        </a>
-                    </div>
-                );
+            render: (record) => {
+                if ((record.checkin_record && record.checkin_record.imgs) || (record.checkout_record && record.checkout_record.imgs)) {
+                    return (
+                        <div>
+                            <a onClick={this.previewFile.bind(this, record)}>
+                                查看
+                            </a>
+                        </div>
+                    );
+                } else {
+                    return <span>/</span>;
+                }
             }
         }
     ];

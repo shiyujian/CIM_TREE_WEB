@@ -50,12 +50,12 @@ export default class AttendanceCount extends Component {
         });
     }
 
-    query = (queryParams) => { // 考勤查询
+    query = async (queryParams) => { // 考勤查询
         const {actions: {getCheckRecord}} = this.props;
         let params = [];
         if (queryParams) {
             for (let key in queryParams) {
-                if (queryParams[key] != undefined) {
+                if (queryParams[key]) {
                     params.push(key + '=' + encodeURI(queryParams[key]));
                 }
             }
@@ -64,13 +64,11 @@ export default class AttendanceCount extends Component {
         this.setState({
             loading: true
         });
-        getCheckRecord({params})
-            .then((data) => {
-                this.setState({
-                    allcheckrecord: data,
-                    loading: false
-                });
-            });
+        let data = await getCheckRecord({params});
+        this.setState({
+            allcheckrecord: data,
+            loading: false
+        });
     };
 
     render () {
