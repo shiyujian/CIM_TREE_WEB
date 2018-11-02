@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-23 11:34:30
+ * @Last Modified time: 2018-11-01 19:51:05
  */
 /**
  *
@@ -259,7 +259,7 @@ export const WORKFLOW_CODE = {
     审查核定流程: 'TEMPLATE_011',
     总监审查流程: 'TEMPLATE_012'
 };
-
+// 为表单管理的每个文件夹绑定流程信息
 export const FORM_WORKFLOW = [
     {
         value: '普通审查流程',
@@ -885,10 +885,6 @@ export const MODULES = [
                     {
                         id: 'PROJECT.RISKEVALUATION',
                         name: '危险源风险评价'
-                    },
-                    {
-                        id: 'PROJECT.EDUCATIONREGISTER',
-                        name: '安全教育'
                     }
                 ]
             },

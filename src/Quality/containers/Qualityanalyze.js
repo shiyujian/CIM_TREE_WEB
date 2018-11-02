@@ -13,7 +13,6 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import { Select } from 'antd';
-import { PROJECT_UNITS } from '_platform/api';
 const Option = Select.Option;
 
 @connect(
@@ -39,40 +38,24 @@ export default class Qualityanalyze extends Component {
             section: ''
         };
     }
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
             actions: { getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
-        this.biaoduan = [];
-        PROJECT_UNITS[0].units.map(item => {
-            this.biaoduan.push(item);
-        });
-        PROJECT_UNITS[1].units.map(item => {
-            this.biaoduan.push(item);
-        });
-        if (!tree.bigTreeList) {
-            getTreeNodeList();
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
         }
     }
 
     // 设置标段选项
     setSectionOption (rst) {
         if (rst instanceof Array) {
-            let sectionList = [];
             let sectionOptions = [];
-            let sectionoption = rst.map((item, index) => {
-                if (item.Section) {
-                    let sections = item.Section;
-                    sectionList.push(sections);
-                }
-            });
-            let sectionData = [...new Set(sectionList)];
-            sectionData.sort();
-            sectionData.map(sec => {
+            rst.map(sec => {
                 sectionOptions.push(
-                    <Option key={sec.code} value={sec.code}>
-                        {sec.value}
+                    <Option key={sec.No} value={sec.No}>
+                        {sec.Name}
                     </Option>
                 );
             });
@@ -121,13 +104,20 @@ export default class Qualityanalyze extends Component {
 
     // 树选择
     onSelect (value = []) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let keycode = value[0] || '';
         this.setState({ leftkeycode: keycode });
-        // 标段
-        let rst = [];
-        rst = this.biaoduan.filter(item => {
-            return item.code.indexOf(keycode) !== -1;
+
+        let children = [];
+        sectionData.map((project) => {
+            if (project.code.indexOf(keycode) !== -1) {
+                children = project.children;
+            }
         });
-        this.setSectionOption(rst);
+        // 标段
+        this.setSectionOption(children);
     }
 }

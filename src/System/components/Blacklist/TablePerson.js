@@ -11,7 +11,6 @@ import {
     Form
 } from 'antd';
 import './TableOrg.css';
-import { PROJECT_UNITS } from './../../../_platform/api';
 const { Option } = Select;
 const FormItem = Form.Item;
 class TablePerson extends Component {
@@ -46,16 +45,20 @@ class TablePerson extends Component {
         return ops;
     }
     sectiontitle (record) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let data = (tree && tree.bigTreeList) || [];
         let sectione = [];
-        for (let i = 0; i < PROJECT_UNITS.length; i++) {
-            const item = PROJECT_UNITS[i];
-            for (let j = 0; j < item.units.length; j++) {
-                const element = item.units[j];
+        for (let i = 0; i < data.length; i++) {
+            const item = data[i];
+            for (let j = 0; j < item.children.length; j++) {
+                const element = item.children[j];
                 if (record.sections) {
                     for (let z = 0; z < record.sections.length; z++) {
                         const items = record.sections[z];
-                        if (items == element.code) {
-                            sectione.push(element.value);
+                        if (items === element.No) {
+                            sectione.push(element.Name);
                         }
                     }
                 }

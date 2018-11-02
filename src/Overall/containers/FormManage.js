@@ -52,9 +52,13 @@ export default class FormManage extends Component {
     }
     async componentDidMount () {
         const {
-            actions: { getTree }
+            actions: { getTree, getTreeNodeList },
+            platform: { tree = {} }
         } = this.props;
         this.setState({ loading: true });
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
         getTree({ code: Datumcode }).then(({ children }) => {
             this.setState({ loading: false });
         });

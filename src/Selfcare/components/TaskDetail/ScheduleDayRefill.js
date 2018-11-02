@@ -19,7 +19,6 @@ import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import {
-    PROJECT_UNITS,
     TREETYPENO
 } from '../../../_platform/api';
 import queryString from 'query-string';
@@ -182,6 +181,10 @@ class ScheduleDayRefill extends Component {
 
     // 获取当前登陆用户的标段
     getSection () {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
         console.log('user', user);
         let sections = user.sections;
@@ -195,14 +198,14 @@ class ScheduleDayRefill extends Component {
                 let code = section.split('-');
                 if (code && code.length === 3) {
                     // 获取当前标段所在的项目
-                    PROJECT_UNITS.map(item => {
-                        if (code[0] === item.code) {
-                            projectName = item.value;
-                            let units = item.units;
+                    sectionData.map(item => {
+                        if (code[0] === item.No) {
+                            projectName = item.Name;
+                            let units = item.children;
                             units.map(unit => {
                                 // 获取当前标段的名字
-                                if (unit.code == section) {
-                                    sectionName = unit.value;
+                                if (unit.No === section) {
+                                    sectionName = unit.Name;
                                     console.log('sectionName', sectionName);
                                     console.log('projectName', projectName);
                                 }

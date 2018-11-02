@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
 import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
-import { PROJECT_UNITS } from '../../../_platform/api';
 import { Cards, SumTotal, DateImg } from '../../components';
 import moment from 'moment';
 const RadioGroup = Radio.Group;
@@ -69,23 +68,27 @@ export default class RightTop extends Component {
     }
 
     getSectionoption () {
-        const { leftkeycode } = this.props;
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let sectionoption = [];
 
-        PROJECT_UNITS.map(project => {
+        sectionData.map(project => {
             // 获取正确的项目
-            if (leftkeycode.indexOf(project.code) > -1) {
+            if (leftkeycode.indexOf(project.No) > -1) {
                 // 获取项目下的标段
-                let sections = project.units;
+                let sections = project.children;
                 sections.map((section, index) => {
                     sectionoption.push(
-                        <Option key={section.code} value={section.code}>
-                            {section.value}
+                        <Option key={section.No} value={section.No}>
+                            {section.Name}
                         </Option>
                     );
                 });
                 this.setState({
-                    section: sections && sections[0] && sections[0].code
+                    section: sections && sections[0] && sections[0].No
                 });
             }
         });

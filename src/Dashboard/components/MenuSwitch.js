@@ -16,7 +16,9 @@ export default class MenuSwitch extends Component {
         const {
             actions: {
                 switchDashboardAreaTreeLayer,
-                switchFullScreenState
+                switchFullScreenState,
+                switchDashboardMenuType,
+                switchDashboardCompoment
             },
             platform: {
                 tabs = {}
@@ -26,8 +28,12 @@ export default class MenuSwitch extends Component {
         if (tabs && tabs.fullScreenState) {
             fullScreenState = tabs.fullScreenState;
         }
+        // 默认选择初始图层
         await switchDashboardAreaTreeLayer('tileTreeLayerBasic');
-        console.log();
+        // 默认不选择任何菜单
+        await switchDashboardMenuType('');
+        // 默认不选择任何按钮
+        await switchDashboardCompoment('');
         const me = this;
         // 监听是否全屏 过去由F11触发的那种浏览器全屏模式和HTML5中内容的全屏模式是不一样的
         window.onresize = function () {

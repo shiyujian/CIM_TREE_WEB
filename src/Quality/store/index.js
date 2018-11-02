@@ -2,18 +2,14 @@ import { actionsMap } from '_platform/store/util';
 import itemReducer, { actions as itemActions } from './item';
 import cellReducer, { actions as cellActions } from './cell';
 import inspectionReducer, { actions as inspectionActions } from './inspection';
-// import evaluateReducer, {actions as evaluateActions} from'./evaluate';
 import cellsReducer, { actions as cellsActions } from './cells';
-import monitoringReducer, { actions as monitoringActions } from './monitoring';
 import defectReducer, { actions as defectActions } from './defect';
-import subitemReducer, { actions as subitemActions } from './defect';
+import faithInfoReducer, { actions as faithActions } from './faithInfo';
 
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
-import { createFetchActionWithHeaders } from './fetchAction';
-//
-import faithInfoReducer, { actions as faithActions } from './faithInfo';
-import { FOREST_API, WORKFLOW_API, WORKFLOW_CODE } from '_platform/api';
+
+import { FOREST_API, WORKFLOW_API } from '_platform/api';
 const ID = 'faithanazly';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
@@ -239,10 +235,6 @@ export default handleActions(
             ...state,
             inspection: inspectionReducer(state.inspection, action)
         }),
-        // [combineActions(...actionsMap(evaluateActions))]: (state = {}, action) => ({
-        //     ...state,
-        //     evaluate: evaluateReducer(state.evaluate, action),
-        // }),
         [combineActions(...actionsMap(cellsActions))]: (
             state = {},
             action
@@ -250,26 +242,12 @@ export default handleActions(
             ...state,
             cells: cellsReducer(state.cells, action)
         }),
-        [combineActions(...actionsMap(monitoringActions))]: (
-            state = {},
-            action
-        ) => ({
-            ...state,
-            monitoring: monitoringReducer(state.monitoring, action)
-        }),
         [combineActions(...actionsMap(defectActions))]: (
             state = {},
             action
         ) => ({
             ...state,
             defect: defectReducer(state.defect, action)
-        }),
-        [combineActions(...actionsMap(subitemActions))]: (
-            state = {},
-            action
-        ) => ({
-            ...state,
-            subitem: subitemReducer(state.subitem, action)
         }),
         [getTreeOK]: (state, { payload }) => {
             return {

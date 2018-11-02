@@ -915,8 +915,9 @@ export default class TaskStatisTable extends Component {
             }
         } = this.props;
         try {
+            let bigTreeList = (tree && tree.bigTreeList) || [];
             let totalThinClass = tree.totalThinClass || [];
-            let regionData = getTaskThinClassName(task, totalThinClass);
+            let regionData = getTaskThinClassName(task, totalThinClass, bigTreeList);
             console.log('regionData', regionData);
             task.sectionName = regionData.regionSectionName || '';
             task.smallClassName = regionData.regionSmallName || '';

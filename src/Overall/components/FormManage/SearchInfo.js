@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
-import moment from 'moment';
-import {PROJECT_UNITS} from '../../../_platform/api';
 import { getUser } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -36,9 +34,9 @@ class SearchInfo extends Component {
 
     async getSection () {
         const {
-            leftkeycode
+            platform: { tree = {} }
         } = this.props;
-        console.log('leftkeycode', leftkeycode);
+        let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
         let optionArray = [];
         let sections = user.sections;
@@ -49,27 +47,27 @@ class SearchInfo extends Component {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
-                PROJECT_UNITS.map((item) => {
-                    if (code[0] === item.code) {
-                        let units = item.units;
+                sectionData.map((item) => {
+                    if (code[0] === item.No) {
+                        let units = item.children;
                         units.map((unit) => {
                             // 获取当前标段的名字
-                            if (unit.code == section) {
-                                let currentSectionName = unit.value;
-                                optionArray.push(<Option key={unit.code} value={currentSectionName}>{currentSectionName}</Option>);
+                            if (unit.No === section) {
+                                let currentSectionName = unit.Name;
+                                optionArray.push(<Option key={unit.No} value={currentSectionName}>{currentSectionName}</Option>);
                             }
                         });
                     }
                 });
             }
         } else {
-            PROJECT_UNITS.map((project) => {
-                if (project && project.units && project.units.length > 0) {
-                    let units = project.units;
+            sectionData.map((project) => {
+                if (project && project.children && project.children.length > 0) {
+                    let units = project.children;
                     units.map((unit) => {
-                        if (nameArr.indexOf(unit.value) == -1) {
-                            optionArray.push(<Option key={unit.code} value={unit.value}>{unit.value}</Option>);
-                            nameArr.push(unit.value);
+                        if (nameArr.indexOf(unit.Name) === -1) {
+                            optionArray.push(<Option key={unit.No} value={unit.Name}>{unit.Name}</Option>);
+                            nameArr.push(unit.Name);
                         }
                     });
                 }
@@ -79,16 +77,6 @@ class SearchInfo extends Component {
             optionArray: optionArray
         });
     }
-
-    // async componentDidUpdate (prevProps, prevState) {
-    //     const {
-    //         selectedDir
-    //     } = this.props;
-
-    //     if (selectedDir != prevProps.selectedDir) {
-    //         this.clear();
-    //     }
-    // }
 
     render () {
         const {

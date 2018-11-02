@@ -3,15 +3,8 @@ import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
-import ContainerRouters from '_platform/components/panels/ContainerRouters';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { actions as actions2 } from './store/cells';
-import { actions as actions3 } from './store/subitem';
 import { Icon } from 'react-fa';
-import { getUser } from '_platform/auth';
-import { message } from 'antd';
-class Quality extends Component {
+export default class Quality extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -22,56 +15,9 @@ class Quality extends Component {
     async componentDidMount () {
         const { default: reducer } = await import('./store');
         const Containers = await import('./containers');
-        console.log('Containers', Containers);
         injectReducer('quality', reducer);
         this.setState({
             ...Containers
-        });
-        let { getUserById } = this.props.cellActions;
-        getUserById({ pk: getUser().id }).then(rst => {
-            let orgcode;
-            try {
-                orgcode = rst.account.org_code;
-                if (!orgcode) {
-                    // message.error('当前用户无组织部门');
-                    return;
-                }
-            } catch (e) {
-                return;
-            }
-            let { fetchRootOrg } = this.props.hyjActions;
-            fetchRootOrg({ code: orgcode }).then(rst => {
-                console.log('当前用户组织结构反转', rst);
-                // if (rst.children[0].name.indexOf('监理')>=0) {
-                // 	this.setState({ dwysjl: true });
-                // 	//message.info('当前登录为监理单位');
-                // }
-                if (rst.name.indexOf('监理') >= 0) {
-                    this.setState({ dwysjl: true });
-                    // message.info('当前登录为监理单位');
-                }
-                // if (rst.children[0].name.indexOf('施工')>=0) {
-                // 	//message.info('当前登录为施工单位');
-                // }
-                if (rst.name.indexOf('施工') >= 0) {
-                    // message.info('当前登录为施工单位');
-                }
-            });
-            console.log(rst);
-            let have = false;
-            if (rst) {
-                console.log(rst);
-                if (rst && rst.groups) {
-                    rst.groups.forEach(ele => {
-                        if (ele.name.indexOf('监理') >= 0) {
-                            have = true;
-                        }
-                    });
-                }
-            }
-            if (have) {
-                this.setState({ dwysjl: true });
-            }
         });
     }
     render () {
@@ -118,26 +64,8 @@ class Quality extends Component {
         );
     }
 }
-export default connect(
-    state => {
-        const { item = {} } = state.quality || {};
-        return item;
-    },
-    dispatch => ({
-        cellActions: bindActionCreators({ ...actions2 }, dispatch),
-        hyjActions: bindActionCreators({ ...actions3 }, dispatch)
-    })
-)(Quality);
 
 const menus = [
-    // {
-    //     key: 'search',
-    //     name: '质量评分',
-    //     id: 'QUALITY.SEARCH',
-    //     exact: true,
-    //     path: '/quality/search',
-    //     icon: <Icon name='tasks' />
-    // },
     {
         key: 'appraising',
         id: 'QUALITY.APPRAISING',

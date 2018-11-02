@@ -29,15 +29,12 @@ export default class GetMenuTree extends Component {
             }
         } = this.props;
         if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
-            console.log('tree.thinClassTree');
             await getAreaTreeLoading(false);
             await getSurvivalRateTreeLoading(false);
         } else if (tree && tree.onSiteThinClassTree && tree.onSiteThinClassTree instanceof Array && tree.onSiteThinClassTree.length > 0) {
-            console.log('tree.onSiteThinClassTree');
             await getAreaTreeLoading(false);
             await getSurvivalRateTreeLoading(false);
         } else {
-            console.log('loadAreaData');
             await this.loadAreaData();
         }
         if (treetypesTree && treetypesTree instanceof Array && treetypesTree.length > 0) {
@@ -75,7 +72,6 @@ export default class GetMenuTree extends Component {
             }
         } = this.props;
         try {
-            console.log('111111');
             // loading开始
             await getAreaTreeLoading(true);
             await getSurvivalRateTreeLoading(true);
@@ -106,7 +102,6 @@ export default class GetMenuTree extends Component {
             }
         } = this.props;
         try {
-            console.log('22222');
             // loading开始
             await getTreetypesTreeLoading(true);
             let treeTypesTreeData = [];
@@ -167,7 +162,6 @@ export default class GetMenuTree extends Component {
             }
         } = this.props;
         try {
-            console.log('3333333');
             // loading开始
             await getRiskTreeLoading(true);
             let content = [];
@@ -212,7 +206,6 @@ export default class GetMenuTree extends Component {
             }
         } = this.props;
         try {
-            console.log('444444444');
             // loading开始
             await getTrackTreeLoading(true);
             let routes = await getInspectRouter({}, {status: 2});
@@ -237,7 +230,6 @@ export default class GetMenuTree extends Component {
             curingTypes
         } = this.props;
         try {
-            console.log('555555');
             // loading开始
             await getCuringTaskTreeLoading(true);
             let curingTypesData = [];
@@ -267,7 +259,6 @@ export default class GetMenuTree extends Component {
                 if (data2 && data2.content) {
                     curingTasks = curingTasks.concat(data2.content);
                 }
-                console.log('curingTasks', curingTasks);
                 curingTaskTreeData = await handleCuringTaskData(curingTypesData, curingTasks);
             }
             await getCuringTaskTree(curingTaskTreeData);

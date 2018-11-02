@@ -10,7 +10,7 @@ import {
     Upload
 } from 'antd';
 import './PersonModify.less';
-import { PROJECT_UNITS, STATIC_UPLOAD_API } from '_platform/api';
+import { STATIC_UPLOAD_API } from '_platform/api';
 
 const { Option, OptGroup } = Select;
 const FormItem = Form.Item;
@@ -34,7 +34,8 @@ class PersonModify extends Component {
         const {
             form: { getFieldDecorator },
             actions: { changeAdditionField },
-            tags = []
+            tags = [],
+            platform: { tree = {} }
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         let roles = [];
@@ -42,11 +43,12 @@ class PersonModify extends Component {
             roles.push(ese.name);
         });
         let sectio = [];
-        PROJECT_UNITS.map(ies => {
-            ies.units.map(ies1 => {
+        let sectionData = (tree && tree.bigTreeList) || [];
+        sectionData.map(ies => {
+            ies.children.map(ies1 => {
                 addition.sections.map(ie => {
-                    if (ies1.code == ie) {
-                        sectio.push(ies1.value);
+                    if (ies1.No === ie) {
+                        sectio.push(ies1.Name);
                     }
                 });
             });

@@ -90,7 +90,6 @@ export default class TaskTeamTable extends Component {
                 });
             });
         }
-        console.log('dataSource', dataSource);
         return dataSource;
     }
     _addMemberModal () {

@@ -8,7 +8,6 @@ import {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions, ID } from '../store/cell';
-import { PROJECT_UNITS } from '_platform/api';
 import { actions as platformActions } from '_platform/store/global';
 import PkCodeTree from '../components/PkCodeTree';
 import { Table, Chart } from '../components/Appraising';
@@ -76,27 +75,21 @@ export default class Appraising extends Component {
         );
     }
 
-    componentDidMount () {
-        this.biaoduan = [];
-        for (let i = 0; i < PROJECT_UNITS.length; i++) {
-            PROJECT_UNITS[i].units.map(item => {
-                this.biaoduan.push(item);
-            });
-        }
+    componentDidMount = async () => {
         const {
             actions: { getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
-        if (!tree.bigTreeList) {
-            getTreeNodeList();
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
         }
     }
     generateSectionList (sections) {
         let sectionList = [];
         sections.map(item => {
             sectionList.push(
-                <Option key={item.code} value={item.code}>
-                    {item.value}
+                <Option key={item.No} value={item.No}>
+                    {item.Name}
                 </Option>
             );
         });
@@ -104,23 +97,20 @@ export default class Appraising extends Component {
     }
 
     onSelect (value = []) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let code = value[0] || '';
         let user = getUser();
         let sections = JSON.parse(user.sections);
-        let rst = [];
-        if (sections.length === 0) {
-            rst = this.biaoduan.filter(item => {
-                return item.code.indexOf(code) !== -1;
-            });
-        } else {
-            rst = this.biaoduan.filter(item => {
-                return (
-                    item.code.indexOf(code) !== -1 &&
-                    sections.indexOf(item.code) !== -1
-                );
-            });
-        }
-        let sectionList = this.generateSectionList(rst);
+        let children = [];
+        sectionData.map((project) => {
+            if (project.code.indexOf(code) !== -1) {
+                children = project.children;
+            }
+        });
+        let sectionList = this.generateSectionList(children);
         this.setState({ code, sectionList });
     }
 }

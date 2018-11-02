@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Input, Steps } from 'antd';
-import { FOREST_API, PROJECT_UNITS } from '_platform/api';
+import { FOREST_API } from '_platform/api';
 import styles from './style.css';
 import moment from 'moment';
 const Step = Steps.Step;
@@ -64,18 +64,22 @@ export default class RiskDetail extends Component {
     }
 
     _handleSection (section) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let data = '';
         if (section) {
             try {
                 let arr = section.split('-');
                 if (arr && arr.length === 3) {
-                    PROJECT_UNITS.map((project) => {
-                        if (project.code === arr[0]) {
-                            let units = project.units;
-                            data = project.value;
+                    sectionData.map((project) => {
+                        if (project.No === arr[0]) {
+                            let units = project.children;
+                            data = project.Name;
                             units.map((unit) => {
-                                if (unit.code === section) {
-                                    data = data + unit.value;
+                                if (unit.No === section) {
+                                    data = data + unit.Name;
                                 }
                             });
                         }

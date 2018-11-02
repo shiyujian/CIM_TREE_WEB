@@ -12,35 +12,62 @@ export default class Tree extends Component {
             listVisible: true
         };
     }
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
-            actions: { getOrgTree, changeSidebarField }
+            actions: { getOrgTree }
         } = this.props;
-        getOrgTree({}, { depth: 4 }).then(rst => {
+        await getOrgTree({}, { depth: 4 });
+        await this.getOrgDataList();
+        // .then(rst => {
+        //     let dataList = [];
+        //     if (rst && rst.children) {
+        //         dataList = rst.children.filter(item => {
+        //             if (item.name !== '供应商' && item.name !== '苗圃基地') {
+        //                 return item;
+        //             }
+        //         });
+        //         this.setState({
+        //             dataList
+        //         });
+        //         this.getList(dataList);
+        //     }
+        //     const { children: [first] = [] } = rst || {};
+        //     this.setState({ list: this.filiter(rst.children) });
+        //     if (first) {
+        //         changeSidebarField('node', { ...first, type: 'project' });
+        //     }
+        // });
+    }
+
+    getOrgDataList = async () => {
+        const {
+            platform: { org: { children = [] } = {} },
+            actions: {
+                changeOrgTreeDataStatus
+            }
+        } = this.props;
+        console.log('children', children);
+        try {
             let dataList = [];
-            if (rst && rst.children) {
-                dataList = rst.children.filter(item => {
-                    if (item.name !== '供应商' && item.name !== '苗圃基地') {
-                        return item;
-                    }
-                });
-                this.setState({
-                    dataList
-                });
-                this.getList(dataList);
-            }
-            const { children: [first] = [] } = rst || {};
-            this.setState({ list: this.filiter(rst.children) });
-            if (first) {
-                changeSidebarField('node', { ...first, type: 'project' });
-            }
-        });
+            dataList = children.filter(item => {
+                if (item.name !== '供应商' && item.name !== '苗圃基地') {
+                    return item;
+                }
+            });
+            await this.setState({
+                dataList
+            });
+            await this.getList(dataList);
+            await this.setState({ list: this.filiter(children) });
+            await changeOrgTreeDataStatus(false);
+        } catch (e) {
+            console.log('getOrgDataList', e);
+        }
     }
 
     render () {
         const { dataList } = this.state;
         const {
-            platform: { org: { children = [] } = {} },
             sidebar: { node = {} } = {}
         } = this.props;
         const { code } = node || {};
@@ -83,10 +110,17 @@ export default class Tree extends Component {
         );
     }
 
-    componentDidUpdate () {
+    componentDidUpdate = async (prevProps, prevState) => {
         const { childList, listVisible } = this.state;
+        const {
+            orgTreeDataChangeStatus = false
+        } = this.props;
         if (childList && childList.length > 0 && listVisible) {
-            this.setListStore();
+            await this.setListStore();
+        }
+        if (orgTreeDataChangeStatus && orgTreeDataChangeStatus !== prevProps.orgTreeDataChangeStatus) {
+            console.log('aaaaaaaaaaaaaaa');
+            await this.getOrgDataList();
         }
     }
     // 将二维数组传入store中
@@ -196,14 +230,18 @@ export default class Tree extends Component {
         changeSidebarField('node', org);
     }
 
-    remove () {
+    remove = async () => {
         const {
             sidebar: { node = {} } = {},
-            actions: { deleteOrg, getOrgTree }
+            actions: { deleteOrg, getOrgTree, changeOrgTreeDataStatus }
         } = this.props;
-        deleteOrg({ code: node.code }).then(rst => {
-            getOrgTree({}, { depth: 3 });
-        });
+        try {
+            await deleteOrg({ code: node.code });
+            await getOrgTree({}, { depth: 4 });
+            await changeOrgTreeDataStatus(true);
+        } catch (e) {
+            console.log('remove', e);
+        }
     }
 
     static loop = (list, code, deep = 0) => {

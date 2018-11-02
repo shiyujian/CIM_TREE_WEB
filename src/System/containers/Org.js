@@ -30,7 +30,6 @@ export default class Org extends Component {
     static propTypes = {};
 
     render () {
-        console.log('1111111111111111111111', this.props);
         return (
             <div>
                 <DynamicTitle title='组织机构' {...this.props} />

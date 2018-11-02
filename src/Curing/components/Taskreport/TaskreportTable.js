@@ -671,6 +671,7 @@ export default class TaskReportTable extends Component {
         } = this.props;
         try {
             let totalThinClass = tree.totalThinClass || [];
+            let bigTreeList = (tree && tree.bigTreeList) || [];
             let treeNodeName = taskMess.CuringMans;
             let typeName = '';
             curingTypes.map((type) => {
@@ -679,7 +680,7 @@ export default class TaskReportTable extends Component {
                 }
             });
             let status = getTaskStatus(taskMess);
-            let regionData = getTaskThinClassName(taskMess, totalThinClass);
+            let regionData = getTaskThinClassName(taskMess, totalThinClass, bigTreeList);
             let sectionName = regionData.regionSectionName;
             let smallClassName = regionData.regionSmallName;
             let thinClassName = regionData.regionThinName;
@@ -979,6 +980,7 @@ export default class TaskReportTable extends Component {
         }
         try {
             let totalThinClass = tree.totalThinClass || [];
+            let bigTreeList = (tree && tree.bigTreeList) || [];
             let taskMess = taskMessList[taskEventKey];
             if (polygonData) {
                 if (coordinates && coordinates.length <= 2) {
@@ -1002,7 +1004,7 @@ export default class TaskReportTable extends Component {
                 // 包括的细班号
                 let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
                 // let regionData = await this._getThinClassName(regionThinClass);
-                let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections);
+                let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections, bigTreeList);
                 let regionThinName = regionData.regionThinName;
                 let regionThinNo = regionData.regionThinNo;
                 let regionSectionNo = regionData.regionSectionNo;

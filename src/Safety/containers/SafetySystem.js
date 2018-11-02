@@ -32,8 +32,10 @@ export default class SafetySystem extends Component {
         };
     }
     async componentDidMount () {
-        const {actions: {getTreeList, getTreeNodeList, getScheduleTaskList}, users, treetypes, platform: {tree = {}}} = this.props;
-
+        const {actions: {getTreeNodeList, getScheduleTaskList}, platform: {tree = {}}} = this.props;
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
         if (!tree.scheduleTaskList) {
             let data = await getScheduleTaskList();
             if (data && data instanceof Array && data.length > 0) {
@@ -43,7 +45,7 @@ export default class SafetySystem extends Component {
                     leftkeycode
                 });
             }
-        }else {
+        } else {
             let data = tree.projectList;
             if (data && data instanceof Array && data.length > 0) {
                 data = data[0];

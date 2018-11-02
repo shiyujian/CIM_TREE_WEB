@@ -4,7 +4,6 @@ import { Cards, SumTotal, DateImg } from '../../components';
 import {
     FOREST_API,
     TREETYPENO,
-    PROJECT_UNITS,
     ECHARTSCOLOR
 } from '../../../_platform/api';
 import moment from 'moment';
@@ -134,15 +133,15 @@ export default class Right extends Component {
     async search (no) {
         const {
             leftkeycode,
+            platform: { tree = {} },
             actions: { gettreetype }
         } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         const {
             stime,
             etime,
             selectTreeType,
-            treeTypeSelect,
-            treeSelect,
-            treetypeAll
+            treeSelect
         } = this.state;
         let postdata = {};
 
@@ -185,23 +184,23 @@ export default class Right extends Component {
             console.log('times', times);
 
             if (rst && rst instanceof Array) {
-                PROJECT_UNITS.map(project => {
+                sectionData.map(project => {
                     // 获取正确的项目
-                    if (leftkeycode.indexOf(project.code) > -1) {
+                    if (leftkeycode.indexOf(project.No) > -1) {
                         // 获取项目下的标段
-                        let sections = project.units;
+                        let sections = project.children;
                         // 将各个标段的数据设置为0
                         sections.map((section, index) => {
                             // 定义一个二维数组，分为多个标段
                             gpshtnum[index] = new Array();
                             data[index] = new Array();
-                            legend.push(section.value);
+                            legend.push(section.Name);
                         });
 
                         rst.map(item => {
                             if (item && item.Section) {
                                 sections.map((section, index) => {
-                                    if (item.Section === section.code) {
+                                    if (item.Section === section.No) {
                                         gpshtnum[index].push(item);
                                     }
                                 });

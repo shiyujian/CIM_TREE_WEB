@@ -1,21 +1,20 @@
 import './Curing.less';
-import { PROJECT_UNITS } from '_platform/api';
 import { getUser } from '_platform/auth';
 
 // 获取标段名称
-export const getSectionName = (section) => {
+export const getSectionName = (section, sectionData) => {
     let sectionName = '';
     try {
         let arr = section.split('-');
         if (arr && arr.length === 3) {
-            PROJECT_UNITS.map(project => {
-                if (project.code === arr[0]) {
-                    let units = project.units;
-                    sectionName = project.value;
+            sectionData.map(project => {
+                if (project.No === arr[0]) {
+                    let units = project.children;
+                    sectionName = project.Name;
                     units.map(unit => {
-                        if (unit.code === section) {
+                        if (unit.No === section) {
                             sectionName =
-                            sectionName + unit.value;
+                            sectionName + unit.Name;
                         }
                     });
                 }
@@ -90,7 +89,7 @@ export const fillAreaColor = (index) => {
     return colors[index % 5];
 };
 // 获取任务中的标段，小班，细班名称
-export const getTaskThinClassName = (task, totalThinClass) => {
+export const getTaskThinClassName = (task, totalThinClass, bigTreeList) => {
     try {
         let thinClass = task.ThinClass;
         let section = task.Section;
@@ -138,7 +137,7 @@ export const getTaskThinClassName = (task, totalThinClass) => {
                                         }
                                         // 找到符合条件的数据的name
                                         let thinName = thinClass.Name;
-                                        let sectionName = getSectionName(section);
+                                        let sectionName = getSectionName(section, bigTreeList);
                                         regionSectionName = sectionName;
                                         if (index === 0) {
                                             regionThinName = regionThinName + thinName;
@@ -166,7 +165,7 @@ export const getTaskThinClassName = (task, totalThinClass) => {
     }
 };
 // 查找区域内的细班的名称
-export const getThinClassName = (regionThinClass, totalThinClass, sections) => {
+export const getThinClassName = (regionThinClass, totalThinClass, sections, bigTreeList) => {
     // 经过筛选后的细班No
     let regionThinNo = '';
     // 经过筛选后的细班Name
@@ -244,7 +243,7 @@ export const getThinClassName = (regionThinClass, totalThinClass, sections) => {
                                         smallNoList.push(smallClassNo);
                                     }
                                     let thinClassName = thinClass.Name;
-                                    let sectionName = getSectionName(section);
+                                    let sectionName = getSectionName(section, bigTreeList);
                                     regionSectionNo = section;
                                     regionSectionName = sectionName;
                                     if (index === 0) {

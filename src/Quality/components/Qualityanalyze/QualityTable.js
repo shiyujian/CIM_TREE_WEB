@@ -343,11 +343,15 @@ export default class QualityTable extends Component {
         }
     }
     getBiao (code) {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
         let str = '';
-        PROJECT_UNITS.map(item => {
-            item.units.map(single => {
-                if (single.code === code) {
-                    str = single.value;
+        sectionData.map(item => {
+            item.children.map(single => {
+                if (single.No === code) {
+                    str = single.Name;
                 }
             });
         });
