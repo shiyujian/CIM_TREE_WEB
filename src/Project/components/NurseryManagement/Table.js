@@ -107,18 +107,16 @@ class Tablelevel extends Component {
         {
             title: '苗圃名称',
             key: 0,
-            width: 120,
-            fixed: 'left',
+            width: 100,
             dataIndex: 'NurseryName'
         }, {
             title: '行政区划编码',
             key: 2,
-            width: 130,
             dataIndex: 'RegionCode'
         }, {
             title: '产地',
             key: 3,
-            width: 80,
+            width: 150,
             dataIndex: 'TreePlace'
         }, {
             title: '负责人姓名',
@@ -163,7 +161,6 @@ class Tablelevel extends Component {
             title: '操作',
             key: 10,
             width: 160,
-            fixed: 'right',
             dataIndex: 'action',
             render: (text, record) => {
                 if (this.username === 'admin') {
@@ -253,7 +250,7 @@ class Tablelevel extends Component {
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <Table columns={this.columns} bordered dataSource={nurseryList}
-                            scroll={{ x: 1300 }} pagination={false} rowKey='ID' />
+                            pagination={false} rowKey='ID' />
                         <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
                             showQuickJumper page='1' onChange={this.handlePage} />
                     </Col>
