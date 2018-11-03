@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Input, Select, Table, Modal, Form, Button, Row, Col, message } from 'antd';
+import { Input, Select, Table, Modal, Form, Button, Row, Col, Spin, message } from 'antd';
 import { getUser, formItemLayout } from '_platform/auth';
 
 const Option = Select.Option;
@@ -11,13 +11,13 @@ class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            dataList: [],
+            dataList: [], // 表格数据
+            loading: true,
             SupplierList: [], // 供应商列表
             NurseryList: [], // 苗圃列表
             supplierid: '', // 供应商ID
             nurserybaseid: '', // 苗圃ID
             showModal: false, // 新增弹窗
-            record: {}
         };
         this.Checker = ''; // 登陆用户
         this.org_code = ''; // 所在组织机构
@@ -120,11 +120,13 @@ class Tablelevel extends Component {
                         <Button style={{float: 'right'}} type='primary' onClick={this.addRelevance.bind(this)}>新增绑定</Button>
                     </Col>
                 </Row>
-                <Table columns={this.columns} bordered
-                    dataSource={dataList}
-                    pagination={false}
-                    rowKey='ID'
-                />
+                <Spin tip='Loading...' spinning={this.state.loading}>
+                    <Table columns={this.columns} bordered
+                        dataSource={dataList}
+                        pagination={false}
+                        rowKey='ID'
+                    />
+                </Spin>
                 <Modal title='新增绑定' visible={showModal}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -209,12 +211,16 @@ class Tablelevel extends Component {
     toSearch () {
         const { getNb2ss } = this.props.actions;
         const { supplierid, nurserybaseid } = this.state;
+        this.setState({
+            loading: true
+        });
         getNb2ss({}, {
             supplierid: supplierid === undefined ? '' : supplierid,
             nurserybaseid: nurserybaseid === undefined ? '' : nurserybaseid
         }).then(rep => {
             this.setState({
-                dataList: rep
+                dataList: rep,
+                loading: false
             });
         });
     }

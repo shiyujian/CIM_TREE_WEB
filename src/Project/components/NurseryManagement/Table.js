@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, message } from 'antd';
+import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { FOREST_API } from '_platform/api';
 import AddEdit from './AddEdit';
 import { getUser, formItemLayout } from '_platform/auth';
@@ -18,6 +18,7 @@ class Tablelevel extends Component {
             nurseryname: '', // 苗圃名称
             total: 0,
             page: 1,
+            loading: true,
             nurseryList: [], // 苗圃列表
             visible: false, // 新增编辑苗圃弹框
             visibleTitle: '', // 弹框标题
@@ -25,7 +26,8 @@ class Tablelevel extends Component {
             auditVisible: false, // 审核弹框
             RegionCodeList: [], // 行政区划option
             record: null,
-            LeaderCard: '', // 身份证正反面
+            imageUrl: '', // 身份证正反面
+            Leader: '', // 负责人姓名
             optionList: []
         };
         this.username = ''; // 用户名
@@ -134,15 +136,15 @@ class Tablelevel extends Component {
             title: '身份证正面',
             key: 7,
             dataIndex: 'LeaderCard',
-            render: (text) => {
-                return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
+            render: (text, record) => {
+                return text ? <a onClick={this.seeModal.bind(this, record, 'LeaderCard')}>查看</a> : '';
             }
         }, {
             title: '身份证反面',
             key: 8,
             dataIndex: 'LeaderCardBack',
-            render: (text) => {
-                return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
+            render: (text, record) => {
+                return text ? <a onClick={this.seeModal.bind(this, record, 'LeaderCardBack')}>查看</a> : '';
             }
         }, {
             title: '状态',
@@ -193,7 +195,7 @@ class Tablelevel extends Component {
         }
     ];
     render () {
-        const { status, nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, RegionCodeList, nurseryname } = this.state;
+        const { status, nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, imageUrl, record, RegionCodeList, nurseryname, Leader, textCord } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div className='table-level'>
@@ -249,10 +251,12 @@ class Tablelevel extends Component {
                 </Row>
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
-                        <Table columns={this.columns} bordered dataSource={nurseryList}
-                            pagination={false} rowKey='ID' />
-                        <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
-                            showQuickJumper page='1' onChange={this.handlePage} />
+                        <Spin tip='Loading...' spinning={this.state.loading}>
+                            <Table columns={this.columns} bordered dataSource={nurseryList}
+                                pagination={false} rowKey='ID' />
+                            <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
+                                showQuickJumper page='1' onChange={this.handlePage} />
+                        </Spin>                        
                     </Col>
                 </Row>
                 <Modal title='查看' visible={seeVisible}
@@ -260,7 +264,8 @@ class Tablelevel extends Component {
                     style={{textAlign: 'center'}}
                     footer={null}
                 >
-                    <img src={FOREST_API + '/' + LeaderCard} width='100%' height='100%' alt='图片找不到了' />
+                    <p style={{fontSize: 20}}>{Leader}&nbsp;&nbsp;{textCord}</p>
+                    <img src={FOREST_API + '/' + imageUrl} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
                 {
                     auditVisible ? <Modal title='审核' visible
@@ -318,10 +323,12 @@ class Tablelevel extends Component {
             nurseryname: ''
         });
     }
-    seeModal (LeaderCard) {
+    seeModal (record, str) {
         this.setState({
             seeVisible: true,
-            LeaderCard
+            imageUrl: record[str],
+            Leader: record.Leader,
+            textCord:  record.LeaderCardNo
         });
     }
     onSearch () {
@@ -333,12 +340,16 @@ class Tablelevel extends Component {
             size: 10,
             page
         };
+        this.setState({
+            loading: true
+        });
         getNurseryList({}, param).then((rep) => {
             if (rep.code === 200) {
                 this.setState({
                     total: rep.pageinfo.total,
                     nurseryList: rep.content,
-                    page: rep.pageinfo.page
+                    page: rep.pageinfo.page,
+                    loading: false
                 });
             }
         });

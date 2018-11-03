@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, message } from 'antd';
+import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { FOREST_API } from '_platform/api';
 import { getUser, formItemLayout } from '_platform/auth';
 import AddEdit from './AddEdit';
@@ -18,6 +18,7 @@ class Tablelevel extends Component {
             suppliername: '', // 供应商名称
             total: 0,
             page: 1,
+            loading: true,
             supplierList: [], // 供应商列表
             visible: false, // 新增编辑供应商弹框
             visibleTitle: '', // 弹框标题
@@ -26,6 +27,9 @@ class Tablelevel extends Component {
             RegionCode: '',
             RegionCodeList: [], // 行政区划option
             record: null,
+            imageUrl: '', // 图片URL
+            textCord: '', // 编码
+            LegalPerson: '', // 姓名
             optionList: []
         };
         this.Checker = '';
@@ -146,22 +150,28 @@ class Tablelevel extends Component {
             title: '身份证正面',
             key: 10,
             dataIndex: 'LegalPersonCard',
-            render: (text) => {
-                return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
+            render: (text, record) => {
+                return text ? <a onClick={this.seeModal.bind(this, record, 'LegalPersonCard', 'LegalPersonCardNo')}>查看</a> : '';
             }
         }, {
             title: '身份证反面',
             key: 11,
             dataIndex: 'LegalPersonCardBack',
-            render: (text) => {
-                return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
+            render: (text, record) => {
+                return text ? <a onClick={this.seeModal.bind(this, record, 'LegalPersonCardBack', 'LegalPersonCardNo')}>查看</a> : '';
             }
         }, {
-            title: '营业执照',
+            title: '营业执照/门面照片',
             key: 12,
             dataIndex: 'BusinessLicense',
-            render: (text) => {
-                return text ? <a onClick={this.seeModal.bind(this, text)}>查看</a> : '';
+            render: (text, record) => {
+                if (text) {
+                    return <a onClick={this.seeModal.bind(this, record, 'BusinessLicense', 'USCC')}>查看</a>
+                } else if (record.Facade) {
+                    return <a onClick={this.seeModal.bind(this, record, 'Facade', 'USCC')}>查看</a>
+                } else {
+                    return '';
+                }
             }
         }, {
             title: '状态',
@@ -210,8 +220,7 @@ class Tablelevel extends Component {
     ];
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, RegionCodeList, suppliername, status } = this.state;
-        console.log(supplierList, '列表');
+        const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, imageUrl, record, RegionCodeList, suppliername, status, textCord, LegalPerson } = this.state;
         return (
             <div className='table-level'>
                 <Row>
@@ -266,10 +275,12 @@ class Tablelevel extends Component {
                 </Row>
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
-                        <Table columns={this.columns} bordered dataSource={supplierList}
-                            scroll={{ x: 1550 }} pagination={false} rowKey='ID' />
-                        <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
-                            showQuickJumper onChange={this.handlePage} />
+                        <Spin tip='Loading...' spinning={this.state.loading}>
+                            <Table columns={this.columns} bordered dataSource={supplierList}
+                                scroll={{ x: 1550 }} pagination={false} rowKey='ID' />
+                            <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
+                                showQuickJumper onChange={this.handlePage} />
+                        </Spin>
                     </Col>
                 </Row>
                 <Modal title='查看' visible={seeVisible}
@@ -277,7 +288,8 @@ class Tablelevel extends Component {
                     style={{textAlign: 'center'}}
                     footer={null}
                 >
-                    <img src={FOREST_API + '/' + LeaderCard} width='100%' height='100%' alt='图片找不到了' />
+                    <p style={{fontSize: 20}}>{LegalPerson}&nbsp;&nbsp;{textCord}</p>
+                    <img src={FOREST_API + '/' + imageUrl} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
                 {
                     auditVisible ? <Modal title='审核' visible
@@ -358,10 +370,12 @@ class Tablelevel extends Component {
             suppliername: ''
         });
     }
-    seeModal (text) {
+    seeModal (record, str, textCord) {
         this.setState({
             seeVisible: true,
-            LeaderCard: text
+            imageUrl: record[str],
+            LegalPerson: record.LegalPerson,
+            textCord:  record[textCord]
         });
     }
     handleName (e) {
@@ -423,12 +437,16 @@ class Tablelevel extends Component {
             size: 10,
             page
         };
+        this.setState({
+            loading: true
+        });
         getSupplierList({}, param).then((rep) => {
             if (rep.code === 200) {
                 this.setState({
                     total: rep.pageinfo.total,
                     supplierList: rep.content,
-                    page: rep.pageinfo.page
+                    page: rep.pageinfo.page,
+                    loading: false
                 });
             }
         });
