@@ -133,13 +133,18 @@ class SupplyDetails extends Component {
     render () {
         const { TreeTypeName, Photo, LocalPhoto, MostPhoto, OtherPhoto, TreeDescribe, Contacter, Phone, dataList,
             UpdateTime, number, standardList, Stock, Price, TreePlace, NurseryName} = this.state;
+        let img = Photo.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        let LocalImg = LocalPhoto.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        let MostImg = MostPhoto.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        let OtherImg = OtherPhoto.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+
         return (
             <div className='supply-details' style={{padding: '0 20px'}}>
                 <Button type='primary' onClick={this.toReturn.bind(this)} style={{marginBottom: 5}}>返 回</Button>
                 <div style={{height: 200, padding: 20, border: '1px solid #ccc'}}>
                     <Row gutter={16}>
                         <Col span={6}>
-                            <img src={`${FOREST_API}/${Photo}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
+                            <img src={`${FOREST_API}/${img}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
                         </Col>
                         <Col span={5}>
                             <h2 style={{marginBottom: '0.2em'}}>{TreeTypeName}</h2>
@@ -193,16 +198,16 @@ class SupplyDetails extends Component {
                 <div style={{height: 400, padding: 20, border: '1px solid #ccc'}}>
                     <Row>
                         <Col span={6}>
-                            <img src={`${FOREST_API}/${Photo}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
+                            <img src={`${FOREST_API}/${img}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
                         </Col>
                         <Col span={6}>
-                            <img src={`${FOREST_API}/${LocalPhoto}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
+                            <img src={`${FOREST_API}/${LocalImg}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
                         </Col>
                         <Col span={6}>
-                            <img src={`${FOREST_API}/${MostPhoto}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
+                            <img src={`${FOREST_API}/${MostImg}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
                         </Col>
                         <Col span={6}>
-                            <img src={`${FOREST_API}/${OtherPhoto}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
+                            <img src={`${FOREST_API}/${OtherImg}`} alt='图片找不到了' style={{maxHeight: 150, maxWidth: 230}} />
                         </Col>
                     </Row>
                     <p>{TreeDescribe}</p>

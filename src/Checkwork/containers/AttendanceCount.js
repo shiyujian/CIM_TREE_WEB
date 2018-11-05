@@ -27,57 +27,18 @@ export default class AttendanceCount extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            allcheckrecord: [], // 考勤列表
-            loading: false
-        };
-    }
 
-    componentWillMount () {
-        this.getCheckRecord();
+        };
     }
 
     componentDidMount () {
 
     }
 
-    getCheckRecord () {
-        const { getCheckRecord } = this.props.actions; // 获取所有考勤信息
-        getCheckRecord().then(rep => {
-            this.setState({
-                allcheckrecord: rep,
-                loading: false
-            });
-        });
-    }
-
-    query = async (queryParams) => { // 考勤查询
-        const {actions: {getCheckRecord}} = this.props;
-        let params = [];
-        if (queryParams) {
-            for (let key in queryParams) {
-                if (queryParams[key]) {
-                    params.push(key + '=' + encodeURI(queryParams[key]));
-                }
-            }
-        }
-        params = params.join('&');
-        this.setState({
-            loading: true
-        });
-        let data = await getCheckRecord({params});
-        this.setState({
-            allcheckrecord: data,
-            loading: false
-        });
-    };
-
     render () {
         return (
             <div style={{overflow: 'hidden', padding: '0 20px', marginLeft: '160px', marginTop: '20px'}}>
-                <CountFilter {...this.props} {...this.state} query={this.query.bind(this)} />
-                <Spin spinning={this.state.loading} tip='数据加载中，请稍等...'>
-                    <CountTable {...this.props} {...this.state} />
-                </Spin>
+                <CountTable {...this.props} {...this.state} />
             </div>
         );
     }

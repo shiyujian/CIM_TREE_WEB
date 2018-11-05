@@ -103,19 +103,34 @@ export default class MenuSwitch extends Component {
             dashboardTreeMess,
             actions: {
                 switchDashboardTreeMess,
-                switchDashboardAreaMeasure
+                switchDashboardAreaMeasure,
+                switchDashboardAreaTreeLayer
             }
         } = this.props;
+        // 选择成活率，苗木结缘时，不能够点击树木信息开关
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
-            if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' || dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+            if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
+            dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
                 await switchDashboardTreeMess('unTreeMess');
             }
         }
+        // 选择了面积计算，就需要将树木信息取消
         if (dashboardAreaMeasure && dashboardAreaMeasure === 'areaMeasure' && dashboardAreaMeasure !== prevProps.dashboardAreaMeasure) {
             await switchDashboardTreeMess('unTreeMess');
         }
+        // 选择了树木信息，就需要将面积计算取消
         if (dashboardTreeMess && dashboardTreeMess === 'treeMess' && dashboardTreeMess !== prevProps.dashboardTreeMess) {
             await switchDashboardAreaMeasure('unAreaMeasure');
+        }
+        // 选择成活率，树种筛选，辅助验收，苗木结缘时，不能够点击图层控制开关
+        if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
+            if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
+            dashboardCompomentMenu === 'geojsonFeature_treetype' ||
+            dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement' ||
+            dashboardCompomentMenu === 'geojsonFeature_treeAdopt'
+            ) {
+                await switchDashboardAreaTreeLayer('tileTreeLayerBasic');
+            }
         }
     }
 
@@ -295,8 +310,17 @@ export default class MenuSwitch extends Component {
             actions: {
                 switchDashboardAreaTreeLayer
             },
-            dashboardAreaTreeLayer
+            dashboardAreaTreeLayer,
+            dashboardCompomentMenu
         } = this.props;
+        // 选择成活率，树种筛选，辅助验收，苗木结缘时，不能够点击图层
+        if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
+            dashboardCompomentMenu === 'geojsonFeature_treetype' ||
+            dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement' ||
+            dashboardCompomentMenu === 'geojsonFeature_treeAdopt'
+        ) {
+            return;
+        }
         let target = e.target;
         let buttonID = target.getAttribute('id');
         if (dashboardAreaTreeLayer === buttonID) {

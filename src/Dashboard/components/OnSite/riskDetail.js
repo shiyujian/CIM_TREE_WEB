@@ -19,7 +19,7 @@ export default class RiskDetail extends Component {
             if (data) {
                 let arr = data.split(',');
                 arr.map(rst => {
-                    let src = rst.replace(/\/\//g, '/');
+                    let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                     src = `${FOREST_API}/${src}`;
                     srcs.push(src);
                 });

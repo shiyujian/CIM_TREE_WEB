@@ -248,6 +248,7 @@ class OfferDetails extends Component {
         });
     }
     toSeeFile (OfferFiles, e) {
+        OfferFiles = OfferFiles.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         e.preventDefault();
         this.setState({
             showModal: true,

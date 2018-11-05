@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Row, Col, Input, Icon, DatePicker, Select, Spin } from 'antd';
 import { Cards, SumTotal, DateImg } from '../../components';
 import {
-    FOREST_API,
     TREETYPENO,
     ECHARTSCOLOR
 } from '../../../_platform/api';

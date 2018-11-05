@@ -421,7 +421,7 @@ export default class LocmeasureTable extends Component {
     }
 
     onImgClick (src) {
-        src = src.replace(/\/\//g, '/');
+        src = src.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         src = `${FOREST_API}/${src}`;
         this.setState({ src }, () => {
             this.setState({ imgvisible: true });

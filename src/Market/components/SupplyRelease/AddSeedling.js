@@ -225,6 +225,7 @@ class AddSeedling extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
+                    rep = rep.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
                         Photo: rep
@@ -245,6 +246,7 @@ class AddSeedling extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
+                    rep = rep.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
                         LocalPhoto: rep
@@ -265,6 +267,7 @@ class AddSeedling extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
+                    rep = rep.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
                         MostPhoto: rep
@@ -285,6 +288,7 @@ class AddSeedling extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
+                    rep = rep.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                     fileList[0].url = FOREST_API + '/' + rep;
                     this.setState({
                         OtherPhoto: rep

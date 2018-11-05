@@ -42,7 +42,7 @@ class Updatemodal extends Component {
             updatevisible !== prevProps.updatevisible
         ) {
             let viewUrl = oldfile.VideoPath ? oldfile.VideoPath : '';
-            viewUrl = viewUrl.replace(/\/\//g, '/');
+            viewUrl = viewUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
             viewUrl = `${FOREST_API}/${viewUrl}`;
             this.setState({
                 viewUrl: viewUrl,
@@ -219,7 +219,7 @@ class Updatemodal extends Component {
                 postForsetVideo({}, formdata).then(rst => {
                     console.log('rstrstrst', rst);
                     if (rst) {
-                        let src = rst.replace(/\/\//g, '/');
+                        let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                         src = `${FOREST_API}/${src}`;
                         this.props.form.setFieldsValue({
                             attachmentUpdate: rst

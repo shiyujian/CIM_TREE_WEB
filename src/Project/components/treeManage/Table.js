@@ -232,7 +232,7 @@ export default class Tablelevel extends Component {
         });
     }
     onImgClick (src) {
-        src = src.replace(/\/\//g, '/');
+        src = src.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         src = `${FOREST_API}/${src}`;
         this.setState({ src }, () => {
             this.setState({ imgvisible: true });
@@ -285,10 +285,7 @@ export default class Tablelevel extends Component {
             width: '5%',
             render: (text, record) => {
                 if (record.Pics != null) {
-                    let img = `${FOREST_API}/${record.Pics.replace(
-                        /\/\//g,
-                        '/'
-                    )}`;
+                    let img = `${FOREST_API}/${record.Pics.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}`;
                     // console.log('Pics',record.Pics)
                     console.log('img', img);
                     return (
@@ -384,10 +381,7 @@ export default class Tablelevel extends Component {
             key: '6',
             render: (text, record) => {
                 if (record.Pics != null) {
-                    let img = `${FOREST_API}/${record.Pics.replace(
-                        /\/\//g,
-                        '/'
-                    )}`;
+                    let img = `${FOREST_API}/${record.Pics.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}`;
                     console.log('pppp', record.Pics);
                     return (
                         <div style={{ textAlign: 'center', height: '30px' }}>

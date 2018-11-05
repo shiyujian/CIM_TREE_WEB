@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Table, Spin, Tabs, Modal, Row, Col, Select, DatePicker, Button, Input, InputNumber, Progress, message } from 'antd';
 import moment from 'moment';
 import { Cards } from '../../components';
-import { FOREST_API } from '../../../_platform/api';
 import '../index.less';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
@@ -226,50 +225,50 @@ export default class QualityTable extends Component {
         return (
             <div >
                 <Row gutter={10} style={{ margin: '5px 5px 20px 5px' }}>
-    <Col span={12} >
-    <Spin spinning={this.state.loading1}>
-    <Cards search={this.search(1)} title='各标段合格率分析'>
-                                <div id='homeContChart1' style={{ width: '100%', height: '290px', margin: '0 auto' }} />
-                            </Cards>
-                        </Spin>
-                    </Col>
                     <Col span={12} >
-    <Spin spinning={this.state.loading2}>
-    <Cards defaultValue='全部' search={this.search(2)} title={this.title()}>
-                                <div id='homeContChart2' style={{ width: '100%', height: '290px', margin: '0 auto' }} />
-                            </Cards>
-                        </Spin>
+        <Spin spinning={this.state.loading1}>
+                            <Cards search={this.search(1)} title='各标段合格率分析'>
+        <div id='homeContChart1' style={{ width: '100%', height: '290px', margin: '0 auto' }} />
+    </Cards>
+    </Spin>
+    </Col>
+                    <Col span={12} >
+                        <Spin spinning={this.state.loading2}>
+                            <Cards defaultValue='全部' search={this.search(2)} title={this.title()}>
+        <div id='homeContChart2' style={{ width: '100%', height: '290px', margin: '0 auto' }} />
+    </Cards>
+    </Spin>
                     </Col>
                 </Row>
-    <Row gutter={10} style={{ margin: '20px 5px 5px 5px' }}>
+                <Row gutter={10} style={{ margin: '20px 5px 5px 5px' }}>
+        <Col span={12} >
+                        <Spin spinning={this.state.loading3}>
+        <Cards search={this.search(3)} title='业主苗木退回分析'>
+                                <div id='homeContChart3' style={{ width: '100%', height: '290px', margin: '0 auto' }} />
+                            </Cards>
+    </Spin>
+                    </Col>
                     <Col span={12} >
-    <Spin spinning={this.state.loading3}>
-                            <Cards search={this.search(3)} title='业主苗木退回分析'>
-    <div id='homeContChart3' style={{ width: '100%', height: '290px', margin: '0 auto' }} />
-                            </Cards>
-                        </Spin>
-                    </Col>
-    <Col span={12} >
-    <Spin spinning={this.state.loading4}>
-    <Cards search={this.search(4)} title='监理苗木退回分析'>
-                                <div id='homeContChart4' style={{ width: '100%', height: '290px', margin: '0 auto' }} />
-                            </Cards>
-                        </Spin>
-                    </Col>
-                </Row>
+                        <Spin spinning={this.state.loading4}>
+        <Cards search={this.search(4)} title='监理苗木退回分析'>
+        <div id='homeContChart4' style={{ width: '100%', height: '290px', margin: '0 auto' }} />
+    </Cards>
+    </Spin>
+    </Col>
+    </Row>
             </div>
         );
     }
     search (index) {
         return <div>
-    <span>种植时间：</span>
-    <RangePicker
-    style={{ verticalAlign: 'middle' }}
-    defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]}
-                showTime={{ format: 'HH:mm:ss' }}
-                format={'YYYY/MM/DD HH:mm:ss'}
-                onChange={this.datepick.bind(this, index)}
-                onOk={this.datepickok.bind(this, index)}
+            <span>种植时间：</span>
+            <RangePicker
+                style={{ verticalAlign: 'middle' }}
+                defaultValue={[moment(this.state.stime1, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime1, 'YYYY-MM-DD HH:mm:ss')]}
+        showTime={{ format: 'HH:mm:ss' }}
+        format={'YYYY/MM/DD HH:mm:ss'}
+        onChange={this.datepick.bind(this, index)}
+        onOk={this.datepickok.bind(this, index)}
             />
         </div>;
     }
@@ -277,9 +276,9 @@ export default class QualityTable extends Component {
         const { sectionoption } = this.props;
         const { section } = this.state;
         return <div>
-    <Select value={section} onChange={this.onsectionchange.bind(this)} style={{ width: '63px' }}>
-                {sectionoption}
-            </Select>
+            <Select value={section} onChange={this.onsectionchange.bind(this)} style={{ width: '63px' }}>
+        {sectionoption}
+    </Select>
             <span>苗木退回分析</span>
         </div>;
     }

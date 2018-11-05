@@ -242,11 +242,12 @@ class PurchaseDetails extends Component {
         );
     }
     toSeeFile (record, e) {
+        let OfferFiles = record && record.OfferFiles.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         e.preventDefault();
         console.log(record, '行数据');
         this.setState({
             showSeeModal: true,
-            OfferFiles: record.OfferFiles
+            OfferFiles: OfferFiles
         });
     }
     onUpload (record, e) {

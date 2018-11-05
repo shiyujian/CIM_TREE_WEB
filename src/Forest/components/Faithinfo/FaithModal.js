@@ -1,136 +1,136 @@
-import React, {Component} from 'react';
-import {Icon, Table, Spin,Tabs,Modal,Row,Col,Select,Button,Input,InputNumber,Progress,message} from 'antd';
+import React, { Component } from 'react';
+import { Icon, Table, Spin, Tabs, Modal, Row, Col, Select, Button, Input, InputNumber, Progress, message } from 'antd';
 import moment from 'moment';
-import { FOREST_API} from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import '../index.less';
 const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 
 export default class FaithModal extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			tblData: [],
-        	pagination: {},
-        	loading: false,
+    constructor (props) {
+        super(props);
+        this.state = {
+            tblData: [],
+            pagination: {},
+            loading: false,
             loading1: true,
-        	size:10,
-        	exportsize: 100,
-        	leftkeycode: '',
-			section: '',
-    		bigType: '',
-    		treetype: '',
-    		treetypename: '',
-    		integrity: '',
-    		percent:0,
-    		factory: '',
-		}
-	}
+            size: 10,
+            exportsize: 100,
+            leftkeycode: '',
+            section: '',
+            bigType: '',
+            treetype: '',
+            treetypename: '',
+            integrity: '',
+            percent: 0,
+            factory: ''
+        };
+    }
 
-    componentWillReceiveProps(nextProps) {
-        const {honestyList = []} = nextProps;
-        console.log('honestyList',honestyList)
-        if(honestyList.length != 0){
+    componentWillReceiveProps (nextProps) {
+        const { honestyList = [] } = nextProps;
+        console.log('honestyList', honestyList);
+        if (honestyList.length != 0) {
             this.setState({
-                loading1:false
-            })
-        }else{
+                loading1: false
+            });
+        } else {
             this.setState({
-                loading1:true
-            })
+                loading1: true
+            });
         }
     }
 
-	render(){
-		const {tblData} = this.state;
-		const {
-			faith:{visibleModal} = false,
+    render () {
+        const { tblData } = this.state;
+        const {
+            faith: { visibleModal } = false,
             honestyList = [],
-            nurseryName =  ""
-		} = this.props;
-        console.log('this.props',this.props)
+            nurseryName = ''
+        } = this.props;
+        console.log('this.props', this.props);
         let newList = [];
-        honestyList.map((item,index) => {
-                item.order = index + 1;
-                newList.push(item);
-        })
-		return (
-			<Modal
-				closable = {false}
-				visible = {visibleModal}
-				onOk={this.hideModal.bind(this)}
-		        onCancel={this.hideModal.bind(this)}
-		        okText="确认"
-		        cancelText="取消"
-			>
+        honestyList.map((item, index) => {
+            item.order = index + 1;
+            newList.push(item);
+        });
+        return (
+            <Modal
+                closable={false}
+                visible={visibleModal}
+                onOk={this.hideModal.bind(this)}
+                onCancel={this.hideModal.bind(this)}
+                okText='确认'
+                cancelText='取消'
+            >
                 <Row>
                     <Col span={20}>
                         {`${nurseryName} 诚信度详情`}
                     </Col>
                     <Col span={2}>
-        				<Button type='primary' onClick={this.exportexcel.bind(this)}>
-        					导出
-        				</Button>
+                        <Button type='primary' onClick={this.exportexcel.bind(this)}>
+                            导出
+                        </Button>
                     </Col>
                 </Row>
                 <Row>
-    				<Table bordered
-    					className='foresttable'
-    					columns={this.columns}
+                    <Table bordered
+                        className='foresttable'
+                        columns={this.columns}
                         rowKey='order'
-    					loading={{tip:<Progress style={{width:200}} percent={this.state.percent} status="active" strokeWidth={5}/>,spinning:this.state.loading1}}
-    					locale={{emptyText:'当天无信息'}}
-    					dataSource={newList}
-				    />
+                        loading={{ tip: <Progress style={{ width: 200 }} percent={this.state.percent} status='active' strokeWidth={5} />, spinning: this.state.loading1 }}
+                        locale={{ emptyText: '当天无信息' }}
+                        dataSource={newList}
+                    />
                 </Row>
-			</Modal>
-		)
-	}
-	
-	columns = [{
-			title:"序号",
-			dataIndex: 'order',
-		},{
-			title:"标段",
-			dataIndex: 'Section',
-		},{
-			title:"树种",
-			dataIndex: 'TreeTypeName',
-		},{
-			title:"诚信度",
-			dataIndex: 'Sincerity',
-		}];
+            </Modal>
+        );
+    }
 
-	hideModal() {
-	    const {actions:{changeModal1}} = this.props;
-    	changeModal1(false);
-	}
+    columns = [{
+        title: '序号',
+        dataIndex: 'order'
+    }, {
+        title: '标段',
+        dataIndex: 'Section'
+    }, {
+        title: '树种',
+        dataIndex: 'TreeTypeName'
+    }, {
+        title: '诚信度',
+        dataIndex: 'Sincerity'
+    }];
 
-    exportexcel() {
+    hideModal () {
+        const { actions: { changeModal1 } } = this.props;
+        changeModal1(false);
+    }
+
+    exportexcel () {
         const {
             section = '',
             treetype = '',
-            integrity = '',
+            integrity = ''
         } = this.state;
         const {
-            actions: {getHonestyNewDetailModal, getexportFactoryAnalyseDetailInfo},
+            actions: { getHonestyNewDetailModal, getexportFactoryAnalyseDetailInfo },
             keycode = '',
-            nurseryName = '',
+            nurseryName = ''
         } = this.props;
-        
+
         let postdata = {
             factory: nurseryName
-        }
-        this.setState({loading:true,percent:0})
-        getexportFactoryAnalyseDetailInfo({},postdata)
-                .then(rst3 => {
-                    this.setState({loading:false,percent:100})
-                    window.location.href = `${FOREST_API}/${rst3}`
-                })
+        };
+        this.setState({ loading: true, percent: 0 });
+        getexportFactoryAnalyseDetailInfo({}, postdata)
+            .then(rst3 => {
+                this.setState({ loading: false, percent: 100 });
+                window.location.href = `${FOREST_API}/${rst3}`;
+            });
     }
 
-	createLink(name,url) {
-        let link = document.createElement("a");
+    createLink (name, url) {
+        let link = document.createElement('a');
         // link.download = name;
         link.href = url;
         link.setAttribute('download', name);
@@ -139,5 +139,4 @@ export default class FaithModal extends Component {
         link.click();
         document.body.removeChild(link);
     }
-
 }

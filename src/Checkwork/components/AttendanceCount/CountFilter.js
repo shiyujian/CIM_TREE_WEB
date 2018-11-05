@@ -23,7 +23,6 @@ class CountFilter extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            sectionArray: [],
             projectArray: [],
             groupArray: [],
             start: '',
@@ -42,56 +41,7 @@ class CountFilter extends Component {
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
         }
-        await this.getSection();
         await this.getCheckGroup();
-    }
-
-    async getSection () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let user = getUser();
-        let projectArray = [];
-        let sectionArray = [];
-        let sections = user.sections;
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
-            let code = section.split('-');
-            if (code && code.length === 3) {
-                // 获取当前标段所在的项目
-                sectionData.map(item => {
-                    if (code[0] === item.No) {
-                        projectArray.push(
-                            <Option key={item.Name} value={item.Name}>
-                                {item.Name}
-                            </Option>
-                        );
-                        let units = item.children;
-                        units.map(unit => {
-                            sectionArray.push(
-                                <Option key={unit.No} value={unit.No}>
-                                    {unit.Name}
-                                </Option>
-                            );
-                        });
-                    }
-                });
-            }
-        } else {
-            sectionData.map(project => {
-                projectArray.push(
-                    <Option key={project.Name} Name={project.Name}>
-                        {project.Name}
-                    </Option>
-                );
-            });
-        }
-        this.setState({
-            projectArray: projectArray,
-            sectionArray: sectionArray
-        });
     }
 
     async getCheckGroup () {
@@ -112,31 +62,14 @@ class CountFilter extends Component {
         });
     }
 
-    // 项目选择函数
-    onSelectChange (value) {
+    // 公司选择
+    handleOrgSelectChange (value) {
         const {
             form: { setFieldsValue },
             platform: { tree = {} }
         } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
         setFieldsValue({
-            section: undefined
-        });
-        let sectionArray = [];
-        sectionData.map(project => {
-            if (project.Name === value) {
-                let units = project.children;
-                units.map(unit => {
-                    sectionArray.push(
-                        <Option key={unit.No} value={unit.No}>
-                            {unit.Name}
-                        </Option>
-                    );
-                });
-            }
-        });
-        this.setState({
-            sectionArray: sectionArray
+            org_code: value
         });
     }
 
@@ -396,7 +329,7 @@ class CountFilter extends Component {
                 );
             });
         } else if (value === 'n') { // 缺勤时可以选择的状态有打卡一次
-            let arr = [{label: '未打卡', value: 1}, {label: '打卡一次', value: 1}];
+            let arr = [{label: '未打卡', value: 1}];
             arr.map(p => {
                 statusArray.push(
                     <Option key={p.value} value={p.value}>
@@ -414,20 +347,20 @@ class CountFilter extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { projectArray, sectionArray, groupArray, statusArray } = this.state;
+        const { projectArray, groupArray, statusArray } = this.state;
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
                     <Col span={18}>
                         <Row>
                             <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='项目'>
-                                    {getFieldDecorator('project_code', {
+                                <FormItem {...CountFilter.layout} label='公司'>
+                                    {getFieldDecorator('org_code', {
 
                                     })(
                                         <Select
-                                            placeholder='请选择项目'
-                                            onChange={this.onSelectChange.bind(
+                                            placeholder='请选择公司'
+                                            onChange={this.handleOrgSelectChange.bind(
                                                 this
                                             )}
                                         >
@@ -437,12 +370,12 @@ class CountFilter extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='标段'>
-                                    {getFieldDecorator('section', {
+                                <FormItem {...CountFilter.layout} label='考勤群体'>
+                                    {getFieldDecorator('group', {
 
                                     })(
-                                        <Select placeholder='请选择标段'>
-                                            {sectionArray}
+                                        <Select placeholder='请选择考勤群体'>
+                                            {groupArray}
                                         </Select>
                                     )}
                                 </FormItem>
@@ -540,17 +473,6 @@ class CountFilter extends Component {
                     <Col span={18}>
                         <Row>
                             <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='考勤群体'>
-                                    {getFieldDecorator('group', {
-
-                                    })(
-                                        <Select placeholder='请选择考勤群体'>
-                                            {groupArray}
-                                        </Select>
-                                    )}
-                                </FormItem>
-                            </Col>
-                            <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='角色'>
                                     {getFieldDecorator('role', {
 
@@ -601,8 +523,7 @@ class CountFilter extends Component {
         validateFields((err, values) => {
             console.log('err', err);
             let params = {};
-            params['project_code'] = values.project_code;
-            params['section'] = values.section;
+            params['org_code'] = values.org_code;
             params['name'] = values.name;
             if (values.searchDate) {
                 params['start'] = this.state.start;
@@ -619,7 +540,7 @@ class CountFilter extends Component {
             params['group'] = values.group;
             params['role'] = values.role;
             params['duty'] = values.duty;
-            this.props.query(params);
+            this.props.query(1, params);
         });
     }
     clear () {

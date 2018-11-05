@@ -212,6 +212,7 @@ class Tablelevel extends Component {
         const { getFieldDecorator } = this.props.form;
         const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, RegionCodeList, suppliername, status } = this.state;
         console.log(supplierList, '列表');
+        let img = LeaderCard.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         return (
             <div className='table-level'>
                 <Row>
@@ -277,7 +278,7 @@ class Tablelevel extends Component {
                     style={{textAlign: 'center'}}
                     footer={null}
                 >
-                    <img src={FOREST_API + '/' + LeaderCard} width='100%' height='100%' alt='图片找不到了' />
+                    <img src={FOREST_API + '/' + img} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
                 {
                     auditVisible ? <Modal title='审核' visible
@@ -410,7 +411,7 @@ class Tablelevel extends Component {
                 });
             },
             onCancel () {
-                
+
             }
         });
     }

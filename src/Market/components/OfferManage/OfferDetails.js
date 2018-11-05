@@ -227,6 +227,7 @@ class OfferDetails extends Component {
         this.props.actions.changeOfferDetailsVisible(false);
     }
     toSeeFile (OfferFiles, e) {
+        OfferFiles = OfferFiles.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         e.preventDefault();
         this.setState({
             showModal: true,

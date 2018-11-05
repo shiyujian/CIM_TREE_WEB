@@ -797,6 +797,10 @@ class TreeMessModal extends Component {
                                                 flow.Node === '补种'
                                             ) {
                                                 flowName = '施工补录扫码';
+                                            } else if (
+                                                flow.Node === '结缘入库'
+                                            ) {
+                                                flowName = '结缘入库';
                                             }
                                         }
                                         return (

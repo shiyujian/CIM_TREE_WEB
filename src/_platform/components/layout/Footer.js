@@ -22,7 +22,6 @@ export default class Footer extends Component {
                 <span>
                     <a>
                         {loadFooterCompany}
-                        {/* <img src={copyright}/> */}
                     </a>
                 </span>
             </footer>

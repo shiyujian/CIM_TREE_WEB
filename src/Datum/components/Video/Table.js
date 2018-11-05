@@ -186,7 +186,7 @@ export default class GeneralTable extends Component {
 
     previewFile (record) {
         try {
-            let src = record.VideoPath.replace(/\/\//g, '/');
+            let src = record.VideoPath.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
             src = `${FOREST_API}/${src}`;
             this.setState({
                 viewUrl: src,

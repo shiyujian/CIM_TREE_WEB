@@ -195,6 +195,7 @@ class Tablelevel extends Component {
     render () {
         const { status, nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, LeaderCard, record, RegionCodeList, nurseryname } = this.state;
         const { getFieldDecorator } = this.props.form;
+        let img = LeaderCard.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         return (
             <div className='table-level'>
                 <Row>
@@ -260,7 +261,7 @@ class Tablelevel extends Component {
                     style={{textAlign: 'center'}}
                     footer={null}
                 >
-                    <img src={FOREST_API + '/' + LeaderCard} width='100%' height='100%' alt='图片找不到了' />
+                    <img src={FOREST_API + '/' + img} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
                 {
                     auditVisible ? <Modal title='审核' visible

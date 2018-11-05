@@ -232,7 +232,7 @@ class Addition extends Component {
                 postForsetVideo({}, formdata).then(rst => {
                     console.log('rstrstrst', rst);
                     if (rst) {
-                        let src = rst.replace(/\/\//g, '/');
+                        let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                         src = `${FOREST_API}/${src}`;
                         this.setState({
                             postUrl: rst,

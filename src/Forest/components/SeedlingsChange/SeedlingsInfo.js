@@ -689,7 +689,7 @@ export default class SeedlingsChange extends Component {
             let arr = data.split(',');
             console.log('arr', arr);
             arr.map(rst => {
-                let src = rst.replace(/\/\//g, '/');
+                let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
                 src = `${FOREST_API}/${src}`;
                 srcs.push(src);
             });

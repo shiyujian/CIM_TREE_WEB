@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-02 14:22:54
+ * @Last Modified time: 2018-11-03 09:58:31
  */
 import React, { Component } from 'react';
 import {
@@ -343,10 +343,12 @@ class OnSite extends Component {
                 });
                 await this.getSurvivalRateRateDataDefault();
             } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+                // 选择苗木结缘菜单
                 await this.handleRemoveTreeMarkerLayer();
                 await this.removeTileTreeLayerBasic();
                 await this.getTileTreeAdoptBasic();
             } else if (dashboardCompomentMenu === 'geojsonFeature_curingTask') {
+                // 选择养护任务菜单
                 await this.curingTaskTypeOptions.map(async (option) => {
                     await this.setState({
                         [option.id]: true
@@ -355,6 +357,7 @@ class OnSite extends Component {
                 await this.getTileLayerTreeBasic();
                 await this.handleCuringTaskTypeAddLayer();
             } else if (dashboardCompomentMenu === 'geojsonFeature_risk') {
+                // 选择安全隐患菜单
                 await this.riskTypeOptions.map(async (option) => {
                     await this.setState({
                         [option.id]: true
@@ -371,11 +374,12 @@ class OnSite extends Component {
             dashboardAreaTreeLayer && dashboardAreaTreeLayer === 'removeTileTreeLayerBasic' &&
             prevProps.dashboardAreaTreeLayer !== dashboardAreaTreeLayer
         ) {
-            this.removeTileTreeLayerBasic();
+            await this.removeTileTreeLayerBasic();
         }
         // 加载树图层
         // 需要考虑选择实际定位时，需要获取筛选图层
         // 需要考虑选择成活率时，需要获取成活率图层
+        // 需要考虑选择苗木结缘时，需要获取苗木结缘图层
         // 需要考虑取消选择某个菜单时，不能回复原状，完成展示效果
         if (
             dashboardAreaTreeLayer && dashboardAreaTreeLayer === 'tileTreeLayerBasic' &&
@@ -383,9 +387,9 @@ class OnSite extends Component {
             dashboardCompomentMenu !== 'geojsonFeature_survivalRate' &&
             dashboardCompomentMenu !== 'geojsonFeature_treetype' &&
             dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
-            dashboardCompomentMenu !== ''
+            dashboardCompomentMenu !== 'geojsonFeature_treeAdopt'
         ) {
-            this.getTileLayerTreeBasic();
+            await this.getTileLayerTreeBasic();
         }
         // 切换全屏
         let fullScreenState = '';

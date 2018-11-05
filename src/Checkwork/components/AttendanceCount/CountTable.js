@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import {
     Table,
     Modal,
-    Row,
-    Button
+    Spin
 } from 'antd';
 import { FOREST_API } from '../../../_platform/api';
+import CountFilter from './CountFilter';
 import moment from 'moment';
 
 export default class CountTable extends Component {
@@ -13,52 +13,105 @@ export default class CountTable extends Component {
         super(props);
         this.state = {
             seeVisible: false, // 查看弹框
-            record: null // 行数据
+            record: null, // 行数据
+            pagination: {},
+            loading: false,
+            imgs: ''
         };
     }
 
     render () {
-        const { seeVisible, record } = this.state;
         const {
-            allcheckrecord = []
-        } = this.props;
+            seeVisible,
+            record,
+            allcheckrecord,
+            imgs
+        } = this.state;
         console.log('allcheckrecord', allcheckrecord);
-        let dataSource = [];
-        allcheckrecord.map((data) => {
-            dataSource.push(data.user);
-        });
-        console.log('dataSource', dataSource);
-        let imgs = null;
-        if (record) {
-            imgs = record.checkin_record.imgs;
-        }
-
-        const pagination = { // 设置每页显示的页数
-            pageSize: 10
-        };
 
         return (
             <div>
-                <div>此次查询人数:</div>
-                <Table
-                    dataSource={allcheckrecord}
-                    columns={this.columns}
-                    // pagination={pagination}
-                    className='foresttables'
-                    bordered
-                    rowKey='id'
-                />
+                <CountFilter {...this.props} {...this.state} query={this.query.bind(this)} />
+                <Spin spinning={this.state.loading} tip='数据加载中，请稍等...'>
+                    <div>此次查询人数:  {this.state.totalNum} 人</div>
+                    <Table
+                        dataSource={allcheckrecord}
+                        columns={this.columns}
+                        pagination={this.state.pagination}
+                        className='foresttables'
+                        bordered
+                        rowKey='id'
+                        onChange={this.handleTableChange.bind(this)}
+                    />
+                </Spin>
                 <Modal title='查看'
                     visible={seeVisible}
                     onCancel={this.handleCancel.bind(this)}
                     style={{ textAlign: 'center' }}
                     footer={null}
                 >
-                    <img src={FOREST_API + '/' + imgs} width='100%' height='100%' alt='图片找不到了' />
+                    <img src={imgs} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
             </div>
-
         );
+    }
+
+    handleTableChange = (pagination) => {
+        const pager = { ...this.state.pagination };
+        pager.current = pagination.current;
+        this.setState({
+            pagination: pager
+        });
+        this.query(pagination.current);
+    }
+
+    query = async (current, queryParams) => {
+        const {actions: {getCheckRecord}} = this.props;
+
+        try {
+            // let params = [];
+            // if (queryParams) {
+            //     for (let key in queryParams) {
+            //         if (queryParams[key]) {
+            //             params.push(key + '=' + encodeURI(queryParams[key]));
+            //         }
+            //     }
+            // }
+            // params = params.join('&');
+            let postaData = {
+                page: current,
+                size: 10,
+                project_code: queryParams.project_code ? queryParams.project_code : '',
+                name: queryParams.name ? queryParams.name : '',
+                start: queryParams.start ? queryParams.start : '',
+                end: queryParams.end ? queryParams.end : '',
+                checkin: queryParams.checkin ? queryParams.checkin : '',
+                status: queryParams.status ? queryParams.status : '',
+                group: queryParams.group ? queryParams.group : '',
+                role: queryParams.role ? queryParams.role : '',
+                duty: queryParams.duty ? queryParams.duty : ''
+            };
+            this.setState({
+                loading: true
+            });
+            let data = await getCheckRecord({}, postaData);
+            let results = (data && data.results) || [];
+            console.log('data', data);
+            console.log('results', results);
+            const pagination = { ...this.state.pagination };
+            pagination.total = data.count;
+            pagination.pageSize = 10;
+            pagination.current = current;
+            let totalNum = data.count;
+            this.setState({
+                allcheckrecord: results,
+                loading: false,
+                pagination,
+                totalNum
+            });
+        } catch (e) {
+
+        }
     }
 
     columns = [
@@ -200,11 +253,27 @@ export default class CountTable extends Component {
     ];
 
     previewFile (record) {
+        let imgs = this.onImgClick(record && record.checkin_record && record.checkin_record.imgs);
         this.setState({
             seeVisible: true,
-            record: record
+            record: record,
+            imgs
         });
     }
+
+    onImgClick = (data) => {
+        let srcs = '';
+        try {
+            let arr = data.split(',');
+            arr.map(rst => {
+                let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                srcs = `${FOREST_API}/${src}`;
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+        return srcs;
+    };
 
     handleCancel () {
         this.setState({
