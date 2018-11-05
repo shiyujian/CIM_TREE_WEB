@@ -12,6 +12,7 @@ import {
     Notification,
     Input
 } from 'antd';
+import { getForestImgUrl } from '_platform/auth';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 export const Datumcode = window.DeathCode.DATUM_VIDEO;
@@ -232,8 +233,7 @@ class Addition extends Component {
                 postForsetVideo({}, formdata).then(rst => {
                     console.log('rstrstrst', rst);
                     if (rst) {
-                        let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                        src = `${FOREST_API}/${src}`;
+                        let src = getForestImgUrl(rst);
                         this.setState({
                             postUrl: rst,
                             viewUrl: src,

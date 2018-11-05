@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
-import { getUser } from '_platform/auth';
+import { getUser, getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import { getSmallThinNameByPlaceData } from '../auth';
 import {
@@ -72,7 +72,6 @@ export default class CheckerTable extends Component {
                     onCancel={this.handleCancel.bind(this)}
                 >
                     {this.state.imgArr}
-                    {/* <img style={{width:"490px"}} src={this.state.src} alt="图片"/> */}
                     <Row style={{ marginTop: 10 }}>
                         <Button
                             onClick={this.handleCancel.bind(this)}
@@ -523,8 +522,7 @@ export default class CheckerTable extends Component {
             let arr = data.split(',');
             console.log('arr', arr);
             arr.map(rst => {
-                let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                src = `${FOREST_API}/${src}`;
+                let src = getForestImgUrl(rst);
                 srcs.push(src);
             });
         } catch (e) {

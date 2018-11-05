@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
-import { FOREST_API } from '_platform/api';
 import { Form, Card } from 'antd';
+import { getForestImgUrl } from '_platform/auth';
 
 class Menu extends Component {
     constructor (props) {
@@ -48,12 +48,12 @@ class Menu extends Component {
         const { param, minParam, maxParam, NurseryName, TreePlace } = this.state;
         const { record } = this.props;
         let UpdateTime = record.UpdateTime ? record.UpdateTime.split(' ')[0] : '';
-        let img = record && record.Photo && record.Photo.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        let img = record && record.Photo && getForestImgUrl(record.Photo);
         return (
             <div className='menu'>
                 <Card bodyStyle={{padding: 0, height: 270}} bordered={false}>
                     <div style={{height: 150}}>
-                        <img src={FOREST_API + '/' + img} alt='图片找不到了' width='100%' height='150' />
+                        <img src={img} alt='图片找不到了' width='100%' height='150' />
                     </div>
                     <div style={{padding: '0 10px', height: 120}}>
                         <h3 style={{fontSize: 14, color: '#2db7f5'}}>

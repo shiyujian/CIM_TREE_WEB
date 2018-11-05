@@ -4,9 +4,9 @@ import {
     Modal,
     Spin
 } from 'antd';
-import { FOREST_API } from '../../../_platform/api';
 import CountFilter from './CountFilter';
 import moment from 'moment';
+import { getForestImgUrl } from '_platform/auth';
 
 export default class CountTable extends Component {
     constructor (props) {
@@ -266,8 +266,7 @@ export default class CountTable extends Component {
         try {
             let arr = data.split(',');
             arr.map(rst => {
-                let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                srcs = `${FOREST_API}/${src}`;
+                srcs = getForestImgUrl(rst);
             });
         } catch (e) {
             console.log('处理图片', e);

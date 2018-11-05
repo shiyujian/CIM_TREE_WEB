@@ -192,7 +192,6 @@ class Login extends Component {
             forgectState,
             appDownload
         } = this.state;
-        // const loginTitle = require('../../_layouts/logo.png');
         const loginTitle = require('./images/logo1.png');
         const docDescibe = require('./images/doc.png');
         const hello = require('./images/hello.png');

@@ -5,8 +5,7 @@ import {
 import './TaskStatis.less';
 import TaskStatisEcharts from './TaskStatisEcharts';
 import PicViewModal from './PicViewModal';
-import { getUser } from '_platform/auth';
-import { FOREST_API } from '_platform/api';
+import { getUser, getForestImgUrl } from '_platform/auth';
 import {getSmallClass, getThinClass, getTaskThinClassName, getTaskStatus} from '../auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -895,8 +894,7 @@ export default class TaskStatisTable extends Component {
             let imgSrcs = [];
             let arr = data.split(',');
             arr.map(rst => {
-                let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                src = `${FOREST_API}/${src}`;
+                let src = getForestImgUrl(rst);
                 imgSrcs.push(src);
             });
             this.setState({

@@ -28,6 +28,8 @@ window.config = {
     // 'DOMAIN': 'http://47.96.136.67:6530',
     // 林总用户接口地址
     SDOMAIN: 'http://47.104.159.127',
+    // 林总图片新接口
+    ALIIMG: 'https://xatree-1.oss-cn-qingdao.aliyuncs.com',
     // 静态文件存储服务IP
     STATIC_FILE_IP: 'http://47.104.160.65',
     // 静态文件存储服务预览端口

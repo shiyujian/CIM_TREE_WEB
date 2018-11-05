@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Modal, Form, Row, Col, Input, Notification, Spin, Upload, Icon } from 'antd';
-import moment from 'moment';
-import 'moment/locale/zh-cn';
-import { getUser } from '_platform/auth';
+import { Button, Modal, Form, Row, Input, Notification, Spin, Upload, Icon } from 'antd';
 import { FOREST_API } from '../../../_platform/api';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;

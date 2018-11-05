@@ -1,8 +1,8 @@
 
 import React, {Component} from 'react';
 import { Form, Input, Button, Tabs, Select, Table, Upload, Row, Col, Icon, message } from 'antd';
-import { TREETYPENO, FOREST_API, CULTIVATIONMODE } from '_platform/api';
-import { getUser } from '_platform/auth';
+import { TREETYPENO, CULTIVATIONMODE } from '_platform/api';
+import { getUser, getForestImgUrl } from '_platform/auth';
 import './AddSeedling.less';
 
 const FormItem = Form.Item;
@@ -225,8 +225,8 @@ class AddSeedling extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    rep = rep.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    rep = getForestImgUrl(rep);
+                    fileList[0].url = rep;
                     this.setState({
                         Photo: rep
                     });
@@ -246,8 +246,8 @@ class AddSeedling extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    rep = rep.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    rep = getForestImgUrl(rep);
+                    fileList[0].url = rep;
                     this.setState({
                         LocalPhoto: rep
                     });
@@ -267,8 +267,8 @@ class AddSeedling extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    rep = rep.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    rep = getForestImgUrl(rep);
+                    fileList[0].url = rep;
                     this.setState({
                         MostPhoto: rep
                     });
@@ -288,8 +288,8 @@ class AddSeedling extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    rep = rep.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    rep = getForestImgUrl(rep);
+                    fileList[0].url = rep;
                     this.setState({
                         OtherPhoto: rep
                     });
@@ -302,6 +302,10 @@ class AddSeedling extends Component {
                 });
             }
         };
+        let photoImg = getForestImgUrl(Photo);
+        let localPhotoImg = getForestImgUrl(LocalPhoto);
+        let mostPhotoImg = getForestImgUrl(MostPhoto);
+        let otherPhotoImg = getForestImgUrl(OtherPhoto);
         return (
             <div className='addSeedling' style={{padding: '0 20px'}}>
                 <Button type='primary' onClick={this.toReturn.bind(this)} style={{marginBottom: 5}}>返 回</Button>
@@ -361,7 +365,7 @@ class AddSeedling extends Component {
                                     <Col span={6}>
                                         <Upload {...props_one} style={myUpload}>
                                             {
-                                                Photo ? <img src={`${FOREST_API}/${Photo}`} alt='' style={{width: 98, height: 78}} />
+                                                photoImg ? <img src={photoImg} alt='' style={{width: 98, height: 78}} />
                                                     : <Icon type='plus' style={myIcon} />
                                             }
                                         </Upload>
@@ -370,7 +374,7 @@ class AddSeedling extends Component {
                                     <Col span={6}>
                                         <Upload {...props_two} style={myUpload}>
                                             {
-                                                LocalPhoto ? <img src={`${FOREST_API}/${LocalPhoto}`} alt='' style={{width: 98, height: 78}} />
+                                                localPhotoImg ? <img src={localPhotoImg} alt='' style={{width: 98, height: 78}} />
                                                     : <Icon type='plus' style={myIcon} />
                                             }
                                         </Upload>
@@ -379,7 +383,7 @@ class AddSeedling extends Component {
                                     <Col span={6}>
                                         <Upload {...props_three} style={myUpload}>
                                             {
-                                                MostPhoto ? <img src={`${FOREST_API}/${MostPhoto}`} alt='' style={{width: 98, height: 78}} />
+                                                mostPhotoImg ? <img src={mostPhotoImg} alt='' style={{width: 98, height: 78}} />
                                                     : <Icon type='plus' style={myIcon} />
                                             }
                                         </Upload>
@@ -388,7 +392,7 @@ class AddSeedling extends Component {
                                     <Col span={6}>
                                         <Upload {...props_other} style={myUpload}>
                                             {
-                                                OtherPhoto ? <img src={`${FOREST_API}/${OtherPhoto}`} alt='' style={{width: 98, height: 78}} />
+                                                otherPhotoImg ? <img src={otherPhotoImg} alt='' style={{width: 98, height: 78}} />
                                                     : <Icon type='plus' style={myIcon} />
                                             }
                                         </Upload>

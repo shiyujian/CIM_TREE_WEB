@@ -6,13 +6,11 @@ import {
     Button,
     Modal,
     Upload,
-    DatePicker,
     Icon,
-    message,
     Spin,
     Notification
 } from 'antd';
-import moment from 'moment';
+import { getForestImgUrl } from '_platform/auth';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
 
@@ -42,8 +40,7 @@ class Updatemodal extends Component {
             updatevisible !== prevProps.updatevisible
         ) {
             let viewUrl = oldfile.VideoPath ? oldfile.VideoPath : '';
-            viewUrl = viewUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-            viewUrl = `${FOREST_API}/${viewUrl}`;
+            viewUrl = getForestImgUrl(viewUrl);
             this.setState({
                 viewUrl: viewUrl,
                 postUrl: oldfile.VideoPath ? oldfile.VideoPath : ''
@@ -219,8 +216,7 @@ class Updatemodal extends Component {
                 postForsetVideo({}, formdata).then(rst => {
                     console.log('rstrstrst', rst);
                     if (rst) {
-                        let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                        src = `${FOREST_API}/${src}`;
+                        let src = getForestImgUrl(rst);
                         this.props.form.setFieldsValue({
                             attachmentUpdate: rst
                         });

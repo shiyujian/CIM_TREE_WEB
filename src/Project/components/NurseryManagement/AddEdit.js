@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Row, Col, Icon, Input, Button, Select, Modal, Form, Upload, Cascader, notification, message } from 'antd';
 import { checkTel, isCardNo, layoutT } from '../common';
 import { FOREST_API } from '_platform/api';
+import { getForestImgUrl } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -45,18 +46,24 @@ class AddEdit extends Component {
         // 修改信息回显
         if (this.props.record) {
             const { getNb2ss } = this.props.actions;
+            const {
+                LeaderCard = '',
+                LeaderCardBack = ''
+            } = this.props.record;
             const fileList = {
                 uid: '-1',
                 status: 'done'
             };
+            let leaderCardImg = getForestImgUrl(LeaderCard);
+            let leaderCardBackImg = getForestImgUrl(LeaderCardBack);
             this.setState({
                 isAmend: true,
                 record: this.props.record,
                 RegionCode: this.props.record.RegionCode,
                 LeaderCard: this.props.record.LeaderCard,
                 LeaderCardBack: this.props.record.LeaderCardBack,
-                fileList: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LeaderCard}`}],
-                fileListBack: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LeaderCardBack}`}]
+                fileList: [{...fileList, thumbUrl: `${leaderCardImg}`}],
+                fileListBack: [{...fileList, thumbUrl: `${leaderCardBackImg}`}]
             });
             // 根据供应商id获取绑定苗圃
             getNb2ss({}, {nurserybaseid: this.props.record.ID}).then(rep => {
@@ -88,7 +95,7 @@ class AddEdit extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    fileList[0].url = getForestImgUrl(rep);
                     this.setState({
                         LeaderCard: rep,
                         fileList: fileList
@@ -112,7 +119,7 @@ class AddEdit extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    fileList[0].url = getForestImgUrl(rep);
                     this.setState({
                         LeaderCardBack: rep,
                         fileListBack: fileList

@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
-import { Icon, Table, Spin, Tabs, Modal, Row, Col, Select, Button, Input, InputNumber, Progress, message } from 'antd';
-import moment from 'moment';
+import { Table, Modal, Row, Col, Button, Progress } from 'antd';
 import { FOREST_API } from '../../../_platform/api';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
 
 export default class FaithModal extends Component {
     constructor (props) {

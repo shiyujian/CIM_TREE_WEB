@@ -1,29 +1,20 @@
 import React, { Component } from 'react';
 import {
-    Form,
     Input,
     Button,
     Row,
     Col,
     Modal,
-    Upload,
     Avatar,
-    Icon,
-    message,
     Table,
     notification,
-    Select,
     Popconfirm,
     Divider
 } from 'antd';
-// import Button from "antd/es/button/button";
-import Card from '_platform/components/panels/Card';
+import { getForestImgUrl } from '_platform/auth';
 import Addition from './Addition';
 import Edite from './Edite';
 import './index.less';
-import { FOREST_API } from '../../../_platform/api';
-const FormItem = Form.Item;
-const Option = Select.Option;
 
 export default class Tablelevel extends Component {
     static propTypes = {};
@@ -128,7 +119,6 @@ export default class Tablelevel extends Component {
                         style={{ textAlign: 'center' }}
                         visible={this.state.imgvisible}
                         footer={null}
-                        // onOk={this.handleCancel.bind(this)}
                         onCancel={this.handleCancel.bind(this)}
                     >
                         <img
@@ -232,8 +222,7 @@ export default class Tablelevel extends Component {
         });
     }
     onImgClick (src) {
-        src = src.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        src = `${FOREST_API}/${src}`;
+        src = getForestImgUrl(src);
         this.setState({ src }, () => {
             this.setState({ imgvisible: true });
         });
@@ -284,9 +273,8 @@ export default class Tablelevel extends Component {
             dataIndex: 'Pics',
             width: '5%',
             render: (text, record) => {
-                if (record.Pics != null) {
-                    let img = `${FOREST_API}/${record.Pics.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}`;
-                    // console.log('Pics',record.Pics)
+                if (record.Pics) {
+                    let img = getForestImgUrl(record.Pics);
                     console.log('img', img);
                     return (
                         <div style={{ textAlign: 'center', height: '32px' }}>
@@ -297,7 +285,6 @@ export default class Tablelevel extends Component {
                                     record.Pics
                                 )}
                             >
-                                {/* <Avatar shape="square" src={img}></Avatar> */}
                                 <img
                                     id='TreeImg'
                                     src={img}
@@ -380,8 +367,8 @@ export default class Tablelevel extends Component {
             width: '5%',
             key: '6',
             render: (text, record) => {
-                if (record.Pics != null) {
-                    let img = `${FOREST_API}/${record.Pics.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}`;
+                if (record.Pics) {
+                    let img = getForestImgUrl(record.Pics);
                     console.log('pppp', record.Pics);
                     return (
                         <div style={{ textAlign: 'center', height: '30px' }}>

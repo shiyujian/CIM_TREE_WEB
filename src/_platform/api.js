@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-01 19:51:05
+ * @Last Modified time: 2018-11-05 15:47:06
  */
 /**
  *
@@ -126,8 +126,8 @@ export const QRCODE_API = `${base}/service/appserver`;
 // 智慧森林
 export const FOREST_API = `${window.config.SDOMAIN}`;
 export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
-// export const FOREST_API = `${window.config.SDOMAIN}:${window.config.FORESTPORT}`;
 export const FOREST_SYSTEM = `${FOREST_API}/system`;
+export const FOREST_IMG = `${window.config.ALIIMG}`;
 // 苗圃定位模板
 export const nurseryLocation_template =
     STATIC_DOWNLOAD_API +

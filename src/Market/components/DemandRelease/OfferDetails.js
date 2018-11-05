@@ -1,7 +1,8 @@
 
 import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, Table, InputNumber, Tag, Modal, message } from 'antd';
-import { CULTIVATIONMODE, FOREST_API } from '_platform/api';
+import { CULTIVATIONMODE } from '_platform/api';
+import { getForestImgUrl } from '_platform/auth';
 
 class OfferDetails extends Component {
     constructor (props) {
@@ -232,7 +233,7 @@ class OfferDetails extends Component {
                     onOk={this.handleCancel}
                     onCancel={this.handleCancel}
                 >
-                    <img width='100%' src={FOREST_API + '/' + OfferFiles} alt='文件没找到' />
+                    <img width='100%' src={OfferFiles} alt='文件没找到' />
                 </Modal>
             </div>
         );
@@ -248,7 +249,7 @@ class OfferDetails extends Component {
         });
     }
     toSeeFile (OfferFiles, e) {
-        OfferFiles = OfferFiles.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        OfferFiles = getForestImgUrl(OfferFiles);
         e.preventDefault();
         this.setState({
             showModal: true,

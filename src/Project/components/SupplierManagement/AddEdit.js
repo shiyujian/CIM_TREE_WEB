@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Icon, Input, Button, Select, Modal, Form, Upload, Cascader, Switch, notification, message } from 'antd';
 import { checkTel, isCardNo, layoutT } from '../common';
-import { FOREST_API } from '../../../_platform/api';
+import { getForestImgUrl } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -44,6 +44,12 @@ class AddEdit extends Component {
         // 修改信息回显
         if (this.props.record) {
             const { getNb2ss } = this.props.actions;
+            const {
+                LegalPersonCard = '',
+                LegalPersonCardBack = '',
+                BusinessLicense = '',
+                Facade = ''
+            } = this.props.record;
             const fileList = {
                 uid: '-1',
                 status: 'done'
@@ -53,6 +59,9 @@ class AddEdit extends Component {
                     isSwitch: false
                 });
             }
+            let legalPersonImg = getForestImgUrl(LegalPersonCard);
+            let legalPersonBackImg = getForestImgUrl(LegalPersonCardBack);
+            let businessLicenseImg = BusinessLicense ? getForestImgUrl(BusinessLicense) : getForestImgUrl(Facade);
             this.setState({
                 isAmend: true,
                 record: this.props.record,
@@ -60,9 +69,9 @@ class AddEdit extends Component {
                 LegalPersonCard: this.props.record.LegalPersonCard,
                 LegalPersonCardBack: this.props.record.LegalPersonCardBack,
                 BusinessLicense: this.props.record.BusinessLicense || this.props.record.Facade,
-                fileList: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LegalPersonCard}`}],
-                fileListBack: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.LegalPersonCardBack}`}],
-                fileListLicense: [{...fileList, thumbUrl: `${FOREST_API}/${this.props.record.BusinessLicense || this.props.record.Facade}`}]
+                fileList: [{...fileList, thumbUrl: `${legalPersonImg}`}],
+                fileListBack: [{...fileList, thumbUrl: `${legalPersonBackImg}`}],
+                fileListLicense: [{...fileList, thumbUrl: `${businessLicenseImg}`}]
             });
             // 根据供应商id获取绑定苗圃
             getNb2ss({}, {supplierid: this.props.record.ID}).then(rep => {
@@ -94,7 +103,7 @@ class AddEdit extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    fileList[0].url = getForestImgUrl(rep);
                     this.setState({
                         LegalPersonCard: rep,
                         fileList
@@ -118,7 +127,7 @@ class AddEdit extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    fileList[0].url = getForestImgUrl(rep);
                     this.setState({
                         LegalPersonCardBack: rep,
                         fileListBack: fileList
@@ -142,7 +151,7 @@ class AddEdit extends Component {
                 formdata.append('a_file', file);
                 const { postUploadImage } = this.props.actions;
                 postUploadImage({}, formdata).then((rep) => {
-                    fileList[0].url = FOREST_API + '/' + rep;
+                    fileList[0].url = getForestImgUrl(rep);
                     this.setState({
                         BusinessLicense: rep,
                         fileListLicense: fileList

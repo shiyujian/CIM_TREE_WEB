@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Input, Steps } from 'antd';
-import { FOREST_API } from '_platform/api';
+import { getForestImgUrl } from '_platform/auth';
 import styles from './style.css';
 import moment from 'moment';
 const Step = Steps.Step;
@@ -19,8 +19,7 @@ export default class RiskDetail extends Component {
             if (data) {
                 let arr = data.split(',');
                 arr.map(rst => {
-                    let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                    src = `${FOREST_API}/${src}`;
+                    let src = getForestImgUrl(rst);
                     srcs.push(src);
                 });
             }

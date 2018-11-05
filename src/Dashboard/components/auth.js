@@ -1,5 +1,5 @@
 import './OnSite/OnSite.less';
-import { FOREST_API } from '_platform/api';
+import { FOREST_API, FOREST_IMG } from '_platform/api';
 
 export const getAreaData = async (getTreeNodeList, getThinClassList) => {
     let rst = await getTreeNodeList();
@@ -381,14 +381,28 @@ export const onImgClick = (data) => {
     try {
         let arr = data.split(',');
         arr.map(rst => {
-            let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-            src = `${FOREST_API}/${src}`;
+            let src = getForestImgUrl(rst);
             srcs.push(src);
         });
     } catch (e) {
         console.log('处理图片', e);
     }
     return srcs;
+};
+
+// 对林总数据库中的图片进行判断
+export const getForestImgUrl = (data) => {
+    try {
+        let imgUrl = '';
+        if (data.indexOf(FOREST_IMG) !== -1) {
+            imgUrl = data;
+        } else {
+            imgUrl = FOREST_API + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        }
+        return imgUrl;
+    } catch (e) {
+        console.log('getForestImgUrl', e);
+    }
 };
 
 // 获取任务中的标段，小班，细班名称

@@ -1,8 +1,9 @@
 
 import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, Table, Input, Modal, Upload, Icon, InputNumber, message } from 'antd';
-import { CULTIVATIONMODE, FOREST_API } from '_platform/api';
+import { CULTIVATIONMODE } from '_platform/api';
 import './PurchaseDetails.less';
+import { getForestImgUrl } from '_platform/auth';
 
 const Dragger = Upload.Dragger;
 class PurchaseDetails extends Component {
@@ -236,13 +237,13 @@ class PurchaseDetails extends Component {
                     onOk={this.handleCancel}
                     onCancel={this.handleCancel}
                 >
-                    <img width='100%' src={FOREST_API + '/' + OfferFiles} alt='图片没找到' />
+                    <img width='100%' src={OfferFiles} alt='图片没找到' />
                 </Modal>
             </div>
         );
     }
     toSeeFile (record, e) {
-        let OfferFiles = record && record.OfferFiles.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        let OfferFiles = record && record.OfferFiles && getForestImgUrl(record.OfferFiles);
         e.preventDefault();
         console.log(record, '行数据');
         this.setState({

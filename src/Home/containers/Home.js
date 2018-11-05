@@ -9,8 +9,6 @@ import Preview from '_platform/components/layout/Preview';
 import {actions as newsActions} from '../store/news';
 import {actions as staffActions} from '../store/staff';
 import {actions as datumActions} from '../store/datum';
-
-// import {actions} from '../store/index';
 import banner from '../components/images/banner.png';
 
 @connect(

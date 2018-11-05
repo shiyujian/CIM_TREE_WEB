@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
-import { getUser } from '_platform/auth';
+import { getUser, getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -700,8 +700,7 @@ export default class LocmeasureTable extends Component {
             let arr = data.split(',');
             console.log('arr', arr);
             arr.map(rst => {
-                let src = rst.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                src = `${FOREST_API}/${src}`;
+                let src = getForestImgUrl(rst);
                 srcs.push(src);
             });
         } catch (e) {

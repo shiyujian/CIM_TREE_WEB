@@ -1,7 +1,8 @@
 
 import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, Tag, message } from 'antd';
-import { FOREST_API, TREETYPENO, CULTIVATIONMODE } from '_platform/api';
+import { TREETYPENO, CULTIVATIONMODE } from '_platform/api';
+import { getForestImgUrl } from '_platform/auth';
 
 class Menu extends Component {
     constructor (props) {
@@ -52,13 +53,13 @@ class Menu extends Component {
         const { dataList } = this.state;
         const { record } = this.props;
         let UpdateTime = record.UpdateTime ? record.UpdateTime.split(' ')[0] : '';
-        let img = record && record.Photo && record.Photo.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        let img = record && record.Photo && getForestImgUrl(record.Photo);
         return (
             <div className='menu' style={{marginTop: 10}}>
                 <Card title={'发布时间：' + UpdateTime}>
                     <Row>
                         <Col span={4}>
-                            <img src={FOREST_API + '/' + img} alt='图片找不到了' width='150px' height='100px' />
+                            <img src={img} alt='图片找不到了' width='150px' height='100px' />
                         </Col>
                         <Col span={5}>
                             <h3>

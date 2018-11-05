@@ -5,8 +5,7 @@ import {
     Row,
     Button
 } from 'antd';
-import { STATIC_DOWNLOAD_API, FOREST_API } from '../../../_platform/api';
-import moment from 'moment';
+import { getForestImgUrl } from '_platform/auth';
 import './index.less';
 
 export default class GeneralTable extends Component {
@@ -186,8 +185,7 @@ export default class GeneralTable extends Component {
 
     previewFile (record) {
         try {
-            let src = record.VideoPath.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-            src = `${FOREST_API}/${src}`;
+            let src = getForestImgUrl(record.VideoPath);
             this.setState({
                 viewUrl: src,
                 viewVisible: true

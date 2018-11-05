@@ -1,4 +1,5 @@
 import cookie from 'js-cookie';
+import { FOREST_API, FOREST_IMG } from './api';
 
 export default () => {
     return !!cookie.get('id');
@@ -413,5 +414,20 @@ export const getUserIsDocument = () => {
         return userIsDocument;
     } catch (e) {
         console.log('getUserIsDocument', e);
+    }
+};
+
+// 对林总数据库中的图片进行判断
+export const getForestImgUrl = (data) => {
+    try {
+        let imgUrl = '';
+        if (data.indexOf(FOREST_IMG) !== -1) {
+            imgUrl = data;
+        } else {
+            imgUrl = FOREST_API + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+        }
+        return imgUrl;
+    } catch (e) {
+        console.log('getForestImgUrl', e);
     }
 };

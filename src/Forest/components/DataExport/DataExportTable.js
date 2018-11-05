@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
     Icon,
     Table,
-    Modal,
     Row,
     Col,
     Select,
@@ -29,7 +28,6 @@ export default class LocmeasureTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            imgvisible: false,
             tblData: [],
             pagination: {},
             loading: false,
@@ -68,20 +66,6 @@ export default class LocmeasureTable extends Component {
         return (
             <div>
                 {this.treeTable(tblData)}
-                <Modal
-                    width={522}
-                    title='详细信息'
-                    style={{ textAlign: 'center' }}
-                    visible={this.state.imgvisible}
-                    onOk={this.handleCancel.bind(this)}
-                    onCancel={this.handleCancel.bind(this)}
-                >
-                    <img
-                        style={{ width: '490px' }}
-                        src={this.state.src}
-                        alt='图片'
-                    />
-                </Modal>
             </div>
         );
     }
@@ -418,18 +402,6 @@ export default class LocmeasureTable extends Component {
             pagination: pager
         });
         this.query(pagination.current);
-    }
-
-    onImgClick (src) {
-        src = src.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        src = `${FOREST_API}/${src}`;
-        this.setState({ src }, () => {
-            this.setState({ imgvisible: true });
-        });
-    }
-
-    handleCancel () {
-        this.setState({ imgvisible: false });
     }
 
     resetinput () {

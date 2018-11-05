@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FOREST_API, SERVICE_API, FILE_API } from '../../../_platform/api';
+import { FOREST_API } from '../../../_platform/api';
 import {
     Form,
     Input,

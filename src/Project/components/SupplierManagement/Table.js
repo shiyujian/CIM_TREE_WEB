@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
-import { FOREST_API } from '_platform/api';
-import { getUser, formItemLayout } from '_platform/auth';
+import { getUser, formItemLayout, getForestImgUrl } from '_platform/auth';
 import AddEdit from './AddEdit';
 
 const confirm = Modal.confirm;
@@ -221,7 +220,8 @@ class Tablelevel extends Component {
     render () {
         const { getFieldDecorator } = this.props.form;
         const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, imageUrl, record, RegionCodeList, suppliername, status, textCord, LegalPerson } = this.state;
-        let img = imageUrl.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+
+        let img = getForestImgUrl(imageUrl);
         return (
             <div className='table-level'>
                 <Row>
@@ -290,7 +290,7 @@ class Tablelevel extends Component {
                     footer={null}
                 >
                     <p style={{fontSize: 20}}>{LegalPerson}&nbsp;&nbsp;{textCord}</p>
-                    <img src={FOREST_API + '/' + img} width='100%' height='100%' alt='图片找不到了' />
+                    <img src={img} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
                 {
                     auditVisible ? <Modal title='审核' visible
