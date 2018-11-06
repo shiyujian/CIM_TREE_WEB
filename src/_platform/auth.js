@@ -448,6 +448,6 @@ export const getUserIsManager = () => {
         });
         return permission;
     } catch (e) {
-        console.log('getUserIsDocument', e);
+        console.log('getUserIsManager', e);
     }
 };

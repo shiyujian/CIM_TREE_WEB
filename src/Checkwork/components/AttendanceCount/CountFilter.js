@@ -8,7 +8,7 @@ import {
     DatePicker,
     Select
 } from 'antd';
-import { getUser } from '../../../_platform/auth';
+import { getUserIsManager, getCompanyDataByOrgCode } from '../../../_platform/auth';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 const { RangePicker } = DatePicker;
@@ -23,53 +23,134 @@ class CountFilter extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            projectArray: [],
             groupArray: [],
             start: '',
             end: '',
-            statusArray: []
+            statusArray: [],
+            permission: false,
+            userCompany: ''
         };
+        this.companyList = [];
     }
 
     componentDidMount = async () => {
         const {
             actions: {
-                getTreeNodeList
+                getTreeNodeList,
+                getOrgTree
             },
             platform: { tree = {} }
         } = this.props;
-        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
-            await getTreeNodeList();
+        try {
+            if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+                await getTreeNodeList();
+            }
+            this.companyList = [];
+            // 是否为业主或管理员
+            let permission = getUserIsManager();
+            if (permission) {
+                if (!(tree && tree.org && tree.org.children && tree.org.children instanceof Array && tree.org.children.length > 0)) {
+                    let orgData = await getOrgTree({}, { depth: 4 });
+                    console.log('orgData', orgData);
+                    await orgData.children.map(async (child) => {
+                        if (child.name !== '苗圃基地' && child.name !== '供应商') {
+                            await this.getCompanyList(child);
+                        }
+                    });
+                } else {
+                    await tree.org.children.map(async (child) => {
+                        if (child.name !== '苗圃基地' && child.name !== '供应商') {
+                            await this.getCompanyList(child);
+                        }
+                    });
+                }
+            }
+            this.setState({
+                permission
+            });
+            await this.getUserCompany();
+            console.log('this.companyList', this.companyList);
+        } catch (e) {
+            console.log('componentDidMount', e);
         }
-        await this.getCheckGroup();
     }
-
-    async getCheckGroup () {
+    // 获取用户自己的公司信息
+    getUserCompany = async () => {
+        const {
+            actions: {
+                getOrgTreeByCode
+            },
+            form: { setFieldsValue }
+        } = this.props;
+        try {
+            let user = localStorage.getItem('QH_USER_DATA');
+            user = JSON.parse(user);
+            // admin没有部门
+            if (user.username !== 'admin') {
+                // userOrgCode为登录用户自己的部门code
+                let userOrgCode = user.account.org_code;
+                let parentData = await getCompanyDataByOrgCode(userOrgCode, getOrgTreeByCode);
+                let companyOrgCode = parentData.code;
+                await setFieldsValue({
+                    org_code: companyOrgCode
+                });
+                this.setState({
+                    userCompany: companyOrgCode
+                });
+                // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
+                await this.getCheckGroupList(companyOrgCode);
+                await this.query();
+            }
+        } catch (e) {
+            console.log('getUserCompany', e);
+        }
+    }
+    // 查找所有的公司的List
+    getCompanyList = async (data) => {
+        if (data && data.extra_params && data.extra_params.companyStatus) {
+            if (data.extra_params.companyStatus === '项目') {
+                if (data && data.children && data.children.length > 0) {
+                    await data.children.map((child) => {
+                        return this.getCompanyList(child);
+                    });
+                }
+            } else if (data.extra_params.companyStatus === '公司') {
+                await this.companyList.push(data);
+            }
+        }
+    }
+    // 公司选择
+    handleOrgSelectChange = async (value) => {
+        const {
+            form: { setFieldsValue }
+        } = this.props;
+        const {
+            permission
+        } = this.state;
+        await setFieldsValue({
+            org_code: value
+        });
+        // 非业主账户只能查找自己的公司的考勤群体
+        if (permission) {
+            await this.getCheckGroupList(value);
+        }
+    }
+    // 根据选择的公司进行设置考勤群体
+    getCheckGroupList = async (value) => {
         const {
             actions: { getCheckGroup }
         } = this.props;
         let groupArray = [];
-        let data = await getCheckGroup();
-        data.map(p => {
+        let groupList = await getCheckGroup({}, {org_code: value});
+        groupList.map(group => {
             groupArray.push(
-                <Option key={p.id} value={p.id}>
-                    {p.name}
+                <Option key={group.id} value={group.id}>
+                    {group.name}
                 </Option>
             );
         });
         this.setState({
             groupArray: groupArray
-        });
-    }
-
-    // 公司选择
-    handleOrgSelectChange (value) {
-        const {
-            form: { setFieldsValue },
-            platform: { tree = {} }
-        } = this.props;
-        setFieldsValue({
-            org_code: value
         });
     }
 
@@ -347,7 +428,7 @@ class CountFilter extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { projectArray, groupArray, statusArray } = this.state;
+        const { groupArray, statusArray } = this.state;
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
@@ -364,7 +445,13 @@ class CountFilter extends Component {
                                                 this
                                             )}
                                         >
-                                            {projectArray}
+                                            {
+                                                this.companyList.map((company) => {
+                                                    return <Option title={company.name} key={company.code} value={company.code}>
+                                                        {company.name}
+                                                    </Option>;
+                                                })
+                                            }
                                         </Select>
                                     )}
                                 </FormItem>
@@ -522,29 +609,46 @@ class CountFilter extends Component {
         } = this.props;
         validateFields((err, values) => {
             console.log('err', err);
+            console.log('values', values);
             let params = {};
-            params['org_code'] = values.org_code;
-            params['name'] = values.name;
+            params.org_code = values.org_code ? values.org_code : '';
+            params.group = values.group ? values.group : '';
+            params.name = values.name ? values.name : '';
             if (values.searchDate) {
-                params['start'] = this.state.start;
-                params['end'] = this.state.end;
+                params.start = this.state.start;
+                params.end = this.state.end;
             }
-            params['checkin'] = values.checkin;
+            params.checkin = values.checkin ? values.checkin : '';
             if (values.status === 2) { // 迟到默认可查询状态5
-                params['status'] = values.status + ',5';
+                params.status = values.status + ',5';
             } else if (values.status === 3) { // 早退默认可查询状态5
-                params['status'] = values.status + ',5';
+                params.status = values.status + ',5';
             } else {
-                params['status'] = values.status;
+                params.status = values.status ? values.status : '';
             }
-            params['group'] = values.group;
-            params['role'] = values.role;
-            params['duty'] = values.duty;
+            params.role = values.role ? values.role : '';
+            params.duty = values.duty ? values.duty : '';
             this.props.query(1, params);
         });
     }
     clear () {
-        this.props.form.resetFields();
+        const {
+            form: { setFieldsValue }
+        } = this.props;
+        const {
+            userCompany
+        } = this.state;
+        setFieldsValue({
+            checkin: undefined,
+            duty: undefined,
+            group: undefined,
+            name: undefined,
+            org_code: userCompany || undefined,
+            role: undefined,
+            searchDate: undefined,
+            status: undefined
+        });
+        // this.props.form.resetFields();
     }
 }
 export default Form.create()(CountFilter);

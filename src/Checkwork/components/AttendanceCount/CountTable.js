@@ -23,12 +23,9 @@ export default class CountTable extends Component {
     render () {
         const {
             seeVisible,
-            record,
             allcheckrecord,
             imgs
         } = this.state;
-        console.log('allcheckrecord', allcheckrecord);
-
         return (
             <div>
                 <CountFilter {...this.props} {...this.state} query={this.query.bind(this)} />
@@ -56,18 +53,18 @@ export default class CountTable extends Component {
         );
     }
 
-    handleTableChange = (pagination) => {
+    handleTableChange = async (pagination) => {
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
+        await this.query(pagination.current, {});
         this.setState({
             pagination: pager
         });
-        this.query(pagination.current);
     }
 
     query = async (current, queryParams) => {
         const {actions: {getCheckRecord}} = this.props;
-
+        console.log('current', current);
         try {
             // let params = [];
             // if (queryParams) {
@@ -81,13 +78,13 @@ export default class CountTable extends Component {
             let postaData = {
                 page: current,
                 size: 10,
-                project_code: queryParams.project_code ? queryParams.project_code : '',
+                org_code: queryParams.org_code ? queryParams.org_code : '',
+                group: queryParams.group ? queryParams.group : '',
                 name: queryParams.name ? queryParams.name : '',
                 start: queryParams.start ? queryParams.start : '',
                 end: queryParams.end ? queryParams.end : '',
                 checkin: queryParams.checkin ? queryParams.checkin : '',
                 status: queryParams.status ? queryParams.status : '',
-                group: queryParams.group ? queryParams.group : '',
                 role: queryParams.role ? queryParams.role : '',
                 duty: queryParams.duty ? queryParams.duty : ''
             };
@@ -96,8 +93,6 @@ export default class CountTable extends Component {
             });
             let data = await getCheckRecord({}, postaData);
             let results = (data && data.results) || [];
-            console.log('data', data);
-            console.log('results', results);
             const pagination = { ...this.state.pagination };
             pagination.total = data.count;
             pagination.pageSize = 10;
@@ -110,7 +105,7 @@ export default class CountTable extends Component {
                 totalNum
             });
         } catch (e) {
-
+            console.log('query', e);
         }
     }
 
@@ -125,8 +120,6 @@ export default class CountTable extends Component {
                 if (record && record.check_group && record.check_group.length > 0) {
                     company = record.check_group[0].org_name;
                 }
-                console.log('record', record);
-                console.log('text', text);
                 return <span>{company}{organization}</span>;
             }
         },
@@ -143,9 +136,6 @@ export default class CountTable extends Component {
         {
             title: '角色',
             render: (text, record, index) => {
-                console.log('record', record);
-                console.log('text', text);
-
                 if (record && record.user && record.user.groups && record.user.groups.length > 0) {
                     return <span>{record.user.groups[0].name}</span>;
                 }
@@ -163,7 +153,7 @@ export default class CountTable extends Component {
                     let name = '';
                     record.check_group.map((group, index) => {
                         if (index > 0) {
-                            name = ',' + name + group.name;
+                            name = name + ',' + group.name;
                         } else {
                             name = name + group.name;
                         }
