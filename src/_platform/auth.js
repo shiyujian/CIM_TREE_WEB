@@ -431,3 +431,23 @@ export const getForestImgUrl = (data) => {
         console.log('getForestImgUrl', e);
     }
 };
+
+// 判断用户是否为业主和管理员
+export const getUserIsManager = () => {
+    try {
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        let permission = false;
+        if (user.username === 'admin') {
+            permission = true;
+        }
+        let groups = user.groups || [];
+        groups.map((group) => {
+            if (group.name.indexOf('业主') !== -1) {
+                permission = true;
+            }
+        });
+        return permission;
+    } catch (e) {
+        console.log('getUserIsDocument', e);
+    }
+};

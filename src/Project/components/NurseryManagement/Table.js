@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import AddEdit from './AddEdit';
-import { getUser, formItemLayout, getForestImgUrl } from '_platform/auth';
+import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
 const confirm = Modal.confirm;
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -26,9 +26,9 @@ class Tablelevel extends Component {
             record: null,
             imageUrl: '', // 身份证正反面
             Leader: '', // 负责人姓名
-            optionList: []
+            optionList: [],
+            permission: false // 是否为业主或管理员
         };
-        this.username = ''; // 用户名
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
         this.handleStatus = this.handleStatus.bind(this); // 状态
@@ -45,7 +45,11 @@ class Tablelevel extends Component {
         if (user.groups && user.groups.length > 0) {
             this.groupId = user.groups[0].id;
         }
-        this.username = user.username;
+        let permission = getUserIsManager();
+        console.log('permission', permission);
+        this.setState({
+            permission
+        });
         // 获取行政区划编码
         const RegionCodeList = JSON.parse(window.localStorage.getItem('RegionCodeList'));
         if (RegionCodeList) {
@@ -163,7 +167,10 @@ class Tablelevel extends Component {
             width: 160,
             dataIndex: 'action',
             render: (text, record) => {
-                if (this.username === 'admin') {
+                const {
+                    permission
+                } = this.state;
+                if (permission) {
                     return (
                         <span>
                             {

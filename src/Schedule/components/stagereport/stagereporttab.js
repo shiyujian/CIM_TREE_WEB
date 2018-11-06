@@ -69,8 +69,6 @@ class Stagereporttab extends Component {
             return (
                 <OptGroup label={forest.name}>
                     {arr.map(tree => {
-                        // let code = tree.TreeTypeNo.substr(0, 1)
-                        // if(forest.id === code){
                         return (
                             <Option key={tree.id} value={JSON.stringify(tree)}>
                                 {tree.TreeTypeName}
