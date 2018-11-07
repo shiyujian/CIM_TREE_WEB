@@ -7,22 +7,21 @@ import {
 export const ID = 'Checkwork_attendancecount';
 // 示例action
 
-// 修改选择地图的方式
-export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
-
+// 修改查询条件
+export const changeFilterData = createAction(`${ID}_changeFilterData`);
 // 考勤列表
 export const getCheckRecord = createFetchAction(`${MAIN_API}/check-record/list/`, [], 'GET');
-
 // 获取考勤群体
 export const getCheckGroup = createFetchAction(`${MAIN_API}/check-group/`, [], 'GET');
 
 export const actions = {
+    changeFilterData,
     getCheckRecord,
     getCheckGroup
 };
 export default handleActions({
-    [changeSelectMap]: (state, {payload}) => ({
+    [changeFilterData]: (state, {payload}) => ({
         ...state,
-        selectMap: payload
+        filterData: payload
     })
 }, {});

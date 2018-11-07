@@ -15,7 +15,6 @@ import {
     Spin
 } from 'antd';
 import {getSectionNameBySection} from '_platform/gisAuth';
-import { formItemLayout } from '../common';
 import { getUser } from '_platform/auth';
 import './index.less';
 import moment from 'moment';
@@ -485,6 +484,16 @@ class Users extends Component {
                 permissionStatus = this.compare(userc, node, code);
             }
         }
+        const formItemLayout = {
+            labelCol: {
+                xs: { span: 24 },
+                sm: { span: 6 }
+            },
+            wrapperCol: {
+                xs: { span: 24 },
+                sm: { span: 14 }
+            }
+        };
         return permissionStatus ? (
             <div>
                 <Spin

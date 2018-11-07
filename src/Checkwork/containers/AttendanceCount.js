@@ -3,14 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../store/attendanceCount';
 import { actions as platformActions } from '_platform/store/global';
-import {
-    Main,
-    Body,
-    Content,
-    DynamicTitle
-} from '_platform/components/layout';
-import {Spin} from 'antd';
-import { CountFilter, CountTable } from '../components/AttendanceCount';
+import { CountTable } from '../components/AttendanceCount';
 @connect(
     state => {
         const { checkwork: { attendanceCount = {} }, platform } = state;

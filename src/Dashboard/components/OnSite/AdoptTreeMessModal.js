@@ -45,7 +45,7 @@ class AdoptTreeMessModal extends Component {
                 render: (text, record, index) => {
                     if (text) {
                         try {
-                            text = moment(text).format('YYYY-MM-DD hh:mm:ss');
+                            text = moment(text).format('YYYY-MM-DD HH:mm:ss');
                             let timeArr = text.split(' ');
                             let time1 = timeArr[0];
                             let time2 = timeArr[1];
@@ -70,7 +70,7 @@ class AdoptTreeMessModal extends Component {
                 render: (text, record, index) => {
                     if (text) {
                         try {
-                            text = moment(text).format('YYYY-MM-DD hh:mm:ss');
+                            text = moment(text).format('YYYY-MM-DD HH:mm:ss');
                             let timeArr = text.split(' ');
                             let time1 = timeArr[0];
                             let time2 = timeArr[1];
@@ -190,7 +190,7 @@ class AdoptTreeMessModal extends Component {
                         <div className='adoptTreeMess-modal-top-adopt' >
                             <img src={adoptImg} />
                             <div className='adoptTreeMess-modal-top-time'>
-                                {adoptTreeMess.AdoptTime ? moment(adoptTreeMess.AdoptTime).format('YYYY-MM-DD hh:mm:ss') : ''}
+                                {adoptTreeMess.AdoptTime ? moment(adoptTreeMess.AdoptTime).format('YYYY-MM-DD HH:mm:ss') : ''}
                             </div>
                         </div>
                         <div>

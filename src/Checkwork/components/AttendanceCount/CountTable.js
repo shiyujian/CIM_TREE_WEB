@@ -6,6 +6,8 @@ import {
 } from 'antd';
 import CountFilter from './CountFilter';
 import moment from 'moment';
+import './index.less';
+// import 'moment/locale/zh-cn';
 import { getForestImgUrl } from '_platform/auth';
 
 export default class CountTable extends Component {
@@ -54,9 +56,12 @@ export default class CountTable extends Component {
     }
 
     handleTableChange = async (pagination) => {
+        const {
+            filterData = {}
+        } = this.props;
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
-        await this.query(pagination.current, {});
+        await this.query(pagination.current, filterData);
         this.setState({
             pagination: pager
         });
@@ -68,7 +73,7 @@ export default class CountTable extends Component {
         try {
             let postaData = {
                 page: current,
-                size: 10,
+                page_size: 10,
                 org_code: queryParams.org_code ? queryParams.org_code : '',
                 group: queryParams.group ? queryParams.group : '',
                 name: queryParams.name ? queryParams.name : '',
@@ -111,7 +116,14 @@ export default class CountTable extends Component {
                 if (record && record.check_group && record.check_group.length > 0) {
                     company = record.check_group[0].org_name;
                 }
-                return <span>{company}{organization}</span>;
+                return <div style={{textAlign: 'Center'}}>
+                    <div className='column' title={company}>
+                        {company}
+                    </div>
+                    <div className='column' title={organization}>
+                        {organization}
+                    </div>
+                </div>;
             }
         },
         {
@@ -149,7 +161,23 @@ export default class CountTable extends Component {
                             name = name + group.name;
                         }
                     });
-                    return name;
+                    return <div className='column' title={name}>{name}</div>;
+                } else {
+                    return <span>/</span>;
+                }
+            }
+        },
+        {
+            title: '日期',
+            dataIndex: 'created_on',
+            key: 'created_on',
+            render: (text, record, index) => {
+                if (record && record.created_on) {
+                    return <div style={{textAlign: 'Center'}}>
+                        <div>
+                            {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                        </div>
+                    </div>;
                 } else {
                     return <span>/</span>;
                 }
@@ -163,10 +191,10 @@ export default class CountTable extends Component {
                 if (record && record.checkin_record && record.checkin_record.check_time) {
                     return <div style={{textAlign: 'Center'}}>
                         <div>
-                            {moment(text).format('YYYY-MM-DD')}
+                            {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
                         </div>
                         <div>
-                            {moment(text).format('hh:mm:ss')}
+                            {moment(text).utc().zone(-0).format('HH:mm:ss')}
                         </div>
                     </div>;
                 } else {
@@ -180,12 +208,13 @@ export default class CountTable extends Component {
             key: 'checkout_record.check_time',
             render: (text, record, index) => {
                 if (record && record.checkout_record && record.checkout_record.check_time) {
+                    console.log('moment(text).utc().zone(-0)', moment(text).utc().zone(-0).format('YYYY-MM-DD HH:mm:ss'));
                     return <div style={{textAlign: 'Center'}}>
                         <div>
-                            {moment(text).format('YYYY-MM-DD')}
+                            {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
                         </div>
                         <div>
-                            {moment(text).format('hh:mm:ss')}
+                            {moment(text).utc().zone(-0).format('HH:mm:ss')}
                         </div>
                     </div>;
                 } else {

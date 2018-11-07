@@ -173,14 +173,14 @@ export class DefectTable extends Component {
         rst.history.map((item, index) => {
             if (index === 0) {
                 console.log(item.records[0].log_on);
-                selectedRow.created_on = item ? moment(item.records[0].log_on).format('YYYY-MM-DD hh:mm:ss') : '';
+                selectedRow.created_on = item ? moment(item.records[0].log_on).format('YYYY-MM-DD HH:mm:ss') : '';
                 selectedRow.zhenggai = '';
                 selectedRow.check = '';
             } else if (index === 1) {
-                selectedRow.zhenggai = item.records[0] ? moment(item.records[0].log_on).format('YYYY-MM-DD hh:mm:ss') : '';
+                selectedRow.zhenggai = item.records[0] ? moment(item.records[0].log_on).format('YYYY-MM-DD HH:mm:ss') : '';
                 selectedRow.check = '';
             } else if (index === 2) {
-                selectedRow.check = item.records[0] ? moment(item.records[0].log_on).format('YYYY-MM-DD hh:mm:ss') : '';
+                selectedRow.check = item.records[0] ? moment(item.records[0].log_on).format('YYYY-MM-DD HH:mm:ss') : '';
             }
         });
     }

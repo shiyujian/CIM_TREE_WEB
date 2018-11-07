@@ -9,6 +9,7 @@ import {
     Select
 } from 'antd';
 import { getUserIsManager, getCompanyDataByOrgCode } from '../../../_platform/auth';
+import { handleFilterData } from '../auth';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 const { RangePicker } = DatePicker;
@@ -406,7 +407,7 @@ class CountFilter extends Component {
             status: undefined
         });
         let statusArray = [];
-        if (value === 'n') { // 出勤时可以选择的状态有正常打卡,迟到,和早退
+        if (value === 'y') { // 出勤时可以选择的状态有正常打卡,迟到,和早退
             let arr = [{label: '正常打卡', value: 4}, {label: '迟到', value: 2}, {label: '早退', value: 3}];
             arr.map(p => {
                 statusArray.push(
@@ -415,7 +416,7 @@ class CountFilter extends Component {
                     </Option>
                 );
             });
-        } else if (value === 'y') { // 缺勤时可以选择的状态有打卡一次
+        } else if (value === 'n') { // 缺勤时可以选择的状态有打卡一次
             let arr = [{label: '未打卡', value: 1}];
             arr.map(p => {
                 statusArray.push(
@@ -519,14 +520,14 @@ class CountFilter extends Component {
                                             onChange={this.onCheckinChange.bind(this)}
                                         >
                                             <Option
-                                                key={'y'}
-                                                value={'y'}
+                                                key={'n'}
+                                                value={'n'}
                                             >
                                                 缺勤
                                             </Option>
                                             <Option
-                                                key={'n'}
-                                                value={'n'}
+                                                key={'y'}
+                                                value={'y'}
                                             >
                                                 出勤
                                             </Option>
@@ -616,38 +617,35 @@ class CountFilter extends Component {
 
     query () {
         const {
-            form: { validateFields }
+            form: { validateFields },
+            actions: {
+                changeFilterData
+            }
         } = this.props;
+        const {
+            start,
+            end
+        } = this.state;
         validateFields((err, values) => {
             console.log('err', err);
             console.log('values', values);
-            let params = {};
-            params.org_code = values.org_code ? values.org_code : '';
-            params.group = values.group ? values.group : '';
-            params.name = values.name ? values.name : '';
-            if (values.searchDate) {
-                params.start = this.state.start;
-                params.end = this.state.end;
-            }
-            params.checkin = values.checkin ? values.checkin : '';
-            if (values.status === 2) { // 迟到默认可查询状态5
-                params.status = values.status + ',5';
-            } else if (values.status === 3) { // 早退默认可查询状态5
-                params.status = values.status + ',5';
-            } else {
-                params.status = values.status ? values.status : '';
-            }
-            params.role = values.role ? values.role : '';
-            params.duty = values.duty ? values.duty : '';
+            let params = handleFilterData(values, start, end);
+            console.log('params', params);
+            changeFilterData(params);
             this.props.query(1, params);
         });
     }
     clear () {
         const {
-            form: { setFieldsValue }
+            form: { setFieldsValue, validateFields },
+            actions: {
+                changeFilterData
+            }
         } = this.props;
         const {
-            userCompany
+            userCompany,
+            start,
+            end
         } = this.state;
         setFieldsValue({
             checkin: undefined,
@@ -659,7 +657,14 @@ class CountFilter extends Component {
             searchDate: undefined,
             status: undefined
         });
-        // this.props.form.resetFields();
+        validateFields((err, values) => {
+            console.log('err', err);
+            console.log('values', values);
+            let params = handleFilterData(values, start, end);
+            console.log('params', params);
+            changeFilterData(params);
+            this.props.query(1, params);
+        });
     }
 }
 export default Form.create()(CountFilter);
