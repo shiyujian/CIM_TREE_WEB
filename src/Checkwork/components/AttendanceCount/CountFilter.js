@@ -159,8 +159,11 @@ class CountFilter extends Component {
         const {
             platform: { roles = [] }
         } = this.props;
+        const {
+            permission
+        } = this.state;
         var systemRoles = [];
-        if (user.is_superuser) {
+        if (permission) {
             systemRoles.push({
                 name: '苗圃角色',
                 value: roles.filter(role => role.grouptype === 0)
@@ -258,8 +261,11 @@ class CountFilter extends Component {
         const {
             platform: { roles = [] }
         } = this.props;
+        const {
+            permission
+        } = this.state;
         var systemRoles = [];
-        if (user.is_superuser) {
+        if (permission) {
             systemRoles.push({
                 name: '苗圃职务',
                 children: ['苗圃'],
@@ -400,7 +406,7 @@ class CountFilter extends Component {
             status: undefined
         });
         let statusArray = [];
-        if (value === 'y') { // 出勤时可以选择的状态有正常打卡,迟到,和早退
+        if (value === 'n') { // 出勤时可以选择的状态有正常打卡,迟到,和早退
             let arr = [{label: '正常打卡', value: 4}, {label: '迟到', value: 2}, {label: '早退', value: 3}];
             arr.map(p => {
                 statusArray.push(
@@ -409,7 +415,7 @@ class CountFilter extends Component {
                     </Option>
                 );
             });
-        } else if (value === 'n') { // 缺勤时可以选择的状态有打卡一次
+        } else if (value === 'y') { // 缺勤时可以选择的状态有打卡一次
             let arr = [{label: '未打卡', value: 1}];
             arr.map(p => {
                 statusArray.push(
@@ -440,6 +446,7 @@ class CountFilter extends Component {
 
                                     })(
                                         <Select
+                                            allowClear
                                             placeholder='请选择公司'
                                             onChange={this.handleOrgSelectChange.bind(
                                                 this
@@ -461,7 +468,7 @@ class CountFilter extends Component {
                                     {getFieldDecorator('group', {
 
                                     })(
-                                        <Select placeholder='请选择考勤群体'>
+                                        <Select placeholder='请选择考勤群体' allowClear>
                                             {groupArray}
                                         </Select>
                                     )}
@@ -506,20 +513,22 @@ class CountFilter extends Component {
                                     {getFieldDecorator('checkin', {
 
                                     })(
-                                        <Select placeholder='请选择是否出勤' onChange={this.onCheckinChange.bind(
-                                            this
-                                        )}>
+                                        <Select
+                                            allowClear
+                                            placeholder='请选择是否出勤'
+                                            onChange={this.onCheckinChange.bind(this)}
+                                        >
                                             <Option
                                                 key={'y'}
                                                 value={'y'}
                                             >
-                                                出勤
+                                                缺勤
                                             </Option>
                                             <Option
                                                 key={'n'}
                                                 value={'n'}
                                             >
-                                                缺勤
+                                                出勤
                                             </Option>
                                         </Select>
                                     )}
@@ -530,7 +539,7 @@ class CountFilter extends Component {
                                     {getFieldDecorator('status', {
 
                                     })(
-                                        <Select placeholder='请选择状态'>
+                                        <Select placeholder='请选择状态' allowClear>
                                             {statusArray}
                                         </Select>
                                     )}
@@ -574,7 +583,8 @@ class CountFilter extends Component {
                                                         input.toLowerCase()
                                                     ) >= 0
                                             }
-                                            mode='multiple'
+                                            allowClear
+                                            // mode='multiple'
                                             style={{ width: '100%' }}
                                         >
                                             {this.renderContent()}
@@ -588,6 +598,7 @@ class CountFilter extends Component {
 
                                     })(
                                         <Select
+                                            allowClear
                                             placeholder='请选择职务'
                                             style={{ width: '100%' }}
                                         >

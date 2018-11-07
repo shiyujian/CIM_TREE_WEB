@@ -66,15 +66,6 @@ export default class CountTable extends Component {
         const {actions: {getCheckRecord}} = this.props;
         console.log('current', current);
         try {
-            // let params = [];
-            // if (queryParams) {
-            //     for (let key in queryParams) {
-            //         if (queryParams[key]) {
-            //             params.push(key + '=' + encodeURI(queryParams[key]));
-            //         }
-            //     }
-            // }
-            // params = params.join('&');
             let postaData = {
                 page: current,
                 size: 10,
