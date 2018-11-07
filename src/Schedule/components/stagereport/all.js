@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-01 16:06:55
+ * @Last Modified time: 2018-11-07 14:53:21
  */
 import React, { Component } from 'react';
 import {
@@ -31,7 +31,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
 import {
-    base,
+    UPLOAD_API,
     WORKFLOW_CODE
 } from '../../../_platform/api';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
@@ -814,7 +814,7 @@ class All extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         onChange: ({ file, fileList, event }) => {
             this.setState({
                 loading: true

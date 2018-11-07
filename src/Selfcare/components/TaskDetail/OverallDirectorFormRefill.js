@@ -20,7 +20,7 @@ import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import {
-    base
+    UPLOAD_API
 } from '../../../_platform/api';
 import queryString from 'query-string';
 // import {fileTypes} from '../../../_platform/store/global/file';
@@ -571,7 +571,7 @@ class OverallDirectorFormRefill extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         onChange: ({ file, fileList, event }) => {
             this.setState({
                 loading: true
@@ -579,7 +579,6 @@ class OverallDirectorFormRefill extends Component {
             const status = file.status;
             // const { newFileLists } = this.state;
             const { TreatmentData = [] } = this.state;
-            let newdata = [];
             if (status === 'done') {
                 console.log('file', file);
                 // const { actions: { postUploadFilesAc } } = this.props;

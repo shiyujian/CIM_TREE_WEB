@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-03 09:58:31
+ * @Last Modified time: 2018-11-07 14:28:01
  */
 import React, { Component } from 'react';
 import {
@@ -411,17 +411,14 @@ class OnSite extends Component {
         // W3C
         if (docElm.requestFullscreen) {
             docElm.requestFullscreen();
-        }
-        // FireFox
-        else if (docElm.mozRequestFullScreen) {
+        } else if (docElm.mozRequestFullScreen) {
+            // FireFox
             docElm.mozRequestFullScreen();
-        }
-        // Chrome等
-        else if (docElm.webkitRequestFullScreen) {
+        } else if (docElm.webkitRequestFullScreen) {
+            // Chrome等
             docElm.webkitRequestFullScreen();
-        }
-        // IE11
-        else if (docElm.msRequestFullscreen) {
+        } else if (docElm.msRequestFullscreen) {
+            // IE11
             docElm.msRequestFullscreen();
         }
     }

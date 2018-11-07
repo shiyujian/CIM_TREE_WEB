@@ -18,7 +18,7 @@ import moment from 'moment';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base } from '../../../_platform/api';
+import { UPLOAD_API } from '../../../_platform/api';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes =
@@ -347,7 +347,7 @@ class FormAddition extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         onChange: ({ file, fileList, event }) => {
             this.setState({
                 loading: true

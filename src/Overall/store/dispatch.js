@@ -2,7 +2,6 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from './dispatchFetchAction';
 import createFetchActionT from 'fetch-action';
 import {
-    base,
     USER_API,
     SERVICE_API,
     CODE_API

@@ -21,7 +21,7 @@ import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import {
-    base
+    UPLOAD_API
 } from '../../../_platform/api';
 import queryString from 'query-string';
 const { Option } = Select;
@@ -751,13 +751,12 @@ class ScheduleTotalRefill extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         onChange: ({ file, fileList, event }) => {
             this.setState({
                 loading: true
             });
             const status = file.status;
-            let newdata = [];
             const { TreatmentData = [] } = this.state;
             if (status === 'done') {
                 console.log('file', file);

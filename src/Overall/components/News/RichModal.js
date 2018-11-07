@@ -3,7 +3,7 @@ import { Modal, Form, Input, Row, Col, Button, message, Select, Upload, Icon } f
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
-import { base, STATIC_DOWNLOAD_API, SOURCE_API, FILE_API } from '../../../_platform/api';
+import { UPLOAD_API, STATIC_DOWNLOAD_API, SOURCE_API, FILE_API } from '../../../_platform/api';
 import E from 'wangeditor';
 import { DEPARTMENT } from '_platform/api';
 
@@ -37,7 +37,7 @@ class RichModal extends Component {
         };
         editor.customConfig.zIndex = 900;
         editor.customConfig.uploadImgTimeout = 15000;
-        editor.customConfig.uploadImgServer = base + '/service/fileserver/api/user/files/';
+        editor.customConfig.uploadImgServer = UPLOAD_API;
         editor.customConfig.uploadFileName = 'a_file';
         editor.customConfig.uploadImgMaxLength = 1;
         editor.customConfig.uploadImgMaxSize = 5 * 1024 * 1024;
@@ -342,7 +342,7 @@ class RichModal extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: true,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         beforeUpload: () => {
             this.setState({ progress: 0 });
         },
@@ -361,8 +361,7 @@ class RichModal extends Component {
             }
             if (event) {
                 let { percent } = event;
-                if (percent !== undefined)
-                    {this.setState({ progress: parseFloat(percent.toFixed(1)) });}
+                if (percent !== undefined) { this.setState({ progress: parseFloat(percent.toFixed(1)) }); }
             }
         }
     };

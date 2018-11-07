@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
-import { USER_API, SUSER_API, base } from '../../api';
+import { USER_API, SUSER_API } from '../../api';
 import { capitalize } from '../util';
 
 export default (ID, service = '') => {
@@ -26,11 +26,10 @@ export default (ID, service = '') => {
     );
     const putUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'PUT');
     const putUserBlackList = createFetchAction(
-        `${base}/accounts/api/user/{{userID}}/black/`,
+        `${USER_API}/user/{{userID}}/black/`,
         [],
         'PUT'
     );
-    // const putUserBlackList = createFetchAction(`http://172.20.64.68:9595/accounts/api/user/13360/black/`, [], 'PUT');
     const usersReducer = handleActions(
         {
             [getUsersOK]: (state, { payload }) => {

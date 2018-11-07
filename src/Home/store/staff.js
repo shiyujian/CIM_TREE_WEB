@@ -1,16 +1,16 @@
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
-import { base, SERVICE_API, USER_API } from '_platform/api';
+import { MAIN_API, USER_API } from '_platform/api';
 
 const ID = 'home_staff';
 
 export const getOrgAttendInfoOK = createAction(`${ID}_获取部门出勤信息`);
 const getOrgAttendInfo = createFetchAction(
-    `${base}/main/api/staff-statistic2/?org_code=&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`,
+    `${MAIN_API}/staff-statistic2/?org_code=&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`,
     [getOrgAttendInfoOK]
 );
 const getOrgAttendInfoT = createFetchAction(
-    `${base}/main/api/staff-statistic2/?org_code=&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`,
+    `${MAIN_API}/staff-statistic2/?org_code=&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`,
     []
 );
 const getCurrentUserOrgCodeOK = createAction(`${ID}_获取当前用户org-code`);

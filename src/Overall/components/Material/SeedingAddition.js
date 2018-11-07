@@ -19,7 +19,7 @@ import moment from 'moment';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
-import { base, WORKFLOW_CODE } from '../../../_platform/api';
+import { UPLOAD_API, WORKFLOW_CODE } from '../../../_platform/api';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes =
@@ -517,7 +517,7 @@ class SeedingAddition extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         onChange: ({ file, fileList, event }) => {
             this.setState({
                 loading: true

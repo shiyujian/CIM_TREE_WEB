@@ -1,7 +1,6 @@
 import { createAction, handleActions, combineActions } from 'redux-actions';
-import { actionsMap } from '_platform/store/util';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API, base } from '_platform/api';
+import { SERVICE_API } from '_platform/api';
 // import dirFactory from '_platform/store/higher-order/dir';
 
 export const ID = 'riskFactor';

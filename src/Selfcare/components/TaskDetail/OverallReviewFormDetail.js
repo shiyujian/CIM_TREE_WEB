@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Table, Spin, message, Modal, Button, Form, Row, Col, Select, Input, Icon, Card, Divider} from 'antd';
-import moment from 'moment';
-import { WORKFLOW_CODE, SOURCE_API, base, STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { Table, Form, Row, Col, Input, Card, Divider, Notification } from 'antd';
+import { SOURCE_API, STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import Preview from '../../../_platform/components/layout/Preview';
 
 const FormItem = Form.Item;
@@ -49,15 +48,15 @@ class OverallReviewFormDetail extends Component {
     ]
 
     static layout = {
-        labelCol: {span: 4},
-        wrapperCol: {span: 20}
+        labelCol: { span: 4 },
+        wrapperCol: { span: 20 }
     };
 
     render () {
         const {
             platform: { task = {} } = {},
             form: { getFieldDecorator }
-		 } = this.props;
+        } = this.props;
         let record = {};
         if (task && task.subject) {
             record = this.getTable(task);
@@ -65,7 +64,7 @@ class OverallReviewFormDetail extends Component {
         return (
             <Card title={'流程详情'}>
                 <Row gutter={24}>
-        <Col span={24} >
+                    <Col span={24} >
                         <Row gutter={15} >
                             <Col span={12}>
                                 <FormItem {...OverallReviewFormDetail.layout} label='标段:'>
@@ -103,16 +102,16 @@ class OverallReviewFormDetail extends Component {
                             </Col>
                         </Row>
                     </Col>
-    </Row>
+                </Row>
                 <Row gutter={24}>
-        <Col span={24} style={{marginTop: '1em'}}>
+                    <Col span={24} style={{ marginTop: '1em' }}>
                         <Table
                             dataSource={record.TreatmentData ? record.TreatmentData : []}
                             columns={this.columns1}
                             pagination
                         />
                     </Col>
-    </Row>
+                </Row>
                 <Preview />
 
             </Card>
@@ -146,8 +145,8 @@ class OverallReviewFormDetail extends Component {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }else {
-            notification.error({
+        } else {
+            Notification.error({
                 message: '文件下载失败',
                 duration: 2
             });

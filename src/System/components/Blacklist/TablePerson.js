@@ -491,7 +491,6 @@ class TablePerson extends Component {
             } = this.props;
             // 分页获取数据
             let pageSize = 10;
-            // let rst = await getPersonList({ pagesize: pageSize, offset: (obj.current - 1) * pageSize });
             let rst = await getPersonInfo({ is_black: 1, page: obj.current });
             let personlist = rst.results;
             this.setState({ serialNumber: obj });
@@ -587,10 +586,7 @@ class TablePerson extends Component {
     async componentDidMount () {
         this.setState({ loading: true });
         const {
-            platform: { roles = [] },
-            addition = {},
-            actions: { changeAdditionField, getOrgTree },
-            tags = {}
+            actions: { getOrgTree }
         } = this.props;
         const {
             actions: { getPersonInfo }
@@ -602,7 +598,6 @@ class TablePerson extends Component {
             });
 
             // 分页获取数据
-            // let rst = await getPersonList({ pagesize: 10, offset: 0 });
             let personlist = rst;
             this.setState({ resultInfo: rst });
             // let total = rst.result.total;
@@ -619,10 +614,7 @@ class TablePerson extends Component {
             this.setState({
                 pagination: pagination
             });
-            // let rst = await getOrgName({ code: record.account.organization.code })
 
-            let type = [];
-            let element = '';
             let data_person = persons.map((item, index) => {
                 let groupsId = [];
                 const groups = item.groups || [];
@@ -783,16 +775,9 @@ class TablePerson extends Component {
     };
     async confirm (record) {
         const {
-            sidebar: { node } = {},
-            actions: { getOrgName, putUser, putUserBlackList }
+            actions: { putUserBlackList }
         } = this.props;
         console.log('record', record);
-        // let rst = await getOrgName({ code: record.account.organization.code })
-        // console.log("rst", rst)
-        // let groupd = []
-        // record.groups.map(ess => {
-        // 	groupd.push(ess.id)
-        // })
         this.setState({ loading: true });
         putUserBlackList(
             { userID: record.children[0].id },

@@ -1,34 +1,21 @@
 import React, { Component } from 'react';
 import {
     Table,
-    Spin,
-    message,
-    Modal,
-    Button,
     Form,
     Row,
     Col,
-    Select,
     Input,
-    Icon,
-    DatePicker,
-    Popconfirm,
     Card,
-    Divider
+    Divider,
+    Notification
 } from 'antd';
 import {
-    base,
     STATIC_DOWNLOAD_API,
-    SOURCE_API,
-    WORKFLOW_CODE
+    SOURCE_API
 } from '../../../_platform/api';
-import moment from 'moment';
 import Preview from '../../../_platform/components/layout/Preview';
 
 const FormItem = Form.Item;
-const { RangePicker } = DatePicker;
-
-let indexSelect = '';
 class SafetySystemDetail extends Component {
     constructor (props) {
         super(props);
@@ -207,7 +194,6 @@ class SafetySystemDetail extends Component {
 
     getTable (instance) {
         let subject = instance.subject[0];
-        let postData = subject.postData ? JSON.parse(subject.postData) : '';
         let record = {
             id: instance.id,
             TreatmentData: subject.TreatmentData
@@ -238,7 +224,7 @@ class SafetySystemDetail extends Component {
             link.click();
             document.body.removeChild(link);
         } else {
-            notification.error({
+            Notification.error({
                 message: '文件下载失败',
                 duration: 2
             });

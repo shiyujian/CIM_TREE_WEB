@@ -110,7 +110,7 @@ export default class OverallReviewFormHandle extends Component {
     handleSubmit (task = {}) {
         const {
             location,
-            actions: { putFlow, addSchedule }
+            actions: { putFlow }
         } = this.props;
         let { note } = this.state;
         if (!this.member) {

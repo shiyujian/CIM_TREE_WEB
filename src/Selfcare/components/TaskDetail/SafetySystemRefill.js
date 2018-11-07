@@ -11,7 +11,7 @@ import {
     Select,
     Checkbox,
     Popconfirm,
-    notification,
+    Notification,
     Card,
     Steps,
     Spin
@@ -21,7 +21,7 @@ import PerSearch from '../../../_platform/components/panels/PerSearch';
 import { getUser } from '../../../_platform/auth';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import {
-    base
+    UPLOAD_API
 } from '../../../_platform/api';
 import queryString from 'query-string';
 const Dragger = Upload.Dragger;
@@ -630,7 +630,7 @@ class SafetySystemRefill extends Component {
             if (!err) {
                 // 存储新的流程详情
                 if (TreatmentData.length === 0) {
-                    notification.error({
+                    Notification.error({
                         message: '请上传文件',
                         duration: 5
                     });
@@ -715,14 +715,14 @@ class SafetySystemRefill extends Component {
                 putFlow(data, postdata).then(rst => {
                     console.log('rst', rst);
                     if (rst && rst.creator) {
-                        notification.success({
+                        Notification.success({
                             message: '流程提交成功',
                             duration: 2
                         });
                         let to = `/selfcare/task`;
                         me.props.history.push(to);
                     } else {
-                        notification.error({
+                        Notification.error({
                             message: '流程通过失败',
                             duration: 2
                         });
@@ -788,13 +788,12 @@ class SafetySystemRefill extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         onChange: ({ file, fileList, event }) => {
             this.setState({
                 loading: true
             });
             const status = file.status;
-            let newdata = [];
             const { TreatmentData = [] } = this.state;
             if (status === 'done') {
                 console.log('file', file);
@@ -817,7 +816,7 @@ class SafetySystemRefill extends Component {
                     mime_type: file.response.mime_type
                 });
                 console.log('TreatmentData', TreatmentData);
-                notification.success({
+                Notification.success({
                     message: '文件上传成功',
                     duration: 3
                 });
@@ -829,7 +828,7 @@ class SafetySystemRefill extends Component {
                 this.setState({
                     loading: false
                 });
-                notification.error({
+                Notification.error({
                     message: '文件上传失败',
                     duration: 2
                 });

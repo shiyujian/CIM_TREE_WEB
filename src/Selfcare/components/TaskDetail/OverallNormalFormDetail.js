@@ -1,24 +1,15 @@
 import React, { Component } from 'react';
 import {
     Table,
-    Spin,
-    message,
-    Modal,
-    Button,
     Form,
     Row,
     Col,
-    Select,
     Input,
-    Icon,
     Card,
     Divider
 } from 'antd';
-import moment from 'moment';
 import {
-    WORKFLOW_CODE,
     SOURCE_API,
-    base,
     STATIC_DOWNLOAD_API
 } from '../../../_platform/api';
 import Preview from '../../../_platform/components/layout/Preview';

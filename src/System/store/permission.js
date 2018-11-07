@@ -2,9 +2,9 @@ import { handleActions, combineActions, createAction } from 'redux-actions';
 import { actionsMap } from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import fieldFactory from '_platform/store/service/field';
-import { base } from '_platform/api';
+import { USER_API } from '_platform/api';
 const getLoginUser = createFetchAction(
-    `${base}/accounts/api/users/{{id}}/`,
+    `${USER_API}/users/{{id}}/`,
     [],
     'GET'
 );

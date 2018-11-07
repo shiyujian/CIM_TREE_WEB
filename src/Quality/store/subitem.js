@@ -1,9 +1,9 @@
-import { createAction, handleActions, combineActions } from 'redux-actions';
+import { createAction, handleActions } from 'redux-actions';
 import { createFetchActionWithHeaders } from './fetchAction';
 import createFetchAction from 'fetch-action';
 import {
     SERVICE_API,
-    base,
+    MAIN_API,
     USER_API,
     WORKFLOW_API,
     FILE_API,
@@ -16,11 +16,11 @@ export const getArea = createFetchAction(
     [getAreaOK]
 );
 export const getTrack = createFetchAction(
-    `${base}/main/api/user/{{ID}}/location/`,
+    `${MAIN_API}/user/{{ID}}/location/`,
     []
 );
 export const getRisk = createFetchAction(
-    `${base}/main/api/potential-risk/?status=1`,
+    `${MAIN_API}/potential-risk/?status=1`,
     []
 );
 export const setDefectData = createAction('设置质量缺陷详情数据');

@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
-import { Table, Spin, message, Modal, Button, Form, Row, Col, Select, Input, Icon, DatePicker, Popconfirm, Card } from 'antd';
-import { base, STATIC_DOWNLOAD_API, SOURCE_API, WORKFLOW_CODE } from '../../../_platform/api';
-import moment from 'moment';
+import { Button, Form, Row, Col, Input, Icon, Card } from 'antd';
+import { STATIC_DOWNLOAD_API, SOURCE_API } from '../../../_platform/api';
 import Preview from '../../../_platform/components/layout/Preview';
 
 const FormItem = Form.Item;
-const { RangePicker } = DatePicker;
 
-let indexSelect = '';
 class QulityCheckDetail extends Component {
     constructor (props) {
         super(props);
@@ -17,7 +14,6 @@ class QulityCheckDetail extends Component {
             indexSelect: '',
             record: {}
         };
-        const attachmentFile = {};
     }
 
     static layout = {

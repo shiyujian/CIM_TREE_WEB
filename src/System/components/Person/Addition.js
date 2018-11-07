@@ -15,7 +15,7 @@ import {
 } from 'antd';
 import { getUserIsDocument } from '../../../_platform/auth';
 import {getSectionNameBySection} from '_platform/gisAuth';
-import { base, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API } from '../../../_platform/api';
+import { UPLOAD_API, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API } from '../../../_platform/api';
 import { Promise } from 'es6-promise';
 let fileTypes =
     'application/jpeg,application/gif,application/png,image/jpeg,image/gif,image/png,image/jpg';
@@ -781,10 +781,7 @@ class Addition extends Component {
                                             multiple
                                             accept={fileTypes}
                                             // showUploadList: false,
-                                            action={
-                                                base +
-                                                '/service/fileserver/api/user/files/'
-                                            }
+                                            action={UPLOAD_API}
                                             listType='picture'
                                             data={file => ({
                                                 name: file.fileName,
@@ -823,10 +820,7 @@ class Addition extends Component {
                                             multiple
                                             accept={fileTypes}
                                             // showUploadList: false,
-                                            action={
-                                                base +
-                                                '/service/fileserver/api/user/files/'
-                                            }
+                                            action={UPLOAD_API}
                                             listType='picture'
                                             data={file => ({
                                                 name: file.fileName,
@@ -1064,10 +1058,7 @@ class Addition extends Component {
                                             accept={fileTypes}
                                             // showUploadList: false,
                                             // className='form-item-required'
-                                            action={
-                                                base +
-                                                '/service/fileserver/api/user/files/'
-                                            }
+                                            action={UPLOAD_API}
                                             listType='picture'
                                             data={file => ({
                                                 name: file.fileName,
@@ -1107,10 +1098,7 @@ class Addition extends Component {
                                             accept={fileTypes}
                                             // className='form-item-required'
                                             // showUploadList: false,
-                                            action={
-                                                base +
-                                                '/service/fileserver/api/user/files/'
-                                            }
+                                            action={UPLOAD_API}
                                             listType='picture'
                                             data={file => ({
                                                 name: file.fileName,

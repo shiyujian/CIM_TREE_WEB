@@ -75,7 +75,7 @@ export default class SafetySystemDeal extends Component {
     handleSubmit (task = {}) {
         const {
             location,
-            actions: { putFlow, addSchedule }
+            actions: { putFlow }
         } = this.props;
         let { note } = this.state;
 

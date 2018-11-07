@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    base,
+    UPLOAD_API,
     WORKFLOW_CODE
 } from '../../../_platform/api';
 import {
@@ -421,7 +421,7 @@ class AddModal extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         onChange: ({ file, fileList, event }) => {
             this.setState({
                 loading: true

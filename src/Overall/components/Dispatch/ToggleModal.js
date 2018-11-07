@@ -14,7 +14,7 @@ import {
     Progress
 } from 'antd';
 import { getUser } from '../../../_platform/auth';
-import { base, SOURCE_API } from '../../../_platform/api';
+import { UPLOAD_API, SOURCE_API } from '../../../_platform/api';
 import E from 'wangeditor';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -47,7 +47,7 @@ class ToggleModal extends Component {
         name: 'a_file',
         multiple: false,
         showUploadList: false,
-        action: base + '/service/fileserver/api/user/files/',
+        action: UPLOAD_API,
         onChange: ({ file, fileList, event }) => {
             const status = file.status;
             if (status === 'done') {
@@ -82,8 +82,7 @@ class ToggleModal extends Component {
         };
         editor.customConfig.zIndex = 900;
         editor.customConfig.uploadImgTimeout = 15000;
-        editor.customConfig.uploadImgServer =
-            base + '/service/fileserver/api/user/files/';
+        editor.customConfig.uploadImgServer = UPLOAD_API;
         editor.customConfig.uploadFileName = 'a_file';
         editor.customConfig.uploadImgMaxLength = 1;
         editor.customConfig.uploadImgMaxSize = 5 * 1024 * 1024;

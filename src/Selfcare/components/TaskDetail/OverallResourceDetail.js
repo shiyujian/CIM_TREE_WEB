@@ -1,32 +1,21 @@
 import React, { Component } from 'react';
 import {
     Table,
-    Spin,
-    message,
-    Modal,
-    Button,
     Form,
     Row,
     Col,
-    Select,
     Input,
-    Icon,
-    DatePicker,
-    Popconfirm,
     Card,
     Divider
 } from 'antd';
 import {
-    base,
     STATIC_DOWNLOAD_API,
-    SOURCE_API,
-    WORKFLOW_CODE
+    SOURCE_API
 } from '../../../_platform/api';
 import moment from 'moment';
 import Preview from '../../../_platform/components/layout/Preview';
 
 const FormItem = Form.Item;
-const { RangePicker } = DatePicker;
 
 class OverallResourceDetail extends Component {
     constructor (props) {

@@ -2,19 +2,19 @@ import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
 import moment from 'moment';
 // import createFetchAction from 'fetch-action';
-import { base, SERVICE_API } from '_platform/api';
+import { MAIN_API, SERVICE_API } from '_platform/api';
 const ID = 'home';
 // 获取新闻列表
 export const getNewsListOK = createAction('home获取新闻列表');
 export const getNewsList = createFetchAction(
-    `${base}/main/api/post/?publisher={{user_id}}&tag=%E6%96%B0%E9%97%BB&is_draft=false&category=4&time=${moment().valueOf()}`,
+    `${MAIN_API}/post/?publisher={{user_id}}&tag=%E6%96%B0%E9%97%BB&is_draft=false&category=4&time=${moment().valueOf()}`,
     [getNewsListOK]
 );
 
 // 获取通知列表
 export const getTipsListOK = createAction('home获取通知列表');
 export const getTipsList = createFetchAction(
-    `${base}/main/api/post/?publisher={{user_id}}&tag=%E5%85%AC%E5%91%8A&is_draft=false&category=4&time=${moment().valueOf()}`,
+    `${MAIN_API}/post/?publisher={{user_id}}&tag=%E5%85%AC%E5%91%8A&is_draft=false&category=4&time=${moment().valueOf()}`,
     [getTipsListOK]
 );
 
