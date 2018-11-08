@@ -18,25 +18,6 @@ export default class Tree extends Component {
         } = this.props;
         await getOrgTree({}, { depth: 4 });
         await this.getOrgDataList();
-        // .then(rst => {
-        //     let dataList = [];
-        //     if (rst && rst.children) {
-        //         dataList = rst.children.filter(item => {
-        //             if (item.name !== '供应商' && item.name !== '苗圃基地') {
-        //                 return item;
-        //             }
-        //         });
-        //         this.setState({
-        //             dataList
-        //         });
-        //         this.getList(dataList);
-        //     }
-        //     const { children: [first] = [] } = rst || {};
-        //     this.setState({ list: this.filiter(rst.children) });
-        //     if (first) {
-        //         changeSidebarField('node', { ...first, type: 'project' });
-        //     }
-        // });
     }
 
     getOrgDataList = async () => {
@@ -46,7 +27,6 @@ export default class Tree extends Component {
                 changeOrgTreeDataStatus
             }
         } = this.props;
-        console.log('children', children);
         try {
             let dataList = [];
             dataList = children.filter(item => {
@@ -68,8 +48,10 @@ export default class Tree extends Component {
     render () {
         const { dataList } = this.state;
         const {
+            platform: { org: { children = [] } = {} },
             sidebar: { node = {} } = {}
         } = this.props;
+        console.log(children);
         const { code } = node || {};
         return (
             <div>

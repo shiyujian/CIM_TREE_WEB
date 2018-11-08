@@ -223,7 +223,6 @@ class AddEdit extends Component {
                                         <Cascader placeholder='选择您所在的城市'
                                             options={RegionCodeList}
                                             onChange={this.handleRegion}
-                                            changeOnSelect
                                         />
                                     )}
                                 </FormItem>

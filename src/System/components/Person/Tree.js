@@ -4,59 +4,67 @@ import { TreeSelect } from 'antd';
 import {getCompanyDataByOrgCode} from '_platform/auth';
 const TreeNode = TreeSelect.TreeNode;
 
-const addGroupSupplier = (supplier_list, str) => {
+const addGroup = (childrenList, str) => {
+    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
     const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));
     const regionCode_province = JSON.parse(window.sessionStorage.getItem('regionCode_province'));
-    let arr_province = [];
-    supplier_list.map(item => {
-        item.RegionCode = supplier_regionCode[item.code];
-        item.province = regionCode_province[item.RegionCode];
-        if (!arr_province.includes(item.province)) {
-            arr_province.push(item.province);
+    if (str === '供应商') {
+        childrenList.map(item => {
+            item.RegionCode = supplier_regionCode[item.code];
+            if (regionCode_province[item.RegionCode]) {
+                const regionNameArr = regionCode_province[item.RegionCode].split(',');
+                item.province = regionNameArr[1];
+                item.city = regionNameArr[2];
+            }
+        });
+    } else {
+        childrenList.map(item => {
+            item.RegionCode = nursery_regionCode[item.code];
+            if (regionCode_province[item.RegionCode]) {
+                const regionNameArr = regionCode_province[item.RegionCode].split(',');
+                item.province = regionNameArr[1];
+                item.city = regionNameArr[2];
+            }
+        });
+    }
+    
+    let provinceArr = [];
+    childrenList.map(item => {
+        if(!provinceArr.includes(item.province)){
+            provinceArr.push(item.province);
         }
     });
     let newChildren = [];
-    arr_province.map((item, index) => {
-        let arr1 = [];
-        supplier_list.map(record => {
-            if (item === record.province) {
-                arr1.push(record);
+    provinceArr.map((item, index) => {
+        let cityArr = [];
+        childrenList.map(row => {
+            if (item === row.province && !cityArr.includes(row.city)) {
+                cityArr.push(row.city);
             }
-        });
+        })
+        let provinceChildren = [];
+        cityArr.map((row, col) => {
+            let cityChildren = [];
+            childrenList.map(record => {
+                if (row === record.city) {
+                    cityChildren.push({
+                        ...record
+                    })
+                }
+            })
+            provinceChildren.push({
+                name: row || '其他',
+                code: str + row + col,
+                children: cityChildren
+            })
+        })
         newChildren.push({
             name: item || '其他',
-            children: arr1,
-            code: index
+            code: str + item + index,
+            children: provinceChildren
         });
     });
-    return newChildren;
-};
-
-const addGroupNursery = (nursery_list, str) => {
-    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
-    const regionCode_province = JSON.parse(window.sessionStorage.getItem('regionCode_province'));
-    let arr_province = [];
-    nursery_list.map(item => {
-        item.RegionCode = nursery_regionCode[item.code];
-        item.province = regionCode_province[item.RegionCode];
-        if (!arr_province.includes(item.province)) {
-            arr_province.push(item.province);
-        }
-    });
-    let newChildren = [];
-    arr_province.map((item, index) => {
-        let arr1 = [];
-        nursery_list.map(record => {
-            if (item === record.province) {
-                arr1.push(record);
-            }
-        });
-        newChildren.push({
-            name: item || '其他',
-            children: arr1,
-            code: index
-        });
-    });
+    console.log(newChildren, 'newChildren');
     return newChildren;
 };
 
@@ -94,12 +102,11 @@ export default class Tree extends Component {
         getRegionCodes({}, {grade: 3}).then(rst => {
             let obj = {};
             rst.map(item => {
-                obj[item.ID] = item.MergerName.split(',')[1];
+                obj[item.ID] = item.MergerName;
             });
             window.sessionStorage.setItem('regionCode_province', JSON.stringify(obj));
         });
         getSupplierList().then(rst => {
-            console.log(rst, '苗圃');
             window.sessionStorage.setItem('Supplier_list', JSON.stringify(rst.content));
             let obj = {};
             rst.content.map(item => {
@@ -145,13 +152,12 @@ export default class Tree extends Component {
                 await getOrgTreeDataArr(this.orgTreeDataArr);
             }
             let rst = await getOrgTree({}, { depth: 3 });
-            console.log(rst, '11111');
             if (rst && rst.children) {
                 rst.children.map(item => {
                     if (item.name === '供应商') {
-                        item.children = addGroupSupplier(item.children, '供应商');
+                        item.children = addGroup(item.children, '供应商');
                     } else if (item.name === '苗圃基地') {
-                        item.children = addGroupNursery(item.children, '苗圃基地');
+                        item.children = addGroup(item.children, '苗圃基地');
                     }
                 });
                 this.getList(rst.children);
