@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-08 16:40:24
+ * @Last Modified time: 2018-11-08 19:40:06
  */
 import React, { Component } from 'react';
 import {
@@ -1016,15 +1016,15 @@ class OnSite extends Component {
                                 />
                             ) : ''
                     }
-                    {/* {
+                    {
                         adoptTreeModalVisible
-                            ? ( */}
-                    <AdoptTreeMessModal
-                        {...this.props}
-                        {...this.state}
-                        onCancel={this.handleCancelAdoptTreeMessModal.bind(this)} />
-                    {/* ) : ''
-                    } */}
+                            ? (
+                                <AdoptTreeMessModal
+                                    {...this.props}
+                                    {...this.state}
+                                    onCancel={this.handleCancelAdoptTreeMessModal.bind(this)} />
+                            ) : ''
+                    }
                     <Modal
                         title='隐患详情'
                         width={800}
