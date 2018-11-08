@@ -15,10 +15,9 @@ export default class CountTable extends Component {
         super(props);
         this.state = {
             seeVisible: false, // 查看弹框
-            record: null, // 行数据
             pagination: {},
             loading: false,
-            imgs: ''
+            imgs: []
         };
     }
 
@@ -26,7 +25,7 @@ export default class CountTable extends Component {
         const {
             seeVisible,
             allcheckrecord,
-            imgs
+            imgs = []
         } = this.state;
         return (
             <div>
@@ -43,13 +42,17 @@ export default class CountTable extends Component {
                         onChange={this.handleTableChange.bind(this)}
                     />
                 </Spin>
-                <Modal title='查看'
+                <Modal title='查看照片'
                     visible={seeVisible}
                     onCancel={this.handleCancel.bind(this)}
                     style={{ textAlign: 'center' }}
                     footer={null}
                 >
-                    <img src={imgs} width='100%' height='100%' alt='图片找不到了' />
+                    {
+                        imgs.map((img) => {
+                            return <img src={img} style={{ width: '490px', height: '490px', marginBottom: 10 }} alt='图片找不到了' />;
+                        })
+                    }
                 </Modal>
             </div>
         );
@@ -103,6 +106,48 @@ export default class CountTable extends Component {
         } catch (e) {
             console.log('query', e);
         }
+    }
+
+    // 上班的照片
+    previewCheckinImg (record) {
+        let imgs = this.onImgClick((record && record.checkin_record && record.checkin_record.imgs) || []);
+        console.log('imgs', imgs);
+        this.setState({
+            seeVisible: true,
+            imgs: imgs
+        });
+    }
+    // 下班的照片
+    previewCheckoutImg (record) {
+        let imgs = this.onImgClick((record && record.checkout_record && record.checkout_record.imgs) || []);
+        console.log('imgs', imgs);
+        this.setState({
+            seeVisible: true,
+            imgs: imgs
+        });
+    }
+
+    onImgClick = (datas) => {
+        let srcs = [];
+        try {
+            datas.map((data) => {
+                let arr = data.split(',');
+                arr.map(rst => {
+                    let src = getForestImgUrl(rst);
+                    srcs.push(src);
+                });
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+        return srcs;
+    };
+
+    handleCancel () {
+        this.setState({
+            seeVisible: false,
+            imgs: []
+        });
     }
 
     columns = [
@@ -163,7 +208,7 @@ export default class CountTable extends Component {
                     });
                     return <div className='column' title={name}>{name}</div>;
                 } else {
-                    return <span>/</span>;
+                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
                 }
             }
         },
@@ -179,7 +224,7 @@ export default class CountTable extends Component {
                         </div>
                     </div>;
                 } else {
-                    return <span>/</span>;
+                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
                 }
             }
         },
@@ -189,16 +234,31 @@ export default class CountTable extends Component {
             key: 'checkin_record.check_time',
             render: (text, record, index) => {
                 if (record && record.checkin_record && record.checkin_record.check_time) {
-                    return <div style={{textAlign: 'Center'}}>
-                        <div>
-                            {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
-                        </div>
-                        <div>
-                            {moment(text).utc().zone(-0).format('HH:mm:ss')}
-                        </div>
-                    </div>;
+                    if (record.checkin_record.imgs) {
+                        return <div style={{textAlign: 'Center'}}>
+                            <div>
+                                <a onClick={this.previewCheckinImg.bind(this, record)}>
+                                    {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                                </a>
+                            </div>
+                            <div>
+                                <a onClick={this.previewCheckinImg.bind(this, record)}>
+                                    {moment(text).utc().zone(-0).format('HH:mm:ss')}
+                                </a>
+                            </div>
+                        </div>;
+                    } else {
+                        return <div style={{textAlign: 'Center'}}>
+                            <div onClick={this.previewCheckinImg.bind(this, record)}>
+                                {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                            </div>
+                            <div onClick={this.previewCheckinImg.bind(this, record)}>
+                                {moment(text).utc().zone(-0).format('HH:mm:ss')}
+                            </div>
+                        </div>;
+                    }
                 } else {
-                    return <span>/</span>;
+                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
                 }
             }
         },
@@ -208,17 +268,31 @@ export default class CountTable extends Component {
             key: 'checkout_record.check_time',
             render: (text, record, index) => {
                 if (record && record.checkout_record && record.checkout_record.check_time) {
-                    console.log('moment(text).utc().zone(-0)', moment(text).utc().zone(-0).format('YYYY-MM-DD HH:mm:ss'));
-                    return <div style={{textAlign: 'Center'}}>
-                        <div>
-                            {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
-                        </div>
-                        <div>
-                            {moment(text).utc().zone(-0).format('HH:mm:ss')}
-                        </div>
-                    </div>;
+                    if (record.checkin_record.imgs) {
+                        return <div style={{textAlign: 'Center'}}>
+                            <div>
+                                <a onClick={this.previewCheckoutImg.bind(this, record)}>
+                                    {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                                </a>
+                            </div>
+                            <div>
+                                <a onClick={this.previewCheckoutImg.bind(this, record)}>
+                                    {moment(text).utc().zone(-0).format('HH:mm:ss')}
+                                </a>
+                            </div>
+                        </div>;
+                    } else {
+                        return <div style={{textAlign: 'Center'}}>
+                            <div onClick={this.previewCheckoutImg.bind(this, record)}>
+                                {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                            </div>
+                            <div onClick={this.previewCheckoutImg.bind(this, record)}>
+                                {moment(text).utc().zone(-0).format('HH:mm:ss')}
+                            </div>
+                        </div>;
+                    }
                 } else {
-                    return <span>/</span>;
+                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
                 }
             }
         },
@@ -243,50 +317,6 @@ export default class CountTable extends Component {
                     return <span>/</span>;
                 }
             }
-        },
-        {
-            title: '照片',
-            render: (record) => {
-                if ((record.checkin_record && record.checkin_record.imgs) || (record.checkout_record && record.checkout_record.imgs)) {
-                    return (
-                        <div>
-                            <a onClick={this.previewFile.bind(this, record)}>
-                                查看
-                            </a>
-                        </div>
-                    );
-                } else {
-                    return <span>/</span>;
-                }
-            }
         }
     ];
-
-    previewFile (record) {
-        let imgs = this.onImgClick(record && record.checkin_record && record.checkin_record.imgs);
-        this.setState({
-            seeVisible: true,
-            record: record,
-            imgs
-        });
-    }
-
-    onImgClick = (data) => {
-        let srcs = '';
-        try {
-            let arr = data.split(',');
-            arr.map(rst => {
-                srcs = getForestImgUrl(rst);
-            });
-        } catch (e) {
-            console.log('处理图片', e);
-        }
-        return srcs;
-    };
-
-    handleCancel () {
-        this.setState({
-            seeVisible: false
-        });
-    }
 }

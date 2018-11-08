@@ -3,8 +3,6 @@ import { Button, Modal, Form, Table } from 'antd';
 import './AdoptTreeMess.less';
 import moment from 'moment';
 import adoptImg from './TreeAdoptImg/adopt.png';
-import treeImg from './TreeAdoptImg/tree.jpg';
-import userImg from './TreeAdoptImg/user.png';
 import defaultTreeImg from './TreeAdoptImg/defaultTree.jpg';
 import defaultUserImg from './TreeAdoptImg/defaultUser.png';
 
