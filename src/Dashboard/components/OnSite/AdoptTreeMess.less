@@ -1,116 +1,139 @@
-.adoptTreeMess-modal-title {
-    font-size: 16px;
-    font-family: "Microsoft YaHei";
-    color: #333333;
-    font-weight: bold;
-}
+.web {
+    .ant-modal-content {
+        position: relative;
+        background-color: #fff0;
+        border: 0;
+        border-radius: 4px;
+        background-clip: padding-box;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        // opacity: 0.1;
+    }
+    .ant-modal-body {
+        padding: 0px;
+        font-size: 14px;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+    .adoptTreeMess-background{
+        background-image: url('./TreeAdoptImg/background.png');
+        background-size: 900px 500px;
+        height: 500px;
+        padding-left: 66px;
+        padding-top: 50px;
+        padding-right: 50px;
+    }
+    // 结缘信息
+    .adoptTreeMess-modal-top-layout {
+        display:flex;
+        flex-wrap:wrap;
+    }
+    // 结缘时间
+    .adoptTreeMess-modal-top-adopt {
+        margin-left: -8px;
+        padding-top: 67.5px; 
+    }
+    // 结缘时间
+    .adoptTreeMess-modal-top-time {
+        text-align: center;
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    // 结缘树木的人的名字和树种名称
+    .adoptTreeMess-modal-top-name {
+        text-align: center;
+        font-size: 14px;
+        font-family: "Microsoft YaHei";
+        color: #ffffff;
+        font-weight: bold;
+        margin-top: 2px;
+        table-layout: fixed;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 95px;
+    }
+    // 养护信息的整体
+    .adoptTreeMess-curingTaskType-layout {
+        display:flex;
+        flex-wrap:wrap;
+    }
+    // 养护类型的名称
+    .adoptTreeMess-curingTaskTypeName {
+        text-align: center;
+        font-family: "Microsoft YaHei";
+        color: #ffffff;
+    }
+    // 各个类型的养护次数
+    .adoptTreeMess-curingTaskTypeNum {
+        text-align: center;
+        // font-family: "Microsoft YaHei";
+        color: #ffffff;
+        font-weight: bold;
+    }
+    // 苗木信息整体设置
+    .adoptTreeMess-treeMess {
+        // padding-top: 6px;
+        padding-left: 10px;
+        // padding-right: 20px;
+        width: 365px;
+    }
+    // 养护详情整体设置
+    .adoptTreeMess-curingTaskMess {
+        // padding-top: 6px;
+        padding-left: 20px;
+        width: 395px;
+    }
 
-.adoptTreeMess-modal-top-layout {
-    display:flex;
-    flex-wrap:wrap;
-    margin-left: 49px; 
-    margin-bottom: 15px;
-}
-
-.adoptTreeMess-modal-top-adopt {
-    margin-left: 5px;
-    margin-right: 5px;
-    margin-top: 31.5px; 
-}
-
-.adoptTreeMess-modal-top-name {
-    text-align: center;
-    font-size: 14px;
-    font-family: "Microsoft YaHei";
-    color: #191919;
-    font-weight: bold;
-    margin-top: 5px;
-    table-layout: fixed;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100px;
-}
-
-.adoptTreeMess-modal-top-time {
-    text-align: center;
-}
-
-
-.adoptTreeMess-mrg10 {
-	white-space: nowrap;
-    width: 100%;
-    margin-bottom: 20px;
-}
-.adoptTreeMess-mrg20 {
-	white-space: nowrap;
-    width: 100%;
-    margin-bottom: 10px;
-}
-.adoptTreeMess-modal-data-text {
-    float: right;
-}
-
-.adoptTreeMess-modal-border {
-    margin-top: 15px;
-    margin-bottom: 10px;
-    border-color: #e8e8e8;
-    border-width: 1px;
-    border-style: solid;
-}
-.adoptTreeMess-modal-layout {
-	display:flex;
-    flex-wrap:wrap;
-}
-
-
-
-// 4个字
-.adoptTreeMess-modal-span {
-	width: 80px;
-	display: inline-block;
-    text-align: right;
-    font-size: 14px;
-    font-family: "Microsoft YaHei";
-    color: #666666;
-    font-weight: bold;
-}
-
-/* 四个字，一个输入框*/
-.adoptTreeMess-input4 {
-	width: calc(~"100% - 80px");
-}
-
-// 4个字
-.adoptTreeMess-modal-span5 {
-	width: 85px;
-	display: inline-block;
-    text-align: right;
-    font-size: 14px;
-    font-family: "Microsoft YaHei";
-    color: #666666;
-    font-weight: bold;
-}
-
-/* 四个字，一个输入框*/
-.adoptTreeMess-input5 {
-	width: calc(~"100% - 85px");
-}
-
-.adoptTreeMess-modal-midTitle {
-    margin-top: 26px;
-    margin-bottom: 10px;
-    text-align: center;
-    font-size: 16px;
-    font-family: "Microsoft YaHei";
-    color: #444444;
-    font-weight: bold;
-}
-
-.adoptTreeMess-modal-column{
-    table-layout: fixed;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100px;
+    // 苗木信息的每一行
+    .adoptTreeMess-mrg10 {
+        white-space: nowrap;
+        width: 100%;
+        margin-bottom: 20px;
+        font-size: 12px;
+    }
+    // 养护详情的每一行
+    .adoptTreeMess-mrg20 {
+        white-space: nowrap;
+        width: 100%;
+        margin-bottom: 19.8px;
+        font-size: 12px;
+    }
+    // 苗木信息的每一行中的标题
+    .adoptTreeMess-lineTitle {
+        vertical-align: middle;
+        color: #1793ff;
+    }
+    // 苗木的具体信息
+    .adoptTreeMess-modal-data-text {
+        float: right;
+        vertical-align: middle;
+        white-space: nowrap;
+        max-width: 263px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-top: 2px;
+    }
+    // 养护详情中的养护类型
+    .adoptTreeMess-table-type-data {
+        vertical-align: middle;
+        max-width: 65px;
+        display: inline-block;
+        min-width: 30px;
+    }
+    // 养护详情中的人员
+    .adoptTreeMess-table-person-data {
+        display: inline-block;
+        vertical-align: middle;
+        white-space: nowrap;
+        max-width: 50px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 50px;
+    }
+    // 养护详情中的时间
+    .adoptTreeMess-table-time-data {
+        vertical-align: middle;
+        width: 65px;
+    }
 }

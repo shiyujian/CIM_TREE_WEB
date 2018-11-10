@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-08 19:40:06
+ * @Last Modified time: 2018-11-10 17:10:17
  */
 import React, { Component } from 'react';
 import {
@@ -604,7 +604,6 @@ class OnSite extends Component {
     removeAllLayer = () => {
         const {
             survivalRateMarkerLayerList, // 成活率图标图层List
-            treeMarkerLayer,
             adoptTreeMarkerLayerList
         } = this.state;
         const {
