@@ -233,6 +233,7 @@ class AddEdit extends Component {
                                     label='详细地址'
                                 >
                                     {getFieldDecorator('Address', {
+                                        rules: [{required: true, message: '必填项'}],
                                         initialValue: record && record.Address
                                     })(
                                         <Input placeholder='请输入详细地址' />
@@ -375,8 +376,12 @@ class AddEdit extends Component {
                 return;
             }
             const { LegalPersonCard, LegalPersonCardBack, BusinessLicense, RegionCode, record, Nurserys, isSwitch } = this.state;
-            if (!LegalPersonCard || !LegalPersonCardBack || !BusinessLicense) {
+            if (!LegalPersonCard || !LegalPersonCardBack) {
                 message.error('请上传身份证正反面');
+                return;
+            }
+            if (!BusinessLicense) {
+                message.error('请上传营业执照或门店照片');
                 return;
             }
             let arr = [];
