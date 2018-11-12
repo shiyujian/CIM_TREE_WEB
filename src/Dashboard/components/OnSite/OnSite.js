@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-10 17:10:17
+ * @Last Modified time: 2018-11-12 09:56:59
  */
 import React, { Component } from 'react';
 import {
@@ -1989,7 +1989,7 @@ class OnSite extends Component {
         } = this.state;
         try {
             let areaMeasure = computeSignedArea(coordinates, 2);
-            areaMeasure = areaMeasure * 0.0015;
+            areaMeasure = (areaMeasure * 0.0015).toFixed(2);
             this.setState({
                 areaMeasure,
                 areaMeasureVisible: true
