@@ -45,7 +45,6 @@ class AddEdit extends Component {
         }
         // 修改信息回显
         if (this.props.record) {
-            const { getNb2ss } = this.props.actions;
             const {
                 LeaderCard = '',
                 LeaderCardBack = ''
@@ -56,6 +55,8 @@ class AddEdit extends Component {
             };
             let leaderCardImg = getForestImgUrl(LeaderCard);
             let leaderCardBackImg = getForestImgUrl(LeaderCardBack);
+            this.Contacter = this.props.record.Contacter;
+            this.ContacterPhone = this.props.record.ContacterPhone;
             this.setState({
                 isAmend: true,
                 record: this.props.record,
@@ -65,6 +66,7 @@ class AddEdit extends Component {
                 fileList: [{...fileList, thumbUrl: `${leaderCardImg}`}],
                 fileListBack: [{...fileList, thumbUrl: `${leaderCardBackImg}`}]
             });
+            const { getNb2ss } = this.props.actions;
             // 根据供应商id获取绑定苗圃
             getNb2ss({}, {nurserybaseid: this.props.record.ID}).then(rep => {
                 let Suppliers = [];
@@ -330,23 +332,23 @@ class AddEdit extends Component {
                     });
                 });
             }
-            let postdata = {
-                NurseryName: values.NurseryName,
-                TreePlace: values.TreePlace,
-                RegionCode: RegionCode,
-                Address: values.Address || '',
-                Contacter: this.Contacter,
-                ContacterPhone: this.ContacterPhone,
-                Leader: values.Leader,
-                LeaderPhone: values.LeaderPhone,
-                LeaderCardNo: values.LeaderCardNo,
-                LeaderCard: LeaderCard,
-                LeaderCardBack: LeaderCardBack,
-                Suppliers: arr
-            };
             if (record) {
-                postdata.ID = record.ID;
-                postdata.WKT = 'POINT(120 30)';
+                let postdata = {
+                    ID: record.ID,
+                    WKT: 'POINT(120 30)',
+                    NurseryName: values.NurseryName,
+                    TreePlace: values.TreePlace,
+                    RegionCode: RegionCode,
+                    Address: values.Address || '',
+                    Contacter: this.Contacter,
+                    ContacterPhone: this.ContacterPhone,
+                    Leader: values.Leader,
+                    LeaderPhone: values.LeaderPhone,
+                    LeaderCardNo: values.LeaderCardNo,
+                    LeaderCard: LeaderCard,
+                    LeaderCardBack: LeaderCardBack,
+                    Suppliers: arr
+                };
                 putNursery({}, postdata).then(rep => {
                     if (rep && rep.code === 2) {
                         notification.error({
@@ -365,6 +367,20 @@ class AddEdit extends Component {
                     }
                 });
             } else {
+                let postdata = {
+                    NurseryName: values.NurseryName,
+                    TreePlace: values.TreePlace,
+                    RegionCode: RegionCode,
+                    Address: values.Address || '',
+                    Contacter: this.Contacter,
+                    ContacterPhone: this.ContacterPhone,
+                    Leader: values.Leader,
+                    LeaderPhone: values.LeaderPhone,
+                    LeaderCardNo: values.LeaderCardNo,
+                    LeaderCard: LeaderCard,
+                    LeaderCardBack: LeaderCardBack,
+                    Suppliers: arr
+                };
                 postNursery({}, postdata).then(rep => {
                     if (rep && rep.code === 2) {
                         notification.error({

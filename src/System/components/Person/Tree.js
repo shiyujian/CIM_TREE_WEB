@@ -3,7 +3,6 @@ import SimpleTree from '_platform/components/panels/SimpleTree';
 import { TreeSelect } from 'antd';
 import {getCompanyDataByOrgCode} from '_platform/auth';
 const TreeNode = TreeSelect.TreeNode;
-
 const addGroup = (childrenList, str) => {
     const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
     const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));

@@ -43,7 +43,6 @@ class AddEdit extends Component {
         });
         // 修改信息回显
         if (this.props.record) {
-            const { getNb2ss } = this.props.actions;
             const {
                 LegalPersonCard = '',
                 LegalPersonCardBack = '',
@@ -62,6 +61,8 @@ class AddEdit extends Component {
             let legalPersonImg = getForestImgUrl(LegalPersonCard);
             let legalPersonBackImg = getForestImgUrl(LegalPersonCardBack);
             let businessLicenseImg = BusinessLicense ? getForestImgUrl(BusinessLicense) : getForestImgUrl(Facade);
+            this.Contacter = this.props.record.Contacter;
+            this.ContacterPhone = this.props.record.ContacterPhone;
             this.setState({
                 isAmend: true,
                 record: this.props.record,
@@ -74,6 +75,7 @@ class AddEdit extends Component {
                 fileListLicense: [{...fileList, thumbUrl: `${businessLicenseImg}`}]
             });
             // 根据供应商id获取绑定苗圃
+            const { getNb2ss } = this.props.actions;
             getNb2ss({}, {supplierid: this.props.record.ID}).then(rep => {
                 let Nurserys = [];
                 rep.map(item => {
