@@ -7,12 +7,12 @@ const TreeNode = TreeSelect.TreeNode;
 const addGroup = (childrenList, str) => {
     const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
     const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));
-    const regionCode_province = JSON.parse(window.sessionStorage.getItem('regionCode_province'));
+    const regionCode_name = JSON.parse(window.sessionStorage.getItem('regionCode_name'));
     if (str === '供应商') {
         childrenList.map(item => {
             item.RegionCode = supplier_regionCode[item.code];
-            if (regionCode_province[item.RegionCode]) {
-                const regionNameArr = regionCode_province[item.RegionCode].split(',');
+            if (regionCode_name[item.RegionCode]) {
+                const regionNameArr = regionCode_name[item.RegionCode].split(',');
                 item.province = regionNameArr[1];
                 item.city = regionNameArr[2];
             }
@@ -20,14 +20,13 @@ const addGroup = (childrenList, str) => {
     } else {
         childrenList.map(item => {
             item.RegionCode = nursery_regionCode[item.code];
-            if (regionCode_province[item.RegionCode]) {
-                const regionNameArr = regionCode_province[item.RegionCode].split(',');
+            if (regionCode_name[item.RegionCode]) {
+                const regionNameArr = regionCode_name[item.RegionCode].split(',');
                 item.province = regionNameArr[1];
                 item.city = regionNameArr[2];
             }
         });
     }
-    
     let provinceArr = [];
     childrenList.map(item => {
         if(!provinceArr.includes(item.province)){
@@ -99,12 +98,12 @@ export default class Tree extends Component {
         const {
             actions: { getSupplierList, getRegionCodes, getNurseryList }
         } = this.props;
-        getRegionCodes({}, {grade: 3}).then(rst => {
+        getRegionCodes({}, {}).then(rst => {
             let obj = {};
             rst.map(item => {
                 obj[item.ID] = item.MergerName;
             });
-            window.sessionStorage.setItem('regionCode_province', JSON.stringify(obj));
+            window.sessionStorage.setItem('regionCode_name', JSON.stringify(obj));
         });
         getSupplierList().then(rst => {
             window.sessionStorage.setItem('Supplier_list', JSON.stringify(rst.content));
