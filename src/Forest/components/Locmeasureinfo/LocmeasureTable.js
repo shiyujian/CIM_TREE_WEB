@@ -815,7 +815,7 @@ export default class LocmeasureTable extends Component {
                     plan.createtime3 = createtime3;
                     plan.createtime4 = createtime4;
                 });
-                let totalNum = rst.total;
+                let totalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;

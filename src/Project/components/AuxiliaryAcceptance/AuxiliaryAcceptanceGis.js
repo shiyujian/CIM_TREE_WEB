@@ -40,7 +40,9 @@ export default class AuxiliaryAcceptanceGis extends Component {
             selectSectionNo: '',
             selectSectionName: '',
             selectThinClassNo: '',
-            selectThinClassName: ''
+            selectThinClassName: '',
+            treeNum: 0,
+            treeTypeNumDatas: []
 
         };
         this.tileLayer = null;
@@ -98,8 +100,12 @@ export default class AuxiliaryAcceptanceGis extends Component {
         this.map.on('click', function (e) {
             const {
                 coordinates,
-                createBtnVisible
+                createBtnVisible,
+                areaEventKey
             } = me.state;
+            if (!areaEventKey) {
+                return;
+            }
             coordinates.push([e.latlng.lat, e.latlng.lng]);
             if (coordinates.length > 2 && !createBtnVisible) {
                 me.setState({
@@ -464,7 +470,7 @@ export default class AuxiliaryAcceptanceGis extends Component {
         } = this.state;
         const {
             actions: {
-                postThinClassesByRegion // 查询圈选地图内的细班
+                getTreeTypeStatByRegion
             },
             platform: {
                 tree = {}
@@ -496,10 +502,22 @@ export default class AuxiliaryAcceptanceGis extends Component {
             let selectProjectName = getProjectNameBySection(selectSectionNo, thinClassTree);
             let selectSectionName = getSectionNameBySection(selectSectionNo, thinClassTree);
             let selectThinClassName = getSmallThinNameByThinClassData(areaEventKey, thinClassTree);
-
             console.log('selectProjectName', selectProjectName);
             console.log('selectSectionName', selectSectionName);
             console.log('selectThinClassName', selectThinClassName);
+            let postData = {
+                section: selectSectionNo,
+                no: selectThinClassNo,
+                wkt: wkt
+            };
+            let treeTypeNumDatas = await getTreeTypeStatByRegion({}, postData);
+            console.log('treeTypeNumDatas', treeTypeNumDatas);
+            let treeNum = 0;
+            treeTypeNumDatas.map((data) => {
+                if (data && data.Num) {
+                    treeNum = treeNum + data.Num;
+                }
+            });
             this.setState({
                 wkt,
                 regionArea,
@@ -508,7 +526,9 @@ export default class AuxiliaryAcceptanceGis extends Component {
                 selectSectionNo,
                 selectSectionName,
                 selectThinClassNo,
-                selectThinClassName
+                selectThinClassName,
+                treeNum,
+                treeTypeNumDatas
             });
         } catch (e) {
             console.log('e', e);
