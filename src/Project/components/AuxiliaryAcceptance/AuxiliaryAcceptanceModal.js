@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Modal, Form, Row, DatePicker, Select, Input, Notification, Spin } from 'antd';
+import { Button, Modal, Form, Row, DatePicker, Select, Input, Notification, Spin, Table } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '_platform/auth';
@@ -24,7 +24,9 @@ class AuxiliaryAcceptanceModal extends Component {
             noLoading,
             selectProjectName,
             selectSectionName,
-            selectThinClassName
+            selectThinClassName,
+            treeNum,
+            treeTypeNumDatas
         } = this.props;
         const FormItemLayout = {
             labelCol: { span: 6 },
@@ -45,13 +47,12 @@ class AuxiliaryAcceptanceModal extends Component {
         ];
         let footer = noLoading ? null : arr;
 
-
         return (
-
             <Modal
                 title='新建任务'
                 visible
                 width='700px'
+                onCancel={this._handleTaskModalCancel.bind(this)}
                 footer={footer}
                 closable={false}
                 maskClosable={false}
@@ -106,9 +107,9 @@ class AuxiliaryAcceptanceModal extends Component {
                                 )}
                             </FormItem>
                         </Row>
-                        {/* <Row>
+                        <Row>
                             <FormItem {...FormItemLayout} label='树木数量(棵)'>
-                                {getFieldDecorator('taskTreeNum', {
+                                {getFieldDecorator('areaTreeNum', {
                                     initialValue: `${treeNum}`,
                                     rules: [
                                         { required: true, message: '请输入树木数量' }
@@ -117,7 +118,7 @@ class AuxiliaryAcceptanceModal extends Component {
                                     <Input readOnly />
                                 )}
                             </FormItem>
-                        </Row> */}
+                        </Row>
                         {/* <Row>
                         <FormItem {...FormItemLayout} label='备注'>
                             {getFieldDecorator('taskRemark', {
@@ -129,12 +130,36 @@ class AuxiliaryAcceptanceModal extends Component {
                             )}
                         </FormItem>
                     </Row> */}
+                        <Table
+                            bordered
+                            columns={this.columns}
+                            dataSource={treeTypeNumDatas}
+                            rowKey='order'
+                        />
                     </Form>
                 </Spin>
             </Modal>
 
         );
     }
+
+    columns = [
+        {
+            title: '序号',
+            dataIndex: 'index',
+            render: (text, record, index) => {
+                return <span>{index + 1}</span>;
+            }
+        },
+        {
+            title: '树种',
+            dataIndex: 'TreeTypeName'
+        },
+        {
+            title: '数量（棵）',
+            dataIndex: 'Num'
+        }
+    ]
 
     _handleTaskModalCancel = async () => {
         await this.props.onCancel();
@@ -157,6 +182,8 @@ class AuxiliaryAcceptanceModal extends Component {
             console.log('values', values);
             if (!err) {
                 try {
+                    await this.props.onOk();
+                    return;
                     let CuringMans = '';
                     let postData = {
                         'Area': Number(values.taskTreeArea),
