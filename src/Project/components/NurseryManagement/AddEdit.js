@@ -31,6 +31,12 @@ class AddEdit extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 取消弹框
     }
     componentDidMount () {
+        const { getRegionCodes } = this.props.actions;
+        getRegionCodes({}, {
+            grade: 3
+        }).then(rep => {
+            this.regionCode_name = rep;
+        })
         // 获取本用户的姓名，电话作为联系人，联系方式
         const user = JSON.parse(localStorage.getItem('QH_USER_DATA'));
         if (user.account) {
@@ -332,6 +338,14 @@ class AddEdit extends Component {
                     });
                 });
             }
+
+            let RegionName;
+            this.regionCode_name.map(item => {
+                if(item.ID === RegionCode) {
+                    RegionName = item.MergerName
+                }
+            })
+            let regionName = RegionName.split(',')[1] + RegionName.split(',')[2] + RegionName.split(',')[3];
             if (record) {
                 let postdata = {
                     ID: record.ID,
@@ -369,7 +383,7 @@ class AddEdit extends Component {
             } else {
                 let postdata = {
                     NurseryName: values.NurseryName,
-                    TreePlace: values.TreePlace,
+                    TreePlace: regionName + values.TreePlace,
                     RegionCode: RegionCode,
                     Address: values.Address || '',
                     Contacter: this.Contacter,
