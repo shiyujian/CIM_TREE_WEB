@@ -379,6 +379,28 @@ export default class CarPackageTable extends Component {
                 }
             },
             {
+                title: '抽检人',
+                dataIndex: 'ConstructionerName',
+                render: (text, record) => {
+                    if (text) {
+                        return <p>{text}</p>;
+                    } else {
+                        return <p> / </p>;
+                    }
+                }
+            },
+            {
+                title: '监理人',
+                dataIndex: 'SupervisorName',
+                render: (text, record) => {
+                    if (text) {
+                        return <p>{text}</p>;
+                    } else {
+                        return <p> / </p>;
+                    }
+                }
+            },
+            {
                 title: '司机姓名',
                 dataIndex: 'Driver',
                 render: (text, record) => {
@@ -657,7 +679,7 @@ export default class CarPackageTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury (page) {
+    qury = async (page) => {
         const {
             sxm = '',
             section = '',
@@ -672,33 +694,38 @@ export default class CarPackageTable extends Component {
             return;
         }
         const {
-            actions: { getcarpackage },
+            actions: {
+                getcarpackage,
+                getForestUserDetail
+            },
             keycode = '',
             platform: { tree = {} }
         } = this.props;
-        let thinClassTree = tree.thinClassTree;
-        let postdata = {
-            licenseplate: sxm,
-            section: section === '' ? keycode : section,
-            isshrub: mmtype,
-            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            page,
-            size,
-            status
-        };
+        try {
+            let thinClassTree = tree.thinClassTree;
+            let postdata = {
+                licenseplate: sxm,
+                section: section === '' ? keycode : section,
+                isshrub: mmtype,
+                stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+                etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+                page,
+                size,
+                status
+            };
 
-        this.setState({
-            loading: true,
-            percent: 0
-        });
+            this.setState({
+                loading: true,
+                percent: 0
+            });
 
-        getcarpackage({}, postdata).then(rst => {
+            let rst = await getcarpackage({}, postdata);
             this.setState({ loading: false, percent: 100 });
             if (!rst) return;
             let tblData = rst.content;
             if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
+                for (let i = 0; i < tblData.length; i++) {
+                    let plan = tblData[i];
                     plan.order = (page - 1) * size + i + 1;
                     plan.liftertime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
@@ -706,15 +733,37 @@ export default class CarPackageTable extends Component {
                     plan.liftertime2 = plan.CreateTime
                         ? moment(plan.CreateTime).format('HH:mm:ss')
                         : '/';
-                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
-                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-                });
+                    plan.Project = await getProjectNameBySection(plan.Section, thinClassTree);
+                    plan.sectionName = await getSectionNameBySection(plan.Section, thinClassTree);
+                    let userData = await getForestUserDetail({id: plan.Constructioner});
+                    console.log('userData', userData);
+                    plan.ConstructionerName = (userData && userData.Full_Name) || '';
+                    plan.SupervisorName = (plan.SupervisorUser && plan.SupervisorUser.Full_Name) || '';
+                }
+                // tblData.forEach(async (plan, i) => {
+                //     plan.order = (page - 1) * size + i + 1;
+                //     plan.liftertime1 = plan.CreateTime
+                //         ? moment(plan.CreateTime).format('YYYY-MM-DD')
+                //         : '/';
+                //     plan.liftertime2 = plan.CreateTime
+                //         ? moment(plan.CreateTime).format('HH:mm:ss')
+                //         : '/';
+                //     plan.Project = await getProjectNameBySection(plan.Section, thinClassTree);
+                //     plan.sectionName = await getSectionNameBySection(plan.Section, thinClassTree);
+                //     let userData = await getForestUserDetail({id: plan.Constructioner});
+                //     console.log('userData', userData);
+                //     plan.ConstructionerName = (userData && userData.Full_Name) || '';
+                //     plan.SupervisorName = (plan.SupervisorUser && plan.SupervisorUser.Full_Name) || '';
+                // });
+                console.log('tblData', tblData);
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
                 this.setState({ tblData, pagination });
             }
-        });
+        } catch (e) {
+            console.log('qury', e);
+        }
     }
 
     exportexcel () {
