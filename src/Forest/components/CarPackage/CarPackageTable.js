@@ -382,8 +382,10 @@ export default class CarPackageTable extends Component {
                 title: '抽检人',
                 dataIndex: 'ConstructionerName',
                 render: (text, record) => {
-                    if (text) {
-                        return <p>{text}</p>;
+                    if (record.ConstructionerUserName && record.ConstructionerName) {
+                        return <p>{record.ConstructionerName + '(' + record.ConstructionerUserName + ')'}</p>;
+                    } else if (record.ConstructionerName && !record.ConstructionerUserName) {
+                        return <p>{record.ConstructionerName}</p>;
                     } else {
                         return <p> / </p>;
                     }
@@ -393,8 +395,10 @@ export default class CarPackageTable extends Component {
                 title: '监理人',
                 dataIndex: 'SupervisorName',
                 render: (text, record) => {
-                    if (text) {
-                        return <p>{text}</p>;
+                    if (record.SupervisorUserName && record.SupervisorName) {
+                        return <p>{record.SupervisorName + '(' + record.SupervisorUserName + ')'}</p>;
+                    } else if (record.SupervisorName && !record.SupervisorUserName) {
+                        return <p>{record.SupervisorName}</p>;
                     } else {
                         return <p> / </p>;
                     }
@@ -738,23 +742,10 @@ export default class CarPackageTable extends Component {
                     let userData = await getForestUserDetail({id: plan.Constructioner});
                     console.log('userData', userData);
                     plan.ConstructionerName = (userData && userData.Full_Name) || '';
+                    plan.ConstructionerUserName = (userData && userData.User_Name) || '';
                     plan.SupervisorName = (plan.SupervisorUser && plan.SupervisorUser.Full_Name) || '';
+                    plan.SupervisorUserName = (plan.SupervisorUser && plan.SupervisorUser.User_Name) || '';
                 }
-                // tblData.forEach(async (plan, i) => {
-                //     plan.order = (page - 1) * size + i + 1;
-                //     plan.liftertime1 = plan.CreateTime
-                //         ? moment(plan.CreateTime).format('YYYY-MM-DD')
-                //         : '/';
-                //     plan.liftertime2 = plan.CreateTime
-                //         ? moment(plan.CreateTime).format('HH:mm:ss')
-                //         : '/';
-                //     plan.Project = await getProjectNameBySection(plan.Section, thinClassTree);
-                //     plan.sectionName = await getSectionNameBySection(plan.Section, thinClassTree);
-                //     let userData = await getForestUserDetail({id: plan.Constructioner});
-                //     console.log('userData', userData);
-                //     plan.ConstructionerName = (userData && userData.Full_Name) || '';
-                //     plan.SupervisorName = (plan.SupervisorUser && plan.SupervisorUser.Full_Name) || '';
-                // });
                 console.log('tblData', tblData);
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
