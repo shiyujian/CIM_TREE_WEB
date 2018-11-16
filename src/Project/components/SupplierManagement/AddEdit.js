@@ -251,7 +251,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.LegalPerson,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder={isSwitch ? '请输入法人姓名' : '请输入负责人姓名'} disabled={isAmend} />
+                                        <Input placeholder={isSwitch ? '请输入法人姓名' : '请输入负责人姓名'} />
                                     )}
                                 </FormItem>
                             </Col>
@@ -277,7 +277,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.LegalPersonCardNo,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder={isSwitch ? '请输入法人身份证号' : '请输入负责人身份证号'} maxLength='18' disabled={isAmend} onBlur={this.checkCardNo} />
+                                        <Input placeholder={isSwitch ? '请输入法人身份证号' : '请输入负责人身份证号'} maxLength='18' onBlur={this.checkCardNo} />
                                     )}
                                 </FormItem>
                             </Col>

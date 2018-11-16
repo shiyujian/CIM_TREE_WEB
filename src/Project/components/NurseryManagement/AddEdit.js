@@ -216,7 +216,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.Leader,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入负责人姓名' disabled={isAmend} />
+                                        <Input placeholder='请输入负责人姓名' />
                                     )}
                                 </FormItem>
                             </Col>
@@ -242,7 +242,7 @@ class AddEdit extends Component {
                                         initialValue: record && record.LeaderCardNo,
                                         rules: [{required: true, message: '必填项'}]
                                     })(
-                                        <Input placeholder='请输入负责人身份证号' disabled={isAmend} maxLength='18' onBlur={this.checkCardNo} />
+                                        <Input placeholder='请输入负责人身份证号' maxLength='18' onBlur={this.checkCardNo} />
                                     )}
                                 </FormItem>
                             </Col>
