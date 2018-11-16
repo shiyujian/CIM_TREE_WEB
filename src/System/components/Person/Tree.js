@@ -14,6 +14,7 @@ const addGroup = (childrenList, str) => {
                 const regionNameArr = regionCode_name[item.RegionCode].split(',');
                 item.province = regionNameArr[1];
                 item.city = regionNameArr[2];
+                item.county = regionNameArr[3];
             }
         });
     } else {
@@ -23,6 +24,7 @@ const addGroup = (childrenList, str) => {
                 const regionNameArr = regionCode_name[item.RegionCode].split(',');
                 item.province = regionNameArr[1];
                 item.city = regionNameArr[2];
+                item.county = regionNameArr[3];
             }
         });
     }
@@ -33,7 +35,7 @@ const addGroup = (childrenList, str) => {
         }
     });
     let newChildren = [];
-    provinceArr.map((item, index) => {
+    provinceArr.map((item) => {
         let cityArr = [];
         childrenList.map(row => {
             if (item === row.province && !cityArr.includes(row.city)) {
@@ -41,24 +43,36 @@ const addGroup = (childrenList, str) => {
             }
         })
         let provinceChildren = [];
-        cityArr.map((row, col) => {
+        cityArr.map((row) => {
             let cityChildren = [];
+            let countyArr = [];
             childrenList.map(record => {
-                if (row === record.city) {
-                    cityChildren.push({
-                        ...record
-                    })
+                if (row === record.city && !countyArr.includes(record.county)) {
+                    countyArr.push(record.county);
                 }
+            })
+            countyArr.map(record =>{
+                let countyChildren = [];
+                childrenList.map(ite => {
+                    if(row === ite.city && record === ite.county) {
+                        countyChildren.push(ite);
+                    }
+                })
+                cityChildren.push({
+                    name: record || '区域',
+                    code: str + item + row + record,
+                    children: countyChildren
+                })
             })
             provinceChildren.push({
                 name: row || '其他',
-                code: str + row + col,
+                code: str + item + row,
                 children: cityChildren
             })
         })
         newChildren.push({
             name: item || '其他',
-            code: str + item + index,
+            code: str + item,
             children: provinceChildren
         });
     });
