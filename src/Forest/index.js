@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-25 10:51:59
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-23 11:25:33
+ * @Last Modified time: 2018-11-19 10:33:57
  */
 /**
  *
@@ -385,5 +385,5 @@ export default class ForestContainer extends Component {
             ]
         }
     ];
-    static defaultOpenKeys = ['info', 'import'];
+    static defaultOpenKeys = ['info'];
 }

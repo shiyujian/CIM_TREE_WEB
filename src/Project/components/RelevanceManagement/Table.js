@@ -17,7 +17,7 @@ class Tablelevel extends Component {
             NurseryList: [], // 苗圃列表
             supplierid: '', // 供应商ID
             nurserybaseid: '', // 苗圃ID
-            showModal: false, // 新增弹窗
+            showModal: false // 新增弹窗
         };
         this.Checker = ''; // 登陆用户
         this.org_code = ''; // 所在组织机构
@@ -139,10 +139,14 @@ class Tablelevel extends Component {
                             {getFieldDecorator('supplier', {
                                 rules: [{required: true, message: '必填项'}]
                             })(
-                                <Select style={{ width: 200 }} allowClear placeholder='请选择供应商'>
+                                <Select style={{ width: 200 }}
+                                    allowClear
+                                    showSearch
+                                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                    placeholder='请选择供应商'>
                                     {
                                         SupplierList.map(item => {
-                                            return <Option value={item.ID}>{item.SupplierName}</Option>;
+                                            return <Option value={item.ID} key={item.ID}>{item.SupplierName}</Option>;
                                         })
                                     }
                                 </Select>
@@ -155,10 +159,15 @@ class Tablelevel extends Component {
                             {getFieldDecorator('nursery', {
                                 rules: [{required: true, message: '必填项'}]
                             })(
-                                <Select style={{ width: 200 }} allowClear placeholder='请选择苗圃基地'>
+                                <Select
+                                    style={{ width: 200 }}
+                                    showSearch
+                                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                    allowClear
+                                    placeholder='请选择苗圃基地'>
                                     {
                                         NurseryList.map(item => {
-                                            return <Option value={item.ID}>{item.NurseryName}</Option>;
+                                            return <Option value={item.ID} key={item.ID}>{item.NurseryName}</Option>;
                                         })
                                     }
                                 </Select>

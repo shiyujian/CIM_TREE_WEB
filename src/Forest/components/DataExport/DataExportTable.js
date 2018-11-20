@@ -22,6 +22,7 @@ import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
+const InputGroup = Input.Group;
 const { RangePicker } = DatePicker;
 
 export default class LocmeasureTable extends Component {
@@ -54,7 +55,19 @@ export default class LocmeasureTable extends Component {
             percent: 0,
             positiontype: 4326, // 默认地理坐标系
             smallclassData: '',
-            thinclassData: ''
+            thinclassData: '',
+            XJFirst: '',
+            XJSecond: '',
+            DJFirst: '',
+            DJSecond: '',
+            GDFirst: '',
+            GDSecond: '',
+            GFFirst: '',
+            GFSecond: '',
+            TQHDFirst: '',
+            TQHDSecond: '',
+            TQZJFirst: '',
+            TQZJSecond: ''
         };
     }
     componentDidMount () {
@@ -227,7 +240,7 @@ export default class LocmeasureTable extends Component {
                             {positionoption}
                         </Select>
                     </div>
-                    <div className='forest-mrg10'>
+                    <div className='forest-mrg-datePicker'>
                         <span className='forest-search-span'>定位时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
@@ -244,6 +257,78 @@ export default class LocmeasureTable extends Component {
                             onOk={this.datepick.bind(this)}
                         />
                     </div>
+                    {/* <div className='forest-mrg-standard2'>
+                        <span className='forest-search-span'>胸径：</span>
+                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleXJChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleXJChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard2'>
+                        <span className='forest-search-span'>地径：</span>
+                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleDJChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleDJChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard2'>
+                        <span className='forest-search-span'>高度：</span>
+                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleGDChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleGDChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard2'>
+                        <span className='forest-search-span'>冠幅：</span>
+                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleGFChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleGFChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard4'>
+                        <span className='forest-search-span'>土球厚度：</span>
+                        <InputGroup compact className='forest-forestcalcw4' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQHDChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQHDChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard4'>
+                        <span className='forest-search-span'>土球直径：</span>
+                        <InputGroup compact className='forest-forestcalcw4' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQZJChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQZJChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div> */}
                 </Row>
                 <Row>
                     <Col span={2}>
@@ -392,6 +477,84 @@ export default class LocmeasureTable extends Component {
             etime: value[1]
                 ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
                 : ''
+        });
+    }
+    // 胸径
+    handleXJChangeFirst (e) {
+        console.log('handleXJChangeFirst', e.target.value);
+        this.setState({
+            XJFirst: e.target.value
+        });
+    }
+    handleXJChangeSecond (e) {
+        console.log('handleXJChangeSecond', e.target.value);
+        this.setState({
+            XJSecond: e.target.value
+        });
+    }
+    // 地径
+    handleDJChangeFirst (e) {
+        console.log('handleDJChangeFirst', e.target.value);
+        this.setState({
+            DJFirst: e.target.value
+        });
+    }
+    handleDJChangeSecond (e) {
+        console.log('handleDJChangeSecond', e.target.value);
+        this.setState({
+            DJSecond: e.target.value
+        });
+    }
+    // 高度
+    handleGDChangeFirst (e) {
+        console.log('handleGDChangeFirst', e.target.value);
+        this.setState({
+            GDFirst: e.target.value
+        });
+    }
+    handleGDChangeSecond (e) {
+        console.log('handleGDChangeSecond', e.target.value);
+        this.setState({
+            GDSecond: e.target.value
+        });
+    }
+    // 冠幅
+    handleGFChangeFirst (e) {
+        console.log('handleGFChangeFirst', e.target.value);
+        this.setState({
+            GFFirst: e.target.value
+        });
+    }
+    handleGFChangeSecond (e) {
+        console.log('handleGFChangeSecond', e.target.value);
+        this.setState({
+            GFSecond: e.target.value
+        });
+    }
+    // 土球厚度
+    handleTQHDChangeFirst (e) {
+        console.log('handleTQHDChangeFirst', e.target.value);
+        this.setState({
+            TQHDFirst: e.target.value
+        });
+    }
+    handleTQHDChangeSecond (e) {
+        console.log('handleTQHDChangeSecond', e.target.value);
+        this.setState({
+            TQHDSecond: e.target.value
+        });
+    }
+    // 土球直径
+    handleTQZJChangeFirst (e) {
+        console.log('handleTQZJChangeFirst', e.target.value);
+        this.setState({
+            TQZJFirst: e.target.value
+        });
+    }
+    handleTQZJChangeSecond (e) {
+        console.log('handleTQZJChangeSecond', e.target.value);
+        this.setState({
+            TQZJSecond: e.target.value
         });
     }
 
