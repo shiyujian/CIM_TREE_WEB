@@ -10,7 +10,8 @@ import {
     Button,
     Input,
     Progress,
-    message
+    message,
+    Notification
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
@@ -23,6 +24,7 @@ import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
+import XLSX from 'xlsx';
 const { RangePicker } = DatePicker;
 const InputGroup = Input.Group;
 
@@ -58,17 +60,17 @@ export default class LocmeasureTable extends Component {
             imgArr: [],
             smallclassData: '',
             thinclassData: '',
-            XJFirst: '',
+            XJFirst: 0,
             XJSecond: '',
-            DJFirst: '',
+            DJFirst: 0,
             DJSecond: '',
-            GDFirst: '',
+            GDFirst: 0,
             GDSecond: '',
-            GFFirst: '',
+            GFFirst: 0,
             GFSecond: '',
-            TQHDFirst: '',
+            TQHDFirst: 0,
             TQHDSecond: '',
-            TQZJFirst: '',
+            TQZJFirst: 0,
             TQZJSecond: ''
         };
         this.columns = [
@@ -524,15 +526,19 @@ export default class LocmeasureTable extends Component {
                             onOk={this.datepick1.bind(this)}
                         />
                     </div>
-                    {/* <div className='forest-mrg-standard2'>
+                    <div className='forest-mrg-standard2'>
                         <span className='forest-search-span'>胸径：</span>
                         <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleXJChangeFirst.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.XJFirst}
+                                    onChange={this.handleXJChangeFirst.bind(this)} />
                             </Col>
                             <span style={{width: 20, textAlign: 'center'}} >~</span>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleXJChangeSecond.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.XJSecond}
+                                    onChange={this.handleXJChangeSecond.bind(this)} />
                             </Col>
                         </InputGroup>
                     </div>
@@ -540,11 +546,15 @@ export default class LocmeasureTable extends Component {
                         <span className='forest-search-span'>地径：</span>
                         <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleDJChangeFirst.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.DJFirst}
+                                    onChange={this.handleDJChangeFirst.bind(this)} />
                             </Col>
                             <span style={{width: 20, textAlign: 'center'}} >~</span>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleDJChangeSecond.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.DJSecond}
+                                    onChange={this.handleDJChangeSecond.bind(this)} />
                             </Col>
                         </InputGroup>
                     </div>
@@ -552,11 +562,15 @@ export default class LocmeasureTable extends Component {
                         <span className='forest-search-span'>高度：</span>
                         <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleGDChangeFirst.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.GDFirst}
+                                    onChange={this.handleGDChangeFirst.bind(this)} />
                             </Col>
                             <span style={{width: 20, textAlign: 'center'}} >~</span>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleGDChangeSecond.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.GDSecond}
+                                    onChange={this.handleGDChangeSecond.bind(this)} />
                             </Col>
                         </InputGroup>
                     </div>
@@ -564,11 +578,15 @@ export default class LocmeasureTable extends Component {
                         <span className='forest-search-span'>冠幅：</span>
                         <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleGFChangeFirst.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.GFFirst}
+                                    onChange={this.handleGFChangeFirst.bind(this)} />
                             </Col>
                             <span style={{width: 20, textAlign: 'center'}} >~</span>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleGFChangeSecond.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.GFSecond}
+                                    onChange={this.handleGFChangeSecond.bind(this)} />
                             </Col>
                         </InputGroup>
                     </div>
@@ -576,11 +594,15 @@ export default class LocmeasureTable extends Component {
                         <span className='forest-search-span'>土球厚度：</span>
                         <InputGroup compact className='forest-forestcalcw4' style={{display: 'inlineBlock'}}>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQHDChangeFirst.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.TQHDFirst}
+                                    onChange={this.handleTQHDChangeFirst.bind(this)} />
                             </Col>
                             <span style={{width: 20, textAlign: 'center'}} >~</span>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQHDChangeSecond.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.TQHDSecond}
+                                    onChange={this.handleTQHDChangeSecond.bind(this)} />
                             </Col>
                         </InputGroup>
                     </div>
@@ -588,14 +610,18 @@ export default class LocmeasureTable extends Component {
                         <span className='forest-search-span'>土球直径：</span>
                         <InputGroup compact className='forest-forestcalcw4' style={{display: 'inlineBlock'}}>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQZJChangeFirst.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.TQZJFirst}
+                                    onChange={this.handleTQZJChangeFirst.bind(this)} />
                             </Col>
                             <span style={{width: 20, textAlign: 'center'}} >~</span>
                             <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQZJChangeSecond.bind(this)} />
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.TQZJSecond}
+                                    onChange={this.handleTQZJChangeSecond.bind(this)} />
                             </Col>
                         </InputGroup>
-                    </div> */}
+                    </div>
 
                 </Row>
                 <Row style={{marginTop: 10, marginBottom: 10}}>
@@ -774,80 +800,152 @@ export default class LocmeasureTable extends Component {
     // 胸径
     handleXJChangeFirst (e) {
         console.log('handleXJChangeFirst', e.target.value);
-        this.setState({
-            XJFirst: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                XJFirst: 0
+            });
+        } else {
+            this.setState({
+                XJFirst: Number(e.target.value)
+            });
+        }
     }
     handleXJChangeSecond (e) {
         console.log('handleXJChangeSecond', e.target.value);
-        this.setState({
-            XJSecond: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                XJSecond: ''
+            });
+        } else {
+            this.setState({
+                XJSecond: Number(e.target.value)
+            });
+        }
     }
     // 地径
     handleDJChangeFirst (e) {
         console.log('handleDJChangeFirst', e.target.value);
-        this.setState({
-            DJFirst: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                DJFirst: 0
+            });
+        } else {
+            this.setState({
+                DJFirst: Number(e.target.value)
+            });
+        }
     }
     handleDJChangeSecond (e) {
         console.log('handleDJChangeSecond', e.target.value);
-        this.setState({
-            DJSecond: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                DJSecond: ''
+            });
+        } else {
+            this.setState({
+                DJSecond: Number(e.target.value)
+            });
+        }
     }
     // 高度
     handleGDChangeFirst (e) {
         console.log('handleGDChangeFirst', e.target.value);
-        this.setState({
-            GDFirst: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                GDFirst: 0
+            });
+        } else {
+            this.setState({
+                GDFirst: Number(e.target.value)
+            });
+        }
     }
     handleGDChangeSecond (e) {
         console.log('handleGDChangeSecond', e.target.value);
-        this.setState({
-            GDSecond: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                GDSecond: ''
+            });
+        } else {
+            this.setState({
+                GDSecond: Number(e.target.value)
+            });
+        }
     }
     // 冠幅
     handleGFChangeFirst (e) {
         console.log('handleGFChangeFirst', e.target.value);
-        this.setState({
-            GFFirst: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                GFFirst: 0
+            });
+        } else {
+            this.setState({
+                GFFirst: Number(e.target.value)
+            });
+        }
     }
     handleGFChangeSecond (e) {
         console.log('handleGFChangeSecond', e.target.value);
-        this.setState({
-            GFSecond: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                GFSecond: ''
+            });
+        } else {
+            this.setState({
+                GFSecond: Number(e.target.value)
+            });
+        }
     }
     // 土球厚度
     handleTQHDChangeFirst (e) {
         console.log('handleTQHDChangeFirst', e.target.value);
-        this.setState({
-            TQHDFirst: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                TQHDFirst: 0
+            });
+        } else {
+            this.setState({
+                TQHDFirst: Number(e.target.value)
+            });
+        }
     }
     handleTQHDChangeSecond (e) {
         console.log('handleTQHDChangeSecond', e.target.value);
-        this.setState({
-            TQHDSecond: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                TQHDSecond: ''
+            });
+        } else {
+            this.setState({
+                TQHDSecond: Number(e.target.value)
+            });
+        }
     }
     // 土球直径
     handleTQZJChangeFirst (e) {
         console.log('handleTQZJChangeFirst', e.target.value);
-        this.setState({
-            TQZJFirst: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                TQZJFirst: 0
+            });
+        } else {
+            this.setState({
+                TQZJFirst: Number(e.target.value)
+            });
+        }
     }
     handleTQZJChangeSecond (e) {
         console.log('handleTQZJChangeSecond', e.target.value);
-        this.setState({
-            TQZJSecond: e.target.value
-        });
+        if (isNaN(e.target.value)) {
+            this.setState({
+                TQZJSecond: ''
+            });
+        } else {
+            this.setState({
+                TQZJSecond: Number(e.target.value)
+            });
+        }
     }
 
     handleTableChange (pagination) {
@@ -913,7 +1011,19 @@ export default class LocmeasureTable extends Component {
             thinclass = '',
             smallclass = '',
             smallclassData = '',
-            thinclassData = ''
+            thinclassData = '',
+            XJFirst = 0,
+            XJSecond = '',
+            DJFirst = 0,
+            DJSecond = '',
+            GDFirst = 0,
+            GDSecond = '',
+            GFFirst = 0,
+            GFSecond = '',
+            TQHDFirst = 0,
+            TQHDSecond = '',
+            TQZJFirst = 0,
+            TQZJSecond = ''
         } = this.state;
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
@@ -922,10 +1032,81 @@ export default class LocmeasureTable extends Component {
         const {
             actions: { getqueryTree },
             keycode = '',
-            platform: { tree = {} },
-            treetypes
+            platform: { tree = {} }
         } = this.props;
         let thinClassTree = tree.thinClassTree;
+        // 胸径
+        let xj = '';
+        if (XJFirst >= 0 && XJSecond) {
+            if (XJSecond > XJFirst) {
+                xj = XJFirst + '-' + XJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入胸径');
+                return;
+            }
+        } else if (XJFirst >= 0 && !XJSecond) {
+            xj = XJFirst;
+        }
+        // 地径
+        let dj = '';
+        if (DJFirst >= 0 && DJSecond) {
+            if (DJSecond > DJFirst) {
+                dj = DJFirst + '-' + DJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入地径');
+                return;
+            }
+        } else if (DJFirst >= 0 && !DJSecond) {
+            dj = DJFirst;
+        }
+        // 高度
+        let gd = '';
+        if (GDFirst >= 0 && GDSecond) {
+            if (GDSecond > GDFirst) {
+                gd = GDFirst + '-' + GDSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入高度');
+                return;
+            }
+        } else if (GDFirst >= 0 && !GDSecond) {
+            gd = GDFirst;
+        }
+        // 冠幅
+        let gf = '';
+        if (GFFirst >= 0 && GFSecond) {
+            if (GFSecond > GFFirst) {
+                gf = GFFirst + '-' + GFSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入冠幅');
+                return;
+            }
+        } else if (GFFirst >= 0 && !GFSecond) {
+            gf = GFFirst;
+        }
+        // 土球厚度
+        let tqhd = '';
+        if (TQHDFirst >= 0 && TQHDSecond) {
+            if (TQHDSecond > TQHDFirst) {
+                tqhd = TQHDFirst + '-' + TQHDSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入土球厚度');
+                return;
+            }
+        } else if (TQHDFirst >= 0 && !TQHDSecond) {
+            tqhd = TQHDFirst;
+        }
+        // 土球直径
+        let tqzj = '';
+        if (TQZJFirst >= 0 && TQZJSecond) {
+            if (TQZJSecond > TQZJFirst) {
+                tqzj = TQZJFirst + '-' + TQZJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入土球直径');
+                return;
+            }
+        } else if (TQZJFirst >= 0 && !TQZJSecond) {
+            tqzj = TQZJFirst;
+        }
         let postdata = {
             no: keycode,
             sxm,
@@ -941,7 +1122,13 @@ export default class LocmeasureTable extends Component {
             page,
             size: size,
             smallclass: smallclassData,
-            thinclass: thinclassData
+            thinclass: thinclassData,
+            xj: xj,
+            dj: dj,
+            gd: gd,
+            gf: gf,
+            tqhd: tqhd,
+            tqzj: tqzj
         };
         if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
@@ -980,6 +1167,32 @@ export default class LocmeasureTable extends Component {
                     plan.createtime3 = createtime3;
                     plan.createtime4 = createtime4;
                 });
+
+                // let _headers = ['order', 'sectionName', 'place', 'SupervisorCheck', 'islocation'];
+                // let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+                //     .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+                // console.log('headers', headers);
+                // let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+                //     .reduce((prev, next) => prev.concat(next))
+                //     .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+                // console.log('testttt', testttt);
+                // let output = Object.assign({}, headers, testttt);
+                // console.log('output', output);
+                // // 获取所有单元格的位置
+                // let outputPos = Object.keys(output);
+                // console.log('outputPos', outputPos);
+                // // 计算出范围
+                // let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+                // console.log('ref', ref);
+                // // 构建 workbook 对象
+                // let wb = {
+                //     SheetNames: ['mySheet'],
+                //     Sheets: {
+                //         'mySheet': Object.assign({}, output, { '!ref': ref })
+                //     }
+                // };
+                // XLSX.writeFile(wb, 'output.xlsx');
+
                 let totalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
@@ -1079,7 +1292,7 @@ export default class LocmeasureTable extends Component {
                             }
                         },
                         {
-                            title: '实际载植量',
+                            title: '实际栽植量',
                             dataIndex: 'Num'
                         }
                     ];

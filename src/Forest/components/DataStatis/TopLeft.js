@@ -21,7 +21,7 @@ export default class Top extends Component {
             legend: {
                 orient: 'vertical',
                 left: 'left',
-                data: ['待载植', '已栽植']
+                data: ['待栽植', '已栽植']
             },
             toolbox: {
                 show: true,
@@ -36,7 +36,7 @@ export default class Top extends Component {
                     radius: '55%',
                     center: ['50%', '60%'],
                     data: [
-                        {value: 0, name: '待载植'},
+                        {value: 0, name: '待栽植'},
                         {value: 0, name: '已栽植'}
                     ],
                     itemStyle: {
@@ -86,7 +86,7 @@ export default class Top extends Component {
                     series: [
                         {
                             data: [
-                                {value: unPlantNum, name: '待载植'},
+                                {value: unPlantNum, name: '待栽植'},
                                 {value: plantNum, name: '已栽植'}
                             ]
                         }

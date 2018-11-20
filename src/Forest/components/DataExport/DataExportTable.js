@@ -257,7 +257,7 @@ export default class LocmeasureTable extends Component {
                             onOk={this.datepick.bind(this)}
                         />
                     </div>
-                    {/* <div className='forest-mrg-standard2'>
+                    <div className='forest-mrg-standard2'>
                         <span className='forest-search-span'>胸径：</span>
                         <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
                             <Col>
@@ -328,7 +328,7 @@ export default class LocmeasureTable extends Component {
                                 <Input addonAfter={'cm'} style={{width: 100}} onChange={this.handleTQZJChangeSecond.bind(this)} />
                             </Col>
                         </InputGroup>
-                    </div> */}
+                    </div>
                 </Row>
                 <Row>
                     <Col span={2}>

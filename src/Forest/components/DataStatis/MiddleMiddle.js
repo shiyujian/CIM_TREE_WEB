@@ -15,7 +15,7 @@ export default class Middle extends Component {
         var myChart = echarts.init(document.getElementById('middleMiddle'));
         let option = {
             title: {
-                text: '载植树种数量排名',
+                text: '栽植树种数量排名',
                 x: 'center'
             },
             tooltip: {

@@ -128,7 +128,7 @@ export default class DataStatisTable extends Component {
                         </Select>
                     </div>
                     {/* <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>载植时间：</span>
+                        <span className='forest-search-span'></span>栽植时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
                             defaultValue={[
@@ -165,7 +165,7 @@ export default class DataStatisTable extends Component {
                 <Row>
                     <Row>
                         <Card
-                            title='载植量与定位量'
+                            title='栽植量与定位量'
                             style={{marginTop: 10}}
                         >
                             <Col span={12}>
