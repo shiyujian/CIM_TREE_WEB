@@ -59,7 +59,7 @@ const addGroup = (childrenList, str) => {
                     }
                 })
                 cityChildren.push({
-                    name: record || '区域',
+                    name: record || '其他',
                     code: str + item + row + record,
                     children: countyChildren
                 })

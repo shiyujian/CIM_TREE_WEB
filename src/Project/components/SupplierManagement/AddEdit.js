@@ -287,6 +287,7 @@ class AddEdit extends Component {
                                     label='绑定的苗圃基地'
                                 >
                                     <Select
+                                        disabled
                                         value={Nurserys}
                                         mode='multiple'
                                         filterOption={false}

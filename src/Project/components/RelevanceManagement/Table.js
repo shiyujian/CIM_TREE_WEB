@@ -40,13 +40,17 @@ class Tablelevel extends Component {
             this.name = user.account.person_name;
         }
         // 获取供应商列表
-        getSupplierList().then(rep => {
+        getSupplierList({}, {
+            status: 1
+        }).then(rep => {
             this.SupplierList = rep.content;
             this.setState({
                 SupplierList: rep.content
             });
         });
-        getNurseryList().then(rep => {
+        getNurseryList({}, {
+            status: 1
+        }).then(rep => {
             this.NurseryList = rep.content;
             this.setState({
                 NurseryList: rep.content

@@ -252,6 +252,7 @@ class AddEdit extends Component {
                                     label='绑定的供应商'
                                 >
                                     <Select
+                                        disabled
                                         mode='multiple'
                                         value={Suppliers}
                                         filterOption={false}
