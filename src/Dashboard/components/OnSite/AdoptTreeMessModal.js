@@ -82,7 +82,6 @@ class AdoptTreeMessModal extends Component {
         const {
             seedlingMess,
             treeMess,
-            curingMess,
             adoptTreeMess
         } = this.props;
         const {
@@ -112,10 +111,10 @@ class AdoptTreeMessModal extends Component {
                 <div className='adoptTreeMess-background'>
                     <img src={closeImg}
                         onClick={this.handleTreeModalCancel.bind(this)}
-                        style={{ marginLeft: 736, marginTop: -23, cursor: 'pointer' }} />
+                        className='adoptTreeMess-modal-closeImg' />
                     <Row className='adoptTreeMess-modal-top-layout'>
-                        <Col span={8} style={{ paddingLeft: 101, paddingTop: 0 }}>
-                            <img src={defaultUserImg} style={{width: 95, height: 95}} />
+                        <Col span={8} style={{ paddingLeft: 130, paddingTop: 27 }}>
+                            <img src={defaultUserImg} style={{width: 72, height: 72}} />
                             <div className='adoptTreeMess-modal-top-name' title={name}>
                                 {/* 恐怖如斯 */}
                                 { name || '.'}
@@ -127,8 +126,8 @@ class AdoptTreeMessModal extends Component {
                                 {adoptTreeMess.AdoptTime ? moment(adoptTreeMess.AdoptTime).format('YYYY-MM-DD HH:mm:ss') : ''}
                             </div>
                         </Col>
-                        <Col span={8} style={{ paddingLeft: 58, paddingTop: 0 }}>
-                            <img src={defaultTreeImg} style={{width: 95, height: 95}} />
+                        <Col span={8} style={{ paddingLeft: 98, paddingTop: 27 }}>
+                            <img src={defaultTreeImg} style={{width: 72, height: 72}} />
                             <div className='adoptTreeMess-modal-top-name' title={seedlingMess.TreeTypeName ? seedlingMess.TreeTypeName : ''}>
                                 {/* 桀桀桀桀桀桀桀桀桀桀桀桀桀桀 */}
                                 {seedlingMess.TreeTypeName ? seedlingMess.TreeTypeName : '.'}
@@ -137,107 +136,95 @@ class AdoptTreeMessModal extends Component {
                     </Row>
 
                     <div className='adoptTreeMess-curingTaskType-layout'>
-                        <div style={{paddingLeft: 70, paddingTop: 9}}>
+                        <div style={{paddingLeft: 125, paddingTop: 14}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
-                                style={{fontSize: 16}}
+                                style={{fontSize: 14}}
                             >
                                 排涝
                             </div>
                             <div className='adoptTreeMess-curingTaskTypeNum'
-                                style={{fontSize: 22}}
+                                style={{fontSize: 20}}
                             >
                                 {this.handleTypeData('排涝')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 39, paddingTop: 12}}>
+                        <div style={{paddingLeft: 50, paddingTop: 21}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
-                                style={{fontSize: 21}}
+                                style={{fontSize: 16}}
                             >
                                 其他
                             </div>
                             <div className='adoptTreeMess-curingTaskTypeNum'
-                                style={{fontSize: 32}}
+                                style={{fontSize: 24}}
                             >
                                 {this.handleTypeData('其他')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 58, paddingTop: 18}}>
+                        <div style={{paddingLeft: 53, paddingTop: 23}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
-                                style={{fontSize: 13}}
+                                style={{fontSize: 14}}
                             >
                                 病虫害防治
                             </div>
                             <div className='adoptTreeMess-curingTaskTypeNum'
-                                style={{fontSize: 26}}
+                                style={{fontSize: 28}}
                             >
                                 {this.handleTypeData('病虫害防治')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 23, paddingTop: 0}}>
+                        <div style={{paddingLeft: 54, paddingTop: 15}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
-                                style={{fontSize: 18}}
+                                style={{fontSize: 14}}
                             >
                                 修剪
                             </div>
                             <div className='adoptTreeMess-curingTaskTypeNum'
-                                style={{fontSize: 26}}
+                                style={{fontSize: 24}}
                             >
                                 {this.handleTypeData('修剪')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 55, paddingTop: 0}}>
+                        <div style={{paddingLeft: 93, paddingTop: 13}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
-                                style={{fontSize: 21}}
+                                style={{fontSize: 16}}
                             >
                                 除草
                             </div>
                             <div className='adoptTreeMess-curingTaskTypeNum'
-                                style={{fontSize: 32}}
+                                style={{fontSize: 28}}
                             >
                                 {this.handleTypeData('除草')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 34, paddingTop: 2}}>
+                        <div style={{paddingLeft: 85, paddingTop: 12}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
-                                style={{fontSize: 18}}
+                                style={{fontSize: 20}}
                             >
                                 施肥
                             </div>
                             <div className='adoptTreeMess-curingTaskTypeNum'
-                                style={{fontSize: 24}}
+                                style={{fontSize: 32}}
                             >
                                 {this.handleTypeData('施肥')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 37, paddingTop: 8}}>
+                        <div style={{paddingLeft: 57, paddingTop: 38}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
-                                style={{fontSize: 24}}
+                                style={{fontSize: 14}}
                             >
                                 浇水
                             </div>
                             <div className='adoptTreeMess-curingTaskTypeNum'
-                                style={{fontSize: 36}}
+                                style={{fontSize: 28}}
                             >
                                 {this.handleTypeData('浇水')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 53, paddingTop: 20}}>
-                            <div className='adoptTreeMess-curingTaskTypeName'
-                                style={{fontSize: 16}}
-                            >
-                                补植
-                            </div>
-                            <div className='adoptTreeMess-curingTaskTypeNum'
-                                style={{fontSize: 22}}
-                            >
-                                {this.handleTypeData('补植')}
-                            </div>
-                        </div>
                     </div>
-                    <Row style={{ paddingTop: 15, display: 'flex' }}>
-                        <div className='adoptTreeMess-treeMess'>
+                    <Row style={{ paddingTop: 0, display: 'flex', marginLeft: 70, marginRight: 70 }}>
+                        <Col span={12} style={{paddingRight: 5}}>
                             <div className='adoptTreeMess-mrg10'>
-                                <img src={codeImg} style={{marginRight: 10}} />
+                                {/* <img src={codeImg} style={{marginRight: 10}} /> */}
                                 <span className='adoptTreeMess-lineTitle'>苗木编码</span>
                                 <span className='adoptTreeMess-modal-data-text'>
                                     {/* abn2017 */}
@@ -245,7 +232,7 @@ class AdoptTreeMessModal extends Component {
                                 </span>
                             </div>
                             <div className='adoptTreeMess-mrg10'>
-                                <img src={productLocationImg} style={{marginRight: 10}} />
+                                {/* <img src={productLocationImg} style={{marginRight: 10}} /> */}
                                 <span className='adoptTreeMess-lineTitle'>产地</span>
                                 <span className='adoptTreeMess-modal-data-text'>
                                     {/* 定州市大辛庄某某村 */}
@@ -253,7 +240,7 @@ class AdoptTreeMessModal extends Component {
                                 </span>
                             </div>
                             <div className='adoptTreeMess-mrg10'>
-                                <img src={liftTimeImg} style={{marginRight: 10}} />
+                                {/* <img src={liftTimeImg} style={{marginRight: 10}} /> */}
                                 <span className='adoptTreeMess-lineTitle'>起苗时间</span>
                                 <span className='adoptTreeMess-modal-data-text'>
                                     {/* 2018-01-01 12:00:00 */}
@@ -261,7 +248,7 @@ class AdoptTreeMessModal extends Component {
                                 </span>
                             </div>
                             <div className='adoptTreeMess-mrg10'>
-                                <img src={treeLocationImg} style={{marginRight: 10}} />
+                                {/* <img src={treeLocationImg} style={{marginRight: 10}} /> */}
                                 <span className='adoptTreeMess-lineTitle'>栽植定位</span>
                                 <span className='adoptTreeMess-modal-data-text'
                                     title={treeMess.landName ? `${treeMess.landName} - ${treeMess.sectionName} - ${treeMess.SmallClass} - ${treeMess.ThinClass}` : ''}>
@@ -269,10 +256,10 @@ class AdoptTreeMessModal extends Component {
                                     {treeMess.landName ? `${treeMess.landName} - ${treeMess.sectionName} - ${treeMess.SmallClass} - ${treeMess.ThinClass}` : ''}
                                 </span>
                             </div>
-                        </div>
-                        <div className='adoptTreeMess-curingTaskMess'>
+                        </Col>
+                        <Col span={12} style={{paddingLeft: 5}}>
                             <div className='adoptTreeMess-mrg20'>
-                                <img src={curingTaskMessImg} style={{marginRight: 10, marginTop: 2}} />
+                                {/* <img src={curingTaskMessImg} style={{marginRight: 10, marginTop: 2}} /> */}
                                 <span className='adoptTreeMess-lineTitle'>近三次养护详情</span>
                             </div>
                             {
@@ -298,19 +285,19 @@ class AdoptTreeMessModal extends Component {
                             {/* <div className='adoptTreeMess-mrg20'>
                                 <span className='adoptTreeMess-table-type-data' style={{marginRight: 15}} >病虫害防治</span>
                                 <span className='adoptTreeMess-table-person-data' style={{marginRight: 15}} >啊啊啊啊啊啊啊啊</span>
-                                <span className='adoptTreeMess-table-time-data'>2018-01-01 12:00:00 ~ 2018-01-01 12:00:00</span>
+                                <span className='adoptTreeMess-table-time-data'>2018-01-01 12:00 ~ 2018-01-01 12:00</span>
                             </div>
                             <div className='adoptTreeMess-mrg20'>
                                 <span className='adoptTreeMess-table-type-data' style={{marginRight: 15}} >病虫害防治</span>
                                 <span className='adoptTreeMess-table-person-data' style={{marginRight: 15}} >啊啊啊啊啊啊啊啊</span>
-                                <span className='adoptTreeMess-table-time-data'>2018-01-01 12:00:00 ~ 2018-01-01 12:00:00</span>
+                                <span className='adoptTreeMess-table-time-data'>2018-01-01 12:00 ~ 2018-01-01 12:00</span>
                             </div>
                             <div className='adoptTreeMess-mrg20'>
                                 <span className='adoptTreeMess-table-type-data' style={{marginRight: 15}} >病虫害防治</span>
                                 <span className='adoptTreeMess-table-person-data' style={{marginRight: 15}} >啊啊啊啊啊啊啊啊</span>
-                                <span className='adoptTreeMess-table-time-data'>2018-01-01 12:00:00 ~ 2018-01-01 12:00:00</span>
+                                <span className='adoptTreeMess-table-time-data'>2018-01-01 12:00 ~ 2018-01-01 12:00</span>
                             </div> */}
-                        </div>
+                        </Col>
                     </Row>
                 </div>
             </Modal>

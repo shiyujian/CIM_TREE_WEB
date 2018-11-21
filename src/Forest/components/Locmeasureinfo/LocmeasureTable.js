@@ -10,8 +10,7 @@ import {
     Button,
     Input,
     Progress,
-    message,
-    Notification
+    message
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
@@ -1198,7 +1197,7 @@ export default class LocmeasureTable extends Component {
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
 
-                if (bigType == '5') {
+                if (bigType === '5') {
                     this.columns = [
                         {
                             title: '序号',
