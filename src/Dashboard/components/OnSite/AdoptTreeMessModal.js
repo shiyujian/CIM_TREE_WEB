@@ -136,7 +136,7 @@ class AdoptTreeMessModal extends Component {
                     </Row>
 
                     <div className='adoptTreeMess-curingTaskType-layout'>
-                        <div style={{paddingLeft: 125, paddingTop: 14}}>
+                        <div style={{marginLeft: 113, marginTop: 14, width: 53}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
                                 style={{fontSize: 14}}
                             >
@@ -148,7 +148,7 @@ class AdoptTreeMessModal extends Component {
                                 {this.handleTypeData('排涝')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 50, paddingTop: 21}}>
+                        <div style={{marginLeft: 23, marginTop: 20, width: 59}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
                                 style={{fontSize: 16}}
                             >
@@ -160,7 +160,7 @@ class AdoptTreeMessModal extends Component {
                                 {this.handleTypeData('其他')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 53, paddingTop: 23}}>
+                        <div style={{marginLeft: 40, marginTop: 20, width: 70}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
                                 style={{fontSize: 14}}
                             >
@@ -172,7 +172,7 @@ class AdoptTreeMessModal extends Component {
                                 {this.handleTypeData('病虫害防治')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 54, paddingTop: 15}}>
+                        <div style={{marginLeft: 34, marginTop: 17, width: 67}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
                                 style={{fontSize: 14}}
                             >
@@ -184,7 +184,7 @@ class AdoptTreeMessModal extends Component {
                                 {this.handleTypeData('修剪')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 93, paddingTop: 13}}>
+                        <div style={{marginLeft: 51, marginTop: 15, width: 79}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
                                 style={{fontSize: 16}}
                             >
@@ -196,7 +196,7 @@ class AdoptTreeMessModal extends Component {
                                 {this.handleTypeData('除草')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 85, paddingTop: 12}}>
+                        <div style={{marginLeft: 38, marginTop: 14, width: 86}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
                                 style={{fontSize: 20}}
                             >
@@ -208,7 +208,7 @@ class AdoptTreeMessModal extends Component {
                                 {this.handleTypeData('施肥')}
                             </div>
                         </div>
-                        <div style={{paddingLeft: 57, paddingTop: 38}}>
+                        <div style={{marginLeft: 18, marginTop: 42, width: 60}}>
                             <div className='adoptTreeMess-curingTaskTypeName'
                                 style={{fontSize: 14}}
                             >
@@ -263,23 +263,25 @@ class AdoptTreeMessModal extends Component {
                                 <span className='adoptTreeMess-lineTitle'>近三次养护详情</span>
                             </div>
                             {
-                                curingData.map((data) => {
-                                    return (
-                                        <div className='adoptTreeMess-mrg20'>
-                                            <span className='adoptTreeMess-table-type-data'
-                                                style={{marginRight: 15}} >
-                                                {data.typeName ? data.typeName : ''}
-                                            </span>
-                                            <span className='adoptTreeMess-table-person-data'
-                                                title={data.CuringMans ? data.CuringMans : ''}
-                                                style={{marginRight: 20}} >
-                                                {data.CuringMans ? data.CuringMans : ''}
-                                            </span>
-                                            <span className='adoptTreeMess-table-time-data'>
-                                                {data.StartTime && data.EndTime ? data.StartTime + ' ~ ' + data.EndTime : ''}
-                                            </span>
-                                        </div>
-                                    );
+                                curingData.map((data, index) => {
+                                    if (data && data.typeName && data.typeName !== '补植' && index < 3) {
+                                        return (
+                                            <div className='adoptTreeMess-mrg20'>
+                                                <span className='adoptTreeMess-table-type-data'
+                                                    style={{marginRight: 15}} >
+                                                    {data.typeName ? data.typeName : ''}
+                                                </span>
+                                                <span className='adoptTreeMess-table-person-data'
+                                                    title={data.CuringMans ? data.CuringMans : ''}
+                                                    style={{marginRight: 20}} >
+                                                    {data.CuringMans ? data.CuringMans : ''}
+                                                </span>
+                                                <span className='adoptTreeMess-table-time-data'>
+                                                    {data.StartTime && data.EndTime ? data.StartTime + ' ~ ' + data.EndTime : ''}
+                                                </span>
+                                            </div>
+                                        );
+                                    }
                                 })
                             }
                             {/* <div className='adoptTreeMess-mrg20'>
