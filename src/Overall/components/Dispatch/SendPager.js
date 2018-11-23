@@ -47,7 +47,7 @@ class SendPage1 extends Component {
         orgListCodes.pop();
         let codeu = orgListCodes.join();
         let ucode = codeu.replace(/,/g, '_');
-        if (user.is_superuser == true) {
+        if (user.is_superuser) {
             deleteSentDocAc({
                 id: _id,
                 user: encodeURIComponent('admin')
@@ -98,13 +98,12 @@ class SendPage1 extends Component {
     // 查找
     query () {
         const {
-            actions: { getReceiveInfoAc, getReceiveInfoAcOK },
-            sendInfo = {},
-            filter = {}
+            sendInfo = {}
         } = this.props;
         const { notifications = [] } = sendInfo;
         let searchList = [];
         this.props.form.validateFields(async (err, values) => {
+            console.log('err', err);
             notifications.map(item => {
                 let isName = false;
                 let isRoles = false;
@@ -511,7 +510,7 @@ class SendPage1 extends Component {
         orgListCodes.pop();
         let codeu = orgListCodes.join();
         let ucode = codeu.replace(/,/g, '_');
-        if (user.is_superuser == true) {
+        if (user.is_superuser) {
             getSendDetailAc({
                 id: id,
                 user: encodeURIComponent('admin')

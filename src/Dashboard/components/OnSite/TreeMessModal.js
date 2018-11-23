@@ -171,9 +171,13 @@ class TreeMessModal extends Component {
                                 size='large'
                                 addonBefore='起苗地点'
                                 value={
-                                    seedlingMess.nurserysLocationName
-                                        ? seedlingMess.nurserysLocationName
-                                        : ''
+                                    seedlingMess.nurserysAddressName
+                                        ? (seedlingMess.location
+                                            ? `${seedlingMess.nurserysAddressName}(${seedlingMess.location})`
+                                            : seedlingMess.nurserysAddressName)
+                                        : (seedlingMess.location
+                                            ? seedlingMess.location
+                                            : '')
                                 }
                             />
                             {seedlingMess.GD ? (
@@ -475,6 +479,13 @@ class TreeMessModal extends Component {
                                 size='large'
                                 addonBefore='位置'
                                 value={
+                                    // treeMess.queryTreeAddressName
+                                    //     ? treeMess.queryTreeAddressName
+                                    //     : (treeMess.Location
+                                    //         ? `${treeMess.LocationX},${
+                                    //             treeMess.LocationY
+                                    //         }`
+                                    //         : '')
                                     treeMess.Location
                                         ? `${treeMess.LocationX},${
                                             treeMess.LocationY

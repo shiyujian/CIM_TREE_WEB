@@ -45,10 +45,16 @@ export default class Dispatch extends Component {
             let codeu = orgListCodes.join();
             let ucode = codeu.replace(/,/g, '_');
             getOrgListAc().then(item => {
-                getReceiveInfoAc({
-                    user: encodeURIComponent(ucode)
-                });
-                if (user.is_superuser == true) {
+                if (user.is_superuser) {
+                    getReceiveInfoAc({
+                        user: encodeURIComponent('admin')
+                    });
+                } else {
+                    getReceiveInfoAc({
+                        user: encodeURIComponent(ucode)
+                    });
+                }
+                if (user.is_superuser) {
                     getSentInfoAc({
                         user: encodeURIComponent('admin')
                     });

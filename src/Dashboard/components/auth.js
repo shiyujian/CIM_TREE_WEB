@@ -1,5 +1,5 @@
 import './OnSite/OnSite.less';
-import { FOREST_API, FOREST_IMG } from '_platform/api';
+import { FOREST_API, FOREST_IMG, LBSAMAP_KEY } from '_platform/api';
 
 export const getAreaData = async (getTreeNodeList, getThinClassList) => {
     let rst = await getTreeNodeList();
@@ -829,4 +829,26 @@ export const handleCuringTaskMess = (str, taskMess, totalThinClass, curingTypes,
         geometry: { type: 'Polygon', coordinates: treearea }
     };
     return message;
+};
+// 根据坐标获取
+export const handleGetAddressByCoordinate = async (location, getLocationNameByCoordinate) => {
+    try {
+        let postData = {
+            key: LBSAMAP_KEY,
+            s: 'rsv3',
+            location: location,
+            radius: 2800,
+            // callback: 'jsonp_10127_',
+            platform: 'JS',
+            logversion: 2.0,
+            sdkversion: 1.3,
+            appname: 'https://lbs.amap.com/console/show/picker',
+            csid: '8A18DA11-6CD2-445E-B0B0-B3DEFEB925B3'
+        };
+        let addressData = await getLocationNameByCoordinate({}, postData);
+        console.log('addressData', addressData);
+        return addressData;
+    } catch (e) {
+
+    }
 };

@@ -181,20 +181,13 @@ export default handleActions(
             toggleData: payload
         }),
         [getReceiveInfoAcOK]: (state, { payload }) => {
-            const user = JSON.parse(
-                window.localStorage.getItem('QH_USER_DATA')
-            );
-
             let datas = [];
             loop(state.orgList, payload.notifications, datas);
             if (datas && datas.length > 0) {
                 payload.notifications.map((dat, index) => {
-                    // if (dat.from_whom == datas[0].code) {
-                    // 	dat.to_whom_name = datas[0].name
-                    // }
                     for (let i = 0; i < datas.length; i++) {
                         const elementdatas = datas[i];
-                        if (dat.from_whom == elementdatas.code) {
+                        if (dat.from_whom === elementdatas.code) {
                             dat.to_whom_name = elementdatas.name;
                         }
                     }

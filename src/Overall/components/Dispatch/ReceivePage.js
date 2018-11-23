@@ -46,6 +46,7 @@ class ReceivePage extends Component {
         const {
             actions: { deleteReceiveDocAc, getReceiveInfoAc }
         } = this.props;
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         let orgCode = getUser().org_code;
 
         let orgListCodes = orgCode.split('_');
@@ -55,9 +56,15 @@ class ReceivePage extends Component {
         deleteReceiveDocAc({ id: _id, user: encodeURIComponent(ucode) }).then(
             () => {
                 message.success('删除收文成功！');
-                getReceiveInfoAc({
-                    user: encodeURIComponent(ucode)
-                });
+                if (user.is_superuser) {
+                    getReceiveInfoAc({
+                        user: encodeURIComponent('admin')
+                    });
+                } else {
+                    getReceiveInfoAc({
+                        user: encodeURIComponent(ucode)
+                    });
+                }
             }
         );
     }
@@ -66,7 +73,7 @@ class ReceivePage extends Component {
     _viewClick (id, record) {
         this.setState({ code_id: id });
         let orgCode = getUser().org_code;
-
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         let orgListCodes = orgCode.split('_');
         orgListCodes.pop();
         let codeu = orgListCodes.join();
@@ -80,14 +87,25 @@ class ReceivePage extends Component {
             visible: true,
             _viewClickinfo: record
         });
-        getReceiveDetailAc({
-            id: id,
-            user: encodeURIComponent(ucode)
-        }).then(rst => {
-            this.setState({
-                showInfo: rst
+        if (user.is_superuser) {
+            getReceiveDetailAc({
+                id: id,
+                user: encodeURIComponent('admin')
+            }).then(rst => {
+                this.setState({
+                    showInfo: rst
+                });
             });
-        });
+        } else {
+            getReceiveDetailAc({
+                id: id,
+                user: encodeURIComponent(ucode)
+            }).then(rst => {
+                this.setState({
+                    showInfo: rst
+                });
+            });
+        }
     }
 
     _handleCancel () {
@@ -101,6 +119,7 @@ class ReceivePage extends Component {
         const {
             actions: { patchReceiveDetailAc, getReceiveInfoAc }
         } = this.props;
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         patchReceiveDetailAc(
             {
                 id: id,
@@ -112,9 +131,15 @@ class ReceivePage extends Component {
         ).then(rst => {
             if (rst._id) {
                 message.success('已设置已阅！');
-                getReceiveInfoAc({
-                    user: encodeURIComponent(getUser().org)
-                });
+                if (user.is_superuser) {
+                    getReceiveInfoAc({
+                        user: encodeURIComponent('admin')
+                    });
+                } else {
+                    getReceiveInfoAc({
+                        user: encodeURIComponent(getUser().org)
+                    });
+                }
                 this._handleCancel();
             }
         });
@@ -135,15 +160,14 @@ class ReceivePage extends Component {
     // 查找
     query () {
         const {
-            actions: { getReceiveInfoAc, getReceiveInfoAcOK },
-            receiveInfo = {},
-            filter = {}
+            receiveInfo = {}
         } = this.props;
         const { notifications = [] } = receiveInfo;
 
         // const user = getUser();
         let searchList = [];
         this.props.form.validateFields(async (err, values) => {
+            console.log('err', err);
             notifications.map(item => {
                 let isName = false;
                 let isRoles = false;
@@ -224,7 +248,6 @@ class ReceivePage extends Component {
 
     render () {
         const {
-            actions: { getReceiveInfoAc },
             receiveInfo = {},
             form: { getFieldDecorator },
             toggleData: toggleData = {
@@ -428,7 +451,7 @@ class ReceivePage extends Component {
                     onCancel={this.handleCancel.bind(this)}
                     closable={false}
                     maskClosable={false}
-                    // footer={null}
+                // footer={null}
                 >
                     {notification.title && (
                         <Row style={{ padding: '0 80px', minHeight: '300px' }}>
@@ -494,9 +517,9 @@ class ReceivePage extends Component {
                                         <a
                                             href={
                                                 STATIC_DOWNLOAD_API +
-                                                notification
-                                                    .fixed_external_attachments[0]
-                                                    .file_partial_url
+                                                    notification
+                                                        .fixed_external_attachments[0]
+                                                        .file_partial_url
                                             }
                                             target='_bank'
                                         >

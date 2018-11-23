@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-22 17:42:45
+ * @Last Modified time: 2018-11-23 15:14:13
  */
 import React, { Component } from 'react';
 import {
@@ -38,7 +38,8 @@ import {
     getSectionName,
     handleAreaLayerData,
     handleCoordinates,
-    handleCuringTaskMess
+    handleCuringTaskMess,
+    handleGetAddressByCoordinate
 } from '../auth';
 import {
     computeSignedArea
@@ -2148,6 +2149,7 @@ class OnSite extends Component {
                 getForestUserDetail,
                 getUserDetail,
                 getOrgTreeByCode,
+                getTreeLocation,
                 getLocationNameByCoordinate
             },
             platform: {
@@ -2165,12 +2167,19 @@ class OnSite extends Component {
             let bigTreeList = (tree && tree.bigTreeList) || [];
             let queryTreeData = await getTreeMess(postdata);
             let treeflowDatas = {};
+            // 树木审批流程信息
             if (dashboardTreeMess === 'treeMess') {
                 treeflowDatas = await getTreeflows({}, postdata);
             }
+            // 苗圃数据
             let nurserysDatas = await getNurserys({}, postdata);
+            // 车辆打包数据
             let carData = await getCarpackbysxm(postdata);
+            // 养护树木信息
             let curingTreeData = await getCuringTreeInfo({}, postdata);
+            // 获取树的地理坐标信息
+            let treeLocationDatas = await getTreeLocation(postdata);
+
             let curingTypeArr = [];
             if (!curingTypes) {
                 let curingTypesData = await getCuringTypes();
@@ -2205,6 +2214,7 @@ class OnSite extends Component {
             let nurserysData = {};
             let curingTaskData = [];
             let curingTaskArr = [];
+            let treeLocationData = [];
             if (
                 treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array &&
                         treeflowDatas.content.length > 0
@@ -2218,6 +2228,12 @@ class OnSite extends Component {
                 nurserysData = nurserysDatas.content[0];
             }
             if (
+                treeLocationDatas && treeLocationDatas.content && treeLocationDatas.content instanceof Array &&
+                    treeLocationDatas.content.length > 0
+            ) {
+                treeLocationData = treeLocationDatas.content[0];
+            }
+            if (
                 curingTreeData && curingTreeData.content && curingTreeData.content instanceof Array &&
                         curingTreeData.content.length > 0
             ) {
@@ -2229,22 +2245,19 @@ class OnSite extends Component {
                     }
                 });
             }
-            let nurserysLocationPostData = {
-                key: '8325164e247e15eea68b59e89200988b',
-                s: 'rsv3',
-                location: nurserysData.location,
-                radius: 2800,
-                // callback: 'jsonp_10127_',
-                platform: 'JS',
-                logversion: 2.0,
-                sdkversion: 1.3,
-                appname: 'https://lbs.amap.com/console/show/picker',
-                csid: '8A18DA11-6CD2-445E-B0B0-B3DEFEB925B3'
-            };
-            let nurserysLocationData = await getLocationNameByCoordinate({}, nurserysLocationPostData);
-            console.log('nurserysLocationData', nurserysLocationData);
-            let nurserysLocationName = (nurserysLocationData && nurserysLocationData.regeocode.formatted_address) || '';
-            nurserysData.nurserysLocationName = nurserysLocationName;
+            // 根据苗圃的起苗坐标获取起苗地址
+            let nurserysAddressData = await handleGetAddressByCoordinate(nurserysData.location, getLocationNameByCoordinate);
+            console.log('nurserysAddressData', nurserysAddressData);
+            let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
+            nurserysData.nurserysAddressName = nurserysAddressName;
+            // 根据树木的定位坐标获取定位地址
+            // console.log('treeLocationData', treeLocationData);
+            // let location = `${treeLocationData.X},${treeLocationData.Y}`;
+            // let treeAddressData = await handleGetAddressByCoordinate(location, getLocationNameByCoordinate);
+            // console.log('treeAddressData', treeAddressData);
+            // let queryTreeAddressName = (treeAddressData && treeAddressData.regeocode && treeAddressData.regeocode.formatted_address) || '';
+            // queryTreeData.queryTreeAddressName = queryTreeAddressName;
+
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
             for (let i = 0; i < treeflowData.length; i++) {

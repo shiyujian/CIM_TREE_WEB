@@ -600,13 +600,29 @@ export default class SeedlingsChange extends Component {
 
     remarkDefault (record) {
         console.log('record', record);
-        let TreatmentData = [];
-        this.setState({
-            remarkRecord: record,
-            remarkvisible: true,
-            remarkInfo: record.Remark ? record.Remark : '',
-            TreatmentData: TreatmentData
-        });
+        try {
+            let TreatmentData = [];
+            let remarkPics = record.RemarkPics;
+            let arr = remarkPics.split(',');
+            console.log('arr', arr);
+            arr.map((rst, index) => {
+                let src = getForestImgUrl(rst);
+                let data = {
+                    index: index + 1,
+                    fileName: `图片${index + 1}`,
+                    a_file: src
+                };
+                TreatmentData.push(data);
+            });
+            this.setState({
+                remarkRecord: record,
+                remarkvisible: true,
+                remarkInfo: record.Remark ? record.Remark : '',
+                TreatmentData: TreatmentData
+            });
+        } catch (e) {
+            console.log('remarkDefault', e);
+        }
     }
 
     async remarkOK () {
