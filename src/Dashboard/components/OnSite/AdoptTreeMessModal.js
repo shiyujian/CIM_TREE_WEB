@@ -277,7 +277,7 @@ class AdoptTreeMessModal extends Component {
                                                     {data.CuringMans ? data.CuringMans : ''}
                                                 </span>
                                                 <span className='adoptTreeMess-table-time-data'>
-                                                    {data.StartTime && data.EndTime ? data.StartTime + ' ~ ' + data.EndTime : ''}
+                                                    {data.StartTime && data.EndTime ? moment(data.StartTime).format('YYYY-MM-DD HH:mm') + ' ~ ' + moment(data.EndTime).format('YYYY-MM-DD HH:mm') : ''}
                                                 </span>
                                             </div>
                                         );

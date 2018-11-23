@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-05 15:47:06
+ * @Last Modified time: 2018-11-22 17:00:36
  */
 /**
  *
@@ -77,6 +77,8 @@ export const CUS_TILEMAP = window.config.cus_tilemap;
 export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
 export const NODE_FILE_EXCHANGE_API = window.config.NODE_FILE_STATIC_URL;
+// 高德地图逆坐标查询
+export const LBSAMAP_API = window.config.LBSAMAP;
 // FDBServer API
 export const FDBSERVICE_API = `${window.config.FDBServer_API}`;
 export const SAFETY_MONITOR = `${base}/service/appserver`;

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-21 14:24:59
+ * @Last Modified time: 2018-11-22 17:42:45
  */
 import React, { Component } from 'react';
 import {
@@ -2147,7 +2147,8 @@ class OnSite extends Component {
                 getCuringMessage,
                 getForestUserDetail,
                 getUserDetail,
-                getOrgTreeByCode
+                getOrgTreeByCode,
+                getLocationNameByCoordinate
             },
             platform: {
                 tree = {}
@@ -2228,6 +2229,22 @@ class OnSite extends Component {
                     }
                 });
             }
+            let nurserysLocationPostData = {
+                key: '8325164e247e15eea68b59e89200988b',
+                s: 'rsv3',
+                location: nurserysData.location,
+                radius: 2800,
+                // callback: 'jsonp_10127_',
+                platform: 'JS',
+                logversion: 2.0,
+                sdkversion: 1.3,
+                appname: 'https://lbs.amap.com/console/show/picker',
+                csid: '8A18DA11-6CD2-445E-B0B0-B3DEFEB925B3'
+            };
+            let nurserysLocationData = await getLocationNameByCoordinate({}, nurserysLocationPostData);
+            console.log('nurserysLocationData', nurserysLocationData);
+            let nurserysLocationName = (nurserysLocationData && nurserysLocationData.regeocode.formatted_address) || '';
+            nurserysData.nurserysLocationName = nurserysLocationName;
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
             for (let i = 0; i < treeflowData.length; i++) {

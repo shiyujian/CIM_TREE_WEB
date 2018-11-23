@@ -1,6 +1,7 @@
 import { FOREST_API, FOREST_IMG } from '_platform/api';
 import moment from 'moment';
 export const getSeedlingMess = (queryTreeData, carData, nurserysData) => {
+    
     let seedlingMess = {
         sxm: queryTreeData.ZZBM ? queryTreeData.ZZBM : '',
         car: carData.LicensePlate ? carData.LicensePlate : '',
@@ -21,6 +22,9 @@ export const getSeedlingMess = (queryTreeData, carData, nurserysData) => {
             : '',
         location: nurserysData.location
             ? nurserysData.location
+            : '',
+        nurserysLocationName: nurserysData.nurserysLocationName
+            ? nurserysData.nurserysLocationName
             : '',
         InputerObj: nurserysData.InputerObj
             ? nurserysData.InputerObj

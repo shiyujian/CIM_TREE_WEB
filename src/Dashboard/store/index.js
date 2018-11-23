@@ -2,7 +2,8 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {
     USER_API,
-    FOREST_API
+    FOREST_API,
+    LBSAMAP_API
 } from '_platform/api';
 const ID = 'dashboard';
 // 获取隐患列表
@@ -36,6 +37,8 @@ export const getAdoptTreeByAdopter = createFetchAction(`${FOREST_API}/adopt/adop
 export const getTreeLocation = createFetchAction(`${FOREST_API}/tree/treelocations?sxm={{sxm}}&crs=4326`, [], 'GET');
 // 获取苗木结缘信息
 export const getAdoptTrees = createFetchAction(`${FOREST_API}/adopt/adopttrees`, [], 'GET');
+// 根据坐标获取地址信息
+export const getLocationNameByCoordinate = createFetchAction(`${LBSAMAP_API}/v3/geocode/regeo`, [], 'GET');
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -78,6 +81,7 @@ export const actions = {
     getAdoptTreeByAdopter,
     getTreeLocation,
     getAdoptTrees,
+    getLocationNameByCoordinate,
 
     switchDashboardCompoment,
     getAreaTree,

@@ -171,8 +171,8 @@ class TreeMessModal extends Component {
                                 size='large'
                                 addonBefore='起苗地点'
                                 value={
-                                    seedlingMess.location
-                                        ? seedlingMess.location
+                                    seedlingMess.nurserysLocationName
+                                        ? seedlingMess.nurserysLocationName
                                         : ''
                                 }
                             />
