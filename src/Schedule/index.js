@@ -21,7 +21,9 @@ export default class Schedule extends Component {
             Stage,
             Proprogress,
             Scheduleanalyze,
-            Enteranalyze
+            Enteranalyze,
+            ScheduleReport,
+            ScheduleDisplay
         } =
             this.state || {};
         return (
@@ -59,6 +61,20 @@ export default class Schedule extends Component {
                             component={Scheduleanalyze}
                         />
                     )}
+                    {ScheduleReport && (
+                        <Route
+                            exact
+                            path='/schedule/scheduleReport'
+                            component={ScheduleReport}
+                        />
+                    )}
+                    {ScheduleDisplay && (
+                        <Route
+                            exact
+                            path='/schedule/scheduleDisplay'
+                            component={ScheduleDisplay}
+                        />
+                    )}
                 </Main>
             </Body>
         );
@@ -77,6 +93,20 @@ export default class Schedule extends Component {
             name: '项目进度',
             id: 'SCHEDULE.PROPROGRESS',
             path: '/schedule/proprogress',
+            icon: <Icon name='warning' />
+        },
+        {
+            key: 'schedulereport',
+            id: 'SCHEDULE.SCHEDULEREPORT',
+            name: '每周进度',
+            path: '/schedule/schedulereport',
+            icon: <Icon name='suitcase' />
+        },
+        {
+            key: 'scheduleDisplay',
+            id: 'SCHEDULE.SCHEDULEDISPLAY',
+            name: '进度展示',
+            path: '/schedule/scheduleDisplay',
             icon: <Icon name='warning' />
         },
         {

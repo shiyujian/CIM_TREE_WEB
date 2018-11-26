@@ -1,28 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Select, Row, Col, DatePicker, Cards } from 'antd';
+import { Select, Row, Col } from 'antd';
 import * as actions from '../store/entry';
-import moment from 'moment';
 import { PkCodeTree } from '../components';
 import { ScheduleTable } from '../components/Scheduleanalyze';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
-    Aside,
     Body,
     Sidebar,
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { groupBy } from 'lodash';
 import LeftTop from '../components/Scheduleanalyze/LeftTop';
 import RightTop from '../components/Scheduleanalyze/RightTop';
 import MiddleTop from '../components/Scheduleanalyze/MiddleTop';
 import Bottom from '../components/Scheduleanalyze/Bottom';
-
-var echarts = require('echarts');
-const { RangePicker } = DatePicker;
 const Option = Select.Option;
 
 @connect(
@@ -129,7 +123,7 @@ export default class Scheduleanalyze extends Component {
     // 标段选择, 重新获取: 小班、细班、树种
     sectionselect (value, treety) {
         const {
-            actions: { setkeycode, getTreeList }
+            actions: { setkeycode }
         } = this.props;
         const { leftkeycode } = this.state;
         setkeycode(leftkeycode);
