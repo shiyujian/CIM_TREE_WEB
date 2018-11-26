@@ -99,26 +99,6 @@ class ToggleModal extends Component {
             }
         };
         editor.create();
-        const {
-            toggleData: toggleData = {
-                type: 'NEWS',
-                status: 'ADD',
-                visible: false,
-                editData: null
-            },
-            form: { setFieldsValue }
-        } = this.props;
-        // if (toggleData.type === 'NEWS' && toggleData.status === 'EDIT') {
-
-        // 	this.setState({
-        // 		content: toggleData.editData.body_rich
-        // 	});
-        // 	editor.txt.html(toggleData.editData.body_rich)
-        // 	setFieldsValue({
-        // 		'title': toggleData.editData.title,
-        // 		// 'abstract': toggleData.editData.abstract
-        // 	})
-        // }
     }
 
     closeModal () {
@@ -134,291 +114,6 @@ class ToggleModal extends Component {
         });
     }
 
-    // 发送文件
-    _sendDoc () {
-        const {
-            actions: {
-                postSentDocAc,
-                getSentInfoAc,
-                getCopyUsersAc,
-                sentMessageAc,
-                getOrgName
-            },
-
-            toggleData: toggleData = {
-                type: 'NEWS',
-                status: 'ADD',
-                visible: false,
-                editData: null
-            },
-            form: { validateFields },
-            fileList = []
-        } = this.props;
-
-        const {
-            sentUsers = [],
-            copyUsers = [],
-            isSentMsg = false,
-            isCopyMsg = false
-        } = this.state;
-        if (sentUsers.length === 0) {
-            message.warning('请添加接收单位！');
-            return;
-        }
-        if (fileList.length === 0) {
-            message.warning('请上传文件！');
-            return;
-        }
-        // if (copyUsers.length === 0) {
-        // 	message.warning("请添加抄送单位！");
-        // 	return
-        // }
-        let orgCode = getUser().org_code;
-        let orgListCodes = orgCode.split('_');
-        orgListCodes.pop();
-        let codeu = orgListCodes.join();
-        let ucode = codeu.replace(/,/g, '_');
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-
-        validateFields((err, values) => {
-            if (!err) {
-                if (toggleData.status === 'ADD') {
-                    let sendData = {
-                        from_whom: user.is_superuser == true ? 'admin' : ucode,
-                        from_whom_department:
-                            user.is_superuser == true ? 'admin' : ucode,
-                        to_whom: this._getOrgText(sentUsers),
-                        cc: this._getOrgText(copyUsers),
-                        title: values['title3'],
-                        body_rich: this.state.content,
-                        is_draft: false,
-                        sent_email: false,
-                        extend_info: {},
-                        external_attachments: [
-                            {
-                                file_id: fileList[0].id,
-                                file_name: fileList[0].name,
-                                file_partial_url: fileList[0].a_file,
-                                file_info: fileList[0],
-                                send_time: moment().format(
-                                    'YYYY-MM-DD HH:mm:ss'
-                                )
-                            }
-                        ]
-                    };
-                    postSentDocAc({}, sendData).then(rst => {
-                        if (rst._id) {
-                            message.success('发送文件成功！');
-                            let orgCode = getUser().org_code;
-
-                            let orgListCodes = orgCode.split('_');
-                            orgListCodes.pop();
-                            let codeu = orgListCodes.join();
-                            let ucode = codeu.replace(/,/g, '_');
-                            if (user.is_superuser == true) {
-                                getSentInfoAc({
-                                    user: encodeURIComponent('admin')
-                                });
-                            } else {
-                                getSentInfoAc({
-                                    user: encodeURIComponent(ucode)
-                                });
-                            }
-
-                            // 所有需要发短信的人员手机号码
-                            let promises_one = [];
-                            let promises_two = [];
-                            let promises_all = [];
-                            if (isSentMsg) {
-                                promises_one = sentUsers.map(org => {
-                                    return getCopyUsersAc({
-                                        code: org.split('--')[0]
-                                    });
-                                });
-                            }
-                            if (isCopyMsg) {
-                                promises_two = copyUsers.map(org => {
-                                    return getCopyUsersAc({
-                                        code: org.split('--')[0]
-                                    });
-                                });
-                            }
-                            if (isSentMsg || isCopyMsg) {
-                                promises_all = promises_one.concat(
-                                    promises_two
-                                );
-                                Promise.all(promises_all)
-                                    .then(rst => {
-                                        let orgs_all = [];
-                                        let msg_all = [];
-                                        rst.map(org => {
-                                            orgs_all = orgs_all.concat(org);
-                                        });
-                                        msg_all = orgs_all.map(person => {
-                                            let obj = {
-                                                sms_free_sign_name:
-                                                    window.config.DISPATCH_MSG
-                                                        .NAME,
-                                                sms_template_code:
-                                                    window.config.DISPATCH_MSG
-                                                        .CODE,
-                                                phone_number: String(
-                                                    person.account
-                                                        .person_telephone
-                                                ),
-                                                sms_param_dict: {
-                                                    person_name: String(
-                                                        person.account
-                                                            .person_name
-                                                    ),
-                                                    sender_department: getUser()
-                                                        .org
-                                                }
-                                            };
-                                            return sentMessageAc({}, obj);
-                                        });
-                                        Promise.all(msg_all)
-                                            .then(() => {
-                                                message.success(
-                                                    '短信通知成功！'
-                                                );
-                                                this.closeModal();
-                                            })
-                                            .catch(() => {
-                                                message.error('短信通知失败！');
-                                                this.closeModal();
-                                            });
-                                    })
-                                    .catch(() => {
-                                        this.closeModal();
-                                    });
-                            } else {
-                                this.closeModal();
-                            }
-                        }
-                    });
-                } else if (toggleData.status === 'EDIT') {
-                    let sendData = {
-                        from_whom: ucode,
-                        from_whom_department: ucode,
-                        to_whom: this._getOrgText(sentUsers),
-                        cc: this._getOrgText(copyUsers),
-                        title: values['title3'],
-                        body_rich: this.state.content,
-                        is_draft: false,
-                        sent_email: false,
-                        extend_info: {},
-                        external_attachments: [
-                            {
-                                file_id: fileList[0].id,
-                                file_name: fileList[0].name,
-                                file_partial_url: fileList[0].a_file,
-                                file_info: fileList[0],
-                                send_time: moment().format(
-                                    'YYYY-MM-DD HH:mm:ss'
-                                )
-                                // 'backTo_id': this._getOrgText(sentUsers)[1]
-                            }
-                        ]
-                    };
-                    // sentUsers.map((user) => {
-                    // 	let obj = {
-                    // 		code: user.split('--')[0],
-                    // 		name: user.split('--')[1],
-                    // 	}
-                    // 	sendData.extend_info[String(user.split('--')[0])] = obj
-                    // });
-                    // console.log(1, sendData)
-                    // return
-                    postSentDocAc({}, sendData).then(rst => {
-                        if (rst._id) {
-                            message.success('发送文件成功！');
-                            let orgCode = getUser().org_code;
-
-                            let orgListCodes = orgCode.split('_');
-                            orgListCodes.pop();
-                            let codeu = orgListCodes.join();
-                            let ucode = codeu.replace(/,/g, '_');
-                            getSentInfoAc({
-                                user: encodeURIComponent(ucode)
-                            });
-                            // 所有需要发短信的人员手机号码
-                            let promises_one = [];
-                            let promises_two = [];
-                            let promises_all = [];
-                            if (isSentMsg) {
-                                promises_one = sentUsers.map(org => {
-                                    return getCopyUsersAc({
-                                        code: org.split('--')[0]
-                                    });
-                                });
-                            }
-                            if (isCopyMsg) {
-                                promises_two = copyUsers.map(org => {
-                                    return getCopyUsersAc({
-                                        code: org.split('--')[0]
-                                    });
-                                });
-                            }
-                            if (isSentMsg || isCopyMsg) {
-                                promises_all = promises_one.concat(
-                                    promises_two
-                                );
-                                Promise.all(promises_all)
-                                    .then(rst => {
-                                        let orgs_all = [];
-                                        let msg_all = [];
-                                        rst.map(org => {
-                                            orgs_all = orgs_all.concat(org);
-                                        });
-                                        msg_all = orgs_all.map(person => {
-                                            let obj = {
-                                                sms_free_sign_name:
-                                                    window.config.DISPATCH_MSG
-                                                        .NAME,
-                                                sms_template_code:
-                                                    window.config.DISPATCH_MSG
-                                                        .CODE,
-                                                phone_number: String(
-                                                    person.account
-                                                        .person_telephone
-                                                ),
-                                                sms_param_dict: {
-                                                    person_name: String(
-                                                        person.account
-                                                            .person_name
-                                                    ),
-                                                    sender_department: getUser()
-                                                        .org
-                                                }
-                                            };
-                                            return sentMessageAc({}, obj);
-                                        });
-                                        Promise.all(msg_all)
-                                            .then(() => {
-                                                message.success(
-                                                    '短信通知成功！'
-                                                );
-                                                this.closeModal();
-                                            })
-                                            .catch(() => {
-                                                message.error('短信通知失败！');
-                                                this.closeModal();
-                                            });
-                                    })
-                                    .catch(() => {
-                                        this.closeModal();
-                                    });
-                            } else {
-                                this.closeModal();
-                            }
-                        }
-                    });
-                }
-            }
-        });
-    }
-
     _getOrgText (arr) {
         let tmpArr = [];
         arr.map(itm => {
@@ -426,11 +121,7 @@ class ToggleModal extends Component {
                 tmpArr.filter(item => item == itm.split('--')[1]).length === 0
             ) {
                 tmpArr.push(itm.split('--')[0]);
-                // tmpArr.push(itm.split('--')[0])
             }
-
-            // console.log(itm.split('--')[0])
-            // this.setState({org_codes:itm.split('--')[0]})
         });
         return tmpArr;
     }
@@ -451,6 +142,7 @@ class ToggleModal extends Component {
             wrapperCol: { span: 18 }
         };
         let { progress } = this.state;
+        console.log('orgList', orgList);
         return (
             <Modal
                 title={
@@ -703,31 +395,275 @@ class ToggleModal extends Component {
         });
     }
 
-    // _addSentUser() {
-    // 	//接受单位添加
-    // 	if (this.state.selectSentUser === '') {
-    // 		message.warning('请选择接受单位！');
-    // 		return
-    // 	}
-    // 	// let newUsers = this.state.sentUsers;
-    // 	// console.log("newUsers",newUsers)
-    // 	// newUsers.push(this.state.selectSentUser);
-    // 	this.setState({
-    // 		sentUsers: this.state.selectSentUser
-    // 	})
-    // }
+    // 发送文件
+    _sendDoc () {
+        const {
+            actions: {
+                postSentDocAc,
+                getSentInfoAc,
+                getCopyUsersAc,
+                sentMessageAc
+            },
 
-    // _addSentUserT() {
-    // 	if (this.state.selectCopyUser === '') {
-    // 		message.warning('请选择抄送单位！');
-    // 		return
-    // 	}
-    // 	let newUsers = this.state.copyUsers;
-    // 	newUsers.push(this.state.selectCopyUser);
-    // 	this.setState({
-    // 		copyUsers: newUsers
-    // 	})
-    // }
+            toggleData: toggleData = {
+                type: 'NEWS',
+                status: 'ADD',
+                visible: false,
+                editData: null
+            },
+            form: { validateFields },
+            fileList = []
+        } = this.props;
+
+        const {
+            sentUsers = [],
+            copyUsers = [],
+            isSentMsg = false,
+            isCopyMsg = false
+        } = this.state;
+        if (sentUsers.length === 0) {
+            message.warning('请添加接收单位！');
+            return;
+        }
+        if (fileList.length === 0) {
+            message.warning('请上传文件！');
+            return;
+        }
+        let orgCode = getUser().org_code;
+        let orgListCodes = orgCode.split('_');
+        orgListCodes.pop();
+        let codeu = orgListCodes.join();
+        let ucode = codeu.replace(/,/g, '_');
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+
+        validateFields((err, values) => {
+            if (!err) {
+                if (toggleData.status === 'ADD') {
+                    let sendData = {
+                        from_whom: user.is_superuser == true ? 'admin' : ucode,
+                        from_whom_department:
+                        user.is_superuser == true ? 'admin' : ucode,
+                        to_whom: this._getOrgText(sentUsers),
+                        cc: this._getOrgText(copyUsers),
+                        title: values['title3'],
+                        body_rich: this.state.content,
+                        is_draft: false,
+                        sent_email: false,
+                        extend_info: {},
+                        external_attachments: [
+                            {
+                                file_id: fileList[0].id,
+                                file_name: fileList[0].name,
+                                file_partial_url: fileList[0].a_file,
+                                file_info: fileList[0],
+                                send_time: moment().format(
+                                    'YYYY-MM-DD HH:mm:ss'
+                                )
+                            }
+                        ]
+                    };
+                    postSentDocAc({}, sendData).then(rst => {
+                        if (rst._id) {
+                            message.success('发送文件成功！');
+                            let orgCode = getUser().org_code;
+
+                            let orgListCodes = orgCode.split('_');
+                            orgListCodes.pop();
+                            let codeu = orgListCodes.join();
+                            let ucode = codeu.replace(/,/g, '_');
+                            if (user.is_superuser == true) {
+                                getSentInfoAc({
+                                    user: encodeURIComponent('admin')
+                                });
+                            } else {
+                                getSentInfoAc({
+                                    user: encodeURIComponent(ucode)
+                                });
+                            }
+
+                            // 所有需要发短信的人员手机号码
+                            let promises_one = [];
+                            let promises_two = [];
+                            let promises_all = [];
+                            if (isSentMsg) {
+                                promises_one = sentUsers.map(org => {
+                                    return getCopyUsersAc({
+                                        code: org.split('--')[0]
+                                    });
+                                });
+                            }
+                            if (isCopyMsg) {
+                                promises_two = copyUsers.map(org => {
+                                    return getCopyUsersAc({
+                                        code: org.split('--')[0]
+                                    });
+                                });
+                            }
+                            if (isSentMsg || isCopyMsg) {
+                                promises_all = promises_one.concat(
+                                    promises_two
+                                );
+                                Promise.all(promises_all)
+                                    .then(rst => {
+                                        let orgs_all = [];
+                                        let msg_all = [];
+                                        rst.map(org => {
+                                            orgs_all = orgs_all.concat(org);
+                                        });
+                                        msg_all = orgs_all.map(person => {
+                                            let obj = {
+                                                sms_free_sign_name:
+                                                window.config.DISPATCH_MSG
+                                                    .NAME,
+                                                sms_template_code:
+                                                window.config.DISPATCH_MSG
+                                                    .CODE,
+                                                phone_number: String(
+                                                    person.account
+                                                        .person_telephone
+                                                ),
+                                                sms_param_dict: {
+                                                    person_name: String(
+                                                        person.account
+                                                            .person_name
+                                                    ),
+                                                    sender_department: getUser()
+                                                        .org
+                                                }
+                                            };
+                                            return sentMessageAc({}, obj);
+                                        });
+                                        Promise.all(msg_all)
+                                            .then(() => {
+                                                message.success(
+                                                    '短信通知成功！'
+                                                );
+                                                this.closeModal();
+                                            })
+                                            .catch(() => {
+                                                message.error('短信通知失败！');
+                                                this.closeModal();
+                                            });
+                                    })
+                                    .catch(() => {
+                                        this.closeModal();
+                                    });
+                            } else {
+                                this.closeModal();
+                            }
+                        }
+                    });
+                } else if (toggleData.status === 'EDIT') {
+                    let sendData = {
+                        from_whom: ucode,
+                        from_whom_department: ucode,
+                        to_whom: this._getOrgText(sentUsers),
+                        cc: this._getOrgText(copyUsers),
+                        title: values['title3'],
+                        body_rich: this.state.content,
+                        is_draft: false,
+                        sent_email: false,
+                        extend_info: {},
+                        external_attachments: [
+                            {
+                                file_id: fileList[0].id,
+                                file_name: fileList[0].name,
+                                file_partial_url: fileList[0].a_file,
+                                file_info: fileList[0],
+                                send_time: moment().format(
+                                    'YYYY-MM-DD HH:mm:ss'
+                                )
+                            }
+                        ]
+                    };
+                    postSentDocAc({}, sendData).then(rst => {
+                        if (rst._id) {
+                            message.success('发送文件成功！');
+                            let orgCode = getUser().org_code;
+
+                            let orgListCodes = orgCode.split('_');
+                            orgListCodes.pop();
+                            let codeu = orgListCodes.join();
+                            let ucode = codeu.replace(/,/g, '_');
+                            getSentInfoAc({
+                                user: encodeURIComponent(ucode)
+                            });
+                            // 所有需要发短信的人员手机号码
+                            let promises_one = [];
+                            let promises_two = [];
+                            let promises_all = [];
+                            if (isSentMsg) {
+                                promises_one = sentUsers.map(org => {
+                                    return getCopyUsersAc({
+                                        code: org.split('--')[0]
+                                    });
+                                });
+                            }
+                            if (isCopyMsg) {
+                                promises_two = copyUsers.map(org => {
+                                    return getCopyUsersAc({
+                                        code: org.split('--')[0]
+                                    });
+                                });
+                            }
+                            if (isSentMsg || isCopyMsg) {
+                                promises_all = promises_one.concat(
+                                    promises_two
+                                );
+                                Promise.all(promises_all)
+                                    .then(rst => {
+                                        let orgs_all = [];
+                                        let msg_all = [];
+                                        rst.map(org => {
+                                            orgs_all = orgs_all.concat(org);
+                                        });
+                                        msg_all = orgs_all.map(person => {
+                                            let obj = {
+                                                sms_free_sign_name:
+                                                window.config.DISPATCH_MSG
+                                                    .NAME,
+                                                sms_template_code:
+                                                window.config.DISPATCH_MSG
+                                                    .CODE,
+                                                phone_number: String(
+                                                    person.account
+                                                        .person_telephone
+                                                ),
+                                                sms_param_dict: {
+                                                    person_name: String(
+                                                        person.account
+                                                            .person_name
+                                                    ),
+                                                    sender_department: getUser()
+                                                        .org
+                                                }
+                                            };
+                                            return sentMessageAc({}, obj);
+                                        });
+                                        Promise.all(msg_all)
+                                            .then(() => {
+                                                message.success(
+                                                    '短信通知成功！'
+                                                );
+                                                this.closeModal();
+                                            })
+                                            .catch(() => {
+                                                message.error('短信通知失败！');
+                                                this.closeModal();
+                                            });
+                                    })
+                                    .catch(() => {
+                                        this.closeModal();
+                                    });
+                            } else {
+                                this.closeModal();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
 
     static _checkSentDisable (value, arr) {
         let disabled = false;

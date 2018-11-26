@@ -202,7 +202,7 @@ class SendPage1 extends Component {
         });
 
         const { showInfo = {}, searchList } = this.state;
-        const { notification = {}, is_read = false, _id = '' } = showInfo;
+        const { notification = {} } = showInfo;
         let dataSource;
         if (this.state.isUpdate) {
             dataSource = searchList;
@@ -211,7 +211,6 @@ class SendPage1 extends Component {
         }
         const orgto_whoms = Array.from(new Set(orgto_whom));
         const orgcc_whoms = Array.from(new Set(orgcc_whom));
-
         return (
             <Row>
                 <Col span={22} offset={1}>
