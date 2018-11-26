@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { Row, Col, Input, Icon, DatePicker, Select } from 'antd';
 import * as actions from '../store/entry';
 import { PkCodeTree, Cards } from '../components';
-import { EntryTable } from '../components/Enteranalyze';
+import { EntryTable } from '../components/EnterAnalyze';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
@@ -16,8 +16,8 @@ import {
 } from '_platform/components/layout';
 import moment from 'moment';
 import { groupBy } from 'lodash';
-import Left from '../components/Enteranalyze/Left';
-import Right from '../components/Enteranalyze/Right';
+import Left from '../components/EnterAnalyze/Left';
+import Right from '../components/EnterAnalyze/Right';
 
 var echarts = require('echarts');
 const Option = Select.Option;
@@ -35,7 +35,7 @@ const { RangePicker } = DatePicker;
         )
     })
 )
-export default class Enteranalyze extends Component {
+export default class EnterAnalyze extends Component {
     constructor (props) {
         super(props);
         this.state = {

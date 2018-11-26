@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { Select, Row, Col } from 'antd';
 import * as actions from '../store/entry';
 import { PkCodeTree } from '../components';
-import { ScheduleTable } from '../components/Scheduleanalyze';
+import { ScheduleTable } from '../components/ScheduleAnalyze';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
@@ -13,10 +13,10 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import LeftTop from '../components/Scheduleanalyze/LeftTop';
-import RightTop from '../components/Scheduleanalyze/RightTop';
-import MiddleTop from '../components/Scheduleanalyze/MiddleTop';
-import Bottom from '../components/Scheduleanalyze/Bottom';
+import LeftTop from '../components/ScheduleAnalyze/LeftTop';
+import RightTop from '../components/ScheduleAnalyze/RightTop';
+import MiddleTop from '../components/ScheduleAnalyze/MiddleTop';
+import Bottom from '../components/ScheduleAnalyze/Bottom';
 const Option = Select.Option;
 
 @connect(
@@ -31,7 +31,7 @@ const Option = Select.Option;
         )
     })
 )
-export default class Scheduleanalyze extends Component {
+export default class ScheduleAnalyze extends Component {
     constructor (props) {
         super(props);
         this.state = {

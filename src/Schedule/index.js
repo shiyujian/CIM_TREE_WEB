@@ -20,8 +20,8 @@ export default class Schedule extends Component {
         const {
             Stage,
             Progress,
-            Scheduleanalyze,
-            Enteranalyze,
+            ScheduleAnalyze,
+            EnterAnalyze,
             ScheduleReport,
             ScheduleDisplay
         } =
@@ -49,29 +49,29 @@ export default class Schedule extends Component {
                             component={Progress}
                         />
                     )}
-                    {Enteranalyze && (
+                    {EnterAnalyze && (
                         <Route
                             path='/schedule/enteranalyze'
-                            component={Enteranalyze}
+                            component={EnterAnalyze}
                         />
                     )}
-                    {Scheduleanalyze && (
+                    {ScheduleAnalyze && (
                         <Route
                             path='/schedule/scheduleanalyze'
-                            component={Scheduleanalyze}
+                            component={ScheduleAnalyze}
                         />
                     )}
                     {ScheduleReport && (
                         <Route
                             exact
-                            path='/schedule/scheduleReport'
+                            path='/schedule/schedulereport'
                             component={ScheduleReport}
                         />
                     )}
                     {ScheduleDisplay && (
                         <Route
                             exact
-                            path='/schedule/scheduleDisplay'
+                            path='/schedule/scheduledisplay'
                             component={ScheduleDisplay}
                         />
                     )}
@@ -103,10 +103,10 @@ export default class Schedule extends Component {
             icon: <Icon name='suitcase' />
         },
         {
-            key: 'scheduleDisplay',
+            key: 'scheduledisplay',
             id: 'SCHEDULE.SCHEDULEDISPLAY',
             name: '进度展示',
-            path: '/schedule/scheduleDisplay',
+            path: '/schedule/scheduledisplay',
             icon: <Icon name='warning' />
         },
         {
@@ -117,13 +117,13 @@ export default class Schedule extends Component {
             icon: <Icon name='ship' />
         },
         {
-            key: 'Scheduleanalyze',
+            key: 'scheduleanalyze',
             name: '种植进度分析',
             id: 'SCHEDULE.SCHEDULEANALYZE',
-            path: '/schedule/Scheduleanalyze',
+            path: '/schedule/scheduleanalyze',
             icon: <Icon name='warning' />
         }
     ];
 
-    static defaultOpenKeys = ['total', 'stage', 'notice'];
+    static defaultOpenKeys = ['stagereport'];
 }
