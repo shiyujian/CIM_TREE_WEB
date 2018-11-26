@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Row, Col, Input, Icon, DatePicker, Select, Spin } from 'antd';
-import { Cards, SumTotal, DateImg } from '../../components';
+import { Row, Col, DatePicker, Select, Spin } from 'antd';
+import { SumTotal, DateImg } from '../../components';
 import moment from 'moment';
 import { groupBy } from 'lodash';
 var echarts = require('echarts');

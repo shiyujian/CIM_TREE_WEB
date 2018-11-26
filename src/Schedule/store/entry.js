@@ -3,7 +3,6 @@ import createFetchAction from './fetchAction';
 import { createFetchActionWithHeaders } from './fetchAction';
 //
 import { FOREST_API } from '_platform/api';
-import { actionsMap } from '_platform/store/util';
 const ID = 'entry';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
