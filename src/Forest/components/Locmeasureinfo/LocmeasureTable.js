@@ -495,6 +495,7 @@ export default class LocmeasureTable extends Component {
                         <Input
                             suffix={suffix2}
                             value={rolename}
+                            placeholder='请输入用户名'
                             className='forest-forestcalcw4'
                             onChange={this.onRoleNameChange.bind(this)}
                         />

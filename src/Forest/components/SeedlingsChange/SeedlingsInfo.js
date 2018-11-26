@@ -185,7 +185,6 @@ export default class SeedlingsChange extends Component {
 
             let newdata = [];
             if (status === 'done') {
-                debugger;
                 console.log('file', file);
             } else if (status === 'error') {
 
@@ -254,16 +253,6 @@ export default class SeedlingsChange extends Component {
                             className='foresttable'
                         />
                     </div>
-                </Modal>
-                <Modal
-                    width={522}
-                    title='修改详细信息'
-                    style={{ textAlign: 'center' }}
-                    visible={this.state.changevisible}
-                    onOk={this.changeOK.bind(this)}
-                    onCancel={this.changeCancel.bind(this)}
-                >
-                    <div />
                 </Modal>
             </div>
         );
@@ -678,25 +667,6 @@ export default class SeedlingsChange extends Component {
         });
     }
 
-    change (record) {
-        this.setState({
-            changevisible: true,
-            changeRecord: record
-        });
-    }
-
-    changeOK () {
-        this.setState({
-            changevisible: false
-        });
-    }
-
-    changeCancel () {
-        this.setState({
-            changevisible: false
-        });
-    }
-
     remarkchange (value) {
         this.setState({ remark: value.target.value });
     }
@@ -746,7 +716,7 @@ export default class SeedlingsChange extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
 
     handleCancel () {
@@ -756,13 +726,12 @@ export default class SeedlingsChange extends Component {
         const { resetinput, leftkeycode } = this.props;
         resetinput(leftkeycode);
     }
-    async qury (page) {
+    async query (page) {
         const { stime = '', etime = '', size } = this.state;
         const {
             actions: { getqueryTree },
             keycode = '',
-            platform: { tree = {} },
-            treetypes
+            platform: { tree = {} }
         } = this.props;
         let thinClassTree = tree.thinClassTree;
 
@@ -772,6 +741,11 @@ export default class SeedlingsChange extends Component {
         let section = '';
         if (user.username !== 'admin') {
             message.info('没有权限进行查询');
+            return;
+        }
+        if (!keycode && !sxm) {
+            message.info('请选择项目或者输入顺序码进行查询');
+            return;
         }
 
         let postdata = {
