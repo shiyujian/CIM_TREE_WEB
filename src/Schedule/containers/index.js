@@ -1,6 +1,6 @@
 
 export Stage from './Stage';
-export Proprogress from './Proprogress';
+export Progress from './Progress';
 export Scheduleanalyze from './Scheduleanalyze';
 export Enteranalyze from './Enteranalyze';
 export ScheduleReport from './ScheduleReport';

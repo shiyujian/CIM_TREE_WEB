@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-23 14:49:27
+ * @Last Modified time: 2018-11-26 21:50:41
  */
 /**
  *
@@ -559,8 +559,16 @@ export const MODULES = [
                 name: '进度填报'
             },
             {
-                id: 'SCHEDULE.PROPROGRESS',
+                id: 'SCHEDULE.PROGRESS',
                 name: '项目进度'
+            },
+            {
+                id: 'SCHEDULE.SCHEDULEREPORT',
+                name: '每周进度'
+            },
+            {
+                id: 'SCHEDULE.SCHEDULEDISPLAY',
+                name: '进度展示'
             },
             {
                 id: 'SCHEDULE.ENTERANALYZE',

@@ -18,7 +18,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Step = Steps.Step;
-export default class DayPlanModal extends Component {
+export default class ActualModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -39,28 +39,27 @@ export default class DayPlanModal extends Component {
         if (task && task.history) {
             history = task.history;
         }
-
         this.setState({
             treeDatasource: this.props.TreedataSource,
             history
         });
     }
+
     render () {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { history, treeDatasource } = this.state;
+        const { history } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-
         return (
             <div>
                 <Modal
                     title='日进度计划流程详情'
                     width={800}
-                    onOk={this.props.onok}
+                    // onOk={this.props.onok}
                     onCancel={this.props.oncancel}
                     visible
                     footer={null}
@@ -76,7 +75,7 @@ export default class DayPlanModal extends Component {
                                                 label='标段'
                                             >
                                                 {getFieldDecorator(
-                                                    'daysection',
+                                                    'stagesection',
                                                     {
                                                         initialValue: `${this
                                                             .props
@@ -99,7 +98,7 @@ export default class DayPlanModal extends Component {
                                                 label='编号'
                                             >
                                                 {getFieldDecorator(
-                                                    'daynumbercode',
+                                                    'stagenumbercode',
                                                     {
                                                         initialValue: `${this
                                                             .props.numbercode ||
@@ -123,11 +122,11 @@ export default class DayPlanModal extends Component {
                                                 label='文档类型'
                                             >
                                                 {getFieldDecorator(
-                                                    'daydocument',
+                                                    'stagedocument',
                                                     {
                                                         initialValue: `${this
                                                             .props
-                                                            .daydocument ||
+                                                            .stagedocument ||
                                                             '暂无文档类型'}`,
                                                         rules: [
                                                             {
@@ -146,7 +145,7 @@ export default class DayPlanModal extends Component {
                                                 label='日期'
                                             >
                                                 {getFieldDecorator(
-                                                    'daytimedate',
+                                                    'stagetimedate',
                                                     {
                                                         initialValue: `${this
                                                             .props.timedate ||
@@ -167,7 +166,7 @@ export default class DayPlanModal extends Component {
                                         <Col span={12}>
                                             <FormItem {...FormItemLayout} label='监理单位'>
                                                 {
-                                                    getFieldDecorator('daysuperunit', {
+                                                    getFieldDecorator('stagesuperunit', {
                                                         initialValue: `${this.props.superunit || '暂无监理单位'}`,
                                                         rules: [
                                                             { required: false, message: '请输入监理单位' }
@@ -379,4 +378,4 @@ export default class DayPlanModal extends Component {
     ];
 }
 
-// export default Form.create()(DayPlanModal)
+// export default Form.create()(ActualModal)

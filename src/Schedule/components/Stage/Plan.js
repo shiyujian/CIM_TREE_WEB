@@ -29,7 +29,7 @@ import { getUser } from '../../../_platform/auth';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import SearchInfo from './SearchInfo';
 import queryString from 'query-string';
-import DayPlanModal from './DayPlanModal';
+import PlanModal from './PlanModal';
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -366,7 +366,7 @@ class Plan extends Component {
         return (
             <div>
                 {this.state.dayvisible && (
-                    <DayPlanModal
+                    <PlanModal
                         {...this.props}
                         {...this.state.TotleModaldata}
                         oncancel={this.totleCancle.bind(this)}

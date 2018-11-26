@@ -4,21 +4,14 @@ import { DynamicTitle, Sidebar, Content } from '_platform/components/layout';
 import { connect } from 'react-redux';
 
 import { bindActionCreators } from 'redux';
-import { Tabs, Table, Row, Col, Card, DatePicker } from 'antd';
-import LeftTop from '../components/Item/LeftTop';
-import LeftBottom from '../components/Item/LeftBottom';
-import RightBottom from '../components/Item/RightBottom';
-import RightTop from '../components/Item/RightTop';
-import moment from 'moment';
-import { PkCodeTree, Cards } from '../components';
+import { Tabs, Row, Col, DatePicker } from 'antd';
+import LeftTop from '../components/Progress/LeftTop';
+import LeftBottom from '../components/Progress/LeftBottom';
+import RightBottom from '../components/Progress/RightBottom';
+import RightTop from '../components/Progress/RightTop';
+import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import * as actions from '../store/entry';
-// var echarts = require('echarts');
-// var myChart
-// var myChart3
-// var myChart2
-const TabPane = Tabs.TabPane;
-const { RangePicker } = DatePicker;
 @connect(
     state => {
         const { platform } = state || {};
@@ -31,7 +24,7 @@ const { RangePicker } = DatePicker;
         )
     })
 )
-export default class Proprogress extends Component {
+export default class Progress extends Component {
     static propTypes = {};
 
     constructor (props) {

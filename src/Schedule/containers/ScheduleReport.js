@@ -3,11 +3,11 @@ import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import './Schedule.less';
-import { Plan } from '../components/stagereport';
+import { Plan } from '../components/ScheduleReport';
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
-import reducer, { actions } from '../store/stage';
+import { actions } from '../store/stage';
 
 @connect(
     state => {

@@ -28,16 +28,22 @@ import { getNextStates } from '../../../_platform/components/Progress/util';
 import { getUser } from '../../../_platform/auth';
 import PerSearch from '../../../_platform/components/panels/PerSearch';
 import SearchInfo from './SearchInfo';
-import DayModal from './DayModal';
+import queryString from 'query-string';
+import PlanModal from './PlanModal';
 moment.locale('zh-cn');
 const FormItem = Form.Item;
-const { MonthPicker, RangePicker } = DatePicker;
 const { Option, OptGroup } = Select;
-class Stagereporttab extends Component {
+const { MonthPicker, RangePicker } = DatePicker;
+class Plan extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stagedata: [],
+            daydata: [
+                {
+                    unit: '1111'
+                }
+            ],
+            TotleModaldata: [],
             selectedRowKeys: [],
             dataSourceSelected: [],
             visible: false,
@@ -45,7 +51,6 @@ class Stagereporttab extends Component {
             isCopyMsg: false, // 接收人员是否发短信
             treedataSource: [],
             treetype: [], // 树种
-            TotleModaldata: [],
             key: Math.random(),
             sectionSchedule: [],
             projectName: '',
@@ -54,7 +59,6 @@ class Stagereporttab extends Component {
             currentSectionName: ''
         };
     }
-
     async componentDidMount () {
         const {
             actions: { gettreetype }
@@ -92,14 +96,14 @@ class Stagereporttab extends Component {
             this.filterTask();
         }
     }
-    // 获取日实际进度流程信息
+    // 获取日计划进度流程信息
     gettaskSchedule = async () => {
         const {
             actions: { getTaskSchedule }
         } = this.props;
         let reqData = {};
         this.props.form.validateFields((err, values) => {
-            console.log('日实际进度流程信息', values);
+            console.log('日计划进度流程信息', values);
             console.log('err', err);
 
             values.sunitproject
@@ -131,7 +135,7 @@ class Stagereporttab extends Component {
         let tmpData = Object.assign({}, reqData);
 
         let task = await getTaskSchedule(
-            { code: WORKFLOW_CODE.每日进度填报流程 },
+            { code: WORKFLOW_CODE.每日进度计划填报流程 },
             tmpData
         );
 
@@ -173,19 +177,40 @@ class Stagereporttab extends Component {
                     timedate: itemdata.timedate
                         ? JSON.parse(itemdata.timedate)
                         : '',
-                    stagedocument: itemdata.stagedocument
-                        ? JSON.parse(itemdata.stagedocument)
+                    daydocument: itemdata.daydocument
+                        ? JSON.parse(itemdata.daydocument)
                         : '',
                     TreedataSource: itemtreedatasource,
                     dataReview: itemdata.dataReview
                         ? JSON.parse(itemdata.dataReview).person_name
                         : ''
                 };
+
+                // let itemdata = item.workflowactivity.subject[0];
+                // let itempostdata = itemdata.postData?JSON.parse(itemdata.postData):null;
+                // let itemtreedatasource = itemdata.treedataSource ? JSON.parse(itemdata.treedataSource) : null;
+                // let itemarrange = {
+                // 	index:index+1,
+                // 	id:item.workflowactivity.id,
+                // 	section: itemdata.section?JSON.parse(itemdata.section):'',
+                // 	sectionName: itemdata.sectionName?JSON.parse(itemdata.sectionName):'',
+                // 	projectName: itemdata.projectName?JSON.parse(itemdata.projectName):'',
+                // 	type: itempostdata.type,
+                // 	numbercode:itemdata.numbercode?JSON.parse(itemdata.numbercode):'',
+                // 	submitperson:item.workflowactivity.creator.person_name,
+                // 	submittime:item.workflowactivity.real_start_time,
+                // 	status:item.workflowactivity.status,
+                // 	superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
+                // 	timedate:itemdata.timedate?JSON.parse(itemdata.timedate):'',
+                // 	daydocument:itemdata.daydocument?JSON.parse(itemdata.daydocument):'',
+                // 	TreedataSource:itemtreedatasource,
+                // 	dataReview:itemdata.dataReview?JSON.parse(itemdata.dataReview).person_name:''
+                // }
                 totledata.push(itemarrange);
             });
             this.setState(
                 {
-                    stagedata: totledata
+                    daydata: totledata
                 },
                 () => {
                     this.filterTask();
@@ -195,7 +220,7 @@ class Stagereporttab extends Component {
     };
     // 对流程信息根据选择项目进行过滤
     filterTask () {
-        const { stagedata } = this.state;
+        const { daydata } = this.state;
         const { leftkeycode } = this.props;
         let filterData = [];
         let user = getUser();
@@ -210,7 +235,7 @@ class Stagereporttab extends Component {
             let code = sections[0].split('-');
             selectCode = code[0] || '';
 
-            stagedata.map(task => {
+            daydata.map(task => {
                 let projectName = task.projectName;
                 let projectCode = this.getProjectCode(projectName);
 
@@ -224,7 +249,7 @@ class Stagereporttab extends Component {
         } else {
             // 不关联标段的人可以看选择项目的进度流程
             selectCode = leftkeycode;
-            stagedata.map(task => {
+            daydata.map(task => {
                 let projectName = task.projectName;
                 let projectCode = this.getProjectCode(projectName);
 
@@ -341,7 +366,7 @@ class Stagereporttab extends Component {
         return (
             <div>
                 {this.state.dayvisible && (
-                    <DayModal
+                    <PlanModal
                         {...this.props}
                         {...this.state.TotleModaldata}
                         oncancel={this.totleCancle.bind(this)}
@@ -376,7 +401,7 @@ class Stagereporttab extends Component {
                     rowKey='index'
                 />
                 <Modal
-                    title='新增每日实际进度'
+                    title='新增每日计划进度'
                     width={800}
                     visible={this.state.visible}
                     maskClosable={false}
@@ -394,7 +419,7 @@ class Stagereporttab extends Component {
                                                 {...FormItemLayout}
                                                 label='标段'
                                             >
-                                                {getFieldDecorator('Ssection', {
+                                                {getFieldDecorator('Psection', {
                                                     initialValue: {
                                                         currentSectionName
                                                     },
@@ -406,9 +431,6 @@ class Stagereporttab extends Component {
                                                         }
                                                     ]
                                                 })(
-                                                    // (<Select placeholder='请选择标段' allowClear>
-                                                    //     {sectionOption}
-                                                    // </Select> )
                                                     <Input
                                                         readOnly
                                                         placeholder='请输入标段'
@@ -422,7 +444,7 @@ class Stagereporttab extends Component {
                                                 label='编号'
                                             >
                                                 {getFieldDecorator(
-                                                    'Snumbercode',
+                                                    'Pnumbercode',
                                                     {
                                                         rules: [
                                                             {
@@ -445,9 +467,9 @@ class Stagereporttab extends Component {
                                                 label='文档类型'
                                             >
                                                 {getFieldDecorator(
-                                                    'Sstagedocument',
+                                                    'Pdaydocument',
                                                     {
-                                                        initialValue: `每日实际进度`,
+                                                        initialValue: `每日计划进度`,
                                                         rules: [
                                                             {
                                                                 required: true,
@@ -465,7 +487,7 @@ class Stagereporttab extends Component {
                                                 label='日期'
                                             >
                                                 {getFieldDecorator(
-                                                    'Stimedate',
+                                                    'Ptimedate',
                                                     {
                                                         rules: [
                                                             {
@@ -487,20 +509,6 @@ class Stagereporttab extends Component {
                                             </FormItem>
                                         </Col>
                                     </Row>
-                                    {/* <Row>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('Ssuperunit', {
-                                                        rules: [
-                                                            { required: true, message: '请选择审核人员' }
-                                                        ]
-                                                    })
-                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
-                                                }
-                                            </FormItem>
-										</Col>
-									</Row> */}
                                     <Row>
                                         <Table
                                             columns={this.columns1}
@@ -531,7 +539,7 @@ class Stagereporttab extends Component {
                                                 label='审核人'
                                             >
                                                 {getFieldDecorator(
-                                                    'SdataReview',
+                                                    'PdataReview',
                                                     {
                                                         rules: [
                                                             {
@@ -547,7 +555,7 @@ class Stagereporttab extends Component {
                                                             this
                                                         )}
                                                         code={
-                                                            WORKFLOW_CODE.每日进度填报流程
+                                                            WORKFLOW_CODE.每日进度计划填报流程
                                                         }
                                                         visible={
                                                             this.state.visible
@@ -597,8 +605,8 @@ class Stagereporttab extends Component {
         }
 
         setFieldsValue({
-            SdataReview: this.member
-            // Ssuperunit:this.member.org
+            PdataReview: this.member
+            // Psuperunit: this.member.org,
         });
     }
 
@@ -618,14 +626,13 @@ class Stagereporttab extends Component {
         let me = this;
         // 共有信息
         let postData = {};
-        // 专业信息
-        let attrs = {};
 
         me.props.form.validateFields((err, values) => {
             console.log('表单信息', values);
+            console.log('err', err);
             if (!err) {
                 postData.upload_unit = user.org ? user.org : '';
-                postData.type = '每日实际进度';
+                postData.type = '每日计划进度';
                 postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
 
@@ -641,13 +648,13 @@ class Stagereporttab extends Component {
                         section: JSON.stringify(currentSection),
                         projectName: JSON.stringify(projectName),
                         sectionName: JSON.stringify(currentSectionName),
-                        // "superunit": JSON.stringify(values.Ssuperunit),
-                        dataReview: JSON.stringify(values.SdataReview),
-                        numbercode: JSON.stringify(values.Snumbercode),
+                        // "superunit": JSON.stringify(values.Psuperunit),
+                        dataReview: JSON.stringify(values.PdataReview),
+                        numbercode: JSON.stringify(values.Pnumbercode),
                         timedate: JSON.stringify(
-                            moment(values.Stimedate._d).format('YYYY-MM-DD')
+                            moment(values.Ptimedate._d).format('YYYY-MM-DD')
                         ),
-                        stagedocument: JSON.stringify(values.Sstagedocument),
+                        daydocument: JSON.stringify(values.Pdaydocument),
                         postData: JSON.stringify(postData),
                         treedataSource: JSON.stringify(treedataSource)
                     }
@@ -655,9 +662,9 @@ class Stagereporttab extends Component {
                 // 准备发起流程
                 const nextUser = this.member;
                 let WORKFLOW_MAP = {
-                    name: '每日实际进度填报流程',
-                    desc: '进度管理模块每日实际进度填报流程',
-                    code: WORKFLOW_CODE.每日进度填报流程
+                    name: '每日计划进度填报流程',
+                    desc: '进度管理模块每日计划进度填报流程',
+                    code: WORKFLOW_CODE.每日进度计划填报流程
                 };
                 let workflowdata = {
                     name: WORKFLOW_MAP.name,
@@ -759,6 +766,7 @@ class Stagereporttab extends Component {
         value = JSON.parse(value);
         record[project] = value.TreeTypeName;
     }
+
     // 删除树列表
     delTreeClick (record, index) {
         const { treedataSource } = this.state;
@@ -891,11 +899,13 @@ class Stagereporttab extends Component {
             key: Math.random()
         });
         this.props.form.setFieldsValue({
-            // Ssuperunit: undefined,
-            Ssection: this.state.currentSectionName || undefined,
-            SdataReview: undefined,
-            Snumbercode: undefined,
-            Stimedate: moment().utc()
+            // Psuperunit: undefined,
+            Psection: this.state.currentSectionName || undefined,
+            PdataReview: undefined,
+            Pnumbercode: undefined,
+            Ptimedate: moment()
+                .add(1, 'days')
+                .utc()
         });
     };
     // 关闭弹框
@@ -1039,7 +1049,7 @@ class Stagereporttab extends Component {
             render: (text, record, index) => {
                 return (
                     <Input
-                        value={record.number}
+                        value={record.number || ''}
                         onChange={ele => {
                             record.number = ele.target.value;
                             this.forceUpdate();
@@ -1077,4 +1087,4 @@ class Stagereporttab extends Component {
         }
     ];
 }
-export default Form.create()(Stagereporttab);
+export default Form.create()(Plan);

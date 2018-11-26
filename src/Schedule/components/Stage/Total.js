@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-07 14:53:21
+ * @Last Modified time: 2018-11-26 21:37:33
  */
 import React, { Component } from 'react';
 import {
@@ -43,7 +43,7 @@ const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
 moment.locale('zh-cn');
 
-class All extends Component {
+class Total extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -1045,4 +1045,4 @@ class All extends Component {
     ];
 }
 
-export default Form.create()(All);
+export default Form.create()(Total);

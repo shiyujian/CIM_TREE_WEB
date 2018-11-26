@@ -1,19 +1,13 @@
 import React, { Component } from 'react';
 import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
-import { getUser } from '_platform/auth';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import moment from 'moment';
 import './Schedule.less';
-import { Link } from 'react-router-dom';
-import { WORKFLOW_CODE } from '_platform/api';
-import queryString from 'query-string';
-import { Stagereporttab, All, Plan } from '../components/stagereport';
-import { PkCodeTree, Cards } from '../components';
+import { Actual, Total, Plan } from '../components/Stage';
+import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
-import reducer, { actions } from '../store/stage';
-
+import { actions } from '../store/stage';
 import {
     Tabs
 } from 'antd';
@@ -89,13 +83,13 @@ export default class Stage extends Component {
                     <div>
                         <Tabs>
                             <TabPane tab='总计划进度' key='1'>
-                                <All {...this.props} {...this.state} />
+                                <Total {...this.props} {...this.state} />
                             </TabPane>
                             <TabPane tab='每日计划进度' key='2'>
                                 <Plan {...this.props} {...this.state} />
                             </TabPane>
                             <TabPane tab='每日实际进度' key='3'>
-                                <Stagereporttab
+                                <Actual
                                     {...this.props}
                                     {...this.state}
                                 />
