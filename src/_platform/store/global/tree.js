@@ -21,8 +21,6 @@ export const getOnSiteThinClassTree = createAction(`${ID}所有的区域地块�
 export const getThinClassTree = createAction(`${ID}关于标段的区域地块细班树`);
 export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
 
-export const getProjectListOK = createAction(`${ID}获取进度管理左侧项目工程节点信息`);
-export const getProjectList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getProjectListOK]); //    √
 export const getScheduleTaskListOK = createAction(`${ID}获取进度管理流程填报根据标段筛选左侧项目工程节点信息`);
 export const getScheduleTaskList = createFetchAction(`${FOREST_API}/tree/wpunittree`, [getScheduleTaskListOK]); //    √
 
@@ -82,23 +80,6 @@ export default handleActions(
             return {
                 ...state,
                 bigTreeList: projectList
-            };
-        },
-        [getProjectListOK]: (state, { payload }) => {
-            let nodeLevel = [];
-            let root = [];
-            if (payload instanceof Array && payload.length > 0) {
-                root = payload.filter(node => {
-                    return (
-                        node.Type === '项目工程' &&
-                        nodeLevel.indexOf(node.No) === -1 &&
-                        nodeLevel.push(node.No)
-                    );
-                });
-            }
-            return {
-                ...state,
-                projectList: root
             };
         },
         [getScheduleTaskListOK]: (state, { payload }) => {

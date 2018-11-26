@@ -56,30 +56,11 @@ export default class Scheduleanalyze extends Component {
 
     async componentDidMount () {
         const {
-            actions: { getProjectList, getTreeNodeList },
+            actions: { getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
-        }
-        if (!tree.projectList) {
-            let data = await getProjectList();
-            if (data && data instanceof Array && data.length > 0) {
-                data = data[0];
-                let leftkeycode = data.No ? data.No : '';
-                this.setState({
-                    leftkeycode
-                });
-            }
-        } else {
-            let data = tree.projectList;
-            if (data && data instanceof Array && data.length > 0) {
-                data = data[0];
-                let leftkeycode = data.No ? data.No : '';
-                this.setState({
-                    leftkeycode
-                });
-            }
         }
     }
     // 树选择, 重新获取: 标段、树种并置空
@@ -87,7 +68,7 @@ export default class Scheduleanalyze extends Component {
         console.log('onSelect  value', value);
         let keycode = value[0] || '';
         const {
-            actions: { setkeycode, gettreetype }
+            actions: { setkeycode }
         } = this.props;
         setkeycode(keycode);
         console.log('ScheduleanalyzeScheduleanalyze', keycode);
@@ -102,12 +83,11 @@ export default class Scheduleanalyze extends Component {
             leftkeycode
         } = this.state;
         const {
-            platform: { tree = {} },
-            keycode
+            platform: { tree = {} }
         } = this.props;
         let treeList = [];
-        if (tree.projectList) {
-            treeList = tree.projectList;
+        if (tree.bigTreeList) {
+            treeList = tree.bigTreeList;
         }
         console.log('tree', tree);
         return (

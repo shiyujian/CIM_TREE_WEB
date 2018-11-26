@@ -52,30 +52,11 @@ export default class Enteranalyze extends Component {
 
     async componentDidMount () {
         const {
-            actions: { getProjectList, getTreeNodeList },
+            actions: { getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
-        }
-        if (!tree.projectList) {
-            let data = await getProjectList();
-            if (data && data instanceof Array && data.length > 0) {
-                data = data[0];
-                let leftkeycode = data.No ? data.No : '';
-                this.setState({
-                    leftkeycode
-                });
-            }
-        } else {
-            let data = tree.projectList;
-            if (data && data instanceof Array && data.length > 0) {
-                data = data[0];
-                let leftkeycode = data.No ? data.No : '';
-                this.setState({
-                    leftkeycode
-                });
-            }
         }
     }
 
@@ -85,8 +66,8 @@ export default class Enteranalyze extends Component {
             platform: { tree = {} }
         } = this.props;
         let treeList = [];
-        if (tree.projectList) {
-            treeList = tree.projectList;
+        if (tree.bigTreeList) {
+            treeList = tree.bigTreeList;
         }
         console.log('tree', tree);
         return (

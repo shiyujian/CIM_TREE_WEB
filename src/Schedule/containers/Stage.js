@@ -49,7 +49,6 @@ export default class Stage extends Component {
     async componentDidMount () {
         const {
             actions: {
-                getScheduleTaskList,
                 getTreeNodeList
             },
             platform: { tree = {} }
@@ -57,26 +56,6 @@ export default class Stage extends Component {
 
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
-        }
-
-        if (!tree.scheduleTaskList) {
-            let data = await getScheduleTaskList();
-            if (data && data instanceof Array && data.length > 0) {
-                data = data[0];
-                let leftkeycode = data.No ? data.No : '';
-                this.setState({
-                    leftkeycode
-                });
-            }
-        } else {
-            let data = tree.projectList;
-            if (data && data instanceof Array && data.length > 0) {
-                data = data[0];
-                let leftkeycode = data.No ? data.No : '';
-                this.setState({
-                    leftkeycode
-                });
-            }
         }
     }
 
@@ -86,8 +65,8 @@ export default class Stage extends Component {
             platform: { tree = {} }
         } = this.props;
         let treeList = [];
-        if (tree.scheduleTaskList) {
-            treeList = tree.scheduleTaskList;
+        if (tree.bigTreeList) {
+            treeList = tree.bigTreeList;
         }
         console.log('tree', tree);
         return (
@@ -130,11 +109,7 @@ export default class Stage extends Component {
 
     // 树选择
     onSelect (value = []) {
-        console.log('stagestage选择的树节点', value);
         let keycode = value[0] || '';
-        const {
-            actions: { getTreeList, gettreetype }
-        } = this.props;
         this.setState({ leftkeycode: keycode });
     }
 }
