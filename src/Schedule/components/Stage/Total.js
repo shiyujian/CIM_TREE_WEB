@@ -777,8 +777,6 @@ class Total extends Component {
 
     // 新增按钮
     addClick = () => {
-        // const { actions: { postUploadFilesAc } } = this.props;
-        // postUploadFilesAc([]);
         this.setState({
             visible: true,
             TreatmentData: [],
@@ -793,9 +791,6 @@ class Total extends Component {
     };
     // 关闭弹框
     closeModal () {
-        // const { actions: { postUploadFilesAc } } = this.props;
-        // postUploadFilesAc([]);
-
         this.setState({
             visible: false,
             TreatmentData: []
@@ -822,10 +817,8 @@ class Total extends Component {
             const status = file.status;
             // const { newFileLists } = this.state;
             const { TreatmentData = [] } = this.state;
-            let newdata = [];
             if (status === 'done') {
                 console.log('file', file);
-                // const { actions: { postUploadFilesAc } } = this.props;
                 let len = TreatmentData.length;
                 TreatmentData.push({
                     index: len + 1,
@@ -850,7 +843,6 @@ class Total extends Component {
                     TreatmentData: TreatmentData,
                     loading: false
                 });
-                // postUploadFilesAc(newFileLists)
             } else if (status === 'error') {
                 notification.error({
                     message: '文件上传失败',

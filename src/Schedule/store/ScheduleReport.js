@@ -8,13 +8,13 @@ import {
 } from '_platform/api';
 import { createFetchActionWithHeaders as myFetch } from './fetchAction';
 
-const ID = 'STAGE';
+const ID = 'ScheduleReport';
 
 // 流程详情
 export const getWorkflowByIdOK = createAction('获取流程详情');
 export const getWorkflowById = createFetchAction(
     `${WORKFLOW_API}/instance/{{id}}/`,
-    [],
+    [getWorkflowByIdOK],
     'GET'
 );
 // 获取选中树节点信息

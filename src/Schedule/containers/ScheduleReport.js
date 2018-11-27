@@ -7,15 +7,15 @@ import { Plan } from '../components/ScheduleReport';
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
-import { actions } from '../store/stage';
+import { actions } from '../store/ScheduleReport';
 
 @connect(
     state => {
         const {
-            schedule: { stage = {} },
+            schedule: { scheduleReport = {} },
             platform
         } = state;
-        return { platform, ...stage };
+        return { platform, ...scheduleReport };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -71,7 +71,6 @@ export default class ScheduleReport extends Component {
                             treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
-                            // onExpand={this.onExpand.bind(this)}
                         />
                     </div>
                 </Sidebar>

@@ -5,15 +5,18 @@ import { connect } from 'react-redux';
 
 import { bindActionCreators } from 'redux';
 import { Row, Col } from 'antd';
-import LeftTop from '../components/Item/LeftTop';
-import RightTop from '../components/Item/RightTop';
+import LeftTop from '../components/ScheduleDisplay/LeftTop';
+import RightTop from '../components/ScheduleDisplay/RightTop';
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
-import * as actions from '../store/entry';
+import * as actions from '../store/ScheduleDisplay';
 @connect(
     state => {
-        const { platform } = state || {};
-        return { platform };
+        const {
+            schedule: { scheduleDisplay = {} },
+            platform
+        } = state || {};
+        return { platform, scheduleDisplay };
     },
     dispatch => ({
         actions: bindActionCreators(
