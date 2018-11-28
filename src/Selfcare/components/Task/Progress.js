@@ -19,6 +19,8 @@ import OverallReviewFormDeal from '../TaskDetail/OverallReviewFormDeal';
 import ScheduleTotalDeal from '../TaskDetail/ScheduleTotalDeal';
 import ScheduleDayDeal from '../TaskDetail/ScheduleDayDeal';
 import ScheduleStageDeal from '../TaskDetail/ScheduleStageDeal';
+import ScheduleWeekPlanHandle from '../TaskDetail/ScheduleWeekPlanHandle';
+import ScheduleWeekPlanDeal from '../TaskDetail/ScheduleWeekPlanDeal';
 // 质量管理
 import QulityCheckDetail from '../TaskDetail/QulityCheckDetail';
 import QulityCheckDeal from '../TaskDetail/QulityCheckDeal';
@@ -91,6 +93,16 @@ export default class Progress extends Component {
             stateName === '审核'
         ) {
             return <ScheduleStageDeal {...this.props} {...this.state} />;
+        } else if (
+            code === WORKFLOW_CODE.每周进度填报流程 &&
+            stateName === '监理审核'
+        ) {
+            return <ScheduleWeekPlanHandle {...this.props} {...this.state} />;
+        } else if (
+            code === WORKFLOW_CODE.每周进度填报流程 &&
+            stateName === '业主查看'
+        ) {
+            return <ScheduleWeekPlanDeal {...this.props} {...this.state} />;
         } else if (
             code === WORKFLOW_CODE.检验批验收审批流程 &&
             stateName === '审核'

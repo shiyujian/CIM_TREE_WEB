@@ -1,16 +1,12 @@
-import React, { Component, Children } from 'react';
+import React, { Component } from 'react';
 import {
     Row,
     Col,
     Input,
     Form,
-    Icon,
     Button,
     Table,
     Modal,
-    DatePicker,
-    Select,
-    notification,
     Card,
     Steps
 } from 'antd';
@@ -19,11 +15,10 @@ import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Step = Steps.Step;
 
-export default class PlanModal extends Component {
+export default class WeekPlanModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            treeDatasource: [],
             history: []
         };
     }
@@ -42,15 +37,17 @@ export default class PlanModal extends Component {
         }
 
         this.setState({
-            treeDatasource: this.props.TreedataSource,
             history
         });
     }
     render () {
         const {
-            form: { getFieldDecorator }
+            form: { getFieldDecorator },
+            stime = '',
+            etime = '',
+            weekPlanDataSource = []
         } = this.props;
-        const { history, treeDatasource } = this.state;
+        const { history } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -97,61 +94,12 @@ export default class PlanModal extends Component {
                                         <Col span={12}>
                                             <FormItem
                                                 {...FormItemLayout}
-                                                label='编号'
-                                            >
-                                                {getFieldDecorator(
-                                                    'daynumbercode',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props.numbercode ||
-                                                            '暂无编号'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请输入编号'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='文档类型'
-                                            >
-                                                {getFieldDecorator(
-                                                    'daydocument',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props
-                                                            .daydocument ||
-                                                            '暂无文档类型'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请输入文档类型'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
                                                 label='日期'
                                             >
                                                 {getFieldDecorator(
                                                     'daytimedate',
                                                     {
-                                                        initialValue: `${this
-                                                            .props.timedate ||
-                                                            '暂无日期'}`,
+                                                        initialValue: `${stime} ~ ${etime}`,
                                                         rules: [
                                                             {
                                                                 required: false,
@@ -164,27 +112,12 @@ export default class PlanModal extends Component {
                                             </FormItem>
                                         </Col>
                                     </Row>
-                                    {/* <Row>
-                                        <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('daysuperunit', {
-                                                        initialValue: `${this.props.superunit || '暂无监理单位'}`,
-                                                        rules: [
-                                                            { required: false, message: '请输入监理单位' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
-                                            </FormItem>
-                                        </Col>
-                                    </Row> */}
                                     <Row>
                                         <Table
                                             columns={this.columns1}
                                             pagination
                                             dataSource={
-                                                this.state.treeDatasource
+                                                weekPlanDataSource
                                             }
                                             rowKey='index'
                                             className='foresttable'
@@ -214,7 +147,6 @@ export default class PlanModal extends Component {
 
                                         if (step.status === 'processing') {
                                             // 根据历史状态显示
-                                            const state = this.getCurrentState();
                                             return (
                                                 <Step
                                                     title={
@@ -268,8 +200,7 @@ export default class PlanModal extends Component {
                                                 note = ''
                                             } = record || {};
                                             const {
-                                                person_name: name = '',
-                                                organization = ''
+                                                person_name: name = ''
                                             } = executor;
                                             return (
                                                 <Step
@@ -347,37 +278,30 @@ export default class PlanModal extends Component {
         );
     }
     getCurrentState () {
-        const { platform: { task = {} } = {}, location = {} } = this.props;
-        // const { state_id = '0' } = queryString.parse(location.search) || {};
+        const { platform: { task = {} } = {} } = this.props;
         const { states = [] } = task;
         return states.find(state => state.status === 'processing');
     }
     columns1 = [
         {
             title: '序号',
-            dataIndex: 'key',
-            key: 'key',
-            width: '10%',
-            render: (text, record, index) => {
-                return <span>{record.key + 1}</span>;
+            dataIndex: 'index',
+            width: '33%',
+            render: (record, text, index) => {
+                return <span>{index + 1}</span>;
             }
         },
         {
-            title: '项目',
-            dataIndex: 'project',
-            key: 'project'
+            title: '日期',
+            dataIndex: 'date',
+            key: 'date',
+            width: '33%'
         },
         {
-            title: '单位',
-            dataIndex: 'units',
-            key: 'units'
-        },
-        {
-            title: '数量',
-            dataIndex: 'number',
-            key: 'number'
+            title: '计划栽植量',
+            dataIndex: 'planTreeNum',
+            key: 'planTreeNum',
+            width: '34%'
         }
     ];
 }
-
-// export default Form.create()(PlanModal)

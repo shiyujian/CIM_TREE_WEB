@@ -1065,6 +1065,7 @@ class Users extends Component {
             actions: { getSection }
         } = this.props;
         let sectiona = [];
+        console.log('aaaaaaaaaaaaaa', node);
         getSection(sectiona);
         if (node.extra_params.sections) {
             if (node.extra_params.sections instanceof Array) {

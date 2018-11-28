@@ -1,3 +1,3 @@
-export Plan from './Plan';
-export PlanModal from './PlanModal';
+export WeekPlan from './WeekPlan';
+export WeekPlanModal from './WeekPlanModal';
 export SearchInfo from './SearchInfo';

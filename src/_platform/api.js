@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-26 21:50:41
+ * @Last Modified time: 2018-11-27 16:08:36
  */
 /**
  *
@@ -260,7 +260,8 @@ export const WORKFLOW_CODE = {
     安全体系报批流程: 'TEMPLATE_009',
     普通审查流程: 'TEMPLATE_010',
     审查核定流程: 'TEMPLATE_011',
-    总监审查流程: 'TEMPLATE_012'
+    总监审查流程: 'TEMPLATE_012',
+    每周进度填报流程: 'TEMPLATE_013'
 };
 // 为表单管理的每个文件夹绑定流程信息
 export const FORM_WORKFLOW = [

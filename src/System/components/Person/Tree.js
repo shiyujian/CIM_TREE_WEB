@@ -30,7 +30,7 @@ const addGroup = (childrenList, str) => {
     }
     let provinceArr = [];
     childrenList.map(item => {
-        if(!provinceArr.includes(item.province)){
+        if (!provinceArr.includes(item.province)) {
             provinceArr.push(item.province);
         }
     });
@@ -41,7 +41,7 @@ const addGroup = (childrenList, str) => {
             if (item === row.province && !cityArr.includes(row.city)) {
                 cityArr.push(row.city);
             }
-        })
+        });
         let provinceChildren = [];
         cityArr.map((row) => {
             let cityChildren = [];
@@ -50,26 +50,26 @@ const addGroup = (childrenList, str) => {
                 if (row === record.city && !countyArr.includes(record.county)) {
                     countyArr.push(record.county);
                 }
-            })
-            countyArr.map(record =>{
+            });
+            countyArr.map(record => {
                 let countyChildren = [];
                 childrenList.map(ite => {
-                    if(row === ite.city && record === ite.county) {
+                    if (row === ite.city && record === ite.county) {
                         countyChildren.push(ite);
                     }
-                })
+                });
                 cityChildren.push({
                     name: record || '其他',
                     code: str + item + row + record,
                     children: countyChildren
-                })
-            })
+                });
+            });
             provinceChildren.push({
                 name: row || '其他',
                 code: str + item + row,
                 children: cityChildren
-            })
-        })
+            });
+        });
         newChildren.push({
             name: item || '其他',
             code: str + item,
@@ -255,6 +255,7 @@ export default class Tree extends Component {
         } = this.props;
 
         const topProject = Tree.loop(children, eventKey);
+        console.log('topProject', topProject);
         if (this.compare(user, topProject, eventKey)) {
             if (topProject.code) {
                 await getTreeModal(true);

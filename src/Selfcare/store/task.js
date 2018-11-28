@@ -36,6 +36,12 @@ export const addSchedule = createFetchAction(
     [],
     'post'
 );
+// 周进度存储
+export const postWeekPlanSchedule = createFetchAction(
+    `${FOREST_API}/tree/treedayplan`,
+    [],
+    'post'
+);
 export const gettreetype = createFetchAction(
     `${FOREST_API}/tree/treetypesbyno`,
     []
@@ -51,6 +57,7 @@ export const actions = {
     postSubject,
     getWorkflowById,
     addSchedule,
+    postWeekPlanSchedule,
     changeDocs,
     selectDocuments,
     gettreetype

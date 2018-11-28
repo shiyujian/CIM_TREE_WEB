@@ -20,13 +20,13 @@ export default class SearchInfo extends Component {
     };
 
     async componentDidMount () {
-        this.getSection();
+        await this.getSection();
     }
 
     async componentDidUpdate (prevProps, prevState) {
         const { leftkeycode } = this.props;
         // 地块修改，则修改标段
-        if (leftkeycode != prevProps.leftkeycode) {
+        if (leftkeycode !== prevProps.leftkeycode) {
             this.getSection();
         }
     }
@@ -37,11 +37,11 @@ export default class SearchInfo extends Component {
             leftkeycode
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
-        console.log('leftkeycode', leftkeycode);
-        let user = getUser();
+        let user = localStorage.getItem('QH_USER_DATA');
+        user = JSON.parse(user);
+        console.log('user', user);
+        let sections = user && user.account && user.account.sections;
         let optionArray = [];
-        let sections = user.sections;
-        sections = JSON.parse(sections);
         if (sections && sections instanceof Array && sections.length > 0) {
             let section = sections[0];
             let code = section.split('-');
@@ -54,15 +54,17 @@ export default class SearchInfo extends Component {
                             // 获取当前标段的名字
                             if (unit.No === section) {
                                 let currentSectionName = unit.Name;
-                                console.log('unitunitunit', unit);
                                 optionArray.push(
                                     <Option
                                         key={unit.No}
-                                        value={currentSectionName}
+                                        value={unit.No}
                                     >
                                         {currentSectionName}
                                     </Option>
                                 );
+                                this.props.form.setFieldsValue({
+                                    sunitproject: unit.No
+                                });
                             }
                         });
                     }
@@ -70,11 +72,11 @@ export default class SearchInfo extends Component {
             }
         } else {
             sectionData.map(project => {
-                if (leftkeycode === project.No) {
+                if (leftkeycode && leftkeycode === project.No) {
                     let units = project.children;
                     units.map(d =>
                         optionArray.push(
-                            <Option key={d.Name} value={d.Name}>
+                            <Option key={d.No} value={d.No}>
                                 {d.Name}
                             </Option>
                         )
@@ -115,21 +117,7 @@ export default class SearchInfo extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={12}>
-                                <FormItem {...SearchInfo.layout} label='编号'>
-                                    {getFieldDecorator('snumbercode', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请输入编号'
-                                            }
-                                        ]
-                                    })(<Input placeholder='请输入编号' />)}
-                                </FormItem>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col span={12}>
-                                <FormItem {...SearchInfo.layout} label='日期'>
+                                <FormItem {...SearchInfo.layout} label='提交日期'>
                                     {getFieldDecorator('stimedate', {
                                         rules: [
                                             {
@@ -150,6 +138,8 @@ export default class SearchInfo extends Component {
                                     )}
                                 </FormItem>
                             </Col>
+                        </Row>
+                        <Row>
                             <Col span={12}>
                                 <FormItem
                                     {...SearchInfo.layout}
@@ -216,7 +206,6 @@ export default class SearchInfo extends Component {
     clear () {
         this.props.form.setFieldsValue({
             sunitproject: undefined,
-            snumbercode: undefined,
             stimedate: undefined,
             sstatus: undefined,
             ssuperunit: undefined

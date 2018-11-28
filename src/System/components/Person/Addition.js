@@ -1144,6 +1144,9 @@ class Addition extends Component {
         } = this.props;
         let bigTreeList = tree.bigTreeList;
         let units = [];
+        console.log('units', units);
+        console.log('sections', sections);
+
         sections.map((section) => {
             let name = getSectionNameBySection(section, bigTreeList);
             units.push({
