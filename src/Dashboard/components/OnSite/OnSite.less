@@ -444,7 +444,7 @@
     .aside .ant-collapse-content {
         padding: 0 8px;
     }
-
+    // 小班细班树
     .dashboard-rightAreaMenu {
         position: absolute;
         right: 120px;
@@ -469,6 +469,118 @@
             .dashboard-rightAreaMenu-areaTree {
                 margin-top: 20px;
                 margin-left: 20px;
+            }
+        }
+    }
+
+    //初始位置
+    .dashboard-rightInitialPositionMenu {
+        position: absolute;
+        right: 120px;
+        top: 40px;
+        height: 600px;
+        width: 230px;
+        transition: all 0.3s;
+        z-index: 980;
+
+        .dashboard-rightInitialPositionMenu-aside {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255, 0.9);
+            color: #333;
+            z-index: 999;
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            .dashboard-rightInitialPositionMenu-areaTree {
+                margin-top: 10px;
+                margin-left: 20px;
+                height: calc(~'100% - 10px');
+            }
+
+            .dashboard-rightInitialPositionMenu-viewList {
+                height: calc(~'100% - 60px');
+                display: block;
+                // 项目视图
+                .dashboard-rightInitialPositionMenu-areaViewTitle {
+                    height: 30px;
+                    font-family: "Microsoft YaHei";
+                    font-weight: bold;
+                    font-size: 16px;
+                }
+                .dashboard-rightInitialPositionMenu-areaViewData {
+                    height: 40px;
+                    display: block;
+                    text-align: center;
+                    width: 190px;
+                    margin-bottom: 10px;
+                    font-family: "Microsoft YaHei";
+                    font-size: 14px;
+                }
+                // 自定义视图
+                .dashboard-rightInitialPositionMenu-customViewTitle {
+                    height: 30px;
+                    font-family: "Microsoft YaHei";
+                    font-weight: bold;
+                    font-size: 16px;
+                    margin-top: 20px;
+                }
+                .dashboard-rightInitialPositionMenu-customViewData-Unselect {
+                    height: 40px;
+                    line-height: 40px;
+                    display: block;
+                    text-align: center;
+                    width: 190px;
+                    margin-bottom: 10px;
+                    font-family: "Microsoft YaHei";
+                    font-size: 14px;
+                    background-color: #fff;
+                }
+                .dashboard-rightInitialPositionMenu-customViewData-ALabel-Unselect {
+                    width: calc(~'100% - 32px');
+                    height: 40px;
+                    line-height: 40px;
+                    display: inline-block;
+                    color: #333333
+                }
+
+                .dashboard-rightInitialPositionMenu-customViewData-Select {
+                    height: 40px;
+                    line-height: 40px;
+                    display: block;
+                    text-align: center;
+                    width: 190px;
+                    margin-bottom: 10px;
+                    font-family: "Microsoft YaHei";
+                    font-size: 14px;
+                    background-color: #1793ff;
+                }
+
+                .dashboard-rightInitialPositionMenu-customViewData-ALabel-Select {
+                    width: calc(~'100% - 32px');
+                    height: 40px;
+                    line-height: 40px;
+                    display: inline-block;
+                    color: #ffffff
+                }
+                .dashboard-rightInitialPositionMenu-customViewData-deleteImg {
+                    margin-left: 12;
+                    margin-right: 12; 
+                    cursor: pointer;
+                }
+            }
+            .dashboard-rightInitialPositionMenu-footerButton {
+                height: 40px;
+                display: block;
+                text-align: center;
+                width: 190px;
+                // margin-left: 20px;
+                // margin-right: 20px;
+                margin-top: 10px;
+                margin-bottom: 10px;
             }
         }
     }

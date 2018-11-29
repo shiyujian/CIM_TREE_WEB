@@ -39,6 +39,13 @@ export const getTreeLocation = createFetchAction(`${FOREST_API}/tree/treelocatio
 export const getAdoptTrees = createFetchAction(`${FOREST_API}/adopt/adopttrees`, [], 'GET');
 // 根据坐标获取地址信息
 export const getLocationNameByCoordinate = createFetchAction(`${LBSAMAP_API}/v3/geocode/regeo`, [], 'GET');
+export const getCustomViewByUserIDOk = createAction(`${ID}根据用户ID获取用户自定义视图`);
+// 根据用户ID获取用户自定义视图
+export const getCustomViewByUserID = createFetchAction(`${USER_API}/user/{{id}}/custom-view/`, [getCustomViewByUserIDOk], 'GET');
+// 用户创建自定义视图
+export const postUserCustomView = createFetchAction(`${USER_API}/custom-view/`, [], 'POST');
+// 用户删除自定义视图
+export const deleteUserCustomView = createFetchAction(`${USER_API}/custom-view/{{id}}/`, [], 'DELETE');
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -63,6 +70,7 @@ export const getTreetypesTreeLoading = createAction(`${ID}树种筛选树加载l
 export const getCuringTaskTreeLoading = createAction(`${ID}养护任务树加载loading`);
 export const getSurvivalRateTreeLoading = createAction(`${ID}成活率树加载loading`);
 export const getAdoptTreeLoading = createAction(`${ID}苗木结缘树加载loading`);
+export const setUserMapPositionName = createAction(`${ID}设置用户定位的视图名称`);
 
 export const actions = {
     getRisk,
@@ -82,6 +90,10 @@ export const actions = {
     getTreeLocation,
     getAdoptTrees,
     getLocationNameByCoordinate,
+    getCustomViewByUserIDOk,
+    getCustomViewByUserID,
+    postUserCustomView,
+    deleteUserCustomView,
 
     switchDashboardCompoment,
     getAreaTree,
@@ -105,7 +117,8 @@ export const actions = {
     getTreetypesTreeLoading,
     getCuringTaskTreeLoading,
     getSurvivalRateTreeLoading,
-    getAdoptTreeLoading
+    getAdoptTreeLoading,
+    setUserMapPositionName
 };
 export default handleActions(
     {
@@ -251,6 +264,18 @@ export default handleActions(
             return {
                 ...state,
                 adoptTreeLoading: payload
+            };
+        },
+        [setUserMapPositionName]: (state, { payload }) => {
+            return {
+                ...state,
+                userMapPositionName: payload
+            };
+        },
+        [getCustomViewByUserIDOk]: (state, { payload }) => {
+            return {
+                ...state,
+                customViewByUserID: payload
             };
         }
     },

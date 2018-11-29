@@ -278,6 +278,9 @@ export default class MenuSwitch extends Component {
         if (dashboardFocus !== buttonID) {
             await switchDashboardFocus(buttonID);
         }
+        //  else {
+        //     await switchDashboardFocus('');
+        // }
     }
     // 树木信息
     handleTreeMessButton = async (e) => {
