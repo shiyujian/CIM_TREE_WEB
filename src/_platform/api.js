@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-27 16:08:36
+ * @Last Modified time: 2018-11-29 11:27:53
  */
 /**
  *
@@ -360,6 +360,30 @@ export const PROJECT_UNITS = [
                 value: '一标段'
             }
         ]
+    }
+];
+
+// 各个项目的中心坐标
+export const PROJECTPOSITIONCENTER = [
+    {
+        name: '九号地块',
+        center: [38.99042701799772, 116.0396146774292],
+        zoom: 14
+    },
+    {
+        name: '苗景兼用林项目',
+        center: [39.02511978201801, 116.25842285575345],
+        zoom: 13
+    },
+    {
+        name: '市民中心景观项目',
+        center: [39.04825544272171, 115.90770578315642],
+        zoom: 16
+    },
+    {
+        name: '2018秋季造林',
+        center: [38.784605024411576, 115.73293304652907],
+        zoom: 13
     }
 ];
 
@@ -824,14 +848,6 @@ export const MODULES = [
                 id: 'SYSTEM.ORG',
                 name: '组织机构'
             },
-            // {
-            //     id: 'SYSTEM.ORGDATA',
-            //     name: '组织机构填报'
-            // },
-            // {
-            //     id: 'SYSTEM.PERSONSDATA',
-            //     name: '人员信息填报'
-            // },
             {
                 id: 'SYSTEM.BLACKLIST',
                 name: '黑名单'

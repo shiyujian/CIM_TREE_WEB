@@ -3,8 +3,7 @@ import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import './Schedule.less';
-import { WeekPlan } from '../components/ScheduleReport';
-import { PkCodeTree } from '../components';
+import { WeekPlan, PkCodeTree } from '../components/ScheduleReport';
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
 import { actions } from '../store/ScheduleReport';
@@ -73,31 +72,29 @@ export default class ScheduleReport extends Component {
         return (
             <div>
                 <DynamicTitle title='每周进度' {...this.props} />
-                <Spin spinning={loading} tip='Loading...'>
-                    {
-                        loading
-                            ? ''
-                            : <div>
-                                <Sidebar>
-                                    <div
-                                        style={{ overflow: 'hidden' }}
-                                        className='project-tree'
-                                    >
-                                        <PkCodeTree
-                                            treeData={treeList}
-                                            selectedKeys={leftkeycode}
-                                            onSelect={this.onSelect.bind(this)}
-                                        />
-                                    </div>
-                                </Sidebar>
-                                <Content>
-                                    <div>
-                                        <WeekPlan {...this.props} {...this.state} />
-                                    </div>
-                                </Content>
-                            </div>
-                    }
-                </Spin>
+                {
+                    loading
+                        ? <Spin spinning={loading} tip='Loading...' />
+                        : <div>
+                            <Sidebar>
+                                <div
+                                    style={{ overflow: 'hidden' }}
+                                    className='project-tree'
+                                >
+                                    <PkCodeTree
+                                        treeData={treeList}
+                                        selectedKeys={leftkeycode}
+                                        onSelect={this.onSelect.bind(this)}
+                                    />
+                                </div>
+                            </Sidebar>
+                            <Content>
+                                <div>
+                                    <WeekPlan {...this.props} {...this.state} />
+                                </div>
+                            </Content>
+                        </div>
+                }
             </div>
         );
     }

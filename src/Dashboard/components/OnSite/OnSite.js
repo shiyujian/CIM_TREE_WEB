@@ -9,14 +9,16 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-23 15:14:13
+ * @Last Modified time: 2018-11-29 14:05:01
  */
 import React, { Component } from 'react';
 import {
     Button,
     Modal,
     Form,
-    Row
+    Row,
+    Notification,
+    Popconfirm
 } from 'antd';
 import './OnSite.less';
 import RiskTree from './RiskTree';
@@ -29,6 +31,7 @@ import CuringTaskTree from './CuringTaskTree';
 import SurvivalRateTree from './SurvivalRateTree';
 import TreeAdoptTree from './TreeAdoptTree';
 import AdoptTreeMessModal from './AdoptTreeMessModal';
+import SaveUserMapCustomPositionModal from './SaveUserMapCustomPositionModal';
 import GetMenuTree from './GetMenuTree';
 import {
     genPopUpContent,
@@ -49,6 +52,7 @@ import {
     getTreeMessFun,
     getCuringMess
 } from './TreeInfo';
+import { PROJECTPOSITIONCENTER } from '_platform/api';
 import MenuSwitch from '../MenuSwitch';
 import {getCompanyDataByOrgCode} from '_platform/auth';
 // 存活率图片
@@ -72,6 +76,11 @@ import curingTaskTrimImg from './CuringTaskImg/trim.png';
 import curingTaskWateringImg from './CuringTaskImg/watering.png';
 import curingTaskWeedImg from './CuringTaskImg/weed.png';
 import curingTaskWormImg from './CuringTaskImg/worm.png';
+// 自定义视图
+import areaViewImg from './InitialPositionImg/areaView.png';
+import customViewImg from './InitialPositionImg/customView.png';
+import customViewCloseUnSelImg from './InitialPositionImg/delete1.png';
+import customViewCloseSelImg from './InitialPositionImg/delete2.png';
 
 window.config = window.config || {};
 class OnSite extends Component {
@@ -151,7 +160,11 @@ class OnSite extends Component {
             curingTaskOther: true,
             // 子组件搜索的树数据
             riskSrarchData: '',
-            curingTaskSrarchData: ''
+            curingTaskSrarchData: '',
+            // 自定义视图
+            saveUserMapCustomPositionVisible: false,
+            saveUserMapCustomPositionCenter: '',
+            saveUserMapCustomPositionZoom: ''
         };
         this.tileLayer = null; // 最底部基础图层
         this.tileTreeLayerBasic = null; // 树木区域图层
@@ -165,7 +178,6 @@ class OnSite extends Component {
     }
 
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
-    subDomains = ['7'];
 
     tileUrls = {
         1: window.config.IMG_W,
@@ -303,20 +315,121 @@ class OnSite extends Component {
     ]
     // 初始化地图，获取目录树数据
     async componentDidMount () {
+        const {
+            actions: {
+                getCustomViewByUserID
+            }
+        } = this.props;
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        console.log('user', user);
+        await getCustomViewByUserID({id: user.id});
         await this.initMap();
+    }
+    /* 初始化地图 */
+    initMap () {
+        const {
+            customViewByUserID = []
+        } = this.props;
+        try {
+            let me = this;
+            let mapInitialization = window.config.initLeaflet;
+            if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
+                let view = customViewByUserID[0];
+                let center = [view.center[0].lat, view.center[0].lng];
+                let zoom = view.zoom;
+                mapInitialization.center = center;
+                mapInitialization.zoom = zoom;
+            };
+            this.map = L.map('mapid', mapInitialization);
+
+            L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+
+            this.tileLayer = L.tileLayer(this.tileUrls[1], {
+                subdomains: [1, 2, 3],
+                minZoom: 1,
+                maxZoom: 17,
+                storagetype: 0
+            }).addTo(this.map);
+            // 巡检路线的代码   地图上边的地点的名称
+            L.tileLayer(this.WMSTileLayerUrl, {
+                subdomains: [1, 2, 3],
+                minZoom: 1,
+                maxZoom: 17,
+                storagetype: 0
+            }).addTo(this.map);
+            this.getTileLayerTreeBasic();
+            // 隐患详情点击事件
+            document.querySelector('.leaflet-popup-pane').addEventListener('click', async function (e) {
+                let target = e.target;
+                // 绑定隐患详情点击事件
+                if (target.getAttribute('class') === 'btnViewRisk') {
+                    let idRisk = target.getAttribute('data-id');
+                    let risk = null;
+                    me.props.riskTree.forEach(v => {
+                        if (!risk) {
+                            risk = v.children.find(v1 => v1.key === idRisk);
+                        }
+                    });
+                    if (risk) {
+                        // 获取隐患处理措施
+                        const { getRiskContactSheet } = me.props.actions;
+                        let contact = await getRiskContactSheet({ ID: idRisk });
+                        if (contact && contact.ID) {
+                            me.setState({
+                                riskMess: contact,
+                                isShowRisk: true
+                            });
+                        }
+                    }
+                }
+            });
+            this.map.on('click', function (e) {
+                const {
+                    coordinates
+                } = me.state;
+                const {
+                    dashboardCompomentMenu,
+                    dashboardAreaMeasure,
+                    dashboardTreeMess
+                } = me.props;
+                if (dashboardAreaMeasure === 'areaMeasure') {
+                    coordinates.push([e.latlng.lat, e.latlng.lng]);
+                    if (me.state.polygonData) {
+                        me.map.removeLayer(me.state.polygonData);
+                    }
+                    let polygonData = L.polygon(coordinates, {
+                        color: 'white',
+                        fillColor: '#93B9F2',
+                        fillOpacity: 0.2
+                    }).addTo(me.map);
+                    me.setState({
+                        coordinates,
+                        polygonData: polygonData
+                    });
+                } else if (dashboardTreeMess === 'treeMess') {
+                    me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
+                } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
+                    me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
+                } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+                    me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_treeAdopt');
+                }
+            });
+        } catch (e) {
+            console.log('initMap', e);
+        }
     }
     // 切换全部细班时，将其余图层去除，加载最初始图层
     componentDidUpdate = async (prevProps, prevState) => {
         const {
             dashboardCompomentMenu,
             dashboardAreaTreeLayer,
-            dashboardFocus,
             dashboardTreeMess,
-            platform: {
-                tabs = {}
-            },
+            dashboardFocus,
             actions: {
                 switchDashboardFocus
+            },
+            platform: {
+                tabs = {}
             }
         } = this.props;
         // 返回初始位置和放大级数
@@ -390,6 +503,7 @@ class OnSite extends Component {
             dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
             dashboardCompomentMenu !== 'geojsonFeature_treeAdopt'
         ) {
+            console.log('aaaaaaa');
             await this.getTileLayerTreeBasic();
         }
         // 切换全屏
@@ -435,103 +549,25 @@ class OnSite extends Component {
             document.msExitFullscreen();
         }
     }
-    /* 初始化地图 */
-    initMap () {
-        let me = this;
-        this.map = L.map('mapid', window.config.initLeaflet);
-
-        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
-
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 17,
-            storagetype: 0
-        }).addTo(this.map);
-        // 巡检路线的代码   地图上边的地点的名称
-        L.tileLayer(this.WMSTileLayerUrl, {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 17,
-            storagetype: 0
-        }).addTo(this.map);
-
-        this.getTileLayerTreeBasic();
-        // 隐患详情点击事件
-        document.querySelector('.leaflet-popup-pane').addEventListener('click', async function (e) {
-            let target = e.target;
-            // 绑定隐患详情点击事件
-            if (target.getAttribute('class') === 'btnViewRisk') {
-                let idRisk = target.getAttribute('data-id');
-                let risk = null;
-                me.props.riskTree.forEach(v => {
-                    if (!risk) {
-                        risk = v.children.find(v1 => v1.key === idRisk);
-                    }
-                });
-                if (risk) {
-                    // 获取隐患处理措施
-                    const { getRiskContactSheet } = me.props.actions;
-                    let contact = await getRiskContactSheet({ ID: idRisk });
-                    if (contact && contact.ID) {
-                        me.setState({
-                            riskMess: contact,
-                            isShowRisk: true
-                        });
-                    }
-                }
-            }
-        });
-
-        this.map.on('click', function (e) {
-            const {
-                coordinates
-            } = me.state;
-            const {
-                dashboardCompomentMenu,
-                dashboardAreaMeasure,
-                dashboardTreeMess
-            } = me.props;
-            if (dashboardAreaMeasure === 'areaMeasure') {
-                coordinates.push([e.latlng.lat, e.latlng.lng]);
-                if (me.state.polygonData) {
-                    me.map.removeLayer(me.state.polygonData);
-                }
-                let polygonData = L.polygon(coordinates, {
-                    color: 'white',
-                    fillColor: '#93B9F2',
-                    fillOpacity: 0.2
-                }).addTo(me.map);
-                me.setState({
-                    coordinates,
-                    polygonData: polygonData
-                });
-            } else if (dashboardTreeMess === 'treeMess') {
-                me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
-            } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
-                me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
-            } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
-                me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_treeAdopt');
-            }
-        });
-    }
     // 获取初始化数据的树木瓦片图层
     getTileLayerTreeBasic = () => {
-        if (this.tileTreeLayerBasic) {
-            this.tileTreeLayerBasic.addTo(this.map);
-        } else {
-            this.tileTreeLayerBasic = L.tileLayer(
-                window.config.DASHBOARD_ONSITE +
-                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 11,
-                    maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
-                }
-            ).addTo(this.map);
+        if (this.map) {
+            if (this.tileTreeLayerBasic) {
+                this.tileTreeLayerBasic.addTo(this.map);
+            } else {
+                this.tileTreeLayerBasic = L.tileLayer(
+                    window.config.DASHBOARD_ONSITE +
+                            '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    {
+                        opacity: 1.0,
+                        subdomains: [1, 2, 3],
+                        minZoom: 11,
+                        maxZoom: 21,
+                        storagetype: 0,
+                        tiletype: 'wtms'
+                    }
+                ).addTo(this.map);
+            }
         }
     }
     // 去除初始化数据的树木瓦片图层
@@ -559,6 +595,15 @@ class OnSite extends Component {
             ).addTo(this.map);
         }
     }
+    // 去除成活率全部瓦片图层和成活率筛选图层
+    removeTileTreeSurvivalRateLayer = () => {
+        if (this.tileSurvivalRateLayerFilter) {
+            this.map.removeLayer(this.tileSurvivalRateLayerFilter);
+        }
+        if (this.tileTreeSurvivalRateLayerBasic) {
+            this.map.removeLayer(this.tileTreeSurvivalRateLayerBasic);
+        }
+    }
     // 加载苗木结缘全部瓦片图层
     getTileTreeAdoptBasic = () => {
         if (this.tileTreeAdoptLayerBasic) {
@@ -579,15 +624,6 @@ class OnSite extends Component {
             ).addTo(this.map);
         }
     }
-    // 去除成活率全部瓦片图层和成活率筛选图层
-    removeTileTreeSurvivalRateLayer = () => {
-        if (this.tileSurvivalRateLayerFilter) {
-            this.map.removeLayer(this.tileSurvivalRateLayerFilter);
-        }
-        if (this.tileTreeSurvivalRateLayerBasic) {
-            this.map.removeLayer(this.tileTreeSurvivalRateLayerBasic);
-        }
-    }
     // 去除苗木结缘全部瓦片图层
     removeTileTreeAdoptLayer = () => {
         if (this.tileTreeAdoptLayerBasic) {
@@ -601,7 +637,7 @@ class OnSite extends Component {
             this.tileTreeTypeLayerFilter = null;
         }
     }
-    // 去除所有后来添加的图层
+    // 各个模块之间切换时，去除除当前模块外所有后来添加的图层
     removeAllLayer = () => {
         const {
             survivalRateMarkerLayerList, // 成活率图标图层List
@@ -814,13 +850,17 @@ class OnSite extends Component {
             coordinates,
             areaMeasure,
             areaMeasureVisible,
-            adoptTreeModalVisible
+            adoptTreeModalVisible,
+            saveUserMapCustomPositionVisible
         } = this.state;
         const {
             dashboardCompomentMenu,
             menuTreeVisible,
             dashboardAreaMeasure,
             dashboardRightMenu,
+            dashboardFocus,
+            userMapPositionName = '',
+            customViewByUserID = [],
             platform: {
                 tabs = {},
                 tree = {}
@@ -891,6 +931,83 @@ class OnSite extends Component {
                                 </div>
                             ) : ''
                     }
+
+                    {/* { // 右侧菜单当选择区域视图时，展示区域视图页面
+                        dashboardFocus && dashboardFocus === 'mapFoucs'
+                            ? (
+                                <div className='dashboard-rightInitialPositionMenu'>
+                                    <aside className='dashboard-rightInitialPositionMenu-aside' draggable='false'>
+                                        <div className='dashboard-rightInitialPositionMenu-areaTree'>
+                                            <div style={{height: '100%'}}>
+                                                <div className='dashboard-rightInitialPositionMenu-viewList'>
+                                                    <div className='dashboard-rightInitialPositionMenu-areaViewTitle'>
+                                                        <img src={areaViewImg} style={{marginRight: 10, marginTop: -1}} />
+                                                        <span>区域视图</span>
+                                                    </div>
+                                                    <div>
+                                                        {
+                                                            PROJECTPOSITIONCENTER.map((view, index) => {
+                                                                return (<div className='dashboard-rightInitialPositionMenu-areaViewData' key={view.name}>
+                                                                    <Button style={{width: '100%', height: 40}}
+                                                                        onClick={this.locationToMapCustomPosition.bind(this, view)}
+                                                                        type={userMapPositionName === view.name ? 'primary' : ''}>
+                                                                        {view.name}
+                                                                    </Button>
+                                                                </div>);
+                                                            })
+                                                        }
+                                                    </div>
+                                                    <div className='dashboard-rightInitialPositionMenu-customViewTitle'>
+                                                        <img src={customViewImg} style={{marginRight: 10, marginTop: -1}} />
+                                                        <span>自定义视图</span>
+                                                    </div>
+                                                    <div>
+                                                        {
+                                                            customViewByUserID.map((view, index) => {
+                                                                if (userMapPositionName === view.name) {
+                                                                    return (<div className='dashboard-rightInitialPositionMenu-customViewData-Select' key={view.id}>
+                                                                        <a className='dashboard-rightInitialPositionMenu-customViewData-ALabel-Select'
+                                                                            onClick={this.locationToMapCustomPosition.bind(this, view)}>
+                                                                            {view.name}
+                                                                        </a>
+                                                                        <Popconfirm title='确认要删除么'
+                                                                            onConfirm={this.handleDeleteMapCustomPosition.bind(this, view)}
+                                                                            onCancel={this.handleDeleteMapCustomPositionCancel.bind(this)}
+                                                                            okText='Yes' cancelText='No'>
+                                                                            <img src={customViewCloseSelImg} className='dashboard-rightInitialPositionMenu-customViewData-deleteImg' />
+                                                                        </Popconfirm>
+                                                                    </div>);
+                                                                } else {
+                                                                    return (<div className='dashboard-rightInitialPositionMenu-customViewData-Unselect' key={view.id}>
+                                                                        <a className='dashboard-rightInitialPositionMenu-customViewData-ALabel-Unselect'
+                                                                            onClick={this.locationToMapCustomPosition.bind(this, view)}>
+                                                                            {view.name}
+                                                                        </a>
+                                                                        <Popconfirm title='确认要删除么'
+                                                                            onConfirm={this.handleDeleteMapCustomPosition.bind(this, view)}
+                                                                            onCancel={this.handleDeleteMapCustomPositionCancel.bind(this)}
+                                                                            okText='Yes' cancelText='No'>
+                                                                            <img src={customViewCloseUnSelImg} className='dashboard-rightInitialPositionMenu-customViewData-deleteImg' />
+                                                                        </Popconfirm>
+                                                                    </div>);
+                                                                }
+                                                            })
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div className='dashboard-rightInitialPositionMenu-footerButton'>
+                                                    <Button style={{width: '100%', height: 40}}
+                                                        onClick={this.saveUserMapCustomPosition.bind(this)}
+                                                        type='primary' ghost>
+                                                        保存当前视图
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </aside>
+                                </div>
+                            ) : ''
+                    } */}
 
                     { // 成活率右侧范围菜单
                         dashboardCompomentMenu === 'geojsonFeature_survivalRate'
@@ -1023,6 +1140,15 @@ class OnSite extends Component {
                                     {...this.props}
                                     {...this.state}
                                     onCancel={this.handleCancelAdoptTreeMessModal.bind(this)} />
+                            ) : ''
+                    }
+                    {
+                        saveUserMapCustomPositionVisible
+                            ? (
+                                <SaveUserMapCustomPositionModal
+                                    {...this.props}
+                                    {...this.state}
+                                    onCancel={this.handleCancelMapCustomPositionModal.bind(this)} />
                             ) : ''
                     }
                     <Modal
@@ -2403,6 +2529,7 @@ class OnSite extends Component {
             adoptTreeModalVisible: false
         });
     }
+    // 清除苗木结缘弹窗内用到的数据
     handleModalMessData () {
         this.setState({
             seedlingMess: '',
@@ -2410,6 +2537,90 @@ class OnSite extends Component {
             flowMess: '',
             curingMess: '',
             adoptTreeMess: ''
+        });
+    }
+    // 定位至项目区域视图
+    locationToMapCustomPosition = async (view) => {
+        const {
+            actions: {
+                setUserMapPositionName
+            }
+        } = this.props;
+        console.log('view', view);
+        await setUserMapPositionName(view.name);
+        if (view && view.id && view.center && view.center.length > 0) {
+            let center = [view.center[0].lat, view.center[0].lng];
+            await this.map.panTo(center);
+        } else {
+            await this.map.panTo(view.center);
+        }
+        await this.map.setZoom(view.zoom);
+    }
+    // 删除选择的视图
+    handleDeleteMapCustomPosition = async (view) => {
+        const {
+            actions: {
+                deleteUserCustomView,
+                getCustomViewByUserID
+            }
+        } = this.props;
+        try {
+            let postData = {
+                id: view.id
+            };
+            let data = await deleteUserCustomView(postData);
+            console.log('data', data);
+            if (data) {
+                Notification.error({
+                    message: '删除视图失败',
+                    duration: 3
+                });
+            } else {
+                Notification.success({
+                    message: '删除视图成功',
+                    duration: 3
+                });
+            }
+            const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+            console.log('user', user);
+            await getCustomViewByUserID({id: user.id});
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+    handleDeleteMapCustomPositionCancel = async () => {
+
+    }
+    // 获取当前视图的中心和放大层级，打开保存自定义视图弹窗
+    saveUserMapCustomPosition = async () => {
+        const {
+            customViewByUserID = []
+        } = this.props;
+        if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length < 3) {
+            let center = this.map.getCenter();
+            let zoom = this.map.getZoom();
+            console.log('center', center);
+            console.log('zoom', zoom);
+            console.log('center', center);
+
+            this.setState({
+                saveUserMapCustomPositionVisible: true,
+                saveUserMapCustomPositionCenter: center,
+                saveUserMapCustomPositionZoom: zoom
+            });
+        } else {
+            Notification.info({
+                message: '自定义视图最多为三个',
+                duration: 3
+            });
+        }
+    }
+    // 关闭保存自定义视图弹窗
+    handleCancelMapCustomPositionModal = async () => {
+        this.setState({
+            saveUserMapCustomPositionVisible: false,
+            saveUserMapCustomPositionCenter: '',
+            saveUserMapCustomPositionZoom: ''
         });
     }
 }
