@@ -91,6 +91,21 @@ export const progressstat4pie = createFetchAction(
     `${FOREST_API}/tree/progressstat4pie?`,
     []
 );
+// 查询计划栽植量接口
+export const getTreedayplans = createFetchAction(
+    `${FOREST_API}/tree/treedayplans`,
+    []
+);
+// 查询实际栽植量接口
+export const getTreetotalstatbyday = createFetchAction(
+    `${FOREST_API}/tree/treetotalstatbyday`,
+    []
+);
+// 查询计划任务量
+export const getTreesectionplans = createFetchAction(
+    `${FOREST_API}/tree/treesectionplans`,
+    []
+);
 
 export const actions = {
     getTreeOK,
@@ -98,7 +113,11 @@ export const actions = {
     setkeycode,
     gettreetype,
     getSmallClassList,
-    getTotalSat
+    getTotalSat,
+    progressalldata,
+    getTreedayplans,
+    getTreetotalstatbyday,
+    getTreesectionplans
 };
 export default handleActions(
     {

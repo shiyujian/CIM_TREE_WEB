@@ -1168,6 +1168,7 @@ export default class LocmeasureTable extends Component {
                     plan.createtime4 = createtime4;
                 });
 
+                // console.log('tblData', tblData);
                 // let _headers = ['order', 'sectionName', 'place', 'SupervisorCheck', 'islocation'];
                 // let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
                 //     .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});

@@ -46,7 +46,6 @@ export default class ScheduleDisplay extends Component {
 
     // 树选择
     onSelect (value = []) {
-        console.log('onSelect  value', value);
         let keycode = value[0] || '';
         const {
             actions: { setkeycode }
@@ -64,7 +63,6 @@ export default class ScheduleDisplay extends Component {
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
         }
-        console.log('tree', tree);
 
         return (
             <div>
@@ -84,11 +82,13 @@ export default class ScheduleDisplay extends Component {
                 <Content>
                     <Row gutter={10} style={{ margin: '10px 5px' }}>
                         <Col span={24}>
+                            <h2>计划完成情况：</h2>
                             <LeftTop {...this.props} {...this.state} />
                         </Col>
                     </Row>
                     <Row gutter={10} style={{ margin: '10px 5px' }}>
                         <Col span={24}>
+                            <h2>本标段计划完成情况：</h2>
                             <RightTop {...this.props} {...this.state} />
                         </Col>
                     </Row>
