@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-29 11:29:23
+ * @Last Modified time: 2018-11-29 14:05:01
  */
 import React, { Component } from 'react';
 import {
@@ -357,7 +357,6 @@ class OnSite extends Component {
                 maxZoom: 17,
                 storagetype: 0
             }).addTo(this.map);
-
             this.getTileLayerTreeBasic();
             // 隐患详情点击事件
             document.querySelector('.leaflet-popup-pane').addEventListener('click', async function (e) {
@@ -504,6 +503,7 @@ class OnSite extends Component {
             dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
             dashboardCompomentMenu !== 'geojsonFeature_treeAdopt'
         ) {
+            console.log('aaaaaaa');
             await this.getTileLayerTreeBasic();
         }
         // 切换全屏
@@ -551,21 +551,23 @@ class OnSite extends Component {
     }
     // 获取初始化数据的树木瓦片图层
     getTileLayerTreeBasic = () => {
-        if (this.tileTreeLayerBasic) {
-            this.tileTreeLayerBasic.addTo(this.map);
-        } else {
-            this.tileTreeLayerBasic = L.tileLayer(
-                window.config.DASHBOARD_ONSITE +
-                        '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 11,
-                    maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
-                }
-            ).addTo(this.map);
+        if (this.map) {
+            if (this.tileTreeLayerBasic) {
+                this.tileTreeLayerBasic.addTo(this.map);
+            } else {
+                this.tileTreeLayerBasic = L.tileLayer(
+                    window.config.DASHBOARD_ONSITE +
+                            '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    {
+                        opacity: 1.0,
+                        subdomains: [1, 2, 3],
+                        minZoom: 11,
+                        maxZoom: 21,
+                        storagetype: 0,
+                        tiletype: 'wtms'
+                    }
+                ).addTo(this.map);
+            }
         }
     }
     // 去除初始化数据的树木瓦片图层
@@ -1006,6 +1008,7 @@ class OnSite extends Component {
                                 </div>
                             ) : ''
                     } */}
+
                     { // 成活率右侧范围菜单
                         dashboardCompomentMenu === 'geojsonFeature_survivalRate'
                             ? (
