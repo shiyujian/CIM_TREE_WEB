@@ -105,7 +105,7 @@ export default class Warning extends Component {
             })
         });
         console.log('9999',yPlantData[0]);
-        legendList.map( (item, index) => {
+        legendList.map(item => {
             let obj = {};
             xAxisData.map((row, col) => {
                 if(item === '计划栽植量') {
