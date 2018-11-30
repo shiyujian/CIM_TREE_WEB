@@ -60,7 +60,7 @@ export const getMenuTreeVisible = createAction(`${ID}是否显示树`);
 export const switchDashboardRightMenu = createAction(`${ID}切换二维展示右侧按钮`);
 export const switchDashboardFullScreenState = createAction(`${ID}切换二维展示全屏`);
 export const switchDashboardAreaTreeLayer = createAction(`${ID}切换二维展示树图层`);
-export const switchDashboardAreaMeasure = createAction(`${ID}切换二维展示面积计算`);
+export const switchDashboardDataMeasurement = createAction(`${ID}切换二维展示数据测量`);
 export const switchDashboardFocus = createAction(`${ID}切换二维展示聚焦初始位置`);
 export const switchDashboardTreeMess = createAction(`${ID}切换二维展示树木信息`);
 export const getAreaTreeLoading = createAction(`${ID}区域地块树加载loading`);
@@ -71,6 +71,7 @@ export const getCuringTaskTreeLoading = createAction(`${ID}养护任务树加载
 export const getSurvivalRateTreeLoading = createAction(`${ID}成活率树加载loading`);
 export const getAdoptTreeLoading = createAction(`${ID}苗木结缘树加载loading`);
 export const setUserMapPositionName = createAction(`${ID}设置用户定位的视图名称`);
+export const switchAreaDistanceMeasureMenu = createAction(`${ID}切换二维展示面积测量和距离测量`);
 
 export const actions = {
     getRisk,
@@ -108,7 +109,7 @@ export const actions = {
     switchDashboardRightMenu,
     switchDashboardFullScreenState,
     switchDashboardAreaTreeLayer,
-    switchDashboardAreaMeasure,
+    switchDashboardDataMeasurement,
     switchDashboardFocus,
     switchDashboardTreeMess,
     getAreaTreeLoading,
@@ -118,7 +119,8 @@ export const actions = {
     getCuringTaskTreeLoading,
     getSurvivalRateTreeLoading,
     getAdoptTreeLoading,
-    setUserMapPositionName
+    setUserMapPositionName,
+    switchAreaDistanceMeasureMenu
 };
 export default handleActions(
     {
@@ -206,10 +208,10 @@ export default handleActions(
                 dashboardAreaTreeLayer: payload
             };
         },
-        [switchDashboardAreaMeasure]: (state, { payload }) => {
+        [switchDashboardDataMeasurement]: (state, { payload }) => {
             return {
                 ...state,
-                dashboardAreaMeasure: payload
+                dashboardDataMeasurement: payload
             };
         },
         [switchDashboardFocus]: (state, { payload }) => {
@@ -276,6 +278,12 @@ export default handleActions(
             return {
                 ...state,
                 customViewByUserID: payload
+            };
+        },
+        [switchAreaDistanceMeasureMenu]: (state, { payload }) => {
+            return {
+                ...state,
+                areaDistanceMeasureMenu: payload
             };
         }
     },

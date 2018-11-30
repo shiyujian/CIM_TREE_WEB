@@ -3,14 +3,7 @@ import { FOREST_API, FOREST_IMG, LBSAMAP_KEY } from '_platform/api';
 
 export const getAreaData = async (getTreeNodeList, getThinClassList) => {
     let rst = await getTreeNodeList();
-    if (rst instanceof Array && rst.length > 0) {
-        rst.forEach((item, index) => {
-            rst[index].children = [];
-        });
-    } else {
-        this.setState({
-            areaTreeLoading: false
-        });
+    if (!(rst && rst instanceof Array && rst.length > 0)) {
         return;
     }
     // 项目级

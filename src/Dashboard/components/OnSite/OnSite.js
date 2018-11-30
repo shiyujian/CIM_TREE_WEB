@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-30 15:02:05
+ * @Last Modified time: 2018-11-30 20:05:42
  */
 import React, { Component } from 'react';
 import {
@@ -81,6 +81,10 @@ import areaViewImg from './InitialPositionImg/areaView.png';
 import customViewImg from './InitialPositionImg/customView.png';
 import customViewCloseUnSelImg from './InitialPositionImg/delete1.png';
 import customViewCloseSelImg from './InitialPositionImg/delete2.png';
+import distanceMeasureUnSelImg from './MeasureImg/distanceUnSel.png';
+import distanceMeasureSelImg from './MeasureImg/distanceSel.png';
+import areaMeasureUnSelImg from './MeasureImg/areaUnSel.png';
+import areaMeasureSelImg from './MeasureImg/areaSel.png';
 
 window.config = window.config || {};
 class OnSite extends Component {
@@ -89,7 +93,6 @@ class OnSite extends Component {
         super(props);
         this.state = {
             mapLayerBtnType: true, // 切换卫星图和地图
-            leafletCenter: [38.92, 115.98], // 雄安
             // 树木详情弹窗数据
             treeMessModalVisible: false,
             seedlingMess: '', // 树木信息
@@ -100,12 +103,6 @@ class OnSite extends Component {
             // 区域地块
             areaEventKey: '', // 区域地块选中节点的key
             areaEventTitle: '', // 区域地块选中节点的name
-            // 地图圈选
-            areaRadioValue: '全部细班',
-            coordinates: [],
-            polygonData: '', // 圈选地图图层
-            areaMeasure: 0, // 圈选区域面积
-            areaMeasureVisible: false,
             // 安全隐患
             riskMess: {}, // 隐患详情
             isShowRisk: false, // 是否显示隐患详情弹窗
@@ -164,7 +161,13 @@ class OnSite extends Component {
             // 自定义视图
             saveUserMapCustomPositionVisible: false,
             saveUserMapCustomPositionCenter: '',
-            saveUserMapCustomPositionZoom: ''
+            saveUserMapCustomPositionZoom: '',
+            // 数据测量
+            coordinates: [], // 地图圈选
+            polygonData: '', // 圈选地图图层
+            distanceMeasure: 0, // 两点之间的距离
+            areaMeasure: 0, // 圈选区域面积
+            areaMeasureVisible: false // 面积数据显示
         };
         this.tileLayer = null; // 最底部基础图层
         this.tileTreeLayerBasic = null; // 树木区域图层
@@ -387,14 +390,15 @@ class OnSite extends Component {
             });
             this.map.on('click', function (e) {
                 const {
-                    coordinates
+                    coordinates = []
                 } = me.state;
                 const {
                     dashboardCompomentMenu,
-                    dashboardAreaMeasure,
+                    areaDistanceMeasureMenu,
                     dashboardTreeMess
                 } = me.props;
-                if (dashboardAreaMeasure === 'areaMeasure') {
+                // 测量面积
+                if (areaDistanceMeasureMenu === 'areaMeasureMenu') {
                     coordinates.push([e.latlng.lat, e.latlng.lng]);
                     if (me.state.polygonData) {
                         me.map.removeLayer(me.state.polygonData);
@@ -407,6 +411,37 @@ class OnSite extends Component {
                     me.setState({
                         coordinates,
                         polygonData: polygonData
+                    });
+                } else if (areaDistanceMeasureMenu === 'distanceMeasureMenu') {
+                    // 测量距离
+                    // 如果数据已经存在两个了，则计算最新点击的点和前一个点的距离
+                    let distanceMeasure = 0;
+                    if (coordinates.length > 1) {
+                        coordinates.shift();
+                        coordinates.push([e.latlng.lat, e.latlng.lng]);
+                        let latlng = L.latLng(coordinates[0]);
+                        distanceMeasure = latlng.distanceTo(L.latLng(coordinates[1])).toFixed(2);
+                    } else if (coordinates.length === 1) {
+                        // 如果数据已经存在一个，则计算最新点击的点和当前点的距离
+                        coordinates.push([e.latlng.lat, e.latlng.lng]);
+                        let latlng = L.latLng(coordinates[0]);
+                        distanceMeasure = latlng.distanceTo(L.latLng(coordinates[1])).toFixed(2);
+                    } else if (coordinates.length === 0) {
+                        // 如果数据不存在，则不计算距离
+                        coordinates.push([e.latlng.lat, e.latlng.lng]);
+                    }
+                    if (me.state.polygonData) {
+                        me.map.removeLayer(me.state.polygonData);
+                    }
+                    let polygonData = L.polygon(coordinates, {
+                        color: 'white',
+                        fillColor: '#93B9F2',
+                        fillOpacity: 0.2
+                    }).addTo(me.map);
+                    me.setState({
+                        coordinates,
+                        polygonData,
+                        distanceMeasure
                     });
                 } else if (dashboardTreeMess === 'treeMess') {
                     me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
@@ -431,7 +466,7 @@ class OnSite extends Component {
             }
         } = this.props;
         // 去除树木信息图标图层
-        if (dashboardTreeMess && dashboardTreeMess === 'unTreeMess' && dashboardTreeMess !== prevProps.dashboardTreeMess) {
+        if (!dashboardTreeMess && prevProps.dashboardTreeMess && dashboardTreeMess !== prevProps.dashboardTreeMess) {
             await this.handleRemoveTreeMarkerLayer();
         }
         // 在各个菜单之间切换时需要处理的图层
@@ -843,16 +878,18 @@ class OnSite extends Component {
             areaMeasure,
             areaMeasureVisible,
             adoptTreeModalVisible,
-            saveUserMapCustomPositionVisible
+            saveUserMapCustomPositionVisible,
+            distanceMeasure
         } = this.state;
         const {
             dashboardCompomentMenu,
             menuTreeVisible,
-            dashboardAreaMeasure,
+            dashboardDataMeasurement,
             dashboardRightMenu,
             dashboardFocus,
             userMapPositionName = '',
             customViewByUserID = [],
+            areaDistanceMeasureMenu = '',
             platform: {
                 tabs = {},
                 tree = {}
@@ -981,7 +1018,8 @@ class OnSite extends Component {
                                                                             onConfirm={this.handleDeleteMapCustomPosition.bind(this, view)}
                                                                             onCancel={this.handleDeleteMapCustomPositionCancel.bind(this)}
                                                                             okText='Yes' cancelText='No'>
-                                                                            <img src={customViewCloseUnSelImg} className='dashboard-rightInitialPositionMenu-customViewData-deleteImg' />
+                                                                            <img src={customViewCloseUnSelImg}
+                                                                                className='dashboard-rightInitialPositionMenu-customViewData-deleteImg' />
                                                                         </Popconfirm>
                                                                     </div>);
                                                                 }
@@ -1010,6 +1048,52 @@ class OnSite extends Component {
                                     {...this.state}
                                     onCancel={this.handleCancelMapCustomPositionModal.bind(this)} />
                             ) : ''
+                    }
+                    { // 数据测量
+                        dashboardDataMeasurement && dashboardDataMeasurement === 'dataMeasurement'
+                            ? (
+                                <div className='dashboard-rightDataMeasureMenu'>
+                                    <aside className='dashboard-rightDataMeasureMenu-aside' draggable='false'>
+                                        <div>
+                                            <div className={areaDistanceMeasureMenu === 'distanceMeasureMenu' ? 'dashboard-rightDataMeasureMenu-back-Select' : 'dashboard-rightDataMeasureMenu-back-Unselect'}>
+                                                <img src={areaDistanceMeasureMenu === 'distanceMeasureMenu' ? distanceMeasureSelImg : distanceMeasureUnSelImg}
+                                                    onClick={this.handleSwitchMeasureMenu.bind(this, 'distanceMeasureMenu')}
+                                                    className='dashboard-rightDataMeasureMenu-clickImg' />
+                                            </div>
+                                            <div className={areaDistanceMeasureMenu === 'areaMeasureMenu' ? 'dashboard-rightDataMeasureMenu-back-Select' : 'dashboard-rightDataMeasureMenu-back-Unselect'}>
+                                                <img src={areaDistanceMeasureMenu === 'areaMeasureMenu' ? areaMeasureSelImg : areaMeasureUnSelImg}
+                                                    onClick={this.handleSwitchMeasureMenu.bind(this, 'areaMeasureMenu')}
+                                                    className='dashboard-rightDataMeasureMenu-clickImg' />
+                                            </div>
+                                        </div>
+                                    </aside>
+                                </div>
+                            ) : ''
+                    }
+                    { // 框选面积的画图按钮
+                        areaDistanceMeasureMenu === 'areaMeasureMenu' ? (
+                            <div className='dashboard-editPolygonLayout'>
+                                <div>
+                                    <Button type='primary' style={{marginRight: 10}} disabled={createMeasureOkDisplay} onClick={this._handleCreateMeasureOk.bind(this)}>确定</Button>
+                                    <Button type='info' style={{marginRight: 10}} disabled={createMeasureBackDisplay} onClick={this._handleCreateMeasureRetreat.bind(this)}>上一步</Button>
+                                    <Button type='danger' onClick={this._handleCreateMeasureCancel.bind(this)}>撤销</Button>
+                                </div>
+                            </div>
+                        ) : ''
+                    }
+                    { // 显示面积
+                        areaMeasureVisible ? (
+                            <div className='dashboard-areaMeasureLayout'>
+                                <span>{`面积：${areaMeasure} 亩`}</span>
+                            </div>
+                        ) : ''
+                    }
+                    { // 显示距离
+                        distanceMeasure ? (
+                            <div className='dashboard-areaMeasureLayout'>
+                                <span>{`距离：${distanceMeasure} 米`}</span>
+                            </div>
+                        ) : ''
                     }
                     { // 成活率右侧范围菜单
                         dashboardCompomentMenu === 'geojsonFeature_survivalRate'
@@ -1082,24 +1166,6 @@ class OnSite extends Component {
                                     }
                                 </div>
                             ) : ''
-                    }
-                    { // 框选面积的画图按钮
-                        dashboardAreaMeasure === 'areaMeasure' ? (
-                            <div className='dashboard-editPolygonLayout'>
-                                <div>
-                                    <Button type='primary' style={{marginRight: 10}} disabled={createMeasureOkDisplay} onClick={this._handleCreateMeasureOk.bind(this)}>确定</Button>
-                                    <Button type='info' style={{marginRight: 10}} disabled={createMeasureBackDisplay} onClick={this._handleCreateMeasureRetreat.bind(this)}>上一步</Button>
-                                    <Button type='danger' onClick={this._handleCreateMeasureCancel.bind(this)}>撤销</Button>
-                                </div>
-                            </div>
-                        ) : ''
-                    }
-                    { // 显示面积
-                        areaMeasureVisible ? (
-                            <div className='dashboard-areaMeasureLayout'>
-                                <span>{`面积：${areaMeasure} 亩`}</span>
-                            </div>
-                        ) : ''
                     }
                     <div className='dashboard-gisTypeBut'>
                         <div>
@@ -2156,12 +2222,6 @@ class OnSite extends Component {
     }
     // 取消圈选和按钮的功能
     _resetRegionState = () => {
-        const {
-            actions: {
-                switchDashboardAreaMeasure
-            }
-        } = this.props;
-        switchDashboardAreaMeasure('unAreaMeasure');
         this.setState({
             polygonData: '',
             coordinates: []
@@ -2543,10 +2603,14 @@ class OnSite extends Component {
         await setUserMapPositionName(view.name);
         if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
             let center = [view.center[0].lat, view.center[0].lng];
+            console.log('center', center);
+            console.log('aaaaaaaaa');
             await this.map.panTo(center);
         } else {
             await this.map.panTo(view.center);
         }
+        console.log('view.zoom', view.zoom);
+        console.log('bbbbbbb');
         await this.map.setZoom(view.zoom);
     }
     // 删除选择的视图
@@ -2614,6 +2678,33 @@ class OnSite extends Component {
             saveUserMapCustomPositionVisible: false,
             saveUserMapCustomPositionCenter: '',
             saveUserMapCustomPositionZoom: ''
+        });
+    }
+    // 选择是测量面积还是距离
+    handleSwitchMeasureMenu = async (type) => {
+        const {
+            actions: {
+                switchAreaDistanceMeasureMenu
+            },
+            areaDistanceMeasureMenu
+        } = this.props;
+        console.log('type', type);
+        await switchAreaDistanceMeasureMenu(type);
+        if (areaDistanceMeasureMenu && areaDistanceMeasureMenu !== type) {
+            await this.handleCloseMeasureMenu();
+        }
+    }
+    // 选择是测量面积还是距离
+    handleCloseMeasureMenu = async (type) => {
+        if (this.state.polygonData) {
+            this.map.removeLayer(this.state.polygonData);
+        }
+        this.setState({
+            coordinates: [],
+            polygonData: '',
+            distanceMeasure: 0,
+            areaMeasure: 0,
+            areaMeasureVisible: false
         });
     }
 }

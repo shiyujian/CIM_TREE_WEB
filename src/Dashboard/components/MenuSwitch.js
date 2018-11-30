@@ -19,7 +19,12 @@ export default class MenuSwitch extends Component {
                 switchFullScreenState,
                 switchDashboardMenuType,
                 switchDashboardCompoment,
-                setUserMapPositionName
+                setUserMapPositionName,
+                switchDashboardDataMeasurement,
+                switchAreaDistanceMeasureMenu,
+                switchDashboardFocus,
+                switchDashboardTreeMess,
+                switchDashboardRightMenu
             },
             platform: {
                 tabs = {}
@@ -35,8 +40,18 @@ export default class MenuSwitch extends Component {
         await switchDashboardMenuType('');
         // 默认不选择任何按钮
         await switchDashboardCompoment('');
+        // 默认不打开视图菜单
+        await switchDashboardFocus('');
         // 默认不选择任何视图
         await setUserMapPositionName('');
+        // 默认不选择数据测量
+        await switchDashboardDataMeasurement('');
+        // 默认不选择测量图片还是距离
+        await switchAreaDistanceMeasureMenu('');
+        // 默认不查看树木信息
+        await switchDashboardTreeMess('');
+        // 默认不打开区域地块树
+        await switchDashboardRightMenu('');
         const me = this;
         // 监听是否全屏 过去由F11触发的那种浏览器全屏模式和HTML5中内容的全屏模式是不一样的
         window.onresize = function () {
@@ -98,11 +113,12 @@ export default class MenuSwitch extends Component {
     componentDidUpdate = async (prevProps, prevState) => {
         const {
             dashboardCompomentMenu,
-            dashboardAreaMeasure,
+            dashboardDataMeasurement,
             dashboardTreeMess,
             actions: {
                 switchDashboardTreeMess,
-                switchDashboardAreaMeasure,
+                switchDashboardDataMeasurement,
+                switchAreaDistanceMeasureMenu,
                 switchDashboardAreaTreeLayer
             }
         } = this.props;
@@ -110,16 +126,17 @@ export default class MenuSwitch extends Component {
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
             dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
-                await switchDashboardTreeMess('unTreeMess');
+                await switchDashboardTreeMess('');
             }
         }
         // 选择了面积计算，就需要将树木信息取消
-        if (dashboardAreaMeasure && dashboardAreaMeasure === 'areaMeasure' && dashboardAreaMeasure !== prevProps.dashboardAreaMeasure) {
-            await switchDashboardTreeMess('unTreeMess');
+        if (dashboardDataMeasurement && dashboardDataMeasurement === 'dataMeasurement' && dashboardDataMeasurement !== prevProps.dashboardDataMeasurement) {
+            await switchDashboardTreeMess('');
         }
         // 选择了树木信息，就需要将面积计算取消
         if (dashboardTreeMess && dashboardTreeMess === 'treeMess' && dashboardTreeMess !== prevProps.dashboardTreeMess) {
-            await switchDashboardAreaMeasure('unAreaMeasure');
+            await switchDashboardDataMeasurement('');
+            await switchAreaDistanceMeasureMenu('');
         }
         // 选择成活率，树种筛选，辅助验收，苗木结缘时，不能够点击图层控制开关
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
@@ -139,7 +156,7 @@ export default class MenuSwitch extends Component {
             dashboardMenuType,
             dashboardRightMenu,
             dashboardAreaTreeLayer,
-            dashboardAreaMeasure,
+            dashboardDataMeasurement,
             dashboardFocus,
             dashboardTreeMess,
             platform: {
@@ -211,8 +228,8 @@ export default class MenuSwitch extends Component {
                         id='removeTileTreeLayerBasic'
                         title='图层控制'
                         onClick={this.handleTileTreeLayerBasicButton.bind(this)} />
-                    <a className={dashboardAreaMeasure === 'areaMeasure' ? 'menuSwitch-rightMenuAreameasureButtonSelLayout' : 'menuSwitch-rightMenuAreameasureButtonUnSelLayout'}
-                        id='areaMeasure'
+                    <a className={dashboardDataMeasurement === 'dataMeasurement' ? 'menuSwitch-rightMenuAreameasureButtonSelLayout' : 'menuSwitch-rightMenuAreameasureButtonUnSelLayout'}
+                        id='dataMeasurement'
                         title='数据测量'
                         onClick={this.handleAreaMeasureButton.bind(this)} />
                     <a className={dashboardRightMenu === 'area' ? 'menuSwitch-rightMenuAreaButtonSelLayout' : 'menuSwitch-rightMenuAreaButtonUnSelLayout'}
@@ -300,7 +317,7 @@ export default class MenuSwitch extends Component {
         let target = e.target;
         let buttonID = target.getAttribute('id');
         if (dashboardTreeMess === buttonID) {
-            await switchDashboardTreeMess('unTreeMess');
+            await switchDashboardTreeMess('');
         } else {
             await switchDashboardTreeMess(buttonID);
         }
@@ -334,16 +351,18 @@ export default class MenuSwitch extends Component {
     handleAreaMeasureButton = async (e) => {
         const {
             actions: {
-                switchDashboardAreaMeasure
+                switchDashboardDataMeasurement,
+                switchAreaDistanceMeasureMenu
             },
-            dashboardAreaMeasure
+            dashboardDataMeasurement
         } = this.props;
         let target = e.target;
         let buttonID = target.getAttribute('id');
-        if (dashboardAreaMeasure === buttonID) {
-            await switchDashboardAreaMeasure('unAreaMeasure');
+        if (dashboardDataMeasurement === buttonID) {
+            await switchDashboardDataMeasurement('');
+            await switchAreaDistanceMeasureMenu('');
         } else {
-            await switchDashboardAreaMeasure(buttonID);
+            await switchDashboardDataMeasurement(buttonID);
         }
     }
     // 右侧菜单
