@@ -473,7 +473,8 @@
         }
     }
 
-    //初始位置
+    //视图管理模块
+    // 整体菜单的位置
     .dashboard-rightInitialPositionMenu {
         position: absolute;
         right: 120px;
@@ -482,7 +483,7 @@
         width: 230px;
         transition: all 0.3s;
         z-index: 980;
-
+        // 视图管理模块整体菜单的UI数据设置
         .dashboard-rightInitialPositionMenu-aside {
             position: absolute;
             left: 0;
@@ -494,23 +495,25 @@
             z-index: 999;
             overflow-x: hidden;
             overflow-y: auto;
-
+            // 整体菜单的内部实际数据
             .dashboard-rightInitialPositionMenu-areaTree {
                 margin-top: 10px;
                 margin-left: 20px;
                 height: calc(~'100% - 10px');
             }
-
+            // 视图管理的高度设置
             .dashboard-rightInitialPositionMenu-viewList {
                 height: calc(~'100% - 60px');
                 display: block;
-                // 项目视图
+                overflow-y: auto;
+                // 区域地块的视图管理标题
                 .dashboard-rightInitialPositionMenu-areaViewTitle {
                     height: 30px;
                     font-family: "Microsoft YaHei";
                     font-weight: bold;
                     font-size: 16px;
                 }
+                // 区域地块的视图数据
                 .dashboard-rightInitialPositionMenu-areaViewData {
                     height: 40px;
                     display: block;
@@ -520,7 +523,17 @@
                     font-family: "Microsoft YaHei";
                     font-size: 14px;
                 }
-                // 自定义视图
+                // 区域地块视图按钮名字过长隐藏的设置
+                .dashboard-rightInitialPositionMenu-areaViewData-button {
+                    vertical-align: middle;
+                    white-space: nowrap;
+                    max-width: 190px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    width: 100%;
+                    height: 40px;
+                }
+                // 自定义视图的标题
                 .dashboard-rightInitialPositionMenu-customViewTitle {
                     height: 30px;
                     font-family: "Microsoft YaHei";
@@ -528,6 +541,7 @@
                     font-size: 16px;
                     margin-top: 20px;
                 }
+                // 未选中  自定义视图的每行的设置
                 .dashboard-rightInitialPositionMenu-customViewData-Unselect {
                     height: 40px;
                     line-height: 40px;
@@ -537,16 +551,24 @@
                     margin-bottom: 10px;
                     font-family: "Microsoft YaHei";
                     font-size: 14px;
-                    background-color: #fff;
+                    background-color: #fff; // 背景的颜色
                 }
+                // 未选中 自定义视图的a标签的设置
                 .dashboard-rightInitialPositionMenu-customViewData-ALabel-Unselect {
-                    width: calc(~'100% - 32px');
+                    width: calc(~'100% - 50px');
                     height: 40px;
                     line-height: 40px;
                     display: inline-block;
-                    color: #333333
+                    color: #333333; // 文字的颜色
+                    vertical-align: middle;
+                    white-space: nowrap;
+                    max-width: 158px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    margin-left: 15px;
+                    margin-right: 15px;
                 }
-
+                // 选中  自定义视图的每行的设置
                 .dashboard-rightInitialPositionMenu-customViewData-Select {
                     height: 40px;
                     line-height: 40px;
@@ -556,22 +578,30 @@
                     margin-bottom: 10px;
                     font-family: "Microsoft YaHei";
                     font-size: 14px;
-                    background-color: #1793ff;
+                    background-color: #1793ff; // 背景的颜色
                 }
-
+                // 选中 自定义视图的a标签的设置
                 .dashboard-rightInitialPositionMenu-customViewData-ALabel-Select {
-                    width: calc(~'100% - 32px');
+                    width: calc(~"100% - 50px");
                     height: 40px;
                     line-height: 40px;
                     display: inline-block;
-                    color: #ffffff
+                    color: #ffffff; // 文字的颜色
+                    vertical-align: middle;
+                    white-space: nowrap;
+                    max-width: 158px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    margin-left: 15px;
+                    margin-right: 15px;
                 }
+                // 自定义视图的删除图片的设置
                 .dashboard-rightInitialPositionMenu-customViewData-deleteImg {
-                    margin-left: 12;
-                    margin-right: 12; 
+                    margin-right: 12px; 
                     cursor: pointer;
                 }
             }
+            // 保存当前视图的按钮设置
             .dashboard-rightInitialPositionMenu-footerButton {
                 height: 40px;
                 display: block;

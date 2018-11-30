@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-29 14:05:01
+ * @Last Modified time: 2018-11-30 15:02:05
  */
 import React, { Component } from 'react';
 import {
@@ -333,16 +333,18 @@ class OnSite extends Component {
         try {
             let me = this;
             let mapInitialization = window.config.initLeaflet;
+            console.log('customViewByUserID', customViewByUserID);
             if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
                 let view = customViewByUserID[0];
                 let center = [view.center[0].lat, view.center[0].lng];
                 let zoom = view.zoom;
+                console.log('center', center);
                 mapInitialization.center = center;
                 mapInitialization.zoom = zoom;
             };
             this.map = L.map('mapid', mapInitialization);
 
-            L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+            // L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
             this.tileLayer = L.tileLayer(this.tileUrls[1], {
                 subdomains: [1, 2, 3],
@@ -424,20 +426,10 @@ class OnSite extends Component {
             dashboardCompomentMenu,
             dashboardAreaTreeLayer,
             dashboardTreeMess,
-            dashboardFocus,
-            actions: {
-                switchDashboardFocus
-            },
             platform: {
                 tabs = {}
             }
         } = this.props;
-        // 返回初始位置和放大级数
-        if (dashboardFocus && dashboardFocus === 'mapFoucs' && dashboardFocus !== prevProps.dashboardFocus) {
-            await this.map.panTo(window.config.initLeaflet.center);
-            await this.map.setZoom(window.config.initLeaflet.zoom);
-            await switchDashboardFocus('');
-        }
         // 去除树木信息图标图层
         if (dashboardTreeMess && dashboardTreeMess === 'unTreeMess' && dashboardTreeMess !== prevProps.dashboardTreeMess) {
             await this.handleRemoveTreeMarkerLayer();
@@ -931,8 +923,7 @@ class OnSite extends Component {
                                 </div>
                             ) : ''
                     }
-
-                    {/* { // 右侧菜单当选择区域视图时，展示区域视图页面
+                    { // 右侧菜单当选择区域视图时，展示区域视图页面
                         dashboardFocus && dashboardFocus === 'mapFoucs'
                             ? (
                                 <div className='dashboard-rightInitialPositionMenu'>
@@ -948,7 +939,8 @@ class OnSite extends Component {
                                                         {
                                                             PROJECTPOSITIONCENTER.map((view, index) => {
                                                                 return (<div className='dashboard-rightInitialPositionMenu-areaViewData' key={view.name}>
-                                                                    <Button style={{width: '100%', height: 40}}
+                                                                    <Button
+                                                                        className='dashboard-rightInitialPositionMenu-areaViewData-button'
                                                                         onClick={this.locationToMapCustomPosition.bind(this, view)}
                                                                         type={userMapPositionName === view.name ? 'primary' : ''}>
                                                                         {view.name}
@@ -967,6 +959,7 @@ class OnSite extends Component {
                                                                 if (userMapPositionName === view.name) {
                                                                     return (<div className='dashboard-rightInitialPositionMenu-customViewData-Select' key={view.id}>
                                                                         <a className='dashboard-rightInitialPositionMenu-customViewData-ALabel-Select'
+                                                                            title={view.name}
                                                                             onClick={this.locationToMapCustomPosition.bind(this, view)}>
                                                                             {view.name}
                                                                         </a>
@@ -980,6 +973,7 @@ class OnSite extends Component {
                                                                 } else {
                                                                     return (<div className='dashboard-rightInitialPositionMenu-customViewData-Unselect' key={view.id}>
                                                                         <a className='dashboard-rightInitialPositionMenu-customViewData-ALabel-Unselect'
+                                                                            title={view.name}
                                                                             onClick={this.locationToMapCustomPosition.bind(this, view)}>
                                                                             {view.name}
                                                                         </a>
@@ -1007,8 +1001,16 @@ class OnSite extends Component {
                                     </aside>
                                 </div>
                             ) : ''
-                    } */}
-
+                    }
+                    { // 添加自定义视图的弹窗
+                        saveUserMapCustomPositionVisible
+                            ? (
+                                <SaveUserMapCustomPositionModal
+                                    {...this.props}
+                                    {...this.state}
+                                    onCancel={this.handleCancelMapCustomPositionModal.bind(this)} />
+                            ) : ''
+                    }
                     { // 成活率右侧范围菜单
                         dashboardCompomentMenu === 'geojsonFeature_survivalRate'
                             ? (
@@ -1133,22 +1135,13 @@ class OnSite extends Component {
                                 />
                             ) : ''
                     }
-                    {
+                    { // 苗木结缘弹窗展示树木信息
                         adoptTreeModalVisible
                             ? (
                                 <AdoptTreeMessModal
                                     {...this.props}
                                     {...this.state}
                                     onCancel={this.handleCancelAdoptTreeMessModal.bind(this)} />
-                            ) : ''
-                    }
-                    {
-                        saveUserMapCustomPositionVisible
-                            ? (
-                                <SaveUserMapCustomPositionModal
-                                    {...this.props}
-                                    {...this.state}
-                                    onCancel={this.handleCancelMapCustomPositionModal.bind(this)} />
                             ) : ''
                     }
                     <Modal
@@ -2287,7 +2280,7 @@ class OnSite extends Component {
         try {
             let postdata = {
                 sxm: data.features[0].properties.SXM
-                // sxm: 'ATH0619'
+                // sxm: 'CAF2578'
             };
             let totalThinClass = tree.totalThinClass || [];
             let bigTreeList = (tree && tree.bigTreeList) || [];
@@ -2539,7 +2532,7 @@ class OnSite extends Component {
             adoptTreeMess: ''
         });
     }
-    // 定位至项目区域视图
+    // 定位至视图所在的坐标位置
     locationToMapCustomPosition = async (view) => {
         const {
             actions: {
@@ -2548,7 +2541,7 @@ class OnSite extends Component {
         } = this.props;
         console.log('view', view);
         await setUserMapPositionName(view.name);
-        if (view && view.id && view.center && view.center.length > 0) {
+        if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
             let center = [view.center[0].lat, view.center[0].lng];
             await this.map.panTo(center);
         } else {

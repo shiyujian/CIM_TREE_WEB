@@ -77,6 +77,7 @@ export default class CountTable extends Component {
             let postaData = {
                 page: current,
                 page_size: 10,
+                ordering: '-created_on',
                 org_code: queryParams.org_code ? queryParams.org_code : '',
                 group: queryParams.group ? queryParams.group : '',
                 name: queryParams.name ? queryParams.name : '',

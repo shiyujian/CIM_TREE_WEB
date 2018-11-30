@@ -18,7 +18,8 @@ export default class MenuSwitch extends Component {
                 switchDashboardAreaTreeLayer,
                 switchFullScreenState,
                 switchDashboardMenuType,
-                switchDashboardCompoment
+                switchDashboardCompoment,
+                setUserMapPositionName
             },
             platform: {
                 tabs = {}
@@ -34,6 +35,8 @@ export default class MenuSwitch extends Component {
         await switchDashboardMenuType('');
         // 默认不选择任何按钮
         await switchDashboardCompoment('');
+        // 默认不选择任何视图
+        await setUserMapPositionName('');
         const me = this;
         // 监听是否全屏 过去由F11触发的那种浏览器全屏模式和HTML5中内容的全屏模式是不一样的
         window.onresize = function () {
@@ -210,7 +213,7 @@ export default class MenuSwitch extends Component {
                         onClick={this.handleTileTreeLayerBasicButton.bind(this)} />
                     <a className={dashboardAreaMeasure === 'areaMeasure' ? 'menuSwitch-rightMenuAreameasureButtonSelLayout' : 'menuSwitch-rightMenuAreameasureButtonUnSelLayout'}
                         id='areaMeasure'
-                        title='面积计算'
+                        title='数据测量'
                         onClick={this.handleAreaMeasureButton.bind(this)} />
                     <a className={dashboardRightMenu === 'area' ? 'menuSwitch-rightMenuAreaButtonSelLayout' : 'menuSwitch-rightMenuAreaButtonUnSelLayout'}
                         id='area'
@@ -277,10 +280,9 @@ export default class MenuSwitch extends Component {
         let buttonID = target.getAttribute('id');
         if (dashboardFocus !== buttonID) {
             await switchDashboardFocus(buttonID);
+        } else {
+            await switchDashboardFocus('');
         }
-        //  else {
-        //     await switchDashboardFocus('');
-        // }
     }
     // 树木信息
     handleTreeMessButton = async (e) => {
