@@ -24,6 +24,15 @@ export const getForestUsers = createFetchAction(`${FOREST_SYSTEM}/users`, [
 export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [
     getTreeOK
 ]); //    √
+// 苗木进场
+export const gettreeEntrance = createFetchAction(
+    `${FOREST_API}/tree/nurserystat?`,
+    []
+);
+export const getTreeevery = createFetchAction(
+    `${FOREST_API}/tree/treetypes`,
+    []
+);
 export const gettreetype = createFetchAction(
     `${FOREST_API}/tree/treetypesbyno`,
     []
@@ -93,6 +102,10 @@ export const getNurserysProgress = createFetchAction(
     `${FOREST_API}/tree/nurserys/progress/`,
     []
 );
+export const getTotalSat = createFetchAction(
+    `${FOREST_API}/tree/totalstat`,
+    []
+);
 export const getquality = createFetchAction(`${FOREST_API}/trees/quality/`, []);
 export const getreturn = createFetchAction(`${FOREST_API}/trees/return/`, []);
 export const getreturnowner = createFetchAction(
@@ -120,6 +133,11 @@ export const getCountThin = createFetchAction(
     `${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass`,
     []
 );
+export const getSmallClassList = createFetchAction(
+    `${FOREST_API}/tree/wpunit4apps?parent={{no}}`,
+    []
+);
+
 export const getHonesty = createFetchAction(`${FOREST_API}/trees/honesty/`, []);
 export const getHonestyNursery = createFetchAction(
     `${FOREST_API}/trees/honesty/nursery/`,
@@ -229,12 +247,14 @@ export const getTreeStatuss = createFetchAction(
 );
 
 export const actions = {
+    getTotalSat,
     getTreeLocations,
     getExportTreeLocations,
     getForestUsers,
     getTreeOK,
     getTree,
     setkeycode,
+    gettreeEntrance,
     gettreetype,
     getfactoryAnalyse,
     getnurserys,
@@ -260,6 +280,7 @@ export const actions = {
     getCountSection,
     getCountSmall,
     getCountThin,
+    getSmallClassList,
     getHonesty,
     getHonestyNursery,
     getHonestyNew,

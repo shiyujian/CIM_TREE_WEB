@@ -14,8 +14,6 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import moment from 'moment';
-import { groupBy } from 'lodash';
 import Left from '../components/EnterAnalyze/Left';
 import Right from '../components/EnterAnalyze/Right';
 
@@ -69,7 +67,7 @@ export default class EnterAnalyze extends Component {
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
         }
-        console.log('tree', tree);
+        console.log('leftkeycode', leftkeycode);
         return (
             <Body>
                 <Main>

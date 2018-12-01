@@ -75,7 +75,7 @@ export default class MiddleTop extends Component {
     async query () {
         const {
             actions: {    
-                gettreetypeSection
+                getCountSection
             },
             leftkeycode,
             platform: { tree = {} }
@@ -89,7 +89,7 @@ export default class MiddleTop extends Component {
         param.etime = etime;
         this.setState({ loading: true });
 
-        let rst = await gettreetypeSection({}, param);
+        let rst = await getCountSection({}, param);
 
         console.log('MiddleTopMiddleTopMiddleTop', rst);
 
@@ -170,12 +170,12 @@ export default class MiddleTop extends Component {
 
         return (
             <Spin spinning={this.state.loading}>
-                {/* <Cards search={this.search()} title='各标段种植进度分析'> */}
+                <Cards search={this.search()} title='各标段种植进度分析'>
                     <div
                         id='middleTop'
                         style={{ width: '100%', height: '260px' }}
                     />
-                {/* </Cards> */}
+                </Cards>
             </Spin>
         );
     }

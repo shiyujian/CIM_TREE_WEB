@@ -43,16 +43,15 @@ export default class ScheduleTable extends Component {
     async componentDidMount () {
         const {
             actions: {
-                gettreetypeAll,
                 nowmessage,
-                gettreetypeSection,
-                getTotalSat
             }
         } = this.props;
         this.query();
 
         // 实时种植信息
         let message = await nowmessage();
+
+        console.log(message, '实时种植信息');
         let nowmessagelist = [];
         if (message && message.content) {
             nowmessagelist = message.content;
@@ -102,6 +101,7 @@ export default class ScheduleTable extends Component {
         };
         // 获取当前种树信息
         let amount = await getTotalSat({}, postdata);
+        console.log(amount, '种树信息');
         this.setState({});
 
         // 今日种植棵数

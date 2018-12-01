@@ -106,6 +106,7 @@ export default class DataStatis extends Component {
         } catch (e) {
             console.log('e', e);
         }
+        this.onSelect(['P018']);
     }
 
     render () {
@@ -120,6 +121,7 @@ export default class DataStatis extends Component {
         if (tree.thinClassTree) {
             treeList = tree.thinClassTree;
         }
+        console.log('leftkeycode', leftkeycode);
         return (
             <Body>
                 <Main>
@@ -165,7 +167,6 @@ export default class DataStatis extends Component {
             leftkeycode: keycode,
             resetkey: ++this.state.resetkey
         });
-        console.log('info', info);
         let sectionsData = [];
         if (keycode) {
             treeList.map((treeData) => {

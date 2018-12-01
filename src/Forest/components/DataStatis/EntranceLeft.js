@@ -5,7 +5,7 @@ import moment from 'moment';
 var echarts = require('echarts');
 const { RangePicker } = DatePicker;
 
-export default class Left extends Component {
+export default class EntranceLeft extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -30,9 +30,6 @@ export default class Left extends Component {
     componentDidMount () {
         let myChart1 = echarts.init(document.getElementById('king'));
         let option1 = {
-            title: {
-                text: '苗木进场总数'
-            },
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -102,7 +99,7 @@ export default class Left extends Component {
         const {
             platform: { tree = {} },
             leftkeycode,
-            actions: { gettreetype }
+            actions: { gettreeEntrance }
         } = this.props;
         const { etime, stime } = this.state;
         if (!leftkeycode) {
@@ -117,7 +114,7 @@ export default class Left extends Component {
         postdata.no = leftkeycode;
         postdata.stime = stime;
         postdata.etime = etime;
-        let rst = await gettreetype({}, postdata);
+        let rst = await gettreeEntrance({}, postdata);
         console.log('aaaaaaaaaaaaaarst', rst);
         let units = [];
         let data = [];
