@@ -15,13 +15,16 @@ import TopRight from './TopRight';
 import MiddleLeft from './MiddleLeft';
 import MiddleMiddle from './MiddleMiddle';
 import MiddleRight from './MiddleRight';
-import BottomTop from './BottomTop';
-import BottomBottom from './BottomBottom';
+import EntranceLeft from './EntranceLeft';
+import EntranceRight from './EntranceRight';
+import PlantLeft from './PlantLeft';
+import PlantRight from './PlantRight';
+import GroupLeft from './GroupLeft';
+import GroupRight from './GroupRight';
+import DataTable from './DataTable';
+
 import { getUser } from '_platform/auth';
 import '../index.less';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
-const { RangePicker } = DatePicker;
 
 export default class DataStatisTable extends Component {
     constructor (props) {
@@ -56,6 +59,7 @@ export default class DataStatisTable extends Component {
             thinclassoption,
             typeoption
         } = this.props;
+        console.log(sectionoption, 'sectionoption');
         const {
             section,
             smallclass,
@@ -65,146 +69,178 @@ export default class DataStatisTable extends Component {
         } = this.state;
         return (
             <div>
-                <Row className='forest-search-layout'>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>标段：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={section}
-                            onChange={this.onSectionChange.bind(this)}
-                        >
-                            {sectionoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>小班：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={smallclass}
-                            onChange={this.onSmallClassChange.bind(this)}
-                        >
-                            {smallclassoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>细班：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={thinclass}
-                            onChange={this.onThinClassChange.bind(this)}
-                        >
-                            {thinclassoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>类型：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={bigType}
-                            onChange={this.onTypeChange.bind(this)}
-                        >
-                            {typeoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>树种：</span>
-                        <Select
-                            allowClear
-                            showSearch
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={treetypename}
-                            onChange={this.onTreeTypeChange.bind(this)}
-                        >
-                            {treetypeoption}
-                        </Select>
-                    </div>
-                    {/* <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'></span>栽植时间：</span>
-                        <RangePicker
-                            style={{ verticalAlign: 'middle' }}
-                            defaultValue={[
-                                moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),
-                                moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')
-                            ]}
-                            className='forest-forestcalcw4'
-                            showTime={{ format: 'HH:mm:ss' }}
-                            format={'YYYY/MM/DD HH:mm:ss'}
-                            onChange={this.datepick.bind(this)}
-                            onOk={this.datepick.bind(this)}
-                        />
-                    </div> */}
-                </Row>
-                <Row style={{marginTop: 10, marginBottom: 10}}>
-                    <Col span={2} >
-                        <Button
-                            type='primary'
-                            onClick={this.query.bind(this)}
-                        >
-                            查询
-                        </Button>
-                    </Col>
-                    <Col span={20} />
-                    <Col span={2} >
-                        <Button
-                            type='primary'
-                            onClick={this.resetinput.bind(this)}
-                        >
-                            重置
-                        </Button>
+                <DataTable {...this.state} {...this.props} />
+                <Row>
+                    <Col span={24}>
+                        <Card style={{marginTop: 10}}>
+                            <Row className='forest-search-layout'>
+                                <div className='forest-mrg10'>
+                                    <span className='forest-search-span'>标段：</span>
+                                    <Select
+                                        allowClear
+                                        className='forest-forestcalcw4'
+                                        defaultValue='全部'
+                                        value={section}
+                                        onChange={this.onSectionChange.bind(this)}
+                                    >
+                                        {sectionoption}
+                                    </Select>
+                                </div>
+                                <div className='forest-mrg10'>
+                                    <span className='forest-search-span'>小班：</span>
+                                    <Select
+                                        allowClear
+                                        className='forest-forestcalcw4'
+                                        defaultValue='全部'
+                                        value={smallclass}
+                                        onChange={this.onSmallClassChange.bind(this)}
+                                    >
+                                        {smallclassoption}
+                                    </Select>
+                                </div>
+                                <div className='forest-mrg10'>
+                                    <span className='forest-search-span'>细班：</span>
+                                    <Select
+                                        allowClear
+                                        className='forest-forestcalcw4'
+                                        defaultValue='全部'
+                                        value={thinclass}
+                                        onChange={this.onThinClassChange.bind(this)}
+                                    >
+                                        {thinclassoption}
+                                    </Select>
+                                </div>
+                                <div className='forest-mrg10'>
+                                    <span className='forest-search-span'>类型：</span>
+                                    <Select
+                                        allowClear
+                                        className='forest-forestcalcw4'
+                                        defaultValue='全部'
+                                        value={bigType}
+                                        onChange={this.onTypeChange.bind(this)}
+                                    >
+                                        {typeoption}
+                                    </Select>
+                                </div>
+                                <div className='forest-mrg10'>
+                                    <span className='forest-search-span'>树种：</span>
+                                    <Select
+                                        allowClear
+                                        showSearch
+                                        className='forest-forestcalcw4'
+                                        defaultValue='全部'
+                                        value={treetypename}
+                                        onChange={this.onTreeTypeChange.bind(this)}
+                                    >
+                                        {treetypeoption}
+                                    </Select>
+                                </div>
+                            </Row>
+                            <Row style={{marginTop: 10, marginBottom: 10}}>
+                                <Col span={2} >
+                                    <Button
+                                        type='primary'
+                                        onClick={this.query.bind(this)}
+                                    >
+                                        查询
+                                    </Button>
+                                </Col>
+                                <Col span={20} />
+                                <Col span={2} >
+                                    <Button
+                                        type='primary'
+                                        onClick={this.resetinput.bind(this)}
+                                    >
+                                        重置
+                                    </Button>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={12}>
+                                    <Card title="栽植量">
+                                        <TopLeft {...this.state} {...this.props} />
+                                    </Card>
+                                </Col>
+                                <Col span={12}>
+                                    <Card title="定位量">
+                                        <TopRight {...this.state} {...this.props} />
+                                    </Card>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Card
+                                    title='树种分布及排名'
+                                    style={{marginTop: 10}}
+                                >
+                                    <Col span={8}>
+                                        <MiddleLeft {...this.state} {...this.props} />
+                                    </Col>
+                                    <Col span={8}>
+                                        <MiddleMiddle {...this.state} {...this.props} />
+                                    </Col>
+                                    <Col span={8}>
+                                        <MiddleRight {...this.state} {...this.props} />
+                                    </Col>
+                                </Card>
+                            </Row>
+                        </Card>
                     </Col>
                 </Row>
                 <Row>
                     <Row>
-                        <Card
-                            title='栽植量与定位量'
-                            style={{marginTop: 10}}
-                        >
-                            <Col span={12}>
-                                <TopLeft {...this.state} {...this.props} />
-                            </Col>
-                            <Col span={12}>
-                                <TopRight {...this.state} {...this.props} />
-                            </Col>
-                        </Card>
+                        <Col span={12}>
+                            <Card
+                                title='苗木进场强度分析'
+                                style={{marginTop: 10}}
+                            >
+                                <EntranceLeft {...this.state} {...this.props} />
+                            </Card>
+                        </Col>
+                        <Col span={12}>
+                            <Card
+                                title='各树种进场强度分析'
+                                style={{marginTop: 10}}
+                            >
+                                <EntranceRight {...this.state} {...this.props} />
+                            </Card>
+                        </Col>
                     </Row>
                     <Row>
-                        <Card
-                            title='树种分布及排名'
-                            style={{marginTop: 10}}
-                        >
-                            <Col span={8}>
-                                <MiddleLeft {...this.state} {...this.props} />
-                            </Col>
-                            <Col span={8}>
-                                <MiddleMiddle {...this.state} {...this.props} />
-                            </Col>
-                            <Col span={8}>
-                                <MiddleRight {...this.state} {...this.props} />
-                            </Col>
-                        </Card>
+                        <Col span={12}>
+                            <Card
+                                title='苗木种植强度分析'
+                                style={{marginTop: 10}}
+                            >
+                                <PlantLeft {...this.state} {...this.props} />
+                            </Card>
+                        </Col>
+                        <Col span={12}>
+                            <Card
+                                title='各标段种植进度分析'
+                                style={{marginTop: 10}}
+                            >
+                                <PlantRight {...this.state} {...this.props} />
+                            </Card>
+                        </Col>
                     </Row>
-                    {/* <Row>
-                        <Card
-                            title='苗木来源情况'
-                            style={{marginTop: 10}}
-                        >
-                            <Row>
-                                <BottomTop {...this.state} {...this.props} />
-                            </Row>
-                            <Row>
-                                <BottomBottom {...this.state} {...this.props} />
-                            </Row>
-                        </Card>
-                    </Row> */}
+                    <Row>
+                        <Col span={12}>
+                            <Card
+                                title='各小班种植进度分析'
+                                style={{marginTop: 10}}
+                            >
+                                <GroupLeft {...this.state} {...this.props} />
+                            </Card>
+                        </Col>
+                        <Col span={12}>
+                            <Card
+                                title='各细班种植进度分析'
+                                style={{marginTop: 10}}
+                            >
+                                <GroupRight {...this.state} {...this.props} />
+                            </Card>
+                        </Col>
+                    </Row>
                 </Row>
             </div>
         );

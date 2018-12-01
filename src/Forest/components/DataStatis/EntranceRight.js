@@ -10,7 +10,7 @@ var echarts = require('echarts');
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
-export default class Right extends Component {
+export default class EntranceRight extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -91,11 +91,11 @@ export default class Right extends Component {
         };
         myChart2.setOption(options2);
         const {
-            actions: { gettreeevery }
+            actions: { getTreeList }
         } = this.props;
         // 获取全部树种信息
-        gettreeevery().then(rst => {
-            console.log('gettreeeveryrst', rst);
+        getTreeList().then(rst => {
+            console.log('getTreeList', rst);
             if (rst && rst instanceof Array) {
                 this.setState({
                     treetypeAll: rst,
@@ -132,7 +132,7 @@ export default class Right extends Component {
         const {
             leftkeycode,
             platform: { tree = {} },
-            actions: { gettreetype }
+            actions: { gettreeEntrance }
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
         const {
@@ -160,7 +160,7 @@ export default class Right extends Component {
             loading: true
         });
 
-        let rst = await gettreetype({}, postdata);
+        let rst = await gettreeEntrance({}, postdata);
         console.log('wwwwwwwwwrst', rst);
         let total = [];
         let data = [];

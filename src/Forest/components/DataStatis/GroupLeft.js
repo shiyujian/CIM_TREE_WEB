@@ -1,27 +1,33 @@
 import React, { Component } from 'react';
 import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { DatePicker, Spin } from 'antd';
+import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
 import { Cards, SumTotal, DateImg } from '../../components';
 import moment from 'moment';
+const RadioGroup = Radio.Group;
+const Option = Select.Option;
+const RadioButton = Radio.Button;
+const { RangePicker } = DatePicker;
 
-export default class MiddleTop extends Component {
+export default class RightTop extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
             loading: false,
             stime: moment().format('YYYY/MM/DD 00:00:00'),
-            etime: moment().format('YYYY/MM/DD 23:59:59')
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
+            section: 'P009-01-01',
+            sectionoption: []
         };
     }
 
     componentDidMount () {
-        var myChart2 = echarts.init(document.getElementById('middleTop'));
-        myChart2.on('click', function (params) {
-            that.onsectionchange(params.name);
+        var myChart3 = echarts.init(document.getElementById('rightTop'));
+        myChart3.on('click', function (params) {
+            that.smallclasschange(params.name);
         });
-        let option2 = {
+        let option3 = {
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -56,70 +62,100 @@ export default class MiddleTop extends Component {
             ],
             series: []
         };
-        myChart2.setOption(option2);
+        myChart3.setOption(option3);
+        this.getSectionoption();
         this.query();
     }
 
+    getSectionoption () {
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let sectionoption = [];
+
+        sectionData.map(project => {
+            // 获取正确的项目
+            if (leftkeycode.indexOf(project.No) > -1) {
+                // 获取项目下的标段
+                let sections = project.children;
+                sections.map((section, index) => {
+                    sectionoption.push(
+                        <Option key={section.No} value={section.No}>
+                            {section.Name}
+                        </Option>
+                    );
+                });
+                this.setState({
+                    section: sections && sections[0] && sections[0].No
+                });
+            }
+        });
+        this.setState({
+            sectionoption
+        });
+    }
+
     componentDidUpdate (prevProps, prevState) {
-        const { etime, stime } = this.state;
+        const { etime, section, stime } = this.state;
         const { leftkeycode } = this.props;
-        if (
-            leftkeycode != prevProps.leftkeycode ||
-            etime != prevState.etime ||
-            stime != prevState.stime
-        ) {
+        if (leftkeycode != prevProps.leftkeycode) {
+            this.getSectionoption();
+        }
+        if (section != prevState.section) {
+            this.query();
+        }
+        if (etime != prevState.etime || stime != prevState.stime) {
+            console.log('RightTopRightTopsection', section);
+            console.log('RightTopRightTopetime', etime);
+            console.log('RightTopRightTopetime', leftkeycode);
             this.query();
         }
     }
 
     async query () {
         const {
-            actions: {    
-                gettreetypeSection
+            actions: {
+                gettreetypeAll,
+                gettreetypeSection,
+                getCountSmall,
+                gettreetypeThinClass
             },
-            leftkeycode,
-            platform: { tree = {} }
+            leftkeycode
         } = this.props;
-        const { etime, stime } = this.state;
-        let sectionData = (tree && tree.bigTreeList) || [];
+        const { stime, etime, section } = this.state;
         let param = {};
 
-        param.no = leftkeycode;
+        param.section = section;
         // param.stime = stime;
         param.etime = etime;
         this.setState({ loading: true });
 
-        let rst = await gettreetypeSection({}, param);
+        let rst = await getCountSmall({}, param);
 
-        console.log('MiddleTopMiddleTopMiddleTop', rst);
+        console.log('RightTopRightTopRightTop', rst);
 
-        let units = ['一标段', '二标段', '三标段', '四标段', '五标段'];
+        let units = ['1小班', '2小班', '3小班', '4小班', '5小班'];
 
         let complete = [];
         let unComplete = [];
         let label = [];
+        let total = [];
 
         if (rst && rst instanceof Array) {
             rst.map(item => {
                 complete.push(item.Complete);
                 unComplete.push(item.UnComplete);
-                sectionData.map(project => {
-                    // 获取正确的项目
-                    if (leftkeycode.indexOf(project.No) > -1) {
-                        // 获取项目下的标段
-                        let sections = project.children;
-                        sections.map((section, index) => {
-                            if (section.No === item.Label) {
-                                label.push(section.Name);
-                            }
-                        });
-                    }
-                });
+                label.push(item.Label + '号小班');
             });
         }
+        console.log('RightTopcompletecomplete', complete);
+        console.log('RightTopunCompleteunComplete', unComplete);
+        console.log('RightToplabellabel', label);
 
-        let myChart2 = echarts.init(document.getElementById('middleTop'));
-        let options2 = {
+        let myChart3 = echarts.init(document.getElementById('rightTop'));
+        let options3 = {
             legend: {
                 data: ['未种植', '已种植']
             },
@@ -161,7 +197,7 @@ export default class MiddleTop extends Component {
                 }
             ]
         };
-        myChart2.setOption(options2);
+        myChart3.setOption(options3);
         this.setState({ loading: false });
     }
 
@@ -170,15 +206,36 @@ export default class MiddleTop extends Component {
 
         return (
             <Spin spinning={this.state.loading}>
-                {/* <Cards search={this.search()} title='各标段种植进度分析'> */}
+                <Cards search={this.search()} title={this.title()}>
                     <div
-                        id='middleTop'
+                        id='rightTop'
                         style={{ width: '100%', height: '260px' }}
                     />
-                {/* </Cards> */}
+                </Cards>
             </Spin>
         );
     }
+    title () {
+        const { section, sectionoption } = this.state;
+        return (
+            <div>
+                <Select
+                    value={section}
+                    onSelect={this.onsectionchange.bind(this)}
+                    style={{ width: '80px' }}
+                >
+                    {sectionoption}
+                </Select>
+                <span>各小班种植进度分析</span>
+            </div>
+        );
+    }
+    onsectionchange (value) {
+        this.setState({
+            section: value
+        });
+    }
+
     search () {
         return (
             <div>

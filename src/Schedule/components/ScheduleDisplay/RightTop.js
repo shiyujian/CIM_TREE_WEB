@@ -231,7 +231,7 @@ export default class Warning extends Component {
             dataListTask = rep;
         })
         this.setState({
-            dataList,
+            dataList: dataList.reverse(),
             dataListReal,
             dataListTask
         }, () => {
