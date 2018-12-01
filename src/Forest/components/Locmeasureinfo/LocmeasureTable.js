@@ -1009,7 +1009,6 @@ export default class LocmeasureTable extends Component {
             status = '',
             size,
             thinclass = '',
-            smallclass = '',
             smallclassData = '',
             thinclassData = '',
             XJFirst = 0,
@@ -1588,7 +1587,6 @@ export default class LocmeasureTable extends Component {
             letime = '',
             exportsize,
             thinclass = '',
-            smallclass = '',
             status = '',
             smallclassData = '',
             thinclassData = ''

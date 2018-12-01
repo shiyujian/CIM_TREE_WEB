@@ -34,22 +34,29 @@ export default class MenuSwitch extends Component {
         if (tabs && tabs.fullScreenState) {
             fullScreenState = tabs.fullScreenState;
         }
-        // 默认选择初始图层
-        await switchDashboardAreaTreeLayer('tileTreeLayerBasic');
+        // 左侧菜单
         // 默认不选择任何菜单
         await switchDashboardMenuType('');
         // 默认不选择任何按钮
         await switchDashboardCompoment('');
+        // 右侧菜单
+        // 视图管理
         // 默认不打开视图菜单
         await switchDashboardFocus('');
         // 默认不选择任何视图
         await setUserMapPositionName('');
+        // 树木信息
+        // 默认不查看树木信息
+        await switchDashboardTreeMess('');
+        // 图层控制
+        // 默认选择初始图层
+        await switchDashboardAreaTreeLayer('tileTreeLayerBasic');
+        // 数据测量
         // 默认不选择数据测量
         await switchDashboardDataMeasurement('');
         // 默认不选择测量图片还是距离
         await switchAreaDistanceMeasureMenu('');
-        // 默认不查看树木信息
-        await switchDashboardTreeMess('');
+        // 区域地块
         // 默认不打开区域地块树
         await switchDashboardRightMenu('');
         const me = this;
@@ -115,28 +122,54 @@ export default class MenuSwitch extends Component {
             dashboardCompomentMenu,
             dashboardDataMeasurement,
             dashboardTreeMess,
+            dashboardRightMenu,
+            dashboardFocus,
             actions: {
                 switchDashboardTreeMess,
                 switchDashboardDataMeasurement,
                 switchAreaDistanceMeasureMenu,
-                switchDashboardAreaTreeLayer
+                switchDashboardAreaTreeLayer,
+                switchDashboardRightMenu,
+                switchDashboardFocus
             }
         } = this.props;
         // 选择成活率，苗木结缘时，不能够点击树木信息开关
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
-            dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+                dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
                 await switchDashboardTreeMess('');
             }
         }
-        // 选择了面积计算，就需要将树木信息取消
-        if (dashboardDataMeasurement && dashboardDataMeasurement === 'dataMeasurement' && dashboardDataMeasurement !== prevProps.dashboardDataMeasurement) {
+        // 选择了数据测量，就需要取消树木信息和区域地块，视图管理
+        if (dashboardDataMeasurement && dashboardDataMeasurement === 'dataMeasurement' &&
+            dashboardDataMeasurement !== prevProps.dashboardDataMeasurement) {
             await switchDashboardTreeMess('');
+            await switchDashboardRightMenu('');
+            await switchDashboardFocus('');
         }
-        // 选择了树木信息，就需要将面积计算取消
-        if (dashboardTreeMess && dashboardTreeMess === 'treeMess' && dashboardTreeMess !== prevProps.dashboardTreeMess) {
+        // 选择了树木信息，就需要取消数据测量和区域地块，视图管理
+        if (dashboardTreeMess && dashboardTreeMess === 'treeMess' &&
+            dashboardTreeMess !== prevProps.dashboardTreeMess) {
             await switchDashboardDataMeasurement('');
             await switchAreaDistanceMeasureMenu('');
+            await switchDashboardRightMenu('');
+            await switchDashboardFocus('');
+        }
+        // 选择了树木信息，就需要取消数据测量和区域地块，视图管理
+        if (dashboardRightMenu && dashboardRightMenu === 'area' &&
+            dashboardRightMenu !== prevProps.dashboardRightMenu) {
+            await switchDashboardDataMeasurement('');
+            await switchAreaDistanceMeasureMenu('');
+            await switchDashboardTreeMess('');
+            await switchDashboardFocus('');
+        }
+        // 选择了视图管理，就需要取消数据测量和区域地块，树木信息
+        if (dashboardFocus && dashboardFocus === 'mapFoucs' &&
+            dashboardFocus !== prevProps.dashboardFocus) {
+            await switchDashboardDataMeasurement('');
+            await switchAreaDistanceMeasureMenu('');
+            await switchDashboardTreeMess('');
+            await switchDashboardRightMenu('');
         }
         // 选择成活率，树种筛选，辅助验收，苗木结缘时，不能够点击图层控制开关
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
@@ -218,7 +251,7 @@ export default class MenuSwitch extends Component {
                 <div className='menuSwitch-menuSwitchRightLayout'>
                     <a className={dashboardFocus === 'mapFoucs' ? 'menuSwitch-rightMenuMapFoucsButtonSelLayout' : 'menuSwitch-rightMenuMapFoucsButtonUnSelLayout'}
                         id='mapFoucs'
-                        title='初始位置'
+                        title='视图管理'
                         onClick={this.handleMapFoucsButton.bind(this)} />
                     <a className={dashboardTreeMess === 'treeMess' ? 'menuSwitch-rightMenuTreeMessButtonSelLayout' : 'menuSwitch-rightMenuTreeMessButtonUnSelLayout'}
                         id='treeMess'
@@ -285,7 +318,7 @@ export default class MenuSwitch extends Component {
             await switchDashboardCompoment(buttonID);
         }
     }
-    // 初始位置
+    // 视图管理
     handleMapFoucsButton = async (e) => {
         const {
             actions: {
@@ -295,10 +328,10 @@ export default class MenuSwitch extends Component {
         } = this.props;
         let target = e.target;
         let buttonID = target.getAttribute('id');
-        if (dashboardFocus !== buttonID) {
-            await switchDashboardFocus(buttonID);
-        } else {
+        if (dashboardFocus === buttonID) {
             await switchDashboardFocus('');
+        } else {
+            await switchDashboardFocus(buttonID);
         }
     }
     // 树木信息
@@ -311,7 +344,8 @@ export default class MenuSwitch extends Component {
             dashboardCompomentMenu
         } = this.props;
         // 当处于成活率和苗木结缘模块时，不能点击
-        if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' || dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+        if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
+            dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
             return;
         }
         let target = e.target;
@@ -365,7 +399,7 @@ export default class MenuSwitch extends Component {
             await switchDashboardDataMeasurement(buttonID);
         }
     }
-    // 右侧菜单
+    // 区域地块
     handleRightMenuButton = async (e) => {
         const {
             actions: {

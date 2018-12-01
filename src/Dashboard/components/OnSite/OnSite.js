@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-30 20:05:42
+ * @Last Modified time: 2018-12-01 10:07:12
  */
 import React, { Component } from 'react';
 import {
@@ -2601,6 +2601,9 @@ class OnSite extends Component {
         } = this.props;
         console.log('view', view);
         await setUserMapPositionName(view.name);
+        console.log('view.zoom', view.zoom);
+        console.log('bbbbbbb');
+        await this.map.setZoom(view.zoom);
         if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
             let center = [view.center[0].lat, view.center[0].lng];
             console.log('center', center);
@@ -2609,9 +2612,6 @@ class OnSite extends Component {
         } else {
             await this.map.panTo(view.center);
         }
-        console.log('view.zoom', view.zoom);
-        console.log('bbbbbbb');
-        await this.map.setZoom(view.zoom);
     }
     // 删除选择的视图
     handleDeleteMapCustomPosition = async (view) => {
