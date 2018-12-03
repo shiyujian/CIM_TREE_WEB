@@ -1,31 +1,15 @@
 import React, { Component } from 'react';
-import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { Icon, Button, Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
-import {
-    TREETYPENO,
-    ECHARTSCOLOR,
-    SCHEDULRPROJECT
-} from '../../../_platform/api';
+import { Icon, Button, Card, DatePicker, Spin } from 'antd';
 import moment from 'moment';
 import XLSX from 'xlsx';
-const RadioGroup = Radio.Group;
-const Option = Select.Option;
-const RadioButton = Radio.Button;
-const { RangePicker } = DatePicker;
 const DATE_FORMAT = 'YYYY/MM/DD';
-const DATE_FORMAT_ = 'YYYY-MM-DD';
 export default class Warning extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
-            stime: '2018/11/22',
-            // stime: moment().format('YYYY/MM/DD'),
-            departOptions: '',
-            treetypeAll: [],
-            gpshtnum: [],
-            times: [],
+            stime: moment().format('YYYY-MM-DD'),
             dataList: [],
             dataListReal: [],
             legendList: ['计划栽植量', '实际栽植量', '实际完成比例'],
@@ -34,33 +18,21 @@ export default class Warning extends Component {
     }
 
     async componentDidMount () {
-        this.handleDate(moment(), this.state.stime);
+        this.query(this.state.stime);
     }
 
     componentDidUpdate (prevProps, prevState) {
-        // debugger
-        const { stime, etime, treetypeAll, project } = this.state;
         const { leftkeycode } = this.props;
         try {
-            if (leftkeycode != prevProps.leftkeycode) {
+            if (leftkeycode !== prevProps.leftkeycode) {
+                this.query(this.state.stime);
             }
         } catch (e) {
             console.log(e);
         }
-        if (
-            stime != prevState.stime ||
-            etime != prevState.etime ||
-            treetypeAll != prevState.treetypeAll
-        ) {
-        }
-        if (project != prevState.project) {
-            this.filterProjectData();
-        }
     }
 
     render () {
-        // todo 累计完成工程量
-
         const { stime } = this.state;
         return (
             <div>
@@ -69,9 +41,9 @@ export default class Warning extends Component {
                         选择日期：
                         <DatePicker
                             defaultValue={moment(stime, DATE_FORMAT)}
-                            onChange={this.handleDate.bind(this)}
+                            onChange={this.handleChangeDate.bind(this)}
                         />
-                        <Button type="primary" style={{marginLeft: 50}} onClick={this.toExport.bind(this)}>导出<Icon type="download" /></Button>
+                        <Button type='primary' style={{ marginLeft: 50 }} onClick={this.toExport.bind(this)}>导出<Icon type='download' /></Button>
                         <div
                             id='lefttop'
                             style={{ width: '100%', height: '340px' }}
@@ -81,11 +53,18 @@ export default class Warning extends Component {
             </div>
         );
     }
-    toExport() {
+    handleChangeDate = async (value, dateString) => {
+        this.setState({
+            stime: moment(value._d).format('YYYY-MM-DD')
+        }, () => {
+            this.query(this.state.stime);
+        });
+    }
+    toExport () {
         const {
-            dataList,
-            dataListReal,
-            legendList
+            dataList = [],
+            dataListReal = [],
+            legendList = []
         } = this.state;
 
         let tblData = [];
@@ -95,41 +74,40 @@ export default class Warning extends Component {
         let yRatioData = [];
         dataList.map(item => {
             dataListReal.map(row => {
-                if(item.Section === row.Section) {
+                if (item.Section === row.Section) {
                     xAxisData.push(item.Section);
                     yPlantData.push(item.Num);
                     yRealData.push(row.Num);
-                    let ratio = row.Num / item.Num * 100;
+                    let ratio = (row.Num / item.Num * 100).toFixed(2);
                     yRatioData.push(ratio);
                 }
-            })
+            });
         });
-        console.log('9999',yPlantData[0]);
         legendList.map(item => {
             let obj = {};
             xAxisData.map((row, col) => {
-                if(item === '计划栽植量') {
+                if (item === '计划栽植量') {
                     obj[row] = yPlantData[col];
                 } else if (item === '实际栽植量') {
                     obj[row] = yRealData[col];
                 } else {
                     obj[row] = yRatioData[col];
                 }
-            })
+            });
             tblData.push({
                 '标段': item,
                 ...obj
             });
         });
-        
+
         console.log('tblData', tblData);
         let _headers = ['标段', ...xAxisData];
         let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
-            .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
         console.log('headers', headers);
         let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
             .reduce((prev, next) => prev.concat(next))
-            .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
         console.log('testttt', testttt);
         let output = Object.assign({}, headers, testttt);
         console.log('output', output);
@@ -148,47 +126,55 @@ export default class Warning extends Component {
         };
         XLSX.writeFile(wb, 'output.xlsx');
     }
-    async handleDate(date, dateString) {
-        let { dataList, dataListReal, stime } = this.state;
+    async query (dateString) {
+        let { dataList, dataListReal } = this.state;
         const { leftkeycode } = this.props;
         const { getTreedayplans, getTreetotalstatbyday } = this.props.actions;
-        // 获取计划栽植量
-        let etime = dateString + ' 23:59:59';
-        await getTreedayplans({}, {
-            section: leftkeycode,
-            stime: dateString,
-            etime: etime
-        }).then(rep => {
-            if(rep.code === 200) {
-                dataList = rep.content;
-                stime = dateString;
-            }
-        });
-        // 获取实际栽植量
-        await getTreetotalstatbyday({}, {
-            section: leftkeycode,
-            stime: dateString,
-            etime: etime
-        }).then(rep => {
-            dataListReal = rep;
-        });
-        this.setState({
-            dataList: dataList,
-            dataListReal: dataListReal,
-            stime: stime
-        }, () => {
-            // 更新表格
-            this.filterProjectData();
-        });
+        try {
+            this.setState({
+                loading: true
+            });
+            // 获取计划栽植量
+            await getTreedayplans({}, {
+                section: leftkeycode,
+                stime: dateString + ' 00:00:00',
+                etime: dateString + ' 23:59:59'
+            }).then(rep => {
+                if (rep && rep.code && rep.code === 200) {
+                    dataList = rep.content;
+                }
+            });
+            // 获取实际栽植量
+            await getTreetotalstatbyday({}, {
+                section: leftkeycode,
+                stime: dateString + ' 00:00:00',
+                etime: dateString + ' 23:59:59'
+            }).then(rep => {
+                dataListReal = rep;
+            });
+            this.setState({
+                dataList: dataList,
+                dataListReal: dataListReal,
+                loading: false
+            }, () => {
+                // 更新表格
+                this.filterProjectData();
+            });
+        } catch (e) {
+            console.log('query', e);
+        }
     }
 
     // 根据项目筛选数据
     filterProjectData () {
         const {
-            dataList,
-            dataListReal,
-            legendList
+            dataList = [],
+            dataListReal = [],
+            legendList = []
         } = this.state;
+        const {
+            sectionsData
+        } = this.props;
 
         let xAxisData = [];
         let yPlantData = [];
@@ -196,14 +182,18 @@ export default class Warning extends Component {
         let yRatioData = [];
         dataList.map(item => {
             dataListReal.map(row => {
-                if(item.Section === row.Section) {
-                    xAxisData.push(item.Section);
+                if (item.Section === row.Section) {
+                    sectionsData.map((sectionData) => {
+                        if (item.Section === sectionData.No) {
+                            xAxisData.push(sectionData.Name);
+                        }
+                    });
                     yPlantData.push(item.Num);
                     yRealData.push(row.Num);
-                    let ratio = row.Num / item.Num * 100;
+                    let ratio = (row.Num / item.Num * 100).toFixed(2);
                     yRatioData.push(ratio);
                 }
-            })
+            });
         });
         console.log(xAxisData, yPlantData, yRealData, yRatioData, '未来栽植量');
 

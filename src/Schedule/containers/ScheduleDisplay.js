@@ -4,12 +4,13 @@ import { DynamicTitle, Sidebar, Content } from '_platform/components/layout';
 import { connect } from 'react-redux';
 
 import { bindActionCreators } from 'redux';
-import { Row, Col } from 'antd';
+import { Row, Col, Select } from 'antd';
 import LeftTop from '../components/ScheduleDisplay/LeftTop';
 import RightTop from '../components/ScheduleDisplay/RightTop';
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import * as actions from '../store/ScheduleDisplay';
+const Option = Select.Option;
 @connect(
     state => {
         const {
@@ -31,7 +32,9 @@ export default class ScheduleDisplay extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            leftkeycode: ''
+            leftkeycode: '',
+            sectionsData: [],
+            sectionoption: []
         };
     }
     async componentDidMount () {
@@ -41,17 +44,54 @@ export default class ScheduleDisplay extends Component {
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
+            await this.onSelect(['P018']);
+        } else {
+            await this.onSelect(['P018']);
         }
     }
 
     // 树选择
-    onSelect (value = []) {
+    onSelect = async (value = []) => {
         let keycode = value[0] || '';
         const {
-            actions: { setkeycode }
+            actions: { setkeycode },
+            platform: { tree = {} }
         } = this.props;
-        setkeycode(keycode);
-        this.setState({ leftkeycode: keycode });
+        let treeList = (tree && tree.bigTreeList) || [];
+        await setkeycode(keycode);
+        let sectionsData = [];
+        if (keycode) {
+            treeList.map((treeData) => {
+                if (keycode === treeData.No) {
+                    sectionsData = treeData.children;
+                }
+            });
+        }
+        await this.setState({
+            leftkeycode: keycode,
+            sectionsData
+        });
+        await this.setSectionOption(sectionsData);
+    }
+
+    // 设置标段选项
+    setSectionOption (rst) {
+        let sectionOptions = [];
+        try {
+            console.log('rst', rst);
+            if (rst instanceof Array) {
+                rst.map(sec => {
+                    sectionOptions.push(
+                        <Option key={sec.No} value={sec.No} title={sec.Name}>
+                            {sec.Name}
+                        </Option>
+                    );
+                });
+                this.setState({ sectionoption: sectionOptions });
+            }
+        } catch (e) {
+            console.log('e', e);
+        }
     }
 
     render () {

@@ -77,8 +77,9 @@ class WeekPlan extends Component {
         console.log('sections', sections);
         let currentSectionName = '';
         let projectName = '';
+        let section = '';
         if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
+            section = sections[0];
             console.log('section', section);
             let code = section.split('-');
             if (code && code.length === 3) {
@@ -96,13 +97,13 @@ class WeekPlan extends Component {
                     }
                 });
             }
-            this.setState({
-                currentSection: section,
-                currentSectionName: currentSectionName,
-                projectName: projectName,
-                user
-            });
         }
+        this.setState({
+            currentSection: section,
+            currentSectionName: currentSectionName,
+            projectName: projectName,
+            user
+        });
     }
     // 获取周计划进度流程信息
     gettaskSchedule = async () => {
@@ -472,6 +473,8 @@ class WeekPlan extends Component {
     }
     // 多选按钮
     onSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys', selectedRowKeys);
+        console.log('selectedRows', selectedRows);
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     };
     // 设置开始时间
@@ -695,50 +698,82 @@ class WeekPlan extends Component {
         const {
             actions: { deleteFlow }
         } = this.props;
-        const { dataSourceSelected } = this.state;
-        if (dataSourceSelected.length === 0) {
-            notification.warning({
-                message: '请先选择数据！',
-                duration: 3
-            });
-        } else {
-            let user = getUser();
-            let username = user.username;
-
-            if (username !== 'admin') {
+        const {
+            dataSourceSelected,
+            user
+        } = this.state;
+        try {
+            if (dataSourceSelected.length === 0) {
                 notification.warning({
-                    message: '非管理员不得删除！',
+                    message: '请先选择数据！',
                     duration: 3
                 });
-                return;
-            }
+            } else {
+                let username = user.username;
 
-            let flowArr = dataSourceSelected.map(data => {
-                if (data && data.id) {
-                    return data.id;
+                if (username !== 'admin') {
+                    notification.warning({
+                        message: '非管理员不得删除！',
+                        duration: 3
+                    });
+                    return;
                 }
-            });
 
-            let promises = flowArr.map(flow => {
-                let data = flow;
-                let postdata = {
-                    pk: data
-                };
-                return deleteFlow(postdata);
-            });
+                let flowArr = dataSourceSelected.map(data => {
+                    if (data && data.id) {
+                        return data.id;
+                    }
+                });
 
-            Promise.all(promises).then(rst => {
-                console.log('rst', rst);
-                notification.success({
-                    message: '删除流程成功',
-                    duration: 3
+                let promises = flowArr.map(flow => {
+                    let data = flow;
+                    let postdata = {
+                        pk: data
+                    };
+                    return deleteFlow(postdata);
                 });
-                this.setState({
-                    selectedRowKeys: [],
-                    dataSourceSelected: []
+                Promise.all(promises).then(rst => {
+                    console.log('rst', rst);
+                    // 是否删除失败
+                    let errorStatus = false;
+                    // 删除失败的顺序码
+                    let errorArr = [];
+                    rst.map((data, index) => {
+                        if (data) {
+                            errorStatus = true;
+                            errorArr.push(index + 1);
+                        }
+                    });
+                    // 存在删除失败
+                    if (errorStatus) {
+                        let stringData = '';
+                        // 将删除失败的顺序码数组进行组合
+                        errorArr.map((data, index) => {
+                            if (index === 0) {
+                                stringData = stringData + data;
+                            } else {
+                                stringData = stringData + ',' + data;
+                            }
+                        });
+                        notification.error({
+                            message: `第${stringData}条流程删除失败`,
+                            duration: 3
+                        });
+                    } else {
+                        notification.success({
+                            message: '删除流程成功',
+                            duration: 3
+                        });
+                    }
+                    this.setState({
+                        selectedRowKeys: [],
+                        dataSourceSelected: []
+                    });
+                    this.gettaskSchedule();
                 });
-                this.gettaskSchedule();
-            });
+            }
+        } catch (e) {
+            console.log('deleteClick', e);
         }
     };
     // 操作--查看

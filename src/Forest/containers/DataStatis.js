@@ -304,7 +304,7 @@ export default class DataStatis extends Component {
 
     // 类型选择, 重新获取: 树种
     typeselect (value) {
-        const { treetypes } = this.props;
+        const { treetypes = [] } = this.props;
         this.setState({ bigType: value });
         let selectTreeType = [];
         treetypes.map(item => {
