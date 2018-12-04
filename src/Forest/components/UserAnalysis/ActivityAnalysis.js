@@ -14,7 +14,10 @@ export default class ActivityAnalysis extends Component {
             etime: moment().subtract(1, 'days').format('YYYY-MM-DD'),
             loading: false,
             dateType: 'week',
-            tabKey: 'DAU'
+            tabKey: 'DAU',
+            DayUv: 0,
+            WeekUv: 0,
+            MonthUv: 0
         };
         this.dateTypeList = [
             {
@@ -33,89 +36,152 @@ export default class ActivityAnalysis extends Component {
     }
 
     componentDidMount = async () => {
-        await this.query();
+        await this.query(1);
     }
 
     render () {
         const {
             dateType,
-            loading
+            loading,
+            DayUv,
+            WeekUv,
+            MonthUv
         } = this.state;
         return (
-            <div className='UserAnalysis-mod_basic'>
-                <div style={{margin: 5}}>
-                    <RangePicker
-                        style={{ verticalAlign: 'middle' }}
-                        value={[
-                            moment(this.state.stime, 'YYYY-MM-DD'),
-                            moment(this.state.etime, 'YYYY-MM-DD')
-                        ]}
-                        format={'YYYY-MM-DD'}
-                        onChange={this.datepick.bind(this)}
-                        onOk={this.datepick.bind(this)}
-                    />
-                    {
-                        this.dateTypeList.map((data) => {
-                            if (dateType === data.type) {
-                                return (<span style={{marginLeft: 15}}>
-                                    {data.value}
-                                </span>);
-                            } else {
-                                return (
-                                    <a style={{marginLeft: 15}}
-                                        onClick={this.handleChangeDateType.bind(this, data.type)}
-                                    >
+            <div>
+                <div>
+                    <h2>昨日数据</h2>
+                </div>
+                <div className='UserAnalysis-mod_basic'>
+                    <div className='UserAnalysis-mod-title'>
+                        <h3 className='UserAnalysis-mod-title-h3'>昨日关键指标</h3>
+                    </div>
+                    <div className='UserAnalysis-table-content'>
+                        <table className='UserAnalysis-table-layout'>
+                            <tr>
+                                <td className='UserAnalysis-table-border'>
+                                    <div className='UserAnalysis-table-pad'>
+                                        <div className='UserAnalysis-table-title'>
+                                            DAU(日活跃用户数)
+                                        </div>
+                                        <div className='UserAnalysis-table-num'>
+                                            {DayUv}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className='UserAnalysis-table-border'>
+                                    <div className='UserAnalysis-table-pad'>
+                                        <div className='UserAnalysis-table-title'>
+                                            WAU(周活跃用户数)
+                                        </div>
+                                        <div className='UserAnalysis-table-num'>
+                                            {WeekUv}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className='UserAnalysis-table-border'>
+                                    <div className='UserAnalysis-table-pad'>
+                                        <div className='UserAnalysis-table-title'>
+                                            MAU(月活跃用户数)
+                                        </div>
+                                        <div className='UserAnalysis-table-num'>
+                                            {MonthUv}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className='UserAnalysis-table-border'>
+                                    <div className='UserAnalysis-table-pad'>
+                                        <div className='UserAnalysis-table-title'>
+                                            DAU/MAU
+                                        </div>
+                                        <div className='UserAnalysis-table-num'>
+                                            {(DayUv / MonthUv).toFixed(2)}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div style={{marginTop: 15}}>
+                    <h2>历史数据</h2>
+                </div>
+                <div className='UserAnalysis-mod_basic'>
+                    <div style={{margin: 5}}>
+                        <RangePicker
+                            style={{ verticalAlign: 'middle' }}
+                            value={[
+                                moment(this.state.stime, 'YYYY-MM-DD'),
+                                moment(this.state.etime, 'YYYY-MM-DD')
+                            ]}
+                            format={'YYYY-MM-DD'}
+                            onChange={this.datepick.bind(this)}
+                            onOk={this.datepick.bind(this)}
+                        />
+                        {
+                            this.dateTypeList.map((data) => {
+                                if (dateType === data.type) {
+                                    return (<span style={{marginLeft: 15}}>
                                         {data.value}
-                                    </a>
-                                );
-                            }
-                        })
-                    }
+                                    </span>);
+                                } else {
+                                    return (
+                                        <a style={{marginLeft: 15}}
+                                            onClick={this.handleChangeDateType.bind(this, data.type)}
+                                        >
+                                            {data.value}
+                                        </a>
+                                    );
+                                }
+                            })
+                        }
+                    </div>
+                    <div style={{margin: 5}}>
+                        <Tabs tabBarGutter='10' onChange={this.handleTabChangele.bind(this)}>
+                            <TabPane tab='DAU(日活跃用户)' key='DAU'>
+                                <Spin spinning={loading}>
+                                    <div
+                                        id='echartsDAU'
+                                        style={{ width: '100%', height: '300px' }}
+                                    />
+                                </Spin>
+                            </TabPane>
+                            <TabPane tab='WAU(周活跃用户)' key='WAU'>
+                                <Spin spinning={loading}>
+                                    <div
+                                        id='echartsWAU'
+                                        style={{ width: '100%', height: '300px' }}
+                                    />
+                                </Spin>
+                            </TabPane>
+                            <TabPane tab='DAU/WAU' key='DAU/WAU'>
+                                <Spin spinning={loading}>
+                                    <div
+                                        id='echartsDAU/WAU'
+                                        style={{ width: '100%', height: '300px' }}
+                                    />
+                                </Spin>
+                            </TabPane>
+                            <TabPane tab='MAU(月活跃用户)' key='MAU'>
+                                <Spin spinning={loading}>
+                                    <div
+                                        id='echartsMAU'
+                                        style={{ width: '100%', height: '300px' }}
+                                    />
+                                </Spin>
+                            </TabPane>
+                            <TabPane tab='DAU/MAU' key='DAU/MAU'>
+                                <Spin spinning={loading}>
+                                    <div
+                                        id='echartsDAU/MAU'
+                                        style={{ width: '100%', height: '300px' }}
+                                    />
+                                </Spin>
+                            </TabPane>
+                        </Tabs>
+                    </div>
                 </div>
-                <div style={{margin: 5}}>
-                    <Tabs tabBarGutter='10' onChange={this.handleTabChangele.bind(this)}>
-                        <TabPane tab='DAU(日活跃用户)' key='DAU'>
-                            <Spin spinning={loading}>
-                                <div
-                                    id='echartsDAU'
-                                    style={{ width: '100%', height: '300px' }}
-                                />
-                            </Spin>
-                        </TabPane>
-                        <TabPane tab='WAU(周活跃用户)' key='WAU'>
-                            <Spin spinning={loading}>
-                                <div
-                                    id='echartsWAU'
-                                    style={{ width: '100%', height: '300px' }}
-                                />
-                            </Spin>
-                        </TabPane>
-                        <TabPane tab='DAU/WAU' key='DAU/WAU'>
-                            <Spin spinning={loading}>
-                                <div
-                                    id='echartsDAU/WAU'
-                                    style={{ width: '100%', height: '300px' }}
-                                />
-                            </Spin>
-                        </TabPane>
-                        <TabPane tab='MAU(月活跃用户)' key='MAU'>
-                            <Spin spinning={loading}>
-                                <div
-                                    id='echartsMAU'
-                                    style={{ width: '100%', height: '300px' }}
-                                />
-                            </Spin>
-                        </TabPane>
-                        <TabPane tab='DAU/MAU' key='DAU/MAU'>
-                            <Spin spinning={loading}>
-                                <div
-                                    id='echartsDAU/MAU'
-                                    style={{ width: '100%', height: '300px' }}
-                                />
-                            </Spin>
-                        </TabPane>
-                    </Tabs>
-                </div>
+
             </div>
         );
     }
@@ -174,7 +240,7 @@ export default class ActivityAnalysis extends Component {
         }
     }
 
-    query = async () => {
+    query = async (times) => {
         const {
             stime,
             etime,
@@ -201,6 +267,15 @@ export default class ActivityAnalysis extends Component {
             if (data && data.ret_msg && data.ret_msg === 'success') {
                 let content = data.ret_data;
                 console.log('data', data);
+                if (times) {
+                    let yesterdayData = content[etime];
+                    console.log('yesterdayData', yesterdayData);
+                    this.setState({
+                        DayUv: yesterdayData.DayUv,
+                        WeekUv: yesterdayData.WeekUv,
+                        MonthUv: yesterdayData.WeekUv
+                    });
+                }
                 this.setState({
                     content
                 }, () => {
@@ -321,7 +396,7 @@ export default class ActivityAnalysis extends Component {
         } else if (tabKey === 'DAU/WAU') {
             let yGrandData = [];
             for (let i in content) {
-                yGrandData.push(content[i].DayUv / content[i].WeekUv);
+                yGrandData.push((content[i].DayUv / content[i].WeekUv).toFixed(2));
             }
             const myChart = echarts.init(document.getElementById('echartsDAU/WAU'));
             let optionLine = {
@@ -407,7 +482,7 @@ export default class ActivityAnalysis extends Component {
         } else if (tabKey === 'DAU/MAU') {
             let yGrandData = [];
             for (let i in content) {
-                yGrandData.push(content[i].DayUv / content[i].MonthUv);
+                yGrandData.push((content[i].DayUv / content[i].MonthUv).toFixed(2));
             }
             const myChart = echarts.init(document.getElementById('echartsDAU/MAU'));
             let optionLine = {

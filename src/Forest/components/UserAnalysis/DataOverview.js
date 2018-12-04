@@ -85,7 +85,6 @@ export default class DataOverview extends Component {
                                 </td>
                             </tr>
                         </table>
-
                     </div>
                 </div>
                 <div style={{marginTop: 15}}>
