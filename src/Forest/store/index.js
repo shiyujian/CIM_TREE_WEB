@@ -3,7 +3,7 @@ import createFetchAction from './fetchAction';
 import { createFetchActionWithHeaders as myFetch } from './fetchAction';
 //
 import faithInfoReducer, { actions as faithActions } from './faithInfo';
-import { FOREST_API, FOREST_SYSTEM } from '_platform/api';
+import { FOREST_API, FOREST_SYSTEM, TENCENTANALYSIS_API } from '_platform/api';
 import { actionsMap } from '_platform/store/util';
 const ID = 'forest';
 
@@ -246,6 +246,27 @@ export const getTreeStatuss = createFetchAction(
     []
 );
 
+// 获取腾讯移动数据分析实时数据
+export const getTencentRealTimeUser = createFetchAction(
+    `${TENCENTANALYSIS_API}/TencentAPIHandler.ashx?action=realtimeuser`,
+    []
+);
+// 获取腾讯移动数据分析历史数据
+export const getTencentOffLineUser = createFetchAction(
+    `${TENCENTANALYSIS_API}/TencentAPIHandler.ashx?action=offlineuser`,
+    []
+);
+// 获取腾讯移动数据分析用户行为数据
+export const getTencentOffLineActive = createFetchAction(
+    `${TENCENTANALYSIS_API}/TencentAPIHandler.ashx?action=offlineactive`,
+    []
+);
+// 获取腾讯移动数据分析用户时长数据
+export const getTencentOffLineAusage = createFetchAction(
+    `${TENCENTANALYSIS_API}/TencentAPIHandler.ashx?action=offlineausage`,
+    []
+);
+
 export const actions = {
     getTotalSat,
     getTreeLocations,
@@ -306,7 +327,11 @@ export const actions = {
     getTreePlanting,
     getLocationStat,
     getStatByTreetype,
-    getTreeStatuss
+    getTreeStatuss,
+    getTencentRealTimeUser,
+    getTencentOffLineUser,
+    getTencentOffLineActive,
+    getTencentOffLineAusage
 };
 export default handleActions(
     {

@@ -875,14 +875,23 @@ class TreeMessModal extends Component {
                                     })
                                     : ''}
                                 <div>
-                                    <div
+                                    <Row
                                         style={{
                                             marginTop: '10px'
                                         }}
                                     >
-                                        <h3>{'苗圃提交'}</h3>
-                                    </div>
-                                    <div
+                                        <h3 style={{float: 'left'}}>{'苗圃提交'}</h3>
+                                        <div
+                                            style={{
+                                                float: 'right'
+                                            }}
+                                        >
+                                            {seedlingMess.CreateTime
+                                                ? seedlingMess.CreateTime
+                                                : ''}
+                                        </div>
+                                    </Row>
+                                    <Row
                                         style={{
                                             marginTop: '10px'
                                         }}
@@ -898,7 +907,7 @@ class TreeMessModal extends Component {
                                                 ? seedlingMess.Factory
                                                 : ''
                                         }`}
-                                    </div>
+                                    </Row>
                                 </div>
                             </div>
                         </TabPane>

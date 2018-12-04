@@ -12,3 +12,4 @@ export SeedlingsChange from './SeedlingsChange';
 export CuringInfo from './CuringInfo';
 export DataStatis from './DataStatis';
 export TreeAdoptInfo from './TreeAdoptInfo';
+export UserAnalysis from './UserAnalysis';

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-25 10:51:59
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-19 10:33:57
+ * @Last Modified time: 2018-12-04 15:55:57
  */
 /**
  *
@@ -60,7 +60,8 @@ export default class ForestContainer extends Component {
             SeedlingsChange = null,
             CuringInfo = null,
             DataStatis = null,
-            TreeAdoptInfo = null
+            TreeAdoptInfo = null,
+            UserAnalysis = null
         } = this.state || {};
         return (
             <Body>
@@ -165,16 +166,22 @@ export default class ForestContainer extends Component {
                             component={CuringInfo}
                         />
                     )}
+                    {TreeAdoptInfo && (
+                        <Route
+                            path='/forest/treeadoptinfo'
+                            component={TreeAdoptInfo}
+                        />
+                    )}
                     {DataStatis && (
                         <Route
                             path='/forest/datastatis'
                             component={DataStatis}
                         />
                     )}
-                    {TreeAdoptInfo && (
+                    {UserAnalysis && (
                         <Route
-                            path='/forest/treeadoptinfo'
-                            component={TreeAdoptInfo}
+                            path='/forest/useranalysis'
+                            component={UserAnalysis}
                         />
                     )}
                 </Main>
@@ -285,21 +292,27 @@ export default class ForestContainer extends Component {
 
     static menus = [
         {
-            key: 'info',
-            id: 'FOREST.INFO',
-            name: '苗木综合信息',
+            key: 'nursoverallinfo',
+            id: 'FOREST.NURSOVERALLINFO',
+            path: '/forest/nursoverallinfo',
+            name: '苗木综合信息'
+        },
+        {
+            key: 'statis',
+            id: 'FOREST.STATIS',
+            name: '统计图表',
             children: [
-                {
-                    key: 'nursoverallinfo',
-                    id: 'FOREST.NURSOVERALLINFO',
-                    path: '/forest/nursoverallinfo',
-                    name: '苗木综合信息'
-                },
                 {
                     key: 'datastatis',
                     id: 'FOREST.DATASTATIS',
                     path: '/forest/datastatis',
                     name: '数据统计'
+                },
+                {
+                    key: 'useranalysis',
+                    id: 'FOREST.USERANALYSIS',
+                    path: '/forest/useranalysis',
+                    name: '用户行为统计'
                 }
             ]
         },
@@ -385,5 +398,5 @@ export default class ForestContainer extends Component {
             ]
         }
     ];
-    static defaultOpenKeys = ['info'];
+    static defaultOpenKeys = ['statis'];
 }

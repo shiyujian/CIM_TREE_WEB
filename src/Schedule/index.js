@@ -61,13 +61,13 @@ export default class Schedule extends Component {
                             component={ScheduleAnalyze}
                         />
                     )}
-                    {ScheduleReport && (
+                    {/* {ScheduleReport && (
                         <Route
                             exact
                             path='/schedule/schedulereport'
                             component={ScheduleReport}
                         />
-                    )}
+                    )} */}
                     {ScheduleDisplay && (
                         <Route
                             exact
@@ -95,13 +95,13 @@ export default class Schedule extends Component {
             path: '/schedule/progress',
             icon: <Icon name='warning' />
         },
-        {
-            key: 'schedulereport',
-            id: 'SCHEDULE.SCHEDULEREPORT',
-            name: '每周进度',
-            path: '/schedule/schedulereport',
-            icon: <Icon name='suitcase' />
-        },
+        // {
+        //     key: 'schedulereport',
+        //     id: 'SCHEDULE.SCHEDULEREPORT',
+        //     name: '每周进度',
+        //     path: '/schedule/schedulereport',
+        //     icon: <Icon name='suitcase' />
+        // },
         {
             key: 'scheduledisplay',
             id: 'SCHEDULE.SCHEDULEDISPLAY',

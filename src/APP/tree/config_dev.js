@@ -57,6 +57,8 @@ window.config = {
     previewWord_API: 'http://docs.ecidi.com:6500/view/url?url=',
     // 高德地图逆地理编码
     LBSAMAP: 'https://restapi.amap.com',
+    // 腾讯移动分析
+    TENCENTANALYSIS: 'http://47.104.159.127',
 
     // 领导带班服务,安全监测动态加载模板
     Leader_Class_URL: 'http://10.215.160.38:6592',

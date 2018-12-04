@@ -3,14 +3,12 @@ import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import './Schedule.less';
-import { Actual, Total, Plan } from '../components/Stage';
+import { Actual, Total, WeekPlan } from '../components/Stage';
 import { PkCodeTree } from '../components';
+import { Spin, Tabs } from 'antd';
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
 import { actions } from '../store/stage';
-import {
-    Tabs
-} from 'antd';
 const TabPane = Tabs.TabPane;
 
 @connect(
@@ -36,7 +34,8 @@ export default class Stage extends Component {
         this.state = {
             treetyoption: [],
             treeLists: [],
-            leftkeycode: ''
+            leftkeycode: '',
+            loading: true
         };
     }
 
@@ -49,12 +48,21 @@ export default class Stage extends Component {
         } = this.props;
 
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
-            await getTreeNodeList();
+            let data = await getTreeNodeList();
+            if (data && data instanceof Array && data.length > 0) {
+                this.setState({
+                    loading: false
+                });
+            }
+        } else {
+            this.setState({
+                loading: false
+            });
         }
     }
 
     render () {
-        const { leftkeycode } = this.state;
+        const { leftkeycode, loading } = this.state;
         const {
             platform: { tree = {} }
         } = this.props;
@@ -66,37 +74,44 @@ export default class Stage extends Component {
         return (
             <div>
                 <DynamicTitle title='进度填报' {...this.props} />
-                <Sidebar>
-                    <div
-                        style={{ overflow: 'hidden' }}
-                        className='project-tree'
-                    >
-                        <PkCodeTree
-                            treeData={treeList}
-                            selectedKeys={leftkeycode}
-                            onSelect={this.onSelect.bind(this)}
-                            // onExpand={this.onExpand.bind(this)}
-                        />
-                    </div>
-                </Sidebar>
-                <Content>
-                    <div>
-                        <Tabs>
-                            <TabPane tab='总计划进度' key='1'>
-                                <Total {...this.props} {...this.state} />
-                            </TabPane>
-                            <TabPane tab='每日计划进度' key='2'>
-                                <Plan {...this.props} {...this.state} />
-                            </TabPane>
-                            <TabPane tab='每日实际进度' key='3'>
-                                <Actual
-                                    {...this.props}
-                                    {...this.state}
-                                />
-                            </TabPane>
-                        </Tabs>
-                    </div>
-                </Content>
+                {
+                    loading
+                        ? <Spin spinning={loading} tip='Loading...' />
+                        : <div>
+                            <Sidebar>
+                                <div
+                                    style={{ overflow: 'hidden' }}
+                                    className='project-tree'
+                                >
+                                    <PkCodeTree
+                                        treeData={treeList}
+                                        selectedKeys={leftkeycode}
+                                        onSelect={this.onSelect.bind(this)}
+                                    // onExpand={this.onExpand.bind(this)}
+                                    />
+                                </div>
+                            </Sidebar>
+                            <Content>
+                                <div>
+                                    <Tabs>
+                                        <TabPane tab='总计划进度' key='1'>
+                                            <Total {...this.props} {...this.state} />
+                                        </TabPane>
+                                        <TabPane tab='每周计划进度' key='2'>
+                                            <WeekPlan {...this.props} {...this.state} />
+                                        </TabPane>
+                                        <TabPane tab='每日实际进度' key='3'>
+                                            <Actual
+                                                {...this.props}
+                                                {...this.state}
+                                            />
+                                        </TabPane>
+                                    </Tabs>
+                                </div>
+                            </Content>
+                        </div>
+                }
+
             </div>
         );
     }

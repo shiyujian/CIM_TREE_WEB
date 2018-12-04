@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-04 14:46:37
+ * @Last Modified time: 2018-12-04 21:20:59
  */
 /**
  *
@@ -80,6 +80,8 @@ export const NODE_FILE_EXCHANGE_API = window.config.NODE_FILE_STATIC_URL;
 // 高德地图逆坐标查询
 export const LBSAMAP_API = window.config.LBSAMAP;
 export const LBSAMAP_KEY = '8325164e247e15eea68b59e89200988b';
+// 腾讯移动分析
+export const TENCENTANALYSIS_API = window.config.TENCENTANALYSIS;
 // FDBServer API
 export const FDBSERVICE_API = `${window.config.FDBServer_API}`;
 export const SAFETY_MONITOR = `${base}/service/appserver`;
@@ -589,10 +591,6 @@ export const MODULES = [
                 name: '项目进度'
             },
             {
-                id: 'SCHEDULE.SCHEDULEREPORT',
-                name: '每周进度'
-            },
-            {
                 id: 'SCHEDULE.SCHEDULEDISPLAY',
                 name: '进度展示'
             },
@@ -655,16 +653,20 @@ export const MODULES = [
         name: '森林大数据',
         children: [
             {
-                id: 'FOREST.INFO.NONE',
-                name: '苗木综合信息',
+                id: 'FOREST.NURSOVERALLINFO',
+                name: '苗木综合信息'
+            },
+            {
+                id: 'FOREST.STATIS.NONE',
+                name: '统计图表',
                 children: [
-                    {
-                        id: 'FOREST.NURSOVERALLINFO',
-                        name: '苗木综合信息'
-                    },
                     {
                         id: 'FOREST.DATASTATIS',
                         name: '数据统计'
+                    },
+                    {
+                        id: 'FOREST.USERANALYSIS',
+                        name: '用户行为统计'
                     }
                 ]
             },

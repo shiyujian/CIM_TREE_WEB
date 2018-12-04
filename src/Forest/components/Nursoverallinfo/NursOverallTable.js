@@ -1127,8 +1127,8 @@ export default class NursOverallTable extends Component {
                     ? nurserysData.InputerObj
                     : '',
                 Info: '',
-                CreateTime: nurserysData.LifterTime
-                    ? nurserysData.LifterTime
+                CreateTime: nurserysData.CreateTime
+                    ? nurserysData.CreateTime
                     : ''
             });
         } catch (e) {}

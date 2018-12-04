@@ -19,6 +19,11 @@ export const getSeedlingMess = (queryTreeData, carData, nurserysData) => {
                 'YYYY-MM-DD HH:mm:ss'
             )
             : '',
+        CreateTime: nurserysData.CreateTime
+            ? moment(nurserysData.CreateTime).format(
+                'YYYY-MM-DD HH:mm:ss'
+            )
+            : '',
         location: nurserysData.location
             ? nurserysData.location
             : '',

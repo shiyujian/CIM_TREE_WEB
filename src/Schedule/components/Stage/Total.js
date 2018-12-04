@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-26 21:37:33
+ * @Last Modified time: 2018-12-04 16:22:09
  */
 import React, { Component } from 'react';
 import {
@@ -87,9 +87,6 @@ class Total extends Component {
         } = this.props;
         let reqData = {};
         this.props.form.validateFields((err, values) => {
-            console.log('总进度进度计划流程信息', values);
-            console.log('err', err);
-
             values.sunitproject
                 ? (reqData.subject_sectionName__contains = values.sunitproject)
                 : '';
@@ -113,8 +110,6 @@ class Total extends Component {
                     ? (reqData.status = 0)
                     : '';
         });
-
-        console.log('reqData', reqData);
 
         let tmpData = Object.assign({}, reqData);
 
@@ -325,12 +320,6 @@ class Total extends Component {
         if (this.state.file) {
             fileName = this.state.file.name;
         }
-        console.log(
-            'currentSectionNamecurrentSectionNamecurrentSectionName',
-            currentSectionName
-        );
-
-        // let sectionOption = this.getSectionOption()
         return (
             <div>
                 {this.state.totlevisible && (
@@ -706,8 +695,6 @@ class Total extends Component {
     }
 
     onSelectChange = (selectedRowKeys, selectedRows) => {
-        console.log('selectedRowKeys', selectedRowKeys);
-        console.log('selectedRows', selectedRows);
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     };
     // 删除
@@ -748,7 +735,6 @@ class Total extends Component {
             });
 
             Promise.all(promises).then(rst => {
-                console.log('rst', rst);
                 notification.success({
                     message: '删除流程成功',
                     duration: 3
@@ -818,7 +804,6 @@ class Total extends Component {
             // const { newFileLists } = this.state;
             const { TreatmentData = [] } = this.state;
             if (status === 'done') {
-                console.log('file', file);
                 let len = TreatmentData.length;
                 TreatmentData.push({
                     index: len + 1,
@@ -834,7 +819,6 @@ class Total extends Component {
                     misc: file.response.misc,
                     mime_type: file.response.mime_type
                 });
-                console.log('TreatmentData', TreatmentData);
                 notification.success({
                     message: '文件上传成功',
                     duration: 3
@@ -876,7 +860,6 @@ class Total extends Component {
             };
             array.push(data);
         });
-        console.log('array', array);
         this.setState({ TreatmentData: array });
     };
 
