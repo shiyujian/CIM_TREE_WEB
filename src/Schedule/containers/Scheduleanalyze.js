@@ -17,6 +17,7 @@ import LeftTop from '../components/ScheduleAnalyze/LeftTop';
 import RightTop from '../components/ScheduleAnalyze/RightTop';
 import MiddleTop from '../components/ScheduleAnalyze/MiddleTop';
 import Bottom from '../components/ScheduleAnalyze/Bottom';
+import {DEFAULT_PROJECT} from '_platform/api';
 const Option = Select.Option;
 
 @connect(
@@ -38,7 +39,7 @@ export default class ScheduleAnalyze extends Component {
             treeLists: [],
             sectionoption: [],
             smallclassoption: [],
-            leftkeycode: 'P009',
+            leftkeycode: DEFAULT_PROJECT,
             section: '',
             smallclass: '',
             data: [],

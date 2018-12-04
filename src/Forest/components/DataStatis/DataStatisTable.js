@@ -47,9 +47,13 @@ export default class DataStatisTable extends Component {
             queryTime: 0
         };
     }
-    componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode
+        } = this.props;
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
+            await this.query();
+        }
     }
     render () {
         const {
@@ -59,7 +63,6 @@ export default class DataStatisTable extends Component {
             thinclassoption,
             typeoption
         } = this.props;
-        console.log(sectionoption, 'sectionoption');
         const {
             section,
             smallclass,
@@ -72,7 +75,7 @@ export default class DataStatisTable extends Component {
                 <DataTable {...this.state} {...this.props} />
                 <Row>
                     <Col span={24}>
-                        <Card style={{marginTop: 10}}>
+                        <Card style={{ marginTop: 10 }}>
                             <Row className='forest-search-layout'>
                                 <div className='forest-mrg10'>
                                     <span className='forest-search-span'>标段：</span>
@@ -136,7 +139,7 @@ export default class DataStatisTable extends Component {
                                     </Select>
                                 </div>
                             </Row>
-                            <Row style={{marginTop: 10, marginBottom: 10}}>
+                            <Row style={{ marginTop: 10, marginBottom: 10 }}>
                                 <Col span={2} >
                                     <Button
                                         type='primary'
@@ -157,12 +160,12 @@ export default class DataStatisTable extends Component {
                             </Row>
                             <Row>
                                 <Col span={12}>
-                                    <Card title="栽植量">
+                                    <Card title='栽植量'>
                                         <TopLeft {...this.state} {...this.props} />
                                     </Card>
                                 </Col>
                                 <Col span={12}>
-                                    <Card title="定位量">
+                                    <Card title='定位量'>
                                         <TopRight {...this.state} {...this.props} />
                                     </Card>
                                 </Col>
@@ -170,7 +173,7 @@ export default class DataStatisTable extends Component {
                             <Row>
                                 <Card
                                     title='树种分布及排名'
-                                    style={{marginTop: 10}}
+                                    style={{ marginTop: 10 }}
                                 >
                                     <Col span={8}>
                                         <MiddleLeft {...this.state} {...this.props} />
@@ -191,7 +194,7 @@ export default class DataStatisTable extends Component {
                         <Col span={12}>
                             <Card
                                 title='苗木进场强度分析'
-                                style={{marginTop: 10}}
+                                style={{ marginTop: 10 }}
                             >
                                 <EntranceLeft {...this.state} {...this.props} />
                             </Card>
@@ -199,7 +202,7 @@ export default class DataStatisTable extends Component {
                         <Col span={12}>
                             <Card
                                 title='各树种进场强度分析'
-                                style={{marginTop: 10}}
+                                style={{ marginTop: 10 }}
                             >
                                 <EntranceRight {...this.state} {...this.props} />
                             </Card>
@@ -209,7 +212,7 @@ export default class DataStatisTable extends Component {
                         <Col span={12}>
                             <Card
                                 title='苗木种植强度分析'
-                                style={{marginTop: 10}}
+                                style={{ marginTop: 10 }}
                             >
                                 <PlantLeft {...this.state} {...this.props} />
                             </Card>
@@ -217,7 +220,7 @@ export default class DataStatisTable extends Component {
                         <Col span={12}>
                             <Card
                                 title='各标段种植进度分析'
-                                style={{marginTop: 10}}
+                                style={{ marginTop: 10 }}
                             >
                                 <PlantRight {...this.state} {...this.props} />
                             </Card>
@@ -227,7 +230,7 @@ export default class DataStatisTable extends Component {
                         <Col span={12}>
                             <Card
                                 title='各小班种植进度分析'
-                                style={{marginTop: 10}}
+                                style={{ marginTop: 10 }}
                             >
                                 <GroupLeft {...this.state} {...this.props} />
                             </Card>
@@ -235,7 +238,7 @@ export default class DataStatisTable extends Component {
                         <Col span={12}>
                             <Card
                                 title='各细班种植进度分析'
-                                style={{marginTop: 10}}
+                                style={{ marginTop: 10 }}
                             >
                                 <GroupRight {...this.state} {...this.props} />
                             </Card>
@@ -297,8 +300,14 @@ export default class DataStatisTable extends Component {
     }
 
     resetinput () {
-        const { resetinput, leftkeycode } = this.props;
-        resetinput(leftkeycode);
+        this.setState({
+            section: '',
+            thinclass: '',
+            smallclass: '',
+            treetype: ''
+        }, () => {
+            this.query();
+        });
     }
 
     query = () => {
@@ -319,7 +328,6 @@ export default class DataStatisTable extends Component {
             leftkeycode
         } = this.props;
         try {
-            console.log('leftkeycode', leftkeycode);
             if (!leftkeycode) {
                 Notification.info({
                     message: '请选择项目',
@@ -353,14 +361,12 @@ export default class DataStatisTable extends Component {
                 });
             });
             getLocationStat({}, postdata).then((locationStat) => {
-                console.log('locationStat', locationStat);
                 this.setState({
                     locationStat,
                     locationStatQueryTime: moment().unix()
                 });
             });
             getStatByTreetype({}, postdata).then((statByTreetype) => {
-                console.log('statByTreetype', statByTreetype);
                 this.setState({
                     statByTreetype,
                     statByTreetypeQueryTime: moment().unix()

@@ -38,10 +38,6 @@ export const getNurserysCount = createFetchAction(
     `${FOREST_API}/tree/nurserys/count/`,
     []
 );
-export const getNurserysCountFast = createFetchAction(
-    `${FOREST_API}/tree/nurserystat?no=P009`,
-    []
-);
 export const getfactory = createFetchAction(
     `${FOREST_API}/tree/factoryanalysebytreetype`,
     []

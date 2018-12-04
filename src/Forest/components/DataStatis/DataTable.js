@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Row, Col, DatePicker, Select, Spin } from 'antd';
+import { Spin } from 'antd';
 import moment from 'moment';
 import { SumTotal } from '../../components';
 
@@ -16,44 +16,59 @@ export default class DataTable extends Component {
             loading4: false,
             loading5: false,
             loading6: false,
+            loading7: false
         };
     }
-    async componentDidMount() {
-        this.query();
-    }
-    async query() {
+
+    componentDidUpdate = async (prevProps, prevState) => {
         const {
-            actions: { getTotalSat, gettreeEntrance, getCount, gettreetypeSection, getqueryTree },
-            leftkeycode
+            leftkeycode,
+            queryTime,
+            section
+        } = this.props;
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
+            await this.query();
+        }
+        if (queryTime && queryTime !== prevProps.queryTime) {
+            // if (section && section !== prevProps.section) {
+            await this.query();
+            // }
+        }
+    }
+    async query () {
+        const {
+            actions: { getTotalSat, gettreeEntrance, getCount, getqueryTree },
+            leftkeycode,
+            section
         } = this.props;
         this.setState({
             loading3: true,
             loading4: true,
             loading5: true,
             loading6: true,
+            loading7: true
         });
 
         // 获取当前种树信息
         let postdata = {
             statType: 'nursery',
-            section: leftkeycode
+            section: section || leftkeycode
         };
         let amount = await getTotalSat({}, postdata);
-        console.log(amount, '进场总数');
 
         // 获取当前种树信息
         let postdata2 = {
             statType: 'tree',
-            section: leftkeycode
+            section: section || leftkeycode
         };
         let plantAmount = await getTotalSat({}, postdata2);
-        
+
         // 今日入场数
         let today = 0;
         let params = {
             stime: moment().format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            no: leftkeycode
+            no: section || leftkeycode
         };
         let rst = await gettreeEntrance({}, params);
         if (rst && rst instanceof Array) {
@@ -71,17 +86,14 @@ export default class DataTable extends Component {
                 plantToday = plantToday + item.Num;
             });
         }
-        // 一共需要种植棵数
-        // let plantTotal = 0;
-        // // 获取所有需要种植的总数
-        // let totalTrees = await gettreetypeSection({}, { no: leftkeycode });
-        // if (totalTrees && totalTrees instanceof Array) {
-        //     totalTrees.map(tree => {
-        //         plantTotal = tree.Complete + tree.UnComplete + plantTotal;
-        //     });
-        // }
         // 实时种植信息
-        let message = await getqueryTree();
+        let postdata3 = {
+            page: 1,
+            size: 5,
+            no: leftkeycode,
+            section: section
+        };
+        let message = await getqueryTree({}, postdata3);
 
         let nowmessagelist = [];
         if (message && message.content) {
@@ -92,61 +104,60 @@ export default class DataTable extends Component {
             loading4: false,
             loading5: false,
             loading6: false,
+            loading7: false,
             amount,
             today,
             plantAmount: plantAmount,
             plantToday,
             nowmessagelist: nowmessagelist
-            // plantTotal: plantTotal,
         });
     }
     render () {
-        let { amount, today, plantAmount, plantToday, nowmessagelist, loading3, loading4, loading5, loading6 } = this.state;
+        const {
+            amount,
+            today,
+            plantAmount,
+            plantToday,
+            nowmessagelist,
+            loading3,
+            loading4,
+            loading5,
+            loading6,
+            loading7
+        } = this.state;
 
         return (
             <div>
-                <Row>
-                    <Col span={5}>
-                        <Spin spinning={loading3}>
-                            <SumTotal
-                                title='苗木累计进场总数'
-                                title1='Total number of nursery stock'
-                            >
-                                <div>{amount}</div>
-                            </SumTotal>
-                        </Spin>
-                    </Col>
-                    <Col span={5}>
-                        <Spin spinning={loading4}>
-                            <SumTotal
-                                title='苗木今日进场总数'
-                                title1='Total number of nursery stock today'
-                            >
-                                <div>{today}</div>
-                            </SumTotal>
-                        </Spin>
-                    </Col>
-                    <Col span={5}>
-                        <Spin spinning={loading5}>
-                            <SumTotal
-                                title='苗木累计种植总数'
-                                title1='Total number of planted trees'
-                            >
-                                <div>{plantAmount}</div>
-                            </SumTotal>
-                        </Spin>
-                    </Col>
-                    <Col span={5}>
-                        <Spin spinning={loading6}>
-                            <SumTotal
-                                title='苗木今日种植总数'
-                                title1='Total number of planted trees today'
-                            >
-                                <div>{plantToday}</div>
-                            </SumTotal>
-                        </Spin>
-                    </Col>
-                    <Col span={4}>
+                <div style={{display: 'flex'}}>
+                    <Spin spinning={loading3}>
+                        <SumTotal
+                            title='苗木累计进场总数'
+                        >
+                            <div>{amount}</div>
+                        </SumTotal>
+                    </Spin>
+                    <Spin spinning={loading4}>
+                        <SumTotal
+                            title='苗木今日进场总数'
+                        >
+                            <div>{today}</div>
+                        </SumTotal>
+                    </Spin>
+                    <Spin spinning={loading5}>
+                        <SumTotal
+                            title='苗木累计种植总数'
+                        >
+                            <div>{plantAmount}</div>
+                        </SumTotal>
+                    </Spin>
+                    <Spin spinning={loading6}>
+                        <SumTotal
+                            title='苗木今日种植总数'
+                        >
+                            <div>{plantToday}</div>
+                        </SumTotal>
+                    </Spin>
+                    <Spin spinning={loading7}>
                         <div
                             className='nowmessage'
                             style={{ border: '1px solid #666' }}
@@ -158,18 +169,17 @@ export default class DataTable extends Component {
                                         <div key={item.ID}>
                                             <span>
                                                 {item.CreateTime}
-                                                {item.Factory}
-                                                {item.Inputer}
-                                                录入
+                                                    录入
                                                 {item.TreeTypeObj.TreeTypeName}
+                                                ({item.ZZBM})
                                             </span>
                                         </div>
                                     )
                                 )}
                             </div>
                         </div>
-                    </Col>
-                </Row>
+                    </Spin>
+                </div>
             </div>
         );
     }

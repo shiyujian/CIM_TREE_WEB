@@ -17,6 +17,7 @@ import {
     getUser,
     getAreaTreeData
 } from '_platform/auth';
+import {DEFAULT_PROJECT} from '_platform/api';
 const Option = Select.Option;
 @connect(
     state => {
@@ -35,7 +36,6 @@ export default class DataStatis extends Component {
         super(props);
         this.state = {
             leftkeycode: '',
-            resetkey: 0,
             typeoption: [],
             sectionoption: [],
             smallclassoption: [],
@@ -50,22 +50,15 @@ export default class DataStatis extends Component {
         const {
             actions: {
                 getTreeList,
-                getForestUsers,
                 getTreeNodeList,
-                setkeycode,
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree
             },
-            users,
             treetypes,
             platform: { tree = {} }
         } = this.props;
         try {
-            // 避免反复获取森林用户数据，提高效率
-            if (!users) {
-                getForestUsers();
-            }
             // 避免反复获取森林树种列表，提高效率
             if (!treetypes) {
                 getTreeList().then(x => this.setTreeTypeOption(x));
@@ -78,9 +71,10 @@ export default class DataStatis extends Component {
                 await getTotalThinClass(totalThinClass);
                 // 区域地块树
                 await getThinClassTree(projectList);
+                await this.onSelect([DEFAULT_PROJECT]);
+            } else {
+                await this.onSelect([DEFAULT_PROJECT]);
             }
-
-            setkeycode('');
             // 类型
             let typeoption = [
                 <Option key={'全部'} value={''} title={'全部'}>
@@ -106,7 +100,6 @@ export default class DataStatis extends Component {
         } catch (e) {
             console.log('e', e);
         }
-        this.onSelect(['P018']);
     }
 
     render () {
@@ -114,13 +107,13 @@ export default class DataStatis extends Component {
             platform: { tree = {} }
         } = this.props;
         const {
-            leftkeycode,
-            resetkey
+            leftkeycode
         } = this.state;
         let treeList = [];
         if (tree.thinClassTree) {
             treeList = tree.thinClassTree;
         }
+        console.log('treeList', treeList);
         console.log('leftkeycode', leftkeycode);
         return (
             <Body>
@@ -135,13 +128,11 @@ export default class DataStatis extends Component {
                     </Sidebar>
                     <Content>
                         <DataStatisTable
-                            key={resetkey}
                             {...this.props}
                             {...this.state}
                             sectionSelect={this.sectionSelect.bind(this)}
                             smallClassSelect={this.smallClassSelect.bind(this)}
                             thinClassSelect={this.thinClassSelect.bind(this)}
-                            resetinput={this.resetinput.bind(this)}
                             typeselect={this.typeselect.bind(this)}
                         />
                     </Content>
@@ -155,43 +146,43 @@ export default class DataStatis extends Component {
         const {
             platform: { tree = {} }
         } = this.props;
-        let treeList = tree.thinClassTree;
+        try {
+            let treeList = tree.thinClassTree;
+            let user = getUser();
+            let keycode = keys[0] || '';
+            const {
+                actions: { setkeycode }
+            } = this.props;
+            let sectionsData = [];
+            if (keycode) {
+                treeList.map((treeData) => {
+                    if (keycode === treeData.No) {
+                        sectionsData = treeData.children;
+                    }
+                });
+                setkeycode(keycode);
+                this.setState({
+                    leftkeycode: keycode,
+                    sectionsData
+                });
+                // 树种
+                this.typeselect('');
 
-        let user = getUser();
-        let keycode = keys[0] || '';
-        const {
-            actions: { setkeycode }
-        } = this.props;
-        setkeycode(keycode);
-        this.setState({
-            leftkeycode: keycode,
-            resetkey: ++this.state.resetkey
-        });
-        let sectionsData = [];
-        if (keycode) {
-            treeList.map((treeData) => {
-                if (keycode === treeData.No) {
-                    sectionsData = treeData.children;
+                let sections = JSON.parse(user.sections);
+                // 标段
+                if (sections.length === 0) {
+                // 是admin或者业主
+                    this.setSectionOption(sectionsData);
+                } else {
+                    sectionsData.map((sectionData) => {
+                        if (sections[0] === sectionData.No) {
+                            this.setSectionOption(sectionData);
+                        }
+                    });
                 }
-            });
-        }
-        this.setState({
-            sectionsData
-        });
-        // 树种
-        this.typeselect('');
-
-        let sections = JSON.parse(user.sections);
-        // 标段
-        if (sections.length === 0) {
-            // 是admin或者业主
-            this.setSectionOption(sectionsData);
-        } else {
-            sectionsData.map((sectionData) => {
-                if (sections[0] === sectionData.No) {
-                    this.setSectionOption(sectionData);
-                }
-            });
+            }
+        } catch (e) {
+            console.log('onSelect', e);
         }
     }
     // 设置标段选项
@@ -293,13 +284,6 @@ export default class DataStatis extends Component {
 
     // 细班选择, 重新获取: 树种
     thinClassSelect (value) {
-    }
-
-    // 重置
-    resetinput (leftkeycode) {
-        this.setState({ resetkey: ++this.state.resetkey }, () => {
-            this.onSelect([leftkeycode]);
-        });
     }
 
     // 类型选择, 重新获取: 树种

@@ -117,12 +117,8 @@ export default class RightTop extends Component {
     async query () {
         const {
             actions: {
-                gettreetypeAll,
-                gettreetypeSection,
-                gettreetypeSmallClass,
-                gettreetypeThinClass
-            },
-            leftkeycode
+                gettreetypeSmallClass
+            }
         } = this.props;
         const { stime, etime, section } = this.state;
         let param = {};
@@ -136,7 +132,7 @@ export default class RightTop extends Component {
 
         console.log('RightTopRightTopRightTop', rst);
 
-        let units = ['1小班', '2小班', '3小班', '4小班', '5小班'];
+        let units = [];
 
         let complete = [];
         let unComplete = [];

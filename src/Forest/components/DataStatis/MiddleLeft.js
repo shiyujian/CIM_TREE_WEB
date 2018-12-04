@@ -77,7 +77,6 @@ export default class Middle extends Component {
 
     getTreetypeData = () => {
         let treetypeData = [];
-        console.log('TREETYPENO', TREETYPENO);
         for (let i = 0; i < TREETYPENO.length; i++) {
             treetypeData.push(
                 {
@@ -104,9 +103,7 @@ export default class Middle extends Component {
         } = this.props;
         try {
             let treetypeData = this.getTreetypeData();
-            console.log('treetypeData', treetypeData);
             let treetypeName = this.getTreetypeName(treetypeData);
-            console.log('treetypeName', treetypeName);
             if (statByTreetype && statByTreetype instanceof Array) {
                 for (let t = 0; t < statByTreetype.length; t++) {
                     if (statByTreetype[t].TreeTypeNo) {

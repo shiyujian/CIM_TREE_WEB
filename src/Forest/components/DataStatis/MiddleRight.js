@@ -51,7 +51,6 @@ export default class Middle extends Component {
                         return 0;
                     }
                 });
-                console.log('statByTreetype', statByTreetype);
                 this.setState({
                     dataSource: statByTreetype,
                     loading: false

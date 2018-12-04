@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-11-30 14:56:27
+ * @Last Modified time: 2018-12-04 14:46:37
  */
 /**
  *
@@ -278,7 +278,8 @@ export const FORM_WORKFLOW = [
         code: 'TEMPLATE_012'
     }
 ];
-
+// 当前执行的项目
+export const DEFAULT_PROJECT = 'P018';
 // 获取单位工程
 export const PROJECT_UNITS = [
     {

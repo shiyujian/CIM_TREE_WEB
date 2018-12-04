@@ -76,7 +76,6 @@ export default class Top extends Component {
             locationStat
         } = this.props;
         try {
-            console.log('wwwwwwwwwwwww');
             if (locationStat) {
                 let data = locationStat.split(',');
                 let unLocationNum = Number(data[0]);
@@ -103,7 +102,6 @@ export default class Top extends Component {
     }
 
     render () {
-        console.log('loading', this.state.loading);
         return (
             <Spin spinning={this.state.loading}>
                 <div

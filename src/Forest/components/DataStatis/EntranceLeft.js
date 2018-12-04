@@ -16,15 +16,17 @@ export default class EntranceLeft extends Component {
         };
     }
 
-    componentDidUpdate (prevProps, prevState) {
-        const { etime } = this.state;
-        const { leftkeycode } = this.props;
-        if (etime != prevState.etime) {
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode
+            // queryTime
+        } = this.props;
+        if (leftkeycode !== prevProps.leftkeycode) {
             this.query();
         }
-        if (leftkeycode != prevProps.leftkeycode) {
-            this.query();
-        }
+        // if (queryTime && queryTime !== prevProps.queryTime) {
+        //     await this.query();
+        // }
     }
 
     componentDidMount () {
@@ -91,11 +93,9 @@ export default class EntranceLeft extends Component {
             ]
         };
         myChart1.setOption(option1);
-
-        this.query(1);
     }
     // 苗木进场总数
-    async query (no) {
+    async query () {
         const {
             platform: { tree = {} },
             leftkeycode,
@@ -115,7 +115,6 @@ export default class EntranceLeft extends Component {
         postdata.stime = stime;
         postdata.etime = etime;
         let rst = await gettreeEntrance({}, postdata);
-        console.log('aaaaaaaaaaaaaarst', rst);
         let units = [];
         let data = [];
 
@@ -143,8 +142,6 @@ export default class EntranceLeft extends Component {
                 }
             });
         }
-        console.log('data', data);
-        console.log('units', units);
         let myChart1 = echarts.init(document.getElementById('king'));
         let option1 = {
             xAxis: [
@@ -186,8 +183,8 @@ export default class EntranceLeft extends Component {
                 <RangePicker
                     style={{ verticalAlign: 'middle' }}
                     defaultValue={[
-                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
-                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                        moment(this.state.stime, 'YYYY/MM/DD 00:00:00'),
+                        moment(this.state.etime, 'YYYY/MM/DD 23:59:59')
                     ]}
                     showTime={{ format: 'HH:mm:ss' }}
                     format={'YYYY/MM/DD HH:mm:ss'}
@@ -202,12 +199,12 @@ export default class EntranceLeft extends Component {
         this.setState({
             stime: value[0]
                 ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
+                : '',
             etime: value[1]
                 ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
                 : ''
+        }, () => {
+            this.query();
         });
     }
 }

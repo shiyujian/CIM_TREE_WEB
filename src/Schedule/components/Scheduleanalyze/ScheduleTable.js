@@ -43,7 +43,7 @@ export default class ScheduleTable extends Component {
     async componentDidMount () {
         const {
             actions: {
-                nowmessage,
+                nowmessage
             }
         } = this.props;
         this.query();
@@ -121,7 +121,7 @@ export default class ScheduleTable extends Component {
         // 一共需要种植棵数
         let total = 0;
         // 获取所有需要种植的总数
-        let totalTrees = await gettreetypeSection({}, { no: leftkeycode });
+        let totalTrees = await gettreetypeSection({}, { section: leftkeycode });
         if (totalTrees && totalTrees instanceof Array) {
             totalTrees.map(tree => {
                 total = tree.Complete + tree.UnComplete + total;

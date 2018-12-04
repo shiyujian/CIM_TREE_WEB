@@ -94,7 +94,6 @@ export default class Middle extends Component {
                         return 0;
                     }
                 });
-                console.log('statByTreetype', statByTreetype);
                 for (let i = 4; i >= 0; i--) {
                     if (statByTreetype[i]) {
                         treetypeName.push(statByTreetype[i].TreeTypeName);
@@ -102,8 +101,6 @@ export default class Middle extends Component {
                     }
                 }
             }
-            console.log('treetypeName', treetypeName);
-            console.log('treetypeNum', treetypeNum);
             let myChart = echarts.init(document.getElementById('middleMiddle'));
             let option = {
                 yAxis: {

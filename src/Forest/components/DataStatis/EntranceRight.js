@@ -1,29 +1,17 @@
 import React, { Component } from 'react';
-import { Row, Col, DatePicker, Select, Spin } from 'antd';
+import { DatePicker, Spin } from 'antd';
 import { Cards } from '../../components';
 import {
-    TREETYPENO,
     ECHARTSCOLOR
 } from '../../../_platform/api';
 import moment from 'moment';
 var echarts = require('echarts');
-const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 export default class EntranceRight extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            // 树种的list
-            selectTreeType: [],
-            // 所有的树种类型
-            treetypeAll: [],
-            // 树类型option数组
-            treetyoption: [],
-            // 选择树种类型的值
-            treeTypeSelect: '全部',
-            // 选择的树种的值
-            treeSelect: '全部',
             section: '',
             stime: moment()
                 .subtract(10, 'days')
@@ -33,20 +21,17 @@ export default class EntranceRight extends Component {
         };
     }
 
-    componentDidUpdate (prevProps, prevState) {
-        const { stime, etime, selectTreeType, treeSelect } = this.state;
-        const { leftkeycode } = this.props;
-        if (
-            stime != prevState.stime ||
-            etime != prevState.etime ||
-            selectTreeType != prevState.selectTreeType ||
-            treeSelect != prevState.treeSelect
-        ) {
-            this.search();
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode
+            // queryTime
+        } = this.props;
+        if (leftkeycode !== prevProps.leftkeycode) {
+            this.query();
         }
-        if (leftkeycode != prevProps.leftkeycode) {
-            this.search();
-        }
+        // if (queryTime && queryTime !== prevProps.queryTime) {
+        //     await this.query();
+        // }
     }
 
     componentDidMount () {
@@ -90,70 +75,34 @@ export default class EntranceRight extends Component {
             series: []
         };
         myChart2.setOption(options2);
-        const {
-            actions: { getTreeList }
-        } = this.props;
-        // 获取全部树种信息
-        getTreeList().then(rst => {
-            console.log('getTreeList', rst);
-            if (rst && rst instanceof Array) {
-                this.setState({
-                    treetypeAll: rst,
-                    selectTreeType: rst
-                });
-            }
-        });
-
-        // 树木类型
-        let treetyoption = [];
-        treetyoption.push(
-            <Option key={'全部'} value={'全部'}>
-                全部
-            </Option>
-        );
-        TREETYPENO.map(tree => {
-            console.log('tree', tree);
-            treetyoption.push(
-                <Option key={tree.name} value={tree.id.toString()}>
-                    {tree.name}
-                </Option>
-            );
-        });
-        console.log('treetyoption', treetyoption);
-
-        this.setState({
-            treetyoption
-        });
-        this.search();
     }
 
     // 进场强度分析
-    async search (no) {
+    async query () {
         const {
             leftkeycode,
+            treetype,
             platform: { tree = {} },
             actions: { gettreeEntrance }
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
         const {
             stime,
-            etime,
-            selectTreeType,
-            treeSelect
+            etime
         } = this.state;
         let postdata = {};
 
         postdata.no = leftkeycode;
         postdata.stime = stime;
         postdata.etime = etime;
-        let treetype = [];
-        if (treeSelect === '全部') {
-            selectTreeType.map(rst => {
-                treetype.push(rst.ID);
-            });
-        } else {
-            treetype.push(treeSelect);
-            postdata.treetype = treetype;
+        let treeArr = [];
+        if (treetype === '全部') {
+            // selectTreeType.map(rst => {
+            //     treeArr.push(rst.ID);
+            // });
+        } else if (treetype) {
+            treeArr.push(treetype);
+            postdata.treetype = treeArr;
         }
 
         this.setState({
@@ -161,7 +110,6 @@ export default class EntranceRight extends Component {
         });
 
         let rst = await gettreeEntrance({}, postdata);
-        console.log('wwwwwwwwwrst', rst);
         let total = [];
         let data = [];
         let gpshtnum = [];
@@ -176,10 +124,8 @@ export default class EntranceRight extends Component {
                     time.push(rst[i].Time);
                 }
             }
-            console.log('time', time);
             // 时间数组去重
             times = [...new Set(time)];
-            console.log('times', times);
 
             if (rst && rst instanceof Array) {
                 sectionData.map(project => {
@@ -208,12 +154,10 @@ export default class EntranceRight extends Component {
                 });
             }
 
-            console.log('gpshtnum', gpshtnum);
             times.map((time, index) => {
                 data.map(sectionData => {
                     sectionData[index] = 0;
                 });
-                console.log('sectionData', data);
                 gpshtnum.map((test, i) => {
                     test.map((arr, a) => {
                         if (moment(arr.Time).format('YYYY/MM/DD') === time) {
@@ -228,8 +172,6 @@ export default class EntranceRight extends Component {
                     total[i] = total[i] + sectionData[i];
                 });
             }
-            console.log('total', total);
-            console.log('data', data);
         }
 
         let series = [
@@ -293,135 +235,33 @@ export default class EntranceRight extends Component {
     }
 
     searchRender () {
-        const {
-            treetypename,
-            treety,
-            treetyoption = [],
-            treetypeAll = []
-        } = this.state;
-        let treetypeoption = this.setTreeType();
         return (
-            <Row>
-                <Col xl={4} lg={10}>
-                    <span>类型：</span>
-                    <Select
-                        className='forestcalcw2 mxw100'
-                        defaultValue={'全部'}
-                        style={{ width: '85px' }}
-                        onChange={this.ontypechange.bind(this)}
-                    >
-                        {treetyoption}
-                    </Select>
-                </Col>
-                <Col xl={5} lg={10}>
-                    <span>树种：</span>
-                    <Select
-                        value={this.state.treeSelect}
-                        optionFilterProp='children'
-                        filterOption={(input, option) =>
-                            option.props.children
-                                .toLowerCase()
-                                .indexOf(input.toLowerCase()) >= 0
-                        }
-                        onChange={this.ontreetypechange.bind(this)}
-                        style={{ width: '100px' }}
-                        showSearch
-                        className='forestcalcw2 mxw100'
-                    >
-                        {treetypeoption}
-                    </Select>
-                </Col>
-                <Col xl={15} lg={24}>
-                    <span>起苗时间：</span>
-                    <RangePicker
-                        style={{ verticalAlign: 'middle' }}
-                        defaultValue={[
-                            moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
-                            moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
-                        ]}
-                        showTime={{ format: 'HH:mm:ss' }}
-                        format={'YYYY/MM/DD HH:mm:ss'}
-                        onChange={this.datepick.bind(this)}
-                        onOk={this.datepick.bind(this)}
-                    />
-                </Col>
-            </Row>
+            <div>
+                <span>起苗时间：</span>
+                <RangePicker
+                    style={{ verticalAlign: 'middle' }}
+                    defaultValue={[
+                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
+                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                    ]}
+                    showTime={{ format: 'HH:mm:ss' }}
+                    format={'YYYY/MM/DD HH:mm:ss'}
+                    onChange={this.datepick.bind(this)}
+                    onOk={this.datepick.bind(this)}
+                />
+            </div>
         );
     }
-
-    setTreeType () {
-        const { selectTreeType = [] } = this.state;
-        let treetypeoption = [];
-        treetypeoption.push(
-            <Option key={-1} value={'全部'}>
-                全部
-            </Option>
-        );
-        selectTreeType.map(rst => {
-            treetypeoption.push(
-                <Option
-                    key={rst.ID}
-                    title={rst.TreeTypeName}
-                    value={rst.ID.toString()}
-                >
-                    {rst.TreeTypeName}
-                </Option>
-            );
-        });
-        return treetypeoption;
-    }
-
-    // 选择树种类型
-    ontypechange (value) {
-        const { treetypeAll = [] } = this.state;
-        console.log('value', value);
-        if (value === '全部') {
-            this.setState({
-                selectTreeType: treetypeAll,
-                treeTypeSelect: value,
-                treeSelect: '全部'
-            });
-        } else {
-            let selectTreeType = [];
-            treetypeAll.map(tree => {
-                // 获取树种cdoe的首个数字，找到对应的类型
-                let code = tree.TreeTypeNo.substr(0, 1);
-                console.log('code', code);
-                if (code === value) {
-                    console.log('treetreetree', tree);
-                    selectTreeType.push(tree);
-                }
-            });
-            console.log('selectTreeType', selectTreeType);
-            this.setState(
-                {
-                    selectTreeType,
-                    treeTypeSelect: value,
-                    treeSelect: '全部'
-                },
-                () => {
-                    this.search();
-                }
-            );
-        }
-    }
-    // 选择树种
-    ontreetypechange (value) {
-        this.setState({
-            treeSelect: value
-        });
-    }
-
     datepick (value) {
         this.setState({
             stime: value[0]
                 ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
+                : '',
             etime: value[1]
                 ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
                 : ''
+        }, () => {
+            this.query();
         });
     }
 }

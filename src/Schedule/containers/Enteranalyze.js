@@ -14,6 +14,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
+import {DEFAULT_PROJECT} from '_platform/api';
 import Left from '../components/EnterAnalyze/Left';
 import Right from '../components/EnterAnalyze/Right';
 
@@ -40,7 +41,7 @@ export default class EnterAnalyze extends Component {
             treetypelist: [],
             treeLists: [],
             sectionoption: [],
-            leftkeycode: 'P009',
+            leftkeycode: DEFAULT_PROJECT,
             data: [],
             account: '',
             biaoduan: [],

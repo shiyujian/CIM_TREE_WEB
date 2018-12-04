@@ -9,6 +9,7 @@ import LeftTop from '../components/ScheduleDisplay/LeftTop';
 import RightTop from '../components/ScheduleDisplay/RightTop';
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
+import {DEFAULT_PROJECT} from '_platform/api';
 import * as actions from '../store/ScheduleDisplay';
 const Option = Select.Option;
 @connect(
@@ -44,9 +45,9 @@ export default class ScheduleDisplay extends Component {
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
-            await this.onSelect(['P018']);
+            await this.onSelect([DEFAULT_PROJECT]);
         } else {
-            await this.onSelect(['P018']);
+            await this.onSelect([DEFAULT_PROJECT]);
         }
     }
 

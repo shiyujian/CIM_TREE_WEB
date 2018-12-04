@@ -126,7 +126,7 @@ export default class Warning extends Component {
         dataListTask.map(item => {
             dataListReal.map(row => {
                 if (item.Section === row.Section) {
-                    let ratio = row.Complete / item.Sum * 100;
+                    let ratio = (row.Complete / item.Sum * 100).toFixed(2);
                     yGrandData.push(ratio);
                 }
             });
@@ -280,7 +280,7 @@ export default class Warning extends Component {
                 console.log('dataListReal', dataListReal);
                 console.log('row', row);
                 if (item.Section === row.Section) {
-                    let ratio = row.Complete / item.Sum * 100;
+                    let ratio = (row.Complete / item.Sum * 100).toFixed(2);
                     yGrandData.push(ratio);
                 }
             });

@@ -85,9 +85,6 @@ export default class Bottom extends Component {
             smallClassSelect != prevState.smallClassSelect ||
             stime != prevState.stime
         ) {
-            console.log('Bottomsection', section);
-            console.log('Bottometime', smallClassSelect);
-            console.log('Bottomleftkeycode', leftkeycode);
             this.query();
         }
     }
@@ -137,7 +134,6 @@ export default class Bottom extends Component {
 
         let SmallClassList = [];
         let lists = await getSmallClassList(param);
-        console.log('BottomBottom', lists);
         if (lists && lists instanceof Array) {
             SmallClassList = lists;
         }
@@ -160,7 +156,6 @@ export default class Bottom extends Component {
                 console.log(e);
             }
         }
-        console.log('codecode', code);
 
         SmallClassList.map(SmallClass => {
             try {
@@ -190,7 +185,6 @@ export default class Bottom extends Component {
                 array.push(list.SmallClass);
             }
         });
-        console.log('uniqueSmallClass', uniqueSmallClass);
 
         if (uniqueSmallClass.length > 0) {
             smallClassSelect = uniqueSmallClass[0].SmallClass;
@@ -235,10 +229,6 @@ export default class Bottom extends Component {
                 label.push(item.Label + '号细班');
             });
         }
-
-        console.log('Bottomcompletecomplete', complete);
-        console.log('BottomunCompleteunComplete', unComplete);
-        console.log('Bottomlabellabel', label);
 
         let myChart4 = echarts.init(document.getElementById('bottom'));
         let options4 = {
@@ -299,7 +289,7 @@ export default class Bottom extends Component {
                 >
                     <div
                         id='bottom'
-                        style={{ width: '100%', height: '300px' }}
+                        style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>
             </Spin>
@@ -344,7 +334,6 @@ export default class Bottom extends Component {
     }
     // 选择标段
     onsectionchange (value) {
-        console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
         this.setState(
             {
                 section: value

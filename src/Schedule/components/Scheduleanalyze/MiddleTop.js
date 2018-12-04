@@ -74,7 +74,7 @@ export default class MiddleTop extends Component {
 
     async query () {
         const {
-            actions: {    
+            actions: {
                 gettreetypeSection
             },
             leftkeycode,
@@ -84,7 +84,7 @@ export default class MiddleTop extends Component {
         let sectionData = (tree && tree.bigTreeList) || [];
         let param = {};
 
-        param.no = leftkeycode;
+        param.section = leftkeycode;
         // param.stime = stime;
         param.etime = etime;
         this.setState({ loading: true });
@@ -93,7 +93,7 @@ export default class MiddleTop extends Component {
 
         console.log('MiddleTopMiddleTopMiddleTop', rst);
 
-        let units = ['一标段', '二标段', '三标段', '四标段', '五标段'];
+        let units = [];
 
         let complete = [];
         let unComplete = [];
@@ -171,10 +171,10 @@ export default class MiddleTop extends Component {
         return (
             <Spin spinning={this.state.loading}>
                 {/* <Cards search={this.search()} title='各标段种植进度分析'> */}
-                    <div
-                        id='middleTop'
-                        style={{ width: '100%', height: '260px' }}
-                    />
+                <div
+                    id='middleTop'
+                    style={{ width: '100%', height: '260px' }}
+                />
                 {/* </Cards> */}
             </Spin>
         );

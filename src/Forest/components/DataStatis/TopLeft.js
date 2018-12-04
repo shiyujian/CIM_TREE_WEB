@@ -76,7 +76,6 @@ export default class Top extends Component {
             treePlanting
         } = this.props;
         try {
-            console.log('wwwwwwwwwwwww');
             if (treePlanting) {
                 let data = treePlanting.split(',');
                 let unPlantNum = Number(data[0]);

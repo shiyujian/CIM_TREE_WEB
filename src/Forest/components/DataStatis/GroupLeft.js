@@ -107,9 +107,6 @@ export default class RightTop extends Component {
             this.query();
         }
         if (etime != prevState.etime || stime != prevState.stime) {
-            console.log('RightTopRightTopsection', section);
-            console.log('RightTopRightTopetime', etime);
-            console.log('RightTopRightTopetime', leftkeycode);
             this.query();
         }
     }
@@ -117,12 +114,8 @@ export default class RightTop extends Component {
     async query () {
         const {
             actions: {
-                gettreetypeAll,
-                gettreetypeSection,
-                getCountSmall,
-                gettreetypeThinClass
-            },
-            leftkeycode
+                getCountSmall
+            }
         } = this.props;
         const { stime, etime, section } = this.state;
         let param = {};
@@ -133,8 +126,6 @@ export default class RightTop extends Component {
         this.setState({ loading: true });
 
         let rst = await getCountSmall({}, param);
-
-        console.log('RightTopRightTopRightTop', rst);
 
         let units = ['1小班', '2小班', '3小班', '4小班', '5小班'];
 
@@ -150,9 +141,6 @@ export default class RightTop extends Component {
                 label.push(item.Label + '号小班');
             });
         }
-        console.log('RightTopcompletecomplete', complete);
-        console.log('RightTopunCompleteunComplete', unComplete);
-        console.log('RightToplabellabel', label);
 
         let myChart3 = echarts.init(document.getElementById('rightTop'));
         let options3 = {
@@ -209,7 +197,7 @@ export default class RightTop extends Component {
                 <Cards search={this.search()} title={this.title()}>
                     <div
                         id='rightTop'
-                        style={{ width: '100%', height: '260px' }}
+                        style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>
             </Spin>
