@@ -43,9 +43,9 @@ export default class ActivityAnalysis extends Component {
         const {
             dateType,
             loading,
-            DayUv,
-            WeekUv,
-            MonthUv
+            DayUv = 0,
+            WeekUv = 0,
+            MonthUv = 0
         } = this.state;
         return (
             <div>
@@ -95,7 +95,7 @@ export default class ActivityAnalysis extends Component {
                                             DAU/MAU
                                         </div>
                                         <div className='UserAnalysis-table-num'>
-                                            {(DayUv / MonthUv).toFixed(2)}
+                                            {(DayUv / MonthUv) ? (DayUv / MonthUv).toFixed(2) : 0}
                                         </div>
                                     </div>
                                 </td>
@@ -268,12 +268,12 @@ export default class ActivityAnalysis extends Component {
                 let content = data.ret_data;
                 console.log('data', data);
                 if (times) {
-                    let yesterdayData = content[etime];
+                    let yesterdayData = content[Object.keys(content)[Object.keys(content).length - 1]];
                     console.log('yesterdayData', yesterdayData);
                     this.setState({
-                        DayUv: yesterdayData.DayUv,
-                        WeekUv: yesterdayData.WeekUv,
-                        MonthUv: yesterdayData.WeekUv
+                        DayUv: (yesterdayData && yesterdayData.DayUv) || 0,
+                        WeekUv: (yesterdayData && yesterdayData.WeekUv) || 0,
+                        MonthUv: (yesterdayData && yesterdayData.WeekUv) || 0
                     });
                 }
                 this.setState({
