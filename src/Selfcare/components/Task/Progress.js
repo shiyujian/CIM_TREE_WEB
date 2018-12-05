@@ -18,7 +18,8 @@ import OverallReviewFormDeal from '../TaskDetail/OverallReviewFormDeal';
 // 进度管理
 import ScheduleTotalDeal from '../TaskDetail/ScheduleTotalDeal';
 import ScheduleDayDeal from '../TaskDetail/ScheduleDayDeal';
-import ScheduleStageDeal from '../TaskDetail/ScheduleStageDeal';
+import ScheduleActualHandle from '../TaskDetail/ScheduleActualHandle';
+import ScheduleActualDeal from '../TaskDetail/ScheduleActualDeal';
 import ScheduleWeekPlanHandle from '../TaskDetail/ScheduleWeekPlanHandle';
 import ScheduleWeekPlanDeal from '../TaskDetail/ScheduleWeekPlanDeal';
 // 质量管理
@@ -90,9 +91,14 @@ export default class Progress extends Component {
             return <ScheduleDayDeal {...this.props} {...this.state} />;
         } else if (
             code === WORKFLOW_CODE.每日进度填报流程 &&
-            stateName === '审核'
+            stateName === '监理审核'
         ) {
-            return <ScheduleStageDeal {...this.props} {...this.state} />;
+            return <ScheduleActualHandle {...this.props} {...this.state} />;
+        } else if (
+            code === WORKFLOW_CODE.每日进度填报流程 &&
+            stateName === '业主查看'
+        ) {
+            return <ScheduleActualDeal {...this.props} {...this.state} />;
         } else if (
             code === WORKFLOW_CODE.每周进度填报流程 &&
             stateName === '监理审核'

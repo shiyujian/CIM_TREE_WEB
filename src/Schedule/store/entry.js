@@ -1,45 +1,11 @@
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
-import { createFetchActionWithHeaders } from './fetchAction';
-//
 import { FOREST_API } from '_platform/api';
 const ID = 'entry';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
-export const getTreeOK = createAction(`${ID}_getTreeOK`);
-export const changeNursery = createAction(`${ID}传递nurseryName`);
-
-/** ***************************院内************************/
-export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [
-    getTreeOK
-]); //    √
 export const gettreetype = createFetchAction(
     `${FOREST_API}/tree/nurserystat?`,
-    []
-);
-export const getfactoryAnalyse = createFetchAction(
-    `${FOREST_API}/trees/analyse/`,
-    []
-);
-export const getnurserys = createFetchAction(
-    `${FOREST_API}/tree/nurserys/`,
-    []
-);
-export const getqueryTree = createFetchAction(
-    `${FOREST_API}/tree/queryTree`,
-    []
-);
-export const getexportTree = createFetchAction(
-    `${FOREST_API}/tree/xlsx/`,
-    [],
-    'POST'
-);
-export const getNurserysCount = createFetchAction(
-    `${FOREST_API}/tree/nurserys/count/`,
-    []
-);
-export const getfactory = createFetchAction(
-    `${FOREST_API}/tree/factoryanalysebytreetype`,
     []
 );
 export const gettreeevery = createFetchAction(
@@ -90,21 +56,22 @@ export const progressstat4pie = createFetchAction(
 );
 
 export const actions = {
-    getTreeOK,
-    getTree,
     setkeycode,
     gettreetype,
     getSmallClassList,
-    getTotalSat
+    getTotalSat,
+    gettreeevery,
+    nowmessage,
+    gettreetypeAll,
+    gettreetypeSection,
+    gettreetypeSmallClass,
+    gettreetypeThinClass,
+    progressdata,
+    progressalldata,
+    progressstat4pie
 };
 export default handleActions(
     {
-        [getTreeOK]: (state, { payload }) => {
-            return {
-                ...state,
-                treeLists: [payload]
-            };
-        },
         [setkeycode]: (state, { payload }) => {
             return {
                 ...state,

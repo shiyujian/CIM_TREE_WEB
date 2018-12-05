@@ -1,243 +1,58 @@
-import React, { Component, Children } from 'react';
+import React, { Component } from 'react';
 import {
     Row,
     Col,
     Input,
     Form,
-    Spin,
-    Icon,
     Button,
     Table,
     Modal,
     DatePicker,
-    Progress,
-    Upload,
-    Select,
-    Checkbox,
     notification,
     Popconfirm
 } from 'antd';
-// import {UPLOAD_API} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
-    WORKFLOW_CODE,
-    TREETYPENO
-} from '../../../_platform/api';
-import { getNextStates } from '../../../_platform/components/Progress/util';
-import { getUser } from '../../../_platform/auth';
-import PerSearch from '../../../_platform/components/panels/PerSearch';
-import SearchInfo from './SearchInfo';
+    WORKFLOW_CODE
+} from '_platform/api';
+import { getNextStates } from '_platform/components/Progress/util';
+import { getUserIsManager } from '_platform/auth';
+import PerSearch from './PerSearch';
+import WeekPlanSearchInfo from './WeekPlanSearchInfo';
 import ActualModal from './ActualModal';
 moment.locale('zh-cn');
 const FormItem = Form.Item;
-const { MonthPicker, RangePicker } = DatePicker;
-const { Option, OptGroup } = Select;
 class Actual extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stagedata: [],
+            // 每日实际进度
+            actualData: [],
+            filterData: [], // 对流程信息根据项目进行过滤
+            // 多选
             selectedRowKeys: [],
             dataSourceSelected: [],
-            visible: false,
-            dayvisible: false,
-            isCopyMsg: false, // 接收人员是否发短信
-            treedataSource: [],
-            treetype: [], // 树种
-            TotleModaldata: [],
-            key: Math.random(),
-            sectionSchedule: [],
+            // 项目信息
             projectName: '',
-            filterData: [], // 对流程信息根据项目进行过滤
             currentSection: '',
-            currentSectionName: ''
+            currentSectionName: '',
+            // 用户信息
+            user: '',
+            // 新增流程
+            visible: false,
+            actualDataSource: [],
+            // 流程详情
+            actualModalVisible: false,
+            actualModaldata: []
         };
     }
 
     async componentDidMount () {
-        const {
-            actions: { gettreetype }
-        } = this.props;
-
-        let treelist = await gettreetype({});
-        let arr = [];
-        let treetype = TREETYPENO.map(forest => {
-            arr = treelist.filter(
-                tree => tree.TreeTypeNo.substr(0, 1) === forest.id
-            );
-            return (
-                <OptGroup label={forest.name}>
-                    {arr.map(tree => {
-                        return (
-                            <Option key={tree.id} value={JSON.stringify(tree)}>
-                                {tree.TreeTypeName}
-                            </Option>
-                        );
-                        // }
-                    })}
-                </OptGroup>
-            );
-        });
-        console.log('treetype', treetype);
-        this.setState({ treetype });
-
         this.gettaskSchedule();
         this.getSection();
     }
 
-    async componentDidUpdate (prevProps, prevState) {
-        const { leftkeycode } = this.props;
-        if (leftkeycode != prevProps.leftkeycode) {
-            this.filterTask();
-        }
-    }
-    // 获取日实际进度流程信息
-    gettaskSchedule = async () => {
-        const {
-            actions: { getTaskSchedule }
-        } = this.props;
-        let reqData = {};
-        this.props.form.validateFields((err, values) => {
-            console.log('日实际进度流程信息', values);
-            console.log('err', err);
-
-            values.sunitproject
-                ? (reqData.subject_sectionName__contains = values.sunitproject)
-                : '';
-            values.snumbercode
-                ? (reqData.subject_numbercode__contains = values.snumbercode)
-                : '';
-            // values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
-            values.stimedate
-                ? (reqData.real_start_time_begin = moment(
-                    values.stimedate[0]._d
-                ).format('YYYY-MM-DD 00:00:00'))
-                : '';
-            values.stimedate
-                ? (reqData.real_start_time_end = moment(
-                    values.stimedate[1]._d
-                ).format('YYYY-MM-DD 23:59:59'))
-                : '';
-            values.sstatus
-                ? (reqData.status = values.sstatus)
-                : values.sstatus === 0
-                    ? (reqData.status = 0)
-                    : '';
-        });
-
-        console.log('reqData', reqData);
-
-        let tmpData = Object.assign({}, reqData);
-
-        let task = await getTaskSchedule(
-            { code: WORKFLOW_CODE.每日进度填报流程 },
-            tmpData
-        );
-
-        let subject = [];
-        let totledata = [];
-        let arrange = {};
-        if (task && task instanceof Array) {
-            task.map((item, index) => {
-                let itemdata = item.subject[0];
-                let itempostdata = itemdata.postData
-                    ? JSON.parse(itemdata.postData)
-                    : null;
-                let itemtreedatasource = itemdata.treedataSource
-                    ? JSON.parse(itemdata.treedataSource)
-                    : null;
-                let itemarrange = {
-                    index: index + 1,
-                    id: item.id,
-                    section: itemdata.section
-                        ? JSON.parse(itemdata.section)
-                        : '',
-                    sectionName: itemdata.sectionName
-                        ? JSON.parse(itemdata.sectionName)
-                        : '',
-                    projectName: itemdata.projectName
-                        ? JSON.parse(itemdata.projectName)
-                        : '',
-                    type: itempostdata.type,
-                    numbercode: itemdata.numbercode
-                        ? JSON.parse(itemdata.numbercode)
-                        : '',
-                    submitperson: item.creator.person_name,
-                    submittime: moment(item.workflow.created_on)
-                        .utc()
-                        .zone(-8)
-                        .format('YYYY-MM-DD'),
-                    status: item.status,
-                    // superunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
-                    timedate: itemdata.timedate
-                        ? JSON.parse(itemdata.timedate)
-                        : '',
-                    stagedocument: itemdata.stagedocument
-                        ? JSON.parse(itemdata.stagedocument)
-                        : '',
-                    TreedataSource: itemtreedatasource,
-                    dataReview: itemdata.dataReview
-                        ? JSON.parse(itemdata.dataReview).person_name
-                        : ''
-                };
-                totledata.push(itemarrange);
-            });
-            this.setState(
-                {
-                    stagedata: totledata
-                },
-                () => {
-                    this.filterTask();
-                }
-            );
-        }
-    };
-    // 对流程信息根据选择项目进行过滤
-    filterTask () {
-        const { stagedata } = this.state;
-        const { leftkeycode } = this.props;
-        let filterData = [];
-        let user = getUser();
-
-        let sections = user.sections;
-
-        sections = JSON.parse(sections);
-
-        let selectCode = '';
-        // 关联标段的人只能看自己项目的进度流程
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let code = sections[0].split('-');
-            selectCode = code[0] || '';
-
-            stagedata.map(task => {
-                let projectName = task.projectName;
-                let projectCode = this.getProjectCode(projectName);
-
-                if (
-                    projectCode === selectCode &&
-                    task.section === sections[0]
-                ) {
-                    filterData.push(task);
-                }
-            });
-        } else {
-            // 不关联标段的人可以看选择项目的进度流程
-            selectCode = leftkeycode;
-            stagedata.map(task => {
-                let projectName = task.projectName;
-                let projectCode = this.getProjectCode(projectName);
-
-                if (projectCode === selectCode) {
-                    filterData.push(task);
-                }
-            });
-        }
-
-        this.setState({
-            filterData
-        });
-    }
     // 获取项目code
     getProjectCode (projectName) {
         const {
@@ -259,15 +74,17 @@ class Actual extends Component {
             platform: { tree = {} }
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
-        let user = getUser();
+        let user = localStorage.getItem('QH_USER_DATA');
+        user = JSON.parse(user);
+        console.log('user', user);
 
-        let sections = user.sections;
+        let sections = user && user.account && user.account.sections;
+        console.log('sections', sections);
         let currentSectionName = '';
         let projectName = '';
-
-        sections = JSON.parse(sections);
+        let section = '';
         if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
+            section = sections[0];
             console.log('section', section);
             let code = section.split('-');
             if (code && code.length === 3) {
@@ -280,53 +97,167 @@ class Actual extends Component {
                             // 获取当前标段的名字
                             if (unit.No === section) {
                                 currentSectionName = unit.Name;
-                                console.log(
-                                    'currentSectionNameaaaaaaaaaaaaaaaaa',
-                                    currentSectionName
-                                );
-                                console.log('projectName', projectName);
                             }
                         });
                     }
                 });
             }
-            console.log('section', section);
-            console.log('currentSectionName', currentSectionName);
-            console.log('projectName', projectName);
-            this.setState({
-                currentSection: section,
-                currentSectionName: currentSectionName,
-                projectName: projectName
-            });
         }
-    }
-    // 获取当前登陆用户的标段的下拉选项
-    getSectionOption () {
-        const { sectionSchedule } = this.state;
-        let option = [];
-        sectionSchedule.map(section => {
-            option.push(
-                <Option key={section.value} value={section.value}>
-                    {section.name}
-                </Option>
-            );
+        this.setState({
+            currentSection: section,
+            currentSectionName: currentSectionName,
+            projectName: projectName,
+            user
         });
-        return option;
+    }
+    // 获取日实际进度流程信息
+    gettaskSchedule = async () => {
+        const {
+            actions: { getTaskSchedule }
+        } = this.props;
+        let reqData = {};
+        this.props.form.validateFields((err, values) => {
+            console.log('日实际进度流程信息', values);
+            console.log('err', err);
+            reqData.subject_section__contains = values.sunitproject
+                ? values.sunitproject
+                : '';
+            reqData.real_start_time_begin = values.stimedate
+                ? moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00')
+                : '';
+            reqData.real_start_time_end = values.stimedate
+                ? moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59')
+                : '';
+            if (values.sstatus) {
+                reqData.status = values.sstatus
+                    ? values.sstatus
+                    : '';
+            }
+        });
+
+        console.log('reqData', reqData);
+
+        let tmpData = Object.assign({}, reqData);
+
+        let task = await getTaskSchedule(
+            { code: WORKFLOW_CODE.每日进度填报流程 },
+            tmpData
+        );
+
+        let totledata = [];
+        if (task && task instanceof Array) {
+            task.map((item, index) => {
+                let itemdata = item.subject[0];
+                let itempostdata = itemdata.postData
+                    ? JSON.parse(itemdata.postData)
+                    : null;
+                let actualDataSource = itemdata.actualDataSource
+                    ? JSON.parse(itemdata.actualDataSource)
+                    : [];
+                let itemarrange = {
+                    index: index + 1,
+                    id: item.id,
+                    section: itemdata.section
+                        ? JSON.parse(itemdata.section)
+                        : '',
+                    sectionName: itemdata.sectionName
+                        ? JSON.parse(itemdata.sectionName)
+                        : '',
+                    projectName: itemdata.projectName
+                        ? JSON.parse(itemdata.projectName)
+                        : '',
+                    type: itempostdata.type,
+                    submitperson: item.creator.person_name,
+                    submittime: moment(item.workflow.created_on)
+                        .utc()
+                        .zone(-8)
+                        .format('YYYY-MM-DD'),
+                    status: item.status,
+                    actualTimeDate: itemdata.actualTimeDate
+                        ? JSON.parse(itemdata.actualTimeDate)
+                        : '',
+                    actualDataSource: actualDataSource,
+                    actualSupervisorReview: itemdata.actualSupervisorReview
+                        ? JSON.parse(itemdata.actualSupervisorReview).person_name
+                        : ''
+                };
+                totledata.push(itemarrange);
+            });
+            this.setState(
+                {
+                    actualData: totledata
+                },
+                () => {
+                    this.filterTask();
+                }
+            );
+        }
+    };
+
+    // 对流程信息根据选择项目进行过滤
+    filterTask () {
+        const { actualData } = this.state;
+        const { leftkeycode } = this.props;
+        let filterData = [];
+        let user = localStorage.getItem('QH_USER_DATA');
+        user = JSON.parse(user);
+        console.log('user', user);
+        // 是否为业主或管理员
+        let permission = getUserIsManager();
+        if (permission) {
+            // 业主或管理员可以看选择项目的进度流程
+            actualData.map(task => {
+                let projectName = task.projectName;
+                let projectCode = this.getProjectCode(projectName);
+                if (leftkeycode) {
+                    if (projectCode === leftkeycode) {
+                        filterData.push(task);
+                    }
+                } else {
+                    filterData.push(task);
+                }
+            });
+        } else {
+            let sections = user && user.account && user.account.sections;
+            let selectCode = '';
+            // 关联标段的人只能看自己项目的进度流程
+            if (sections && sections instanceof Array && sections.length > 0) {
+                let code = sections[0].split('-');
+                selectCode = code[0] || '';
+                actualData.map(task => {
+                    let projectName = task.projectName;
+                    let projectCode = this.getProjectCode(projectName);
+                    if (
+                        projectCode === selectCode &&
+                            task.section === sections[0]
+                    ) {
+                        filterData.push(task);
+                    }
+                });
+            }
+        }
+        this.setState({
+            filterData
+        });
+    }
+
+    async componentDidUpdate (prevProps, prevState) {
+        const { leftkeycode } = this.props;
+        if (leftkeycode !== prevProps.leftkeycode) {
+            this.filterTask();
+        }
     }
 
     render () {
         const {
             selectedRowKeys,
-            sectionSchedule = [],
             filterData,
-            currentSectionName
+            currentSectionName,
+            user
         } = this.state;
         const {
             form: { getFieldDecorator }
         } = this.props;
-
-        let user = getUser();
-        let username = user.username;
 
         const rowSelection = {
             selectedRowKeys,
@@ -337,18 +268,18 @@ class Actual extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        // let sectionOption = this.getSectionOption()
+        let username = user && user.username;
         return (
             <div>
-                {this.state.dayvisible && (
+                {this.state.actualModalVisible && (
                     <ActualModal
                         {...this.props}
-                        {...this.state.TotleModaldata}
+                        {...this.state.actualModaldata}
                         oncancel={this.totleCancle.bind(this)}
-                        onok={this.totleOk.bind(this)}
+                        onok={this.totleCancle.bind(this)}
                     />
                 )}
-                <SearchInfo
+                <WeekPlanSearchInfo
                     {...this.props}
                     {...this.state}
                     gettaskSchedule={this.gettaskSchedule.bind(this)}
@@ -382,7 +313,6 @@ class Actual extends Component {
                     maskClosable={false}
                     onCancel={this.closeModal.bind(this)}
                     onOk={this.sendWork.bind(this)}
-                    // key={this.state.key}
                 >
                     <div>
                         <Form>
@@ -394,7 +324,7 @@ class Actual extends Component {
                                                 {...FormItemLayout}
                                                 label='标段'
                                             >
-                                                {getFieldDecorator('Ssection', {
+                                                {getFieldDecorator('actualSection', {
                                                     initialValue: {
                                                         currentSectionName
                                                     },
@@ -406,9 +336,6 @@ class Actual extends Component {
                                                         }
                                                     ]
                                                 })(
-                                                    // (<Select placeholder='请选择标段' allowClear>
-                                                    //     {sectionOption}
-                                                    // </Select> )
                                                     <Input
                                                         readOnly
                                                         placeholder='请输入标段'
@@ -419,53 +346,10 @@ class Actual extends Component {
                                         <Col span={12}>
                                             <FormItem
                                                 {...FormItemLayout}
-                                                label='编号'
-                                            >
-                                                {getFieldDecorator(
-                                                    'Snumbercode',
-                                                    {
-                                                        rules: [
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    '请输入编号'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(
-                                                    <Input placeholder='请输入编号' />
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='文档类型'
-                                            >
-                                                {getFieldDecorator(
-                                                    'Sstagedocument',
-                                                    {
-                                                        initialValue: `每日实际进度`,
-                                                        rules: [
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    '请选择文档类型'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
                                                 label='日期'
                                             >
                                                 {getFieldDecorator(
-                                                    'Stimedate',
+                                                    'actualTimeDate',
                                                     {
                                                         rules: [
                                                             {
@@ -487,42 +371,14 @@ class Actual extends Component {
                                             </FormItem>
                                         </Col>
                                     </Row>
-                                    {/* <Row>
-										<Col span={12}>
-											<FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('Ssuperunit', {
-                                                        rules: [
-                                                            { required: true, message: '请选择审核人员' }
-                                                        ]
-                                                    })
-                                                        (<Input placeholder='系统自动识别，无需手输' readOnly/>)
-                                                }
-                                            </FormItem>
-										</Col>
-									</Row> */}
                                     <Row>
                                         <Table
                                             columns={this.columns1}
                                             dataSource={
-                                                this.state.treedataSource
+                                                this.state.actualDataSource
                                             }
                                             className='foresttable'
                                         />
-                                        <Button
-                                            onClick={this.addTreeClick.bind(
-                                                this
-                                            )}
-                                            style={{
-                                                marginLeft: 20,
-                                                marginRight: 10,
-                                                marginBottom: 20
-                                            }}
-                                            type='primary'
-                                            ghost
-                                        >
-                                            添加
-                                        </Button>
                                     </Row>
                                     <Row>
                                         <Col span={8} offset={4}>
@@ -531,7 +387,7 @@ class Actual extends Component {
                                                 label='审核人'
                                             >
                                                 {getFieldDecorator(
-                                                    'SdataReview',
+                                                    'actualSupervisorReview',
                                                     {
                                                         rules: [
                                                             {
@@ -556,15 +412,7 @@ class Actual extends Component {
                                                 )}
                                             </FormItem>
                                         </Col>
-                                        <Col span={8} offset={4}>
-                                            <Checkbox
-                                                onChange={this._cpoyMsgT.bind(
-                                                    this
-                                                )}
-                                            >
-                                                短信通知
-                                            </Checkbox>
-                                        </Col>
+                                        <Col span={8} offset={4} />
                                     </Row>
                                 </Col>
                             </Row>
@@ -573,6 +421,98 @@ class Actual extends Component {
                 </Modal>
             </div>
         );
+    }
+    // 多选
+    onSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys', selectedRowKeys);
+        console.log('selectedRows', selectedRows);
+        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+    };
+    // 新增按钮
+    addClick = () => {
+        let treedata = [
+            {
+                key: 0,
+                project: '便道施工',
+                units: 'm',
+                canDelete: false
+            },
+            {
+                key: 1,
+                project: '给排水沟槽开挖',
+                units: 'm',
+                canDelete: false
+            },
+            {
+                key: 2,
+                project: '给排水管道安装',
+                units: 'm',
+                canDelete: false
+            },
+            {
+                key: 3,
+                project: '给排水回填',
+                units: 'm',
+                canDelete: false
+            },
+            {
+                key: 4,
+                project: '绿地平整',
+                units: '亩',
+                canDelete: false
+            },
+            {
+                key: 5,
+                project: '种植穴工程',
+                units: '个',
+                canDelete: false
+            },
+            {
+                key: 6,
+                project: '管理人员投入',
+                units: '人',
+                canDelete: false
+            },
+            {
+                key: 7,
+                project: '大数据录入人员投入',
+                units: '人',
+                canDelete: false
+            },
+            {
+                key: 8,
+                project: '劳务用工投入',
+                units: '人',
+                canDelete: false
+            },
+            {
+                key: 9,
+                project: '机械设备投入',
+                units: '台',
+                canDelete: false
+            }
+        ];
+        this.setState({
+            visible: true,
+            actualDataSource: treedata
+        });
+        this.props.form.setFieldsValue({
+            actualSection: this.state.currentSectionName || undefined,
+            actualSupervisorReview: undefined,
+            actualTimeDate: moment().utc()
+        });
+    };
+    // 关闭弹框
+    closeModal () {
+        this.props.form.setFieldsValue({
+            actualSection: undefined,
+            actualSupervisorReview: undefined,
+            actualTimeDate: undefined
+        });
+        this.setState({
+            visible: false,
+            actualDataSource: []
+        });
     }
 
     // 选择人员
@@ -595,45 +535,40 @@ class Actual extends Component {
         } else {
             this.member = null;
         }
-
         setFieldsValue({
-            SdataReview: this.member
-            // Ssuperunit:this.member.org
+            actualSupervisorReview: this.member
         });
     }
-
     // 发起填报
     sendWork () {
         const {
-            actions: { createFlow, getWorkflowById, putFlow },
-            location
+            actions: { createFlow, getWorkflowById, putFlow }
         } = this.props;
         const {
-            treedataSource,
+            actualDataSource,
             projectName,
             currentSectionName,
-            currentSection
+            currentSection,
+            user
         } = this.state;
-        let user = getUser(); // 当前登录用户
         let me = this;
         // 共有信息
         let postData = {};
-        // 专业信息
-        let attrs = {};
 
         me.props.form.validateFields((err, values) => {
             console.log('表单信息', values);
             if (!err) {
-                postData.upload_unit = user.org ? user.org : '';
+                postData.upload_unit = user.account ? user.account.org_code : '';
                 postData.type = '每日实际进度';
-                postData.upload_person = user.name ? user.name : user.username;
-                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
+                postData.upload_person = user.account ? user.account.person_name : user.username;
+                postData.upload_time = moment().format('YYYY-MM-DD HH:mm:ss');
 
                 const currentUser = {
                     username: user.username,
-                    person_code: user.code,
-                    person_name: user.name,
-                    id: parseInt(user.id)
+                    person_code: user && user.account && user.account.person_code,
+                    person_name: user && user.account && user.account.person_name,
+                    id: user && parseInt(user.id),
+                    org: user && user.account && user.account.org_code
                 };
 
                 let subject = [
@@ -641,15 +576,11 @@ class Actual extends Component {
                         section: JSON.stringify(currentSection),
                         projectName: JSON.stringify(projectName),
                         sectionName: JSON.stringify(currentSectionName),
-                        // "superunit": JSON.stringify(values.Ssuperunit),
-                        dataReview: JSON.stringify(values.SdataReview),
-                        numbercode: JSON.stringify(values.Snumbercode),
-                        timedate: JSON.stringify(
-                            moment(values.Stimedate._d).format('YYYY-MM-DD')
-                        ),
-                        stagedocument: JSON.stringify(values.Sstagedocument),
+                        actualSupervisorReview: JSON.stringify(values.actualSupervisorReview),
+                        actualTimeDate: JSON.stringify(moment(values.actualTimeDate._d).format('YYYY-MM-DD')),
+                        actualDataSource: JSON.stringify(actualDataSource),
                         postData: JSON.stringify(postData),
-                        treedataSource: JSON.stringify(treedataSource)
+                        fillPerson: JSON.stringify(currentUser)
                     }
                 ];
                 // 准备发起流程
@@ -678,13 +609,7 @@ class Actual extends Component {
                         });
                         return;
                     }
-                    const { id, workflow: { states = [] } = {} } = instance;
-                    const [
-                        {
-                            id: state_id,
-                            actions: [action]
-                        }
-                    ] = states;
+                    const { id } = instance;
                     // 获取流程信息
                     getWorkflowById({ id: id }).then(instance => {
                         if (instance && instance.current) {
@@ -693,9 +618,7 @@ class Actual extends Component {
                                 instance,
                                 currentStateId
                             );
-
                             let stateid = nextStates[0].to_state[0].id;
-
                             let postInfo = {
                                 next_states: [
                                     {
@@ -736,181 +659,94 @@ class Actual extends Component {
             }
         });
     }
-
-    // 添加树列表
-    addTreeClick () {
-        const { treedataSource } = this.state;
-        let key = treedataSource.length;
-        let addtree = {
-            key: key,
-            project: '',
-            units: '棵',
-            canDelete: true
-        };
-        treedataSource.push(addtree);
-
-        this.setState({ treedataSource });
-    }
-
-    // 下拉框选择变化
-    handleSelect (record, project, value) {
-        const { treedataSource } = this.state;
-
-        value = JSON.parse(value);
-        record[project] = value.TreeTypeName;
-    }
-    // 删除树列表
-    delTreeClick (record, index) {
-        const { treedataSource } = this.state;
-
-        treedataSource.splice(record.key, 1);
-
-        for (let i = 0; i < treedataSource.length; i++) {
-            if (i >= record.key) {
-                treedataSource[i].key = treedataSource[i].key - 1;
-            }
-        }
-        this.setState({
-            treedataSource: treedataSource
-        });
-    }
-
-    onSelectChange = (selectedRowKeys, selectedRows) => {
-        console.log('selectedRowKeys', selectedRowKeys);
-        console.log('selectedRows', selectedRows);
-        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
-    };
     // 删除
     deleteClick = async () => {
         const {
             actions: { deleteFlow }
         } = this.props;
-        const { dataSourceSelected } = this.state;
-        if (dataSourceSelected.length === 0) {
-            notification.warning({
-                message: '请先选择数据！',
-                duration: 3
-            });
-        } else {
-            let user = getUser();
-            let username = user.username;
-
-            if (username != 'admin') {
+        const {
+            dataSourceSelected,
+            user
+        } = this.state;
+        try {
+            if (dataSourceSelected.length === 0) {
                 notification.warning({
-                    message: '非管理员不得删除！',
+                    message: '请先选择数据！',
                     duration: 3
                 });
-                return;
-            }
-
-            let flowArr = dataSourceSelected.map(data => {
-                if (data && data.id) {
-                    return data.id;
+            } else {
+                let username = user.username;
+                if (username !== 'admin') {
+                    notification.warning({
+                        message: '非管理员不得删除！',
+                        duration: 3
+                    });
+                    return;
                 }
-            });
-
-            let promises = flowArr.map(flow => {
-                let data = flow;
-                let postdata = {
-                    pk: data
-                };
-                return deleteFlow(postdata);
-            });
-
-            Promise.all(promises).then(rst => {
-                console.log('rst', rst);
-                notification.success({
-                    message: '删除流程成功',
-                    duration: 3
+                let flowArr = dataSourceSelected.map(data => {
+                    if (data && data.id) {
+                        return data.id;
+                    }
                 });
-                this.setState({
-                    selectedRowKeys: [],
-                    dataSourceSelected: []
+                let promises = flowArr.map(flow => {
+                    let data = flow;
+                    let postdata = {
+                        pk: data
+                    };
+                    return deleteFlow(postdata);
                 });
-                this.gettaskSchedule();
-            });
+                Promise.all(promises).then(rst => {
+                    console.log('rst', rst);
+                    // 是否删除失败
+                    let errorStatus = false;
+                    // 删除失败的顺序码
+                    let errorArr = [];
+                    rst.map((data, index) => {
+                        if (data) {
+                            errorStatus = true;
+                            errorArr.push(index + 1);
+                        }
+                    });
+                    // 存在删除失败
+                    if (errorStatus) {
+                        let stringData = '';
+                        // 将删除失败的顺序码数组进行组合
+                        errorArr.map((data, index) => {
+                            if (index === 0) {
+                                stringData = stringData + data;
+                            } else {
+                                stringData = stringData + ',' + data;
+                            }
+                        });
+                        notification.error({
+                            message: `第${stringData}条流程删除失败`,
+                            duration: 3
+                        });
+                    } else {
+                        notification.success({
+                            message: '删除流程成功',
+                            duration: 3
+                        });
+                    }
+                    this.setState({
+                        selectedRowKeys: [],
+                        dataSourceSelected: []
+                    });
+                    this.gettaskSchedule();
+                });
+            }
+        } catch (e) {
+            console.log('deleteClick', e);
         }
     };
 
     // 操作--查看
     clickInfo (record) {
-        this.setState({ dayvisible: true, TotleModaldata: record });
+        this.setState({ actualModalVisible: true, actualModaldata: record });
     }
     // 取消
     totleCancle () {
-        this.setState({ dayvisible: false });
-    }
-    // 确定
-    totleOk () {
-        this.setState({ dayvisible: false });
-    }
-
-    // 新增按钮
-    addClick = () => {
-        let treedata = [
-            {
-                key: 0,
-                project: '便道施工',
-                units: 'm',
-                canDelete: false
-            },
-            {
-                key: 1,
-                project: '给排水沟槽开挖',
-                units: 'm',
-                canDelete: false
-            },
-            {
-                key: 2,
-                project: '给排水管道安装',
-                units: 'm',
-                canDelete: false
-            },
-            {
-                key: 3,
-                project: '给排水回填',
-                units: 'm',
-                canDelete: false
-            },
-            {
-                key: 4,
-                project: '绿地平整',
-                units: '亩',
-                canDelete: false
-            },
-            {
-                key: 5,
-                project: '种植穴工程',
-                units: '个',
-                canDelete: false
-            }
-        ];
-        this.setState({
-            visible: true,
-            treedataSource: treedata,
-            key: Math.random()
-        });
-        this.props.form.setFieldsValue({
-            // Ssuperunit: undefined,
-            Ssection: this.state.currentSectionName || undefined,
-            SdataReview: undefined,
-            Snumbercode: undefined,
-            Stimedate: moment().utc()
-        });
-    };
-    // 关闭弹框
-    closeModal () {
-        this.setState({
-            visible: false,
-            treedataSource: []
-        });
-    }
-
-    // 短信
-    _cpoyMsgT (e) {
-        this.setState({
-            isCopyMsg: e.target.checked
-        });
+        this.setState({ actualModalVisible: false });
     }
 
     columns = [
@@ -918,37 +754,31 @@ class Actual extends Component {
             title: '项目',
             dataIndex: 'projectName',
             key: 'projectName',
-            width: '15%'
+            width: '18%'
         },
         {
             title: '标段',
             dataIndex: 'sectionName',
             key: 'sectionName',
-            width: '10%'
+            width: '12%'
         },
         {
             title: '进度类型',
             dataIndex: 'type',
             key: 'type',
-            width: '15%'
-        },
-        {
-            title: '编号',
-            dataIndex: 'numbercode',
-            key: 'numbercode',
-            width: '15%'
+            width: '18%'
         },
         {
             title: '提交人',
             dataIndex: 'submitperson',
             key: 'submitperson',
-            width: '10%'
+            width: '15%'
         },
         {
             title: '提交时间',
             dataIndex: 'submittime',
             key: 'submittime',
-            width: '15%',
+            width: '17%',
             sorter: (a, b) =>
                 moment(a['submittime']).unix() - moment(b['submittime']).unix(),
             render: text => {
@@ -1003,27 +833,6 @@ class Actual extends Component {
             render: (text, record, index) => {
                 if (record.project) {
                     return text;
-                } else {
-                    return (
-                        <Select
-                            showSearch
-                            optionFilterProp='children'
-                            filterOption={(input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                            }
-                            style={{ width: '200px' }}
-                            placeholder='请选择树种'
-                            onChange={this.handleSelect.bind(
-                                this,
-                                record,
-                                'project'
-                            )}
-                        >
-                            {this.state.treetype}
-                        </Select>
-                    );
                 }
             }
         },
@@ -1034,47 +843,31 @@ class Actual extends Component {
         },
         {
             title: '数量',
-            dataIndex: 'number',
-            key: 'number',
+            dataIndex: 'actualNum',
+            key: 'actualNum',
             render: (text, record, index) => {
                 return (
                     <Input
-                        value={record.number}
-                        onChange={ele => {
-                            record.number = ele.target.value;
-                            this.forceUpdate();
-                        }}
+                        value={record.actualNum || 0}
+                        onChange={this.handleActualNumChange.bind(this, index)}
                     />
                 );
             }
-        },
-        {
-            title: '操作',
-            dataIndex: 'operation',
-            key: 'operation',
-            width: '10%',
-            render: (text, record, index) => {
-                if (record.canDelete) {
-                    return (
-                        <div>
-                            <Popconfirm
-                                placement='rightTop'
-                                title='确定删除吗？'
-                                onConfirm={this.delTreeClick.bind(
-                                    this,
-                                    record,
-                                    index + 1
-                                )}
-                                okText='确认'
-                                cancelText='取消'
-                            >
-                                <a>删除</a>
-                            </Popconfirm>
-                        </div>
-                    );
-                }
-            }
         }
     ];
+    // 实际数量的输入
+    handleActualNumChange = (index, data) => {
+        const {
+            actualDataSource
+        } = this.state;
+        try {
+            actualDataSource[index].actualNum = data.target.value;
+            this.setState({
+                actualDataSource
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
 }
 export default Form.create()(Actual);

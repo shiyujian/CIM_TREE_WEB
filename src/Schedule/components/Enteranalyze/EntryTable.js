@@ -17,7 +17,7 @@ export default class EntryTable extends Component {
             nurserys: 0,
             loading3: false,
             loading4: false,
-            loading5: false,
+            loading6: false,
             isOpen: [false, false, false],
             nowmessage: [],
             nowmessagelist: []
@@ -26,11 +26,8 @@ export default class EntryTable extends Component {
 
     async componentDidMount () {
         const {
-            actions: { getfactory, nowmessage, gettreetype, getTotalSat }
+            actions: { nowmessage }
         } = this.props;
-        this.setState({
-            loading5: true
-        });
         this.query();
         // 实时种植信息
         let rst = await nowmessage();
@@ -40,16 +37,6 @@ export default class EntryTable extends Component {
                 nowmessagelist: rst.content
             });
         }
-
-        // 供应商个数
-        // let factorys = await getfactory()
-        // if(factorys && factorys instanceof Array ){
-        //     let factorynum = factorys.length;
-        //     this.setState({
-        //         nurserys:factorynum,
-        //         loading5:false
-        //     })
-        // }
     }
 
     async componentDidUpdate (prevProps, prevState) {
@@ -67,7 +54,8 @@ export default class EntryTable extends Component {
         } = this.props;
         this.setState({
             loading3: true,
-            loading4: true
+            loading4: true,
+            loading6: true
         });
 
         // 获取当前种树信息
@@ -96,6 +84,7 @@ export default class EntryTable extends Component {
         this.setState({
             loading3: false,
             loading4: false,
+            loading6: false,
             amount,
             today
         });
@@ -106,37 +95,26 @@ export default class EntryTable extends Component {
 
         return (
             <div>
-                <Row gutter={10} style={{ margin: '5px 5px 20px 5px' }}>
-                    <Col span={5}>
-                        <Spin spinning={this.state.loading3}>
-                            <SumTotal
-                                search={this.searchSum(0)}
-                                title='苗木累计进场总数'
-                                title1='Total number of nursery stock'
-                            >
-                                <div>{amount}</div>
-                            </SumTotal>
-                        </Spin>
-                    </Col>
-                    <Col span={5}>
-                        <Spin spinning={this.state.loading4}>
-                            <SumTotal
-                                search={this.searchSum(1)}
-                                title='苗木今日进场总数'
-                                title1='Total number of nursery stock today'
-                            >
-                                <div>{this.state.today}</div>
-                            </SumTotal>
-                        </Spin>
-                    </Col>
-                    {/* <Col span={5}>
-                        <Spin spinning={this.state.loading5}>
-                            <SumTotal search={this.searchSum(2)} title='供苗商总数' title1='Total number of nursery'>
-                                <div>{this.state.nurserys}</div>
-                            </SumTotal>
-                        </Spin>
-                    </Col> */}
-                    <Col span={6}>
+                <div style={{display: 'flex'}}>
+                    <Spin spinning={this.state.loading3}>
+                        <SumTotal
+                            search={this.searchSum(0)}
+                            title='苗木累计进场总数'
+                            title1='Total number of nursery stock'
+                        >
+                            <div>{amount}</div>
+                        </SumTotal>
+                    </Spin>
+                    <Spin spinning={this.state.loading4}>
+                        <SumTotal
+                            search={this.searchSum(1)}
+                            title='苗木今日进场总数'
+                            title1='Total number of nursery stock today'
+                        >
+                            <div>{this.state.today}</div>
+                        </SumTotal>
+                    </Spin>
+                    <Spin spinning={this.state.loading6}>
                         <div
                             className='nowmessage'
                             style={{ border: '1px solid #666' }}
@@ -158,8 +136,8 @@ export default class EntryTable extends Component {
                                 )}
                             </div>
                         </div>
-                    </Col>
-                </Row>
+                    </Spin>
+                </div>
             </div>
         );
     }

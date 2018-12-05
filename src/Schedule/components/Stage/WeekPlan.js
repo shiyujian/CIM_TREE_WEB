@@ -19,7 +19,7 @@ import {
     WORKFLOW_CODE
 } from '_platform/api';
 import { getNextStates } from '_platform/components/Progress/util';
-import { getUser, getUserIsManager } from '_platform/auth';
+import { getUserIsManager } from '_platform/auth';
 import PerSearch from './PerSearch';
 import WeekPlanSearchInfo from './WeekPlanSearchInfo';
 import WeekPlanModal from './WeekPlanModal';

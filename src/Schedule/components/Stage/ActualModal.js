@@ -40,7 +40,7 @@ export default class ActualModal extends Component {
             history = task.history;
         }
         this.setState({
-            treeDatasource: this.props.TreedataSource,
+            treeDatasource: this.props.actualDataSource,
             history
         });
     }
@@ -95,60 +95,13 @@ export default class ActualModal extends Component {
                                         <Col span={12}>
                                             <FormItem
                                                 {...FormItemLayout}
-                                                label='编号'
-                                            >
-                                                {getFieldDecorator(
-                                                    'stagenumbercode',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props.numbercode ||
-                                                            '暂无编号'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请输入编号'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='文档类型'
-                                            >
-                                                {getFieldDecorator(
-                                                    'stagedocument',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props
-                                                            .stagedocument ||
-                                                            '暂无文档类型'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请输入文档类型'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
                                                 label='日期'
                                             >
                                                 {getFieldDecorator(
                                                     'stagetimedate',
                                                     {
                                                         initialValue: `${this
-                                                            .props.timedate ||
+                                                            .props.actualTimeDate ||
                                                             '暂无日期'}`,
                                                         rules: [
                                                             {
@@ -162,21 +115,6 @@ export default class ActualModal extends Component {
                                             </FormItem>
                                         </Col>
                                     </Row>
-                                    {/* <Row>
-                                        <Col span={12}>
-                                            <FormItem {...FormItemLayout} label='监理单位'>
-                                                {
-                                                    getFieldDecorator('stagesuperunit', {
-                                                        initialValue: `${this.props.superunit || '暂无监理单位'}`,
-                                                        rules: [
-                                                            { required: false, message: '请输入监理单位' }
-                                                        ]
-                                                    })
-                                                        (<Input readOnly />)
-                                                }
-                                            </FormItem>
-                                        </Col>
-                                    </Row> */}
                                     <Row>
                                         <Table
                                             columns={this.columns1}
@@ -208,11 +146,7 @@ export default class ActualModal extends Component {
                                                 ] = []
                                             } = {}
                                         } = step;
-                                        const { id: userID } = executor || {};
-
                                         if (step.status === 'processing') {
-                                            // 根据历史状态显示
-                                            const state = this.getCurrentState();
                                             return (
                                                 <Step
                                                     title={
@@ -266,8 +200,7 @@ export default class ActualModal extends Component {
                                                 note = ''
                                             } = record || {};
                                             const {
-                                                person_name: name = '',
-                                                organization = ''
+                                                person_name: name = ''
                                             } = executor;
                                             return (
                                                 <Step
@@ -345,8 +278,7 @@ export default class ActualModal extends Component {
         );
     }
     getCurrentState () {
-        const { platform: { task = {} } = {}, location = {} } = this.props;
-        // const { state_id = '0' } = queryString.parse(location.search) || {};
+        const { platform: { task = {} } = {} } = this.props;
         const { states = [] } = task;
         return states.find(state => state.status === 'processing');
     }
@@ -372,8 +304,8 @@ export default class ActualModal extends Component {
         },
         {
             title: '数量',
-            dataIndex: 'number',
-            key: 'number'
+            dataIndex: 'actualNum',
+            key: 'actualNum'
         }
     ];
 }

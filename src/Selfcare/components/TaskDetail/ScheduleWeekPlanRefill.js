@@ -551,7 +551,6 @@ class ScheduleWeekPlanRefill extends Component {
                             supervisorReview: JSON.stringify(values.weekSupervisorReview),
                             stime: JSON.stringify(moment(stime).format('YYYY-MM-DD')),
                             etime: JSON.stringify(moment(etime).format('YYYY-MM-DD')),
-                            daydocument: JSON.stringify(values.daydocument),
                             weekPlanDataSource: JSON.stringify(weekPlanDataSource),
                             postData: JSON.stringify(postData),
                             fillPerson: JSON.stringify(executor)

@@ -11,7 +11,7 @@ import queryString from 'query-string';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 const FormItem = Form.Item;
 
-export default class ScheduleWeekPlanDeal extends Component {
+export default class ScheduleActualDeal extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -36,13 +36,12 @@ export default class ScheduleWeekPlanDeal extends Component {
         const {
             platform: { task = {} } = {}
         } = this.props;
-
         return (
             <div>
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <FormItem
-                            {...ScheduleWeekPlanDeal.layout}
+                            {...ScheduleActualDeal.layout}
                             label='处理意见'
                         >
                             <Input
@@ -80,7 +79,7 @@ export default class ScheduleWeekPlanDeal extends Component {
     handleSubmit = async (task = {}) => {
         const {
             location,
-            actions: { putFlow, postWeekPlanSchedule }
+            actions: { putFlow, addSchedule }
         } = this.props;
         let {
             note,
@@ -88,7 +87,6 @@ export default class ScheduleWeekPlanDeal extends Component {
         } = this.state;
         try {
             const { state_id = '0' } = queryString.parse(location.search) || {};
-
             let me = this;
             // 获取登陆用户信息
             console.log('user', user);
@@ -99,7 +97,6 @@ export default class ScheduleWeekPlanDeal extends Component {
                 id: user && parseInt(user.id),
                 org: user && user.account && user.account.org_code
             };
-
             // 获取流程的action名称
             let action_name = '';
             let nextStates = await getNextStates(task, Number(state_id));
@@ -122,40 +119,52 @@ export default class ScheduleWeekPlanDeal extends Component {
             let data = {
                 pk: task.id
             };
-
             // 进度数据入库
+            console.log('task', task);
             let subject = task.subject[0];
-            let weekPlanDataSource = subject.weekPlanDataSource
-                ? JSON.parse(subject.weekPlanDataSource)
+            let actualDataSource = subject.actualDataSource
+                ? JSON.parse(subject.actualDataSource)
                 : '';
+            console.log('actualDataSource', actualDataSource);
+            let items = [];
             let section = subject.section ? JSON.parse(subject.section) : '';
-            if (!section) {
-                notification.error({
-                    message: '数据错误，请确认填报人标段是否存在',
-                    duration: 3
-                });
+            let fillPerson = subject.fillPerson ? JSON.parse(subject.fillPerson) : '';
+            let project = '';
+            if (section) {
+                let sectionArr = section.split('-');
+                if (sectionArr && sectionArr instanceof Array && sectionArr.length > 0) {
+                    project = sectionArr[0];
+                }
             }
-            let schedulePostData = [];
-            weekPlanDataSource.map(item => {
+            actualDataSource.map(item => {
                 let data = {
-                    PlanDate: item.date,
-                    Section: section,
-                    Num: Number(item.planTreeNum)
+                    Num: item.actualNum,
+                    Project: item.project,
+                    WPNo: section
                 };
-                schedulePostData.push(data);
+                items.push(data);
             });
-            console.log('schedulePostData', schedulePostData);
-            // 周进度入库
-            let rst = await postWeekPlanSchedule({}, schedulePostData);
-            console.log('rst', rst);
-            if (rst && rst.code) {
+            let postData = {
+                DocType: 'doc',
+                Items: items,
+                ProgressNo: fillPerson ? (fillPerson.username ? fillPerson.username : '') : '',
+                ProgressTime: subject.actualTimeDate ? JSON.parse(subject.actualTimeDate) : '',
+                ProgressType: '日实际',
+                SMS: 0,
+                UnitProject: subject.section ? JSON.parse(subject.section) : '',
+                WPNo: project
+            };
+            // 日进度入库
+            let scheduleData = await addSchedule({}, postData);
+            console.log('scheduleData', scheduleData);
+            if (scheduleData && scheduleData.code && scheduleData.code === 1) {
                 notification.success({
                     message: '上传数据成功',
                     duration: 2
                 });
 
-                let flowData = await putFlow(data, workflowData);
-                if (flowData && flowData.id) {
+                let rst = await putFlow(data, workflowData);
+                if (rst && rst.creator) {
                     notification.success({
                         message: '流程提交成功',
                         duration: 2
@@ -190,9 +199,7 @@ export default class ScheduleWeekPlanDeal extends Component {
         } = this.state;
         try {
             const { state_id = '0' } = queryString.parse(location.search) || {};
-
             let me = this;
-            // 获取登陆用户信息
             console.log('user', user);
             let executor = {
                 username: user.username,
@@ -221,7 +228,6 @@ export default class ScheduleWeekPlanDeal extends Component {
             nextUser = oldSubject.fillPerson
                 ? JSON.parse(oldSubject.fillPerson)
                 : {};
-
             let state = task.current[0].id;
             let workflowData = {
                 next_states: [
@@ -238,12 +244,14 @@ export default class ScheduleWeekPlanDeal extends Component {
                 note: note,
                 attachment: null
             };
+            console.log('workflowData', workflowData);
 
             let data = {
                 pk: task.id
             };
 
             let rst = await putFlow(data, workflowData);
+            console.log('rst', rst);
             if (rst && rst.creator) {
                 notification.success({
                     message: '流程拒绝成功',

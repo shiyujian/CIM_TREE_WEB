@@ -112,7 +112,7 @@ export default class ScheduleWeekPlanHandle extends Component {
         try {
             if (!this.member) {
                 notification.error({
-                    message: '请选择监理查看审核人',
+                    message: '请选择业主查看执行人',
                     duration: 2
                 });
                 return;

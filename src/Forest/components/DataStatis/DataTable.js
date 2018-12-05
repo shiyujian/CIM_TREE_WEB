@@ -23,16 +23,14 @@ export default class DataTable extends Component {
     componentDidUpdate = async (prevProps, prevState) => {
         const {
             leftkeycode,
-            queryTime,
-            section
+            queryTime
+            // section
         } = this.props;
         if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             await this.query();
         }
         if (queryTime && queryTime !== prevProps.queryTime) {
-            // if (section && section !== prevProps.section) {
             await this.query();
-            // }
         }
     }
     async query () {
@@ -50,27 +48,27 @@ export default class DataTable extends Component {
         });
 
         // 获取当前种树信息
-        let postdata = {
+        let getTotalSatNurseryPostdata = {
             statType: 'nursery',
             section: section || leftkeycode
         };
-        let amount = await getTotalSat({}, postdata);
+        let amount = await getTotalSat({}, getTotalSatNurseryPostdata);
 
         // 获取当前种树信息
-        let postdata2 = {
+        let getTotalSatTreePostdata = {
             statType: 'tree',
             section: section || leftkeycode
         };
-        let plantAmount = await getTotalSat({}, postdata2);
+        let plantAmount = await getTotalSat({}, getTotalSatTreePostdata);
 
         // 今日入场数
         let today = 0;
-        let params = {
+        let gettreeEntrancePostData = {
             stime: moment().format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             no: section || leftkeycode
         };
-        let rst = await gettreeEntrance({}, params);
+        let rst = await gettreeEntrance({}, gettreeEntrancePostData);
         if (rst && rst instanceof Array) {
             rst.map(item => {
                 if (item && item.Section) {
@@ -78,22 +76,35 @@ export default class DataTable extends Component {
                 }
             });
         }
+        let getCountPostData = {
+            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
+            no: leftkeycode
+        };
         // 今日种植棵数
-        let rst2 = await getCount({}, params);
+        let rst2 = await getCount({}, getCountPostData);
         let plantToday = 0;
         if (rst2 && rst2 instanceof Array) {
-            rst2.map(item => {
-                plantToday = plantToday + item.Num;
-            });
+            if (section) {
+                rst2.map(item => {
+                    if (item.Section === section) {
+                        plantToday = item.Num;
+                    }
+                });
+            } else {
+                rst2.map(item => {
+                    plantToday = plantToday + item.Num;
+                });
+            }
         }
         // 实时种植信息
-        let postdata3 = {
+        let getqueryTreePostData = {
             page: 1,
             size: 5,
             no: leftkeycode,
             section: section
         };
-        let message = await getqueryTree({}, postdata3);
+        let message = await getqueryTree({}, getqueryTreePostData);
 
         let nowmessagelist = [];
         if (message && message.content) {

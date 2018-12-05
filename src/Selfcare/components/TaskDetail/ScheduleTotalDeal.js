@@ -76,7 +76,7 @@ export default class ScheduleTotalDeal extends Component {
         });
     }
 
-    handleSubmit (task = {}) {
+    handleSubmit = async (task = {}) => {
         const {
             location,
             actions: { putFlow, addSchedule }
@@ -98,7 +98,7 @@ export default class ScheduleTotalDeal extends Component {
 
         // 获取流程的action名称
         let action_name = '';
-        let nextStates = getNextStates(task, Number(state_id));
+        let nextStates = await getNextStates(task, Number(state_id));
         for (var i = 0; i < nextStates.length; i++) {
             if (nextStates[i].action_name === '通过') {
                 action_name = nextStates[i].action_name;
@@ -144,7 +144,7 @@ export default class ScheduleTotalDeal extends Component {
 
         let filePath = JSON.stringify(items);
 
-        let scheduledata = {
+        let postData = {
             DocType: 'doc',
             ProgressNo: '01',
             ProgressTime: moment(postdata.upload_time).format('YYYY-MM-DD'),
@@ -155,36 +155,33 @@ export default class ScheduleTotalDeal extends Component {
             FilePath: filePath
         };
         // 日进度入库
-        addSchedule({}, scheduledata).then(item => {
-            console.log('item', item);
-            if (item && item.msg) {
-                notification.success({
-                    message: '上传数据成功',
-                    duration: 2
-                });
-
-                putFlow(data, workflowData).then(rst => {
-                    if (rst && rst.creator) {
-                        notification.success({
-                            message: '流程提交成功',
-                            duration: 2
-                        });
-                        let to = `/selfcare/task`;
-                        me.props.history.push(to);
-                    } else {
-                        notification.error({
-                            message: '流程提交失败',
-                            duration: 2
-                        });
-                    }
-                });
-            } else {
-                notification.error({
-                    message: '上传数据失败',
-                    duration: 2
-                });
-            }
-        });
+        // let scheduleData = await addSchedule({}, postData);
+        // console.log('scheduleData', scheduleData);
+        // if (scheduleData && scheduleData.code && scheduleData.code === 1) {
+        //     notification.success({
+        //         message: '上传数据成功',
+        //         duration: 2
+        //     });
+        let rst = await putFlow(data, workflowData);
+        if (rst && rst.creator) {
+            notification.success({
+                message: '流程提交成功',
+                duration: 2
+            });
+            let to = `/selfcare/task`;
+            me.props.history.push(to);
+        } else {
+            notification.error({
+                message: '流程提交失败',
+                duration: 2
+            });
+        }
+        // } else {
+        //     notification.error({
+        //         message: '上传数据失败',
+        //         duration: 2
+        //     });
+        // }
     }
 
     handleReject (task = {}) {

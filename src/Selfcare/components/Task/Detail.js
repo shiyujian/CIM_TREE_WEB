@@ -20,8 +20,8 @@ import ScheduleTotalDetail from '../TaskDetail/ScheduleTotalDetail';
 import ScheduleTotalRefill from '../TaskDetail/ScheduleTotalRefill';
 import ScheduleDayDetail from '../TaskDetail/ScheduleDayDetail';
 import ScheduleDayRefill from '../TaskDetail/ScheduleDayRefill';
-import ScheduleStageDetail from '../TaskDetail/ScheduleStageDetail';
-import ScheduleStageRefill from '../TaskDetail/ScheduleStageRefill';
+import ScheduleActualDetail from '../TaskDetail/ScheduleActualDetail';
+import ScheduleActualRefill from '../TaskDetail/ScheduleActualRefill';
 import ScheduleWeekPlanDetail from '../TaskDetail/ScheduleWeekPlanDetail';
 import ScheduleWeekPlanRefill from '../TaskDetail/ScheduleWeekPlanRefill';
 // 质量管理模块
@@ -48,9 +48,9 @@ export default class Detail extends Component {
                 return <ScheduleDayDetail {...this.props} {...this.state} />;
             } else if (
                 code === WORKFLOW_CODE.每日进度填报流程 &&
-                (name === '审核' || name === '结束')
+                (name === '监理审核' || name === '业主查看' || name === '结束')
             ) {
-                return <ScheduleStageDetail {...this.props} {...this.state} />;
+                return <ScheduleActualDetail {...this.props} {...this.state} />;
             } else if (
                 code === WORKFLOW_CODE.每周进度填报流程 &&
                 (name === '监理审核' || name === '业主查看' || name === '结束')
@@ -140,9 +140,9 @@ export default class Detail extends Component {
                 return <ScheduleDayRefill {...this.props} {...this.state} />;
             } else if (
                 code === WORKFLOW_CODE.每日进度填报流程 &&
-                name === '填报'
+                name === '施工填报'
             ) {
-                return <ScheduleStageRefill {...this.props} {...this.state} />;
+                return <ScheduleActualRefill {...this.props} {...this.state} />;
             } else if (
                 code === WORKFLOW_CODE.每周进度填报流程 &&
                 name === '施工填报'
