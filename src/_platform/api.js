@@ -452,48 +452,54 @@ export const CULTIVATIONMODE = [
 
 export const SCHEDULRPROJECT = [
     {
-        id: 6,
-        name: '便道施工'
-    },
-    {
-        id: 7,
-        name: '给排水沟槽开挖'
-    },
-    {
-        id: 8,
-        name: '给排水管道安装'
-    },
-    {
-        id: 9,
-        name: '给排水回填'
-    },
-    {
-        id: 10,
-        name: '绿地平整'
-    },
-    {
-        id: 11,
-        name: '种植穴工程'
-    },
-    {
         id: 1,
-        name: '常绿乔木'
+        name: '便道施工',
+        units: 'm'
     },
     {
         id: 2,
-        name: '落叶乔木'
+        name: '给排水沟槽开挖',
+        units: 'm'
     },
     {
         id: 3,
-        name: '亚乔木'
+        name: '给排水管道安装',
+        units: 'm'
     },
     {
         id: 4,
-        name: '灌木'
+        name: '给排水回填',
+        units: 'm'
     },
     {
         id: 5,
-        name: '草本'
+        name: '绿地平整',
+        units: '亩'
+    },
+    {
+        id: 6,
+        name: '种植穴工程',
+        units: '个'
+    },
+    {
+        id: 7,
+        name: '管理人员投入',
+        units: '人'
+    },
+    {
+        id: 8,
+        name: '大数据录入人员投入',
+        units: '人'
+    },
+    {
+        id: 9,
+        name: '劳务用工投入',
+        units: '人'
+    },
+    {
+        id: 10,
+        name: '机械设备投入',
+        units: '台'
     }
 ];
 

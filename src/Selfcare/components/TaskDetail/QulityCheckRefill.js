@@ -15,12 +15,14 @@ import {
     Steps
 } from 'antd';
 import moment from 'moment';
-import PerSearch from '../../../_platform/components/panels/PerSearch';
-import { getUser } from '../../../_platform/auth';
-import { getNextStates } from '../../../_platform/components/Progress/util';
+import PerSearch from '_platform/components/panels/PerSearch';
+import { getUser } from '_platform/auth';
+import { getNextStates } from '_platform/components/Progress/util';
 import queryString from 'query-string';
+import { SCHEDULRPROJECT } from '_platform/api';
 const FormItem = Form.Item;
 const Step = Steps.Step;
+const Option = Select.Option;
 
 class QulityCheckRefill extends Component {
     static propTypes = {};
@@ -100,38 +102,14 @@ class QulityCheckRefill extends Component {
         const {
             actions: { gettreetype }
         } = this.props;
-        let treedata = [
-            {
-                key: 1,
-                project: '便道施工',
-                units: 'm'
-            },
-            {
-                key: 2,
-                project: '给排水沟槽开挖',
-                units: 'm'
-            },
-            {
-                key: 3,
-                project: '给排水管道安装',
-                units: 'm'
-            },
-            {
-                key: 4,
-                project: '给排水回填',
-                units: 'm'
-            },
-            {
-                key: 5,
-                project: '绿地平整',
-                units: '亩'
-            },
-            {
-                key: 6,
-                project: '种植穴工程',
-                units: '个'
-            }
-        ];
+        let treedata = [];
+        SCHEDULRPROJECT.map((item) => {
+            treedata.push({
+                key: item.id - 1,
+                project: item.name,
+                units: item.units
+            });
+        });
         this.setState({
             treedataSource: treedata
         });

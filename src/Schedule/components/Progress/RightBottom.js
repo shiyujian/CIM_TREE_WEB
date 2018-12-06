@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
-import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
+import { Select, Card, DatePicker, Spin } from 'antd';
 import {
-    TREETYPENO,
-    ECHARTSCOLOR,
     SCHEDULRPROJECT
 } from '../../../_platform/api';
 import moment from 'moment';
-const RadioGroup = Radio.Group;
 const Option = Select.Option;
-const RadioButton = Radio.Button;
 const { RangePicker } = DatePicker;
-export default class Warning extends Component {
+export default class RightBottom extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -23,7 +18,6 @@ export default class Warning extends Component {
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             departOptions: '',
             currentSection: '',
-            treetypeAll: [],
             loading: false,
             datas: [],
             gpshtnum: []
@@ -31,18 +25,6 @@ export default class Warning extends Component {
     }
 
     async componentDidMount () {
-        const {
-            actions: { gettreeevery }
-        } = this.props;
-        // 获取全部树种信息
-        let rst = await gettreeevery();
-        console.log('gettreeeveryrst', rst);
-        if (rst && rst instanceof Array) {
-            this.setState({
-                treetypeAll: rst
-            });
-        }
-
         this.getSection();
         let myChart = echarts.init(document.getElementById('rightbottom'));
 
@@ -85,7 +67,7 @@ export default class Warning extends Component {
             ]
         };
         myChart.setOption(optionLine);
-        this.getdata();
+        // this.getdata();
     }
 
     getSection () {
@@ -119,17 +101,17 @@ export default class Warning extends Component {
         const { stime, etime, currentSection } = this.state;
         const { leftkeycode } = this.props;
         try {
-            if (leftkeycode != prevProps.leftkeycode) {
+            if (leftkeycode !== prevProps.leftkeycode) {
                 this.getSection();
                 this.getdata();
             }
         } catch (e) {
             console.log(e);
         }
-        if (stime != prevState.stime || etime != prevState.etime) {
+        if (stime !== prevState.stime || etime !== prevState.etime) {
             this.getdata();
         }
-        if (currentSection != prevState.currentSection) {
+        if (currentSection !== prevState.currentSection) {
             this.filterProjectData();
         }
     }
@@ -190,7 +172,7 @@ export default class Warning extends Component {
     }
 
     getdata () {
-        const { etime, stime, treetypeAll } = this.state;
+        const { etime, stime } = this.state;
         const {
             platform: { tree = {} },
             leftkeycode
@@ -203,17 +185,12 @@ export default class Warning extends Component {
         this.setState({
             loading: true
         });
-        console.log('RightBottomaaaaaaaaaaaaaaaaaaaaa', params);
         const {
-            actions: { progressdata, progressalldata }
+            actions: { progressalldata }
         } = this.props;
         let gpshtnum = [];
-        let times = [];
-        let time = [];
         let datas = [];
-        // let datas = Array(10).fill(0);
         progressalldata({}, params).then(rst => {
-            console.log('RightBottom', rst);
             if (rst && rst.content) {
                 let content = [];
                 rst.content.map(item => {
@@ -226,9 +203,6 @@ export default class Warning extends Component {
                     datas[index].project = item.name;
                     datas[index].value = new Array();
                 });
-
-                console.log('RightBottomdatas', datas);
-
                 if (content && content instanceof Array) {
                     sectionData.map(project => {
                         // 获取正确的项目
@@ -256,58 +230,17 @@ export default class Warning extends Component {
                         }
                     });
                 }
-
-                console.log('RightBottomgpshtnum', gpshtnum);
-
                 gpshtnum.map((data, i) => {
                     data.map((arr, a) => {
                         let Items = arr.Items;
                         Items.map((item, x) => {
-                            // 默认的种类
-                            // console.log('RightBottomitem',item)
-                            // console.log('RightBottomx',x)
-                            if (x < 6) {
+                            if (item) {
                                 SCHEDULRPROJECT.map((project, serial) => {
                                     if (item.Project === project.name) {
                                         let reg = isNaN(item.Num);
-                                        console.log('reg', reg);
                                         if (!reg) {
                                             if (item.Num > 0) {
-                                                datas[serial].value[i] =
-                                                    datas[serial].value[i] +
-                                                    item.Num +
-                                                    0;
-                                            }
-                                        }
-                                        // datas[serial].value[index] = datas[serial].value[index] + item.Num + 0
-                                    }
-                                });
-                            } else {
-                                // 添加的数目种类
-                                let treetype = '';
-                                treetypeAll.map(tree => {
-                                    if (tree.TreeTypeName === item.Project) {
-                                        // 获取树种cdoe的首个数字，找到对应的类型
-                                        let code = tree.TreeTypeNo.substr(0, 1);
-                                        console.log('code', code);
-                                        TREETYPENO.map(forest => {
-                                            if (forest.id === code) {
-                                                treetype = forest.name;
-                                            }
-                                        });
-                                    }
-                                });
-                                // console.log('RightBottomtreetype',treetype)
-                                SCHEDULRPROJECT.map((project, serial) => {
-                                    if (treetype === project.name) {
-                                        let reg = isNaN(item.Num);
-                                        console.log('reg', reg);
-                                        if (!reg) {
-                                            if (item.Num > 0) {
-                                                datas[serial].value[i] =
-                                                    datas[serial].value[i] +
-                                                    item.Num +
-                                                    0;
+                                                datas[serial].value[i] = datas[serial].value[i] + item.Num + 0;
                                             }
                                         }
                                     }
@@ -316,7 +249,6 @@ export default class Warning extends Component {
                         });
                     });
                 });
-                console.log('RightBottomdatas', datas);
                 this.setState(
                     {
                         datas: datas,

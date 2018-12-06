@@ -14,7 +14,8 @@ import {
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
-    WORKFLOW_CODE
+    WORKFLOW_CODE,
+    SCHEDULRPROJECT
 } from '_platform/api';
 import { getNextStates } from '_platform/components/Progress/util';
 import { getUserIsManager } from '_platform/auth';
@@ -430,68 +431,16 @@ class Actual extends Component {
     };
     // 新增按钮
     addClick = () => {
-        let treedata = [
-            {
-                key: 0,
-                project: '便道施工',
-                units: 'm',
-                canDelete: false
-            },
-            {
-                key: 1,
-                project: '给排水沟槽开挖',
-                units: 'm',
-                canDelete: false
-            },
-            {
-                key: 2,
-                project: '给排水管道安装',
-                units: 'm',
-                canDelete: false
-            },
-            {
-                key: 3,
-                project: '给排水回填',
-                units: 'm',
-                canDelete: false
-            },
-            {
-                key: 4,
-                project: '绿地平整',
-                units: '亩',
-                canDelete: false
-            },
-            {
-                key: 5,
-                project: '种植穴工程',
-                units: '个',
-                canDelete: false
-            },
-            {
-                key: 6,
-                project: '管理人员投入',
-                units: '人',
-                canDelete: false
-            },
-            {
-                key: 7,
-                project: '大数据录入人员投入',
-                units: '人',
-                canDelete: false
-            },
-            {
-                key: 8,
-                project: '劳务用工投入',
-                units: '人',
-                canDelete: false
-            },
-            {
-                key: 9,
-                project: '机械设备投入',
-                units: '台',
-                canDelete: false
-            }
-        ];
+        let treedata = [];
+        SCHEDULRPROJECT.map((item) => {
+            treedata.push({
+                key: item.id - 1,
+                project: item.name,
+                units: item.units
+            });
+        });
+        console.log('SCHEDULRPROJECT', SCHEDULRPROJECT);
+        console.log('treedata', treedata);
         this.setState({
             visible: true,
             actualDataSource: treedata

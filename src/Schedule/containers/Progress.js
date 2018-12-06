@@ -4,14 +4,14 @@ import { DynamicTitle, Sidebar, Content } from '_platform/components/layout';
 import { connect } from 'react-redux';
 
 import { bindActionCreators } from 'redux';
-import { Tabs, Row, Col, DatePicker } from 'antd';
+import { Tabs, Row, Col } from 'antd';
 import LeftTop from '../components/Progress/LeftTop';
-import LeftBottom from '../components/Progress/LeftBottom';
 import RightBottom from '../components/Progress/RightBottom';
 import RightTop from '../components/Progress/RightTop';
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import * as actions from '../store/entry';
+import {DEFAULT_PROJECT} from '_platform/api';
 @connect(
     state => {
         const { platform } = state || {};
@@ -40,6 +40,9 @@ export default class Progress extends Component {
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
+            await this.onSelect([DEFAULT_PROJECT]);
+        } else {
+            await this.onSelect([DEFAULT_PROJECT]);
         }
     }
 
@@ -50,8 +53,10 @@ export default class Progress extends Component {
         const {
             actions: { setkeycode }
         } = this.props;
-        setkeycode(keycode);
-        this.setState({ leftkeycode: keycode });
+        if (keycode) {
+            setkeycode(keycode);
+            this.setState({ leftkeycode: keycode });
+        }
     }
 
     render () {
@@ -91,9 +96,6 @@ export default class Progress extends Component {
                         </Col>
                     </Row>
                     <Row gutter={10} style={{ margin: '10px 5px' }}>
-                        {/* <Col span={12}>
-                            <LeftBottom   {...this.props} {...this.state}/>
-                        </Col> */}
                         <Col span={24}>
                             <RightBottom {...this.props} {...this.state} />
                         </Col>

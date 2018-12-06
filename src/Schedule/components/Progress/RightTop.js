@@ -1,32 +1,24 @@
 import React, { Component } from 'react';
-import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
+import { Select, Card, DatePicker, Spin } from 'antd';
 import {
-    TREETYPENO,
-    ECHARTSCOLOR,
     SCHEDULRPROJECT
 } from '../../../_platform/api';
 import moment from 'moment';
-const RadioGroup = Radio.Group;
 const Option = Select.Option;
-const RadioButton = Radio.Button;
 const { RangePicker } = DatePicker;
-export default class Warning extends Component {
+export default class RightTop extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
-            stime: moment()
-                .subtract(10, 'days')
-                .format('YYYY/MM/DD 00:00:00'),
+            stime: moment().subtract(10, 'days').format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             data: '',
             departOptions: '',
             currentSection: '',
-            project: '便道施工',
+            project: SCHEDULRPROJECT[0].name,
             sections: [],
-            treetypeAll: [],
             gpshtnum: [],
             times: [],
             datas: [],
@@ -35,18 +27,6 @@ export default class Warning extends Component {
     }
 
     async componentDidMount () {
-        const {
-            actions: { gettreeevery }
-        } = this.props;
-        // 获取全部树种信息
-        let rst = await gettreeevery();
-        console.log('gettreeeveryrst', rst);
-        if (rst && rst instanceof Array) {
-            this.setState({
-                treetypeAll: rst
-            });
-        }
-
         this.getSection();
         const myChart = echarts.init(document.getElementById('rightop'));
 
@@ -80,7 +60,6 @@ export default class Warning extends Component {
             yAxis: [
                 {
                     type: 'value',
-                    // name: '长度（m）',
                     axisLabel: {
                         formatter: '{value} '
                     }
@@ -89,7 +68,7 @@ export default class Warning extends Component {
             series: []
         };
         myChart.setOption(optionLine);
-        this.getdata();
+        // this.getdata();
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -97,12 +76,11 @@ export default class Warning extends Component {
             stime,
             etime,
             project,
-            currentSection,
-            treetypeAll
+            currentSection
         } = this.state;
         const { leftkeycode } = this.props;
         try {
-            if (leftkeycode != prevProps.leftkeycode) {
+            if (leftkeycode !== prevProps.leftkeycode) {
                 this.getSection();
                 this.getdata();
             }
@@ -110,15 +88,14 @@ export default class Warning extends Component {
             console.log(e);
         }
         if (
-            stime != prevState.stime ||
-            etime != prevState.etime ||
-            treetypeAll != prevState.treetypeAll
+            stime !== prevState.stime ||
+            etime !== prevState.etime
         ) {
             this.getdata();
         }
         if (
-            project != prevState.project ||
-            currentSection != prevState.currentSection
+            project !== prevState.project ||
+            currentSection !== prevState.currentSection
         ) {
             this.filterProjectData();
         }
@@ -152,7 +129,6 @@ export default class Warning extends Component {
     }
 
     render () {
-        // todo 累计完成工程量
         const { sections } = this.state;
         return (
             <div>
@@ -172,7 +148,7 @@ export default class Warning extends Component {
                         />
                         <div
                             id='rightop'
-                            style={{ width: '100%', height: '340px' }}
+                            style={{ width: '100%', height: '400px' }}
                         />
                         <Select
                             placeholder='请选择标段'
@@ -183,7 +159,7 @@ export default class Warning extends Component {
                             {sections}
                         </Select>
                         <Select
-                            defaultValue='便道施工'
+                            defaultValue={SCHEDULRPROJECT[0].name}
                             style={{ width: '120px' }}
                             onSelect={this.selectProject.bind(this)}
                         >
@@ -232,10 +208,7 @@ export default class Warning extends Component {
     getdata () {
         const {
             stime,
-            etime,
-            // project,
-            // unitproject,
-            treetypeAll
+            etime
         } = this.state;
         const {
             platform: { tree = {} },
@@ -249,16 +222,14 @@ export default class Warning extends Component {
         this.setState({
             loading: true
         });
-        console.log('RightTopaaaaaaaaaaaaaaaaaaaaa', params);
         const {
-            actions: { progressdata, progressalldata }
+            actions: { progressalldata }
         } = this.props;
         let gpshtnum = [];
         let times = [];
         let time = [];
 
         progressalldata({}, params).then(rst => {
-            console.log('RightTop', rst);
             let datas = [];
             if (rst && rst.content) {
                 let content = [];
@@ -277,7 +248,6 @@ export default class Warning extends Component {
                         return 0;
                     }
                 });
-                console.log('RightTopcontent', content);
                 // 将 ProgressTime 单独列为一个数组
                 for (let i = 0; i < content.length; i++) {
                     let a = moment(content[i].ProgressTime).format(
@@ -287,15 +257,12 @@ export default class Warning extends Component {
                 }
                 // 时间数组去重
                 times = [...new Set(time)];
-                console.log('RightToptimes', times);
 
                 SCHEDULRPROJECT.map((item, index) => {
                     datas[index] = new Object();
                     datas[index].project = item.name;
                     datas[index].value = new Array();
                 });
-
-                console.log('RightTopdatas', datas);
 
                 if (content && content instanceof Array) {
                     sectionData.map(project => {
@@ -324,10 +291,6 @@ export default class Warning extends Component {
                         }
                     });
                 }
-
-                console.log('RightTopdatas', datas);
-                console.log('RightTopgpshtnum', gpshtnum);
-
                 times.map((time, index) => {
                     datas.map(projectData => {
                         projectData.value.map(sectionData => {
@@ -335,7 +298,6 @@ export default class Warning extends Component {
                         });
                     });
 
-                    console.log('sectionData', datas);
                     gpshtnum.map((data, i) => {
                         data.map((arr, a) => {
                             if (
@@ -346,7 +308,7 @@ export default class Warning extends Component {
                                 let Items = arr.Items;
                                 Items.map((item, x) => {
                                     // 默认的种类
-                                    if (x < 6) {
+                                    if (item) {
                                         SCHEDULRPROJECT.map(
                                             (project, serial) => {
                                                 if (
@@ -354,65 +316,9 @@ export default class Warning extends Component {
                                                     project.name
                                                 ) {
                                                     let reg = isNaN(item.Num);
-                                                    console.log('reg', reg);
                                                     if (!reg) {
                                                         if (item.Num > 0) {
-                                                            datas[serial].value[
-                                                                i
-                                                            ][index] =
-                                                                datas[serial]
-                                                                    .value[i][
-                                                                        index
-                                                                    ] +
-                                                                item.Num +
-                                                                0;
-                                                        }
-                                                    }
-                                                    // datas[serial].value[index] = datas[serial].value[index] + item.Num + 0
-                                                }
-                                            }
-                                        );
-                                    } else {
-                                        // 添加的数目种类
-                                        let treetype = '';
-                                        treetypeAll.map(tree => {
-                                            if (
-                                                tree.TreeTypeName ===
-                                                item.Project
-                                            ) {
-                                                // 获取树种cdoe的首个数字，找到对应的类型
-                                                let code = tree.TreeTypeNo.substr(
-                                                    0,
-                                                    1
-                                                );
-                                                console.log('code', code);
-                                                TREETYPENO.map(forest => {
-                                                    if (forest.id === code) {
-                                                        treetype = forest.name;
-                                                    }
-                                                });
-                                            }
-                                        });
-                                        console.log(
-                                            'RightToptreetype',
-                                            treetype
-                                        );
-                                        SCHEDULRPROJECT.map(
-                                            (project, serial) => {
-                                                if (treetype === project.name) {
-                                                    let reg = isNaN(item.Num);
-                                                    console.log('reg', reg);
-                                                    if (!reg) {
-                                                        if (item.Num > 0) {
-                                                            datas[serial].value[
-                                                                i
-                                                            ][index] =
-                                                                datas[serial]
-                                                                    .value[i][
-                                                                        index
-                                                                    ] +
-                                                                item.Num +
-                                                                0;
+                                                            datas[serial].value[i][index] = datas[serial].value[i][index] + item.Num + 0;
                                                         }
                                                     }
                                                 }
@@ -424,8 +330,6 @@ export default class Warning extends Component {
                         });
                     });
                 });
-                console.log('RightTopdatas', datas);
-
                 this.setState(
                     {
                         datas: datas,
@@ -478,7 +382,6 @@ export default class Warning extends Component {
         dates.push(c);
         dates.push(d);
         dates.push(e);
-        console.log('RightTopdates', dates);
 
         let currentProjectData = [];
         let currentData = [];
@@ -487,8 +390,6 @@ export default class Warning extends Component {
                 currentProjectData = data.value;
             }
         });
-
-        console.log('currentProjectData', currentProjectData);
         sectionData.map(item => {
             // 获取正确的项目
             if (leftkeycode.indexOf(item.No) > -1) {
@@ -502,8 +403,6 @@ export default class Warning extends Component {
                 });
             }
         });
-        console.log('currentData', currentData);
-
         const myChart = echarts.init(document.getElementById('rightop'));
 
         let optionLine = {

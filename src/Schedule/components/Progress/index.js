@@ -1,3 +1,3 @@
-export Filter from './Filter';
-export Table from './Table';
-export Blueprint from './Blueprint';
+export RightBottom from './RightBottom';
+export LeftTop from './LeftTop';
+export RightTop from './RightTop';
