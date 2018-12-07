@@ -642,7 +642,7 @@ export default class LocmeasureTable extends Component {
                         <Button
                             type='primary'
                             onClick={this.exportexcel.bind(this)}
-                            style={{display: 'none'}}
+                            style={{display: 'block'}}
                         >
                             导出
                         </Button>
@@ -1588,8 +1588,20 @@ export default class LocmeasureTable extends Component {
             exportsize,
             thinclass = '',
             status = '',
-            smallclassData = '',
-            thinclassData = ''
+            smallclassData = '', 
+            thinclassData = '',
+            XJFirst = 0,
+            XJSecond = '',
+            DJFirst = 0,
+            DJSecond = '',
+            GDFirst = 0,
+            GDSecond = '',
+            GFFirst = 0,
+            GFSecond = '',
+            TQHDFirst = 0,
+            TQHDSecond = '',
+            TQZJFirst = 0,
+            TQZJSecond = ''
         } = this.state;
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
@@ -1599,6 +1611,78 @@ export default class LocmeasureTable extends Component {
             actions: { getexportTree },
             keycode = ''
         } = this.props;
+        // 胸径
+        let xj = '';
+        if (XJFirst >= 0 && XJSecond) {
+            if (XJSecond > XJFirst) {
+                xj = XJFirst + '-' + XJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入胸径');
+                return;
+            }
+        } else if (XJFirst >= 0 && !XJSecond) {
+            xj = XJFirst;
+        }
+        // 地径
+        let dj = '';
+        if (DJFirst >= 0 && DJSecond) {
+            if (DJSecond > DJFirst) {
+                dj = DJFirst + '-' + DJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入地径');
+                return;
+            }
+        } else if (DJFirst >= 0 && !DJSecond) {
+            dj = DJFirst;
+        }
+        // 高度
+        let gd = '';
+        if (GDFirst >= 0 && GDSecond) {
+            if (GDSecond > GDFirst) {
+                gd = GDFirst + '-' + GDSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入高度');
+                return;
+            }
+        } else if (GDFirst >= 0 && !GDSecond) {
+            gd = GDFirst;
+        }
+        // 冠幅
+        let gf = '';
+        if (GFFirst >= 0 && GFSecond) {
+            if (GFSecond > GFFirst) {
+                gf = GFFirst + '-' + GFSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入冠幅');
+                return;
+            }
+        } else if (GFFirst >= 0 && !GFSecond) {
+            gf = GFFirst;
+        }
+        // 土球厚度
+        let tqhd = '';
+        if (TQHDFirst >= 0 && TQHDSecond) {
+            if (TQHDSecond > TQHDFirst) {
+                tqhd = TQHDFirst + '-' + TQHDSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入土球厚度');
+                return;
+            }
+        } else if (TQHDFirst >= 0 && !TQHDSecond) {
+            tqhd = TQHDFirst;
+        }
+        // 土球直径
+        let tqzj = '';
+        if (TQZJFirst >= 0 && TQZJSecond) {
+            if (TQZJSecond > TQZJFirst) {
+                tqzj = TQZJFirst + '-' + TQZJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入土球直径');
+                return;
+            }
+        } else if (TQZJFirst >= 0 && !TQZJSecond) {
+            tqzj = TQZJFirst;
+        }
         let postdata = {
             no: keycode,
             sxm,
@@ -1612,8 +1696,14 @@ export default class LocmeasureTable extends Component {
             letime: letime && moment(letime).format('YYYY-MM-DD HH:mm:ss'),
             page: 1,
             size: exportsize,
-            smallclass: smallclassData,
-            thinclass: thinclassData
+            smallclass: smallclassData, // 小班
+            thinclass: thinclassData,
+            xj: xj,
+            dj: dj,
+            gd: gd,
+            gf: gf,
+            tqhd: tqhd,
+            tqzj: tqzj
         };
         if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
