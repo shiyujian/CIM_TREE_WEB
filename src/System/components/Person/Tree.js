@@ -249,8 +249,7 @@ export default class Tree extends Component {
                 getTreeModal,
                 setUpdate,
                 getTablePage,
-                getTreeCode,
-                getIsBtn
+                getTreeCode
             }
         } = this.props;
 
@@ -274,8 +273,6 @@ export default class Tree extends Component {
             await getTreeModal(false);
             await setUpdate(true);
             await getTablePage(pagination);
-            // 控制是否通过角色条件分页
-            await getIsBtn(true);
         }
     }
     compare (user, topProject, eventKey) {

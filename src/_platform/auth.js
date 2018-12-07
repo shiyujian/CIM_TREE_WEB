@@ -98,19 +98,6 @@ export const isCardNo = (card) => {
     let card_15 = /^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$/;
     return card_18.test(card) || card_15.test(card);
 };
-// 根据pk获取林工库里的id
-export const getUserId = () => {
-    let userData = JSON.parse(localStorage.getItem('LZ_TOTAL_USER_DATA'));
-    let userId;
-    if (userData && userData.length > 0) {
-        userData.map(item => {
-            if (item.PK === getUser().id + '') {
-                userId = item.ID;
-            }
-        });
-    }
-    return userId;
-};
 export const searchToObj = (url) => {
     // 这个方法将"?letter=2&opp=23"这种string转换为JS对象形式，方便获取URL的参数
     let obj = {};

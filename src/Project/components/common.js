@@ -11,20 +11,6 @@ export const isCardNo = (card) => {
     return card_18.test(card) || card_15.test(card);
 };
 
-// 根据pk获取林工库里的id
-export const getUserId = () => {
-    let userData = JSON.parse(localStorage.getItem('LZ_TOTAL_USER_DATA'));
-    let userId;
-    if (userData && userData.length > 0) {
-        userData.map(item => {
-            if (item.PK === getUser().id + '') {
-                userId = item.ID;
-            }
-        });
-    }
-    return userId;
-};
-
 export const layoutT = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 }

@@ -1465,8 +1465,6 @@ class Addition extends Component {
                                 postUploadFilesNum();
                                 postUploadNegative();
                                 postUploadAutograph();
-                                // 控制是否通过角色条件分页
-                                // getIsBtn(true)
                                 clearAdditionField();
                                 // 之前不修改人员的部门   所以不需要重新获取人员列表 但是现在要修改部门   所以要重新获取人员列表
                                 const codes = node.code;

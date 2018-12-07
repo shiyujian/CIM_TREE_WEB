@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-01 10:07:12
+ * @Last Modified time: 2018-12-07 11:26:14
  */
 import React, { Component } from 'react';
 import {
@@ -165,9 +165,12 @@ class OnSite extends Component {
             // 数据测量
             coordinates: [], // 地图圈选
             polygonData: '', // 圈选地图图层
-            distanceMeasure: 0, // 两点之间的距离
+            totalDistanceMeasure: 0, // 总距离
             areaMeasure: 0, // 圈选区域面积
-            areaMeasureVisible: false // 面积数据显示
+            areaMeasureVisible: false, // 面积数据显示
+            distanceMeasureMarkerList: {},
+            distanceMeasureLineList: {},
+            distanceMeasureNumList: []
         };
         this.tileLayer = null; // 最底部基础图层
         this.tileTreeLayerBasic = null; // 树木区域图层
@@ -324,7 +327,6 @@ class OnSite extends Component {
             }
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        console.log('user', user);
         await getCustomViewByUserID({id: user.id});
         await this.initMap();
     }
@@ -336,12 +338,10 @@ class OnSite extends Component {
         try {
             let me = this;
             let mapInitialization = window.config.initLeaflet;
-            console.log('customViewByUserID', customViewByUserID);
             if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
                 let view = customViewByUserID[0];
                 let center = [view.center[0].lat, view.center[0].lng];
                 let zoom = view.zoom;
-                console.log('center', center);
                 mapInitialization.center = center;
                 mapInitialization.zoom = zoom;
             };
@@ -390,7 +390,10 @@ class OnSite extends Component {
             });
             this.map.on('click', function (e) {
                 const {
-                    coordinates = []
+                    coordinates = [],
+                    distanceMeasureMarkerList = {},
+                    distanceMeasureLineList = {},
+                    distanceMeasureNumList = []
                 } = me.state;
                 const {
                     dashboardCompomentMenu,
@@ -416,32 +419,81 @@ class OnSite extends Component {
                     // 测量距离
                     // 如果数据已经存在两个了，则计算最新点击的点和前一个点的距离
                     let distanceMeasure = 0;
+                    let lineData = [];
                     if (coordinates.length > 1) {
-                        coordinates.shift();
                         coordinates.push([e.latlng.lat, e.latlng.lng]);
-                        let latlng = L.latLng(coordinates[0]);
-                        distanceMeasure = latlng.distanceTo(L.latLng(coordinates[1])).toFixed(2);
+                        let latlng = L.latLng(coordinates[coordinates.length - 2]);
+                        // 计算前一个点与当前点的距离
+                        distanceMeasure = latlng.distanceTo(L.latLng(coordinates[coordinates.length - 1])).toFixed(2);
+                        // 将计算的距离加载在地图上  两点中间
+                        let iconType = L.divIcon({
+                            html: `${distanceMeasure}`,
+                            className: 'dashboard-distanceMeasure-icon',
+                            iconSize: 'auto'
+                        });
+                        let dataX = (coordinates[coordinates.length - 2][0] + e.latlng.lat) / 2;
+                        let dataY = (coordinates[coordinates.length - 2][1] + e.latlng.lng) / 2;
+                        let marker = L.marker([dataX, dataY], {
+                            icon: iconType
+                        });
+                        marker.addTo(me.map);
+                        // 将两点之间的marker图层保存起来
+                        let markerId = `${e.latlng.lat}, ${e.latlng.lng}`;
+                        distanceMeasureMarkerList[markerId] = marker;
+                        // 设置直线数据
+                        lineData.push(coordinates[coordinates.length - 2]);
+                        lineData.push(coordinates[coordinates.length - 1]);
                     } else if (coordinates.length === 1) {
                         // 如果数据已经存在一个，则计算最新点击的点和当前点的距离
                         coordinates.push([e.latlng.lat, e.latlng.lng]);
                         let latlng = L.latLng(coordinates[0]);
+                        // 计算前一个点与当前点的距离
                         distanceMeasure = latlng.distanceTo(L.latLng(coordinates[1])).toFixed(2);
+                        // 将计算的距离加载在地图上  两点中间
+                        let iconType = L.divIcon({
+                            html: `${distanceMeasure}`,
+                            className: 'dashboard-distanceMeasure-icon',
+                            iconSize: 'auto'
+                        });
+                        let dataX = (coordinates[coordinates.length - 2][0] + e.latlng.lat) / 2;
+                        let dataY = (coordinates[coordinates.length - 2][1] + e.latlng.lng) / 2;
+                        let marker = L.marker([dataX, dataY], {
+                            icon: iconType
+                        });
+                        marker.addTo(me.map);
+                        // 将两点之间的marker图层保存起来
+                        let markerId = `${e.latlng.lat}, ${e.latlng.lng}`;
+                        distanceMeasureMarkerList[markerId] = marker;
+                        // 设置直线数据
+                        lineData.push(coordinates[coordinates.length - 2]);
+                        lineData.push(coordinates[coordinates.length - 1]);
                     } else if (coordinates.length === 0) {
                         // 如果数据不存在，则不计算距离
                         coordinates.push([e.latlng.lat, e.latlng.lng]);
+                        lineData.push([e.latlng.lat, e.latlng.lng]);
                     }
-                    if (me.state.polygonData) {
-                        me.map.removeLayer(me.state.polygonData);
+
+                    if (distanceMeasure) {
+                        distanceMeasureNumList.push(distanceMeasure);
                     }
-                    let polygonData = L.polygon(coordinates, {
+                    let totalDistanceMeasure = 0;
+                    distanceMeasureNumList.map((distance) => {
+                        totalDistanceMeasure = (Number(totalDistanceMeasure) +
+                            Number(distance) + 0).toFixed(2);
+                    });
+                    let polygonData = L.polygon(lineData, {
                         color: 'white',
                         fillColor: '#93B9F2',
                         fillOpacity: 0.2
                     }).addTo(me.map);
+                    let lineID = `${e.latlng.lat}, ${e.latlng.lng}`;
+                    distanceMeasureLineList[lineID] = polygonData;
                     me.setState({
                         coordinates,
-                        polygonData,
-                        distanceMeasure
+                        distanceMeasureLineList,
+                        totalDistanceMeasure,
+                        distanceMeasureMarkerList,
+                        distanceMeasureNumList
                     });
                 } else if (dashboardTreeMess === 'treeMess') {
                     me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
@@ -530,7 +582,6 @@ class OnSite extends Component {
             dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
             dashboardCompomentMenu !== 'geojsonFeature_treeAdopt'
         ) {
-            console.log('aaaaaaa');
             await this.getTileLayerTreeBasic();
         }
         // 切换全屏
@@ -879,7 +930,8 @@ class OnSite extends Component {
             areaMeasureVisible,
             adoptTreeModalVisible,
             saveUserMapCustomPositionVisible,
-            distanceMeasure
+            totalDistanceMeasure,
+            distanceMeasureLineList
         } = this.state;
         const {
             dashboardCompomentMenu,
@@ -900,14 +952,20 @@ class OnSite extends Component {
             fullScreenState = tabs.fullScreenState;
         }
         // 计算面积的确定按钮是否可以点击，如果不形成封闭区域，不能点击
-        let createMeasureOkDisplay = false;
+        let createAreaMeasureOkDisplay = false;
         if (coordinates.length <= 2) {
-            createMeasureOkDisplay = true;
+            createAreaMeasureOkDisplay = true;
         }
         // 计算面积的上一步按钮是否可以点击，如果没有点，不能点击
-        let createMeasureBackDisplay = false;
+        let createAreaMeasureBackDisplay = false;
         if (coordinates.length <= 0) {
-            createMeasureBackDisplay = true;
+            createAreaMeasureBackDisplay = true;
+        }
+
+        // 计算距离的上一步按钮是否可以点击，如果没有点，不能点击
+        let createDistanceMeasureBackDisplay = false;
+        if (Object.keys(distanceMeasureLineList).length <= 0) {
+            createDistanceMeasureBackDisplay = true;
         }
         let onSiteAreaTreeData = [];
         if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
@@ -1058,11 +1116,13 @@ class OnSite extends Component {
                                             <div className={areaDistanceMeasureMenu === 'distanceMeasureMenu' ? 'dashboard-rightDataMeasureMenu-back-Select' : 'dashboard-rightDataMeasureMenu-back-Unselect'}>
                                                 <img src={areaDistanceMeasureMenu === 'distanceMeasureMenu' ? distanceMeasureSelImg : distanceMeasureUnSelImg}
                                                     onClick={this.handleSwitchMeasureMenu.bind(this, 'distanceMeasureMenu')}
+                                                    title='距离计算'
                                                     className='dashboard-rightDataMeasureMenu-clickImg' />
                                             </div>
                                             <div className={areaDistanceMeasureMenu === 'areaMeasureMenu' ? 'dashboard-rightDataMeasureMenu-back-Select' : 'dashboard-rightDataMeasureMenu-back-Unselect'}>
                                                 <img src={areaDistanceMeasureMenu === 'areaMeasureMenu' ? areaMeasureSelImg : areaMeasureUnSelImg}
                                                     onClick={this.handleSwitchMeasureMenu.bind(this, 'areaMeasureMenu')}
+                                                    title='面积计算'
                                                     className='dashboard-rightDataMeasureMenu-clickImg' />
                                             </div>
                                         </div>
@@ -1074,9 +1134,20 @@ class OnSite extends Component {
                         areaDistanceMeasureMenu === 'areaMeasureMenu' ? (
                             <div className='dashboard-editPolygonLayout'>
                                 <div>
-                                    <Button type='primary' style={{marginRight: 10}} disabled={createMeasureOkDisplay} onClick={this._handleCreateMeasureOk.bind(this)}>确定</Button>
-                                    <Button type='info' style={{marginRight: 10}} disabled={createMeasureBackDisplay} onClick={this._handleCreateMeasureRetreat.bind(this)}>上一步</Button>
-                                    <Button type='danger' onClick={this._handleCreateMeasureCancel.bind(this)}>撤销</Button>
+                                    <Button type='primary' style={{marginRight: 10}}
+                                        disabled={createAreaMeasureOkDisplay}
+                                        onClick={this._handleCreateMeasureOk.bind(this)}>
+                                        确定
+                                    </Button>
+                                    <Button type='info' style={{marginRight: 10}}
+                                        disabled={createAreaMeasureBackDisplay}
+                                        onClick={this._handleCreateMeasureRetreat.bind(this)}>
+                                        上一步
+                                    </Button>
+                                    <Button type='danger'
+                                        onClick={this.handleCloseMeasureMenu.bind(this)}>
+                                        撤销
+                                    </Button>
                                 </div>
                             </div>
                         ) : ''
@@ -1088,10 +1159,27 @@ class OnSite extends Component {
                             </div>
                         ) : ''
                     }
+                    { // 框选面积的画图按钮
+                        areaDistanceMeasureMenu === 'distanceMeasureMenu' ? (
+                            <div className='dashboard-editPolygonLayout'>
+                                <div>
+                                    <Button type='info' style={{marginRight: 10}}
+                                        disabled={createDistanceMeasureBackDisplay}
+                                        onClick={this._handleCreateMeasureRetreat.bind(this)}>
+                                        上一步
+                                    </Button>
+                                    <Button type='danger'
+                                        onClick={this.handleCloseMeasureMenu.bind(this)}>
+                                        撤销
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : ''
+                    }
                     { // 显示距离
-                        distanceMeasure ? (
+                        totalDistanceMeasure ? (
                             <div className='dashboard-areaMeasureLayout'>
-                                <span>{`距离：${distanceMeasure} 米`}</span>
+                                <span>{`总距离：${totalDistanceMeasure} 米`}</span>
                             </div>
                         ) : ''
                     }
@@ -1923,7 +2011,6 @@ class OnSite extends Component {
     // 切换到成活率模块后对成活率标段数据进行处理
     getSurvivalRateRateDataDefault = () => {
         let survivalRateRateData = this.handleSurvivalRateRateData();
-        console.log('survivalRateRateData', survivalRateRateData);
         this.setState({
             survivalRateRateData,
             switchSurvivalRateFirst: true
@@ -1935,7 +2022,6 @@ class OnSite extends Component {
             switchSurvivalRateFirst
         } = this.state;
         try {
-            console.log('keys', keys);
             let queryData = '';
             for (let i = 0; i < keys.length; i++) {
                 if (keys.length > 0 && keys[i] !== '全部') {
@@ -1984,7 +2070,6 @@ class OnSite extends Component {
     // 在获取成活率数据处理后，加载图层
     getSurvivalRateRateData = () => {
         let survivalRateRateData = this.handleSurvivalRateRateData();
-        console.log('survivalRateRateData', survivalRateRateData);
         this.setState({
             survivalRateRateData
         }, () => {
@@ -2017,8 +2102,6 @@ class OnSite extends Component {
             switchSurvivalRateFirst
         } = this.state;
         try {
-            console.log('survivalRateSectionData', survivalRateSectionData);
-            console.log('switchSurvivalRateFirst', switchSurvivalRateFirst);
             await this.removeTileTreeLayerBasic();
             await this.removeTileTreeSurvivalRateLayer();
             let url = '';
@@ -2167,65 +2250,6 @@ class OnSite extends Component {
         } catch (e) {
             console.log('e', e);
         }
-    }
-    // 计算圈选区域面积
-    _handleCreateMeasureOk = async () => {
-        const {
-            coordinates
-        } = this.state;
-        try {
-            let areaMeasure = computeSignedArea(coordinates, 2);
-            areaMeasure = (areaMeasure * 0.0015).toFixed(2);
-            this.setState({
-                areaMeasure,
-                areaMeasureVisible: true
-            });
-        } catch (e) {
-            console.log('e', e);
-        }
-    }
-    // 圈选地图后退
-    _handleCreateMeasureRetreat = async () => {
-        const {
-            coordinates
-        } = this.state;
-        let me = this;
-        if (me.state.polygonData) {
-            me.map.removeLayer(me.state.polygonData);
-        }
-        this.setState({
-            areaMeasureVisible: false
-        });
-        coordinates.pop();
-        let polygonData = L.polygon(coordinates, {
-            color: 'white',
-            fillColor: '#93B9F2',
-            fillOpacity: 0.2
-        }).addTo(me.map);
-        me.setState({
-            coordinates,
-            polygonData: polygonData
-        });
-    }
-    // 撤销圈选地图
-    _handleCreateMeasureCancel = async () => {
-        const {
-            polygonData
-        } = this.state;
-        if (polygonData) {
-            this.map.removeLayer(polygonData);
-        }
-        this.setState({
-            areaMeasureVisible: false
-        });
-        this._resetRegionState();
-    }
-    // 取消圈选和按钮的功能
-    _resetRegionState = () => {
-        this.setState({
-            polygonData: '',
-            coordinates: []
-        });
     }
     // 退出隐患详情查看
     _handleCancelVisible () {
@@ -2426,14 +2450,11 @@ class OnSite extends Component {
             }
             // 根据苗圃的起苗坐标获取起苗地址
             let nurserysAddressData = await handleGetAddressByCoordinate(nurserysData.location, getLocationNameByCoordinate);
-            console.log('nurserysAddressData', nurserysAddressData);
             let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
             nurserysData.nurserysAddressName = nurserysAddressName;
             // 根据树木的定位坐标获取定位地址
-            // console.log('treeLocationData', treeLocationData);
             // let location = `${treeLocationData.X},${treeLocationData.Y}`;
             // let treeAddressData = await handleGetAddressByCoordinate(location, getLocationNameByCoordinate);
-            // console.log('treeAddressData', treeAddressData);
             // let queryTreeAddressName = (treeAddressData && treeAddressData.regeocode && treeAddressData.regeocode.formatted_address) || '';
             // queryTreeData.queryTreeAddressName = queryTreeAddressName;
 
@@ -2599,15 +2620,10 @@ class OnSite extends Component {
                 setUserMapPositionName
             }
         } = this.props;
-        console.log('view', view);
         await setUserMapPositionName(view.name);
-        console.log('view.zoom', view.zoom);
-        console.log('bbbbbbb');
         await this.map.setZoom(view.zoom);
         if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
             let center = [view.center[0].lat, view.center[0].lng];
-            console.log('center', center);
-            console.log('aaaaaaaaa');
             await this.map.panTo(center);
         } else {
             await this.map.panTo(view.center);
@@ -2626,7 +2642,6 @@ class OnSite extends Component {
                 id: view.id
             };
             let data = await deleteUserCustomView(postData);
-            console.log('data', data);
             if (data) {
                 Notification.error({
                     message: '删除视图失败',
@@ -2639,7 +2654,6 @@ class OnSite extends Component {
                 });
             }
             const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-            console.log('user', user);
             await getCustomViewByUserID({id: user.id});
         } catch (e) {
             console.log('e', e);
@@ -2656,10 +2670,6 @@ class OnSite extends Component {
         if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length < 3) {
             let center = this.map.getCenter();
             let zoom = this.map.getZoom();
-            console.log('center', center);
-            console.log('zoom', zoom);
-            console.log('center', center);
-
             this.setState({
                 saveUserMapCustomPositionVisible: true,
                 saveUserMapCustomPositionCenter: center,
@@ -2680,6 +2690,78 @@ class OnSite extends Component {
             saveUserMapCustomPositionZoom: ''
         });
     }
+    // 计算圈选区域面积
+    _handleCreateMeasureOk = async () => {
+        const {
+            coordinates
+        } = this.state;
+        try {
+            let areaMeasure = computeSignedArea(coordinates, 2);
+            areaMeasure = (areaMeasure * 0.0015).toFixed(2);
+            this.setState({
+                areaMeasure,
+                areaMeasureVisible: true
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+    // 圈选地图后退
+    _handleCreateMeasureRetreat = async () => {
+        const {
+            coordinates,
+            distanceMeasureMarkerList,
+            distanceMeasureLineList,
+            distanceMeasureNumList
+        } = this.state;
+        const {
+            areaDistanceMeasureMenu
+        } = this.props;
+        let me = this;
+        // 计算距离
+        if (areaDistanceMeasureMenu === 'distanceMeasureMenu') {
+            if (Object.keys(distanceMeasureMarkerList).length > 0) {
+                me.map.removeLayer(distanceMeasureMarkerList[Object.keys(distanceMeasureMarkerList)[Object.keys(distanceMeasureMarkerList).length - 1]]);
+                delete distanceMeasureMarkerList[Object.keys(distanceMeasureMarkerList)[Object.keys(distanceMeasureMarkerList).length - 1]];
+            }
+            if (Object.keys(distanceMeasureLineList).length > 0) {
+                me.map.removeLayer(distanceMeasureLineList[Object.keys(distanceMeasureLineList)[Object.keys(distanceMeasureLineList).length - 1]]);
+                delete distanceMeasureLineList[Object.keys(distanceMeasureLineList)[Object.keys(distanceMeasureLineList).length - 1]];
+            }
+            distanceMeasureNumList.pop();
+            let totalDistanceMeasure = 0;
+            distanceMeasureNumList.map((distance) => {
+                totalDistanceMeasure = (Number(totalDistanceMeasure) +
+                    Number(distance) + 0).toFixed(2);
+            });
+            coordinates.pop();
+            me.setState({
+                distanceMeasureMarkerList,
+                distanceMeasureLineList,
+                totalDistanceMeasure,
+                distanceMeasureNumList,
+                coordinates
+            });
+        } else if (areaDistanceMeasureMenu === 'areaMeasureMenu') {
+            // 计算面积
+            if (me.state.polygonData) {
+                me.map.removeLayer(me.state.polygonData);
+            }
+            this.setState({
+                areaMeasureVisible: false
+            });
+            coordinates.pop();
+            let polygonData = L.polygon(coordinates, {
+                color: 'white',
+                fillColor: '#93B9F2',
+                fillOpacity: 0.2
+            }).addTo(me.map);
+            me.setState({
+                coordinates,
+                polygonData: polygonData
+            });
+        }
+    }
     // 选择是测量面积还是距离
     handleSwitchMeasureMenu = async (type) => {
         const {
@@ -2688,23 +2770,39 @@ class OnSite extends Component {
             },
             areaDistanceMeasureMenu
         } = this.props;
-        console.log('type', type);
         await switchAreaDistanceMeasureMenu(type);
         if (areaDistanceMeasureMenu && areaDistanceMeasureMenu !== type) {
             await this.handleCloseMeasureMenu();
         }
     }
-    // 选择是测量面积还是距离
-    handleCloseMeasureMenu = async (type) => {
-        if (this.state.polygonData) {
-            this.map.removeLayer(this.state.polygonData);
+    // 撤销测量面积或者距离的图层
+    handleCloseMeasureMenu = async () => {
+        const {
+            distanceMeasureMarkerList,
+            distanceMeasureLineList,
+            polygonData
+        } = this.state;
+        // 去除框选地图的面积图层
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        // 去除距离测量的显示的距离图层
+        for (let i in distanceMeasureMarkerList) {
+            this.map.removeLayer(distanceMeasureMarkerList[i]);
+        }
+        // 去除距离测量的各个直线的图层
+        for (let i in distanceMeasureLineList) {
+            this.map.removeLayer(distanceMeasureLineList[i]);
         }
         this.setState({
             coordinates: [],
             polygonData: '',
-            distanceMeasure: 0,
             areaMeasure: 0,
-            areaMeasureVisible: false
+            areaMeasureVisible: false,
+            totalDistanceMeasure: 0,
+            distanceMeasureNumList: [],
+            distanceMeasureLineList: {},
+            distanceMeasureMarkerList: {}
         });
     }
 }
