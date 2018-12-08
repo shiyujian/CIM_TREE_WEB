@@ -100,7 +100,7 @@ export default class ManMachineTop extends Component {
     }
 
     // 根据项目筛选数据
-    filterProjectData () {
+    filterProjectData = async () => {
         const {
             dataList = []
         } = this.state;
@@ -112,93 +112,138 @@ export default class ManMachineTop extends Component {
         let yAxisData = [];
         let seriesData = [];
         let seriesNameList = [];
-        dataList.map((content, index) => {
-            sectionsData.map((sectionData) => {
-                if (content.UnitProject === sectionData.No) {
-                    xAxisData.push(sectionData.Name);
-                }
-            });
-            let items = content.Items;
-            SCHEDULRPROJECT.map((project) => {
-                items.map((item) => {
-                    if (item.Project === project.name) {
-                        if (seriesNameList.indexOf(item.Project) === -1) {
-                            seriesNameList.push(item.Project);
-                            if (project.type !== '其他') {
-                                seriesData.push({
-                                    name: item.Project,
-                                    type: 'bar',
-                                    stack: project.type,
-                                    data: [item.Num]
-                                });
+        console.log('dataList', dataList);
+        let myChart = echarts.init(document.getElementById('ManMachineTop'));
+        if (dataList && dataList instanceof Array && dataList.length > 0) {
+            dataList.map((content, index) => {
+                sectionsData.map((sectionData) => {
+                    if (content.UnitProject === sectionData.No) {
+                        xAxisData.push(sectionData.Name);
+                    }
+                });
+                let items = content.Items;
+                SCHEDULRPROJECT.map((project) => {
+                    items.map((item) => {
+                        if (item.Project === project.name) {
+                            if (seriesNameList.indexOf(item.Project) === -1) {
+                                seriesNameList.push(item.Project);
+                                if (project.type !== '其他') {
+                                    seriesData.push({
+                                        name: item.Project,
+                                        type: 'bar',
+                                        stack: project.type,
+                                        data: [item.Num]
+                                    });
+                                } else {
+                                    seriesData.push({
+                                        name: item.Project,
+                                        type: 'line',
+                                        yAxisIndex: 1,
+                                        data: [item.Num]
+                                    });
+                                }
+                                if (index === 0) {
+                                    yAxisData.push({
+                                        type: 'value',
+                                        // name: project.units,
+                                        axisLabel: {
+                                            formatter: '{value} '
+                                        }
+                                    });
+                                }
                             } else {
-                                seriesData.push({
-                                    name: item.Project,
-                                    type: 'line',
-                                    yAxisIndex: 1,
-                                    data: [item.Num]
-                                });
-                            }
-                            if (index === 0) {
-                                yAxisData.push({
-                                    type: 'value',
-                                    // name: project.units,
-                                    axisLabel: {
-                                        formatter: '{value} '
+                                seriesData.map((series) => {
+                                    if (series.name === item.Project) {
+                                        let dataArr = series.data;
+                                        dataArr.push(item.Num);
                                     }
                                 });
                             }
-                        } else {
-                            seriesData.map((series) => {
-                                if (series.name === item.Project) {
-                                    let dataArr = series.data;
-                                    dataArr.push(item.Num);
-                                }
-                            });
                         }
+                    });
+                });
+            });
+            console.log('seriesNameList', seriesNameList);
+            console.log('xAxisData', xAxisData);
+            console.log('yAxisData', yAxisData);
+            console.log('seriesData', seriesData);
+            let optionLine = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: 'light'
+                        }
+                    }
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: { show: true }
+                    }
+                },
+                legend: {
+                    bottom: 5,
+                    type: 'scroll',
+                    data: seriesNameList
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xAxisData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: yAxisData.length > 0 ? yAxisData : [
+                    {
+                        type: 'value',
+                        axisLabel: {
+                            formatter: '{value} '
+                        }
+                    }
+                ],
+                series: seriesData.length > 0 ? seriesData : [
+                    {
+                        name: '管理人员投入',
+                        type: 'bar',
+                        data: []
+                    }
+                ]
+            };
+            myChart.setOption(optionLine);
+        } else {
+            SCHEDULRPROJECT.map((project, index) => {
+                seriesNameList.push(project.name);
+                seriesData.push({
+                    data: [],
+                    type: 'bar'
+                });
+                yAxisData.push({
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value} '
                     }
                 });
             });
-        });
-        console.log('seriesNameList', seriesNameList);
-        console.log('xAxisData', xAxisData);
-        console.log('yAxisData', yAxisData);
-        console.log('seriesData', seriesData);
-
-        let myChart = echarts.init(document.getElementById('ManMachineTop'));
-        let optionLine = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: 'light'
-                    }
-                }
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: { show: true }
-                }
-            },
-            legend: {
-                bottom: 5,
-                type: 'scroll',
-                data: seriesNameList
-            },
-            xAxis: [
-                {
+            await myChart.clear();
+            let option = {
+                legend: {
+                    bottom: 5,
+                    type: 'scroll',
+                    data: seriesNameList
+                },
+                xAxis: {
                     type: 'category',
-                    data: xAxisData,
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                }
-            ],
-            yAxis: yAxisData,
-            series: seriesData
-        };
-        myChart.setOption(optionLine);
+                    data: []
+                },
+                yAxis: yAxisData,
+                series: seriesData
+            };
+            await myChart.setOption(option);
+            //
+        }
         this.setState({
             loading: false
         });
@@ -213,6 +258,7 @@ export default class ManMachineTop extends Component {
         } = this.props;
         let tblData = [];
         let xAxisData = [];
+        let xAxisDataUnique = [];
         // dataList.map((content, index) => {
         //     let obj = {};
         //     sectionsData.map((sectionData) => {
@@ -236,7 +282,8 @@ export default class ManMachineTop extends Component {
         dataList.map((content, index) => {
             sectionsData.map((sectionData) => {
                 if (content.UnitProject === sectionData.No) {
-                    xAxisData.push(sectionData.Name);
+                    xAxisData.push(`${index + 1}-${sectionData.Name}`);
+                    // xAxisData.push(sectionData.Name);
                 }
             });
         });
@@ -263,7 +310,7 @@ export default class ManMachineTop extends Component {
                 });
             });
         });
-        
+        console.log('xAxisDataUnique', xAxisDataUnique);
         console.log('tblData', tblData);
         console.log('xAxisData', xAxisData);
         let _headers = ['标段', ...xAxisData];

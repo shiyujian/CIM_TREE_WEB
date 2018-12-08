@@ -152,6 +152,16 @@ export default class ManMachineBottom extends Component {
                     }
                 });
             }
+            // 将获取的数据按照 ProgressTime 时间排序
+            dataList.sort(function (a, b) {
+                if (a.ProgressTime < b.ProgressTime) {
+                    return -1;
+                } else if (a.ProgressTime > b.ProgressTime) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
             this.setState({
                 dataList: dataList,
                 loading: false
@@ -164,7 +174,7 @@ export default class ManMachineBottom extends Component {
         }
     }
     // 根据标段和项目筛选数据
-    filterProjectData () {
+    filterProjectData = async () => {
         const {
             dataList = []
         } = this.state;
@@ -176,89 +186,119 @@ export default class ManMachineBottom extends Component {
         let yAxisData = [];
         let seriesData = [];
         let seriesNameList = [];
-        dataList.map((content, index) => {
-            xAxisData.push(moment(content.ProgressTime).format('YYYY-MM-DD'));
-            let items = content.Items;
-            SCHEDULRPROJECT.map((project) => {
-                items.map((item) => {
-                    if (item.Project === project.name) {
-                        if (seriesNameList.indexOf(item.Project) === -1) {
-                            seriesNameList.push(item.Project);
-                            if (project.type !== '其他') {
-                                seriesData.push({
-                                    name: item.Project,
-                                    type: 'bar',
-                                    stack: project.type,
-                                    data: [item.Num]
-                                });
+        const myChart = echarts.init(document.getElementById('ManMachineBottom'));
+        if (dataList && dataList instanceof Array && dataList.length > 0) {
+            dataList.map((content, index) => {
+                xAxisData.push(moment(content.ProgressTime).format('YYYY-MM-DD'));
+                let items = content.Items;
+                SCHEDULRPROJECT.map((project) => {
+                    items.map((item) => {
+                        if (item.Project === project.name) {
+                            if (seriesNameList.indexOf(item.Project) === -1) {
+                                seriesNameList.push(item.Project);
+                                if (project.type !== '其他') {
+                                    seriesData.push({
+                                        name: item.Project,
+                                        type: 'bar',
+                                        stack: project.type,
+                                        data: [item.Num]
+                                    });
+                                } else {
+                                    seriesData.push({
+                                        name: item.Project,
+                                        type: 'line',
+                                        yAxisIndex: 1,
+                                        data: [item.Num]
+                                    });
+                                }
+                                if (index === 0) {
+                                    yAxisData.push({
+                                        type: 'value',
+                                        // name: project.units,
+                                        axisLabel: {
+                                            formatter: '{value} '
+                                        }
+                                    });
+                                }
                             } else {
-                                seriesData.push({
-                                    name: item.Project,
-                                    type: 'line',
-                                    yAxisIndex: 1,
-                                    data: [item.Num]
-                                });
-                            }
-                            if (index === 0) {
-                                yAxisData.push({
-                                    type: 'value',
-                                    // name: project.units,
-                                    axisLabel: {
-                                        formatter: '{value} '
+                                seriesData.map((series) => {
+                                    if (series.name === item.Project) {
+                                        let dataArr = series.data;
+                                        dataArr.push(item.Num);
                                     }
                                 });
                             }
-                        } else {
-                            seriesData.map((series) => {
-                                if (series.name === item.Project) {
-                                    let dataArr = series.data;
-                                    dataArr.push(item.Num);
-                                }
-                            });
                         }
+                    });
+                });
+            });
+            console.log('seriesNameList', seriesNameList);
+            console.log('xAxisData', xAxisData);
+            console.log('yAxisData', yAxisData);
+            console.log('seriesData', seriesData);
+            let optionLine = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: { show: true }
+                    }
+                },
+                legend: {
+                    bottom: 5,
+                    type: 'scroll',
+                    data: seriesNameList
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xAxisData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: yAxisData,
+                series: seriesData
+            };
+            myChart.setOption(optionLine);
+        } else {
+            SCHEDULRPROJECT.map((project, index) => {
+                seriesNameList.push(project.name);
+                seriesData.push({
+                    data: [],
+                    type: 'bar'
+                });
+                yAxisData.push({
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value} '
                     }
                 });
             });
-        });
-        console.log('seriesNameList', seriesNameList);
-        console.log('xAxisData', xAxisData);
-        console.log('yAxisData', yAxisData);
-        console.log('seriesData', seriesData);
-
-        const myChart = echarts.init(document.getElementById('ManMachineBottom'));
-        let optionLine = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: '#999'
-                    }
-                }
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: { show: true }
-                }
-            },
-            legend: {
-                bottom: 5,
-                type: 'scroll',
-                data: seriesNameList
-            },
-            xAxis: [
-                {
+            await myChart.clear();
+            let option = {
+                legend: {
+                    bottom: 5,
+                    type: 'scroll',
+                    data: seriesNameList
+                },
+                xAxis: {
                     type: 'category',
-                    data: xAxisData,
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                }
-            ],
-            yAxis: yAxisData,
-            series: seriesData
-        };
-        myChart.setOption(optionLine);
+                    data: []
+                },
+                yAxis: yAxisData,
+                series: seriesData
+            };
+            await myChart.setOption(option);
+        }
     }
 
     toExport () {

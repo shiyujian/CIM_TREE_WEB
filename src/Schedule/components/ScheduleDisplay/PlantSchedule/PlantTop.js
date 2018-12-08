@@ -18,7 +18,7 @@ export default class PlantTop extends Component {
     }
 
     async componentDidMount () {
-        this.query(this.state.stime);
+        // this.query(this.state.stime);
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -59,72 +59,6 @@ export default class PlantTop extends Component {
         }, () => {
             this.query(this.state.stime);
         });
-    }
-    toExport () {
-        const {
-            dataList = [],
-            dataListReal = [],
-            legendList = []
-        } = this.state;
-
-        let tblData = [];
-        let xAxisData = [];
-        let yPlantData = [];
-        let yRealData = [];
-        let yRatioData = [];
-        dataList.map(item => {
-            dataListReal.map(row => {
-                if (item.Section === row.Section) {
-                    xAxisData.push(item.Section);
-                    yPlantData.push(item.Num);
-                    yRealData.push(row.Num);
-                    let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    yRatioData.push(ratio);
-                }
-            });
-        });
-        legendList.map(item => {
-            let obj = {};
-            xAxisData.map((row, col) => {
-                if (item === '计划栽植量') {
-                    obj[row] = yPlantData[col];
-                } else if (item === '实际栽植量') {
-                    obj[row] = yRealData[col];
-                } else {
-                    obj[row] = yRatioData[col];
-                }
-            });
-            tblData.push({
-                '标段': item,
-                ...obj
-            });
-        });
-
-        console.log('tblData', tblData);
-        let _headers = ['标段', ...xAxisData];
-        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
-            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('headers', headers);
-        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
-            .reduce((prev, next) => prev.concat(next))
-            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('testttt', testttt);
-        let output = Object.assign({}, headers, testttt);
-        console.log('output', output);
-        // 获取所有单元格的位置
-        let outputPos = Object.keys(output);
-        console.log('outputPos', outputPos);
-        // 计算出范围
-        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-        console.log('ref', ref);
-        // 构建 workbook 对象
-        let wb = {
-            SheetNames: ['mySheet'],
-            Sheets: {
-                'mySheet': Object.assign({}, output, { '!ref': ref })
-            }
-        };
-        XLSX.writeFile(wb, 'output.xlsx');
     }
     async query (dateString) {
         let { dataList, dataListReal } = this.state;
@@ -195,7 +129,6 @@ export default class PlantTop extends Component {
                 }
             });
         });
-        console.log(xAxisData, yPlantData, yRealData, yRatioData, '未来栽植量');
 
         let myChart = echarts.init(document.getElementById('PlantTop'));
         let optionLine = {
@@ -265,5 +198,65 @@ export default class PlantTop extends Component {
         this.setState({
             loading: false
         });
+    }
+    toExport () {
+        const {
+            dataList = [],
+            dataListReal = [],
+            legendList = []
+        } = this.state;
+
+        let tblData = [];
+        let xAxisData = [];
+        let yPlantData = [];
+        let yRealData = [];
+        let yRatioData = [];
+        dataList.map(item => {
+            dataListReal.map(row => {
+                if (item.Section === row.Section) {
+                    xAxisData.push(item.Section);
+                    yPlantData.push(item.Num);
+                    yRealData.push(row.Num);
+                    let ratio = (row.Num / item.Num * 100).toFixed(2);
+                    yRatioData.push(ratio);
+                }
+            });
+        });
+        legendList.map(item => {
+            let obj = {};
+            xAxisData.map((row, col) => {
+                if (item === '计划栽植量') {
+                    obj[row] = yPlantData[col];
+                } else if (item === '实际栽植量') {
+                    obj[row] = yRealData[col];
+                } else {
+                    obj[row] = yRatioData[col];
+                }
+            });
+            tblData.push({
+                '标段': item,
+                ...obj
+            });
+        });
+
+        let _headers = ['标段', ...xAxisData];
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, 'output.xlsx');
     }
 }

@@ -93,6 +93,214 @@ export default class PlantBottom extends Component {
             </div>
         );
     }
+    handleSection (value) {
+        this.setState({
+            section: value
+        });
+    }
+    async onSearch () {
+        let {
+            dataList,
+            dataListReal,
+            dataListTask,
+            stime,
+            etime,
+            section
+        } = this.state;
+        const {
+            actions: {
+                getTreedayplans,
+                getTreetotalstatbyday,
+                getTreesectionplans
+            },
+            leftkeycode
+        } = this.props;
+        try {
+            this.setState({
+                loading: true
+            });
+            // 计划栽植量
+            await getTreedayplans({}, {
+                section: section || leftkeycode,
+                stime: stime,
+                etime: etime
+            }).then(rep => {
+                if (rep && rep.code && rep.code === 200) {
+                    dataList = rep.content;
+                }
+            });
+            // 实际栽植量
+            await getTreetotalstatbyday({}, {
+                section: section || leftkeycode,
+                stime: stime,
+                etime: etime
+            }).then(rep => {
+                dataListReal = rep;
+            });
+            // 任务量
+            await getTreesectionplans({}, {
+                section: section || leftkeycode
+            }).then(rep => {
+                dataListTask = rep;
+            });
+            console.log('dataList', dataList);
+            console.log('dataListReal', dataListReal);
+            console.log('dataListTask', dataListTask);
+
+            this.setState({
+                dataList: dataList,
+                dataListReal,
+                dataListTask,
+                loading: false
+            }, () => {
+                // 更新表格
+                this.filterProjectData();
+            });
+        } catch (e) {
+            console.log('onSearch', e);
+        }
+    }
+    handleDate (date, dateString) {
+        this.setState({
+            stime: dateString[0],
+            etime: dateString[1]
+        });
+    }
+    // 根据标段和项目筛选数据
+    filterProjectData () {
+        const {
+            dataList = [],
+            dataListReal = [],
+            dataListTask = [],
+            legendList = []
+        } = this.state;
+        let xAxisData = [];
+        let yPlantData = [];
+        let yRealData = [];
+        let yRatioData = [];
+        let yCompleteData = [];
+        let yGrandData = [];
+        dataList.map(item => {
+            let PlanDate = moment(item.PlanDate.split(' ')[0], DATE_FORMAT).format(DATE_FORMAT_);
+            xAxisData.push(PlanDate);
+            yPlantData.push(item.Num);
+            dataListReal.map(row => {
+                if (item.Section === row.Section && PlanDate === row.Label) {
+                    yRealData.push(row.Num);
+                    let ratio = (row.Num / item.Num * 100).toFixed(2);
+                    yRatioData.push(ratio);
+                    yCompleteData.push(row.Complete);
+                }
+            });
+        });
+        dataListTask.map(item => {
+            dataListReal.map(row => {
+                if (item.Section === row.Section) {
+                    let ratio = (row.Complete / item.Sum * 100).toFixed(2);
+                    yGrandData.push(ratio);
+                }
+            });
+        });
+        const myChart = echarts.init(document.getElementById('PlantBottom'));
+        let optionLine = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: { show: true }
+                }
+            },
+            legend: {
+                bottom: 10,
+                data: legendList
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: xAxisData,
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '颗',
+                    axisLabel: {
+                        formatter: '{value} '
+                    }
+                },
+                {
+                    type: 'value',
+                    name: '颗',
+                    axisLabel: {
+                        formatter: '{value} '
+                    }
+                },
+                {
+                    type: 'value',
+                    name: '颗',
+                    axisLabel: {
+                        formatter: '{value} '
+                    }
+                },
+                {
+                    type: 'value',
+                    name: '颗',
+                    axisLabel: {
+                        formatter: '{value} '
+                    }
+                },
+
+                {
+                    type: 'value',
+                    name: '百分比',
+                    axisLabel: {
+                        formatter: '{value}.0%'
+                    }
+                }
+            ],
+            series: [
+                {
+                    name: '计划栽植量',
+                    type: 'bar',
+                    data: yPlantData
+                },
+                {
+                    name: '实际栽植量',
+                    type: 'bar',
+                    data: yRealData
+                },
+                {
+                    name: '实际完成比例',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    data: yRatioData
+                },
+                {
+                    name: '累计栽植量',
+                    type: 'bar',
+                    data: yCompleteData
+                },
+                {
+                    name: '累计完成百分比',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    data: yGrandData
+                }
+            ]
+        };
+        myChart.setOption(optionLine);
+    }
+
     toExport () {
         const {
             dataList = [],
@@ -176,190 +384,5 @@ export default class PlantBottom extends Component {
             }
         };
         XLSX.writeFile(wb, 'output.xlsx');
-    }
-    handleSection (value) {
-        this.setState({
-            section: value
-        });
-    }
-    async onSearch () {
-        let {
-            dataList,
-            dataListReal,
-            dataListTask,
-            stime,
-            etime,
-            section
-        } = this.state;
-        const {
-            actions: {
-                getTreedayplans,
-                getTreetotalstatbyday,
-                getTreesectionplans
-            },
-            leftkeycode
-        } = this.props;
-        try {
-            this.setState({
-                loading: true
-            });
-            // 计划栽植量
-            await getTreedayplans({}, {
-                section: section || leftkeycode,
-                stime: stime,
-                etime: etime
-            }).then(rep => {
-                if (rep && rep.code && rep.code === 200) {
-                    dataList = rep.content;
-                }
-            });
-            // 实际栽植量
-            await getTreetotalstatbyday({}, {
-                section: section || leftkeycode,
-                stime: stime,
-                etime: etime
-            }).then(rep => {
-                dataListReal = rep;
-            });
-            // 任务量
-            await getTreesectionplans({}, {
-                section: section || leftkeycode
-            }).then(rep => {
-                dataListTask = rep;
-            });
-            this.setState({
-                dataList: dataList.reverse(),
-                dataListReal,
-                dataListTask,
-                loading: false
-            }, () => {
-                // 更新表格
-                this.filterProjectData();
-            });
-        } catch (e) {
-            console.log('onSearch', e);
-        }
-    }
-    handleDate (date, dateString) {
-        this.setState({
-            stime: dateString[0],
-            etime: dateString[1]
-        });
-    }
-    // 根据标段和项目筛选数据
-    filterProjectData () {
-        const {
-            dataList = [],
-            dataListReal = [],
-            dataListTask = [],
-            legendList = []
-        } = this.state;
-        let xAxisData = [];
-        let yPlantData = [];
-        let yRealData = [];
-        let yRatioData = [];
-        let yCompleteData = [];
-        let yGrandData = [];
-        dataList.map(item => {
-            let PlanDate = moment(item.PlanDate.split(' ')[0], DATE_FORMAT).format(DATE_FORMAT_);
-            xAxisData.push(PlanDate);
-            yPlantData.push(item.Num);
-            dataListReal.map(row => {
-                if (item.Section === row.Section && PlanDate === row.Label) {
-                    yRealData.push(row.Num);
-                    let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    yRatioData.push(ratio);
-                    yCompleteData.push(row.Complete);
-                }
-            });
-        });
-        dataListTask.map(item => {
-            dataListReal.map(row => {
-                console.log('dataListReal', dataListReal);
-                console.log('row', row);
-                if (item.Section === row.Section) {
-                    let ratio = (row.Complete / item.Sum * 100).toFixed(2);
-                    yGrandData.push(ratio);
-                }
-            });
-        });
-        console.log(xAxisData, yPlantData, yRealData, yRatioData, yCompleteData, yGrandData, '计划栽植量');
-
-        const myChart = echarts.init(document.getElementById('rightop'));
-        let optionLine = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross',
-                    crossStyle: {
-                        color: '#999'
-                    }
-                }
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: { show: true }
-                }
-            },
-            legend: {
-                bottom: 10,
-                data: legendList
-            },
-            xAxis: [
-                {
-                    type: 'category',
-                    data: xAxisData,
-                    axisPointer: {
-                        type: 'shadow'
-                    }
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    name: '颗',
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                },
-                {
-                    type: 'value',
-                    name: '百分比',
-                    axisLabel: {
-                        formatter: '{value}.0%'
-                    }
-                }
-            ],
-            series: [
-                {
-                    name: '计划栽植量',
-                    type: 'bar',
-                    data: yPlantData
-                },
-                {
-                    name: '实际栽植量',
-                    type: 'bar',
-                    data: yRealData
-                },
-                {
-                    name: '实际完成比例',
-                    type: 'line',
-                    yAxisIndex: 1,
-                    data: yRatioData
-                },
-                {
-                    name: '累计栽植量',
-                    type: 'bar',
-                    data: yCompleteData
-                },
-                {
-                    name: '累计完成百分比',
-                    type: 'line',
-                    yAxisIndex: 1,
-                    data: yGrandData
-                }
-            ]
-        };
-        myChart.setOption(optionLine);
     }
 }
