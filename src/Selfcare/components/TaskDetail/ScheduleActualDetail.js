@@ -26,6 +26,23 @@ class ScheduleActualDetail extends Component {
             }
         },
         {
+            title: '类别',
+            dataIndex: 'type',
+            key: 'type',
+            render: (text, record, index) => {
+                const obj = {
+                    children: text,
+                    props: {}
+                };
+                if (record.typeFirst) {
+                    obj.props.rowSpan = record.typeList;
+                } else {
+                    obj.props.rowSpan = 0;
+                }
+                return obj;
+            }
+        },
+        {
             title: '项目',
             dataIndex: 'project',
             key: 'project'
@@ -83,7 +100,8 @@ class ScheduleActualDetail extends Component {
                     <Col span={24}>
                         <Table
                             columns={this.columns1}
-                            pagination
+                            pagination={false}
+                            bordered
                             dataSource={record.actualDataSource}
                         />
                     </Col>

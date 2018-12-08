@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-04 21:20:59
+ * @Last Modified time: 2018-12-08 10:34:08
  */
 /**
  *
@@ -453,53 +453,97 @@ export const CULTIVATIONMODE = [
 export const SCHEDULRPROJECT = [
     {
         id: 1,
-        name: '便道施工',
-        units: 'm'
+        name: '管理人员投入',
+        units: '人',
+        type: '人员投入',
+        typeFirst: true,
+        typeList: 3
     },
     {
         id: 2,
-        name: '给排水沟槽开挖',
-        units: 'm'
+        name: '大数据录入人员投入',
+        units: '人',
+        type: '人员投入',
+        typeFirst: false
     },
     {
         id: 3,
-        name: '给排水管道安装',
-        units: 'm'
+        name: '劳务用工投入',
+        units: '人',
+        type: '人员投入',
+        typeFirst: false
     },
     {
         id: 4,
-        name: '给排水回填',
-        units: 'm'
+        name: '打坑机投入',
+        units: '台',
+        type: '机械投入',
+        typeFirst: true,
+        typeList: 4
     },
     {
         id: 5,
-        name: '绿地平整',
-        units: '亩'
+        name: '吊机投入',
+        units: '台',
+        type: '机械投入',
+        typeFirst: false
     },
     {
         id: 6,
-        name: '种植穴工程',
-        units: '个'
+        name: '开沟机投入',
+        units: '台',
+        type: '机械投入',
+        typeFirst: false
     },
     {
         id: 7,
-        name: '管理人员投入',
-        units: '人'
+        name: '其他机械投入',
+        units: '台',
+        type: '机械投入',
+        typeFirst: false
     },
     {
         id: 8,
-        name: '大数据录入人员投入',
-        units: '人'
+        name: '便道施工',
+        units: 'm',
+        type: '其他',
+        typeFirst: true,
+        typeList: 6
     },
     {
         id: 9,
-        name: '劳务用工投入',
-        units: '人'
+        name: '开挖排水沟槽',
+        units: 'm',
+        type: '其他',
+        typeFirst: false
     },
     {
         id: 10,
-        name: '机械设备投入',
-        units: '台'
+        name: '安装排水管道',
+        units: 'm',
+        type: '其他',
+        typeFirst: false
+    },
+    {
+        id: 11,
+        name: '回填排水',
+        units: 'm',
+        type: '其他',
+        typeFirst: false
+    },
+    {
+        id: 12,
+        name: '绿地平整',
+        units: '亩',
+        type: '其他',
+        typeFirst: false
+    },
+    {
+        id: 13,
+        name: '种植穴工程',
+        units: '个',
+        type: '其他',
+        typeFirst: false
     }
 ];
 

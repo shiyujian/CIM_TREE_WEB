@@ -465,12 +465,12 @@ class Users extends Component {
                                     ? (<div className='system-person-mrg20'>
                                         <Select
                                             placeholder='是否全局搜索'
-                                            value={this.state.searchOveralSituation || []}
+                                            value={this.state.searchOveralSituation}
                                             onChange={this.changeOveralSituation.bind(this)}
                                             style={{ width: '100%' }}
                                         >
-                                            <Option key='全局' title='全局' value='true' >全局</Option>
-                                            <Option key='部门' title='部门' value='false' >部门</Option>
+                                            <Option key='全局' title='全局' value >全局</Option>
+                                            <Option key='部门' title='部门' value={''} >部门</Option>
                                         </Select>
                                     </div>)
                                     : ''
@@ -619,7 +619,11 @@ class Users extends Component {
                 window.localStorage.getItem('QH_USER_DATA')
             );
             let userName = userc.username;
+            console.log('searchOveralSituation', searchOveralSituation);
+            console.log('userName', userName !== 'admin');
+            debugger;
             if (!searchOveralSituation || userName !== 'admin') {
+                console.log('aaaaaaaaaaa');
                 postData.org_code = getTreeCodes;
             }
             this.setState({ loading: true });

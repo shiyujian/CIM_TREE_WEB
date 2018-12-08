@@ -4,7 +4,7 @@ import { Icon, Button, Card, DatePicker, Spin } from 'antd';
 import moment from 'moment';
 import XLSX from 'xlsx';
 const DATE_FORMAT = 'YYYY/MM/DD';
-export default class Warning extends Component {
+export default class PlantTop extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -45,7 +45,7 @@ export default class Warning extends Component {
                         />
                         <Button type='primary' style={{ marginLeft: 50 }} onClick={this.toExport.bind(this)}>导出<Icon type='download' /></Button>
                         <div
-                            id='lefttop'
+                            id='PlantTop'
                             style={{ width: '100%', height: '340px' }}
                         />
                     </Card>
@@ -197,7 +197,7 @@ export default class Warning extends Component {
         });
         console.log(xAxisData, yPlantData, yRealData, yRatioData, '未来栽植量');
 
-        let myChart = echarts.init(document.getElementById('lefttop'));
+        let myChart = echarts.init(document.getElementById('PlantTop'));
         let optionLine = {
             tooltip: {
                 trigger: 'axis',

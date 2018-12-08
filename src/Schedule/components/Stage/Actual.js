@@ -378,7 +378,9 @@ class Actual extends Component {
                                             dataSource={
                                                 this.state.actualDataSource
                                             }
+                                            bordered
                                             className='foresttable'
+                                            pagination={false}
                                         />
                                     </Row>
                                     <Row>
@@ -436,7 +438,10 @@ class Actual extends Component {
             treedata.push({
                 key: item.id - 1,
                 project: item.name,
-                units: item.units
+                units: item.units,
+                type: item.type,
+                typeFirst: item.typeFirst,
+                typeList: item.typeList || 0
             });
         });
         console.log('SCHEDULRPROJECT', SCHEDULRPROJECT);
@@ -773,6 +778,23 @@ class Actual extends Component {
             width: '10%',
             render: (text, record, index) => {
                 return <span>{record.key + 1}</span>;
+            }
+        },
+        {
+            title: '类别',
+            dataIndex: 'type',
+            key: 'type',
+            render: (text, record, index) => {
+                const obj = {
+                    children: text,
+                    props: {}
+                };
+                if (record.typeFirst) {
+                    obj.props.rowSpan = record.typeList;
+                } else {
+                    obj.props.rowSpan = 0;
+                }
+                return obj;
             }
         },
         {

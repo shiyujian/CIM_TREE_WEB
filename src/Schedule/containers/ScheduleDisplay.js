@@ -4,14 +4,18 @@ import { DynamicTitle, Sidebar, Content } from '_platform/components/layout';
 import { connect } from 'react-redux';
 
 import { bindActionCreators } from 'redux';
-import { Row, Col, Select } from 'antd';
-import LeftTop from '../components/ScheduleDisplay/LeftTop';
-import RightTop from '../components/ScheduleDisplay/RightTop';
+import { Row, Col, Select, Tabs } from 'antd';
+import PlantTop from '../components/ScheduleDisplay/PlantSchedule/PlantTop';
+import PlantBottom from '../components/ScheduleDisplay/PlantSchedule/PlantBottom';
+
+import ManMachineTop from '../components/ScheduleDisplay/ManMachineSchedule/ManMachineTop';
+import ManMachineBottom from '../components/ScheduleDisplay/ManMachineSchedule/ManMachineBottom';
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import {DEFAULT_PROJECT} from '_platform/api';
 import * as actions from '../store/ScheduleDisplay';
 const Option = Select.Option;
+const TabPane = Tabs.TabPane;
 @connect(
     state => {
         const {
@@ -121,18 +125,36 @@ export default class ScheduleDisplay extends Component {
                     </div>
                 </Sidebar>
                 <Content>
-                    <Row gutter={10} style={{ margin: '10px 5px' }}>
-                        <Col span={24}>
-                            <h2>计划完成情况：</h2>
-                            <LeftTop {...this.props} {...this.state} />
-                        </Col>
-                    </Row>
-                    <Row gutter={10} style={{ margin: '10px 5px' }}>
-                        <Col span={24}>
-                            <h2>本标段计划完成情况：</h2>
-                            <RightTop {...this.props} {...this.state} />
-                        </Col>
-                    </Row>
+                    <Tabs>
+                        <TabPane tab='栽植进度展示' key='1'>
+                            <Row gutter={10} style={{ margin: '10px 5px' }}>
+                                <Col span={24}>
+                                    <h2>计划完成情况：</h2>
+                                    <PlantTop {...this.props} {...this.state} />
+                                </Col>
+                            </Row>
+                            <Row gutter={10} style={{ margin: '10px 5px' }}>
+                                <Col span={24}>
+                                    <h2>本标段计划完成情况：</h2>
+                                    <PlantBottom {...this.props} {...this.state} />
+                                </Col>
+                            </Row>
+                        </TabPane>
+                        <TabPane tab='人/机进度展示' key='2'>
+                            <Row gutter={10} style={{ margin: '10px 5px' }}>
+                                <Col span={24}>
+                                    <h2>当日完成情况：</h2>
+                                    <ManMachineTop {...this.props} {...this.state} />
+                                </Col>
+                            </Row>
+                            <Row gutter={10} style={{ margin: '10px 5px' }}>
+                                <Col span={24}>
+                                    <h2>各标段完成情况：</h2>
+                                    <ManMachineBottom {...this.props} {...this.state} />
+                                </Col>
+                            </Row>
+                        </TabPane>
+                    </Tabs>
                 </Content>
             </div>
         );

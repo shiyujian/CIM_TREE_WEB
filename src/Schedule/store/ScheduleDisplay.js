@@ -20,12 +20,18 @@ export const getTreesectionplans = createFetchAction(
     `${FOREST_API}/tree/treesectionplans`,
     []
 );
+// 查询进度表
+export const getProgressData = createFetchAction(
+    `${FOREST_API}/tree/progresss?`,
+    []
+);
 
 export const actions = {
     setkeycode,
     getTreedayplans,
     getTreetotalstatbyday,
-    getTreesectionplans
+    getTreesectionplans,
+    getProgressData
 };
 export default handleActions(
     {

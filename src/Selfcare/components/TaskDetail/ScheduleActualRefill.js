@@ -138,6 +138,8 @@ class ScheduleActualRefill extends Component {
                                 <Row>
                                     <Table
                                         columns={this.columns1}
+                                        bordered
+                                        pagination={false}
                                         dataSource={this.state.actualDataSource}
                                         className='foresttable'
                                     />
@@ -484,6 +486,23 @@ class ScheduleActualRefill extends Component {
             width: '10%',
             render: (text, record, index) => {
                 return <span>{record.key + 1}</span>;
+            }
+        },
+        {
+            title: '类别',
+            dataIndex: 'type',
+            key: 'type',
+            render: (text, record, index) => {
+                const obj = {
+                    children: text,
+                    props: {}
+                };
+                if (record.typeFirst) {
+                    obj.props.rowSpan = record.typeList;
+                } else {
+                    obj.props.rowSpan = 0;
+                }
+                return obj;
             }
         },
         {

@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { Icon, Button, Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
+import { Icon, Button, Select, Card, DatePicker, Spin } from 'antd';
 import moment from 'moment';
 import XLSX from 'xlsx';
 import './index.less';
-const Option = Select.Option;
 const { RangePicker } = DatePicker;
 const DATE_FORMAT = 'YYYY/MM/DD';
 const DATE_FORMAT_ = 'YYYY-MM-DD';
 
-export default class Warning extends Component {
+export default class PlantBottom extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -87,7 +85,7 @@ export default class Warning extends Component {
                             <Button type='primary' style={{ marginLeft: 25 }} onClick={this.toExport.bind(this)}>导出<Icon type='download' /></Button>
                         </div>
                         <div
-                            id='rightop'
+                            id='PlantBottom'
                             style={{ width: '100%', height: '340px' }}
                         />
                     </Card>

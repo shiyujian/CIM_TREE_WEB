@@ -19,7 +19,6 @@ export default class Schedule extends Component {
     render () {
         const {
             Stage,
-            Progress,
             ScheduleAnalyze,
             EnterAnalyze,
             ScheduleReport,
@@ -41,12 +40,6 @@ export default class Schedule extends Component {
                             exact
                             path='/schedule/stagereport'
                             component={Stage}
-                        />
-                    )}
-                    {Progress && (
-                        <Route
-                            path='/schedule/progress'
-                            component={Progress}
                         />
                     )}
                     {EnterAnalyze && (
@@ -87,13 +80,6 @@ export default class Schedule extends Component {
             name: '进度填报',
             path: '/schedule/stagereport',
             icon: <Icon name='suitcase' />
-        },
-        {
-            key: 'progress',
-            name: '项目进度',
-            id: 'SCHEDULE.PROGRESS',
-            path: '/schedule/progress',
-            icon: <Icon name='warning' />
         },
         // {
         //     key: 'schedulereport',
