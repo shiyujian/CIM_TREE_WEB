@@ -20,50 +20,58 @@ export const forestFetchAction = (url, [successAction, failAction], method = 'GE
     method = method.toUpperCase();
     return (pathnames = {}, data = {}, refresh = true) => {
         data = data instanceof Array ? data : Object.assign({}, defaultParams, data);
-        let secrectData = encrypt(25);
-        console.log('secrectData', secrectData);
-        let headData = {
-            'Content-Type': 'application/json',
-            'USERID': '25',
-            'SINGNINFO': secrectData
-        };
-        // console.log('headData', headData);
-        return dispatch => {
-            const params = {
-                headers: headData,
-                method
+        let forestLoginUserData = window.localStorage.getItem('FOREST_LOGIN_USER_DATA');
+        forestLoginUserData = JSON.parse(forestLoginUserData) || {};
+        if (forestLoginUserData && forestLoginUserData.ID && forestLoginUserData.Token) {
+            let token = forestLoginUserData.Token;
+            let ID = forestLoginUserData.ID;
+            let secrectData = encrypt(ID, token);
+            console.log('secrectData', secrectData);
+            let headData = {
+                'Content-Type': 'application/json',
+                'USERID': `${ID}`,
+                'SINGNINFO': secrectData
             };
-            let u = encodeURI(getUrl(url, pathnames));
-            if ((method === 'POST' || method === 'PATCH') && Object.keys(data).length !== 0) {
-                params.body = JSON.stringify(data);
-            } else if (method === 'GET' || method === 'DELETE') {
-                const search = serialize(data);
-                if (search) {
-                    if (url.indexOf('?') > 0) {
-                        u = `${u}&${serialize(data)}`;
-                    } else {
-                        u = `${u}?${serialize(data)}`;
+            // console.log('headData', headData);
+            return dispatch => {
+                const params = {
+                    headers: headData,
+                    method
+                };
+                let u = encodeURI(getUrl(url, pathnames));
+                if ((method === 'POST' || method === 'PATCH') && Object.keys(data).length !== 0) {
+                    params.body = JSON.stringify(data);
+                } else if (method === 'GET' || method === 'DELETE') {
+                    const search = serialize(data);
+                    if (search) {
+                        if (url.indexOf('?') > 0) {
+                            u = `${u}&${serialize(data)}`;
+                        } else {
+                            u = `${u}?${serialize(data)}`;
+                        }
                     }
                 }
-            }
-            console.log('params', params);
-            return fetch(u, params)
-                .then(response => {
-                    console.log('response', response);
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.indexOf('application/json') !== -1) {
-                        return response.json();
-                    } else {
-                        return response.text();
-                    }
-                })
-                .then(result => {
-                    refresh && successAction && dispatch(successAction(result));
-                    return result;
-                }, result => {
-                    refresh && failAction && dispatch(failAction(result));
-                });
-        };
+                console.log('params', params);
+                return fetch(u, params)
+                    .then(response => {
+                        console.log('response', response);
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.indexOf('application/json') !== -1) {
+                            return response.json();
+                        } else {
+                            return response.text();
+                        }
+                    })
+                    .then(result => {
+                        refresh && successAction && dispatch(successAction(result));
+                        return result;
+                    }, result => {
+                        refresh && failAction && dispatch(failAction(result));
+                    });
+            };
+        } else {
+            console.log('aaaaaaaaaaaaaaa');
+        }
     };
 };
 

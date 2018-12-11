@@ -33,7 +33,6 @@ export default class ManMachineBottom extends Component {
             sectionsData = []
         } = this.props;
         if (!section) {
-            console.log('sectionsectionsectionsectionsection', section);
             if (sectionsData && sectionsData instanceof Array && sectionsData.length > 0) {
                 this.setState({
                     section: sectionsData[0].No
@@ -54,9 +53,7 @@ export default class ManMachineBottom extends Component {
             leftkeycode,
             sectionsData = []
         } = this.props;
-        console.log('section', section);
         if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
-            console.log('leftkeycodeleftkeycodeleftkeycode', leftkeycode);
             if (sectionsData && sectionsData instanceof Array && sectionsData.length > 0) {
                 this.setState({
                     section: sectionsData[0].No
@@ -67,7 +64,6 @@ export default class ManMachineBottom extends Component {
             stime !== prevState.stime ||
             etime !== prevState.etime || section !== prevState.section
         ) {
-            console.log('statestatestatestate', section);
             this.onSearch();
         }
     }
@@ -232,10 +228,6 @@ export default class ManMachineBottom extends Component {
                     });
                 });
             });
-            console.log('seriesNameList', seriesNameList);
-            console.log('xAxisData', xAxisData);
-            console.log('yAxisData', yAxisData);
-            console.log('seriesData', seriesData);
             let optionLine = {
                 tooltip: {
                     trigger: 'axis',

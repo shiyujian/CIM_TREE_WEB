@@ -18,6 +18,8 @@ export const getLoginState = createFetchAction(`${QRCODE_API}/qrcode/{{token}}/`
 
 export const getForestAllUsersData = createFetchAction(`${FOREST_API}/system/users`, [], 'GET');
 
+export const loginForest = createFetchAction(`${FOREST_API}:6510/system/login`, [], 'GET');
+
 export default handleActions({
     [loginOK]: (state, action) => {
         return {...state, userData: action.payload};

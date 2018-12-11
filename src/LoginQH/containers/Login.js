@@ -681,113 +681,120 @@ class Login extends Component {
         });
     }
 
-    loginFunc (data, loginType, values) {
+    loginFunc = async (data, loginType, values) => {
         const {
             actions: {
                 login,
                 getTasks,
-                getForestAllUsersData
+                getForestAllUsersData,
+                loginForest
             },
             history: { replace }
         } = this.props;
-        clearUser();
-        clearUser();
-        clearUser();
-        clearUser();
-        clearUser();
-        removePermissions();
-        removePermissions();
-        login({}, data).then(rst => {
-            if (rst.status === 'Nonactived') {
-                message.error('用户没有被激活');
-            } else {
-                if (rst && rst.id) {
-                    getForestAllUsersData().then((userData) => {
-                        if (userData && userData.content) {
-                            let content = userData.content;
-                            window.localStorage.setItem(
-                                'LZ_TOTAL_USER_DATA',
-                                JSON.stringify(content)
-                            );
-                        }
-                    });
-                    getTasks({}, { task: 'processing', executor: rst.id }).then(
-                        (tasks = []) => {
-                            notification.open({
-                                message: loginType
-                                    ? '自动登录成功'
-                                    : '登录成功',
-                                description: rst.username
-                            });
-                            console.log('rst', rst);
-                            const {
-                                username,
-                                id,
-                                account = {},
-                                all_permissions: permissions = [],
-                                is_superuser = false,
-                                groups = []
-                            } = rst;
-                            let isOwnerClerk = false;
-                            groups.forEach((role) => {
-                                if (role && role.name && role.name === '业主文书') {
-                                    isOwnerClerk = true;
-                                }
-                            });
-                            rst.isOwnerClerk = isOwnerClerk;
-                            window.localStorage.setItem(
-                                'QH_USER_DATA',
-                                JSON.stringify(rst)
-                            );
-
-                            const {
-                                person_name: name,
-                                organization: org,
-                                person_code: code,
-                                org_code,
-                                sections,
-                                person_telephone
-                            } = account;
-                            setUser(
-                                username,
-                                id,
-                                name,
-                                org,
-                                tasks.length,
-                                data.password,
-                                code,
-                                is_superuser,
-                                org_code,
-                                sections,
-                                isOwnerClerk,
-                                person_telephone
-                            );
-                            console.log(getUser(), 'cookie存的信息2');
-
-                            setPermissions(permissions);
-
-                            if (loginType === 0) {
-                                if (values.remember) {
-                                    window.localStorage.setItem(
-                                        'QH_LOGIN_USER',
-                                        JSON.stringify(data)
-                                    );
-                                } else {
-                                    window.localStorage.removeItem(
-                                        'QH_LOGIN_USER'
-                                    );
-                                }
-                            }
-                            setTimeout(() => {
-                                replace('/');
-                            }, 500);
-                        }
+        await clearUser();
+        await clearUser();
+        await removePermissions();
+        await removePermissions();
+        console.log('loginFuncloginFuncdata', data);
+        let rst = await login({}, data);
+        if (rst.status === 'Nonactived') {
+            message.error('用户没有被激活');
+        } else {
+            if (rst && rst.id) {
+                let postData = {
+                    phone: data.username,
+                    pwd: data.password
+                };
+                // let forestUserData = await loginForest({}, postData);
+                // console.log('forestUserData', forestUserData);
+                // if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
+                //     let forestLoginUserData = forestUserData[0];
+                //     window.localStorage.setItem(
+                //         'FOREST_LOGIN_USER_DATA',
+                //         JSON.stringify(forestLoginUserData)
+                //     );
+                // }
+                let userData = await getForestAllUsersData();
+                if (userData && userData.content) {
+                    let content = userData.content;
+                    window.localStorage.setItem(
+                        'LZ_TOTAL_USER_DATA',
+                        JSON.stringify(content)
                     );
-                } else {
-                    message.error('用户名或密码错误！');
                 }
+
+                let tasks = await getTasks({}, { task: 'processing', executor: rst.id });
+                notification.open({
+                    message: loginType
+                        ? '自动登录成功'
+                        : '登录成功',
+                    description: rst.username
+                });
+                console.log('rst', rst);
+                const {
+                    username,
+                    id,
+                    account = {},
+                    all_permissions: permissions = [],
+                    is_superuser = false,
+                    groups = []
+                } = rst;
+                let isOwnerClerk = false;
+                groups.forEach((role) => {
+                    if (role && role.name && role.name === '业主文书') {
+                        isOwnerClerk = true;
+                    }
+                });
+                rst.isOwnerClerk = isOwnerClerk;
+                window.localStorage.setItem(
+                    'QH_USER_DATA',
+                    JSON.stringify(rst)
+                );
+
+                const {
+                    person_name: name,
+                    organization: org,
+                    person_code: code,
+                    org_code,
+                    sections,
+                    person_telephone
+                } = account;
+                await setUser(
+                    username,
+                    id,
+                    name,
+                    org,
+                    tasks.length,
+                    data.password,
+                    code,
+                    is_superuser,
+                    org_code,
+                    sections,
+                    isOwnerClerk,
+                    person_telephone
+                );
+                console.log(getUser(), 'cookie存的信息2');
+
+                await setPermissions(permissions);
+                if (loginType === 0) {
+                    if (values.remember) {
+                        window.localStorage.setItem(
+                            'QH_LOGIN_USER',
+                            JSON.stringify(data)
+                        );
+                    } else {
+                        window.localStorage.removeItem(
+                            'QH_LOGIN_USER'
+                        );
+                    }
+                }
+                setTimeout(() => {
+                    replace('/');
+                }, 500);
+            } else {
+                message.error('用户名或密码错误！');
             }
-        });
+        }
     }
 }
 
