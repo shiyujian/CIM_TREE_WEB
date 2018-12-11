@@ -140,7 +140,7 @@ export default class ScheduleWeekPlanDeal extends Component {
                 let data = {
                     PlanDate: item.date,
                     Section: section,
-                    Num: Number(item.planTreeNum)
+                    Num: item && item.planTreeNum ? Number(item.planTreeNum) : 0
                 };
                 schedulePostData.push(data);
             });

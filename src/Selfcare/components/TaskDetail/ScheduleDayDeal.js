@@ -126,12 +126,14 @@ export default class ScheduleDayDeal extends Component {
         console.log('treedataSource', treedataSource);
         let items = [];
         treedataSource.map(item => {
-            let data = {
-                Num: item.number,
-                Project: item.project,
-                WPNo: ''
-            };
-            items.push(data);
+            if (item && item.number) {
+                let data = {
+                    Num: item.number,
+                    Project: item.project,
+                    WPNo: ''
+                };
+                items.push(data);
+            }
         });
         let scheduledata = {
             DocType: 'doc',

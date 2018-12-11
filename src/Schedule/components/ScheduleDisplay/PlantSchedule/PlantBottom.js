@@ -122,8 +122,8 @@ export default class PlantBottom extends Component {
             // 计划栽植量
             await getTreedayplans({}, {
                 section: section || leftkeycode,
-                stime: stime,
-                etime: etime
+                stime: stime + ' 00:00:00',
+                etime: etime + ' 23:59:59'
             }).then(rep => {
                 if (rep && rep.code && rep.code === 200) {
                     dataList = rep.content;

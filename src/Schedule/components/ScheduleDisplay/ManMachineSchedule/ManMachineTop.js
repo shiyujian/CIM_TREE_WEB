@@ -3,6 +3,7 @@ import echarts from 'echarts';
 import { Icon, Button, Card, DatePicker, Spin } from 'antd';
 import { SCHEDULRPROJECT } from '_platform/api';
 import moment from 'moment';
+import { encrypt } from '_platform/store/secrect';
 import XLSX from 'xlsx';
 const DATE_FORMAT = 'YYYY/MM/DD';
 
@@ -19,6 +20,14 @@ export default class ManMachineTop extends Component {
     }
 
     async componentDidMount () {
+        // const {
+        //     actions: {
+        //         getTestData,
+        //         getTestData222
+        //     }
+        // } = this.props;
+        // let data = await getTestData();
+        // console.log('data', data);
         this.query(this.state.stime);
     }
 
@@ -112,7 +121,6 @@ export default class ManMachineTop extends Component {
         let yAxisData = [];
         let seriesData = [];
         let seriesNameList = [];
-        console.log('dataList', dataList);
         let myChart = echarts.init(document.getElementById('ManMachineTop'));
         if (dataList && dataList instanceof Array && dataList.length > 0) {
             dataList.map((content, index) => {
@@ -163,10 +171,6 @@ export default class ManMachineTop extends Component {
                     });
                 });
             });
-            console.log('seriesNameList', seriesNameList);
-            console.log('xAxisData', xAxisData);
-            console.log('yAxisData', yAxisData);
-            console.log('seriesData', seriesData);
             let optionLine = {
                 tooltip: {
                     trigger: 'axis',
@@ -310,9 +314,6 @@ export default class ManMachineTop extends Component {
                 });
             });
         });
-        console.log('xAxisDataUnique', xAxisDataUnique);
-        console.log('tblData', tblData);
-        console.log('xAxisData', xAxisData);
         let _headers = ['标段', ...xAxisData];
         let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});

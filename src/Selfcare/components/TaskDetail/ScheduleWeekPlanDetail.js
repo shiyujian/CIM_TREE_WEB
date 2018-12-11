@@ -119,6 +119,7 @@ class ScheduleWeekPlanDetail extends Component {
                 ? JSON.parse(subject.supervisorReview).person_name
                 : ''
         };
+        console.log('record.weekPlanDataSource', record.weekPlanDataSource);
         return record;
     }
 }

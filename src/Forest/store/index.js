@@ -1,6 +1,7 @@
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
 import { createFetchActionWithHeaders as myFetch } from './fetchAction';
+import {forestFetchAction, forestFetchActionWithHeaders} from '_platform/store/fetchAction';
 //
 import faithInfoReducer, { actions as faithActions } from './faithInfo';
 import { FOREST_API, FOREST_SYSTEM, TENCENTANALYSIS_API } from '_platform/api';
@@ -266,6 +267,7 @@ export const getTencentOffLineAusage = createFetchAction(
     `${TENCENTANALYSIS_API}/TencentAPIHandler.ashx?action=offlineausage`,
     []
 );
+export const postTestData = forestFetchActionWithHeaders(`http://47.104.159.127/OSSUploadHandler.ashx?filetype=leader`, [], 'POST');
 
 export const actions = {
     getTotalSat,
@@ -331,7 +333,8 @@ export const actions = {
     getTencentRealTimeUser,
     getTencentOffLineUser,
     getTencentOffLineActive,
-    getTencentOffLineAusage
+    getTencentOffLineAusage,
+    postTestData
 };
 export default handleActions(
     {

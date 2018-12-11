@@ -7,6 +7,7 @@
  */
 
 import 'whatwg-fetch';
+import { encrypt } from './secrect';
 require('es6-promise').polyfill();
 
 const headers = {
@@ -15,17 +16,23 @@ const headers = {
     // 'pragma': 'no-cache',
 };
 
-export default (url, [successAction, failAction], method = 'GET', defaultParams = {}) => {
+export const forestFetchAction = (url, [successAction, failAction], method = 'GET', defaultParams = {}) => {
     method = method.toUpperCase();
     return (pathnames = {}, data = {}, refresh = true) => {
         data = data instanceof Array ? data : Object.assign({}, defaultParams, data);
-
+        let secrectData = encrypt(25);
+        console.log('secrectData', secrectData);
+        let headData = {
+            'Content-Type': 'application/json',
+            'USERID': '25',
+            'SINGNINFO': secrectData
+        };
+        // console.log('headData', headData);
         return dispatch => {
             const params = {
-                headers: headers,
+                headers: headData,
                 method
             };
-
             let u = encodeURI(getUrl(url, pathnames));
             if ((method === 'POST' || method === 'PATCH') && Object.keys(data).length !== 0) {
                 params.body = JSON.stringify(data);
@@ -39,8 +46,10 @@ export default (url, [successAction, failAction], method = 'GET', defaultParams 
                     }
                 }
             }
+            console.log('params', params);
             return fetch(u, params)
                 .then(response => {
+                    console.log('response', response);
                     const contentType = response.headers.get('content-type');
                     if (contentType && contentType.indexOf('application/json') !== -1) {
                         return response.json();

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-08 10:34:08
+ * @Last Modified time: 2018-12-11 11:06:33
  */
 /**
  *
@@ -133,6 +133,7 @@ export const FOREST_API = `${window.config.SDOMAIN}`;
 export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
 export const FOREST_SYSTEM = `${FOREST_API}/system`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
+export const FOREST_SECRECT = '8gvPuMCBKpkVNkMO';
 // 苗圃定位模板
 export const nurseryLocation_template =
     STATIC_DOWNLOAD_API +

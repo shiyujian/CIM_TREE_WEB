@@ -1,5 +1,6 @@
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
+import {forestFetchAction} from '_platform/store/fetchAction';
 //
 import { FOREST_API } from '_platform/api';
 const ID = 'ScheduleDisplay';
@@ -25,13 +26,14 @@ export const getProgressData = createFetchAction(
     `${FOREST_API}/tree/progresss?`,
     []
 );
-
+export const getTestData = forestFetchAction(`${FOREST_API}:6510/tree/tree/abn2017`, []);
 export const actions = {
     setkeycode,
     getTreedayplans,
     getTreetotalstatbyday,
     getTreesectionplans,
-    getProgressData
+    getProgressData,
+    getTestData
 };
 export default handleActions(
     {

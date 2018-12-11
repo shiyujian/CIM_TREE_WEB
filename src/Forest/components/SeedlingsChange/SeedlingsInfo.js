@@ -79,7 +79,6 @@ export default class SeedlingsChange extends Component {
             key: 'operation',
             // width: '10%',
             render: (text, record, index) => {
-                console.log('record', record);
                 return (
                     <div>
                         <a onClick={this.onImgClick.bind(this, record.a_file)}>
@@ -119,7 +118,6 @@ export default class SeedlingsChange extends Component {
             };
             array.push(data);
         });
-        console.log('array', array);
         this.setState({ TreatmentData: array });
     };
 
@@ -135,7 +133,6 @@ export default class SeedlingsChange extends Component {
             } = this.props;
             const { TreatmentData = [] } = this.state;
             let type = file.name.toString().split('.');
-            console.log('type', type);
             let len = type.length;
             if (
                 type[len - 1] === 'jpg' ||
@@ -588,13 +585,11 @@ export default class SeedlingsChange extends Component {
     }
 
     remarkDefault (record) {
-        console.log('record', record);
         try {
             let TreatmentData = [];
             let remarkPics = (record && record.RemarkPics) || '';
             if (remarkPics) {
                 let arr = remarkPics.split(',');
-                console.log('arr', arr);
                 arr.map((rst, index) => {
                     let src = getForestImgUrl(rst);
                     let data = {
@@ -635,14 +630,11 @@ export default class SeedlingsChange extends Component {
             });
         } catch (e) {}
 
-        console.log('remarkPics', remarkPics);
-
         let postdata = {
             remark: remarkInfo,
             pics: remarkPics,
             sxm: remarkRecord.ZZBM
         };
-        console.log('postdata', postdata);
         let rst = await getSeedlingInfo(postdata);
         if (rst && rst.code && rst.code == 1) {
             message.success('修改备注和图片成功');
