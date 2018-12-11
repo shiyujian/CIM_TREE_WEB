@@ -20,14 +20,6 @@ export default class ManMachineTop extends Component {
     }
 
     async componentDidMount () {
-        // const {
-        //     actions: {
-        //         getTestData,
-        //         getTestData222
-        //     }
-        // } = this.props;
-        // let data = await getTestData();
-        // console.log('data', data);
         this.query(this.state.stime);
     }
 

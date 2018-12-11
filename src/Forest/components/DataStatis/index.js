@@ -13,3 +13,5 @@ export PlantRight from './PlantRight';
 export GroupLeft from './GroupLeft';
 export GroupRight from './GroupRight';
 export DataTable from './DataTable';
+export LocationLeft from './LocationLeft';
+export LocationRight from './LocationRight';

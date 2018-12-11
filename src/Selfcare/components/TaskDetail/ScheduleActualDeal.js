@@ -138,7 +138,7 @@ export default class ScheduleActualDeal extends Component {
             }
             actualDataSource.map(item => {
                 let data = {
-                    Num: item.actualNum,
+                    Num: item && item.actualNum ? Number(item.actualNum) : 0,
                     Project: item.project,
                     WPNo: section
                 };

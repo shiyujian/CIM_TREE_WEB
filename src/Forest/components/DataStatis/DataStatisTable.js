@@ -10,6 +10,7 @@ import {
     Notification
 } from 'antd';
 import moment from 'moment';
+import DataTable from './DataTable';
 import TopLeft from './TopLeft';
 import TopRight from './TopRight';
 import MiddleLeft from './MiddleLeft';
@@ -21,7 +22,8 @@ import PlantLeft from './PlantLeft';
 import PlantRight from './PlantRight';
 import GroupLeft from './GroupLeft';
 import GroupRight from './GroupRight';
-import DataTable from './DataTable';
+import LocationLeft from './LocationLeft';
+import LocationRight from './LocationRight';
 
 import { getUser } from '_platform/auth';
 import '../index.less';
@@ -226,6 +228,24 @@ export default class DataStatisTable extends Component {
                             </Card>
                         </Col>
                     </Row>
+                    {/* <Row>
+                        <Col span={12}>
+                            <Card
+                                title='各小班定位进度分析'
+                                style={{ marginTop: 10 }}
+                            >
+                                <LocationLeft {...this.state} {...this.props} />
+                            </Card>
+                        </Col>
+                        <Col span={12}>
+                            <Card
+                                title='各细班定位进度分析'
+                                style={{ marginTop: 10 }}
+                            >
+                                <LocationRight {...this.state} {...this.props} />
+                            </Card>
+                        </Col>
+                    </Row> */}
                     <Row>
                         <Col span={12}>
                             <Card

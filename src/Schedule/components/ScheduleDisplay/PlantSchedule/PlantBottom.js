@@ -35,7 +35,6 @@ export default class PlantBottom extends Component {
             sectionsData = []
         } = this.props;
         if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
-            console.log('leftkeycodeleftkeycodeleftkeycode', leftkeycode);
             if (sectionsData && sectionsData instanceof Array && sectionsData.length > 0) {
                 this.setState({
                     section: sectionsData[0].No
@@ -46,7 +45,6 @@ export default class PlantBottom extends Component {
             stime !== prevState.stime ||
             etime !== prevState.etime || section !== prevState.section
         ) {
-            console.log('statestatestatestate', section);
             this.onSearch();
         }
     }
@@ -143,10 +141,6 @@ export default class PlantBottom extends Component {
             }).then(rep => {
                 dataListTask = rep;
             });
-            console.log('dataList', dataList);
-            console.log('dataListReal', dataListReal);
-            console.log('dataListTask', dataListTask);
-
             this.setState({
                 dataList: dataList,
                 dataListReal,
@@ -337,8 +331,6 @@ export default class PlantBottom extends Component {
                 }
             });
         });
-        console.log(xAxisData, yPlantData, yRealData, yRatioData, yCompleteData, yGrandData, '计划栽植量');
-
         legendList.map(item => {
             let obj = {};
             xAxisData.map((row, col) => {

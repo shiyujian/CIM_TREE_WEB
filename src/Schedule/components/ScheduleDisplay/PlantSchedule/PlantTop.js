@@ -19,6 +19,13 @@ export default class PlantTop extends Component {
 
     async componentDidMount () {
         // this.query(this.state.stime);
+        const {
+            actions: {
+                getTestData
+            }
+        } = this.props;
+        let data = await getTestData();
+        console.log('data', data);
     }
 
     componentDidUpdate (prevProps, prevState) {

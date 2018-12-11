@@ -4,7 +4,7 @@ import {FOREST_SECRECT} from '../api';
 export const encrypt = (ID, token) => {
     let key = CryptoJS.enc.Utf8.parse('BFSmin0bP9');
     // const iv = CryptoJS.enc.Utf8.parse('0000000000');
-    const iv = CryptoJS.enc.Utf8.parse('\0\0\0\0\0\0\0\0');
+    const iv = CryptoJS.enc.Utf8.parse(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
     console.log('utf8处理后key:' + key);
     console.log('utf8处理后iv:' + iv);
     let source = ID;
