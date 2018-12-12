@@ -61,7 +61,7 @@ export default class Bottom extends Component {
         await this.getSectionoption();
         await this.getSmallClass();
         await this.selectSmallClass();
-        await this.query();
+        // await this.query();
     }
 
     async componentDidUpdate (prevProps, prevState) {

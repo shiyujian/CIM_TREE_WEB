@@ -24,9 +24,6 @@ export default class RightTop extends Component {
 
     componentDidMount () {
         var myChart3 = echarts.init(document.getElementById('rightTop'));
-        myChart3.on('click', function (params) {
-            that.smallclasschange(params.name);
-        });
         let option3 = {
             tooltip: {
                 trigger: 'axis',
@@ -64,7 +61,7 @@ export default class RightTop extends Component {
         };
         myChart3.setOption(option3);
         this.getSectionoption();
-        this.query();
+        // this.query();
     }
 
     getSectionoption () {

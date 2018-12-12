@@ -1,5 +1,6 @@
 import { FOREST_API, FOREST_IMG } from '_platform/api';
 import moment from 'moment';
+import {getForestImgUrl} from '_platform/auth';
 export const getSeedlingMess = (queryTreeData, carData, nurserysData) => {
     let seedlingMess = {
         sxm: queryTreeData.ZZBM ? queryTreeData.ZZBM : '',
@@ -156,21 +157,6 @@ export const onImgClick = (data) => {
         console.log('处理图片', e);
     }
     return srcs;
-};
-
-// 对林总数据库中的图片进行判断
-export const getForestImgUrl = (data) => {
-    try {
-        let imgUrl = '';
-        if (data.indexOf(FOREST_IMG) !== -1) {
-            imgUrl = data;
-        } else {
-            imgUrl = FOREST_API + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        }
-        return imgUrl;
-    } catch (e) {
-        console.log('getForestImgUrl', e);
-    }
 };
 
 export const getCuringMess = async (curingTaskData, curingTypeArr, getCuringMessage) => {

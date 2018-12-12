@@ -244,6 +244,11 @@ export const getTreeStatuss = createFetchAction(
     `${FOREST_API}/tree/treestatuss`,
     []
 );
+// 获取标段，小班或者细班的定位量
+export const getLocationStatBySpecfield = createFetchAction(
+    `${FOREST_API}/tree/locationstatbyspecfield`,
+    []
+);
 
 // 获取腾讯移动数据分析实时数据
 export const getTencentRealTimeUser = createFetchAction(

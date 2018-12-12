@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
-import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
-import { Cards, SumTotal, DateImg } from '../../components';
+import { Select, DatePicker, Spin } from 'antd';
+import { Cards } from '../../components';
 import moment from 'moment';
-const RadioGroup = Radio.Group;
 const Option = Select.Option;
-const RadioButton = Radio.Button;
-const { RangePicker } = DatePicker;
 
 export default class LocationLeft extends Component {
     static propTypes = {};
@@ -15,18 +11,15 @@ export default class LocationLeft extends Component {
         super(props);
         this.state = {
             loading: false,
-            stime: moment().format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            section: 'P009-01-01',
-            sectionoption: []
+            section: '',
+            sectionoption: [],
+            sectionsData: []
         };
     }
 
     componentDidMount () {
         var myChart3 = echarts.init(document.getElementById('LocationLeft'));
-        myChart3.on('click', function (params) {
-            that.smallclasschange(params.name);
-        });
         let option3 = {
             tooltip: {
                 trigger: 'axis',
@@ -63,8 +56,6 @@ export default class LocationLeft extends Component {
             series: []
         };
         myChart3.setOption(option3);
-        this.getSectionoption();
-        this.query();
     }
 
     getSectionoption () {
@@ -72,14 +63,15 @@ export default class LocationLeft extends Component {
             platform: { tree = {} },
             leftkeycode
         } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
+        let sectionData = (tree && tree.thinClassTree) || [];
         let sectionoption = [];
-
+        console.log('ssssssssssssssssssss');
         sectionData.map(project => {
             // 获取正确的项目
             if (leftkeycode.indexOf(project.No) > -1) {
                 // 获取项目下的标段
                 let sections = project.children;
+                console.log('sections', sections);
                 sections.map((section, index) => {
                     sectionoption.push(
                         <Option key={section.No} value={section.No}>
@@ -88,7 +80,8 @@ export default class LocationLeft extends Component {
                     );
                 });
                 this.setState({
-                    section: sections && sections[0] && sections[0].No
+                    section: sections && sections[0] && sections[0].No,
+                    sectionsData: sections
                 });
             }
         });
@@ -98,15 +91,15 @@ export default class LocationLeft extends Component {
     }
 
     componentDidUpdate (prevProps, prevState) {
-        const { etime, section, stime } = this.state;
+        const { etime, section } = this.state;
         const { leftkeycode } = this.props;
-        if (leftkeycode != prevProps.leftkeycode) {
+        if (leftkeycode !== prevProps.leftkeycode) {
             this.getSectionoption();
         }
-        if (section != prevState.section) {
+        if (section !== prevState.section) {
             this.query();
         }
-        if (etime != prevState.etime || stime != prevState.stime) {
+        if (etime !== prevState.etime) {
             this.query();
         }
     }
@@ -114,19 +107,29 @@ export default class LocationLeft extends Component {
     async query () {
         const {
             actions: {
-                getCountSmall
+                getLocationStatBySpecfield
             }
         } = this.props;
-        const { stime, etime, section } = this.state;
-        let param = {};
-
-        param.section = section;
-        // param.stime = stime;
-        param.etime = etime;
+        const {
+            etime,
+            section,
+            sectionsData
+        } = this.state;
+        let param = {
+            stattype: 'smallclass',
+            section: section,
+            etime: etime
+        };
         this.setState({ loading: true });
+        let smallClassList = [];
+        sectionsData.map((sectionData) => {
+            if (section === sectionData.No) {
+                smallClassList = sectionData.children;
+            }
+        });
 
-        let rst = await getCountSmall({}, param);
-
+        let rst = await getLocationStatBySpecfield({}, param);
+        console.log('LocationLeftLocationLeft', rst);
         let units = ['1小班', '2小班', '3小班', '4小班', '5小班'];
 
         let complete = [];
@@ -138,6 +141,9 @@ export default class LocationLeft extends Component {
             rst.map(item => {
                 complete.push(item.Complete);
                 unComplete.push(item.UnComplete);
+                smallClassList.map((smallClass) => {
+
+                });
                 label.push(item.Label + '号小班');
             });
         }

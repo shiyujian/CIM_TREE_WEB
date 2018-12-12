@@ -61,7 +61,7 @@ export default class LocationRight extends Component {
         await this.getSectionoption();
         await this.getSmallClass();
         await this.selectSmallClass();
-        await this.query();
+        // await this.query();
     }
 
     async componentDidUpdate (prevProps, prevState) {
@@ -197,25 +197,19 @@ export default class LocationRight extends Component {
     // 查询数据
     async query () {
         const {
-            actions: { getCountThin },
+            actions: { getLocationStatBySpecfield },
             leftkeycode
         } = this.props;
         const { smallClassSelect, section, etime, stime } = this.state;
         this.setState({ loading: true });
-        let param = {};
-        let code = '';
-        try {
-            code = section.split('-');
-            code = code[0] + '-' + code[1];
-        } catch (e) {
-            console.log(e);
-        }
 
-        param.no = code + '-' + smallClassSelect;
-        param.section = section;
-        // param.stime = stime;
-        param.etime = etime;
-        let rst = await getCountThin({}, param);
+        let param = {
+            stattype: 'thinclass',
+            section: section,
+            etime: etime
+        };
+        let rst = await getLocationStatBySpecfield({}, param);
+        console.log('LocationRightLocationRight', rst);
 
         let complete = [];
         let unComplete = [];

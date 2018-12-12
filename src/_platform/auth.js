@@ -1,5 +1,5 @@
 import cookie from 'js-cookie';
-import { FOREST_API, FOREST_IMG } from './api';
+import { FOREST_API_OLD, FOREST_IMG } from './api';
 
 export default () => {
     return !!cookie.get('id');
@@ -411,7 +411,7 @@ export const getForestImgUrl = (data) => {
         if (data.indexOf(FOREST_IMG) !== -1) {
             imgUrl = data;
         } else {
-            imgUrl = FOREST_API + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+            imgUrl = FOREST_API_OLD + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         }
         return imgUrl;
     } catch (e) {
