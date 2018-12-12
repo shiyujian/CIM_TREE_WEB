@@ -3,7 +3,7 @@ import echarts from 'echarts';
 import { Card, Spin, Row, Col } from 'antd';
 import moment from 'moment';
 
-export default class Middle extends Component {
+export default class TreeTypeMiddle extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -12,7 +12,7 @@ export default class Middle extends Component {
         };
     }
     async componentDidMount () {
-        var myChart = echarts.init(document.getElementById('middleMiddle'));
+        var myChart = echarts.init(document.getElementById('TreeTypeMiddle'));
         let option = {
             title: {
                 text: '栽植树种数量排名',
@@ -101,7 +101,7 @@ export default class Middle extends Component {
                     }
                 }
             }
-            let myChart = echarts.init(document.getElementById('middleMiddle'));
+            let myChart = echarts.init(document.getElementById('TreeTypeMiddle'));
             let option = {
                 yAxis: {
                     data: treetypeName
@@ -117,7 +117,7 @@ export default class Middle extends Component {
                 loading: false
             });
         } catch (e) {
-            console.log('middleMiddle', e);
+            console.log('TreeTypeMiddle', e);
         }
     }
 
@@ -125,7 +125,7 @@ export default class Middle extends Component {
         return (
             <Spin spinning={this.state.loading}>
                 <div
-                    id='middleMiddle'
+                    id='TreeTypeMiddle'
                     style={{ width: '100%', height: '350px' }}
                 />
             </Spin>

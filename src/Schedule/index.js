@@ -21,7 +21,6 @@ export default class Schedule extends Component {
             Stage,
             ScheduleAnalyze,
             EnterAnalyze,
-            ScheduleReport,
             ScheduleDisplay
         } =
             this.state || {};
@@ -54,13 +53,6 @@ export default class Schedule extends Component {
                             component={ScheduleAnalyze}
                         />
                     )}
-                    {/* {ScheduleReport && (
-                        <Route
-                            exact
-                            path='/schedule/schedulereport'
-                            component={ScheduleReport}
-                        />
-                    )} */}
                     {ScheduleDisplay && (
                         <Route
                             exact
@@ -81,13 +73,6 @@ export default class Schedule extends Component {
             path: '/schedule/stagereport',
             icon: <Icon name='suitcase' />
         },
-        // {
-        //     key: 'schedulereport',
-        //     id: 'SCHEDULE.SCHEDULEREPORT',
-        //     name: '每周进度',
-        //     path: '/schedule/schedulereport',
-        //     icon: <Icon name='suitcase' />
-        // },
         {
             key: 'scheduledisplay',
             id: 'SCHEDULE.SCHEDULEDISPLAY',

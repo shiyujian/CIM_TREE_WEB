@@ -9,7 +9,7 @@ const Option = Select.Option;
 const RadioButton = Radio.Button;
 const { RangePicker } = DatePicker;
 
-export default class RightTop extends Component {
+export default class GroupLeft extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -23,7 +23,7 @@ export default class RightTop extends Component {
     }
 
     componentDidMount () {
-        var myChart3 = echarts.init(document.getElementById('rightTop'));
+        var myChart3 = echarts.init(document.getElementById('GroupLeft'));
         let option3 = {
             tooltip: {
                 trigger: 'axis',
@@ -139,7 +139,7 @@ export default class RightTop extends Component {
             });
         }
 
-        let myChart3 = echarts.init(document.getElementById('rightTop'));
+        let myChart3 = echarts.init(document.getElementById('GroupLeft'));
         let options3 = {
             legend: {
                 data: ['未种植', '已种植']
@@ -193,7 +193,7 @@ export default class RightTop extends Component {
             <Spin spinning={this.state.loading}>
                 <Cards search={this.search()} title={this.title()}>
                     <div
-                        id='rightTop'
+                        id='GroupLeft'
                         style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>

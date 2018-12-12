@@ -665,7 +665,7 @@ export default class SupervisorTable extends Component {
             }
         }
         const {
-            actions: { getqueryTree, getexportTree4Supervisor },
+            actions: { getexportTree4Supervisor },
             keycode = ''
         } = this.props;
         let postdata = {

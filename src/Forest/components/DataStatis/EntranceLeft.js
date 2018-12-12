@@ -30,7 +30,7 @@ export default class EntranceLeft extends Component {
     }
 
     componentDidMount () {
-        let myChart1 = echarts.init(document.getElementById('king'));
+        let myChart1 = echarts.init(document.getElementById('EntranceLeft'));
         let option1 = {
             tooltip: {
                 trigger: 'axis',
@@ -142,7 +142,7 @@ export default class EntranceLeft extends Component {
                 }
             });
         }
-        let myChart1 = echarts.init(document.getElementById('king'));
+        let myChart1 = echarts.init(document.getElementById('EntranceLeft'));
         let option1 = {
             xAxis: [
                 {
@@ -167,7 +167,7 @@ export default class EntranceLeft extends Component {
                 <Spin spinning={this.state.loading}>
                     <Cards search={this.searchRender()} title='苗木进场总数'>
                         <div
-                            id='king'
+                            id='EntranceLeft'
                             style={{ width: '100%', height: '400px' }}
                         />
                     </Cards>

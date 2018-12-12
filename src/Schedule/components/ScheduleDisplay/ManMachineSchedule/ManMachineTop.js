@@ -12,15 +12,45 @@ export default class ManMachineTop extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stime: moment().format('YYYY-MM-DD'),
+            stime: moment().subtract(1, 'days').format('YYYY/MM/DD'),
             dataList: [],
-            legendList: ['人员投入', '机械投入'],
             loading: false
         };
     }
 
     async componentDidMount () {
-        this.query(this.state.stime);
+        let myChart = echarts.init(document.getElementById('ManMachineTop'));
+        let yAxisData = [];
+        let seriesData = [];
+        let seriesNameList = [];
+        SCHEDULRPROJECT.map((project, index) => {
+            seriesNameList.push(project.name);
+            seriesData.push({
+                data: [],
+                type: 'bar'
+            });
+            yAxisData.push({
+                type: 'value',
+                axisLabel: {
+                    formatter: '{value} '
+                }
+            });
+        });
+        let option = {
+            legend: {
+                bottom: 5,
+                type: 'scroll',
+                data: seriesNameList
+            },
+            xAxis: {
+                type: 'category',
+                data: []
+            },
+            yAxis: yAxisData,
+            series: seriesData
+        };
+        await myChart.setOption(option);
+        await this.query(this.state.stime);
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -108,59 +138,59 @@ export default class ManMachineTop extends Component {
         const {
             sectionsData
         } = this.props;
-
+        console.log('sectionsData', sectionsData);
         let xAxisData = [];
         let yAxisData = [];
         let seriesData = [];
         let seriesNameList = [];
         let myChart = echarts.init(document.getElementById('ManMachineTop'));
         if (dataList && dataList instanceof Array && dataList.length > 0) {
-            dataList.map((content, index) => {
-                sectionsData.map((sectionData) => {
+            sectionsData.map((sectionData) => {
+                dataList.map((content, index) => {
                     if (content.UnitProject === sectionData.No) {
                         xAxisData.push(sectionData.Name);
-                    }
-                });
-                let items = content.Items;
-                SCHEDULRPROJECT.map((project) => {
-                    items.map((item) => {
-                        if (item.Project === project.name) {
-                            if (seriesNameList.indexOf(item.Project) === -1) {
-                                seriesNameList.push(item.Project);
-                                if (project.type !== '其他') {
-                                    seriesData.push({
-                                        name: item.Project,
-                                        type: 'bar',
-                                        stack: project.type,
-                                        data: [item.Num]
-                                    });
-                                } else {
-                                    seriesData.push({
-                                        name: item.Project,
-                                        type: 'line',
-                                        yAxisIndex: 1,
-                                        data: [item.Num]
-                                    });
-                                }
-                                if (index === 0) {
-                                    yAxisData.push({
-                                        type: 'value',
-                                        // name: project.units,
-                                        axisLabel: {
-                                            formatter: '{value} '
+                        let items = content.Items;
+                        SCHEDULRPROJECT.map((project) => {
+                            items.map((item) => {
+                                if (item.Project === project.name) {
+                                    if (seriesNameList.indexOf(item.Project) === -1) {
+                                        seriesNameList.push(item.Project);
+                                        if (project.type !== '其他') {
+                                            seriesData.push({
+                                                name: item.Project,
+                                                type: 'bar',
+                                                stack: project.type,
+                                                data: [item.Num]
+                                            });
+                                        } else {
+                                            seriesData.push({
+                                                name: item.Project,
+                                                type: 'line',
+                                                yAxisIndex: 1,
+                                                data: [item.Num]
+                                            });
                                         }
-                                    });
-                                }
-                            } else {
-                                seriesData.map((series) => {
-                                    if (series.name === item.Project) {
-                                        let dataArr = series.data;
-                                        dataArr.push(item.Num);
+                                        if (index === 0) {
+                                            yAxisData.push({
+                                                type: 'value',
+                                                // name: project.units,
+                                                axisLabel: {
+                                                    formatter: '{value} '
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        seriesData.map((series) => {
+                                            if (series.name === item.Project) {
+                                                let dataArr = series.data;
+                                                dataArr.push(item.Num);
+                                            }
+                                        });
                                     }
-                                });
-                            }
-                        }
-                    });
+                                }
+                            });
+                        });
+                    }
                 });
             });
             let optionLine = {
@@ -254,32 +284,10 @@ export default class ManMachineTop extends Component {
         } = this.props;
         let tblData = [];
         let xAxisData = [];
-        let xAxisDataUnique = [];
-        // dataList.map((content, index) => {
-        //     let obj = {};
-        //     sectionsData.map((sectionData) => {
-        //         if (content.UnitProject === sectionData.No) {
-        //             obj['标段'] = sectionData.Name;
-        //         }
-        //     });
-        //     let items = content.Items;
-        //     SCHEDULRPROJECT.map((project) => {
-        //         if (index === 0) {
-        //             xAxisData.push(project.name);
-        //         }
-        //         items.map((item) => {
-        //             if (item.Project === project.name) {
-        //                 obj[project.name] = item.Num;
-        //             }
-        //         });
-        //     });
-        //     tblData.push(obj);
-        // });
-        dataList.map((content, index) => {
-            sectionsData.map((sectionData) => {
+        sectionsData.map((sectionData) => {
+            dataList.map((content, index) => {
                 if (content.UnitProject === sectionData.No) {
-                    xAxisData.push(`${index + 1}-${sectionData.Name}`);
-                    // xAxisData.push(sectionData.Name);
+                    xAxisData.push(sectionData.Name);
                 }
             });
         });

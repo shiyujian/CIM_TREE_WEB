@@ -13,9 +13,9 @@ import moment from 'moment';
 import DataTable from './DataTable';
 import TopLeft from './TopLeft';
 import TopRight from './TopRight';
-import MiddleLeft from './MiddleLeft';
-import MiddleMiddle from './MiddleMiddle';
-import MiddleRight from './MiddleRight';
+import TreeTypeLeft from './TreeTypeLeft';
+import TreeTypeMiddle from './TreeTypeMiddle';
+import TreeTypeRight from './TreeTypeRight';
 import EntranceLeft from './EntranceLeft';
 import EntranceRight from './EntranceRight';
 import PlantLeft from './PlantLeft';
@@ -178,13 +178,13 @@ export default class DataStatisTable extends Component {
                                     style={{ marginTop: 10 }}
                                 >
                                     <Col span={8}>
-                                        <MiddleLeft {...this.state} {...this.props} />
+                                        <TreeTypeLeft {...this.state} {...this.props} />
                                     </Col>
                                     <Col span={8}>
-                                        <MiddleMiddle {...this.state} {...this.props} />
+                                        <TreeTypeMiddle {...this.state} {...this.props} />
                                     </Col>
                                     <Col span={8}>
-                                        <MiddleRight {...this.state} {...this.props} />
+                                        <TreeTypeRight {...this.state} {...this.props} />
                                     </Col>
                                 </Card>
                             </Row>
@@ -195,7 +195,7 @@ export default class DataStatisTable extends Component {
                     <Row>
                         <Col span={12}>
                             <Card
-                                title='苗木进场强度分析'
+                                title='苗木进场总数分析'
                                 style={{ marginTop: 10 }}
                             >
                                 <EntranceLeft {...this.state} {...this.props} />
@@ -228,7 +228,7 @@ export default class DataStatisTable extends Component {
                             </Card>
                         </Col>
                     </Row>
-                    {/* <Row>
+                    <Row>
                         <Col span={12}>
                             <Card
                                 title='各小班定位进度分析'
@@ -245,7 +245,7 @@ export default class DataStatisTable extends Component {
                                 <LocationRight {...this.state} {...this.props} />
                             </Card>
                         </Col>
-                    </Row> */}
+                    </Row>
                     <Row>
                         <Col span={12}>
                             <Card

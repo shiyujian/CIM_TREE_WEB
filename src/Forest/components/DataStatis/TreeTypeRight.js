@@ -3,7 +3,7 @@ import echarts from 'echarts';
 import { Card, Spin, Row, Col, Table } from 'antd';
 import moment from 'moment';
 
-export default class Middle extends Component {
+export default class TreeTypeRight extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);

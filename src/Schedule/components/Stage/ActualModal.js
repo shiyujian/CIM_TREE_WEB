@@ -323,7 +323,14 @@ export default class ActualModal extends Component {
         {
             title: '数量',
             dataIndex: 'actualNum',
-            key: 'actualNum'
+            key: 'actualNum',
+            render: (record, text, index) => {
+                if (record && record.actualNum) {
+                    return <span>{record.actualNum}</span>;
+                } else {
+                    return <span>0</span>;
+                }
+            }
         }
     ];
 }

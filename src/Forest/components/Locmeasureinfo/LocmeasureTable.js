@@ -1130,6 +1130,12 @@ export default class LocmeasureTable extends Component {
             tqzj: tqzj
         };
         if (role) postdata[role] = rolename;
+        console.log('postdata', postdata);
+        console.log('stime', stime);
+        console.log('etime', etime);
+        console.log('lstime', lstime);
+        console.log('letime', letime);
+
         this.setState({ loading: true, percent: 0 });
         getqueryTree({}, postdata).then(rst => {
             this.setState({ loading: false, percent: 100 });
@@ -1588,7 +1594,7 @@ export default class LocmeasureTable extends Component {
             exportsize,
             thinclass = '',
             status = '',
-            smallclassData = '', 
+            smallclassData = '',
             thinclassData = '',
             XJFirst = 0,
             XJSecond = '',

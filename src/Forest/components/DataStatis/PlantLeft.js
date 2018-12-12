@@ -22,7 +22,7 @@ export default class PlantLeft extends Component {
     }
 
     componentDidMount () {
-        var myChart1 = echarts.init(document.getElementById('leftTop'));
+        var myChart1 = echarts.init(document.getElementById('PlantLeft'));
         let option1 = {
             tooltip: {
                 trigger: 'axis',
@@ -173,7 +173,7 @@ export default class PlantLeft extends Component {
                 }
             }
 
-            let myChart1 = echarts.init(document.getElementById('leftTop'));
+            let myChart1 = echarts.init(document.getElementById('PlantLeft'));
             let series = [
                 {
                     name: '总数',
@@ -224,7 +224,7 @@ export default class PlantLeft extends Component {
             <Spin spinning={this.state.loading}>
                 <Cards search={this.search()} title='苗木种植强度分析'>
                     <div
-                        id='leftTop'
+                        id='PlantLeft'
                         style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>

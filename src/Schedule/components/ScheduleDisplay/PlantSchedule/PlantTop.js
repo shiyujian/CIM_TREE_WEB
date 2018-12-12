@@ -19,13 +19,13 @@ export default class PlantTop extends Component {
 
     async componentDidMount () {
         // this.query(this.state.stime);
-        const {
-            actions: {
-                getTestData
-            }
-        } = this.props;
-        let data = await getTestData();
-        console.log('data', data);
+        // const {
+        //     actions: {
+        //         getTestData
+        //     }
+        // } = this.props;
+        // let data = await getTestData();
+        // console.log('data', data);
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -132,7 +132,11 @@ export default class PlantTop extends Component {
                     yPlantData.push(item.Num);
                     yRealData.push(row.Num);
                     let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    yRatioData.push(ratio);
+                    if (isNaN(ratio) || ratio === 'Infinity') {
+                        yRatioData.push(0);
+                    } else {
+                        yRatioData.push(ratio);
+                    }
                 }
             });
         });
@@ -264,6 +268,6 @@ export default class PlantTop extends Component {
                 'mySheet': Object.assign({}, output, { '!ref': ref })
             }
         };
-        XLSX.writeFile(wb, 'output.xlsx');
+        XLSX.writeFile(wb, '计划完成情况.xlsx');
     }
 }

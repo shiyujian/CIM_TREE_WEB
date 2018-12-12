@@ -301,7 +301,14 @@ export default class WeekPlanModal extends Component {
             title: '计划栽植量',
             dataIndex: 'planTreeNum',
             key: 'planTreeNum',
-            width: '34%'
+            width: '34%',
+            render: (record, text, index) => {
+                if (record && record.planTreeNum) {
+                    return <span>{record.planTreeNum}</span>;
+                } else {
+                    return <span>0</span>;
+                }
+            }
         }
     ];
 }

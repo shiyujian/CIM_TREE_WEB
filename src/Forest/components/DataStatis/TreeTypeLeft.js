@@ -4,7 +4,7 @@ import { Card, Spin, Row, Col } from 'antd';
 import {TREETYPENO} from '_platform/api';
 import moment from 'moment';
 
-export default class Middle extends Component {
+export default class TreeTypeLeft extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -13,7 +13,7 @@ export default class Middle extends Component {
         };
     }
     async componentDidMount () {
-        var myChart = echarts.init(document.getElementById('middleLeft'));
+        var myChart = echarts.init(document.getElementById('TreeTypeLeft'));
         let option = {
             tooltip: {
                 trigger: 'item',
@@ -116,7 +116,7 @@ export default class Middle extends Component {
                     }
                 }
             }
-            let myChart = echarts.init(document.getElementById('middleLeft'));
+            let myChart = echarts.init(document.getElementById('TreeTypeLeft'));
             let option = {
                 legend: {
                     data: treetypeName
@@ -132,7 +132,7 @@ export default class Middle extends Component {
                 loading: false
             });
         } catch (e) {
-            console.log('middleLeft', e);
+            console.log('TreeTypeLeft', e);
         }
     }
 
@@ -140,7 +140,7 @@ export default class Middle extends Component {
         return (
             <Spin spinning={this.state.loading}>
                 <div
-                    id='middleLeft'
+                    id='TreeTypeLeft'
                     style={{ width: '100%', height: '350px' }}
                 />
             </Spin>

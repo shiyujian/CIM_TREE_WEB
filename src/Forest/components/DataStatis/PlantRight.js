@@ -15,7 +15,7 @@ export default class PlantRight extends Component {
     }
 
     componentDidMount () {
-        var myChart2 = echarts.init(document.getElementById('middleTop'));
+        var myChart2 = echarts.init(document.getElementById('PlantRight'));
         let option2 = {
             tooltip: {
                 trigger: 'axis',
@@ -111,7 +111,7 @@ export default class PlantRight extends Component {
                 });
             }
 
-            let myChart2 = echarts.init(document.getElementById('middleTop'));
+            let myChart2 = echarts.init(document.getElementById('PlantRight'));
             let options2 = {
                 legend: {
                     data: ['未种植', '已种植']
@@ -168,7 +168,7 @@ export default class PlantRight extends Component {
             <Spin spinning={this.state.loading}>
                 <Cards search={this.search()} title='各标段种植进度分析'>
                     <div
-                        id='middleTop'
+                        id='PlantRight'
                         style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>

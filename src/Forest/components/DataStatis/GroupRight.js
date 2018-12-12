@@ -5,7 +5,7 @@ import { Cards } from '../../components';
 import moment from 'moment';
 const Option = Select.Option;
 
-export default class Bottom extends Component {
+export default class GroupRight extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -21,7 +21,7 @@ export default class Bottom extends Component {
         };
     }
     async componentDidMount () {
-        var myChart4 = echarts.init(document.getElementById('bottom'));
+        var myChart4 = echarts.init(document.getElementById('GroupRight'));
         let option4 = {
             tooltip: {
                 trigger: 'axis',
@@ -230,7 +230,7 @@ export default class Bottom extends Component {
             });
         }
 
-        let myChart4 = echarts.init(document.getElementById('bottom'));
+        let myChart4 = echarts.init(document.getElementById('GroupRight'));
         let options4 = {
             legend: {
                 data: ['未种植', '已种植']
@@ -288,7 +288,7 @@ export default class Bottom extends Component {
                     title={this.title1()}
                 >
                     <div
-                        id='bottom'
+                        id='GroupRight'
                         style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>

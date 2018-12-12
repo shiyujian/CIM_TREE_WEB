@@ -4,6 +4,7 @@ import { Select, DatePicker, Spin } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
 const Option = Select.Option;
+const { RangePicker } = DatePicker;
 
 export default class LocationLeft extends Component {
     static propTypes = {};
@@ -11,6 +12,9 @@ export default class LocationLeft extends Component {
         super(props);
         this.state = {
             loading: false,
+            stime: moment()
+                .subtract(1, 'days')
+                .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             section: '',
             sectionoption: [],
@@ -58,14 +62,13 @@ export default class LocationLeft extends Component {
         myChart3.setOption(option3);
     }
 
-    getSectionoption () {
+    getSectionOption () {
         const {
             platform: { tree = {} },
             leftkeycode
         } = this.props;
         let sectionData = (tree && tree.thinClassTree) || [];
         let sectionoption = [];
-        console.log('ssssssssssssssssssss');
         sectionData.map(project => {
             // 获取正确的项目
             if (leftkeycode.indexOf(project.No) > -1) {
@@ -91,113 +94,17 @@ export default class LocationLeft extends Component {
     }
 
     componentDidUpdate (prevProps, prevState) {
-        const { etime, section } = this.state;
+        const { section } = this.state;
         const { leftkeycode } = this.props;
         if (leftkeycode !== prevProps.leftkeycode) {
-            this.getSectionoption();
+            this.getSectionOption();
         }
         if (section !== prevState.section) {
             this.query();
         }
-        if (etime !== prevState.etime) {
-            this.query();
-        }
-    }
-
-    async query () {
-        const {
-            actions: {
-                getLocationStatBySpecfield
-            }
-        } = this.props;
-        const {
-            etime,
-            section,
-            sectionsData
-        } = this.state;
-        let param = {
-            stattype: 'smallclass',
-            section: section,
-            etime: etime
-        };
-        this.setState({ loading: true });
-        let smallClassList = [];
-        sectionsData.map((sectionData) => {
-            if (section === sectionData.No) {
-                smallClassList = sectionData.children;
-            }
-        });
-
-        let rst = await getLocationStatBySpecfield({}, param);
-        console.log('LocationLeftLocationLeft', rst);
-        let units = ['1小班', '2小班', '3小班', '4小班', '5小班'];
-
-        let complete = [];
-        let unComplete = [];
-        let label = [];
-        let total = [];
-
-        if (rst && rst instanceof Array) {
-            rst.map(item => {
-                complete.push(item.Complete);
-                unComplete.push(item.UnComplete);
-                smallClassList.map((smallClass) => {
-
-                });
-                label.push(item.Label + '号小班');
-            });
-        }
-
-        let myChart3 = echarts.init(document.getElementById('LocationLeft'));
-        let options3 = {
-            legend: {
-                data: ['未种植', '已种植']
-            },
-            xAxis: [
-                {
-                    data: label.length > 0 ? label : units
-                }
-            ],
-            series: [
-                {
-                    name: '未种植',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            offset: ['50', '80'],
-                            show: true,
-                            position: 'inside',
-                            formatter: '{c}',
-                            textStyle: { color: '#FFFFFF' }
-                        }
-                    },
-                    data: unComplete
-                },
-                {
-                    name: '已种植',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            offset: ['50', '80'],
-                            show: true,
-                            position: 'inside',
-                            formatter: '{c}',
-                            textStyle: { color: '#FFFFFF' }
-                        }
-                    },
-                    data: complete
-                }
-            ]
-        };
-        myChart3.setOption(options3);
-        this.setState({ loading: false });
     }
 
     render () {
-        // todo 苗木种植强度分析
-
         return (
             <Spin spinning={this.state.loading}>
                 <Cards search={this.search()} title={this.title()}>
@@ -233,13 +140,13 @@ export default class LocationLeft extends Component {
     search () {
         return (
             <div>
-                <span>截止时间：</span>
-                <DatePicker
+                <span>定位时间：</span>
+                <RangePicker
                     style={{ verticalAlign: 'middle' }}
-                    defaultValue={moment(
-                        this.state.etime,
-                        'YYYY/MM/DD HH:mm:ss'
-                    )}
+                    defaultValue={[
+                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
+                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                    ]}
                     showTime={{ format: 'HH:mm:ss' }}
                     format={'YYYY/MM/DD HH:mm:ss'}
                     onChange={this.datepick.bind(this)}
@@ -251,7 +158,93 @@ export default class LocationLeft extends Component {
 
     datepick (value) {
         this.setState({
-            etime: value ? moment(value).format('YYYY/MM/DD') : ''
+            stime: value[0]
+                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
+                : '',
+            etime: value[1]
+                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        }, () => {
+            this.query();
         });
+    }
+
+    async query () {
+        const {
+            actions: {
+                getLocationStatBySpecfield
+            }
+        } = this.props;
+        const {
+            stime,
+            etime,
+            section,
+            sectionsData
+        } = this.state;
+        let param = {
+            stattype: 'smallclass',
+            section: section,
+            stime: stime,
+            etime: etime
+        };
+        this.setState({ loading: true });
+        let smallClassList = [];
+        sectionsData.map((sectionData) => {
+            if (section === sectionData.No) {
+                smallClassList = sectionData.children;
+            }
+        });
+
+        let rst = await getLocationStatBySpecfield({}, param);
+        let units = [];
+
+        let complete = [];
+        let label = [];
+
+        if (rst && rst instanceof Array) {
+            rst.map(item => {
+                complete.push(item.Num);
+                smallClassList.map((smallClass) => {
+                    let No = smallClass.No;
+                    let NoArr = No.split('-');
+                    if (NoArr.length === 4) {
+                        let smallClassNo = NoArr[0] + '-' + NoArr[1] + '-' + NoArr[3];
+                        if (item.Label === smallClassNo) {
+                            label.push(smallClass.Name);
+                        }
+                    };
+                });
+            });
+        }
+        let myChart3 = echarts.init(document.getElementById('LocationLeft'));
+        let options3 = {
+            legend: {
+                data: ['已定位']
+            },
+            xAxis: [
+                {
+                    data: label.length > 0 ? label : units
+                }
+            ],
+            series: [
+                {
+                    name: '已定位',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: { color: '#FFFFFF' }
+                        }
+                    },
+                    data: complete
+                }
+            ]
+        };
+        myChart3.setOption(options3);
+        this.setState({ loading: false });
     }
 }

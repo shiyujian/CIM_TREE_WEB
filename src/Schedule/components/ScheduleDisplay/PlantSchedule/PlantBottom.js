@@ -14,7 +14,7 @@ export default class PlantBottom extends Component {
         super(props);
         this.state = {
             stime: moment().subtract(7, 'days').calendar(),
-            etime: moment().format('YYYY/MM/DD'),
+            etime: moment().subtract(1, 'days').format('YYYY/MM/DD'),
             dataList: [],
             dataListReal: [],
             dataListTask: [],
@@ -130,8 +130,8 @@ export default class PlantBottom extends Component {
             // 实际栽植量
             await getTreetotalstatbyday({}, {
                 section: section || leftkeycode,
-                stime: stime,
-                etime: etime
+                stime: stime + ' 00:00:00',
+                etime: etime + ' 23:59:59'
             }).then(rep => {
                 dataListReal = rep;
             });
@@ -140,6 +140,19 @@ export default class PlantBottom extends Component {
                 section: section || leftkeycode
             }).then(rep => {
                 dataListTask = rep;
+            });
+            // 将获取的数据按照 PlanDate 时间排序
+            dataList.sort(function (a, b) {
+                let aPlanDate = moment(a.PlanDate).format(DATE_FORMAT_);
+                let bPlanDate = moment(b.PlanDate).format(DATE_FORMAT_);
+
+                if (aPlanDate < bPlanDate) {
+                    return -1;
+                } else if (aPlanDate > bPlanDate) {
+                    return 1;
+                } else {
+                    return 0;
+                }
             });
             this.setState({
                 dataList: dataList,
@@ -175,26 +188,40 @@ export default class PlantBottom extends Component {
         let yCompleteData = [];
         let yGrandData = [];
         dataList.map(item => {
-            let PlanDate = moment(item.PlanDate.split(' ')[0], DATE_FORMAT).format(DATE_FORMAT_);
+            let PlanDate = moment(item.PlanDate).format(DATE_FORMAT_);
             xAxisData.push(PlanDate);
             yPlantData.push(item.Num);
             dataListReal.map(row => {
                 if (item.Section === row.Section && PlanDate === row.Label) {
                     yRealData.push(row.Num);
                     let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    yRatioData.push(ratio);
+                    // yRatioData.push(ratio);
+                    if (isNaN(ratio) || ratio === 'Infinity') {
+                        yRatioData.push(0);
+                    } else {
+                        yRatioData.push(ratio);
+                    }
                     yCompleteData.push(row.Complete);
                 }
             });
         });
-        dataListTask.map(item => {
-            dataListReal.map(row => {
-                if (item.Section === row.Section) {
-                    let ratio = (row.Complete / item.Sum * 100).toFixed(2);
-                    yGrandData.push(ratio);
-                }
+        xAxisData.map((date) => {
+            dataListTask.map(item => {
+                dataListReal.map(row => {
+                    if (item.Section === row.Section) {
+                        if (date === moment(row.Label).format(DATE_FORMAT_)) {
+                            let ratio = (row.Complete / item.Sum * 100).toFixed(2);
+                            if (isNaN(ratio) || ratio === 'Infinity') {
+                                yGrandData.push(0);
+                            } else {
+                                yGrandData.push(ratio);
+                            }
+                        }
+                    }
+                });
             });
         });
+
         const myChart = echarts.init(document.getElementById('PlantBottom'));
         let optionLine = {
             tooltip: {
@@ -232,28 +259,6 @@ export default class PlantBottom extends Component {
                         formatter: '{value} '
                     }
                 },
-                {
-                    type: 'value',
-                    name: '颗',
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                },
-                {
-                    type: 'value',
-                    name: '颗',
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                },
-                {
-                    type: 'value',
-                    name: '颗',
-                    axisLabel: {
-                        formatter: '{value} '
-                    }
-                },
-
                 {
                     type: 'value',
                     name: '百分比',
@@ -318,17 +323,29 @@ export default class PlantBottom extends Component {
                 if (item.Section === row.Section && PlanDate === row.Label) {
                     yRealData.push(row.Num);
                     let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    yRatioData.push(ratio);
+                    if (isNaN(ratio) || ratio === 'Infinity') {
+                        yRatioData.push(0);
+                    } else {
+                        yRatioData.push(ratio);
+                    }
                     yCompleteData.push(row.Complete);
                 }
             });
         });
-        dataListTask.map(item => {
-            dataListReal.map(row => {
-                if (item.Section === row.Section) {
-                    let ratio = (row.Complete / item.Sum * 100).toFixed(2);
-                    yGrandData.push(ratio);
-                }
+        xAxisData.map((date) => {
+            dataListTask.map(item => {
+                dataListReal.map(row => {
+                    if (item.Section === row.Section) {
+                        if (date === moment(row.Label).format(DATE_FORMAT_)) {
+                            let ratio = (row.Complete / item.Sum * 100).toFixed(2);
+                            if (isNaN(ratio) || ratio === 'Infinity') {
+                                yGrandData.push(0);
+                            } else {
+                                yGrandData.push(ratio);
+                            }
+                        }
+                    }
+                });
             });
         });
         legendList.map(item => {
@@ -375,6 +392,6 @@ export default class PlantBottom extends Component {
                 'mySheet': Object.assign({}, output, { '!ref': ref })
             }
         };
-        XLSX.writeFile(wb, 'output.xlsx');
+        XLSX.writeFile(wb, '本标段计划完成情况.xlsx');
     }
 }

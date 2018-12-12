@@ -35,7 +35,7 @@ export default class EntranceRight extends Component {
     }
 
     componentDidMount () {
-        let myChart2 = echarts.init(document.getElementById('stock'));
+        let myChart2 = echarts.init(document.getElementById('EntranceRight'));
         let options2 = {
             tooltip: {
                 trigger: 'axis',
@@ -201,7 +201,7 @@ export default class EntranceRight extends Component {
             });
         });
 
-        let myChart2 = echarts.init(document.getElementById('stock'));
+        let myChart2 = echarts.init(document.getElementById('EntranceRight'));
         let options2 = {
             legend: {
                 data: legend
@@ -225,7 +225,7 @@ export default class EntranceRight extends Component {
                 <Spin spinning={this.state.loading}>
                     <Cards search={this.searchRender()} title={`进场强度分析`}>
                         <div
-                            id='stock'
+                            id='EntranceRight'
                             style={{ width: '100%', height: '400px' }}
                         />
                     </Cards>
