@@ -54,6 +54,7 @@ export default class ActualModal extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
+        console.log('treeDatasource', this.state.treeDatasource);
         return (
             <div>
                 <Modal
@@ -324,7 +325,7 @@ export default class ActualModal extends Component {
             title: '数量',
             dataIndex: 'actualNum',
             key: 'actualNum',
-            render: (record, text, index) => {
+            render: (text, record, index) => {
                 if (record && record.actualNum) {
                     return <span>{record.actualNum}</span>;
                 } else {

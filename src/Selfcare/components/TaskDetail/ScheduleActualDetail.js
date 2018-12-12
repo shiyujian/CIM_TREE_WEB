@@ -56,7 +56,7 @@ class ScheduleActualDetail extends Component {
             title: '数量',
             dataIndex: 'actualNum',
             key: 'actualNum',
-            render: (record, text, index) => {
+            render: (text, record, index) => {
                 if (record && record.actualNum) {
                     return <span>{record.actualNum}</span>;
                 } else {

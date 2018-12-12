@@ -287,7 +287,7 @@ export default class WeekPlanModal extends Component {
             title: '序号',
             dataIndex: 'index',
             width: '33%',
-            render: (record, text, index) => {
+            render: (text, record, index) => {
                 return <span>{index + 1}</span>;
             }
         },
@@ -302,7 +302,7 @@ export default class WeekPlanModal extends Component {
             dataIndex: 'planTreeNum',
             key: 'planTreeNum',
             width: '34%',
-            render: (record, text, index) => {
+            render: (text, record, index) => {
                 if (record && record.planTreeNum) {
                     return <span>{record.planTreeNum}</span>;
                 } else {

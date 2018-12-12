@@ -89,8 +89,6 @@ export default class Bottom extends Component {
     }
 
     render () {
-        // todo 苗木种植强度分析
-
         return (
             <div
                 id='bottomBottom'

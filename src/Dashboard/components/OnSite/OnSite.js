@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-07 11:26:14
+ * @Last Modified time: 2018-12-12 18:23:41
  */
 import React, { Component } from 'react';
 import {
@@ -661,7 +661,7 @@ class OnSite extends Component {
         } else {
             this.tileTreeSurvivalRateLayerBasic = L.tileLayer(
                 window.config.DASHBOARD_ONSITE +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Athinclass&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                '/geoserver/gwc/service/wmts?layer=xatree%3Asurvivalrate&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
@@ -2128,7 +2128,7 @@ class OnSite extends Component {
             if (url) {
                 this.tileSurvivalRateLayerFilter = L.tileLayer.wms(url,
                     {
-                        layers: 'xatree:thinclass',
+                        layers: 'xatree:survivalrate',
                         crs: L.CRS.EPSG4326,
                         format: 'image/png',
                         maxZoom: 22,
