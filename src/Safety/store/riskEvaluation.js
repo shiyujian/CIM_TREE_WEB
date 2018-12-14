@@ -1,7 +1,7 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
-import { SERVICE_API, WORKFLOW_API} from '_platform/api';
+import { SERVICE_API } from '_platform/api';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
@@ -12,7 +12,7 @@ const documentReducer = documentFactory(ID);
 export const getdocumentOK = createAction(`${ID}_搜索目录文档`);
 export const getdocument = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [getdocumentOK]);
 export const deletedoc = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, 'DELETE');
-export const putdocument =createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, 'PUT');
+export const putdocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, 'PUT');
 export const SearchOK = createAction(`${ID}_高级搜索`);
 export const Search = createFetchAction(`${SERVICE_API}/searcher/`, [SearchOK]);
 const visibleReducer = booleanFactory(ID, 'addition');
@@ -22,9 +22,9 @@ const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 const selectDocuments = createAction(`${ID}_SELECTDOUMENT`);
 const updatevisible = createAction(`${ID}_updatevisible`);
 const setoldfile = createAction(`${ID}setoldfile`);
-export const setkeycode =createAction(`${ID}_setkeycode`);
+export const setkeycode = createAction(`${ID}_setkeycode`);
 export const getTreeOK = createAction(`${ID}_工程施工包`);
-export const getTree =createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
+export const getTree = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 export const actions = {
     getdocumentOK,
     getdocument,
@@ -37,7 +37,7 @@ export const actions = {
     Search,
     updatevisible,
     setoldfile,
-	setkeycode,
+    setkeycode,
     getTreeOK,
     getTree,
     // ...dirReducer,
@@ -52,7 +52,7 @@ export default handleActions({
         return {
             ...state,
             tree: children
-        }
+        };
     },
     [combineActions(...actionsMap(additionReducer))]: (state, action) => ({
         ...state,
@@ -97,5 +97,5 @@ export default handleActions({
     [setkeycode]: (state, {payload}) => ({
 	    ...state,
 	    keycode: payload
-    }),
+    })
 }, {});

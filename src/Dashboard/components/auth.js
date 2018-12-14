@@ -1,5 +1,5 @@
 import './OnSite/OnSite.less';
-import { FOREST_API, FOREST_IMG, LBSAMAP_KEY } from '_platform/api';
+import { LBSAMAP_KEY } from '_platform/api';
 import {getForestImgUrl} from '_platform/auth';
 export const getAreaData = async (getTreeNodeList, getThinClassList) => {
     let rst = await getTreeNodeList();

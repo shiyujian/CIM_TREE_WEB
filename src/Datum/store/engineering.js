@@ -2,13 +2,10 @@ import { createAction, handleActions, combineActions } from 'redux-actions';
 import { actionsMap } from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 
-import { SERVICE_API, WORKFLOW_API, FOREST_API } from '_platform/api';
-import dirFactory from '_platform/store/higher-order/dir';
+import { SERVICE_API } from '_platform/api';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
-// import engineeringReducer, {actions as engineeringActions} from './engineering';
-// import rediosReducer, {actions as rediosActions} from './redios';
 
 const ID = 'datum_engineering';
 const additionReducer = fieldFactory(ID, 'addition');
@@ -42,7 +39,6 @@ export const getTree = createFetchAction(
     `${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`,
     [getTreeOK]
 );
-const getTreeNodeList = createFetchAction(`${FOREST_API}/tree/wpunittree`, []); //    √
 
 export const searchEnginMessage = createAction(`${ID}获取工程文档搜索信息`);
 export const searchEnginVisible = createAction(`${ID}是否搜索工程文档`);
@@ -58,7 +54,6 @@ export const actions = {
     Search,
     updatevisible,
     setoldfile,
-    getTreeNodeList,
     setkeycode,
     getTreeOK,
     getTree,

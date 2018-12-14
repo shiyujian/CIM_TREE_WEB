@@ -18,7 +18,7 @@ import {
     getUser
 } from '../../_platform/auth';
 import QRCode from '../components/QRCode';
-import { QRCODE_API } from '_platform/api';
+import { QRCODE_API, FOREST_LOGIN_DATA } from '_platform/api';
 import './Login.less';
 
 const FormItem = Form.Item;
@@ -701,19 +701,25 @@ class Login extends Component {
             message.error('用户没有被激活');
         } else {
             if (rst && rst.id) {
-                let postData = {
-                    phone: data.username,
-                    pwd: data.password
-                };
-                // let forestUserData = await loginForest({}, postData);
-                // console.log('forestUserData', forestUserData);
-                // if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
-                //     let forestLoginUserData = forestUserData[0];
-                //     window.localStorage.setItem(
-                //         'FOREST_LOGIN_USER_DATA',
-                //         JSON.stringify(forestLoginUserData)
-                //     );
-                // }
+                let postData = {};
+                if (data.username === 'admin') {
+                    postData = FOREST_LOGIN_DATA;
+                } else {
+                    postData = {
+                        phone: data.username,
+                        pwd: data.password
+                    };
+                }
+
+                let forestUserData = await loginForest({}, postData);
+                console.log('forestUserData', forestUserData);
+                if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
+                    let forestLoginUserData = forestUserData[0];
+                    window.localStorage.setItem(
+                        'FOREST_LOGIN_USER_DATA',
+                        JSON.stringify(forestLoginUserData)
+                    );
+                }
                 let userData = await getForestAllUsersData();
                 if (userData && userData.content) {
                     let content = userData.content;

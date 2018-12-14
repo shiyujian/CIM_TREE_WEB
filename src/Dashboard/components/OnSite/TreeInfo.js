@@ -1,4 +1,3 @@
-import { FOREST_API, FOREST_IMG } from '_platform/api';
 import moment from 'moment';
 import {getForestImgUrl} from '_platform/auth';
 export const getSeedlingMess = (queryTreeData, carData, nurserysData) => {

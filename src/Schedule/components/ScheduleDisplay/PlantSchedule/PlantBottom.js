@@ -117,6 +117,9 @@ export default class PlantBottom extends Component {
             this.setState({
                 loading: true
             });
+            if (!(leftkeycode || section)) {
+                return;
+            }
             // 计划栽植量
             await getTreedayplans({}, {
                 section: section || leftkeycode,

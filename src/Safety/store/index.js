@@ -10,32 +10,32 @@ import hiddenDangerReducer, {actions as hiddenDangerActions} from './hiddenDange
 import trendReducer, {actions as trendActions} from './trend';
 
 export default handleActions({
-	[combineActions(...actionsMap(safetySystemActions))]: (state = {}, action) => ({
-		...state,
-		safetySystem: safetySystemReducer(state.safetySystem, action),
-	}),
-	[combineActions(...actionsMap(riskFactorActions))]: (state = {}, action) => ({
-		...state,
-		riskFactor: riskFactorReducer(state.riskFactor, action),
-	}),
-	[combineActions(...actionsMap(unbearableActions))]: (state = {}, action) => ({
-		...state,
-		unbearable: unbearableReducer(state.unbearable, action),
-	}),
-	[combineActions(...actionsMap(riskEvaluationActions))]: (state = {}, action) => ({
-		...state,
-		riskEvaluation: riskEvaluationReducer(state.riskEvaluation, action),
-	}),
-	[combineActions(...actionsMap(safetyTrendActions))]: (state = {}, action) => ({
-		...state,
-		safetyTrend: safetyTrendReducer(state.safetyTrend, action),
-	}),
-	[combineActions(...actionsMap(hiddenDangerActions))]: (state, action) => ({
-		...state,
-		hiddenDanger: hiddenDangerReducer(state.hiddenDanger, action)
-	}),
-	[combineActions(...actionsMap(trendActions))]: (state, action) => ({
-		...state,
-		trend: trendReducer(state.trend, action)
-	}),
+    [combineActions(...actionsMap(safetySystemActions))]: (state = {}, action) => ({
+        ...state,
+        safetySystem: safetySystemReducer(state.safetySystem, action)
+    }),
+    [combineActions(...actionsMap(riskFactorActions))]: (state = {}, action) => ({
+        ...state,
+        riskFactor: riskFactorReducer(state.riskFactor, action)
+    }),
+    [combineActions(...actionsMap(unbearableActions))]: (state = {}, action) => ({
+        ...state,
+        unbearable: unbearableReducer(state.unbearable, action)
+    }),
+    [combineActions(...actionsMap(riskEvaluationActions))]: (state = {}, action) => ({
+        ...state,
+        riskEvaluation: riskEvaluationReducer(state.riskEvaluation, action)
+    }),
+    [combineActions(...actionsMap(safetyTrendActions))]: (state = {}, action) => ({
+        ...state,
+        safetyTrend: safetyTrendReducer(state.safetyTrend, action)
+    }),
+    [combineActions(...actionsMap(hiddenDangerActions))]: (state, action) => ({
+        ...state,
+        hiddenDanger: hiddenDangerReducer(state.hiddenDanger, action)
+    }),
+    [combineActions(...actionsMap(trendActions))]: (state, action) => ({
+        ...state,
+        trend: trendReducer(state.trend, action)
+    })
 }, {});

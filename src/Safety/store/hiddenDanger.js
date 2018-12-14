@@ -1,12 +1,13 @@
 import { handleActions, combineActions, createAction } from 'redux-actions';
 import createFetchAction from 'fetch-action';
+import {forestFetchAction} from '_platform/store/fetchAction';
+
 import { actionsMap } from '_platform/store/util';
-// import dirFactory from '_platform/store/higher-order/dir';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
 import { SERVICE_API, WORKFLOW_API, FOREST_API } from '_platform/api';
+
 const ID = 'safety_hiddenDanger';
-// const dirReducer = dirFactory(ID);
 const documentReducer = documentFactory(ID);
 
 const setIsAddPlan = createAction(`${ID}安全隐患-设置新增状态`);
@@ -29,15 +30,12 @@ const setkeycode = createAction(`${ID}_setkeycode`);
 
 export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
-// export const getProjectAcOK = createAction('PROJECT获取项目列表');
-// export const getProjectAc = createFetchAction(`${SERVICE_API}/project-tree/?depth=2`, [getProjectAcOK]);
 
 // 获取所有安全隐患
-export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents?eventtype=1&status={{status}}`);
+export const getRisk = forestFetchAction(`${FOREST_API}/tree/patrolevents?eventtype=1&status={{status}}`);
 // 上传文件
 export const getWrokflowByID = createFetchAction(`${WORKFLOW_API}/instance?code={{code}}&subject_id={{id}}&detail=true`);
 export const actions = {
-    // getPotentialRiskByCode,
     getWrokflowByID,
     getRisk,
     getdocumentOK,

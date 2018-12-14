@@ -1,5 +1,6 @@
 import {createAction, handleActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
+import {forestFetchAction} from '_platform/store/fetchAction';
 import {USER_API, WORKFLOW_API, QRCODE_API, FOREST_API} from '_platform/api';
 
 export const loginOK = createAction('登录成功');
@@ -16,9 +17,9 @@ export const getToken = createFetchAction(`${QRCODE_API}/qrcode/`, [], 'GET');
 export const getLoginStateOK = createAction('二维码登录信息');
 export const getLoginState = createFetchAction(`${QRCODE_API}/qrcode/{{token}}/`, [], 'GET');
 
-export const getForestAllUsersData = createFetchAction(`${FOREST_API}/system/users`, [], 'GET');
+export const getForestAllUsersData = forestFetchAction(`${FOREST_API}/system/users`, [], 'GET');
 
-export const loginForest = createFetchAction(`${FOREST_API}:6510/system/login`, [], 'GET');
+export const loginForest = createFetchAction(`${FOREST_API}/system/login`, [], 'GET');
 
 export default handleActions({
     [loginOK]: (state, action) => {

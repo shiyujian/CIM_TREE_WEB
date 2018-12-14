@@ -1,6 +1,6 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
-
+import {forestFetchAction} from '_platform/store/fetchAction';
 import {
     FOREST_API, SEEDLING_API, SERVICE_API
 } from '_platform/api';
@@ -8,8 +8,12 @@ import {
 export const ID = 'Market_supermarket_demandRelease';
 // 示例action
 // 苗木养护查询
-export const getCuring = createFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
-export const getNurseryByPk = createFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃基地列表
+export const getCuring = forestFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
+export const getWpunittree = forestFetchAction(`${FOREST_API}/tree/wpunittree`); // 获得所有项目
+export const getRegionCodes = forestFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
+export const getTreeTypes = forestFetchAction(`${FOREST_API}/tree/treetypes`); // 获取苗木品种
+export const getNurseryByPk = forestFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃基地列表
+
 export const getPurchaseList = createFetchAction(`${SEEDLING_API}/purchase/purchases`); // 获取采购列表
 export const getPurchaseById = createFetchAction(`${SEEDLING_API}/purchase/purchase/{{id}}`); // 根据ID获取采购单
 export const getOffersListById = createFetchAction(`${SEEDLING_API}/purchase/offers`); // 根据采购单ID获取报价单
@@ -21,9 +25,7 @@ export const getPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/s
 export const postPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/spec`, [], 'POST'); // 增加采购单规格
 export const putPurchaseStandard = createFetchAction(`${SEEDLING_API}/purchase/spec`, [], 'PUT'); // 采购单规格变更
 export const postPurchaseSelect = createFetchAction(`${SEEDLING_API}/purchase/purchaseselect`, [], 'POST'); // 选标
-export const getWpunittree = createFetchAction(`${FOREST_API}/tree/wpunittree`); // 获得所有项目
-export const getRegionCodes = createFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
-export const getTreeTypes = createFetchAction(`${FOREST_API}/tree/treetypes`); // 获取苗木品种
+
 export const getOrgTree_new = createFetchAction(`${SERVICE_API}/org-tree/code/{{code}}/`); // 根据code获取组织机构
 
 // 修改选择地图的方式

@@ -6,10 +6,11 @@ import {
     USER_API,
     FOREST_API
 } from '_platform/api';
+import {forestFetchAction} from '_platform/store/fetchAction';
 export const ID = 'SYSTEM_blacklist';
 // 苗圃信息
 const getTagsOK = createAction(`${ID}_GET_TAGS_OK`);
-const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [
+const getTags = forestFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [
     getTagsOK
 ]);
 

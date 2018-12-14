@@ -1,9 +1,11 @@
 import { handleActions, combineActions, createAction } from 'redux-actions';
 import createFetchAction from 'fetch-action';
+import {forestFetchAction} from '_platform/store/fetchAction';
 import { actionsMap } from '_platform/store/util';
 import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
 import { SERVICE_API, WORKFLOW_API, FOREST_API } from '_platform/api';
+
 const ID = 'RISKFACTOR';
 // const dirReducer = dirFactory(ID);
 const documentReducer = documentFactory(ID);
@@ -30,7 +32,7 @@ export const getTreeOK = createAction(`${ID}_目录树`);
 export const getTree = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getTreeOK]);
 
 // 获取所有安全隐
-export const getRisk = createFetchAction(`${FOREST_API}/tree/patrolevents?eventtype=2&status={{status}}`);
+export const getRisk = forestFetchAction(`${FOREST_API}/tree/patrolevents?eventtype=2&status={{status}}`);
 // 上传文件
 export const getWrokflowByID = createFetchAction(`${WORKFLOW_API}/instance?code={{code}}&subject_id={{id}}&detail=true`);
 export const actions = {

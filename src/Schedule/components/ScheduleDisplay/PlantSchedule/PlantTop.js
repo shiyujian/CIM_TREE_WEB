@@ -17,17 +17,6 @@ export default class PlantTop extends Component {
         };
     }
 
-    async componentDidMount () {
-        // this.query(this.state.stime);
-        // const {
-        //     actions: {
-        //         getTestData
-        //     }
-        // } = this.props;
-        // let data = await getTestData();
-        // console.log('data', data);
-    }
-
     componentDidUpdate (prevProps, prevState) {
         const { leftkeycode } = this.props;
         try {
@@ -72,6 +61,9 @@ export default class PlantTop extends Component {
         const { leftkeycode } = this.props;
         const { getTreedayplans, getTreetotalstatbyday } = this.props.actions;
         try {
+            if (!leftkeycode) {
+                return;
+            }
             this.setState({
                 loading: true
             });

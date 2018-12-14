@@ -10,6 +10,7 @@ import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
 
 import { FOREST_API, WORKFLOW_API } from '_platform/api';
+import {forestFetchAction} from '_platform/store/fetchAction';
 const ID = 'faithanazly';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
@@ -20,13 +21,9 @@ export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供苗商名字`);
 
 /** ***************************院内************************/
-export const getTree = createFetchAction(`${FOREST_API}/tree/wpunits`, [
+export const getTree = forestFetchAction(`${FOREST_API}/tree/wpunits`, [
     getTreeOK
 ]); //    √
-export const getQualityTreeNodeList = createFetchAction(
-    `${FOREST_API}/tree/wpunittree`,
-    []
-); //    √
 export const getWorkflowById = createFetchAction(
     `${WORKFLOW_API}/instance/{{id}}/`,
     [],
@@ -42,133 +39,133 @@ export const deleteTasksList = createFetchAction(
     [],
     'DELETE'
 );
-export const gettreetype = createFetchAction(
+export const gettreetype = forestFetchAction(
     `${FOREST_API}/tree/treetypesbyno`,
     []
 );
-export const getfactoryAnalyse = createFetchAction(
+export const getfactoryAnalyse = forestFetchAction(
     `${FOREST_API}/tree/factoryAnalyse`,
     []
 );
-export const getnurserys = createFetchAction(`${FOREST_API}/tree/nurserys`, []);
-export const getNurserysTree = createFetchAction(
+export const getnurserys = forestFetchAction(`${FOREST_API}/tree/nurserys`, []);
+export const getNurserysTree = forestFetchAction(
     `${FOREST_API}/tree/treenurserys`,
     []
 );
-export const getqueryTree = createFetchAction(
+export const getqueryTree = forestFetchAction(
     `${FOREST_API}/tree/queryTree`,
     []
 );
-export const getTreeList = createFetchAction(
+export const getTreeList = forestFetchAction(
     `${FOREST_API}/tree/treetypes`,
     []
 );
-export const getexportFactoryAnalyseInfo = createFetchAction(
+export const getexportFactoryAnalyseInfo = forestFetchAction(
     `${FOREST_API}/tree/exportFactoryAnalyseInfo`,
     []
 );
-export const getexportFactoryAnalyseDetailInfo = createFetchAction(
+export const getexportFactoryAnalyseDetailInfo = forestFetchAction(
     `${FOREST_API}/tree/exportFactoryAnalyseDetailInfo`,
     []
 );
-export const getexportFactoryAnalyse = createFetchAction(
+export const getexportFactoryAnalyse = forestFetchAction(
     `${FOREST_API}/tree/exportFactoryAnalyse`,
     []
 );
-export const getexportTree4Checker = createFetchAction(
+export const getexportTree4Checker = forestFetchAction(
     `${FOREST_API}/tree/exportTree4Checker`,
     []
 );
-export const getexportTree4Supervisor = createFetchAction(
+export const getexportTree4Supervisor = forestFetchAction(
     `${FOREST_API}/tree/exportTree4Supervisor`,
     []
 );
-export const getexportTree = createFetchAction(
+export const getexportTree = forestFetchAction(
     `${FOREST_API}/tree/exportTree`,
     []
 );
-export const getexportNurserys = createFetchAction(
+export const getexportNurserys = forestFetchAction(
     `${FOREST_API}/tree/exportNurserys`,
     []
 );
-export const getexportTreeNurserys = createFetchAction(
+export const getexportTreeNurserys = forestFetchAction(
     `${FOREST_API}/tree/exportTreeNurserys`,
     []
 );
 
-export const getNurserysCount = createFetchAction(
+export const getNurserysCount = forestFetchAction(
     `${FOREST_API}/tree/nurserys/count/`,
     []
 );
-export const getNurserysCountFast = createFetchAction(
+export const getNurserysCountFast = forestFetchAction(
     `${FOREST_API}/tree/nurserys/count/fast/`,
     []
 );
-export const getNurserysProgress = createFetchAction(
+export const getNurserysProgress = forestFetchAction(
     `${FOREST_API}/tree/nurserys/progress/`,
     []
 );
-export const getquality = createFetchAction(
+export const getquality = forestFetchAction(
     `${FOREST_API}/tree/treestat4qualitybysection`,
     []
 );
-export const getreturn = createFetchAction(
+export const getreturn = forestFetchAction(
     `${FOREST_API}/tree/treestat4qualitybytimeback`,
     []
 );
-export const getreturnowner = createFetchAction(
+export const getreturnowner = forestFetchAction(
     `${FOREST_API}/trees/return/owner/`,
     []
 );
-export const getreturnsupervision = createFetchAction(
+export const getreturnsupervision = forestFetchAction(
     `${FOREST_API}/trees/return/supervision/`,
     []
 );
-export const getCount = createFetchAction(`${FOREST_API}/trees/count/`, []);
-export const getTreesProgress = createFetchAction(
+export const getCount = forestFetchAction(`${FOREST_API}/trees/count/`, []);
+export const getTreesProgress = forestFetchAction(
     `${FOREST_API}/trees/progress/`,
     []
 );
-export const getCountSection = createFetchAction(
+export const getCountSection = forestFetchAction(
     `${FOREST_API}/trees/count/section/`,
     []
 );
-export const getCountSmall = createFetchAction(
+export const getCountSmall = forestFetchAction(
     `${FOREST_API}/trees/count/small/`,
     []
 );
-export const getCountThin = createFetchAction(
+export const getCountThin = forestFetchAction(
     `${FOREST_API}/trees/count/thin/`,
     []
 );
-export const getHonesty = createFetchAction(`${FOREST_API}/trees/honesty/`, []);
-export const getHonestyNursery = createFetchAction(
+export const getHonesty = forestFetchAction(`${FOREST_API}/trees/honesty/`, []);
+export const getHonestyNursery = forestFetchAction(
     `${FOREST_API}/trees/honesty/nursery/`,
     []
 );
-export const getHonestyNew = createFetchAction(
+export const getHonestyNew = forestFetchAction(
     `${FOREST_API}/tree/factoryAnalyseInfo`,
     []
 );
-export const getHonestyNewSort = createFetchAction(
+export const getHonestyNewSort = forestFetchAction(
     `${FOREST_API}/trees/honesty/new/fast/?sort=true`,
     []
 );
-export const postFile = createFetchAction(
+export const postFile = forestFetchAction(
     `${FOREST_API}/db/import_location/`,
     [],
     'POST'
 );
-export const getHonestyNewDetail = createFetchAction(
+export const getHonestyNewDetail = forestFetchAction(
     `${FOREST_API}/tree/factoryAnalyseDetailInfo?factory={{name}}`,
     [getHonestyNewDetailOk],
     'GET'
 );
-export const getHonestyNewDetailModal = createFetchAction(
+export const getHonestyNewDetailModal = forestFetchAction(
     `${FOREST_API}/trees/honesty/new/?detail=true`,
     []
 );
-export const getHonestyNewTreetype = createFetchAction(
+export const getHonestyNewTreetype = forestFetchAction(
     `${FOREST_API}/tree/factoryanalysebytreetype`,
     ''
 );
@@ -213,7 +210,6 @@ export const actions = {
     getNurserysCountFast,
     getHonestyNewTreetype,
     getHonestyNewDetailModal,
-    getQualityTreeNodeList,
     getWorkflowById,
     getTasksList,
     deleteTasksList

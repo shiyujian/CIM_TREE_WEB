@@ -52,6 +52,7 @@ export default class WeekPlanModal extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
+        console.log('weekPlanDataSource', weekPlanDataSource);
 
         return (
             <div>

@@ -1,56 +1,56 @@
-import { createAction, handleActions, combineActions } from 'redux-actions';
-import createFetchAction from './fetchAction';
+import { createAction, handleActions } from 'redux-actions';
 import { FOREST_API } from '_platform/api';
+import {forestFetchAction} from '_platform/store/fetchAction';
 const ID = 'entry';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
-export const gettreetype = createFetchAction(
+export const gettreetype = forestFetchAction(
     `${FOREST_API}/tree/nurserystat?`,
     []
 );
-export const gettreeevery = createFetchAction(
+export const gettreeevery = forestFetchAction(
     `${FOREST_API}/tree/treetypes`,
     []
 );
-export const nowmessage = createFetchAction(
+export const nowmessage = forestFetchAction(
     `${FOREST_API}/tree/queryTree?page=1&size=5`,
     []
 );
 
-export const getTotalSat = createFetchAction(
+export const getTotalSat = forestFetchAction(
     `${FOREST_API}/tree/totalstat`,
     []
 );
-export const gettreetypeAll = createFetchAction(
+export const gettreetypeAll = forestFetchAction(
     `${FOREST_API}/tree/treestat`,
     []
 );
-export const gettreetypeSection = createFetchAction(
+export const gettreetypeSection = forestFetchAction(
     `${FOREST_API}/tree/treestatbyspecfield?stattype=Section`,
     []
 );
-export const gettreetypeSmallClass = createFetchAction(
+export const gettreetypeSmallClass = forestFetchAction(
     `${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`,
     []
 );
-export const gettreetypeThinClass = createFetchAction(
+export const gettreetypeThinClass = forestFetchAction(
     `${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass`,
     []
 );
-export const getSmallClassList = createFetchAction(
+export const getSmallClassList = forestFetchAction(
     `${FOREST_API}/tree/wpunit4apps?parent={{no}}`,
     []
 );
 
-export const progressdata = createFetchAction(
+export const progressdata = forestFetchAction(
     `${FOREST_API}/tree/progressstat?`,
     []
 );
-export const progressalldata = createFetchAction(
+export const progressalldata = forestFetchAction(
     `${FOREST_API}/tree/progresss?`,
     []
 );
-export const progressstat4pie = createFetchAction(
+export const progressstat4pie = forestFetchAction(
     `${FOREST_API}/tree/progressstat4pie?`,
     []
 );

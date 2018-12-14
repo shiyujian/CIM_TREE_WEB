@@ -15,9 +15,9 @@ import {
 } from '_platform/components/layout';
 import {
     getUser,
-    getAreaTreeData
+    getAreaTreeData,
+    getDefaultProject
 } from '_platform/auth';
-import {DEFAULT_PROJECT} from '_platform/api';
 const Option = Select.Option;
 @connect(
     state => {
@@ -71,9 +71,10 @@ export default class DataStatis extends Component {
                 await getTotalThinClass(totalThinClass);
                 // 区域地块树
                 await getThinClassTree(projectList);
-                await this.onSelect([DEFAULT_PROJECT]);
-            } else {
-                await this.onSelect([DEFAULT_PROJECT]);
+            }
+            let defaultProject = await getDefaultProject();
+            if (defaultProject) {
+                this.onSelect([defaultProject]);
             }
             // 类型
             let typeoption = [

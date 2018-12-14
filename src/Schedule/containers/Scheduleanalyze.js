@@ -17,8 +17,7 @@ import LeftTop from '../components/ScheduleAnalyze/LeftTop';
 import RightTop from '../components/ScheduleAnalyze/RightTop';
 import MiddleTop from '../components/ScheduleAnalyze/MiddleTop';
 import Bottom from '../components/ScheduleAnalyze/Bottom';
-import {DEFAULT_PROJECT} from '_platform/api';
-const Option = Select.Option;
+import { getDefaultProject } from '_platform/auth';
 
 @connect(
     state => {
@@ -39,7 +38,7 @@ export default class ScheduleAnalyze extends Component {
             treeLists: [],
             sectionoption: [],
             smallclassoption: [],
-            leftkeycode: DEFAULT_PROJECT,
+            leftkeycode: '',
             section: '',
             smallclass: '',
             data: [],
@@ -56,6 +55,10 @@ export default class ScheduleAnalyze extends Component {
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
+        }
+        let defaultProject = await getDefaultProject();
+        if (defaultProject) {
+            this.onSelect([defaultProject]);
         }
     }
     // 树选择, 重新获取: 标段、树种并置空

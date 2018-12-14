@@ -14,14 +14,9 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import {DEFAULT_PROJECT} from '_platform/api';
+import { getDefaultProject } from '_platform/auth';
 import Left from '../components/EnterAnalyze/Left';
 import Right from '../components/EnterAnalyze/Right';
-
-var echarts = require('echarts');
-const Option = Select.Option;
-const { RangePicker } = DatePicker;
-
 @connect(
     state => {
         const { platform } = state || {};
@@ -41,7 +36,7 @@ export default class EnterAnalyze extends Component {
             treetypelist: [],
             treeLists: [],
             sectionoption: [],
-            leftkeycode: DEFAULT_PROJECT,
+            leftkeycode: '',
             data: [],
             account: '',
             biaoduan: [],
@@ -56,6 +51,10 @@ export default class EnterAnalyze extends Component {
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
+        }
+        let defaultProject = await getDefaultProject();
+        if (defaultProject) {
+            this.onSelect([defaultProject]);
         }
     }
 

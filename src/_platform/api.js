@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-12 11:25:46
+ * @Last Modified time: 2018-12-14 15:02:33
  */
 /**
  *
@@ -129,12 +129,9 @@ export const QRCODE_API = `${base}/service/appserver`;
 // export const SubItem_WordTemplate = STATIC_UPLOAD_API + '/media/documents/meta/'+encodeURI('分项工程质量验收记录模板.docx')
 
 // 智慧森林
-export const FOREST_API = `${window.config.SDOMAIN}:6510`;
-export const FOREST_API_OLD = `${window.config.SDOMAIN}`;
+export const FOREST_API = `${window.config.SDOMAIN}`;
 export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
-export const FOREST_SYSTEM = `${FOREST_API}/system`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
-export const FOREST_SECRECT = '8gvPuMCBKpkVNkMO';
 // 苗圃定位模板
 export const nurseryLocation_template =
     STATIC_DOWNLOAD_API +
@@ -284,6 +281,10 @@ export const FORM_WORKFLOW = [
 ];
 // 当前执行的项目
 export const DEFAULT_PROJECT = 'P018';
+export const FOREST_LOGIN_DATA = {
+    phone: 'liugy',
+    pwd: '12580'
+};
 // 获取单位工程
 export const PROJECT_UNITS = [
     {

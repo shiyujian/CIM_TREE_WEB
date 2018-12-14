@@ -3,6 +3,7 @@ import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import fieldFactory from '_platform/store/service/field';
 import { FOREST_API } from '_platform/api';
+import {forestFetchAction} from '_platform/store/fetchAction';
 
 export const ID = 'SYSTEM_PERSON1';
 
@@ -44,11 +45,11 @@ export const getImgArr = createAction('编辑时如果有照片就显示照片')
 // 黑名单控制开关
 export const getSwitch = createAction('黑名单控制开关');
 
-const getTags = createFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
-const checkUsers = createFetchAction(`${FOREST_API}/system/checksuser`, [], 'POST'); // 审核用户
-const getSupplierList = createFetchAction(`${FOREST_API}/system/suppliers`); // 获取供应商列表
-const getNurseryList = createFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃列表
-const getRegionCodes = createFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
+const getTags = forestFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
+const checkUsers = forestFetchAction(`${FOREST_API}/system/checksuser`, [], 'POST'); // 审核用户
+const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers`); // 获取供应商列表
+const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃列表
+const getRegionCodes = forestFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
 
 const getMobileCheck = createFetchAction(`http(s)://phonethird.market.alicloudapi.com/mobileCheck`); // 实名认证
 

@@ -1,5 +1,5 @@
 import cookie from 'js-cookie';
-import { FOREST_API_OLD, FOREST_IMG } from './api';
+import { FOREST_API, FOREST_IMG, DEFAULT_PROJECT } from './api';
 
 export default () => {
     return !!cookie.get('id');
@@ -411,7 +411,7 @@ export const getForestImgUrl = (data) => {
         if (data.indexOf(FOREST_IMG) !== -1) {
             imgUrl = data;
         } else {
-            imgUrl = FOREST_API_OLD + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+            imgUrl = FOREST_API + '/' + data.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         }
         return imgUrl;
     } catch (e) {
@@ -434,6 +434,45 @@ export const getUserIsManager = () => {
             }
         });
         return permission;
+    } catch (e) {
+        console.log('getUserIsManager', e);
+    }
+};
+
+// 判断用户的标段信息
+export const getUserSection = () => {
+    try {
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        console.log('user', user);
+        let sections = (user && user.account && user.account.sections) || [];
+        let section = '';
+        if (sections && sections instanceof Array && sections.length > 0) {
+            section = sections[0];
+        }
+        return section;
+    } catch (e) {
+        console.log('getUserIsManager', e);
+    }
+};
+
+// 判断用户应该选择的标段
+export const getDefaultProject = async () => {
+    try {
+        let permission = await getUserIsManager();
+        if (permission) {
+            return DEFAULT_PROJECT;
+        } else {
+            let section = await getUserSection();
+            if (section) {
+                let sectionArr = section.split('-');
+                if (sectionArr && sectionArr instanceof Array && sectionArr.length > 0) {
+                    let project = sectionArr[0];
+                    return project;
+                } else {
+                    return null;
+                }
+            }
+        }
     } catch (e) {
         console.log('getUserIsManager', e);
     }

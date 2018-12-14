@@ -12,7 +12,7 @@ import ManMachineTop from '../components/ScheduleDisplay/ManMachineSchedule/ManM
 import ManMachineBottom from '../components/ScheduleDisplay/ManMachineSchedule/ManMachineBottom';
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
-import {DEFAULT_PROJECT} from '_platform/api';
+import { getDefaultProject } from '_platform/auth';
 import * as actions from '../store/ScheduleDisplay';
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
@@ -49,9 +49,10 @@ export default class ScheduleDisplay extends Component {
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
-            await this.onSelect([DEFAULT_PROJECT]);
-        } else {
-            await this.onSelect([DEFAULT_PROJECT]);
+        }
+        let defaultProject = await getDefaultProject();
+        if (defaultProject) {
+            this.onSelect([defaultProject]);
         }
     }
 

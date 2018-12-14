@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-12 18:23:41
+ * @Last Modified time: 2018-12-14 15:42:31
  */
 import React, { Component } from 'react';
 import {
@@ -176,7 +176,8 @@ class OnSite extends Component {
         this.tileTreeLayerBasic = null; // 树木区域图层
         this.tileTreeSurvivalRateLayerBasic = null; // 成活率全部图层
         this.tileTreeAdoptLayerBasic = null; // 苗木结缘全部图层
-
+        this.tileTreeWinterThinClassLayerBasic = null;
+        this.tileTreeWinterProjectLayerBasic = null;
         this.tileTreeTypeLayerFilter = null; // 树种筛选图层
         this.tileSurvivalRateLayerFilter = null; // 成活率范围和标段筛选图层
         this.map = null;
@@ -363,6 +364,8 @@ class OnSite extends Component {
                 storagetype: 0
             }).addTo(this.map);
             this.getTileLayerTreeBasic();
+            this.getTileTreeWinterThinClassLayerBasic();
+            this.getTileTreeWinterProjectLayerBasic();
             // 隐患详情点击事件
             document.querySelector('.leaflet-popup-pane').addEventListener('click', async function (e) {
                 let target = e.target;
@@ -652,6 +655,53 @@ class OnSite extends Component {
     removeTileTreeLayerBasic () {
         if (this.tileTreeLayerBasic) {
             this.map.removeLayer(this.tileTreeLayerBasic);
+        }
+    }
+    // 获取秋冬季的细班
+    getTileTreeWinterThinClassLayerBasic = () => {
+        if (this.map) {
+            if (this.tileTreeWinterThinClassLayerBasic) {
+                this.tileTreeLayerBasic.addTo(this.map);
+            } else {
+                this.tileTreeWinterThinClassLayerBasic = L.tileLayer(
+                    window.config.DASHBOARD_ONSITE +
+                            'geoserver/gwc/service/wmts?layer=xatree%3Aland&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    {
+                        opacity: 1.0,
+                        subdomains: [1, 2, 3],
+                        minZoom: 11,
+                        maxZoom: 21,
+                        storagetype: 0,
+                        tiletype: 'wtms'
+                    }
+                );
+                console.log('this.tileTreeWinterThinClassLayerBasic', this.tileTreeWinterThinClassLayerBasic);
+                this.tileTreeWinterThinClassLayerBasic.setOpacity(0.7);
+                this.tileTreeWinterThinClassLayerBasic.addTo(this.map);
+            }
+        }
+    }
+    // 获取秋冬季的区块范围
+    getTileTreeWinterProjectLayerBasic = () => {
+        if (this.map) {
+            if (this.tileTreeWinterProjectLayerBasic) {
+                this.tileTreeLayerBasic.addTo(this.map);
+            } else {
+                this.tileTreeWinterProjectLayerBasic = L.tileLayer(
+                    window.config.DASHBOARD_ONSITE +
+                            'geoserver/gwc/service/wmts?layer=xatree%3Athinclass&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+                    {
+                        opacity: 1.0,
+                        subdomains: [1, 2, 3],
+                        minZoom: 11,
+                        maxZoom: 21,
+                        storagetype: 0,
+                        tiletype: 'wtms'
+                    }
+                );
+                this.tileTreeWinterProjectLayerBasic.setOpacity(0.7);
+                this.tileTreeWinterProjectLayerBasic.addTo(this.map);
+            }
         }
     }
     // 加载成活率全部瓦片图层

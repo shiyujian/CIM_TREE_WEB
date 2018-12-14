@@ -40,7 +40,7 @@ export default class SafetySystem extends Component {
             let data = await getScheduleTaskList();
             if (data && data instanceof Array && data.length > 0) {
                 data = data[0];
-                let leftkeycode = data.No ? data.No :'';
+                let leftkeycode = data.No ? data.No : '';
                 this.setState({
                     leftkeycode
                 });
@@ -49,7 +49,7 @@ export default class SafetySystem extends Component {
             let data = tree.projectList;
             if (data && data instanceof Array && data.length > 0) {
                 data = data[0];
-                let leftkeycode = data.No ? data.No :'';
+                let leftkeycode = data.No ? data.No : '';
                 this.setState({
                     leftkeycode
                 });
@@ -98,7 +98,7 @@ export default class SafetySystem extends Component {
     // 树选择, 重新获取: 标段、树种并置空
     onSelect (value = []) {
         let keycode = value[0] || '';
-        const {actions: {setkeycode, gettreetype, getTreeList, getTree}} = this.props;
+        const {actions: {setkeycode}} = this.props;
         setkeycode(keycode);
         this.setState({leftkeycode: keycode});
     }

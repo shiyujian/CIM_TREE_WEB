@@ -242,10 +242,8 @@ class AddModal extends Component {
                 getWorkflowById,
                 putFlow,
                 AddVisible,
-                getTaskSafety,
                 SearchSafety
-            },
-            location
+            }
         } = this.props;
         const {
             projectName,

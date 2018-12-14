@@ -6,6 +6,7 @@ import {
     WORKFLOW_API,
     FOREST_API
 } from '_platform/api';
+import {forestFetchAction} from '_platform/store/fetchAction';
 const ID = 'SELFCARE_TASK';
 const parameterReducer = fieldFactory(ID, 'parameter');
 
@@ -31,18 +32,18 @@ export const getWorkflowById = createFetchAction(
     'GET'
 );
 // 日进度存储
-export const addSchedule = createFetchAction(
+export const addSchedule = forestFetchAction(
     `${FOREST_API}/tree/progress`,
     [],
     'post'
 );
 // 周进度存储
-export const postWeekPlanSchedule = createFetchAction(
+export const postWeekPlanSchedule = forestFetchAction(
     `${FOREST_API}/tree/treedayplan`,
     [],
     'post'
 );
-export const gettreetype = createFetchAction(
+export const gettreetype = forestFetchAction(
     `${FOREST_API}/tree/treetypesbyno`,
     []
 );

@@ -1,6 +1,7 @@
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import { actionsMap } from '_platform/store/util';
 import createFetchAction from 'fetch-action';
+import {forestFetchAction} from '_platform/store/fetchAction';
 import { SERVICE_API, FOREST_API } from '_platform/api';
 import fieldFactory from '_platform/store/service/field';
 import booleanFactory from '_platform/store/higher-order/bool';
@@ -8,6 +9,7 @@ import documentFactory from '_platform/store/higher-order/doc';
 import engineeringReducer, {
     actions as engineeringActions
 } from './engineering';
+
 import rediosReducer, { actions as rediosActions } from './redios';
 import { createFetchActionWithHeaders as myFetch } from './fetchAction';
 
@@ -51,22 +53,22 @@ export const postForsetVideo = myFetch(
     [],
     'POST'
 );
-export const getForsetVideo = createFetchAction(
+export const getForsetVideo = forestFetchAction(
     `${FOREST_API}/tree/videos`,
     [],
     'GET'
 );
-export const reportForsetVideo = createFetchAction(
+export const reportForsetVideo = forestFetchAction(
     `${FOREST_API}/tree/video`,
     [],
     'POST'
 );
-export const updateForsetVideo = createFetchAction(
+export const updateForsetVideo = forestFetchAction(
     `${FOREST_API}/tree/video`,
     [],
     'PUT'
 );
-export const deleteForsetVideo = createFetchAction(
+export const deleteForsetVideo = forestFetchAction(
     `${FOREST_API}/tree/video/{{ID}}`,
     [],
     'DELETE'

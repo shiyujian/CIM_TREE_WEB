@@ -8,6 +8,7 @@
 
 import 'whatwg-fetch';
 import { encrypt } from './secrect';
+import { Notification } from 'antd';
 require('es6-promise').polyfill();
 
 const headers = {
@@ -16,7 +17,7 @@ const headers = {
     // 'pragma': 'no-cache',
 };
 
-export const forestFetchAction = (url, [successAction, failAction], method = 'GET', defaultParams = {}) => {
+export const forestFetchAction = (url, [successAction, failAction] = [], method = 'GET', defaultParams = {}) => {
     method = method.toUpperCase();
     return (pathnames = {}, data = {}, refresh = true) => {
         data = data instanceof Array ? data : Object.assign({}, defaultParams, data);
@@ -26,13 +27,11 @@ export const forestFetchAction = (url, [successAction, failAction], method = 'GE
             let token = forestLoginUserData.Token;
             let ID = forestLoginUserData.ID;
             let secrectData = encrypt(ID, token);
-            console.log('secrectData', secrectData);
             let headData = {
                 'Content-Type': 'application/json',
                 'USERID': `${ID}`,
                 'SINGNINFO': secrectData
             };
-            // console.log('headData', headData);
             return dispatch => {
                 const params = {
                     headers: headData,
@@ -51,10 +50,15 @@ export const forestFetchAction = (url, [successAction, failAction], method = 'GE
                         }
                     }
                 }
-                console.log('params', params);
                 return fetch(u, params)
                     .then(response => {
                         console.log('response', response);
+                        if (response && response.status === 400) {
+                            Notification.error({
+                                message: '请重新登录',
+                                duration: 5
+                            });
+                        }
                         const contentType = response.headers.get('content-type');
                         if (contentType && contentType.indexOf('application/json') !== -1) {
                             return response.json();
@@ -63,6 +67,7 @@ export const forestFetchAction = (url, [successAction, failAction], method = 'GE
                         }
                     })
                     .then(result => {
+                        console.log('result', result);
                         refresh && successAction && dispatch(successAction(result));
                         return result;
                     }, result => {

@@ -1,38 +1,18 @@
 import CryptoJS from 'crypto-js';
-import {FOREST_SECRECT} from '../api';
 
 export const encrypt = (ID, token) => {
-    let key = CryptoJS.enc.Utf8.parse('BFSmin0bP9');
-    // const iv = CryptoJS.enc.Utf8.parse('0000000000');
-    const iv = CryptoJS.enc.Utf8.parse(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
+    let key = CryptoJS.enc.Utf8.parse(token);
+    let srcs = CryptoJS.enc.Utf8.parse(ID);
     console.log('utf8处理后key:' + key);
-    console.log('utf8处理后iv:' + iv);
-    let source = ID;
-    let password = CryptoJS.enc.Utf8.parse(source);
-    console.log('原始字符串:' + source);
-    console.log('utf8处理后:' + password);
-
-    // let options = {
-    //     mode: CryptoJS.mode.ECB,
-    //     padding: CryptoJS.pad.Pkcs7
-    // };
-    let options = {
-        iv: iv,
+    console.log('utf8处理后srcs:' + srcs);
+    let encrypted = CryptoJS.AES.encrypt(srcs, key, {
         mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7
-    };
-    let encrypted = CryptoJS.AES.encrypt(password, key, options);
-    // let decrypted = CryptoJS.AES.decrypt(encrypted, key, options);
+        padding: CryptoJS.pad.Pkcs7,
+        iv: CryptoJS.enc.Utf8.parse('')
+    });
     let stringData = encrypted.toString();
-    // console.log('加密后base64:' + encrypted);
-    // console.log('stringData:', stringData);
-    // let encryptedStr = encrypted.ciphertext.toString();
-    // console.log('加密后16进制:' + encryptedStr);
-    // console.log('解密后utf8:' + decrypted);
-    // console.log('解密后原始字符串:' + decrypted.toString(CryptoJS.enc.Utf8));
-    // console.log('encrypted:', encrypted);
+    console.log('stringDatastringData:' + stringData);
     return stringData;
-    //  128   laBC8ujEo6RemT23ISP8dg==
 };
 
     // public static string Encrypt(string encryptStr, string key)
