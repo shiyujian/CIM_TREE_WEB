@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-14 15:02:33
+ * @Last Modified time: 2018-12-14 17:32:25
  */
 /**
  *
@@ -281,6 +281,7 @@ export const FORM_WORKFLOW = [
 ];
 // 当前执行的项目
 export const DEFAULT_PROJECT = 'P018';
+// admin登录林总接口所用的账号
 export const FOREST_LOGIN_DATA = {
     phone: 'liugy',
     pwd: '12580'
