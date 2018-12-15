@@ -15,7 +15,8 @@ import {
 import {TreeAdoptInfoTable} from '../components/TreeAdoptInfo';
 import {
     getUser,
-    getAreaTreeData
+    getAreaTreeData,
+    getUserIsManager
 } from '_platform/auth';
 const Option = Select.Option;
 @connect(
@@ -195,9 +196,11 @@ export default class TreeAdoptInfo extends Component {
         // 树种
         this.typeselect('');
 
-        let sections = JSON.parse(user.sections);
         // 标段
-        if (sections.length === 0) {
+        let sections = JSON.parse(user.sections);
+        console.log('sections', sections);
+        let permission = getUserIsManager();
+        if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
         } else {

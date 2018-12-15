@@ -3,15 +3,12 @@ import CryptoJS from 'crypto-js';
 export const encrypt = (ID, token) => {
     let key = CryptoJS.enc.Utf8.parse(token);
     let srcs = CryptoJS.enc.Utf8.parse(ID);
-    console.log('utf8处理后key:' + key);
-    console.log('utf8处理后srcs:' + srcs);
     let encrypted = CryptoJS.AES.encrypt(srcs, key, {
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7,
         iv: CryptoJS.enc.Utf8.parse('')
     });
     let stringData = encrypted.toString();
-    console.log('stringDatastringData:' + stringData);
     return stringData;
 };
 

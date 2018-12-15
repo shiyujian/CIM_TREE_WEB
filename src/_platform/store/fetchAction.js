@@ -52,7 +52,7 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                 }
                 return fetch(u, params)
                     .then(response => {
-                        console.log('response', response);
+                        // console.log('response', response);
                         if (response && response.status === 400) {
                             Notification.error({
                                 message: '请重新登录',
@@ -67,7 +67,7 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                         }
                     })
                     .then(result => {
-                        console.log('result', result);
+                        // console.log('result', result);
                         refresh && successAction && dispatch(successAction(result));
                         return result;
                     }, result => {

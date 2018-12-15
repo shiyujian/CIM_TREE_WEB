@@ -15,7 +15,8 @@ import {
 } from '_platform/components/layout';
 import {
     getUser,
-    getAreaTreeData
+    getAreaTreeData,
+    getUserIsManager
 } from '_platform/auth';
 const Option = Select.Option;
 @connect(
@@ -170,7 +171,9 @@ export default class CuringInfo extends Component {
 
         // 标段
         let sections = JSON.parse(user.sections);
-        if (sections.length === 0) {
+        console.log('sections', sections);
+        let permission = getUserIsManager();
+        if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
         } else {
