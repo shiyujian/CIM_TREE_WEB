@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import echarts from 'echarts';
-import { Card, Spin, Row, Col, Table } from 'antd';
-import moment from 'moment';
+import { Spin, Table } from 'antd';
 
 export default class TreeTypeRight extends Component {
     static propTypes = {};
@@ -13,18 +11,27 @@ export default class TreeTypeRight extends Component {
         };
     }
     async componentDidMount () {
-
+        const {
+            leftkeycode
+        } = this.props;
+        if (leftkeycode) {
+            this.query();
+        }
     }
 
     async componentDidUpdate (prevProps, prevState) {
         const {
             statByTreetypeQueryTime,
-            queryTime
+            queryTime,
+            treeTypeDisplayTable
         } = this.props;
         if (queryTime && queryTime !== prevProps.queryTime) {
             this.loading();
         }
         if (statByTreetypeQueryTime && statByTreetypeQueryTime !== prevProps.statByTreetypeQueryTime) {
+            this.query();
+        }
+        if (!treeTypeDisplayTable && treeTypeDisplayTable !== prevProps.treeTypeDisplayTable) {
             this.query();
         }
     }
@@ -92,15 +99,18 @@ export default class TreeTypeRight extends Component {
             dataIndex: 'index',
             render: (record, text, index) => {
                 return <span>{index + 1}</span>;
-            }
+            },
+            width: '20%'
         },
         {
             title: '树种',
-            dataIndex: 'TreeTypeName'
+            dataIndex: 'TreeTypeName',
+            width: '40%'
         },
         {
             title: '数量',
-            dataIndex: 'Num'
+            dataIndex: 'Num',
+            width: '40%'
         }
     ]
 }

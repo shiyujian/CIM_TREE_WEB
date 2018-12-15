@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Card, Spin, Row, Col } from 'antd';
-import moment from 'moment';
+import { Spin } from 'antd';
 
 export default class TreeTypeMiddle extends Component {
     static propTypes = {};
@@ -55,17 +54,27 @@ export default class TreeTypeMiddle extends Component {
             ]
         };
         myChart.setOption(option);
+        const {
+            leftkeycode
+        } = this.props;
+        if (leftkeycode) {
+            this.query();
+        }
     }
 
     async componentDidUpdate (prevProps, prevState) {
         const {
             statByTreetypeQueryTime,
-            queryTime
+            queryTime,
+            treeTypeDisplayTable
         } = this.props;
         if (queryTime && queryTime !== prevProps.queryTime) {
             this.loading();
         }
         if (statByTreetypeQueryTime && statByTreetypeQueryTime !== prevProps.statByTreetypeQueryTime) {
+            this.query();
+        }
+        if (!treeTypeDisplayTable && treeTypeDisplayTable !== prevProps.treeTypeDisplayTable) {
             this.query();
         }
     }
@@ -84,7 +93,7 @@ export default class TreeTypeMiddle extends Component {
             let treetypeName = [];
             let treetypeNum = [];
             if (statByTreetype && statByTreetype instanceof Array) {
-                // 将获取的数据按照 ProgressTime 时间排序
+                // 将获取的数据按照 Num 排序
                 statByTreetype.sort(function (a, b) {
                     if (a.Num > b.Num) {
                         return -1;

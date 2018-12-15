@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { DatePicker, Spin } from 'antd';
+import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
 var echarts = require('echarts');
@@ -165,12 +165,16 @@ export default class EntranceLeft extends Component {
         return (
             <div>
                 <Spin spinning={this.state.loading}>
-                    <Cards search={this.searchRender()} title='苗木进场总数'>
-                        <div
-                            id='EntranceLeft'
-                            style={{ width: '100%', height: '400px' }}
-                        />
-                    </Cards>
+                    <Card
+                        title='苗木进场总数分析'
+                    >
+                        <Cards search={this.searchRender()} title='苗木进场总数'>
+                            <div
+                                id='EntranceLeft'
+                                style={{ width: '100%', height: '400px' }}
+                            />
+                        </Cards>
+                    </Card>
                 </Spin>
             </div>
         );

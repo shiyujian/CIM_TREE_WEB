@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { DatePicker, Spin } from 'antd';
+import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
 
@@ -166,12 +166,16 @@ export default class PlantRight extends Component {
 
         return (
             <Spin spinning={this.state.loading}>
-                <Cards search={this.search()} title='各标段种植进度分析'>
-                    <div
-                        id='PlantRight'
-                        style={{ width: '100%', height: '400px' }}
-                    />
-                </Cards>
+                <Card
+                    title='各标段种植进度分析'
+                >
+                    <Cards search={this.search()} title='各标段种植进度分析'>
+                        <div
+                            id='PlantRight'
+                            style={{ width: '100%', height: '400px' }}
+                        />
+                    </Cards>
+                </Card>
             </Spin>
         );
     }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { DatePicker, Spin } from 'antd';
+import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import {
     ECHARTSCOLOR
@@ -222,12 +222,16 @@ export default class PlantLeft extends Component {
         // todo 苗木种植强度分析
         return (
             <Spin spinning={this.state.loading}>
-                <Cards search={this.search()} title='苗木种植强度分析'>
-                    <div
-                        id='PlantLeft'
-                        style={{ width: '100%', height: '400px' }}
-                    />
-                </Cards>
+                <Card
+                    title='苗木种植强度分析'
+                >
+                    <Cards search={this.search()} title='苗木种植强度分析'>
+                        <div
+                            id='PlantLeft'
+                            style={{ width: '100%', height: '400px' }}
+                        />
+                    </Cards>
+                </Card>
             </Spin>
         );
     }

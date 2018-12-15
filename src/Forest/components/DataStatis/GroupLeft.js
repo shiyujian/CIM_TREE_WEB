@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
-import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { Select, Row, Col, Radio, Card, DatePicker, Spin } from 'antd';
-import { Cards, SumTotal, DateImg } from '../../components';
+import { Select, Card, DatePicker, Spin } from 'antd';
+import { Cards } from '../../components';
 import moment from 'moment';
-const RadioGroup = Radio.Group;
 const Option = Select.Option;
-const RadioButton = Radio.Button;
-const { RangePicker } = DatePicker;
 
 export default class GroupLeft extends Component {
     static propTypes = {};
@@ -191,12 +187,16 @@ export default class GroupLeft extends Component {
 
         return (
             <Spin spinning={this.state.loading}>
-                <Cards search={this.search()} title={this.title()}>
-                    <div
-                        id='GroupLeft'
-                        style={{ width: '100%', height: '400px' }}
-                    />
-                </Cards>
+                <Card
+                    title='各小班种植进度分析'
+                >
+                    <Cards search={this.search()} title={this.title()}>
+                        <div
+                            id='GroupLeft'
+                            style={{ width: '100%', height: '400px' }}
+                        />
+                    </Cards>
+                </Card>
             </Spin>
         );
     }

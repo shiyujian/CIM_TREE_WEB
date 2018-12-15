@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { DatePicker, Spin } from 'antd';
+import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import {
     ECHARTSCOLOR
@@ -223,12 +223,16 @@ export default class EntranceRight extends Component {
         return (
             <div>
                 <Spin spinning={this.state.loading}>
-                    <Cards search={this.searchRender()} title={`进场强度分析`}>
-                        <div
-                            id='EntranceRight'
-                            style={{ width: '100%', height: '400px' }}
-                        />
-                    </Cards>
+                    <Card
+                        title='各树种进场强度分析'
+                    >
+                        <Cards search={this.searchRender()} title={`进场强度分析`}>
+                            <div
+                                id='EntranceRight'
+                                style={{ width: '100%', height: '400px' }}
+                            />
+                        </Cards>
+                    </Card>
                 </Spin>
             </div>
         );

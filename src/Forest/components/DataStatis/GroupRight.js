@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Select, DatePicker, Spin } from 'antd';
+import { Select, DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
 const Option = Select.Option;
@@ -68,7 +68,7 @@ export default class GroupRight extends Component {
         const { etime, stime, section, smallClassSelect } = this.state;
         const { leftkeycode } = this.props;
         // 地块修改，则修改标段
-        if (leftkeycode != prevProps.leftkeycode) {
+        if (leftkeycode !== prevProps.leftkeycode) {
             await this.getSectionoption();
             await this.getSmallClass();
             await this.selectSmallClass();
@@ -76,14 +76,14 @@ export default class GroupRight extends Component {
             this.query();
         }
         // 标段修改，修改小班
-        if (section != prevState.section) {
+        if (section !== prevState.section) {
             this.selectSmallClass();
         }
         // 小班和时间修改，查询数据
         if (
-            etime != prevState.etime ||
-            smallClassSelect != prevState.smallClassSelect ||
-            stime != prevState.stime
+            etime !== prevState.etime ||
+            smallClassSelect !== prevState.smallClassSelect ||
+            stime !== prevState.stime
         ) {
             this.query();
         }
@@ -278,20 +278,23 @@ export default class GroupRight extends Component {
     }
 
     render () {
-        // todo 苗木种植强度分析
-
+        // todo 各细班种植进度分析
         return (
             <Spin spinning={this.state.loading}>
-                <Cards
-                    style={{ margin: '20px 5px 5px 5px' }}
-                    search={this.search()}
-                    title={this.title1()}
+                <Card
+                    title='各细班种植进度分析'
                 >
-                    <div
-                        id='GroupRight'
-                        style={{ width: '100%', height: '400px' }}
-                    />
-                </Cards>
+                    <Cards
+                        style={{ margin: '20px 5px 5px 5px' }}
+                        search={this.search()}
+                        title={this.title1()}
+                    >
+                        <div
+                            id='GroupRight'
+                            style={{ width: '100%', height: '400px' }}
+                        />
+                    </Cards>
+                </Card>
             </Spin>
         );
     }

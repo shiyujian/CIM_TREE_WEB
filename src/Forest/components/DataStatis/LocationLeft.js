@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Select, DatePicker, Spin } from 'antd';
+import { Select, DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
+import XLSX from 'xlsx';
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
@@ -18,7 +19,9 @@ export default class LocationLeft extends Component {
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             section: '',
             sectionoption: [],
-            sectionsData: []
+            sectionsData: [],
+            queryData: [], // 查找到的数据
+            smallClassList: [] // 根据选择的项目标段获取的小班数据
         };
     }
 
@@ -107,12 +110,23 @@ export default class LocationLeft extends Component {
     render () {
         return (
             <Spin spinning={this.state.loading}>
-                <Cards search={this.search()} title={this.title()}>
-                    <div
-                        id='LocationLeft'
-                        style={{ width: '100%', height: '400px' }}
-                    />
-                </Cards>
+                <Card
+                    title='各小班定位进度分析'
+                    extra={
+                        <div>
+                            <a onClick={this.handleLocationDataExport.bind(this)}>
+                                导出
+                            </a>
+                        </div>
+                    }
+                >
+                    <Cards search={this.search()} title={this.title()}>
+                        <div
+                            id='LocationLeft'
+                            style={{ width: '100%', height: '400px' }}
+                        />
+                    </Cards>
+                </Card>
             </Spin>
         );
     }
@@ -189,6 +203,7 @@ export default class LocationLeft extends Component {
         };
         this.setState({ loading: true });
         let smallClassList = [];
+        let queryData = [];
         sectionsData.map((sectionData) => {
             if (section === sectionData.No) {
                 smallClassList = sectionData.children;
@@ -197,11 +212,11 @@ export default class LocationLeft extends Component {
 
         let rst = await getLocationStatBySpecfield({}, param);
         let units = [];
-
         let complete = [];
         let label = [];
 
         if (rst && rst instanceof Array) {
+            queryData = rst;
             rst.map(item => {
                 complete.push(item.Num);
                 smallClassList.map((smallClass) => {
@@ -215,7 +230,12 @@ export default class LocationLeft extends Component {
                     };
                 });
             });
-        }
+        };
+        this.setState({
+            queryData,
+            smallClassList
+        });
+        console.log('queryData', queryData);
         let myChart3 = echarts.init(document.getElementById('LocationLeft'));
         let options3 = {
             legend: {
@@ -246,5 +266,54 @@ export default class LocationLeft extends Component {
         };
         myChart3.setOption(options3);
         this.setState({ loading: false });
+    }
+
+    handleLocationDataExport = () => {
+        const {
+            queryData,
+            smallClassList
+        } = this.state;
+        let tblData = [];
+        queryData.map((item, index) => {
+            let obj = {};
+            obj['定位数'] = item.Num;
+            obj['小班'] = item.Label;
+            smallClassList.map((smallClass) => {
+                let No = smallClass.No;
+                let NoArr = No.split('-');
+                if (NoArr.length === 4) {
+                    let smallClassNo = NoArr[0] + '-' + NoArr[1] + '-' + NoArr[3];
+                    if (item.Label === smallClassNo) {
+                        obj['小班'] = smallClass.Name;
+                    }
+                };
+            });
+            tblData.push(obj);
+        });
+        console.log('tblData', tblData);
+        let _headers = ['小班', '定位数'];
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        console.log('headers', headers);
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        console.log('testttt', testttt);
+        let output = Object.assign({}, headers, testttt);
+        console.log('output', output);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        console.log('outputPos', outputPos);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        console.log('ref', ref);
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, `各小班定位进度.xlsx`);
     }
 }

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Select, DatePicker, Spin } from 'antd';
+import { Select, DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
+import XLSX from 'xlsx';
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
@@ -21,7 +22,9 @@ export default class LocationRight extends Component {
             sectionOption: [],
             smallClassData: [],
             smallClassOption: [],
-            smallClassSelect: ''
+            smallClassSelect: '',
+            queryData: [], // 查找到的数据
+            thinClassList: [] // 根据选择的项目标段获取的细班数据
         };
     }
     async componentDidMount () {
@@ -147,16 +150,28 @@ export default class LocationRight extends Component {
     render () {
         return (
             <Spin spinning={this.state.loading}>
-                <Cards
-                    style={{ margin: '20px 5px 5px 5px' }}
-                    search={this.search()}
-                    title={this.title1()}
+                <Card
+                    title='各细班定位进度分析'
+                    extra={
+                        <div>
+                            <a onClick={this.handleLocationDataExport.bind(this)}>
+                                导出
+                            </a>
+                        </div>
+                    }
                 >
-                    <div
-                        id='LocationRight'
-                        style={{ width: '100%', height: '400px' }}
-                    />
-                </Cards>
+                    <Cards
+                        style={{ margin: '20px 5px 5px 5px' }}
+                        search={this.search()}
+                        title={this.title1()}
+                    >
+                        <div
+                            id='LocationRight'
+                            style={{ width: '100%', height: '400px' }}
+                        />
+                    </Cards>
+                </Card>
+
             </Spin>
         );
     }
@@ -248,6 +263,7 @@ export default class LocationRight extends Component {
         this.setState({ loading: true });
         let rst = await getLocationStatBySpecfield({}, param);
         let thinClassList = [];
+        let queryData = [];
         smallClassData.map((smallClass) => {
             if (smallClassSelect === smallClass.No) {
                 thinClassList = smallClass.children;
@@ -257,6 +273,7 @@ export default class LocationRight extends Component {
         let label = [];
         let units = [];
         if (rst && rst instanceof Array) {
+            queryData = rst;
             rst.map(item => {
                 thinClassList.map((thinClass) => {
                     let No = thinClass.No;
@@ -271,8 +288,10 @@ export default class LocationRight extends Component {
                 });
             });
         }
-        console.log('LocationRight---complete', complete);
-        console.log('LocationRight---label', label);
+        this.setState({
+            queryData,
+            thinClassList
+        });
 
         let myChart4 = echarts.init(document.getElementById('LocationRight'));
         let options4 = {
@@ -304,5 +323,53 @@ export default class LocationRight extends Component {
         };
         myChart4.setOption(options4);
         this.setState({ loading: false });
+    }
+
+    handleLocationDataExport = () => {
+        const {
+            queryData,
+            thinClassList
+        } = this.state;
+        let tblData = [];
+        queryData.map((item, index) => {
+            let obj = {};
+            thinClassList.map((thinClass) => {
+                let No = thinClass.No;
+                let NoArr = No.split('-');
+                if (NoArr.length === 5) {
+                    let smallClassNo = NoArr[0] + '-' + NoArr[1] + '-' + NoArr[3] + '-' + NoArr[4];
+                    if (item.Label === smallClassNo) {
+                        obj['定位数'] = item.Num;
+                        obj['细班'] = thinClass.Name;
+                        tblData.push(obj);
+                    }
+                };
+            });
+        });
+        console.log('tblData', tblData);
+        let _headers = ['细班', '定位数'];
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        console.log('headers', headers);
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        console.log('testttt', testttt);
+        let output = Object.assign({}, headers, testttt);
+        console.log('output', output);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        console.log('outputPos', outputPos);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        console.log('ref', ref);
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, `各细班定位进度.xlsx`);
     }
 }

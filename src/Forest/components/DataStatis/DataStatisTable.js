@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import {
-    Tabs,
     Row,
     Col,
     Select,
-    DatePicker,
     Button,
     Card,
     Notification
 } from 'antd';
+import XLSX from 'xlsx';
 import moment from 'moment';
 import DataTable from './DataTable';
 import TopLeft from './TopLeft';
@@ -46,7 +45,8 @@ export default class DataStatisTable extends Component {
             treePlantingQueryTime: 0,
             locationStatQueryTime: 0,
             statByTreetypeQueryTime: 0,
-            queryTime: 0
+            queryTime: 0,
+            treeTypeDisplayTable: false
         };
     }
     componentDidUpdate = async (prevProps, prevState) => {
@@ -70,7 +70,8 @@ export default class DataStatisTable extends Component {
             smallclass,
             thinclass,
             bigType,
-            treetypename
+            treetypename,
+            treeTypeDisplayTable
         } = this.state;
         return (
             <div>
@@ -172,96 +173,76 @@ export default class DataStatisTable extends Component {
                                     </Card>
                                 </Col>
                             </Row>
-                            <Row>
-                                <Card
-                                    title='树种分布及排名'
-                                    style={{ marginTop: 10 }}
-                                >
-                                    <Col span={8}>
+                            <Row style={{ marginTop: 10 }}>
+                                <Col span={12}>
+                                    <Card title='树种分布'>
                                         <TreeTypeLeft {...this.state} {...this.props} />
-                                    </Col>
-                                    <Col span={8}>
-                                        <TreeTypeMiddle {...this.state} {...this.props} />
-                                    </Col>
-                                    <Col span={8}>
-                                        <TreeTypeRight {...this.state} {...this.props} />
-                                    </Col>
-                                </Card>
+                                    </Card>
+                                </Col>
+                                <Col span={12}>
+                                    <Card title='树种排名'
+                                        extra={
+                                            <div>
+                                                <a onClick={this.handleTreeTypeDisplayChange.bind(this)}>
+                                                    {treeTypeDisplayTable ? '图形展示' : '表格展示'}
+                                                </a>
+                                                <a style={{marginLeft: 10}}
+                                                    onClick={this.handleTreeTypeDataExport.bind(this)}>
+                                                    导出
+                                                </a>
+                                            </div>
+                                        }
+                                    >
+                                        {
+                                            treeTypeDisplayTable
+                                                ? <TreeTypeRight {...this.state} {...this.props} />
+                                                : <TreeTypeMiddle {...this.state} {...this.props} />
+                                        }
+                                    </Card>
+                                </Col>
                             </Row>
                         </Card>
                     </Col>
                 </Row>
                 <Row>
-                    <Row>
+                    <Row style={{ marginTop: 10 }}>
                         <Col span={12}>
-                            <Card
-                                title='苗木进场总数分析'
-                                style={{ marginTop: 10 }}
-                            >
-                                <EntranceLeft {...this.state} {...this.props} />
-                            </Card>
+                            {/* 苗木进场总数分析 */}
+                            <EntranceLeft {...this.state} {...this.props} />
                         </Col>
                         <Col span={12}>
-                            <Card
-                                title='各树种进场强度分析'
-                                style={{ marginTop: 10 }}
-                            >
-                                <EntranceRight {...this.state} {...this.props} />
-                            </Card>
+                            {/* 各树种进场强度分析 */}
+                            <EntranceRight {...this.state} {...this.props} />
                         </Col>
                     </Row>
-                    <Row>
+                    <Row style={{ marginTop: 10 }}>
                         <Col span={12}>
-                            <Card
-                                title='苗木种植强度分析'
-                                style={{ marginTop: 10 }}
-                            >
-                                <PlantLeft {...this.state} {...this.props} />
-                            </Card>
+                            {/* 苗木种植强度分析 */}
+                            <PlantLeft {...this.state} {...this.props} />
                         </Col>
                         <Col span={12}>
-                            <Card
-                                title='各标段种植进度分析'
-                                style={{ marginTop: 10 }}
-                            >
-                                <PlantRight {...this.state} {...this.props} />
-                            </Card>
+                            {/* 各标段种植进度分析 */}
+                            <PlantRight {...this.state} {...this.props} />
                         </Col>
                     </Row>
-                    <Row>
+                    <Row style={{ marginTop: 10 }}>
                         <Col span={12}>
-                            <Card
-                                title='各小班定位进度分析'
-                                style={{ marginTop: 10 }}
-                            >
-                                <LocationLeft {...this.state} {...this.props} />
-                            </Card>
+                            {/* 各小班定位进度分析 */}
+                            <LocationLeft {...this.state} {...this.props} />
                         </Col>
                         <Col span={12}>
-                            <Card
-                                title='各细班定位进度分析'
-                                style={{ marginTop: 10 }}
-                            >
-                                <LocationRight {...this.state} {...this.props} />
-                            </Card>
+                            {/* 各细班定位进度分析 */}
+                            <LocationRight {...this.state} {...this.props} />
                         </Col>
                     </Row>
-                    <Row>
+                    <Row style={{ marginTop: 10 }}>
                         <Col span={12}>
-                            <Card
-                                title='各小班种植进度分析'
-                                style={{ marginTop: 10 }}
-                            >
-                                <GroupLeft {...this.state} {...this.props} />
-                            </Card>
+                            {/* 各小班种植进度分析 */}
+                            <GroupLeft {...this.state} {...this.props} />
                         </Col>
                         <Col span={12}>
-                            <Card
-                                title='各细班种植进度分析'
-                                style={{ marginTop: 10 }}
-                            >
-                                <GroupRight {...this.state} {...this.props} />
-                            </Card>
+                            {/* 各细班种植进度分析 */}
+                            <GroupRight {...this.state} {...this.props} />
                         </Col>
                     </Row>
                 </Row>
@@ -395,5 +376,63 @@ export default class DataStatisTable extends Component {
         } catch (e) {
             console.log('e', e);
         }
+    }
+
+    handleTreeTypeDisplayChange = () => {
+        const {
+            treeTypeDisplayTable
+        } = this.state;
+        this.setState({
+            treeTypeDisplayTable: !treeTypeDisplayTable
+        });
+    }
+
+    handleTreeTypeDataExport = () => {
+        const {
+            statByTreetype
+        } = this.state;
+        console.log('statByTreetype', statByTreetype);
+        let tblData = [];
+        statByTreetype.sort(function (a, b) {
+            if (a.Num > b.Num) {
+                return -1;
+            } else if (a.Num < b.Num) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        statByTreetype.map((data, index) => {
+            let obj = {};
+            obj['树种'] = data.TreeTypeName;
+            obj['数量'] = data.Num;
+            tblData.push(obj);
+        });
+
+        console.log('tblData', tblData);
+        let _headers = ['树种', '数量'];
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        console.log('headers', headers);
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        console.log('testttt', testttt);
+        let output = Object.assign({}, headers, testttt);
+        console.log('output', output);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        console.log('outputPos', outputPos);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        console.log('ref', ref);
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, `树种排名.xlsx`);
     }
 }
