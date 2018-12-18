@@ -293,6 +293,7 @@ export default class Header extends Component {
             history,
             actions: { clearTab }
         } = this.props;
+        console.log('history', history);
         clearUser();
         clearTab();
         removePermissions();

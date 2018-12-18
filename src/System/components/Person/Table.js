@@ -902,7 +902,7 @@ class Users extends Component {
     // 单个用户的删除功能
     del = async (user) => {
         const {
-            actions: { deleteUser, getForestAllUsersData },
+            actions: { deleteUser },
             getTablePages
         } = this.props;
         const pager = { ...getTablePages };
@@ -912,16 +912,6 @@ class Users extends Component {
             });
             let rep = await deleteUser({ userID: user.id });
             if (rep && rep.code && rep.code === 1) {
-                // 更新林总的库中的所有人员信息
-                let userData = await getForestAllUsersData()
-                if (userData && userData.content) {
-                    window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
-                    let content = userData.content;
-                    window.localStorage.setItem(
-                        'LZ_TOTAL_USER_DATA',
-                        JSON.stringify(content)
-                    );
-                }
                 message.success('删除用户成功');
                 // 更新表格
                 await this.search(pager.current || 1);

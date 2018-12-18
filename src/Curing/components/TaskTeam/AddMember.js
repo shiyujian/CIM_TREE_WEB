@@ -24,8 +24,7 @@ export default class AddMember extends Component {
     async componentDidMount () {
         const {
             actions: {
-                getRoles,
-                getForestAllUsersData
+                getRoles
             }
         } = this.props;
         this.user = getUser();
@@ -35,17 +34,6 @@ export default class AddMember extends Component {
         if (!(this.sections && this.sections instanceof Array && this.sections.length > 0) && (this.user.username !== 'admin')) {
             return;
         }
-        let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
-        totalUserData = JSON.parse(totalUserData);
-        if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
-
-        } else {
-            let userData = await getForestAllUsersData();
-            totalUserData = userData && userData.content;
-        }
-        this.setState({
-            totalUserData
-        });
         // 需要找到是养护角色的人
         let role = await getRoles();
         const curingRoles = role.filter(rst => rst.grouptype === 4);
@@ -114,8 +102,7 @@ export default class AddMember extends Component {
             addMemVisible
         } = this.props;
         const {
-            users,
-            RelationMem
+            users
         } = this.state;
         return (
             <div>
@@ -147,20 +134,30 @@ export default class AddMember extends Component {
 
     _getRelMem = async () => {
         const {
-            curingGroupMans
+            curingGroupMans,
+            actions: {
+                getForestUserDetail
+            }
         } = this.props;
-        const {
-            totalUserData
-        } = this.state;
         let RelationMem = [];
         if (curingGroupMans && curingGroupMans instanceof Array && curingGroupMans.length > 0) {
-            curingGroupMans.map((man) => {
-                totalUserData.map((userData) => {
-                    if (Number(userData.ID) === man.User) {
-                        RelationMem.push(Number(userData.PK));
-                    }
-                });
+            let requestArr = [];
+            curingGroupMans.map((user) => {
+                if (user && user.User) {
+                    let postData = {
+                        id: user && user.User
+                    };
+                    requestArr.push(getForestUserDetail(postData));
+                }
             });
+            let dataSource = [];
+            if (requestArr && requestArr.length > 0) {
+                dataSource = await Promise.all(requestArr);
+                console.log('dataSource', dataSource);
+                await dataSource.map((data) => {
+                    RelationMem.push(Number(data.PK));
+                });
+            }
         }
         this.setState({
             RelationMem: RelationMem
@@ -179,26 +176,32 @@ export default class AddMember extends Component {
 
     _check = async (user, e) => {
         const {
-            RelationMem = [],
-            totalUserData = []
+            RelationMem = []
         } = this.state;
         const {
             actions: {
                 postCuringGroupMan,
-                deleteCuringGroupMan
+                deleteCuringGroupMan,
+                getForestAllUsersData
             },
             selectMemTeam,
             curingGroupMans
         } = this.props;
         let checked = e.target.checked;
         try {
-            let pk = user.id;
+            console.log('user', user);
             let checkUserId = '';
-            totalUserData.map((userData) => {
-                if (userData && userData.PK && Number(userData.PK) === pk) {
-                    checkUserId = userData && userData.ID;
+            let username = (user && user.username) || '';
+            if (username) {
+                let postData = {
+                    username
+                };
+                let forestData = await getForestAllUsersData({}, postData);
+                if (forestData && forestData.content && forestData.content.length > 0) {
+                    let forestUserDetail = forestData.content[0];
+                    checkUserId = forestUserDetail.ID;
                 }
-            });
+            }
             if (checked) {
                 try {
                     if (checkUserId) {

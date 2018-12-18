@@ -686,7 +686,6 @@ class Login extends Component {
             actions: {
                 login,
                 getTasks,
-                getForestAllUsersData,
                 loginForest
             },
             history: { replace }
@@ -720,15 +719,6 @@ class Login extends Component {
                         JSON.stringify(forestLoginUserData)
                     );
                 }
-                let userData = await getForestAllUsersData();
-                if (userData && userData.content) {
-                    let content = userData.content;
-                    window.localStorage.setItem(
-                        'LZ_TOTAL_USER_DATA',
-                        JSON.stringify(content)
-                    );
-                }
-
                 let tasks = await getTasks({}, { task: 'processing', executor: rst.id });
                 notification.open({
                     message: loginType

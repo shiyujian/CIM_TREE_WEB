@@ -13,16 +13,11 @@ export default class TaskTeamTable extends Component {
         this.state = {
             addMemberVisible: false,
             relateDisabled: true,
-            totalUserData: []
+            dataSource: []
         };
     }
 
     async componentDidMount () {
-        const {
-            actions: {
-                getForestAllUsersData
-            }
-        } = this.props;
         this.user = getUser();
         let sections = this.user.sections;
         sections = JSON.parse(sections);
@@ -32,22 +27,61 @@ export default class TaskTeamTable extends Component {
                 relateDisabled: false
             });
         }
-        let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
-        totalUserData = JSON.parse(totalUserData);
-        if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
-
-        } else {
-            let userData = await getForestAllUsersData();
-            totalUserData = userData && userData.content;
-        }
-        this.setState({
-            totalUserData
-        });
     };
+
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            selectMemTeam
+        } = this.props;
+        console.log('selectMemTeam', selectMemTeam);
+        let selectMemTeamID = (selectMemTeam && selectMemTeam.ID) || '';
+        let prevMemTeamID = (prevProps.selectMemTeam && prevProps.selectMemTeam.ID) || '';
+        if (selectMemTeamID && selectMemTeamID !== prevMemTeamID) {
+            await this.getGetTaskTeamData();
+        }
+    }
+
+    getGetTaskTeamData = async () => {
+        const {
+            curingGroupMans = [],
+            actions: {
+                getForestUserDetail
+            }
+        } = this.props;
+        try {
+            console.log('curingGroupMans', curingGroupMans);
+            if (curingGroupMans && curingGroupMans.length > 0) {
+                let requestArr = [];
+                curingGroupMans.map((user) => {
+                    if (user && user.User) {
+                        let postData = {
+                            id: user && user.User
+                        };
+                        requestArr.push(getForestUserDetail(postData));
+                    }
+                });
+                let dataSource = [];
+                if (requestArr && requestArr.length > 0) {
+                    dataSource = await Promise.all(requestArr);
+                    console.log('dataSource', dataSource);
+                }
+                this.setState({
+                    dataSource
+                });
+            } else {
+                this.setState({
+                    dataSource: []
+                });
+            }
+        } catch (e) {
+            console.log('getGetTaskTeamData', e);
+        }
+    }
 
     render () {
         const {
-            relateDisabled
+            relateDisabled,
+            dataSource
         } = this.state;
         const {
             selectState
@@ -56,8 +90,6 @@ export default class TaskTeamTable extends Component {
         if (selectState && !relateDisabled) {
             disabled = false;
         }
-        let dataSource = this._getRelMemMess();
-
         return (
             <div>
                 <Button style={{marginBottom: 10}} type='primary' disabled={disabled} onClick={this._addMemberModal.bind(this)}>关联用户</Button>
@@ -72,25 +104,6 @@ export default class TaskTeamTable extends Component {
             </div>
 
         );
-    }
-    _getRelMemMess = () => {
-        const {
-            curingGroupMans = []
-        } = this.props;
-        const {
-            totalUserData = []
-        } = this.state;
-        let dataSource = [];
-        if (curingGroupMans && curingGroupMans instanceof Array && curingGroupMans.length > 0) {
-            curingGroupMans.map((man) => {
-                totalUserData.map((userData) => {
-                    if (Number(userData.ID) === man.User) {
-                        dataSource.push(userData);
-                    }
-                });
-            });
-        }
-        return dataSource;
     }
     _addMemberModal () {
         const {

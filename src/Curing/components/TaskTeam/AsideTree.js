@@ -27,22 +27,28 @@ class AsideTree extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getTreeNodeList
+                getTreeNodeList,
+                changeSelectMemTeam
             },
             platform: { tree = {} }
         } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
-        // 首先查看是否为管理员，是的话，获取全部信息
-        if (this.user.username === 'admin') {
-            if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
-                await getTreeNodeList();
+        try {
+            this.user = getUser();
+            let sections = this.user.sections;
+            sections = JSON.parse(sections);
+            await changeSelectMemTeam('');
+            // 首先查看是否为管理员，是的话，获取全部信息
+            if (this.user.username === 'admin') {
+                if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+                    await getTreeNodeList();
+                }
+                await this._getAdminData();
+            } else if (sections && sections instanceof Array && sections.length > 0) {
+                // 然后查看有没有关联标段，没有关联的人无法获取列表
+                await this._getSectionData();
             }
-            await this._getAdminData();
-        } else if (sections && sections instanceof Array && sections.length > 0) {
-            // 然后查看有没有关联标段，没有关联的人无法获取列表
-            await this._getSectionData();
+        } catch (e) {
+            console.log('changeSelectMemTeam', e);
         }
     }
     // 非管理员，获取文档数据
@@ -404,15 +410,15 @@ class AsideTree extends Component {
                         let taskTeams = list.children;
                         taskTeams.map(async (team) => {
                             if (team.ID === Number(keyArr[0])) {
+                                let postData = {
+                                    groupid: keyArr[0]
+                                };
+                                await getCuringGroupMans(postData);
                                 await changeSelectMemTeam(team);
                             }
                         });
                     }
                 });
-                let postData = {
-                    groupid: keyArr[0]
-                };
-                await getCuringGroupMans(postData);
             }
         } catch (e) {
             console.log('点击节点', e);

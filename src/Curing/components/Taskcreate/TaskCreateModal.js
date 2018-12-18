@@ -38,25 +38,20 @@ class TaskCreateModal extends Component {
         this.setState({
             typeOptionArr
         });
-        // 获取林总数据库中所有的人员
-        let totalUserData = window.localStorage.getItem('LZ_TOTAL_USER_DATA');
-        totalUserData = JSON.parse(totalUserData);
-        if (totalUserData && totalUserData instanceof Array && totalUserData.length > 0) {
-
-        } else {
-            let userData = await getForestAllUsersData();
-            totalUserData = userData && userData.content;
-        }
-        let user = getUser();
-        let signUser = '';
-        totalUserData.map((userData) => {
-            if (userData && userData.PK && Number(userData.PK) === user.id) {
-                signUser = userData;
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        let username = (user && user.username) || '';
+        if (username) {
+            let postData = {
+                username
+            };
+            let forestData = await getForestAllUsersData({}, postData);
+            if (forestData && forestData.content && forestData.content.length > 0) {
+                let signUser = forestData.content[0];
+                this.setState({
+                    signUser
+                });
             }
-        });
-        this.setState({
-            signUser
-        });
+        }
     };
     componentDidUpdate (prevProps, prevState) {
         const {

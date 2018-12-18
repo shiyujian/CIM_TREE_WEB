@@ -58,7 +58,10 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                                 message: '请重新登录',
                                 duration: 5
                             });
+                            return;
                         }
+                        // let href = window.location.href;
+                        // console.log('href', href);
                         const contentType = response.headers.get('content-type');
                         if (contentType && contentType.indexOf('application/json') !== -1) {
                             return response.json();

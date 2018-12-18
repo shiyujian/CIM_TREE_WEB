@@ -1242,7 +1242,6 @@ class Addition extends Component {
                 getSwitch,
                 postUploadAutograph,
                 putUserBlackList,
-                getForestAllUsersData,
                 getMobileCheck
             }
         } = this.props;
@@ -1553,16 +1552,6 @@ class Addition extends Component {
                                         return;
                                     } else {
                                         message.info('新增人员成功');
-                                        getForestAllUsersData().then((userData) => {
-                                            if (userData && userData.content) {
-                                                window.localStorage.removeItem('LZ_TOTAL_USER_DATA');
-                                                let content = userData.content;
-                                                window.localStorage.setItem(
-                                                    'LZ_TOTAL_USER_DATA',
-                                                    JSON.stringify(content)
-                                                );
-                                            }
-                                        });
                                     }
                                     clearAdditionField();
                                     postUploadFilesImg();
