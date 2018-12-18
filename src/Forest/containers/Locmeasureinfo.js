@@ -45,6 +45,7 @@ export default class Locmeasureinfo extends Component {
             typeoption: [],
             statusoption: [],
             locationoption: [],
+            samplingStatusOption: [],
             leftkeycode: '',
             resetkey: 0,
             bigType: '',
@@ -146,6 +147,22 @@ export default class Locmeasureinfo extends Component {
             </Option>
         ];
         this.setState({ statusoption });
+        // 抽查状态
+        let samplingStatusOption = [
+            <Option key={'-1'} value={''} title={'全部'}>
+                全部
+            </Option>,
+            <Option key={'0'} value={'0'} title={'未抽检'}>
+                未抽检
+            </Option>,
+            <Option key={'1'} value={'1'} title={'已抽检'}>
+                已抽检
+            </Option>,
+            <Option key={'2'} value={'2'} title={'不合格'}>
+                不合格
+            </Option>
+        ];
+        this.setState({ samplingStatusOption });
         // 定位
         let locationoption = [
             <Option key={'-1'} value={''} title={'全部'}>
@@ -174,6 +191,7 @@ export default class Locmeasureinfo extends Component {
             bigType,
             statusoption,
             locationoption,
+            samplingStatusOption,
             resetkey
         } = this.state;
         const {
@@ -211,6 +229,7 @@ export default class Locmeasureinfo extends Component {
                             treetypelist={treetypelist}
                             statusoption={statusoption}
                             locationoption={locationoption}
+                            samplingStatusOption={samplingStatusOption}
                             leftkeycode={leftkeycode}
                             keycode={keycode}
                             resetinput={this.resetinput.bind(this)}

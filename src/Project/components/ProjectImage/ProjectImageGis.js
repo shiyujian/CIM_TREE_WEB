@@ -1,24 +1,9 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { actions } from '../../store';
-import { Radio, Button } from 'antd';
-// import { CUS_TILEMAP } from '_platform/api';
-import './Project.less';
+import { Radio } from 'antd';
+import './ProjectImageGis.less';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
-const $ = window.$;
-window.config = window.config || {};
-@connect(
-    state => {
-        const { dashboard, platform } = state;
-        return { ...dashboard, platform };
-    },
-    dispatch => ({
-        actions: bindActionCreators(actions, dispatch)
-    })
-)
-export default class Project extends Component {
+export default class ProjectImageGis extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -42,27 +27,7 @@ export default class Project extends Component {
         };
     }
 
-    async componentDidMount () {
-        this.initMap();
-        this.initMap2();
-        // 地图联动
-        const maps = [this.map, this.map2];
-        // 事件
-        function maplink (e) {
-            let _this = this;
-            maps.map(function (t) {
-                t.setView(_this.getCenter(), _this.getZoom());
-            });
-        }
-        // 绑定
-        maps.map(function (t) {
-            // t.on({moveend:maplink,zoomend:maplink})
-            t.on({ drag: maplink, zoom: maplink });
-        });
-    }
-
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
-    subDomains = ['7'];
     tileUrls = {
         // 1: window.config.IMG_W,
         // 2: window.config.VEC_W,
@@ -74,11 +39,31 @@ export default class Project extends Component {
         6: window.config.IMG_6,
         7: window.config.IMG_7
     };
+
+    async componentDidMount () {
+        try {
+            await this.initMap();
+            await this.initMap2();
+            // 地图联动
+            const maps = [this.map, this.map2];
+            // 事件
+            function maplink (e) {
+                let _this = this;
+                maps.map(function (t) {
+                    t.setView(_this.getCenter(), _this.getZoom());
+                });
+            }
+            // 绑定
+            maps.map(function (t) {
+                t.on({ drag: maplink, zoom: maplink });
+            });
+        } catch (e) {
+            console.log('componentDidMount', e);
+        }
+    }
     /* 初始化地图 */
     initMap () {
         this.map = L.map('mapid', window.config.initLeaflet);
-
-        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
         this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
             subdomains: [1, 2, 3],
@@ -102,18 +87,9 @@ export default class Project extends Component {
             storagetype: 0,
             tiletype: 'arcgis'
         }).addTo(this.map);
-
-        // 航拍影像
-        // L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
-        // document.querySelector('#mapid').addEventListener('animationend', function(){
-        //     this.map.invalidateSize();
-        //     console.log('test');
-        // });
     }
     initMap2 () {
         this.map2 = L.map('mapid2', window.config.initLeaflet);
-
-        L.control.zoom({ position: 'bottomright' }).addTo(this.map2);
 
         this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
             subdomains: [1, 2, 3],
@@ -137,108 +113,71 @@ export default class Project extends Component {
             storagetype: 0,
             tiletype: 'arcgis'
         }).addTo(this.map2);
-
-        // 航拍影像
-        // L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
-    }
-    // 切换
-    toggleTileLayer (e) {
-        const index = e.target.value;
-        console.log('index', index);
-        this.tileLayer.setUrl(this.tileUrls[index]);
-    }
-    toggleTileLayer2 (e) {
-        const index = e.target.value;
-        console.log('index', index);
-        this.tileTreeLayerBasic.setUrl(this.tileUrls[index]);
-    }
-    /* 显示隐藏地图marker */
-    onEndResize (e) {
-        this.menu.isStart = false;
-    }
-    onResizingMenu (e) {
-        if (this.menu.isStart) {
-            e.preventDefault();
-            this.menu.count++;
-            let ys = this.menu.count % 5;
-            if (ys == 0 || ys == 1 || ys == 3 || ys == 4) return; // 降低事件执行频率
-            let dx = e.clientX - this.menu.startPos;
-            let menuWidth = this.menu.tempMenuWidth + dx;
-            if (menuWidth > this.menu.maxWidth) menuWidth = this.menu.maxWidth;
-            if (menuWidth < this.menu.minWidth) menuWidth = this.menu.minWidth;
-            this.setState({ menuWidth: menuWidth });
-        }
     }
     render () {
-        const {
-            dashboardCompomentMenu
-        } = this.props;
         return (
-            <div className='project_map-container'>
+            <div className='ProjectImageGis-container'>
                 <div
-                    ref='appendBody'
-                    className='l-map project_r-main'
-                    onMouseUp={this.onEndResize.bind(this)}
-                    onMouseMove={this.onResizingMenu.bind(this)}
+                    className='ProjectImageGis-map ProjectImageGis-r-main'
                 >
-                    <div className='project_treeControl3' style={{ zIndex: 888 }}>
+                    <div className='ProjectImageGis-treeControlLeft' style={{ zIndex: 888 }}>
                         <div>
                             <RadioGroup
                                 defaultValue={1}
                                 onChange={this.toggleTileLayer.bind(this)}
                                 size='small'
                             >
-                                <RadioButton value={1}>
-                                    2017年11月15日
+                                <RadioButton value={1} style={{marginRight: 2}}>
+                                    2017-11-15
                                 </RadioButton>
-                                <RadioButton value={2}>
-                                    2017年11月24日
+                                <RadioButton value={2} style={{marginRight: 2}}>
+                                    2017-11-24
                                 </RadioButton>
-                                <RadioButton value={3}>
-                                    2017年12月01日
+                                <RadioButton value={3} style={{marginRight: 2}}>
+                                    2017-12-01
                                 </RadioButton>
-                                <RadioButton value={4}>
-                                    2017年12月10日
+                                <RadioButton value={4} style={{marginRight: 2}}>
+                                    2017-12-10
                                 </RadioButton>
-                                <RadioButton value={5}>
-                                    2017年12月13日
+                                <RadioButton value={5} style={{marginRight: 2}}>
+                                    2017-12-13
                                 </RadioButton>
-                                <RadioButton value={6}>
-                                    2018年3月23日
+                                <RadioButton value={6} style={{marginRight: 2}}>
+                                    2018-3-23
                                 </RadioButton>
-                                <RadioButton value={7}>
-                                    2018年5月4日
+                                <RadioButton value={7} style={{marginRight: 2}}>
+                                    2018-5-4
                                 </RadioButton>
                             </RadioGroup>
                         </div>
                     </div>
-                    <div className='project_treeControl2' style={{ zIndex: 888 }}>
+                    <div className='ProjectImageGis-treeControlRight' style={{ zIndex: 888 }}>
                         <div>
                             <RadioGroup
                                 defaultValue={1}
                                 onChange={this.toggleTileLayer2.bind(this)}
                                 size='small'
                             >
-                                <RadioButton value={1}>
-                                    2017年11月15日
+                                <RadioButton value={1} style={{marginRight: 2}}>
+                                    2017-11-15
                                 </RadioButton>
-                                <RadioButton value={2}>
-                                    2017年11月24日
+                                <RadioButton value={2} style={{marginRight: 2}}>
+                                    2017-11-24
                                 </RadioButton>
-                                <RadioButton value={3}>
-                                    2017年12月01日
+                                <RadioButton value={3} style={{marginRight: 2}}>
+                                    2017-12-01
                                 </RadioButton>
-                                <RadioButton value={4}>
-                                    2017年12月10日
+                                <RadioButton value={4} style={{marginRight: 2}}>
+                                    2017-12-10
                                 </RadioButton>
-                                <RadioButton value={5}>
-                                    2017年12月13日
+                                <RadioButton value={5} style={{marginRight: 2}}>
+                                    2017-12-13
                                 </RadioButton>
-                                <RadioButton value={6}>
-                                    2018年3月23日
+                                <RadioButton value={6} style={{marginRight: 2}}>
+                                    2018-3-23
                                 </RadioButton>
-                                <RadioButton value={7}>
-                                    2018年5月4日
+                                <RadioButton value={7} style={{marginRight: 2}}>
+                                    2018-5-4
                                 </RadioButton>
                             </RadioGroup>
                         </div>
@@ -274,5 +213,16 @@ export default class Project extends Component {
                 </div>
             </div>
         );
+    }
+    // 切换
+    toggleTileLayer (e) {
+        const index = e.target.value;
+        console.log('index', index);
+        this.tileLayer.setUrl(this.tileUrls[index]);
+    }
+    toggleTileLayer2 (e) {
+        const index = e.target.value;
+        console.log('index', index);
+        this.tileTreeLayerBasic.setUrl(this.tileUrls[index]);
     }
 }

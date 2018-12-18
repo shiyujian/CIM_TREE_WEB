@@ -15,3 +15,4 @@ export NurseryManagement from './NurseryManagement';
 export SupplierManagement from './SupplierManagement';
 export RelevanceManagement from './RelevanceManagement';
 export AuxiliaryAcceptance from './AuxiliaryAcceptance';
+export ProjectImage from './ProjectImage';

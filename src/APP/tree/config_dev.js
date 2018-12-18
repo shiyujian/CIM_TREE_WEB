@@ -119,7 +119,7 @@ window.config = {
         crs: L.CRS.EPSG4326, // new setting
         center: [38.99042701799772, 116.0396146774292],
         zoomControl: false,
-        zoom: 14
+        zoom: 13
     },
     fullExtent: {
         minlat: 22.468466,

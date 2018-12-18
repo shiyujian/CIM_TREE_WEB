@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-11 14:22:58
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-18 19:58:16
+ * @Last Modified time: 2018-12-18 10:38:16
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -44,9 +44,10 @@ export default class Project extends Component {
         } = this.props;
         const {
             AuxiliaryAcceptance,
+            ProjectImage,
             defaultOpenKeys
         } = this.state || {};
-        if (pathname === '/project/auxiliaryacceptance') {
+        if (pathname === '/project/auxiliaryacceptance' || pathname === '/project/projectimage') {
             return (
                 <Body>
                     <AsideComponent>
@@ -63,6 +64,12 @@ export default class Project extends Component {
                                 <Route
                                     path='/project/auxiliaryAcceptance'
                                     component={AuxiliaryAcceptance}
+                                />
+                            )}
+                            {ProjectImage && (
+                                <Route
+                                    path='/project/projectimage'
+                                    component={ProjectImage}
                                 />
                             )}
                         </Switch>
@@ -263,6 +270,13 @@ export default class Project extends Component {
             name: '辅助验收',
             id: 'PROJECT.AUXILIARYACCEPTANCE',
             path: '/project/auxiliaryacceptance',
+            icon: <Icon name='check' />
+        },
+        {
+            key: 'projectImage',
+            name: '工程影像',
+            id: 'PROJECT.PROJECTIMAGE',
+            path: '/project/projectimage',
             icon: <Icon name='check' />
         }
     ];

@@ -19,20 +19,16 @@ import EntranceLeft from './EntranceLeft';
 import EntranceRight from './EntranceRight';
 import PlantLeft from './PlantLeft';
 import PlantRight from './PlantRight';
-import GroupLeft from './GroupLeft';
-import GroupRight from './GroupRight';
+import PlantLeftSmallClass from './PlantLeftSmallClass';
+import PlantRightThinClass from './PlantRightThinClass';
 import LocationLeft from './LocationLeft';
 import LocationRight from './LocationRight';
-
-import { getUser } from '_platform/auth';
 import '../index.less';
 
 export default class DataStatisTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stime: moment().format('YYYY-MM-DD 00:00:00'),
-            etime: moment().format('YYYY-MM-DD 23:59:59'),
             section: '',
             bigType: '',
             treetype: '',
@@ -238,11 +234,11 @@ export default class DataStatisTable extends Component {
                     <Row style={{ marginTop: 10 }}>
                         <Col span={12}>
                             {/* 各小班种植进度分析 */}
-                            <GroupLeft {...this.state} {...this.props} />
+                            <PlantLeftSmallClass {...this.state} {...this.props} />
                         </Col>
                         <Col span={12}>
                             {/* 各细班种植进度分析 */}
-                            <GroupRight {...this.state} {...this.props} />
+                            <PlantRightThinClass {...this.state} {...this.props} />
                         </Col>
                     </Row>
                 </Row>
@@ -315,8 +311,6 @@ export default class DataStatisTable extends Component {
         const {
             section = '',
             treetype = '',
-            stime = '',
-            etime = '',
             thinclass = '',
             smallclass = ''
         } = this.state;

@@ -1,0 +1,51 @@
+.ProjectImageGis-container {
+    display: flex;
+    position: absolute;
+    top: 80px;
+    width: calc(~'100% - 160px');
+    height: calc(~'100% - 80px');
+    left: 160px;
+
+    .ProjectImageGis-r-main {
+        flex:1 1 auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ProjectImageGis-treeControlRight {
+        position: absolute;
+        z-index: 960;
+        top: 6px;
+        right: 0px;
+        width: 50%;
+    }
+    .ProjectImageGis-treeControlLeft {
+        position: absolute;
+        z-index: 960;
+        top: 6px;
+        width: 50%;
+    }
+}
+
+.ProjectImageGis-map {
+    position:relative;
+    .leaflet-popup-content h2 {
+      font-weight: 400 !important;
+      font-size: 12px !important;
+    }
+  
+    #mapid{
+      cursor: pointer;
+    }
+
+    .ProjectImageGis-treeControl {
+      position: absolute;
+      z-index: 960;
+      top: 6px;
+      right: 50px;
+    }
+    /*修改菜单边距*/
+    .aside .ant-collapse-content {
+      padding: 0 8px;
+    }
+}

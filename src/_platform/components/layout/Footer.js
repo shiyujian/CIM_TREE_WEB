@@ -13,7 +13,7 @@ export default class Footer extends Component {
         if (ignore) {
             return null;
         }
-        if (pathname === '/project/auxiliaryacceptance') {
+        if (pathname === '/project/auxiliaryacceptance' || pathname === '/project/projectimage') {
             return null;
         }
         return (
