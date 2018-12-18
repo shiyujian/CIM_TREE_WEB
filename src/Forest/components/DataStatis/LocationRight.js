@@ -303,6 +303,16 @@ export default class LocationRight extends Component {
                     data: label.length > 0 ? label : units
                 }
             ],
+            grid: {
+                bottom: 50
+            },
+            dataZoom: [
+                {
+                    type: 'inside'
+                }, {
+                    type: 'slider'
+                }
+            ],
             series: [
                 {
                     name: '已定位',

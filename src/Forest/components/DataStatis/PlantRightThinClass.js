@@ -13,7 +13,7 @@ export default class PlantRightThinClass extends Component {
             loading: false,
             stime: moment().format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            section: 'P009-01-01',
+            section: '',
             sectionoption: [],
             SmallClassList: [],
             smallClassSelect: '',
@@ -124,7 +124,6 @@ export default class PlantRightThinClass extends Component {
             leftkeycode
         } = this.props;
 
-        const { section } = this.state;
         let param = {
             no: leftkeycode
         };
@@ -143,19 +142,9 @@ export default class PlantRightThinClass extends Component {
         });
     }
     async selectSmallClass () {
-        const { leftkeycode } = this.props;
         const { section, SmallClassList } = this.state;
-        let code = '';
         // 根据标段筛选不同的小班
         let selectSmallClassList = [];
-        let test = [];
-        if (section) {
-            try {
-                code = section.split('-')[2];
-            } catch (e) {
-                console.log(e);
-            }
-        }
 
         SmallClassList.map(SmallClass => {
             try {
@@ -197,10 +186,12 @@ export default class PlantRightThinClass extends Component {
     // 查询数据
     async query () {
         const {
-            actions: { getCountThin },
-            leftkeycode
+            actions: { getCountThin }
         } = this.props;
-        const { smallClassSelect, section, etime, stime } = this.state;
+        const { smallClassSelect, section, etime } = this.state;
+        if (!section) {
+            return;
+        }
         this.setState({ loading: true });
         let param = {};
         let code = '';
@@ -240,6 +231,14 @@ export default class PlantRightThinClass extends Component {
                     data: label.length > 0 ? label : units
                 }
             ],
+            grid: {
+                bottom: 50
+            },
+            dataZoom: [{
+                type: 'inside'
+            }, {
+                type: 'slider'
+            }],
             series: [
                 {
                     name: '未种植',

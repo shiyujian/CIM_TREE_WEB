@@ -70,7 +70,7 @@ export default class DataStatisTable extends Component {
             treeTypeDisplayTable
         } = this.state;
         return (
-            <div>
+            <div className='forest-DataStatis'>
                 <DataTable {...this.state} {...this.props} />
                 <Row>
                     <Col span={24}>

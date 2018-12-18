@@ -13,7 +13,7 @@ export default class PlantLeftSmallClass extends Component {
             loading: false,
             stime: moment().format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            section: 'P009-01-01',
+            section: '',
             sectionoption: []
         };
     }
@@ -93,13 +93,13 @@ export default class PlantLeftSmallClass extends Component {
     componentDidUpdate (prevProps, prevState) {
         const { etime, section, stime } = this.state;
         const { leftkeycode } = this.props;
-        if (leftkeycode != prevProps.leftkeycode) {
+        if (leftkeycode !== prevProps.leftkeycode) {
             this.getSectionoption();
         }
-        if (section != prevState.section) {
+        if (section !== prevState.section) {
             this.query();
         }
-        if (etime != prevState.etime || stime != prevState.stime) {
+        if (etime !== prevState.etime || stime !== prevState.stime) {
             this.query();
         }
     }
@@ -110,7 +110,10 @@ export default class PlantLeftSmallClass extends Component {
                 getCountSmall
             }
         } = this.props;
-        const { stime, etime, section } = this.state;
+        const { etime, section } = this.state;
+        if (!section) {
+            return;
+        }
         let param = {};
 
         param.section = section;
@@ -125,7 +128,6 @@ export default class PlantLeftSmallClass extends Component {
         let complete = [];
         let unComplete = [];
         let label = [];
-        let total = [];
 
         if (rst && rst instanceof Array) {
             rst.map(item => {
@@ -143,6 +145,16 @@ export default class PlantLeftSmallClass extends Component {
             xAxis: [
                 {
                     data: label.length > 0 ? label : units
+                }
+            ],
+            grid: {
+                bottom: 50
+            },
+            dataZoom: [
+                {
+                    type: 'inside'
+                }, {
+                    type: 'slider'
                 }
             ],
             series: [
