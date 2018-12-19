@@ -235,6 +235,8 @@ export default class NursOverallTable extends Component {
                                 record.LocationY
                             }`}</span>
                         );
+                    } else if (record.locationCoord) {
+                        return <span>{record.locationCoord}</span>;
                     } else {
                         return <span>未定位</span>;
                     }
@@ -292,9 +294,6 @@ export default class NursOverallTable extends Component {
     }
     render () {
         const { seedlingMess, treeMess, flowMess, curingMess, sxm } = this.state;
-        const suffix = sxm ? (
-            <Icon type='close-circle' onClick={this.emitEmpty} />
-        ) : null;
         return (
             <div>
                 <Row>
@@ -302,7 +301,6 @@ export default class NursOverallTable extends Component {
                         <Col xl={3} lg={4} md={5} className='forest-mrg10'>
                             <span>顺序码：</span>
                             <Input
-                                suffix={suffix}
                                 value={sxm}
                                 className='forest-forestcalcw2'
                                 style={{width: 100}}
@@ -435,10 +433,6 @@ export default class NursOverallTable extends Component {
             </div>
         );
     }
-
-    emitEmpty = () => {
-        this.setState({ sxm: '' });
-    };
 
     sxmChange (value) {
         this.setState({ sxm: value.target.value });
@@ -709,7 +703,6 @@ export default class NursOverallTable extends Component {
             },
             {
                 title: '位置',
-                // dataIndex: 'Location',
                 render: (text, record) => {
                     if (record.Location) {
                         return (
@@ -717,6 +710,8 @@ export default class NursOverallTable extends Component {
                                 record.LocationY
                             }`}</span>
                         );
+                    } else if (record.locationCoord) {
+                        return <span>{record.locationCoord}</span>;
                     } else {
                         return <span>未定位</span>;
                     }
@@ -919,7 +914,8 @@ export default class NursOverallTable extends Component {
                 getThinClassList,
                 getCuringTreeInfo,
                 getCuringTypes,
-                getCuringMessage
+                getCuringMessage,
+                getTreeLocationCoord
             },
             platform: { tree = {} }
         } = this.props;
@@ -937,12 +933,17 @@ export default class NursOverallTable extends Component {
         });
 
         let queryTreeData = await getTreeMess(postdata);
+        if (!queryTreeData) {
+            queryTreeData = {};
+        }
         let treeflowDatas = await getTreeflows({}, postdata);
         let nurserysDatas = await getnurserys({}, postdata);
         let carData = await getCarpackbysxm(postdata);
         let curingTreeData = await getCuringTreeInfo({}, postdata);
         let curingTypesData = await getCuringTypes();
         let curingTypeArr = (curingTypesData && curingTypesData.content) || [];
+        // 获取树的地理坐标信息
+        let treeLocationData = await getTreeLocationCoord(postdata);
 
         let SmallClassName = queryTreeData.SmallClass
             ? queryTreeData.SmallClass + '号小班'
@@ -1071,6 +1072,12 @@ export default class NursOverallTable extends Component {
         let landName = getProjectNameBySection(Section, thinClassTree);
         console.log('sectionName', sectionName);
         console.log('landName', landName);
+        // 根据树木的定位坐标获取定位地址
+        let location = '';
+        if (treeLocationData && treeLocationData.X && treeLocationData.Y) {
+            location = `${treeLocationData.X},${treeLocationData.Y}`;
+        }
+        queryTreeData.locationCoord = location;
 
         let treeMess = [
             {

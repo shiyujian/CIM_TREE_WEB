@@ -211,6 +211,11 @@ export const getTreeMess = forestFetchAction(
     `${FOREST_API}/tree/tree/{{sxm}}`,
     []
 );
+// 获取树木定位信息
+export const getTreeLocationCoord = forestFetchAction(
+    `${FOREST_API}/tree/locationcoord?sxm={{sxm}}`,
+    [], 'GET'
+);
 
 export const postForsetPic = myFetch(
     `${FOREST_API}/UploadHandler.ashx?filetype=leader`,
@@ -323,6 +328,7 @@ export const actions = {
     getTreeflows,
     getCarpackbysxm,
     getTreeMess,
+    getTreeLocationCoord,
     postForsetPic,
     getTreePlanting,
     getLocationStat,

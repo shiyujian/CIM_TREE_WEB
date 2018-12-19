@@ -9,6 +9,10 @@
 import 'whatwg-fetch';
 import { encrypt } from './secrect';
 import { Notification } from 'antd';
+import {
+    clearUser,
+    removePermissions
+} from '../auth';
 require('es6-promise').polyfill();
 
 const headers = {
@@ -52,16 +56,29 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                 }
                 return fetch(u, params)
                     .then(response => {
-                        // console.log('response', response);
                         if (response && response.status === 400) {
-                            Notification.error({
-                                message: '请重新登录',
-                                duration: 5
-                            });
-                            return;
+                            let href = window.location.href;
+                            let reg = new RegExp(/(\w+):\/\/([^/:]+)(:\d*)?/);
+                            let result = href.match(reg);
+                            if (result && result instanceof Array && result.length === 4) {
+                                let locationStart = result[0];
+                                if (result.indexOf('/login') === -1) {
+                                    Notification.error({
+                                        message: '请重新登录',
+                                        duration: 5
+                                    });
+                                    clearUser();
+                                    removePermissions();
+                                    let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
+                                    if (!remember) {
+                                        window.localStorage.removeItem('QH_LOGIN_USER');
+                                    }
+                                    window.location.replace(locationStart + '/login');
+                                    return;
+                                }
+                            }
                         }
-                        // let href = window.location.href;
-                        // console.log('href', href);
+
                         const contentType = response.headers.get('content-type');
                         if (contentType && contentType.indexOf('application/json') !== -1) {
                             return response.json();

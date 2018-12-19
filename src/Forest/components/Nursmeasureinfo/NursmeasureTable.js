@@ -105,9 +105,6 @@ export default class NursmeasureTable extends Component {
             ispack,
             mmtype = ''
         } = this.state;
-        const suffix1 = sxm ? (
-            <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
         const suffix2 = rolename ? (
             <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
@@ -383,7 +380,6 @@ export default class NursmeasureTable extends Component {
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>顺序码：</span>
                         <Input
-                            // suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
                             onChange={this.sxmChange.bind(this)}
@@ -575,10 +571,6 @@ export default class NursmeasureTable extends Component {
             </div>
         );
     }
-
-    emitEmpty1 = () => {
-        this.setState({ sxm: '' });
-    };
 
     emitEmpty2 = () => {
         this.setState({ rolename: '' });

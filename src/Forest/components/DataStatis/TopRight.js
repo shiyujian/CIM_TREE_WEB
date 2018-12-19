@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Card, Spin, Row, Col } from 'antd';
-import moment from 'moment';
+import { Spin } from 'antd';
 
 export default class Top extends Component {
     static propTypes = {};

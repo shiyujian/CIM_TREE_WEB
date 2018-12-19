@@ -34,6 +34,8 @@ export const getAdoptTreeOk = createAction(`${ID}苗木结缘树`);
 export const getAdoptTreeData = forestFetchAction(`${FOREST_API}/adopt/adopttrees`, [getAdoptTreeOk], 'GET');
 // 根据领养人名称获取领养树
 export const getAdoptTreeByAdopter = forestFetchAction(`${FOREST_API}/adopt/adopttrees?aadopter={{aadopter}}`, [], 'GET');
+// 获取树木定位信息
+export const getTreeLocationCoord = forestFetchAction(`${FOREST_API}/tree/locationcoord?sxm={{sxm}}`, [], 'GET');
 // 苗木定位位置地理坐标系查询
 export const getTreeLocation = forestFetchAction(`${FOREST_API}/tree/treelocations?sxm={{sxm}}&crs=4326`, [], 'GET');
 // 获取苗木结缘信息
@@ -89,6 +91,7 @@ export const actions = {
     getAdoptTreeOk,
     getAdoptTreeData,
     getAdoptTreeByAdopter,
+    getTreeLocationCoord,
     getTreeLocation,
     getAdoptTrees,
     getLocationNameByCoordinate,

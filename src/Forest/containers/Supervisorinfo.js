@@ -42,6 +42,7 @@ export default class Supervisorinfo extends Component {
             smallclassoption: [],
             thinclassoption: [],
             statusoption: [],
+            samplingStatusOption: [],
             leftkeycode: '',
             resetkey: 0,
             treetypeoption: [],
@@ -119,6 +120,22 @@ export default class Supervisorinfo extends Component {
             </Option>
         ];
         this.setState({ statusoption, typeoption });
+        // 抽查状态
+        let samplingStatusOption = [
+            <Option key={'-1'} value={''} title={'全部'}>
+                全部
+            </Option>,
+            <Option key={'0'} value={'0'} title={'未抽检'}>
+                未抽检
+            </Option>,
+            <Option key={'1'} value={'1'} title={'已抽检'}>
+                已抽检
+            </Option>,
+            <Option key={'2'} value={'2'} title={'不合格'}>
+                不合格
+            </Option>
+        ];
+        this.setState({ samplingStatusOption });
     }
 
     render () {
@@ -129,10 +146,10 @@ export default class Supervisorinfo extends Component {
             smallclassoption,
             thinclassoption,
             statusoption,
+            samplingStatusOption,
             resetkey,
             treetypeoption,
             typeoption,
-            treetypelist,
             bigType
         } = this.state;
         const {
@@ -168,6 +185,7 @@ export default class Supervisorinfo extends Component {
                             treetypeoption={treetypeoption}
                             thinClassSelect={this.thinClassSelect.bind(this)}
                             statusoption={statusoption}
+                            samplingStatusOption={samplingStatusOption}
                             leftkeycode={leftkeycode}
                             keycode={keycode}
                             resetinput={this.resetinput.bind(this)}

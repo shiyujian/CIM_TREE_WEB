@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Card, Spin, Row, Col } from 'antd';
-import moment from 'moment';
+import { Spin } from 'antd';
 
 export default class Top extends Component {
     static propTypes = {};
@@ -79,7 +78,13 @@ export default class Top extends Component {
             if (treePlanting) {
                 let data = treePlanting.split(',');
                 let unPlantNum = Number(data[0]);
+                if (unPlantNum < 0) {
+                    unPlantNum = -unPlantNum;
+                }
                 let plantNum = Number(data[1]);
+                if (plantNum < 0) {
+                    plantNum = -plantNum;
+                }
                 let myChart = echarts.init(document.getElementById('topLeft'));
                 let option = {
                     series: [

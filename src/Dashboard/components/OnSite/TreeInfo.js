@@ -107,6 +107,9 @@ export const getTreeMessFun = (SmallClassName, ThinClassName, queryTreeData, nur
         LocationY: queryTreeData.Location
             ? queryTreeData.Location.Y
             : '',
+        locationCoord: queryTreeData.locationCoord
+            ? queryTreeData.locationCoord
+            : '',
         DJ: queryTreeData.DJ ? queryTreeData.DJ : '',
         DJFJ: queryTreeData.DJFJ
             ? onImgClick(queryTreeData.DJFJ)

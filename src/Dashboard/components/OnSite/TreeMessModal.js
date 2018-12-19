@@ -490,7 +490,11 @@ class TreeMessModal extends Component {
                                         ? `${treeMess.LocationX},${
                                             treeMess.LocationY
                                         }`
-                                        : ''
+                                        : (
+                                            treeMess.locationCoord
+                                                ? treeMess.locationCoord
+                                                : ''
+                                        )
                                 }
                             />
                             {treeMess.GD ? (

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-14 15:42:31
+ * @Last Modified time: 2018-12-19 09:42:05
  */
 import React, { Component } from 'react';
 import {
@@ -2403,6 +2403,7 @@ class OnSite extends Component {
                 getUserDetail,
                 getOrgTreeByCode,
                 getTreeLocation,
+                getTreeLocationCoord,
                 getLocationNameByCoordinate
             },
             platform: {
@@ -2419,6 +2420,9 @@ class OnSite extends Component {
             let totalThinClass = tree.totalThinClass || [];
             let bigTreeList = (tree && tree.bigTreeList) || [];
             let queryTreeData = await getTreeMess(postdata);
+            if (!queryTreeData) {
+                queryTreeData = {};
+            }
             let treeflowDatas = {};
             // 树木审批流程信息
             if (dashboardTreeMess === 'treeMess') {
@@ -2431,7 +2435,7 @@ class OnSite extends Component {
             // 养护树木信息
             let curingTreeData = await getCuringTreeInfo({}, postdata);
             // 获取树的地理坐标信息
-            let treeLocationDatas = await getTreeLocation(postdata);
+            let treeLocationData = await getTreeLocationCoord(postdata);
 
             let curingTypeArr = [];
             if (!curingTypes) {
@@ -2467,7 +2471,6 @@ class OnSite extends Component {
             let nurserysData = {};
             let curingTaskData = [];
             let curingTaskArr = [];
-            let treeLocationData = [];
             if (
                 treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array &&
                         treeflowDatas.content.length > 0
@@ -2479,12 +2482,6 @@ class OnSite extends Component {
                         nurserysDatas.content.length > 0
             ) {
                 nurserysData = nurserysDatas.content[0];
-            }
-            if (
-                treeLocationDatas && treeLocationDatas.content && treeLocationDatas.content instanceof Array &&
-                    treeLocationDatas.content.length > 0
-            ) {
-                treeLocationData = treeLocationDatas.content[0];
             }
             if (
                 curingTreeData && curingTreeData.content && curingTreeData.content instanceof Array &&
@@ -2503,7 +2500,12 @@ class OnSite extends Component {
             let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
             nurserysData.nurserysAddressName = nurserysAddressName;
             // 根据树木的定位坐标获取定位地址
-            // let location = `${treeLocationData.X},${treeLocationData.Y}`;
+            let location = '';
+            if (treeLocationData && treeLocationData.X && treeLocationData.Y) {
+                location = `${treeLocationData.X},${treeLocationData.Y}`;
+            }
+            console.log('location', location);
+            queryTreeData.locationCoord = location;
             // let treeAddressData = await handleGetAddressByCoordinate(location, getLocationNameByCoordinate);
             // let queryTreeAddressName = (treeAddressData && treeAddressData.regeocode && treeAddressData.regeocode.formatted_address) || '';
             // queryTreeData.queryTreeAddressName = queryTreeAddressName;

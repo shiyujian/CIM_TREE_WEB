@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
     Icon,
     Table,
-    Spin,
     Tabs,
     Modal,
     Row,
@@ -11,7 +10,6 @@ import {
     DatePicker,
     Button,
     Input,
-    InputNumber,
     Progress,
     message
 } from 'antd';
@@ -26,8 +24,6 @@ import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
-const TabPane = Tabs.TabPane;
-const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
 export default class SupervisorTable extends Component {
@@ -49,6 +45,7 @@ export default class SupervisorTable extends Component {
             smallclass: '',
             thinclass: '',
             status: '',
+            samplingStatus: '',
             SupervisorCheck: '',
             role: '',
             rolename: '',
@@ -99,6 +96,7 @@ export default class SupervisorTable extends Component {
             treetypeoption,
             thinclassoption,
             statusoption,
+            samplingStatusOption,
             users,
             typeoption
         } = this.props;
@@ -109,6 +107,7 @@ export default class SupervisorTable extends Component {
             smallclass,
             thinclass,
             status,
+            samplingStatus,
             bigType,
             treetypename
         } = this.state;
@@ -152,19 +151,22 @@ export default class SupervisorTable extends Component {
                     let superName = '';
                     let ownerName = '';
                     if (
-                        record.SupervisorCheck == -1 &&
-                        record.CheckStatus == -1
+                        record.SupervisorCheck === -1 &&
+                        record.CheckStatus === -1
                     ) {
                         return <span>未抽查</span>;
                     } else {
-                        if (record.SupervisorCheck == 0) { superName = '监理抽查退回'; } else if (record.SupervisorCheck === 1) {
+                        if (record.SupervisorCheck === 0) {
+                            superName = '监理抽查退回';
+                        } else if (record.SupervisorCheck === 1) {
                             superName = '监理抽查通过';
                         }
 
-                        if (record.CheckStatus == 0) ownerName = '业主抽查退回';
-                        else if (record.CheckStatus == 1) {
+                        if (record.CheckStatus === 0) {
+                            ownerName = '业主抽查退回';
+                        } else if (record.CheckStatus === 1) {
                             ownerName = '业主抽查通过';
-                        } else if (record.CheckStatus == 2) {
+                        } else if (record.CheckStatus === 2) {
                             ownerName = '业主抽查退回后修改';
                         }
                         if (superName && ownerName) {
@@ -180,6 +182,21 @@ export default class SupervisorTable extends Component {
                             return <span>{ownerName}</span>;
                         }
                     }
+                }
+            },
+            {
+                title: '抽查状态',
+                dataIndex: 'samplingStatusName',
+                render: (text, record) => {
+                    let samplingStatusName = '';
+                    if (record.Status === 0) {
+                        samplingStatusName = '未抽检';
+                    } else if (record.Status === 1) {
+                        samplingStatusName = '已抽检';
+                    } else if (record.Status === 2) {
+                        samplingStatusName = '不合格';
+                    }
+                    return <span>{samplingStatusName}</span>;
                 }
             },
             {
@@ -305,6 +322,18 @@ export default class SupervisorTable extends Component {
                             onChange={this.onStatusChange.bind(this)}
                         >
                             {statusoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>抽查状态：</span>
+                        <Select
+                            allowClear
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={samplingStatus}
+                            onChange={this.onSamplingStatusChange.bind(this)}
+                        >
+                            {samplingStatusOption}
                         </Select>
                     </div>
                     <div className='forest-mrg10'>
@@ -491,6 +520,10 @@ export default class SupervisorTable extends Component {
         this.setState({ SupervisorCheck, status: value || '' });
     }
 
+    onSamplingStatusChange (value) {
+        this.setState({ samplingStatus: value || '' });
+    }
+
     onRoleNameChange (value) {
         this.setState({ rolename: value.target.value });
     }
@@ -564,12 +597,14 @@ export default class SupervisorTable extends Component {
             sstime = '',
             setime = '',
             status = '',
+            samplingStatus = '',
             size,
             bigType = '',
             treetype = '',
             smallclassData = '',
             thinclassData = ''
         } = this.state;
+
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
             return;
@@ -588,6 +623,7 @@ export default class SupervisorTable extends Component {
             smallclass: smallclassData,
             thinclass: thinclassData,
             status,
+            samplingStatus,
             SupervisorCheck,
             sstime: sstime && moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
             setime: setime && moment(setime).format('YYYY-MM-DD HH:mm:ss'),
