@@ -78,13 +78,13 @@ export default class Top extends Component {
             if (treePlanting) {
                 let data = treePlanting.split(',');
                 let unPlantNum = Number(data[0]);
-                if (unPlantNum < 0) {
-                    unPlantNum = -unPlantNum;
-                }
+                // if (unPlantNum < 0) {
+                //     unPlantNum = -unPlantNum;
+                // }
                 let plantNum = Number(data[1]);
-                if (plantNum < 0) {
-                    plantNum = -plantNum;
-                }
+                // if (plantNum < 0) {
+                //     plantNum = -plantNum;
+                // }
                 let myChart = echarts.init(document.getElementById('topLeft'));
                 let option = {
                     series: [
