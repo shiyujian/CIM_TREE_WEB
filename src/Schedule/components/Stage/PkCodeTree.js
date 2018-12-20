@@ -9,7 +9,6 @@ export default class PkCodeTree extends Component {
     static loop (data = []) {
         let user = localStorage.getItem('QH_USER_DATA');
         user = JSON.parse(user);
-        console.log('user', user);
         let component = [];
         // 是否为业主或管理员
         let permission = getUserIsManager();
@@ -22,7 +21,6 @@ export default class PkCodeTree extends Component {
             let sections = user && user.account && user.account.sections;
             if (sections && sections instanceof Array && sections.length > 0) {
                 let section = sections[0];
-                console.log('section', section);
                 let code = section.split('-');
                 if (code && code.length === 3) {
                     data.map((item, index) => {

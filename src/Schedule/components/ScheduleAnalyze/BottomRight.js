@@ -5,7 +5,7 @@ import { Cards } from '../../components';
 import moment from 'moment';
 const Option = Select.Option;
 
-export default class Bottom extends Component {
+export default class BottomRight extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -13,7 +13,7 @@ export default class Bottom extends Component {
             loading: false,
             stime: moment().format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            section: 'P009-01-01',
+            section: '',
             sectionoption: [],
             SmallClassList: [],
             smallClassSelect: '',
@@ -21,7 +21,7 @@ export default class Bottom extends Component {
         };
     }
     async componentDidMount () {
-        var myChart4 = echarts.init(document.getElementById('bottom'));
+        var myChart4 = echarts.init(document.getElementById('BottomRight'));
         let option4 = {
             tooltip: {
                 trigger: 'axis',
@@ -61,14 +61,14 @@ export default class Bottom extends Component {
         await this.getSectionoption();
         await this.getSmallClass();
         await this.selectSmallClass();
-        await this.query();
+        // await this.query();
     }
 
     async componentDidUpdate (prevProps, prevState) {
         const { etime, stime, section, smallClassSelect } = this.state;
         const { leftkeycode } = this.props;
         // 地块修改，则修改标段
-        if (leftkeycode != prevProps.leftkeycode) {
+        if (leftkeycode !== prevProps.leftkeycode) {
             await this.getSectionoption();
             await this.getSmallClass();
             await this.selectSmallClass();
@@ -76,18 +76,15 @@ export default class Bottom extends Component {
             this.query();
         }
         // 标段修改，修改小班
-        if (section != prevState.section) {
+        if (section !== prevState.section) {
             this.selectSmallClass();
         }
         // 小班和时间修改，查询数据
         if (
-            etime != prevState.etime ||
-            smallClassSelect != prevState.smallClassSelect ||
-            stime != prevState.stime
+            etime !== prevState.etime ||
+            smallClassSelect !== prevState.smallClassSelect ||
+            stime !== prevState.stime
         ) {
-            console.log('Bottomsection', section);
-            console.log('Bottometime', smallClassSelect);
-            console.log('Bottomleftkeycode', leftkeycode);
             this.query();
         }
     }
@@ -127,7 +124,6 @@ export default class Bottom extends Component {
             leftkeycode
         } = this.props;
 
-        const { section } = this.state;
         let param = {
             no: leftkeycode
         };
@@ -137,7 +133,6 @@ export default class Bottom extends Component {
 
         let SmallClassList = [];
         let lists = await getSmallClassList(param);
-        console.log('BottomBottom', lists);
         if (lists && lists instanceof Array) {
             SmallClassList = lists;
         }
@@ -147,20 +142,9 @@ export default class Bottom extends Component {
         });
     }
     async selectSmallClass () {
-        const { leftkeycode } = this.props;
         const { section, SmallClassList } = this.state;
-        let code = '';
         // 根据标段筛选不同的小班
         let selectSmallClassList = [];
-        let test = [];
-        if (section) {
-            try {
-                code = section.split('-')[2];
-            } catch (e) {
-                console.log(e);
-            }
-        }
-        console.log('codecode', code);
 
         SmallClassList.map(SmallClass => {
             try {
@@ -190,7 +174,6 @@ export default class Bottom extends Component {
                 array.push(list.SmallClass);
             }
         });
-        console.log('uniqueSmallClass', uniqueSmallClass);
 
         if (uniqueSmallClass.length > 0) {
             smallClassSelect = uniqueSmallClass[0].SmallClass;
@@ -200,96 +183,9 @@ export default class Bottom extends Component {
             smallClassSelect
         });
     }
-    // 查询数据
-    async query () {
-        const {
-            actions: { gettreetypeThinClass },
-            leftkeycode
-        } = this.props;
-        const { smallClassSelect, section, etime, stime } = this.state;
-        this.setState({ loading: true });
-        let param = {};
-        let code = '';
-        try {
-            code = section.split('-');
-            code = code[0] + '-' + code[1];
-        } catch (e) {
-            console.log(e);
-        }
-
-        param.no = code + '-' + smallClassSelect;
-        param.section = section;
-        // param.stime = stime;
-        param.etime = etime;
-        let rst = await gettreetypeThinClass({}, param);
-
-        let complete = [];
-        let unComplete = [];
-        let label = [];
-        let total = [];
-        let units = ['1细班', '2细班', '3细班', '4细班', '5细班'];
-        if (rst && rst instanceof Array) {
-            rst.map(item => {
-                complete.push(item.Complete);
-                unComplete.push(item.UnComplete);
-                label.push(item.Label + '号细班');
-            });
-        }
-
-        console.log('Bottomcompletecomplete', complete);
-        console.log('BottomunCompleteunComplete', unComplete);
-        console.log('Bottomlabellabel', label);
-
-        let myChart4 = echarts.init(document.getElementById('bottom'));
-        let options4 = {
-            legend: {
-                data: ['未种植', '已种植']
-            },
-            xAxis: [
-                {
-                    data: label.length > 0 ? label : units
-                }
-            ],
-            series: [
-                {
-                    name: '未种植',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            offset: ['50', '80'],
-                            show: true,
-                            position: 'inside',
-                            formatter: '{c}',
-                            textStyle: { color: '#FFFFFF' }
-                        }
-                    },
-                    data: unComplete
-                },
-                {
-                    name: '已种植',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            offset: ['50', '80'],
-                            show: true,
-                            position: 'inside',
-                            formatter: '{c}',
-                            textStyle: { color: '#FFFFFF' }
-                        }
-                    },
-                    data: complete
-                }
-            ]
-        };
-        myChart4.setOption(options4);
-        this.setState({ loading: false });
-    }
 
     render () {
-        // todo 苗木种植强度分析
-
+        // todo 各细班种植进度分析
         return (
             <Spin spinning={this.state.loading}>
                 <Cards
@@ -298,8 +194,8 @@ export default class Bottom extends Component {
                     title={this.title1()}
                 >
                     <div
-                        id='bottom'
-                        style={{ width: '100%', height: '300px' }}
+                        id='BottomRight'
+                        style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>
             </Spin>
@@ -344,7 +240,6 @@ export default class Bottom extends Component {
     }
     // 选择标段
     onsectionchange (value) {
-        console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
         this.setState(
             {
                 section: value
@@ -383,5 +278,97 @@ export default class Bottom extends Component {
         this.setState({
             etime: value ? moment(value).format('YYYY/MM/DD') : ''
         });
+    }
+
+    // 查询数据
+    async query () {
+        const {
+            actions: { gettreetypeThinClass }
+        } = this.props;
+        const { smallClassSelect, section, etime } = this.state;
+        if (!section) {
+            return;
+        }
+        this.setState({ loading: true });
+        let param = {};
+        let code = '';
+        try {
+            code = section.split('-');
+            code = code[0] + '-' + code[1];
+        } catch (e) {
+            console.log(e);
+        }
+
+        param.no = code + '-' + smallClassSelect;
+        param.section = section;
+        // param.stime = stime;
+        param.etime = etime;
+        let rst = await gettreetypeThinClass({}, param);
+
+        let complete = [];
+        let unComplete = [];
+        let label = [];
+        let units = ['1细班', '2细班', '3细班', '4细班', '5细班'];
+        if (rst && rst instanceof Array) {
+            rst.map(item => {
+                complete.push(item.Complete);
+                unComplete.push(item.UnComplete);
+                label.push(item.Label + '号细班');
+            });
+        }
+
+        let myChart4 = echarts.init(document.getElementById('BottomRight'));
+        let options4 = {
+            legend: {
+                data: ['未种植', '已种植']
+            },
+            xAxis: [
+                {
+                    data: label.length > 0 ? label : units
+                }
+            ],
+            grid: {
+                bottom: 50
+            },
+            dataZoom: [{
+                type: 'inside'
+            }, {
+                type: 'slider'
+            }],
+            series: [
+                {
+                    name: '未种植',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: { color: '#FFFFFF' }
+                        }
+                    },
+                    data: unComplete
+                },
+                {
+                    name: '已种植',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: { color: '#FFFFFF' }
+                        }
+                    },
+                    data: complete
+                }
+            ]
+        };
+        myChart4.setOption(options4);
+        this.setState({ loading: false });
     }
 }

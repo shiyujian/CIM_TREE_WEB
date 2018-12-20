@@ -371,23 +371,17 @@ export default class PlantBottom extends Component {
                 ...obj
             });
         });
-        console.log('tblData', tblData);
         let _headers = ['日期', ...xAxisData];
         let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('headers', headers);
         let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
             .reduce((prev, next) => prev.concat(next))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('testttt', testttt);
         let output = Object.assign({}, headers, testttt);
-        console.log('output', output);
         // 获取所有单元格的位置
         let outputPos = Object.keys(output);
-        console.log('outputPos', outputPos);
         // 计算出范围
         let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-        console.log('ref', ref);
         // 构建 workbook 对象
         let wb = {
             SheetNames: ['mySheet'],

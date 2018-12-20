@@ -16,19 +16,8 @@ export default class Left extends Component {
         };
     }
 
-    componentDidUpdate (prevProps, prevState) {
-        const { etime } = this.state;
-        const { leftkeycode } = this.props;
-        if (etime != prevState.etime) {
-            this.query();
-        }
-        if (leftkeycode != prevProps.leftkeycode) {
-            this.query();
-        }
-    }
-
     componentDidMount () {
-        let myChart1 = echarts.init(document.getElementById('king'));
+        let myChart1 = echarts.init(document.getElementById('Left'));
         let option1 = {
             title: {
                 text: '苗木进场总数'
@@ -94,77 +83,17 @@ export default class Left extends Component {
             ]
         };
         myChart1.setOption(option1);
-
-        this.query(1);
     }
-    // 苗木进场总数
-    async query (no) {
-        const {
-            platform: { tree = {} },
-            leftkeycode,
-            actions: { gettreetype }
-        } = this.props;
-        const { etime, stime } = this.state;
-        if (!leftkeycode) {
-            return;
+
+    componentDidUpdate (prevProps, prevState) {
+        const { etime } = this.state;
+        const { leftkeycode } = this.props;
+        if (etime !== prevState.etime) {
+            this.query();
         }
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let postdata = {};
-        this.setState({
-            loading: true
-        });
-
-        postdata.no = leftkeycode;
-        postdata.stime = stime;
-        postdata.etime = etime;
-        let rst = await gettreetype({}, postdata);
-        console.log('aaaaaaaaaaaaaarst', rst);
-        let units = [];
-        let data = [];
-
-        if (rst && rst instanceof Array) {
-            sectionData.map(project => {
-                // 获取正确的项目
-                if (leftkeycode.indexOf(project.No) > -1) {
-                    // 获取项目下的标段
-                    let sections = project.children;
-                    // 将各个标段的数据设置为0
-                    sections.map((section, index) => {
-                        data[index] = 0;
-                        units.push(section.Name);
-                    });
-
-                    rst.map(item => {
-                        if (item && item.Section) {
-                            sections.map((section, index) => {
-                                if (item.Section === section.No) {
-                                    data[index] = data[index] + item.Num;
-                                }
-                            });
-                        }
-                    });
-                }
-            });
+        if (leftkeycode !== prevProps.leftkeycode) {
+            this.query();
         }
-        console.log('data', data);
-        console.log('units', units);
-        let myChart1 = echarts.init(document.getElementById('king'));
-        let option1 = {
-            xAxis: [
-                {
-                    data: units
-                }
-            ],
-            series: [
-                {
-                    data: data
-                }
-            ]
-        };
-        myChart1.setOption(option1);
-        this.setState({
-            loading: false
-        });
     }
 
     render () {
@@ -173,7 +102,7 @@ export default class Left extends Component {
                 <Spin spinning={this.state.loading}>
                     <Cards search={this.searchRender()} title='苗木进场总数'>
                         <div
-                            id='king'
+                            id='Left'
                             style={{ width: '100%', height: '400px' }}
                         />
                     </Cards>
@@ -211,6 +140,72 @@ export default class Left extends Component {
             etime: value[1]
                 ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
                 : ''
+        });
+    }
+    // 苗木进场总数
+    async query (no) {
+        const {
+            platform: { tree = {} },
+            leftkeycode,
+            actions: { gettreetype }
+        } = this.props;
+        const { etime, stime } = this.state;
+        if (!leftkeycode) {
+            return;
+        }
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let postdata = {};
+        this.setState({
+            loading: true
+        });
+
+        postdata.no = leftkeycode;
+        postdata.stime = stime;
+        postdata.etime = etime;
+        let rst = await gettreetype({}, postdata);
+        let units = [];
+        let data = [];
+
+        if (rst && rst instanceof Array) {
+            sectionData.map(project => {
+                // 获取正确的项目
+                if (leftkeycode.indexOf(project.No) > -1) {
+                    // 获取项目下的标段
+                    let sections = project.children;
+                    // 将各个标段的数据设置为0
+                    sections.map((section, index) => {
+                        data[index] = 0;
+                        units.push(section.Name);
+                    });
+
+                    rst.map(item => {
+                        if (item && item.Section) {
+                            sections.map((section, index) => {
+                                if (item.Section === section.No) {
+                                    data[index] = data[index] + item.Num;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        let myChart1 = echarts.init(document.getElementById('Left'));
+        let option1 = {
+            xAxis: [
+                {
+                    data: units
+                }
+            ],
+            series: [
+                {
+                    data: data
+                }
+            ]
+        };
+        myChart1.setOption(option1);
+        this.setState({
+            loading: false
         });
     }
 }

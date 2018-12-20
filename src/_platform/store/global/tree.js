@@ -10,11 +10,6 @@ export const getTreeNodeList = forestFetchAction(
     `${FOREST_API}/tree/wpunittree`,
     [getTreeNodeListOK]
 ); //    √
-export const getLittleBanOK = createAction(`${ID}获取森林大数据树小班细班信息`);
-export const getLittleBan = forestFetchAction(
-    `${FOREST_API}/tree/wpunitsbysuffixno?no={{no}}`,
-    [getLittleBanOK]
-);
 export const getThinClassList = forestFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []); //
 // 设置区域地块树，对于所有人员获取所有的数据
 export const getOnSiteThinClassTree = createAction(`${ID}所有的区域地块细班树`);
@@ -46,7 +41,6 @@ export const getForestUserDetail = forestFetchAction(
     [],
     'GET'
 );
-
 export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET');
 
 export default handleActions(
@@ -133,12 +127,6 @@ export default handleActions(
                     scheduleTaskList: root
                 };
             }
-        },
-        [getLittleBanOK]: (state, { payload }) => {
-            return {
-                ...state,
-                littleClass: payload
-            };
         },
         [getOnSiteThinClassTree]: (state, { payload }) => {
             return {

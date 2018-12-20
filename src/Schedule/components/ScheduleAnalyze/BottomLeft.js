@@ -1,23 +1,26 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { DatePicker, Spin } from 'antd';
-import moment from 'moment';
+import { Select, DatePicker, Spin } from 'antd';
 import { Cards } from '../../components';
+import moment from 'moment';
+const Option = Select.Option;
 
-export default class RightTop extends Component {
+export default class BottomLeft extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
             loading: false,
             stime: moment().format('YYYY/MM/DD 00:00:00'),
-            etime: moment().format('YYYY/MM/DD 23:59:59')
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
+            section: '',
+            sectionoption: []
         };
     }
 
     componentDidMount () {
-        var myChart2 = echarts.init(document.getElementById('RightTop'));
-        let option2 = {
+        var myChart3 = echarts.init(document.getElementById('BottomLeft'));
+        let option3 = {
             tooltip: {
                 trigger: 'axis',
                 axisPointer: {
@@ -52,35 +55,87 @@ export default class RightTop extends Component {
             ],
             series: []
         };
-        myChart2.setOption(option2);
+        myChart3.setOption(option3);
+        this.getSectionoption();
+    }
+
+    getSectionoption () {
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let sectionoption = [];
+
+        sectionData.map(project => {
+            // 获取正确的项目
+            if (leftkeycode.indexOf(project.No) > -1) {
+                // 获取项目下的标段
+                let sections = project.children;
+                sections.map((section, index) => {
+                    sectionoption.push(
+                        <Option key={section.No} value={section.No}>
+                            {section.Name}
+                        </Option>
+                    );
+                });
+                this.setState({
+                    section: sections && sections[0] && sections[0].No
+                });
+            }
+        });
+        this.setState({
+            sectionoption
+        });
     }
 
     componentDidUpdate (prevProps, prevState) {
-        const { etime, stime } = this.state;
+        const { etime, section, stime } = this.state;
         const { leftkeycode } = this.props;
-        if (
-            leftkeycode !== prevProps.leftkeycode ||
-            etime !== prevState.etime ||
-            stime !== prevState.stime
-        ) {
+        if (leftkeycode !== prevProps.leftkeycode) {
+            this.getSectionoption();
+        }
+        if (section !== prevState.section) {
+            this.query();
+        }
+        if (etime !== prevState.etime || stime !== prevState.stime) {
             this.query();
         }
     }
-
     render () {
-        // todo 各标段种植进度分析
-
+        // todo 各小班种植进度分析
         return (
             <Spin spinning={this.state.loading}>
-                <Cards search={this.search()} title='各标段种植进度分析'>
+                <Cards search={this.search()} title={this.title()}>
                     <div
-                        id='RightTop'
+                        id='BottomLeft'
                         style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>
             </Spin>
         );
     }
+    title () {
+        const { section, sectionoption } = this.state;
+        return (
+            <div>
+                <Select
+                    value={section}
+                    onSelect={this.onsectionchange.bind(this)}
+                    style={{ width: '80px' }}
+                >
+                    {sectionoption}
+                </Select>
+                <span>各小班种植进度分析</span>
+            </div>
+        );
+    }
+    onsectionchange (value) {
+        this.setState({
+            section: value
+        });
+    }
+
     search () {
         return (
             <div>
@@ -109,21 +164,23 @@ export default class RightTop extends Component {
     async query () {
         const {
             actions: {
-                gettreetypeSection
-            },
-            leftkeycode,
-            platform: { tree = {} }
+                gettreetypeSmallClass
+            }
         } = this.props;
-        const { etime } = this.state;
-        let sectionData = (tree && tree.bigTreeList) || [];
+        const { etime, section } = this.state;
+        if (!section) {
+            return;
+        }
         let param = {};
 
-        param.section = leftkeycode;
+        param.section = section;
+        // param.stime = stime;
         param.etime = etime;
         this.setState({ loading: true });
 
-        let rst = await gettreetypeSection({}, param);
-        let units = [];
+        let rst = await gettreetypeSmallClass({}, param);
+
+        let units = ['1小班', '2小班', '3小班', '4小班', '5小班'];
 
         let complete = [];
         let unComplete = [];
@@ -133,29 +190,28 @@ export default class RightTop extends Component {
             rst.map(item => {
                 complete.push(item.Complete);
                 unComplete.push(item.UnComplete);
-                sectionData.map(project => {
-                    // 获取正确的项目
-                    if (leftkeycode.indexOf(project.No) > -1) {
-                        // 获取项目下的标段
-                        let sections = project.children;
-                        sections.map((section, index) => {
-                            if (section.No === item.Label) {
-                                label.push(section.Name);
-                            }
-                        });
-                    }
-                });
+                label.push(item.Label + '号小班');
             });
         }
 
-        let myChart2 = echarts.init(document.getElementById('RightTop'));
-        let options2 = {
+        let myChart3 = echarts.init(document.getElementById('BottomLeft'));
+        let options3 = {
             legend: {
                 data: ['未种植', '已种植']
             },
             xAxis: [
                 {
                     data: label.length > 0 ? label : units
+                }
+            ],
+            grid: {
+                bottom: 50
+            },
+            dataZoom: [
+                {
+                    type: 'inside'
+                }, {
+                    type: 'slider'
                 }
             ],
             series: [
@@ -191,7 +247,7 @@ export default class RightTop extends Component {
                 }
             ]
         };
-        myChart2.setOption(options2);
+        myChart3.setOption(options3);
         this.setState({ loading: false });
     }
 }

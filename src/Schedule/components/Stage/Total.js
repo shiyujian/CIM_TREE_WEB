@@ -230,7 +230,6 @@ class Total extends Component {
                 projectCode = item.No;
             }
         });
-        console.log('projectCode', projectCode);
         return projectCode;
     }
     // 获取当前登陆用户的标段
@@ -248,7 +247,6 @@ class Total extends Component {
         sections = JSON.parse(sections);
         if (sections && sections instanceof Array && sections.length > 0) {
             let section = sections[0];
-            console.log('section', section);
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
@@ -260,11 +258,6 @@ class Total extends Component {
                             // 获取当前标段的名字
                             if (unit.No === section) {
                                 currentSectionName = unit.Name;
-                                console.log(
-                                    'currentSectionNameaaaaaaaaaaaaaaaaa',
-                                    currentSectionName
-                                );
-                                console.log('projectName', projectName);
                             }
                         });
                     }

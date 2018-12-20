@@ -71,16 +71,13 @@ class WeekPlan extends Component {
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = localStorage.getItem('QH_USER_DATA');
         user = JSON.parse(user);
-        console.log('user', user);
 
         let sections = user && user.account && user.account.sections;
-        console.log('sections', sections);
         let currentSectionName = '';
         let projectName = '';
         let section = '';
         if (sections && sections instanceof Array && sections.length > 0) {
             section = sections[0];
-            console.log('section', section);
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
@@ -113,7 +110,6 @@ class WeekPlan extends Component {
         try {
             let reqData = {};
             this.props.form.validateFields((err, values) => {
-                console.log('周计划进度流程信息', values);
                 console.log('err', err);
                 reqData.subject_section__contains = values.sunitproject
                     ? values.sunitproject
@@ -131,10 +127,7 @@ class WeekPlan extends Component {
                 }
             });
 
-            console.log('reqData', reqData);
-
             let tmpData = Object.assign({}, reqData);
-            console.log('tmpData', tmpData);
             let task = await getTaskSchedule(
                 { code: WORKFLOW_CODE.每周进度填报流程 },
                 tmpData
@@ -201,7 +194,6 @@ class WeekPlan extends Component {
         let filterData = [];
         let user = localStorage.getItem('QH_USER_DATA');
         user = JSON.parse(user);
-        console.log('user', user);
         // 是否为业主或管理员
         let permission = getUserIsManager();
         if (permission) {
@@ -473,8 +465,6 @@ class WeekPlan extends Component {
     }
     // 多选按钮
     onSelectChange = (selectedRowKeys, selectedRows) => {
-        console.log('selectedRowKeys', selectedRowKeys);
-        console.log('selectedRows', selectedRows);
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     };
     // 设置开始时间
@@ -536,7 +526,6 @@ class WeekPlan extends Component {
                 date: moment(tmp).format('YYYY-MM-DD')
             });
         }
-        console.log('weekPlanDataSource', weekPlanDataSource);
         this.props.form.setFieldsValue({
             weekTimeDate: moment(stime).format('YYYY-MM-DD') + '~' +
                 moment(etime).format('YYYY-MM-DD')
@@ -588,7 +577,6 @@ class WeekPlan extends Component {
         let postData = {};
 
         me.props.form.validateFields((err, values) => {
-            console.log('表单信息', values);
             console.log('err', err);
             if (!err) {
                 postData.upload_unit = user.account ? user.account.org_code : '';
@@ -733,7 +721,6 @@ class WeekPlan extends Component {
                     return deleteFlow(postdata);
                 });
                 Promise.all(promises).then(rst => {
-                    console.log('rst', rst);
                     // 是否删除失败
                     let errorStatus = false;
                     // 删除失败的顺序码

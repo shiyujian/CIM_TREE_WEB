@@ -54,7 +54,6 @@ export default class ActualModal extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        console.log('treeDatasource', this.state.treeDatasource);
         return (
             <div>
                 <Modal

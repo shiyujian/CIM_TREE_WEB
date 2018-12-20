@@ -39,7 +39,6 @@ export default class WeekPlanSearchInfo extends Component {
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = localStorage.getItem('QH_USER_DATA');
         user = JSON.parse(user);
-        console.log('user', user);
         let sections = user && user.account && user.account.sections;
         let optionArray = [];
         if (sections && sections instanceof Array && sections.length > 0) {

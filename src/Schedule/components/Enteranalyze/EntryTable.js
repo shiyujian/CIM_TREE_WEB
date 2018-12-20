@@ -32,7 +32,6 @@ export default class EntryTable extends Component {
         // 实时种植信息
         let rst = await nowmessage();
         if (rst && rst.content) {
-            console.log(rst.content, 'xionsui');
             this.setState({
                 nowmessagelist: rst.content
             });
@@ -100,7 +99,6 @@ export default class EntryTable extends Component {
                         <SumTotal
                             search={this.searchSum(0)}
                             title='苗木累计进场总数'
-                            title1='Total number of nursery stock'
                         >
                             <div>{amount}</div>
                         </SumTotal>
@@ -109,7 +107,6 @@ export default class EntryTable extends Component {
                         <SumTotal
                             search={this.searchSum(1)}
                             title='苗木今日进场总数'
-                            title1='Total number of nursery stock today'
                         >
                             <div>{this.state.today}</div>
                         </SumTotal>

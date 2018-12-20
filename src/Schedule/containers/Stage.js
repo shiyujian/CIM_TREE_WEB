@@ -69,7 +69,6 @@ export default class Stage extends Component {
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
         }
-        console.log('tree', tree);
         return (
             <div>
                 <DynamicTitle title='进度填报' {...this.props} />

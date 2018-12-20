@@ -66,7 +66,6 @@ export default class PerSearch extends Component {
         let sections = user.sections;
         sections = JSON.parse(sections);
         let roles = await getRoles();
-        console.log('roles', roles);
         if (!(sections && sections instanceof Array && sections.length > 0)) {
             return;
         }
@@ -86,7 +85,6 @@ export default class PerSearch extends Component {
             };
             let results = [];
             let users = await getUsers({}, postdata);
-            console.log('users', users);
             results = results.concat((users && users.results) || []);
             let total = users.count;
             if (total > 20) {

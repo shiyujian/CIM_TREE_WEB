@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Row, Col, Input, Icon, DatePicker, Select } from 'antd';
+import { Row, Col } from 'antd';
 import * as actions from '../store/entry';
-import { PkCodeTree, Cards } from '../components';
+import { PkCodeTree } from '../components';
 import { EntryTable } from '../components/EnterAnalyze';
 import { actions as platformActions } from '_platform/store/global';
 import {
@@ -33,14 +33,7 @@ export default class EnterAnalyze extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            treetypelist: [],
-            treeLists: [],
-            sectionoption: [],
-            leftkeycode: '',
-            data: [],
-            account: '',
-            biaoduan: [],
-            shuzhi: []
+            leftkeycode: ''
         };
     }
 
@@ -67,7 +60,6 @@ export default class EnterAnalyze extends Component {
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
         }
-        console.log('leftkeycode', leftkeycode);
         return (
             <Body>
                 <Main>
@@ -77,7 +69,6 @@ export default class EnterAnalyze extends Component {
                             treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
-                            // onExpand={this.onExpand.bind(this)}
                         />
                     </Sidebar>
                     <Content>
@@ -96,16 +87,20 @@ export default class EnterAnalyze extends Component {
         );
     }
     // 树选择, 重新获取: 标段、树种并置空
-    onSelect (value = []) {
-        console.log('onSelect  value', value);
-        let keycode = value[0] || '';
-        const {
-            actions: { setkeycode }
-        } = this.props;
-        setkeycode(keycode);
-        this.setState({
-            leftkeycode: keycode,
-            resetkey: ++this.state.resetkey
-        });
+    onSelect (keys, info) {
+        try {
+            let keycode = keys[0] || '';
+            const {
+                actions: { setkeycode }
+            } = this.props;
+            if (keycode) {
+                setkeycode(keycode);
+                this.setState({
+                    leftkeycode: keycode
+                });
+            }
+        } catch (e) {
+            console.log('onSelect', e);
+        }
     }
 }

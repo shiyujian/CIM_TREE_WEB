@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { Row, Col, DatePicker, Select, Spin } from 'antd';
 import { Cards } from '../../components';
 import {
-    TREETYPENO,
-    ECHARTSCOLOR
+    TREETYPENO
 } from '../../../_platform/api';
 import moment from 'moment';
 var echarts = require('echarts');
@@ -33,24 +32,8 @@ export default class Right extends Component {
         };
     }
 
-    componentDidUpdate (prevProps, prevState) {
-        const { stime, etime, selectTreeType, treeSelect } = this.state;
-        const { leftkeycode } = this.props;
-        if (
-            stime != prevState.stime ||
-            etime != prevState.etime ||
-            selectTreeType != prevState.selectTreeType ||
-            treeSelect != prevState.treeSelect
-        ) {
-            this.search();
-        }
-        if (leftkeycode != prevProps.leftkeycode) {
-            this.search();
-        }
-    }
-
     componentDidMount () {
-        let myChart2 = echarts.init(document.getElementById('stock'));
+        let myChart2 = echarts.init(document.getElementById('Right'));
         let options2 = {
             tooltip: {
                 trigger: 'axis',
@@ -68,7 +51,8 @@ export default class Right extends Component {
                 containLabel: true
             },
             legend: {
-                left: 'right'
+                left: 'right',
+                type: 'scroll'
             },
             xAxis: [
                 {
@@ -95,7 +79,6 @@ export default class Right extends Component {
         } = this.props;
         // 获取全部树种信息
         gettreeevery().then(rst => {
-            console.log('gettreeeveryrst', rst);
             if (rst && rst instanceof Array) {
                 this.setState({
                     treetypeAll: rst,
@@ -112,169 +95,32 @@ export default class Right extends Component {
             </Option>
         );
         TREETYPENO.map(tree => {
-            console.log('tree', tree);
             treetyoption.push(
                 <Option key={tree.name} value={tree.id.toString()}>
                     {tree.name}
                 </Option>
             );
         });
-        console.log('treetyoption', treetyoption);
 
         this.setState({
             treetyoption
         });
-        this.search();
     }
 
-    // 进场强度分析
-    async search (no) {
-        const {
-            leftkeycode,
-            platform: { tree = {} },
-            actions: { gettreetype }
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        const {
-            stime,
-            etime,
-            selectTreeType,
-            treeSelect
-        } = this.state;
-        let postdata = {};
-
-        postdata.no = leftkeycode;
-        postdata.stime = stime;
-        postdata.etime = etime;
-        let treetype = [];
-        if (treeSelect === '全部') {
-            selectTreeType.map(rst => {
-                treetype.push(rst.ID);
-            });
-        } else {
-            treetype.push(treeSelect);
-            postdata.treetype = treetype;
+    componentDidUpdate (prevProps, prevState) {
+        const { stime, etime, selectTreeType, treeSelect } = this.state;
+        const { leftkeycode } = this.props;
+        if (
+            stime !== prevState.stime ||
+            etime !== prevState.etime ||
+            selectTreeType !== prevState.selectTreeType ||
+            treeSelect !== prevState.treeSelect
+        ) {
+            this.query();
         }
-
-        this.setState({
-            loading: true
-        });
-
-        let rst = await gettreetype({}, postdata);
-        console.log('wwwwwwwwwrst', rst);
-        let total = [];
-        let data = [];
-        let gpshtnum = [];
-        let times = [];
-        let time = [];
-        let legend = ['总数'];
-
-        if (rst && rst instanceof Array) {
-            // 将 Time 单独列为一个数组
-            for (let i = 0; i < rst.length; i++) {
-                if (rst[i].Section) {
-                    time.push(rst[i].Time);
-                }
-            }
-            console.log('time', time);
-            // 时间数组去重
-            times = [...new Set(time)];
-            console.log('times', times);
-
-            if (rst && rst instanceof Array) {
-                sectionData.map(project => {
-                    // 获取正确的项目
-                    if (leftkeycode.indexOf(project.No) > -1) {
-                        // 获取项目下的标段
-                        let sections = project.children;
-                        // 将各个标段的数据设置为0
-                        sections.map((section, index) => {
-                            // 定义一个二维数组，分为多个标段
-                            gpshtnum[index] = new Array();
-                            data[index] = new Array();
-                            legend.push(section.Name);
-                        });
-
-                        rst.map(item => {
-                            if (item && item.Section) {
-                                sections.map((section, index) => {
-                                    if (item.Section === section.No) {
-                                        gpshtnum[index].push(item);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-
-            console.log('gpshtnum', gpshtnum);
-            times.map((time, index) => {
-                data.map(sectionData => {
-                    sectionData[index] = 0;
-                });
-                console.log('sectionData', data);
-                gpshtnum.map((test, i) => {
-                    test.map((arr, a) => {
-                        if (moment(arr.Time).format('YYYY/MM/DD') === time) {
-                            data[i][index] = data[i][index] + arr.Num + 0;
-                        }
-                    });
-                });
-            });
-            for (let i = 0; i < times.length; i++) {
-                total[i] = 0;
-                data.map(sectionData => {
-                    total[i] = total[i] + sectionData[i];
-                });
-            }
-            console.log('total', total);
-            console.log('data', data);
+        if (leftkeycode !== prevProps.leftkeycode) {
+            this.query();
         }
-
-        let series = [
-            {
-                name: '总数',
-                type: 'bar',
-                data: total,
-                barWidth: '25%',
-                itemStyle: {
-                    normal: {
-                        color: '#02e5cd',
-                        barBorderRadius: [50, 50, 50, 50]
-                    }
-                }
-            }
-        ];
-        data.map((sectionData, index) => {
-            series.push({
-                name: legend[index + 1],
-                type: 'line',
-                data: sectionData,
-                itemStyle: {
-                    normal: {
-                        color: ECHARTSCOLOR[index]
-                    }
-                }
-            });
-        });
-
-        let myChart2 = echarts.init(document.getElementById('stock'));
-        let options2 = {
-            legend: {
-                data: legend
-            },
-            xAxis: [
-                {
-                    data: times
-                }
-            ],
-            series: series
-        };
-        myChart2.setOption(options2);
-        this.setState({
-            loading: false
-        });
     }
 
     render () {
@@ -283,7 +129,7 @@ export default class Right extends Component {
                 <Spin spinning={this.state.loading}>
                     <Cards search={this.searchRender()} title={`进场强度分析`}>
                         <div
-                            id='stock'
+                            id='Right'
                             style={{ width: '100%', height: '400px' }}
                         />
                     </Cards>
@@ -294,10 +140,7 @@ export default class Right extends Component {
 
     searchRender () {
         const {
-            treetypename,
-            treety,
-            treetyoption = [],
-            treetypeAll = []
+            treetyoption = []
         } = this.state;
         let treetypeoption = this.setTreeType();
         return (
@@ -374,7 +217,6 @@ export default class Right extends Component {
     // 选择树种类型
     ontypechange (value) {
         const { treetypeAll = [] } = this.state;
-        console.log('value', value);
         if (value === '全部') {
             this.setState({
                 selectTreeType: treetypeAll,
@@ -386,13 +228,10 @@ export default class Right extends Component {
             treetypeAll.map(tree => {
                 // 获取树种cdoe的首个数字，找到对应的类型
                 let code = tree.TreeTypeNo.substr(0, 1);
-                console.log('code', code);
                 if (code === value) {
-                    console.log('treetreetree', tree);
                     selectTreeType.push(tree);
                 }
             });
-            console.log('selectTreeType', selectTreeType);
             this.setState(
                 {
                     selectTreeType,
@@ -400,7 +239,7 @@ export default class Right extends Component {
                     treeSelect: '全部'
                 },
                 () => {
-                    this.search();
+                    this.query();
                 }
             );
         }
@@ -422,6 +261,145 @@ export default class Right extends Component {
             etime: value[1]
                 ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
                 : ''
+        });
+    }
+
+    // 进场强度分析
+    async query (no) {
+        const {
+            leftkeycode,
+            platform: { tree = {} },
+            actions: { gettreetype }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
+        const {
+            stime,
+            etime,
+            selectTreeType,
+            treeSelect
+        } = this.state;
+        let postdata = {};
+
+        postdata.no = leftkeycode;
+        postdata.stime = stime;
+        postdata.etime = etime;
+        let treetype = [];
+        if (treeSelect === '全部') {
+            selectTreeType.map(rst => {
+                treetype.push(rst.ID);
+            });
+        } else {
+            treetype.push(treeSelect);
+            postdata.treetype = treetype;
+        }
+
+        this.setState({
+            loading: true
+        });
+
+        let rst = await gettreetype({}, postdata);
+        let total = [];
+        let data = [];
+        let gpshtnum = [];
+        let times = [];
+        let time = [];
+        let legend = ['总数'];
+
+        if (rst && rst instanceof Array) {
+            // 将 Time 单独列为一个数组
+            for (let i = 0; i < rst.length; i++) {
+                if (rst[i].Section) {
+                    time.push(rst[i].Time);
+                }
+            }
+            // 时间数组去重
+            times = [...new Set(time)];
+
+            if (rst && rst instanceof Array) {
+                sectionData.map(project => {
+                    // 获取正确的项目
+                    if (leftkeycode.indexOf(project.No) > -1) {
+                        // 获取项目下的标段
+                        let sections = project.children;
+                        // 将各个标段的数据设置为0
+                        sections.map((section, index) => {
+                            // 定义一个二维数组，分为多个标段
+                            gpshtnum[index] = new Array();
+                            data[index] = new Array();
+                            legend.push(section.Name);
+                        });
+
+                        rst.map(item => {
+                            if (item && item.Section) {
+                                sections.map((section, index) => {
+                                    if (item.Section === section.No) {
+                                        gpshtnum[index].push(item);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            times.map((time, index) => {
+                data.map(sectionData => {
+                    sectionData[index] = 0;
+                });
+                gpshtnum.map((test, i) => {
+                    test.map((arr, a) => {
+                        if (moment(arr.Time).format('YYYY/MM/DD') === time) {
+                            data[i][index] = data[i][index] + arr.Num + 0;
+                        }
+                    });
+                });
+            });
+            for (let i = 0; i < times.length; i++) {
+                total[i] = 0;
+                data.map(sectionData => {
+                    total[i] = total[i] + sectionData[i];
+                });
+            }
+        }
+
+        let series = [
+            {
+                name: '总数',
+                type: 'bar',
+                data: total,
+                barWidth: '25%',
+                itemStyle: {
+                    normal: {
+                        color: '#02e5cd',
+                        barBorderRadius: [50, 50, 50, 50]
+                    }
+                }
+            }
+        ];
+        data.map((sectionData, index) => {
+            series.push({
+                name: legend[index + 1],
+                type: 'line',
+                data: sectionData
+            });
+        });
+
+        let myChart2 = echarts.init(document.getElementById('Right'));
+        let options2 = {
+            legend: {
+                data: legend,
+                type: 'scroll'
+            },
+            xAxis: [
+                {
+                    data: times
+                }
+            ],
+            series: series
+        };
+        myChart2.setOption(options2);
+        this.setState({
+            loading: false
         });
     }
 }

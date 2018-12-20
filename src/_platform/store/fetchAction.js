@@ -22,7 +22,7 @@ const headers = {
 };
 
 export const forestFetchAction = (url, [successAction, failAction] = [], method = 'GET', defaultParams = {}) => {
-    method = method.toUpperCase();
+    method = method.toUpperCase(); // 将字符串改为大写
     return (pathnames = {}, data = {}, refresh = true) => {
         data = data instanceof Array ? data : Object.assign({}, defaultParams, data);
         let forestLoginUserData = window.localStorage.getItem('FOREST_LOGIN_USER_DATA');
@@ -56,7 +56,7 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                 }
                 return fetch(u, params)
                     .then(response => {
-                        if (response && response.status === 400) {
+                        if (response && response.status === 403) {
                             let href = window.location.href;
                             let reg = new RegExp(/(\w+):\/\/([^/:]+)(:\d*)?/);
                             let result = href.match(reg);

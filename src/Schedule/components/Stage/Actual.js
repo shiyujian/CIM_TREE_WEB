@@ -66,7 +66,6 @@ class Actual extends Component {
                 projectCode = item.No;
             }
         });
-        console.log('projectCode', projectCode);
         return projectCode;
     }
     // 获取当前登陆用户的标段
@@ -77,16 +76,13 @@ class Actual extends Component {
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = localStorage.getItem('QH_USER_DATA');
         user = JSON.parse(user);
-        console.log('user', user);
 
         let sections = user && user.account && user.account.sections;
-        console.log('sections', sections);
         let currentSectionName = '';
         let projectName = '';
         let section = '';
         if (sections && sections instanceof Array && sections.length > 0) {
             section = sections[0];
-            console.log('section', section);
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
@@ -118,7 +114,6 @@ class Actual extends Component {
         } = this.props;
         let reqData = {};
         this.props.form.validateFields((err, values) => {
-            console.log('日实际进度流程信息', values);
             console.log('err', err);
             reqData.subject_section__contains = values.sunitproject
                 ? values.sunitproject
@@ -135,8 +130,6 @@ class Actual extends Component {
                     : '';
             }
         });
-
-        console.log('reqData', reqData);
 
         let tmpData = Object.assign({}, reqData);
 
@@ -202,7 +195,6 @@ class Actual extends Component {
         let filterData = [];
         let user = localStorage.getItem('QH_USER_DATA');
         user = JSON.parse(user);
-        console.log('user', user);
         // 是否为业主或管理员
         let permission = getUserIsManager();
         if (permission) {
@@ -427,8 +419,6 @@ class Actual extends Component {
     }
     // 多选
     onSelectChange = (selectedRowKeys, selectedRows) => {
-        console.log('selectedRowKeys', selectedRowKeys);
-        console.log('selectedRows', selectedRows);
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     };
     // 新增按钮
@@ -444,8 +434,6 @@ class Actual extends Component {
                 typeList: item.typeList || 0
             });
         });
-        console.log('SCHEDULRPROJECT', SCHEDULRPROJECT);
-        console.log('treedata', treedata);
         this.setState({
             visible: true,
             actualDataSource: treedata
@@ -510,7 +498,6 @@ class Actual extends Component {
         let postData = {};
 
         me.props.form.validateFields((err, values) => {
-            console.log('表单信息', values);
             if (!err) {
                 postData.upload_unit = user.account ? user.account.org_code : '';
                 postData.type = '每日实际进度';
@@ -650,7 +637,6 @@ class Actual extends Component {
                     return deleteFlow(postdata);
                 });
                 Promise.all(promises).then(rst => {
-                    console.log('rst', rst);
                     // 是否删除失败
                     let errorStatus = false;
                     // 删除失败的顺序码

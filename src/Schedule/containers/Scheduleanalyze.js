@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Select, Row, Col } from 'antd';
+import { Row, Col } from 'antd';
 import * as actions from '../store/entry';
 import { PkCodeTree } from '../components';
 import { ScheduleTable } from '../components/ScheduleAnalyze';
@@ -14,10 +14,13 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import LeftTop from '../components/ScheduleAnalyze/LeftTop';
+import BottomLeft from '../components/ScheduleAnalyze/BottomLeft';
 import RightTop from '../components/ScheduleAnalyze/RightTop';
-import MiddleTop from '../components/ScheduleAnalyze/MiddleTop';
-import Bottom from '../components/ScheduleAnalyze/Bottom';
-import { getDefaultProject } from '_platform/auth';
+import BottomRight from '../components/ScheduleAnalyze/BottomRight';
+import {
+    getAreaTreeData,
+    getDefaultProject
+} from '_platform/auth';
 
 @connect(
     state => {
@@ -35,45 +38,62 @@ export default class ScheduleAnalyze extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            treeLists: [],
-            sectionoption: [],
-            smallclassoption: [],
             leftkeycode: '',
-            section: '',
-            smallclass: '',
-            data: [],
-            account: '',
-            biaoduan: [],
-            shuzhi: []
+            sectionsData: []
         };
     }
 
     async componentDidMount () {
         const {
-            actions: { getTreeNodeList },
+            actions: {
+                getTreeNodeList,
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
+            },
             platform: { tree = {} }
         } = this.props;
-        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
-            await getTreeNodeList();
+        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+            let totalThinClass = data.totalThinClass || [];
+            let projectList = data.projectList || [];
+            // 获取所有的小班数据，用来计算养护任务的位置
+            await getTotalThinClass(totalThinClass);
+            // 区域地块树
+            await getThinClassTree(projectList);
         }
         let defaultProject = await getDefaultProject();
         if (defaultProject) {
             this.onSelect([defaultProject]);
         }
     }
-    // 树选择, 重新获取: 标段、树种并置空
-    onSelect (value = []) {
-        console.log('onSelect  value', value);
-        let keycode = value[0] || '';
+    // 树选择, 重新获取: 标段、小班、细班、树种并置空
+    onSelect (keys, info) {
         const {
-            actions: { setkeycode }
+            platform: { tree = {} }
         } = this.props;
-        setkeycode(keycode);
-        console.log('ScheduleanalyzeScheduleanalyze', keycode);
-        this.setState({
-            leftkeycode: keycode,
-            resetkey: ++this.state.resetkey
-        });
+        try {
+            let treeList = tree.thinClassTree;
+            let keycode = keys[0] || '';
+            const {
+                actions: { setkeycode }
+            } = this.props;
+            let sectionsData = [];
+            if (keycode) {
+                treeList.map((treeData) => {
+                    if (keycode === treeData.No) {
+                        sectionsData = treeData.children;
+                    }
+                });
+                setkeycode(keycode);
+                this.setState({
+                    leftkeycode: keycode,
+                    sectionsData
+                });
+            }
+        } catch (e) {
+            console.log('onSelect', e);
+        }
     }
 
     render () {
@@ -84,10 +104,9 @@ export default class ScheduleAnalyze extends Component {
             platform: { tree = {} }
         } = this.props;
         let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
+        if (tree.thinClassTree) {
+            treeList = tree.thinClassTree;
         }
-        console.log('tree', tree);
         return (
             <Body>
                 <Main>
@@ -97,25 +116,24 @@ export default class ScheduleAnalyze extends Component {
                             treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
-                            // onExpand={this.onExpand.bind(this)}
                         />
                     </Sidebar>
                     <Content>
                         <ScheduleTable {...this.props} {...this.state} />
-                        <Row gutter={10} style={{ margin: '10px 5px' }}>
-                            <Col span={8}>
+                        <Row style={{ margin: '10px 5px' }}>
+                            <Col span={12}>
                                 <LeftTop {...this.props} {...this.state} />
                             </Col>
-                            <Col span={8}>
-                                <MiddleTop {...this.props} {...this.state} />
-                            </Col>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <RightTop {...this.props} {...this.state} />
                             </Col>
                         </Row>
-                        <Row gutter={10} style={{ margin: '10px 5px' }}>
-                            <Col span={24}>
-                                <Bottom {...this.props} {...this.state} />
+                        <Row style={{ margin: '10px 5px' }}>
+                            <Col span={12}>
+                                <BottomLeft {...this.props} {...this.state} />
+                            </Col>
+                            <Col span={12}>
+                                <BottomRight {...this.props} {...this.state} />
                             </Col>
                         </Row>
                     </Content>

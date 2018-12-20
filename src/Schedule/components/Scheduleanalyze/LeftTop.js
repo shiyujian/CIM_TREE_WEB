@@ -1,15 +1,8 @@
 import React, { Component } from 'react';
-import Blade from '_platform/components/panels/Blade';
 import echarts from 'echarts';
-import { Select, Row, Col, Radio, DatePicker, Spin } from 'antd';
-import { Cards, SumTotal, DateImg } from '../../components';
-import {
-    ECHARTSCOLOR
-} from '../../../_platform/api';
+import { DatePicker, Spin } from 'antd';
+import { Cards } from '../../components';
 import moment from 'moment';
-const RadioGroup = Radio.Group;
-const Option = Select.Option;
-const RadioButton = Radio.Button;
 const { RangePicker } = DatePicker;
 
 export default class LeftTop extends Component {
@@ -27,7 +20,6 @@ export default class LeftTop extends Component {
 
     componentDidMount () {
         var myChart1 = echarts.init(document.getElementById('leftTop'));
-        const that = this;
         let option1 = {
             tooltip: {
                 trigger: 'axis',
@@ -81,165 +73,21 @@ export default class LeftTop extends Component {
             series: []
         };
         myChart1.setOption(option1);
-        this.query();
     }
 
     componentDidUpdate (prevProps, prevState) {
         const { stime, etime } = this.state;
         const { leftkeycode } = this.props;
         try {
-            if (
-                leftkeycode.split('-')[0] != prevProps.leftkeycode.split('-')[0]
-            ) {
+            if (leftkeycode !== prevProps.leftkeycode) {
                 this.query();
             }
         } catch (e) {
             console.log(e);
         }
-        if (stime != prevState.stime || etime != prevState.etime) {
+        if (stime !== prevState.stime || etime !== prevState.etime) {
             this.query();
         }
-    }
-
-    async query () {
-        const {
-            actions: {
-                gettreetypeAll
-            },
-            leftkeycode,
-            sectionoption,
-            platform: { tree = {} }
-        } = this.props;
-        const { stime, etime } = this.state;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let param = {};
-        let no = '';
-        if (leftkeycode) {
-            try {
-                no = leftkeycode.split('-')[0];
-            } catch (e) {
-                console.log(e);
-            }
-        }
-        param.no = no;
-        param.stime = stime;
-        param.etime = etime;
-
-        this.setState({ loading: true });
-        let rst = await gettreetypeAll({}, param);
-        console.log('leftkeycodeleftkeycodeleftkeycode', leftkeycode);
-        console.log('LeftTopLeftTopLeftTop', rst);
-
-        let data = [];
-        let gpshtnum = [];
-        let times = [];
-        let time = [];
-        let total = [];
-        let legend = ['总数'];
-
-        if (rst && rst instanceof Array) {
-            // 将 Time 单独列为一个数组
-            for (let i = 0; i < rst.length; i++) {
-                if (rst[i].Section) {
-                    time.push(rst[i].Time);
-                }
-            }
-            console.log('time', time);
-            // 时间数组去重
-            times = [...new Set(time)];
-            console.log('times', times);
-
-            if (rst && rst instanceof Array) {
-                sectionData.map(project => {
-                    // 获取正确的项目
-                    if (leftkeycode.indexOf(project.No) > -1) {
-                        // 获取项目下的标段
-                        let sections = project.children;
-                        // 将各个标段的数据设置为0
-                        sections.map((section, index) => {
-                            // 定义一个二维数组，分为多个标段
-                            gpshtnum[index] = new Array();
-                            data[index] = new Array();
-                            legend.push(section.Name);
-                        });
-
-                        rst.map(item => {
-                            if (item && item.Section) {
-                                sections.map((section, index) => {
-                                    if (item.Section === section.No) {
-                                        gpshtnum[index].push(item);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-            console.log('gpshtnum', gpshtnum);
-
-            times.map((time, index) => {
-                data.map(sectionData => {
-                    sectionData[index] = 0;
-                });
-                console.log('sectionData', data);
-                gpshtnum.map((test, i) => {
-                    test.map((arr, a) => {
-                        if (moment(arr.Time).format('YYYY/MM/DD') === time) {
-                            data[i][index] = data[i][index] + arr.Num + 0;
-                        }
-                    });
-                });
-            });
-            for (let i = 0; i < times.length; i++) {
-                total[i] = 0;
-                data.map(sectionData => {
-                    total[i] = total[i] + sectionData[i];
-                });
-            }
-            console.log('total', total);
-            console.log('data', data);
-        }
-
-        let myChart1 = echarts.init(document.getElementById('leftTop'));
-        let series = [
-            {
-                name: '总数',
-                type: 'bar',
-                data: total,
-                barWidth: '25%',
-                itemStyle: {
-                    normal: {
-                        color: '#02e5cd',
-                        barBorderRadius: [50, 50, 50, 50]
-                    }
-                }
-            }
-        ];
-        data.map((sectionData, index) => {
-            series.push({
-                name: legend[index + 1],
-                type: 'line',
-                data: sectionData,
-                itemStyle: {
-                    normal: {
-                        color: ECHARTSCOLOR[index]
-                    }
-                }
-            });
-        });
-        let options1 = {
-            legend: {
-                data: legend
-            },
-            xAxis: [
-                {
-                    data: times
-                }
-            ],
-            series: series
-        };
-        myChart1.setOption(options1);
-        this.setState({ loading: false });
     }
 
     render () {
@@ -250,7 +98,7 @@ export default class LeftTop extends Component {
                 <Cards search={this.search(1)} title='苗木种植强度分析'>
                     <div
                         id='leftTop'
-                        style={{ width: '100%', height: '260px' }}
+                        style={{ width: '100%', height: '400px' }}
                     />
                 </Cards>
             </Spin>
@@ -289,5 +137,133 @@ export default class LeftTop extends Component {
                 ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
                 : ''
         });
+    }
+
+    async query () {
+        const {
+            actions: {
+                gettreetypeAll
+            },
+            leftkeycode,
+            platform: { tree = {} }
+        } = this.props;
+        const { stime, etime } = this.state;
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let param = {};
+        let no = '';
+        if (leftkeycode) {
+            try {
+                no = leftkeycode.split('-')[0];
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        param.no = no;
+        param.stime = stime;
+        param.etime = etime;
+
+        this.setState({ loading: true });
+        let rst = await gettreetypeAll({}, param);
+
+        let data = [];
+        let gpshtnum = [];
+        let times = [];
+        let time = [];
+        let total = [];
+        let legend = ['总数'];
+
+        if (rst && rst instanceof Array) {
+            // 将 Time 单独列为一个数组
+            for (let i = 0; i < rst.length; i++) {
+                if (rst[i].Section) {
+                    time.push(rst[i].Time);
+                }
+            }
+            // 时间数组去重
+            times = [...new Set(time)];
+
+            if (rst && rst instanceof Array) {
+                sectionData.map(project => {
+                    // 获取正确的项目
+                    if (leftkeycode.indexOf(project.No) > -1) {
+                        // 获取项目下的标段
+                        let sections = project.children;
+                        // 将各个标段的数据设置为0
+                        sections.map((section, index) => {
+                            // 定义一个二维数组，分为多个标段
+                            gpshtnum[index] = new Array();
+                            data[index] = new Array();
+                            legend.push(section.Name);
+                        });
+
+                        rst.map(item => {
+                            if (item && item.Section) {
+                                sections.map((section, index) => {
+                                    if (item.Section === section.No) {
+                                        gpshtnum[index].push(item);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            times.map((time, index) => {
+                data.map(sectionData => {
+                    sectionData[index] = 0;
+                });
+                gpshtnum.map((test, i) => {
+                    test.map((arr, a) => {
+                        if (moment(arr.Time).format('YYYY/MM/DD') === time) {
+                            data[i][index] = data[i][index] + arr.Num + 0;
+                        }
+                    });
+                });
+            });
+            for (let i = 0; i < times.length; i++) {
+                total[i] = 0;
+                data.map(sectionData => {
+                    total[i] = total[i] + sectionData[i];
+                });
+            }
+        }
+
+        let myChart1 = echarts.init(document.getElementById('leftTop'));
+        let series = [
+            {
+                name: '总数',
+                type: 'bar',
+                data: total,
+                barWidth: '25%',
+                itemStyle: {
+                    normal: {
+                        color: '#02e5cd',
+                        barBorderRadius: [50, 50, 50, 50]
+                    }
+                }
+            }
+        ];
+        data.map((sectionData, index) => {
+            series.push({
+                name: legend[index + 1],
+                type: 'line',
+                data: sectionData
+            });
+        });
+        let options1 = {
+            legend: {
+                data: legend,
+                type: 'scroll'
+            },
+            xAxis: [
+                {
+                    data: times
+                }
+            ],
+            series: series
+        };
+        myChart1.setOption(options1);
+        this.setState({ loading: false });
     }
 }

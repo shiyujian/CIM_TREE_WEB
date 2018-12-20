@@ -84,7 +84,6 @@ export default class ScheduleDisplay extends Component {
     setSectionOption (rst) {
         let sectionOptions = [];
         try {
-            console.log('rst', rst);
             if (rst instanceof Array) {
                 rst.map(sec => {
                     sectionOptions.push(
