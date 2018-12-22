@@ -115,8 +115,6 @@ export default class DataStatis extends Component {
         if (tree.thinClassTree) {
             treeList = tree.thinClassTree;
         }
-        console.log('treeList', treeList);
-        console.log('leftkeycode', leftkeycode);
         return (
             <Body>
                 <Main>
@@ -172,7 +170,6 @@ export default class DataStatis extends Component {
 
                 // 标段
                 let sections = JSON.parse(user.sections);
-                console.log('sections', sections);
                 let permission = getUserIsManager();
                 if (permission) {
                 // 是admin或者业主

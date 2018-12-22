@@ -29,11 +29,11 @@ export default class DataStatisTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            section: '',
-            bigType: '',
-            treetype: '',
-            smallclass: '',
-            thinclass: '',
+            sectionSearch: '',
+            bigTypeSearch: '',
+            treetypeSearch: '',
+            smallclassSearch: '',
+            thinclassSearch: '',
             treetypename: '',
             treePlanting: '',
             locationStat: '',
@@ -62,10 +62,10 @@ export default class DataStatisTable extends Component {
             typeoption
         } = this.props;
         const {
-            section,
-            smallclass,
-            thinclass,
-            bigType,
+            sectionSearch,
+            smallclassSearch,
+            thinclassSearch,
+            bigTypeSearch,
             treetypename,
             treeTypeDisplayTable
         } = this.state;
@@ -82,7 +82,7 @@ export default class DataStatisTable extends Component {
                                         allowClear
                                         className='forest-forestcalcw4'
                                         defaultValue='全部'
-                                        value={section}
+                                        value={sectionSearch}
                                         onChange={this.onSectionChange.bind(this)}
                                     >
                                         {sectionoption}
@@ -94,7 +94,7 @@ export default class DataStatisTable extends Component {
                                         allowClear
                                         className='forest-forestcalcw4'
                                         defaultValue='全部'
-                                        value={smallclass}
+                                        value={smallclassSearch}
                                         onChange={this.onSmallClassChange.bind(this)}
                                     >
                                         {smallclassoption}
@@ -106,7 +106,7 @@ export default class DataStatisTable extends Component {
                                         allowClear
                                         className='forest-forestcalcw4'
                                         defaultValue='全部'
-                                        value={thinclass}
+                                        value={thinclassSearch}
                                         onChange={this.onThinClassChange.bind(this)}
                                     >
                                         {thinclassoption}
@@ -118,7 +118,7 @@ export default class DataStatisTable extends Component {
                                         allowClear
                                         className='forest-forestcalcw4'
                                         defaultValue='全部'
-                                        value={bigType}
+                                        value={bigTypeSearch}
                                         onChange={this.onTypeChange.bind(this)}
                                     >
                                         {typeoption}
@@ -250,9 +250,9 @@ export default class DataStatisTable extends Component {
         const { sectionSelect } = this.props;
         sectionSelect(value || '');
         this.setState({
-            section: value || '',
-            smallclass: '',
-            thinclass: ''
+            sectionSearch: value || '',
+            smallclassSearch: '',
+            thinclassSearch: ''
         });
     }
 
@@ -260,8 +260,8 @@ export default class DataStatisTable extends Component {
         const { smallClassSelect } = this.props;
         smallClassSelect(value);
         this.setState({
-            smallclass: value || '',
-            thinclass: ''
+            smallclassSearch: value || '',
+            thinclassSearch: ''
         });
     }
 
@@ -269,39 +269,26 @@ export default class DataStatisTable extends Component {
         const { thinClassSelect } = this.props;
         thinClassSelect(value);
         this.setState({
-            thinclass: value || ''
+            thinclassSearch: value || ''
         });
     }
 
     onTypeChange (value) {
         const { typeselect } = this.props;
         typeselect(value || '');
-        this.setState({ bigType: value || '', treetype: '', treetypename: '' });
+        this.setState({ bigTypeSearch: value || '', treetypeSearch: '', treetypename: '' });
     }
 
     onTreeTypeChange (value) {
-        this.setState({ treetype: value, treetypename: value });
-    }
-
-    datepick (value) {
-        this.setState({
-            stime: value[0]
-                ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
-            etime: value[1]
-                ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
-                : ''
-        });
+        this.setState({ treetypeSearch: value, treetypename: value });
     }
 
     resetinput () {
         this.setState({
-            section: '',
-            thinclass: '',
-            smallclass: '',
-            treetype: ''
+            sectionSearch: '',
+            thinclassSearch: '',
+            smallclassSearch: '',
+            treetypeSearch: ''
         }, () => {
             this.query();
         });
@@ -309,10 +296,10 @@ export default class DataStatisTable extends Component {
 
     query = () => {
         const {
-            section = '',
-            treetype = '',
-            thinclass = '',
-            smallclass = ''
+            sectionSearch = '',
+            treetypeSearch = '',
+            thinclassSearch = '',
+            smallclassSearch = ''
         } = this.state;
         const {
             actions: {
@@ -331,11 +318,11 @@ export default class DataStatisTable extends Component {
                 return;
             }
             let no = '';
-            if (thinclass) {
-                let arr = thinclass.split('-');
+            if (thinclassSearch) {
+                let arr = thinclassSearch.split('-');
                 no = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
-            } else if (smallclass) {
-                let arr = smallclass.split('-');
+            } else if (smallclassSearch) {
+                let arr = smallclassSearch.split('-');
                 no = arr[0] + '-' + arr[1] + '-' + arr[3];
             } else if (leftkeycode) {
                 no = leftkeycode;
@@ -343,8 +330,8 @@ export default class DataStatisTable extends Component {
 
             let postdata = {
                 no: no,
-                section,
-                treetype
+                section: sectionSearch,
+                treetype: treetypeSearch
             };
             this.setState({
                 queryTime: moment().unix()
@@ -385,7 +372,6 @@ export default class DataStatisTable extends Component {
         const {
             statByTreetype
         } = this.state;
-        console.log('statByTreetype', statByTreetype);
         let tblData = [];
         statByTreetype.sort(function (a, b) {
             if (a.Num > b.Num) {
@@ -403,23 +389,17 @@ export default class DataStatisTable extends Component {
             tblData.push(obj);
         });
 
-        console.log('tblData', tblData);
         let _headers = ['树种', '数量'];
         let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('headers', headers);
         let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
             .reduce((prev, next) => prev.concat(next))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('testttt', testttt);
         let output = Object.assign({}, headers, testttt);
-        console.log('output', output);
         // 获取所有单元格的位置
         let outputPos = Object.keys(output);
-        console.log('outputPos', outputPos);
         // 计算出范围
         let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-        console.log('ref', ref);
         // 构建 workbook 对象
         let wb = {
             SheetNames: ['mySheet'],

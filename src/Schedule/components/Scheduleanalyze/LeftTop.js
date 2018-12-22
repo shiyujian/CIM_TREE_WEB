@@ -76,7 +76,6 @@ export default class LeftTop extends Component {
     }
 
     componentDidUpdate (prevProps, prevState) {
-        const { stime, etime } = this.state;
         const { leftkeycode } = this.props;
         try {
             if (leftkeycode !== prevProps.leftkeycode) {
@@ -84,9 +83,6 @@ export default class LeftTop extends Component {
             }
         } catch (e) {
             console.log(e);
-        }
-        if (stime !== prevState.stime || etime !== prevState.etime) {
-            this.query();
         }
     }
 
@@ -130,12 +126,12 @@ export default class LeftTop extends Component {
         this.setState({
             stime: value[0]
                 ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
+                : '',
             etime: value[1]
                 ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
                 : ''
+        }, () => {
+            this.query();
         });
     }
 

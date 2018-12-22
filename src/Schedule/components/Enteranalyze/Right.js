@@ -13,16 +13,13 @@ export default class Right extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            // 树种的list
-            selectTreeType: [],
             // 所有的树种类型
-            treetypeAll: [],
+            treeTypeAll: [],
+            treeTypeOption: [],
             // 树类型option数组
-            treetyoption: [],
-            // 选择树种类型的值
-            treeTypeSelect: '全部',
+            bigTypeOption: [],
             // 选择的树种的值
-            treeSelect: '全部',
+            treeTypeSelect: '',
             section: '',
             stime: moment()
                 .subtract(10, 'days')
@@ -81,21 +78,20 @@ export default class Right extends Component {
         gettreeevery().then(rst => {
             if (rst && rst instanceof Array) {
                 this.setState({
-                    treetypeAll: rst,
-                    selectTreeType: rst
+                    treeTypeAll: rst
                 });
             }
         });
 
         // 树木类型
-        let treetyoption = [];
-        treetyoption.push(
+        let bigTypeOption = [];
+        bigTypeOption.push(
             <Option key={'全部'} value={'全部'}>
                 全部
             </Option>
         );
         TREETYPENO.map(tree => {
-            treetyoption.push(
+            bigTypeOption.push(
                 <Option key={tree.name} value={tree.id.toString()}>
                     {tree.name}
                 </Option>
@@ -103,22 +99,17 @@ export default class Right extends Component {
         });
 
         this.setState({
-            treetyoption
+            bigTypeOption
         });
     }
 
     componentDidUpdate (prevProps, prevState) {
-        const { stime, etime, selectTreeType, treeSelect } = this.state;
+        const { treeTypeSelect } = this.state;
         const { leftkeycode } = this.props;
-        if (
-            stime !== prevState.stime ||
-            etime !== prevState.etime ||
-            selectTreeType !== prevState.selectTreeType ||
-            treeSelect !== prevState.treeSelect
-        ) {
+        if (treeTypeSelect && treeTypeSelect !== prevState.treeTypeSelect) {
             this.query();
         }
-        if (leftkeycode !== prevProps.leftkeycode) {
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             this.query();
         }
     }
@@ -140,9 +131,9 @@ export default class Right extends Component {
 
     searchRender () {
         const {
-            treetyoption = []
+            bigTypeOption = [],
+            treeTypeOption = []
         } = this.state;
-        let treetypeoption = this.setTreeType();
         return (
             <Row>
                 <Col xl={4} lg={10}>
@@ -151,27 +142,27 @@ export default class Right extends Component {
                         className='forestcalcw2 mxw100'
                         defaultValue={'全部'}
                         style={{ width: '85px' }}
-                        onChange={this.ontypechange.bind(this)}
+                        onChange={this.onBigTypeChange.bind(this)}
                     >
-                        {treetyoption}
+                        {bigTypeOption}
                     </Select>
                 </Col>
                 <Col xl={5} lg={10}>
                     <span>树种：</span>
                     <Select
-                        value={this.state.treeSelect}
+                        value={this.state.treeTypeSelect}
                         optionFilterProp='children'
                         filterOption={(input, option) =>
                             option.props.children
                                 .toLowerCase()
                                 .indexOf(input.toLowerCase()) >= 0
                         }
-                        onChange={this.ontreetypechange.bind(this)}
+                        onChange={this.onTreeTypeChange.bind(this)}
                         style={{ width: '100px' }}
                         showSearch
                         className='forestcalcw2 mxw100'
                     >
-                        {treetypeoption}
+                        {treeTypeOption}
                     </Select>
                 </Col>
                 <Col xl={15} lg={24}>
@@ -192,62 +183,50 @@ export default class Right extends Component {
         );
     }
 
-    setTreeType () {
-        const { selectTreeType = [] } = this.state;
-        let treetypeoption = [];
-        treetypeoption.push(
-            <Option key={-1} value={'全部'}>
-                全部
-            </Option>
-        );
-        selectTreeType.map(rst => {
-            treetypeoption.push(
-                <Option
-                    key={rst.ID}
-                    title={rst.TreeTypeName}
-                    value={rst.ID.toString()}
-                >
-                    {rst.TreeTypeName}
-                </Option>
-            );
+    // 选择树种类型
+    onBigTypeChange (value) {
+        const { treeTypeAll = [] } = this.state;
+        this.setState({
+            treeTypeSelect: ''
         });
-        return treetypeoption;
+        let selectTreeType = [];
+        treeTypeAll.map(item => {
+            if (item.TreeTypeNo) {
+                try {
+                    let code = item.TreeTypeNo.substr(0, 1);
+                    if (code === value) {
+                        selectTreeType.push(item);
+                    }
+                } catch (e) {
+                    console.log('e', e);
+                }
+            }
+        });
+        this.setTreeTypeOption(selectTreeType);
     }
 
-    // 选择树种类型
-    ontypechange (value) {
-        const { treetypeAll = [] } = this.state;
-        if (value === '全部') {
-            this.setState({
-                selectTreeType: treetypeAll,
-                treeTypeSelect: value,
-                treeSelect: '全部'
+    // 设置树种选项
+    setTreeTypeOption (rst) {
+        if (rst instanceof Array) {
+            let treeTypeOption = rst.map(item => {
+                return (
+                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                        {item.TreeTypeName}
+                    </Option>
+                );
             });
-        } else {
-            let selectTreeType = [];
-            treetypeAll.map(tree => {
-                // 获取树种cdoe的首个数字，找到对应的类型
-                let code = tree.TreeTypeNo.substr(0, 1);
-                if (code === value) {
-                    selectTreeType.push(tree);
-                }
-            });
-            this.setState(
-                {
-                    selectTreeType,
-                    treeTypeSelect: value,
-                    treeSelect: '全部'
-                },
-                () => {
-                    this.query();
-                }
+            treeTypeOption.unshift(
+                <Option key={'全部'} value={''} title={'全部'}>
+                        全部
+                </Option>
             );
+            this.setState({ treeTypeOption });
         }
     }
     // 选择树种
-    ontreetypechange (value) {
+    onTreeTypeChange (value) {
         this.setState({
-            treeSelect: value
+            treeTypeSelect: value
         });
     }
 
@@ -255,12 +234,12 @@ export default class Right extends Component {
         this.setState({
             stime: value[0]
                 ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
+                : '',
             etime: value[1]
                 ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
                 : ''
+        }, () => {
+            this.query();
         });
     }
 
@@ -275,8 +254,7 @@ export default class Right extends Component {
         const {
             stime,
             etime,
-            selectTreeType,
-            treeSelect
+            treeTypeSelect
         } = this.state;
         let postdata = {};
 
@@ -284,12 +262,8 @@ export default class Right extends Component {
         postdata.stime = stime;
         postdata.etime = etime;
         let treetype = [];
-        if (treeSelect === '全部') {
-            selectTreeType.map(rst => {
-                treetype.push(rst.ID);
-            });
-        } else {
-            treetype.push(treeSelect);
+        if (treeTypeSelect) {
+            treetype.push(treeTypeSelect);
             postdata.treetype = treetype;
         }
 

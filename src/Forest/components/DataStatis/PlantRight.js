@@ -3,6 +3,7 @@ import echarts from 'echarts';
 import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
+const { RangePicker } = DatePicker;
 
 export default class PlantRight extends Component {
     static propTypes = {};
@@ -10,6 +11,9 @@ export default class PlantRight extends Component {
         super(props);
         this.state = {
             loading: false,
+            stime: moment()
+                .subtract(10, 'days')
+                .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59')
         };
     }
@@ -57,16 +61,62 @@ export default class PlantRight extends Component {
     componentDidUpdate = async (prevProps, prevState) => {
         const {
             leftkeycode
-            // queryTime
         } = this.props;
         if (
-            leftkeycode !== prevProps.leftkeycode
+            leftkeycode && leftkeycode !== prevProps.leftkeycode
         ) {
             await this.query();
         }
-        // if (queryTime && queryTime !== prevProps.queryTime) {
-        //     await this.query();
-        // }
+    }
+
+    render () {
+        // todo 苗木种植强度分析
+
+        return (
+            <Spin spinning={this.state.loading}>
+                <Card
+                    title='各标段种植进度分析'
+                >
+                    <Cards search={this.search()} title='各标段种植进度分析'>
+                        <div
+                            id='PlantRight'
+                            style={{ width: '100%', height: '400px' }}
+                        />
+                    </Cards>
+                </Card>
+            </Spin>
+        );
+    }
+    search () {
+        return (
+            <div>
+                <span>种植时间：</span>
+                <RangePicker
+                    style={{ verticalAlign: 'middle' }}
+                    defaultValue={[
+                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
+                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                    ]}
+                    showTime={{ format: 'HH:mm:ss' }}
+                    format={'YYYY/MM/DD HH:mm:ss'}
+                    onChange={this.datepick.bind(this)}
+                    onOk={this.datepick.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    datepick (value) {
+        this.setState({
+            stime: value[0]
+                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
+                : '',
+            etime: value[1]
+                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        }, () => {
+            this.query();
+        });
     }
 
     async query () {
@@ -77,11 +127,12 @@ export default class PlantRight extends Component {
             leftkeycode,
             platform: { tree = {} }
         } = this.props;
-        const { etime } = this.state;
+        const { stime, etime } = this.state;
         try {
             let sectionData = (tree && tree.bigTreeList) || [];
             let param = {};
             param.section = leftkeycode;
+            param.stime = stime;
             param.etime = etime;
             this.setState({ loading: true });
             let rst = await getCountSection({}, param);
@@ -159,52 +210,5 @@ export default class PlantRight extends Component {
         } catch (e) {
             console.log('PlantRight', e);
         }
-    }
-
-    render () {
-        // todo 苗木种植强度分析
-
-        return (
-            <Spin spinning={this.state.loading}>
-                <Card
-                    title='各标段种植进度分析'
-                >
-                    <Cards search={this.search()} title='各标段种植进度分析'>
-                        <div
-                            id='PlantRight'
-                            style={{ width: '100%', height: '400px' }}
-                        />
-                    </Cards>
-                </Card>
-            </Spin>
-        );
-    }
-    search () {
-        return (
-            <div>
-                <span>截止时间：</span>
-                <DatePicker
-                    style={{ verticalAlign: 'middle' }}
-                    defaultValue={moment(
-                        this.state.etime,
-                        'YYYY/MM/DD HH:mm:ss'
-                    )}
-                    showTime={{ format: 'HH:mm:ss' }}
-                    format={'YYYY/MM/DD HH:mm:ss'}
-                    onChange={this.datepick.bind(this)}
-                    onOk={this.datepick.bind(this)}
-                />
-            </div>
-        );
-    }
-
-    datepick (value) {
-        this.setState({
-            etime: value ? moment(value).format('YYYY/MM/DD') : ''
-        }, () => {
-            if (value) {
-                this.query();
-            }
-        });
     }
 }

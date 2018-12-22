@@ -3,6 +3,7 @@ import echarts from 'echarts';
 import { DatePicker, Spin } from 'antd';
 import moment from 'moment';
 import { Cards } from '../../components';
+const { RangePicker } = DatePicker;
 
 export default class RightTop extends Component {
     static propTypes = {};
@@ -10,7 +11,9 @@ export default class RightTop extends Component {
         super(props);
         this.state = {
             loading: false,
-            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            stime: moment()
+                .subtract(10, 'days')
+                .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59')
         };
     }
@@ -56,12 +59,9 @@ export default class RightTop extends Component {
     }
 
     componentDidUpdate (prevProps, prevState) {
-        const { etime, stime } = this.state;
         const { leftkeycode } = this.props;
         if (
-            leftkeycode !== prevProps.leftkeycode ||
-            etime !== prevState.etime ||
-            stime !== prevState.stime
+            leftkeycode !== prevProps.leftkeycode
         ) {
             this.query();
         }
@@ -84,13 +84,13 @@ export default class RightTop extends Component {
     search () {
         return (
             <div>
-                <span>截止时间：</span>
-                <DatePicker
+                <span>种植时间：</span>
+                <RangePicker
                     style={{ verticalAlign: 'middle' }}
-                    defaultValue={moment(
-                        this.state.etime,
-                        'YYYY/MM/DD HH:mm:ss'
-                    )}
+                    defaultValue={[
+                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
+                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                    ]}
                     showTime={{ format: 'HH:mm:ss' }}
                     format={'YYYY/MM/DD HH:mm:ss'}
                     onChange={this.datepick.bind(this)}
@@ -102,7 +102,14 @@ export default class RightTop extends Component {
 
     datepick (value) {
         this.setState({
-            etime: value ? moment(value).format('YYYY/MM/DD') : ''
+            stime: value[0]
+                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
+                : '',
+            etime: value[1]
+                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        }, () => {
+            this.query();
         });
     }
 
@@ -114,11 +121,12 @@ export default class RightTop extends Component {
             leftkeycode,
             platform: { tree = {} }
         } = this.props;
-        const { etime } = this.state;
+        const { stime, etime } = this.state;
         let sectionData = (tree && tree.bigTreeList) || [];
         let param = {};
 
         param.section = leftkeycode;
+        param.stime = stime;
         param.etime = etime;
         this.setState({ loading: true });
 

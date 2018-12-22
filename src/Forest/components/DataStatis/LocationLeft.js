@@ -18,7 +18,7 @@ export default class LocationLeft extends Component {
                 .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             section: '',
-            sectionoption: [],
+            sectionOption: [],
             sectionsData: [],
             queryData: [], // 查找到的数据
             smallClassList: [] // 根据选择的项目标段获取的小班数据
@@ -71,15 +71,14 @@ export default class LocationLeft extends Component {
             leftkeycode
         } = this.props;
         let sectionData = (tree && tree.thinClassTree) || [];
-        let sectionoption = [];
+        let sectionOption = [];
         sectionData.map(project => {
             // 获取正确的项目
             if (leftkeycode.indexOf(project.No) > -1) {
                 // 获取项目下的标段
                 let sections = project.children;
-                console.log('sections', sections);
                 sections.map((section, index) => {
-                    sectionoption.push(
+                    sectionOption.push(
                         <Option key={section.No} value={section.No}>
                             {section.Name}
                         </Option>
@@ -92,17 +91,17 @@ export default class LocationLeft extends Component {
             }
         });
         this.setState({
-            sectionoption
+            sectionOption
         });
     }
 
     componentDidUpdate (prevProps, prevState) {
         const { section } = this.state;
         const { leftkeycode } = this.props;
-        if (leftkeycode !== prevProps.leftkeycode) {
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             this.getSectionOption();
         }
-        if (section !== prevState.section) {
+        if (section && section !== prevState.section) {
             this.query();
         }
     }
@@ -131,21 +130,21 @@ export default class LocationLeft extends Component {
         );
     }
     title () {
-        const { section, sectionoption } = this.state;
+        const { section, sectionOption } = this.state;
         return (
             <div>
                 <Select
                     value={section}
-                    onSelect={this.onsectionchange.bind(this)}
+                    onSelect={this.onSectionChange.bind(this)}
                     style={{ width: '80px' }}
                 >
-                    {sectionoption}
+                    {sectionOption}
                 </Select>
                 <span>各小班定位进度分析</span>
             </div>
         );
     }
-    onsectionchange (value) {
+    onSectionChange (value) {
         this.setState({
             section: value
         });
@@ -217,14 +216,14 @@ export default class LocationLeft extends Component {
 
         if (rst && rst instanceof Array) {
             queryData = rst;
-            rst.map(item => {
-                complete.push(item.Num);
-                smallClassList.map((smallClass) => {
+            smallClassList.map((smallClass) => {
+                rst.map(item => {
                     let No = smallClass.No;
                     let NoArr = No.split('-');
                     if (NoArr.length === 4) {
                         let smallClassNo = NoArr[0] + '-' + NoArr[1] + '-' + NoArr[3];
                         if (item.Label === smallClassNo) {
+                            complete.push(item.Num);
                             label.push(smallClass.Name);
                         }
                     };
@@ -235,7 +234,6 @@ export default class LocationLeft extends Component {
             queryData,
             smallClassList
         });
-        console.log('queryData', queryData);
         let myChart3 = echarts.init(document.getElementById('LocationLeft'));
         let options3 = {
             legend: {
@@ -300,23 +298,17 @@ export default class LocationLeft extends Component {
             });
             tblData.push(obj);
         });
-        console.log('tblData', tblData);
         let _headers = ['小班', '定位数'];
         let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('headers', headers);
         let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
             .reduce((prev, next) => prev.concat(next))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('testttt', testttt);
         let output = Object.assign({}, headers, testttt);
-        console.log('output', output);
         // 获取所有单元格的位置
         let outputPos = Object.keys(output);
-        console.log('outputPos', outputPos);
         // 计算出范围
         let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-        console.log('ref', ref);
         // 构建 workbook 对象
         let wb = {
             SheetNames: ['mySheet'],

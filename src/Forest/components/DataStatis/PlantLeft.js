@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import echarts from 'echarts';
 import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
-import {
-    ECHARTSCOLOR
-} from '../../../_platform/api';
 import moment from 'moment';
 const { RangePicker } = DatePicker;
 
@@ -40,7 +37,7 @@ export default class PlantLeft extends Component {
             },
             grid: {
                 left: '3%',
-                right: '3%',
+                right: '4%',
                 bottom: '3%',
                 containLabel: true
             },
@@ -58,7 +55,7 @@ export default class PlantLeft extends Component {
                     name: '总数',
                     yAxisIndex: 1,
                     stack: '总量',
-                    position: 'left',
+                    position: 'inside',
                     axisLabel: {
                         formatter: '{value} 棵'
                     }
@@ -67,7 +64,7 @@ export default class PlantLeft extends Component {
                     type: 'value',
                     name: '标段',
                     stack: '总量',
-                    position: 'right',
+                    position: 'inside',
                     axisLabel: {
                         formatter: '{value} 棵'
                     }
@@ -81,14 +78,60 @@ export default class PlantLeft extends Component {
     componentDidUpdate = async (prevProps, prevState) => {
         const {
             leftkeycode
-            // queryTime
         } = this.props;
-        if (leftkeycode !== prevProps.leftkeycode) {
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             await this.query();
         }
-        // if (queryTime && queryTime !== prevProps.queryTime) {
-        //     await this.query();
-        // }
+    }
+
+    render () {
+        // todo 苗木种植强度分析
+        return (
+            <Spin spinning={this.state.loading}>
+                <Card
+                    title='苗木种植强度分析'
+                >
+                    <Cards search={this.search()} title='苗木种植强度分析'>
+                        <div
+                            id='PlantLeft'
+                            style={{ width: '100%', height: '400px' }}
+                        />
+                    </Cards>
+                </Card>
+            </Spin>
+        );
+    }
+
+    search () {
+        return (
+            <div>
+                <span>种植时间：</span>
+                <RangePicker
+                    style={{ verticalAlign: 'middle' }}
+                    defaultValue={[
+                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
+                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                    ]}
+                    showTime={{ format: 'HH:mm:ss' }}
+                    format={'YYYY/MM/DD HH:mm:ss'}
+                    onChange={this.datepick.bind(this)}
+                    onOk={this.datepick.bind(this)}
+                />
+            </div>
+        );
+    }
+
+    datepick (value) {
+        this.setState({
+            stime: value[0]
+                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
+                : '',
+            etime: value[1]
+                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        }, () => {
+            this.query();
+        });
     }
 
     async query () {
@@ -179,7 +222,6 @@ export default class PlantLeft extends Component {
                     name: '总数',
                     type: 'bar',
                     data: total,
-                    barWidth: '25%',
                     itemStyle: {
                         normal: {
                             color: '#02e5cd',
@@ -192,12 +234,7 @@ export default class PlantLeft extends Component {
                 series.push({
                     name: legend[index + 1],
                     type: 'line',
-                    data: sectionData,
-                    itemStyle: {
-                        normal: {
-                            color: ECHARTSCOLOR[index]
-                        }
-                    }
+                    data: sectionData
                 });
             });
             let options1 = {
@@ -216,55 +253,5 @@ export default class PlantLeft extends Component {
         } catch (e) {
             console.log('PlantLeft', e);
         }
-    }
-
-    render () {
-        // todo 苗木种植强度分析
-        return (
-            <Spin spinning={this.state.loading}>
-                <Card
-                    title='苗木种植强度分析'
-                >
-                    <Cards search={this.search()} title='苗木种植强度分析'>
-                        <div
-                            id='PlantLeft'
-                            style={{ width: '100%', height: '400px' }}
-                        />
-                    </Cards>
-                </Card>
-            </Spin>
-        );
-    }
-
-    search () {
-        return (
-            <div>
-                <span>种植时间：</span>
-                <RangePicker
-                    style={{ verticalAlign: 'middle' }}
-                    defaultValue={[
-                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
-                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
-                    ]}
-                    showTime={{ format: 'HH:mm:ss' }}
-                    format={'YYYY/MM/DD HH:mm:ss'}
-                    onChange={this.datepick.bind(this)}
-                    onOk={this.datepick.bind(this)}
-                />
-            </div>
-        );
-    }
-
-    datepick (value) {
-        this.setState({
-            stime: value[0]
-                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
-                : '',
-            etime: value[1]
-                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
-                : ''
-        }, () => {
-            this.query();
-        });
     }
 }

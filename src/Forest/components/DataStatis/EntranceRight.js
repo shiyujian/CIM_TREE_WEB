@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
-import {
-    ECHARTSCOLOR
-} from '../../../_platform/api';
 import moment from 'moment';
 var echarts = require('echarts');
 const { RangePicker } = DatePicker;
@@ -19,19 +16,6 @@ export default class EntranceRight extends Component {
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             loading: false
         };
-    }
-
-    componentDidUpdate = async (prevProps, prevState) => {
-        const {
-            leftkeycode
-            // queryTime
-        } = this.props;
-        if (leftkeycode !== prevProps.leftkeycode) {
-            this.query();
-        }
-        // if (queryTime && queryTime !== prevProps.queryTime) {
-        //     await this.query();
-        // }
     }
 
     componentDidMount () {
@@ -75,6 +59,69 @@ export default class EntranceRight extends Component {
             series: []
         };
         myChart2.setOption(options2);
+    }
+
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode,
+            treetype
+        } = this.props;
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
+            this.query();
+        }
+        if (treetype && treetype !== prevProps.treetype) {
+            this.query();
+        }
+    }
+
+    render () {
+        return (
+            <div>
+                <Spin spinning={this.state.loading}>
+                    <Card
+                        title='各树种进场强度分析'
+                    >
+                        <Cards search={this.searchRender()} title={`进场强度分析`}>
+                            <div
+                                id='EntranceRight'
+                                style={{ width: '100%', height: '400px' }}
+                            />
+                        </Cards>
+                    </Card>
+                </Spin>
+            </div>
+        );
+    }
+
+    searchRender () {
+        return (
+            <div>
+                <span>选择时间：</span>
+                <RangePicker
+                    style={{ verticalAlign: 'middle' }}
+                    defaultValue={[
+                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
+                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
+                    ]}
+                    showTime={{ format: 'HH:mm:ss' }}
+                    format={'YYYY/MM/DD HH:mm:ss'}
+                    onChange={this.datepick.bind(this)}
+                    onOk={this.datepick.bind(this)}
+                />
+            </div>
+        );
+    }
+    datepick (value) {
+        this.setState({
+            stime: value[0]
+                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
+                : '',
+            etime: value[1]
+                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
+                : ''
+        }, () => {
+            this.query();
+        });
     }
 
     // 进场强度分析
@@ -192,12 +239,7 @@ export default class EntranceRight extends Component {
             series.push({
                 name: legend[index + 1],
                 type: 'line',
-                data: sectionData,
-                itemStyle: {
-                    normal: {
-                        color: ECHARTSCOLOR[index]
-                    }
-                }
+                data: sectionData
             });
         });
 
@@ -216,56 +258,6 @@ export default class EntranceRight extends Component {
         myChart2.setOption(options2);
         this.setState({
             loading: false
-        });
-    }
-
-    render () {
-        return (
-            <div>
-                <Spin spinning={this.state.loading}>
-                    <Card
-                        title='各树种进场强度分析'
-                    >
-                        <Cards search={this.searchRender()} title={`进场强度分析`}>
-                            <div
-                                id='EntranceRight'
-                                style={{ width: '100%', height: '400px' }}
-                            />
-                        </Cards>
-                    </Card>
-                </Spin>
-            </div>
-        );
-    }
-
-    searchRender () {
-        return (
-            <div>
-                <span>起苗时间：</span>
-                <RangePicker
-                    style={{ verticalAlign: 'middle' }}
-                    defaultValue={[
-                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
-                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
-                    ]}
-                    showTime={{ format: 'HH:mm:ss' }}
-                    format={'YYYY/MM/DD HH:mm:ss'}
-                    onChange={this.datepick.bind(this)}
-                    onOk={this.datepick.bind(this)}
-                />
-            </div>
-        );
-    }
-    datepick (value) {
-        this.setState({
-            stime: value[0]
-                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
-                : '',
-            etime: value[1]
-                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
-                : ''
-        }, () => {
-            this.query();
         });
     }
 }

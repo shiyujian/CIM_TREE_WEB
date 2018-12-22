@@ -71,16 +71,16 @@ export default class LocationRight extends Component {
         const { section, smallClassSelect } = this.state;
         const { leftkeycode } = this.props;
         // 地块修改，则修改标段
-        if (leftkeycode !== prevProps.leftkeycode) {
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             await this.getSectionOption();
         }
         // 标段修改，修改小班
-        if (section !== prevState.section) {
+        if (section && section !== prevState.section) {
             this.getSmallClassOption();
         }
         // 小班和时间修改，查询数据
         if (
-            smallClassSelect !== prevState.smallClassSelect
+            smallClassSelect && smallClassSelect !== prevState.smallClassSelect
         ) {
             this.query();
         }
@@ -98,7 +98,6 @@ export default class LocationRight extends Component {
             if (leftkeycode.indexOf(project.No) > -1) {
                 // 获取项目下的标段
                 let sections = project.children;
-                console.log('sections', sections);
                 sections.map((section, index) => {
                     sectionOption.push(
                         <Option key={section.No} value={section.No} title={section.Name}>
@@ -128,7 +127,6 @@ export default class LocationRight extends Component {
             if (section.indexOf(sectionData.No) > -1) {
                 // 获取项目下的标段
                 let smallClassList = sectionData.children;
-                console.log('smallClassList', smallClassList);
                 smallClassList.map((smallClass, index) => {
                     smallClassOption.push(
                         <Option key={smallClass.No} value={smallClass.No} title={smallClass.Name}>
@@ -274,8 +272,8 @@ export default class LocationRight extends Component {
         let units = [];
         if (rst && rst instanceof Array) {
             queryData = rst;
-            rst.map(item => {
-                thinClassList.map((thinClass) => {
+            thinClassList.map((thinClass) => {
+                rst.map(item => {
                     let No = thinClass.No;
                     let NoArr = No.split('-');
                     if (NoArr.length === 5) {
@@ -356,23 +354,17 @@ export default class LocationRight extends Component {
                 };
             });
         });
-        console.log('tblData', tblData);
         let _headers = ['细班', '定位数'];
         let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('headers', headers);
         let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
             .reduce((prev, next) => prev.concat(next))
             .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        console.log('testttt', testttt);
         let output = Object.assign({}, headers, testttt);
-        console.log('output', output);
         // 获取所有单元格的位置
         let outputPos = Object.keys(output);
-        console.log('outputPos', outputPos);
         // 计算出范围
         let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-        console.log('ref', ref);
         // 构建 workbook 对象
         let wb = {
             SheetNames: ['mySheet'],

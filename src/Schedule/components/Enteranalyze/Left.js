@@ -10,7 +10,9 @@ export default class Left extends Component {
         super(props);
         this.state = {
             section: '',
-            stime: moment().format('YYYY/MM/DD 00:00:00'),
+            stime: moment()
+                .subtract(10, 'days')
+                .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             loading: false
         };
@@ -85,13 +87,11 @@ export default class Left extends Component {
         myChart1.setOption(option1);
     }
 
-    componentDidUpdate (prevProps, prevState) {
-        const { etime } = this.state;
-        const { leftkeycode } = this.props;
-        if (etime !== prevState.etime) {
-            this.query();
-        }
-        if (leftkeycode !== prevProps.leftkeycode) {
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode
+        } = this.props;
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             this.query();
         }
     }
@@ -134,12 +134,12 @@ export default class Left extends Component {
         this.setState({
             stime: value[0]
                 ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
+                : '',
             etime: value[1]
                 ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
                 : ''
+        }, () => {
+            this.query();
         });
     }
     // 苗木进场总数

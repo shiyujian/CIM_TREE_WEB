@@ -4,8 +4,6 @@ export TopRight from './TopRight';
 export TreeTypeLeft from './TreeTypeLeft';
 export TreeTypeMiddle from './TreeTypeMiddle';
 export TreeTypeRight from './TreeTypeRight';
-export BottomTop from './BottomTop';
-export BottomBottom from './BottomBottom';
 export EntranceLeft from './EntranceLeft';
 export EntranceRight from './EntranceRight';
 export PlantLeft from './PlantLeft';
