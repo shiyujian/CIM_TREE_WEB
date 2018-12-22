@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
 import { Select, Card, DatePicker, Spin } from 'antd';
+import XLSX from 'xlsx';
 import { Cards } from '../../components';
 import moment from 'moment';
 const Option = Select.Option;
@@ -16,12 +17,16 @@ export default class PlantLeftSmallClass extends Component {
                 .subtract(1, 'days')
                 .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            section: '',
+            section: '', // 标段编号
+            sectionName: '', // 标段名
             sectionOption: [],
             sectionsData: [],
             queryData: [], // 查找到的数据
+            exportData: [], // 导出数据
             smallClassList: [] // 根据选择的项目标段获取的小班数据
         };
+        this.toExport = this.toExport.bind(this); // 导出
+        this.renderChart = this.renderChart.bind(this); // 渲染图表
     }
 
     componentDidMount () {
@@ -107,11 +112,11 @@ export default class PlantLeftSmallClass extends Component {
 
     render () {
         // todo 苗木种植强度分析
-
         return (
             <Spin spinning={this.state.loading}>
                 <Card
                     title='各小班种植进度分析'
+                    extra={<a href="#" onClick={this.toExport.bind(this)}>导出</a>}
                 >
                     <Cards search={this.search()} title={this.title()}>
                         <div
@@ -139,8 +144,17 @@ export default class PlantLeftSmallClass extends Component {
         );
     }
     onSectionChange (value) {
+        const { sectionOption } = this.state;
+        let sectionName = '';
+        sectionOption.map(item => {
+            if(item.props && item.props.value === value){
+                sectionName = item.props.children;
+            }
+        })
+        console.log('sectionName', sectionName);
         this.setState({
-            section: value
+            section: value,
+            sectionName
         });
     }
 
@@ -175,7 +189,33 @@ export default class PlantLeftSmallClass extends Component {
             this.query();
         });
     }
-
+    toExport () {
+        const { exportData, sectionName } = this.state;
+        let tblData = exportData;
+        if(!tblData.length){
+            message.warning('没有数据供导出');
+            return;
+        }
+        let _headers = ['小班编号', '未种植', '已种植'];   
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+        .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+        .reduce((prev, next) => prev.concat(next))
+        .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+            'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, sectionName + '各小班种植进度表.xlsx');
+    }
     async query () {
         const {
             actions: {
@@ -207,10 +247,10 @@ export default class PlantLeftSmallClass extends Component {
 
         let rst = await getCountSmall({}, param);
 
-        let units = [];
         let complete = [];
         let unComplete = [];
         let label = [];
+        let exportData = [];
 
         if (rst && rst instanceof Array) {
             queryData = rst;
@@ -225,15 +265,25 @@ export default class PlantLeftSmallClass extends Component {
                         complete.push(item.Complete);
                         unComplete.push(item.UnComplete);
                         label.push(smallClass.Name);
+                        exportData.push({
+                            '小班编号': smallClass.Name,
+                            '未种植': item.UnComplete,
+                            '已种植': item.Complete,
+                        })
                     }
                 });
             });
         }
         this.setState({
             queryData,
-            smallClassList
+            smallClassList,
+            exportData
         });
-
+        console.log('导出数据', label, unComplete, complete);
+        this.renderChart(label, unComplete, complete);
+    }
+    
+    renderChart(label, unComplete, complete){
         let myChart3 = echarts.init(document.getElementById('PlantLeftSmallClass'));
         let options3 = {
             legend: {
@@ -241,7 +291,7 @@ export default class PlantLeftSmallClass extends Component {
             },
             xAxis: [
                 {
-                    data: label.length > 0 ? label : units
+                    data: label.length > 0 ? label : []
                 }
             ],
             grid: {
