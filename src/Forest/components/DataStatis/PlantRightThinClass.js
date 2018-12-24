@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
 import { Select, DatePicker, Spin, Card } from 'antd';
+import XLSX from 'xlsx';
 import { Cards } from '../../components';
 import moment from 'moment';
+import { message } from 'antd';
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
@@ -16,15 +18,20 @@ export default class PlantRightThinClass extends Component {
                 .subtract(1, 'days')
                 .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            section: '',
+            section: '', // 标段编号
+            sectionName: '', // 标段名
+            sectionClassName: '', // 小班
             sectionsData: [],
             sectionOption: [],
             smallClassData: [],
             smallClassOption: [],
             smallClassSelect: '',
             queryData: [], // 查找到的数据
+            exportData: [], // 导出数据
             thinClassList: [] // 根据选择的项目标段获取的细班数据
         };
+        this.toExport = this.toExport.bind(this); // 导出
+        this.renderChart = this.renderChart.bind(this); // 渲染图表
     }
     async componentDidMount () {
         var myChart4 = echarts.init(document.getElementById('PlantRightThinClass'));
@@ -152,6 +159,7 @@ export default class PlantRightThinClass extends Component {
             <Spin spinning={this.state.loading}>
                 <Card
                     title='各细班种植进度分析'
+                    extra={<a href="#" onClick={this.toExport.bind(this)}>导出</a>}
                 >
                     <Cards
                         style={{ margin: '20px 5px 5px 5px' }}
@@ -189,6 +197,7 @@ export default class PlantRightThinClass extends Component {
     // 标题左侧下拉框
     title1 () {
         const { section, smallClassSelect, sectionOption, smallClassOption } = this.state;
+        console.log('smallClassOption33', smallClassOption);
         return (
             <div>
                 <Select
@@ -211,14 +220,32 @@ export default class PlantRightThinClass extends Component {
     }
     // 选择标段
     handleSectionChange (value) {
+        const { sectionOption } = this.state;
+        let sectionName = '';
+        sectionOption.map(item => {
+            if(item.props && item.props.value === value){
+                sectionName = item.props.children;
+            }
+        })
         this.setState({
-            section: value
+            section: value,
+            sectionName
         });
     }
     // 选择小班
     handleSmallClassChange (value) {
+        console.log(value);
+        const { smallClassOption } = this.state;
+        let sectionClassName = '';
+        smallClassOption.map(item => {
+            if(item.props && item.props.value === value){
+                sectionClassName = item.props.children;
+            }
+        })
+        console.log('sectionClassName', sectionClassName);
         this.setState({
-            smallClassSelect: value
+            smallClassSelect: value,
+            sectionClassName
         });
     }
     datepick (value) {
@@ -232,6 +259,33 @@ export default class PlantRightThinClass extends Component {
         }, () => {
             this.query();
         });
+    }
+    toExport () {
+        const { exportData, sectionName, sectionClassName } = this.state;
+        let tblData = exportData;
+        if(!tblData.length){
+            message.warning('没有数据供导出');
+            return;
+        }
+        let _headers = ['细班编号', '未种植', '已种植'];   
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+        .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+        .reduce((prev, next) => prev.concat(next))
+        .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+            'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, sectionName + sectionClassName + '各细班种植进度表.xlsx');
     }
     // 查询数据
     async query () {
@@ -270,7 +324,7 @@ export default class PlantRightThinClass extends Component {
             let complete = [];
             let unComplete = [];
             let label = [];
-            let units = [];
+            let exportData = [];
             if (rst && rst instanceof Array) {
                 queryData = rst;
                 thinClassList.map((thinClass) => {
@@ -284,70 +338,78 @@ export default class PlantRightThinClass extends Component {
                             complete.push(item.Complete);
                             unComplete.push(item.UnComplete);
                             label.push(thinClass.Name);
+                            exportData.push({
+                                '细班编号': thinClass.Name,
+                                '未种植': item.UnComplete,
+                                '已种植': item.Complete,
+                            })
                         }
                     });
                 });
             }
             this.setState({
                 queryData,
-                thinClassList
+                thinClassList,
+                exportData
             });
-
-            let myChart4 = echarts.init(document.getElementById('PlantRightThinClass'));
-            let options4 = {
-                legend: {
-                    data: ['未种植', '已种植']
-                },
-                xAxis: [
-                    {
-                        data: label.length > 0 ? label : units
-                    }
-                ],
-                grid: {
-                    bottom: 50
-                },
-                dataZoom: [{
-                    type: 'inside'
-                }, {
-                    type: 'slider'
-                }],
-                series: [
-                    {
-                        name: '未种植',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                offset: ['50', '80'],
-                                show: true,
-                                position: 'inside',
-                                formatter: '{c}',
-                                textStyle: { color: '#FFFFFF' }
-                            }
-                        },
-                        data: unComplete
-                    },
-                    {
-                        name: '已种植',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                offset: ['50', '80'],
-                                show: true,
-                                position: 'inside',
-                                formatter: '{c}',
-                                textStyle: { color: '#FFFFFF' }
-                            }
-                        },
-                        data: complete
-                    }
-                ]
-            };
-            myChart4.setOption(options4);
-            this.setState({ loading: false });
+            this.renderChart(label, unComplete, complete);
         } catch (e) {
             console.log(e);
         }
+    }
+    renderChart(label, unComplete, complete){
+        let myChart4 = echarts.init(document.getElementById('PlantRightThinClass'));
+        let options4 = {
+            legend: {
+                data: ['未种植', '已种植']
+            },
+            xAxis: [
+                {
+                    data: label.length > 0 ? label : []
+                }
+            ],
+            grid: {
+                bottom: 50
+            },
+            dataZoom: [{
+                type: 'inside'
+            }, {
+                type: 'slider'
+            }],
+            series: [
+                {
+                    name: '未种植',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: { color: '#FFFFFF' }
+                        }
+                    },
+                    data: unComplete
+                },
+                {
+                    name: '已种植',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: { color: '#FFFFFF' }
+                        }
+                    },
+                    data: complete
+                }
+            ]
+        };
+        myChart4.setOption(options4);
+        this.setState({ loading: false });
     }
 }
