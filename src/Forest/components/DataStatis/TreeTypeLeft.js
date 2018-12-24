@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Card, Spin, Row, Col } from 'antd';
+import { Spin } from 'antd';
 import {TREETYPENO} from '_platform/api';
-import moment from 'moment';
 
 export default class TreeTypeLeft extends Component {
     static propTypes = {};

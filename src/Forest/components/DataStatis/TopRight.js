@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Spin } from 'antd';
+import { Spin, Card } from 'antd';
+import XLSX from 'xlsx';
 
 export default class Top extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            queryData: []
         };
     }
     async componentDidMount () {
@@ -51,48 +53,93 @@ export default class Top extends Component {
         myChart.setOption(option);
     }
 
-    async componentDidUpdate (prevProps, prevState) {
+    componentDidUpdate = async (prevProps, prevState) => {
         const {
-            locationStatQueryTime,
+            leftkeycode,
             queryTime
         } = this.props;
-        if (queryTime && queryTime !== prevProps.queryTime) {
-            this.loading();
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
+            this.query();
         }
-        if (locationStatQueryTime && locationStatQueryTime !== prevProps.locationStatQueryTime) {
+        if (queryTime && queryTime !== prevProps.queryTime) {
             this.query();
         }
     }
 
-    loading = () => {
-        this.setState({
-            loading: true
-        });
+    render () {
+        return (
+            <Spin spinning={this.state.loading}>
+                <Card title='定位量'
+                    extra={
+                        <div>
+                            <a onClick={this.handleLocationDataExport.bind(this)}>
+                                导出
+                            </a>
+                        </div>
+                    }
+                >
+                    <div
+                        id='topRight'
+                        style={{ width: '100%', height: '300px' }}
+                    />
+                </Card>
+            </Spin>
+
+        );
     }
 
-    query = () => {
+    query = async () => {
         const {
-            locationStat
+            leftkeycode = '',
+            sectionSearch = '',
+            thinclassSearch = '',
+            smallclassSearch = '',
+            actions: {
+                getLocationStat
+            }
         } = this.props;
         try {
+            this.setState({
+                loading: true
+            });
+            let no = '';
+            if (thinclassSearch) {
+                let arr = thinclassSearch.split('-');
+                no = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
+            } else if (smallclassSearch) {
+                let arr = smallclassSearch.split('-');
+                no = arr[0] + '-' + arr[1] + '-' + arr[3];
+            } else if (leftkeycode) {
+                no = leftkeycode;
+            }
+            let postdata = {
+                no: no,
+                section: sectionSearch
+            };
+            let queryData = [];
+            let locationStat = await getLocationStat({}, postdata);
             if (locationStat) {
                 let data = locationStat.split(',');
-                let unLocationNum = Number(data[0]);
-                let locationNum = Number(data[1]);
-                let myChart = echarts.init(document.getElementById('topRight'));
-                let option = {
-                    series: [
-                        {
-                            data: [
-                                {value: unLocationNum, name: '未定位'},
-                                {value: locationNum, name: '已定位'}
-                            ]
-                        }
-                    ]
-                };
-                myChart.setOption(option);
+                if (data && data instanceof Array && data.length === 2) {
+                    queryData = data;
+                    let unLocationNum = Number(data[0]);
+                    let locationNum = Number(data[1]);
+                    let myChart = echarts.init(document.getElementById('topRight'));
+                    let option = {
+                        series: [
+                            {
+                                data: [
+                                    {value: unLocationNum, name: '未定位'},
+                                    {value: locationNum, name: '已定位'}
+                                ]
+                            }
+                        ]
+                    };
+                    myChart.setOption(option);
+                }
                 this.setState({
-                    loading: false
+                    loading: false,
+                    queryData
                 });
             }
         } catch (e) {
@@ -100,15 +147,37 @@ export default class Top extends Component {
         }
     }
 
-    render () {
-        return (
-            <Spin spinning={this.state.loading}>
-                <div
-                    id='topRight'
-                    style={{ width: '100%', height: '300px' }}
-                />
-            </Spin>
-
-        );
+    handleLocationDataExport = async () => {
+        const {
+            queryData
+        } = this.state;
+        let tblData = [];
+        if (queryData && queryData instanceof Array && queryData.length === 2) {
+            let unLocationNum = Number(queryData[0]);
+            let locationNum = Number(queryData[1]);
+            let obj = {};
+            obj['已定位'] = locationNum;
+            obj['未定位'] = unLocationNum;
+            tblData.push(obj);
+            let _headers = ['已定位', '未定位'];
+            let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+                .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+            let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+                .reduce((prev, next) => prev.concat(next))
+                .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+            let output = Object.assign({}, headers, testttt);
+            // 获取所有单元格的位置
+            let outputPos = Object.keys(output);
+            // 计算出范围
+            let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+            // 构建 workbook 对象
+            let wb = {
+                SheetNames: ['mySheet'],
+                Sheets: {
+                    'mySheet': Object.assign({}, output, { '!ref': ref })
+                }
+            };
+            XLSX.writeFile(wb, `定位量.xlsx`);
+        }
     }
 }

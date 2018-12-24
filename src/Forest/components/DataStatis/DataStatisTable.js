@@ -9,6 +9,7 @@ import {
 } from 'antd';
 import XLSX from 'xlsx';
 import moment from 'moment';
+import {TREETYPENO} from '_platform/api';
 import DataTable from './DataTable';
 import TopLeft from './TopLeft';
 import TopRight from './TopRight';
@@ -38,8 +39,6 @@ export default class DataStatisTable extends Component {
             treePlanting: '',
             locationStat: '',
             statByTreetype: [],
-            treePlantingQueryTime: 0,
-            locationStatQueryTime: 0,
             statByTreetypeQueryTime: 0,
             queryTime: 0,
             treeTypeDisplayTable: false
@@ -159,19 +158,23 @@ export default class DataStatisTable extends Component {
                             </Row>
                             <Row>
                                 <Col span={12}>
-                                    <Card title='栽植量'>
-                                        <TopLeft {...this.state} {...this.props} />
-                                    </Card>
+                                    <TopLeft {...this.state} {...this.props} />
                                 </Col>
                                 <Col span={12}>
-                                    <Card title='定位量'>
-                                        <TopRight {...this.state} {...this.props} />
-                                    </Card>
+                                    <TopRight {...this.state} {...this.props} />
                                 </Col>
                             </Row>
                             <Row style={{ marginTop: 10 }}>
                                 <Col span={12}>
-                                    <Card title='树种分布'>
+                                    <Card title='树种分布'
+                                        extra={
+                                            <div>
+                                                <a onClick={this.handleTreeBigTypeDataExport.bind(this)}>
+                                                    导出
+                                                </a>
+                                            </div>
+                                        }
+                                    >
                                         <TreeTypeLeft {...this.state} {...this.props} />
                                     </Card>
                                 </Col>
@@ -303,8 +306,6 @@ export default class DataStatisTable extends Component {
         } = this.state;
         const {
             actions: {
-                getTreePlanting,
-                getLocationStat,
                 getStatByTreetype
             },
             leftkeycode
@@ -335,18 +336,6 @@ export default class DataStatisTable extends Component {
             };
             this.setState({
                 queryTime: moment().unix()
-            });
-            getTreePlanting({}, postdata).then((treePlanting) => {
-                this.setState({
-                    treePlanting,
-                    treePlantingQueryTime: moment().unix()
-                });
-            });
-            getLocationStat({}, postdata).then((locationStat) => {
-                this.setState({
-                    locationStat,
-                    locationStatQueryTime: moment().unix()
-                });
             });
             getStatByTreetype({}, postdata).then((statByTreetype) => {
                 this.setState({
@@ -409,4 +398,63 @@ export default class DataStatisTable extends Component {
         };
         XLSX.writeFile(wb, `树种排名.xlsx`);
     }
+
+    handleTreeBigTypeDataExport = async () => {
+        const {
+            statByTreetype
+        } = this.state;
+        let tblData = [];
+        let treetypeData = this.getTreetypeData();
+        if (statByTreetype && statByTreetype instanceof Array) {
+            for (let t = 0; t < statByTreetype.length; t++) {
+                if (statByTreetype[t].TreeTypeNo) {
+                    let bigTreeType = statByTreetype[t].TreeTypeNo.substr(0, 1);
+                    for (let s = 0; s < treetypeData.length; s++) {
+                        if (Number(bigTreeType) === Number(treetypeData[s].id)) {
+                            treetypeData[s].value = treetypeData[s].value + statByTreetype[t].Num;
+                        }
+                    }
+                }
+            }
+        }
+        treetypeData.map((data, index) => {
+            let obj = {};
+            obj['树种'] = data.name;
+            obj['数量'] = data.value;
+            tblData.push(obj);
+        });
+        let _headers = ['树种', '数量'];
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, `树种分布.xlsx`);
+    }
+
+    getTreetypeData = () => {
+        let treetypeData = [];
+        for (let i = 0; i < TREETYPENO.length; i++) {
+            treetypeData.push(
+                {
+                    value: 0,
+                    name: TREETYPENO[i].name,
+                    id: TREETYPENO[i].id
+                }
+            );
+        }
+        return treetypeData;
+    };
 }

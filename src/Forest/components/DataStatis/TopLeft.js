@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Spin } from 'antd';
+import { Spin, Card } from 'antd';
+import XLSX from 'xlsx';
 
 export default class Top extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            queryData: []
         };
     }
     async componentDidMount () {
@@ -51,69 +53,136 @@ export default class Top extends Component {
         myChart.setOption(option);
     }
 
-    async componentDidUpdate (prevProps, prevState) {
+    componentDidUpdate = async (prevProps, prevState) => {
         const {
-            treePlantingQueryTime,
+            leftkeycode,
             queryTime
         } = this.props;
-        if (queryTime && queryTime !== prevProps.queryTime) {
-            this.loading();
-        }
-        if (treePlantingQueryTime && treePlantingQueryTime !== prevProps.treePlantingQueryTime) {
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
             this.query();
         }
-    }
-
-    loading = () => {
-        this.setState({
-            loading: true
-        });
-    }
-
-    query = () => {
-        const {
-            treePlanting
-        } = this.props;
-        try {
-            if (treePlanting) {
-                let data = treePlanting.split(',');
-                let unPlantNum = Number(data[0]);
-                // if (unPlantNum < 0) {
-                //     unPlantNum = -unPlantNum;
-                // }
-                let plantNum = Number(data[1]);
-                // if (plantNum < 0) {
-                //     plantNum = -plantNum;
-                // }
-                let myChart = echarts.init(document.getElementById('topLeft'));
-                let option = {
-                    series: [
-                        {
-                            data: [
-                                {value: unPlantNum, name: '待栽植'},
-                                {value: plantNum, name: '已栽植'}
-                            ]
-                        }
-                    ]
-                };
-                myChart.setOption(option);
-                this.setState({
-                    loading: false
-                });
-            }
-        } catch (e) {
-
+        if (queryTime && queryTime !== prevProps.queryTime) {
+            this.query();
         }
     }
 
     render () {
         return (
             <Spin spinning={this.state.loading}>
-                <div
-                    id='topLeft'
-                    style={{ width: '100%', height: '300px' }}
-                />
+                <Card title='栽植量'
+                    extra={
+                        <div>
+                            <a onClick={this.handlePlantDataExport.bind(this)}>
+                                导出
+                            </a>
+                        </div>
+                    }
+                >
+                    <div
+                        id='topLeft'
+                        style={{ width: '100%', height: '300px' }}
+                    />
+                </Card>
             </Spin>
         );
+    }
+
+    query = async () => {
+        const {
+            leftkeycode = '',
+            sectionSearch = '',
+            thinclassSearch = '',
+            smallclassSearch = '',
+            actions: {
+                getTreePlanting
+            }
+        } = this.props;
+        try {
+            this.setState({
+                loading: true
+            });
+            let no = '';
+            if (thinclassSearch) {
+                let arr = thinclassSearch.split('-');
+                no = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
+            } else if (smallclassSearch) {
+                let arr = smallclassSearch.split('-');
+                no = arr[0] + '-' + arr[1] + '-' + arr[3];
+            } else if (leftkeycode) {
+                no = leftkeycode;
+            }
+            let postdata = {
+                no: no,
+                section: sectionSearch
+            };
+            let queryData = [];
+            let treePlanting = await getTreePlanting({}, postdata);
+            if (treePlanting) {
+                let data = treePlanting.split(',');
+                if (data && data instanceof Array && data.length === 2) {
+                    queryData = data;
+                    let unPlantNum = Number(data[0]);
+                    // if (unPlantNum < 0) {
+                    //     unPlantNum = -unPlantNum;
+                    // }
+                    let plantNum = Number(data[1]);
+                    // if (plantNum < 0) {
+                    //     plantNum = -plantNum;
+                    // }
+                    let myChart = echarts.init(document.getElementById('topLeft'));
+                    let option = {
+                        series: [
+                            {
+                                data: [
+                                    {value: unPlantNum, name: '待栽植'},
+                                    {value: plantNum, name: '已栽植'}
+                                ]
+                            }
+                        ]
+                    };
+                    myChart.setOption(option);
+                }
+                this.setState({
+                    loading: false,
+                    queryData
+                });
+            }
+        } catch (e) {
+            console.log('query', e);
+        }
+    }
+
+    handlePlantDataExport = async () => {
+        const {
+            queryData
+        } = this.state;
+        let tblData = [];
+        if (queryData && queryData instanceof Array && queryData.length === 2) {
+            let unPlantNum = Number(queryData[0]);
+            let plantNum = Number(queryData[1]);
+            let obj = {};
+            obj['已栽植'] = plantNum;
+            obj['未栽植'] = unPlantNum;
+            tblData.push(obj);
+            let _headers = ['已栽植', '未栽植'];
+            let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+                .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+            let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+                .reduce((prev, next) => prev.concat(next))
+                .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+            let output = Object.assign({}, headers, testttt);
+            // 获取所有单元格的位置
+            let outputPos = Object.keys(output);
+            // 计算出范围
+            let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+            // 构建 workbook 对象
+            let wb = {
+                SheetNames: ['mySheet'],
+                Sheets: {
+                    'mySheet': Object.assign({}, output, { '!ref': ref })
+                }
+            };
+            XLSX.writeFile(wb, `栽植量.xlsx`);
+        }
     }
 }
