@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Select, DatePicker, Spin, Card } from 'antd';
+import { Select, DatePicker, Spin, Card, Notification } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
 import XLSX from 'xlsx';
@@ -270,7 +270,7 @@ export default class LocationRight extends Component {
         let complete = [];
         let label = [];
         let units = [];
-        if (rst && rst instanceof Array) {
+        if (rst && rst instanceof Array && rst.length > 0) {
             queryData = rst;
             thinClassList.map((thinClass) => {
                 rst.map(item => {
@@ -338,15 +338,22 @@ export default class LocationRight extends Component {
             queryData,
             thinClassList
         } = this.state;
+        if (!(queryData && queryData instanceof Array && queryData.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
         let tblData = [];
-        queryData.map((item, index) => {
-            let obj = {};
-            thinClassList.map((thinClass) => {
+        thinClassList.map((thinClass) => {
+            queryData.map((item, index) => {
                 let No = thinClass.No;
                 let NoArr = No.split('-');
                 if (NoArr.length === 5) {
                     let smallClassNo = NoArr[0] + '-' + NoArr[1] + '-' + NoArr[3] + '-' + NoArr[4];
                     if (item.Label === smallClassNo) {
+                        let obj = {};
                         obj['定位数'] = item.Num;
                         obj['细班'] = thinClass.Name;
                         tblData.push(obj);

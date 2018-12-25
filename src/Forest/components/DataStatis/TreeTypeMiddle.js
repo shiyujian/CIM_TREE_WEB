@@ -41,7 +41,6 @@ export default class TreeTypeMiddle extends Component {
             },
             yAxis: {
                 type: 'category',
-                // data: ['油松', '银杏', '白皮松', '国槐', '侧柏']
                 data: []
             },
             series: [

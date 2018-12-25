@@ -3,6 +3,7 @@ import echarts from 'echarts';
 import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
+import XLSX from 'xlsx';
 const { RangePicker } = DatePicker;
 
 export default class PlantRight extends Component {
@@ -14,7 +15,8 @@ export default class PlantRight extends Component {
             stime: moment()
                 .subtract(10, 'days')
                 .format('YYYY/MM/DD 00:00:00'),
-            etime: moment().format('YYYY/MM/DD 23:59:59')
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
+            queryData: []
         };
     }
 
@@ -70,12 +72,18 @@ export default class PlantRight extends Component {
     }
 
     render () {
-        // todo 苗木种植强度分析
-
+        // todo 各标段种植进度分析
         return (
             <Spin spinning={this.state.loading}>
                 <Card
                     title='各标段种植进度分析'
+                    extra={
+                        <div>
+                            <a onClick={this.handlePlantDataExport.bind(this)}>
+                                导出
+                            </a>
+                        </div>
+                    }
                 >
                     <Cards search={this.search()} title='各标段种植进度分析'>
                         <div
@@ -142,13 +150,14 @@ export default class PlantRight extends Component {
             let complete = [];
             let unComplete = [];
             let label = [];
-
-            if (rst && rst instanceof Array) {
-                rst.map(item => {
-                    complete.push(item.Complete);
-                    unComplete.push(item.UnComplete);
-                    sectionData.map(project => {
-                    // 获取正确的项目
+            let queryData = [];
+            if (rst && rst instanceof Array && rst.length > 0) {
+                queryData = rst;
+                sectionData.map(project => {
+                    rst.map(item => {
+                        complete.push(item.Complete);
+                        unComplete.push(item.UnComplete);
+                        // 获取正确的项目
                         if (leftkeycode.indexOf(project.No) > -1) {
                         // 获取项目下的标段
                             let sections = project.children;
@@ -206,9 +215,68 @@ export default class PlantRight extends Component {
                 ]
             };
             myChart2.setOption(options2);
-            this.setState({ loading: false });
+            this.setState({
+                loading: false,
+                queryData
+            });
         } catch (e) {
             console.log('PlantRight', e);
         }
+    }
+
+    handlePlantDataExport = async () => {
+        const {
+            queryData
+        } = this.state;
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        if (!(queryData && queryData instanceof Array && queryData.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let tblData = [];
+        sectionData.map(project => {
+            queryData.map(item => {
+                // 获取正确的项目
+                if (leftkeycode.indexOf(project.No) > -1) {
+                // 获取项目下的标段
+                    let sections = project.children;
+                    sections.map((section, index) => {
+                        if (section.No === item.Label) {
+                            let obj = {};
+                            obj['已种植'] = item.Complete;
+                            obj['未种植'] = item.UnComplete;
+                            obj['标段'] = section.Name;
+                            tblData.push(obj);
+                        }
+                    });
+                }
+            });
+        });
+        let _headers = ['标段', '已种植', '未种植'];
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, `各标段种植进度分析.xlsx`);
     }
 }

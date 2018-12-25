@@ -3,6 +3,7 @@ import echarts from 'echarts';
 import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
+import XLSX from 'xlsx';
 const { RangePicker } = DatePicker;
 
 export default class PlantLeft extends Component {
@@ -14,7 +15,9 @@ export default class PlantLeft extends Component {
             stime: moment()
                 .subtract(10, 'days')
                 .format('YYYY/MM/DD 00:00:00'),
-            etime: moment().format('YYYY/MM/DD 23:59:59')
+            etime: moment().format('YYYY/MM/DD 23:59:59'),
+            tblData: [],
+            _headers: []
         };
     }
 
@@ -90,6 +93,13 @@ export default class PlantLeft extends Component {
             <Spin spinning={this.state.loading}>
                 <Card
                     title='苗木种植强度分析'
+                    extra={
+                        <div>
+                            <a onClick={this.handlePlantDataExport.bind(this)}>
+                                导出
+                            </a>
+                        </div>
+                    }
                 >
                     <Cards search={this.search()} title='苗木种植强度分析'>
                         <div
@@ -159,6 +169,9 @@ export default class PlantLeft extends Component {
             let time = [];
             let total = [];
             let legend = ['总数'];
+            // 导出的数据设置
+            let _headers = ['时间', '总数'];
+            let tblData = [];
 
             if (rst && rst instanceof Array) {
             // 将 Time 单独列为一个数组
@@ -178,25 +191,26 @@ export default class PlantLeft extends Component {
                             let sections = project.children;
                             // 将各个标段的数据设置为0
                             sections.map((section, index) => {
-                            // 定义一个二维数组，分为多个标段
+                                // 定义一个二维数组，分为多个标段
                                 gpshtnum[index] = new Array();
                                 data[index] = new Array();
                                 legend.push(section.Name);
-                            });
-
-                            rst.map(item => {
-                                if (item && item.Section) {
-                                    sections.map((section, index) => {
+                                _headers.push(section.Name);
+                                rst.map(item => {
+                                    if (item && item.Section) {
                                         if (item.Section === section.No) {
                                             gpshtnum[index].push(item);
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             });
                         }
                     });
                 }
                 times.map((time, index) => {
+                    let obj = {};
+                    obj['时间'] = time;
+                    tblData.push(obj);
                     data.map(sectionData => {
                         sectionData[index] = 0;
                     });
@@ -230,7 +244,16 @@ export default class PlantLeft extends Component {
                     }
                 }
             ];
+            total.map((num, order) => {
+                let obj = tblData[order];
+                obj['总数'] = num;
+            });
             data.map((sectionData, index) => {
+                let sectionName = legend[index + 1];
+                sectionData.map((num, order) => {
+                    let obj = tblData[order] || {};
+                    obj[sectionName] = num;
+                });
                 series.push({
                     name: legend[index + 1],
                     type: 'line',
@@ -249,9 +272,45 @@ export default class PlantLeft extends Component {
                 series: series
             };
             myChart1.setOption(options1);
-            this.setState({ loading: false });
+            this.setState({
+                loading: false,
+                tblData,
+                _headers
+            });
         } catch (e) {
             console.log('PlantLeft', e);
         }
+    }
+
+    handlePlantDataExport = async () => {
+        const {
+            tblData,
+            _headers
+        } = this.state;
+        if (!(tblData && tblData instanceof Array && tblData.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, `苗木种植强度分析.xlsx`);
     }
 }

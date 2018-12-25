@@ -12,23 +12,19 @@ export default class DataTable extends Component {
             plantAmount: 0,
             plantToday: 0,
             nowmessagelist: [],
+            loading1: false,
+            loading2: false,
             loading3: false,
             loading4: false,
-            loading5: false,
-            loading6: false,
-            loading7: false
+            loading5: false
         };
     }
 
     componentDidUpdate = async (prevProps, prevState) => {
         const {
-            leftkeycode,
             queryTime
-            // section
         } = this.props;
-        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
-            await this.query();
-        }
+        // 因搜索条件处在项目改变后，会进行搜索，改变queryTime的值， 所以不需要对项目进行监控
         if (queryTime && queryTime !== prevProps.queryTime) {
             await this.query();
         }
@@ -40,11 +36,11 @@ export default class DataTable extends Component {
             section
         } = this.props;
         this.setState({
+            loading1: true,
+            loading2: true,
             loading3: true,
             loading4: true,
-            loading5: true,
-            loading6: true,
-            loading7: true
+            loading5: true
         });
 
         // 获取当前种树信息
@@ -111,11 +107,11 @@ export default class DataTable extends Component {
             nowmessagelist = message.content;
         }
         this.setState({
+            loading1: false,
+            loading2: false,
             loading3: false,
             loading4: false,
             loading5: false,
-            loading6: false,
-            loading7: false,
             amount,
             today,
             plantAmount: plantAmount,
@@ -130,45 +126,45 @@ export default class DataTable extends Component {
             plantAmount,
             plantToday,
             nowmessagelist,
+            loading1,
+            loading2,
             loading3,
             loading4,
-            loading5,
-            loading6,
-            loading7
+            loading5
         } = this.state;
 
         return (
             <div>
                 <div style={{display: 'flex'}}>
-                    <Spin spinning={loading3}>
+                    <Spin spinning={loading1}>
                         <SumTotal
                             title='苗木累计进场总数'
                         >
                             <div>{amount}</div>
                         </SumTotal>
                     </Spin>
-                    <Spin spinning={loading4}>
+                    <Spin spinning={loading2}>
                         <SumTotal
                             title='苗木今日进场总数'
                         >
                             <div>{today}</div>
                         </SumTotal>
                     </Spin>
-                    <Spin spinning={loading5}>
+                    <Spin spinning={loading3}>
                         <SumTotal
                             title='苗木累计种植总数'
                         >
                             <div>{plantAmount}</div>
                         </SumTotal>
                     </Spin>
-                    <Spin spinning={loading6}>
+                    <Spin spinning={loading4}>
                         <SumTotal
                             title='苗木今日种植总数'
                         >
                             <div>{plantToday}</div>
                         </SumTotal>
                     </Spin>
-                    <Spin spinning={loading7}>
+                    <Spin spinning={loading5}>
                         <div
                             className='nowmessage'
                             style={{ border: '1px solid #666' }}

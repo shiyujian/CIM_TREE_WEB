@@ -23,7 +23,6 @@ import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
-import XLSX from 'xlsx';
 const { RangePicker } = DatePicker;
 const InputGroup = Input.Group;
 
@@ -49,7 +48,6 @@ export default class LocmeasureTable extends Component {
             thinclass: '',
             treetypename: '',
             status: '',
-            samplingStatus: '',
             SupervisorCheck: '',
             CheckStatus: '',
             islocation: '',
@@ -102,55 +100,22 @@ export default class LocmeasureTable extends Component {
                 title: '状态',
                 dataIndex: 'statusname',
                 render: (text, record) => {
-                    let superName = '';
-                    let ownerName = '';
-                    if (
+                    let statusname = '';
+                    if (record.Status === 2) {
+                        statusname = '不合格';
+                    } else if (
                         record.SupervisorCheck === -1 &&
                         record.CheckStatus === -1
                     ) {
-                        return <span>未抽查</span>;
+                        statusname = '未抽查';
                     } else {
-                        if (record.SupervisorCheck === 0) {
-                            superName = '监理抽查退回';
-                        } else if (record.SupervisorCheck === 1) {
-                            superName = '监理抽查通过';
-                        }
-
-                        if (record.CheckStatus === 0) {
-                            ownerName = '业主抽查退回';
-                        } else if (record.CheckStatus === 1) {
-                            ownerName = '业主抽查通过';
-                        } else if (record.CheckStatus === 2) {
-                            ownerName = '业主抽查退回后修改';
-                        }
-                        if (superName && ownerName) {
-                            return (
-                                <div>
-                                    <div>{superName}</div>
-                                    <div>{ownerName}</div>
-                                </div>
-                            );
-                        } else if (superName) {
-                            return <span>{superName}</span>;
-                        } else {
-                            return <span>{ownerName}</span>;
+                        if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
+                            statusname = '抽查退回';
+                        } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
+                            statusname = '抽查通过';
                         }
                     }
-                }
-            },
-            {
-                title: '抽查状态',
-                dataIndex: 'samplingStatusName',
-                render: (text, record) => {
-                    let samplingStatusName = '';
-                    if (record.Status === 0) {
-                        samplingStatusName = '未抽检';
-                    } else if (record.Status === 1) {
-                        samplingStatusName = '已抽检';
-                    } else if (record.Status === 2) {
-                        samplingStatusName = '不合格';
-                    }
-                    return <span>{samplingStatusName}</span>;
+                    return <span>{statusname}</span>;
                 }
             },
             {
@@ -391,8 +356,7 @@ export default class LocmeasureTable extends Component {
             thinclassoption,
             typeoption,
             statusoption,
-            locationoption,
-            samplingStatusOption
+            locationoption
         } = this.props;
         const {
             sxm,
@@ -403,7 +367,6 @@ export default class LocmeasureTable extends Component {
             bigType,
             treetypename,
             status,
-            samplingStatus,
             islocation
         } = this.state;
         const suffix1 = sxm ? (
@@ -497,18 +460,6 @@ export default class LocmeasureTable extends Component {
                             onChange={this.onStatusChange.bind(this)}
                         >
                             {statusoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>抽查状态：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={samplingStatus}
-                            onChange={this.onSamplingStatusChange.bind(this)}
-                        >
-                            {samplingStatusOption}
                         </Select>
                     </div>
                     <div className='forest-mrg10'>
@@ -797,10 +748,6 @@ export default class LocmeasureTable extends Component {
         this.setState({ status: value || '' });
     }
 
-    onSamplingStatusChange (value) {
-        this.setState({ samplingStatus: value || '' });
-    }
-
     onLocationChange (value) {
         this.setState({ islocation: value || '' });
     }
@@ -1044,7 +991,6 @@ export default class LocmeasureTable extends Component {
             lstime = '',
             letime = '',
             status = '',
-            samplingStatus = '',
             size,
             thinclass = '',
             smallclassData = '',
@@ -1144,6 +1090,15 @@ export default class LocmeasureTable extends Component {
         } else if (TQZJFirst >= 0 && !TQZJSecond) {
             tqzj = TQZJFirst;
         }
+        let searchStatus = '';
+        let searchSamplingStatus = '';
+        if (status === '未抽查') {
+            searchSamplingStatus = -1;
+        } else if (status === '不合格') {
+            searchSamplingStatus = 2;
+        } else {
+            searchStatus = status;
+        }
         let postdata = {
             no: keycode,
             sxm,
@@ -1155,8 +1110,8 @@ export default class LocmeasureTable extends Component {
             lstime: lstime && moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
             letime: letime && moment(letime).format('YYYY-MM-DD HH:mm:ss'),
-            status,
-            samplingStatus,
+            status: searchStatus,
+            samplingStatus: searchSamplingStatus,
             page,
             size: size,
             smallclass: smallclassData,
@@ -1169,11 +1124,6 @@ export default class LocmeasureTable extends Component {
             tqzj: tqzj
         };
         if (role) postdata[role] = rolename;
-        console.log('postdata', postdata);
-        console.log('stime', stime);
-        console.log('etime', etime);
-        console.log('lstime', lstime);
-        console.log('letime', letime);
 
         this.setState({ loading: true, percent: 0 });
         getqueryTree({}, postdata).then(rst => {
@@ -1212,32 +1162,6 @@ export default class LocmeasureTable extends Component {
                     plan.createtime4 = createtime4;
                 });
 
-                // console.log('tblData', tblData);
-                // let _headers = ['order', 'sectionName', 'place', 'SupervisorCheck', 'islocation'];
-                // let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
-                //     .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
-                // console.log('headers', headers);
-                // let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
-                //     .reduce((prev, next) => prev.concat(next))
-                //     .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
-                // console.log('testttt', testttt);
-                // let output = Object.assign({}, headers, testttt);
-                // console.log('output', output);
-                // // 获取所有单元格的位置
-                // let outputPos = Object.keys(output);
-                // console.log('outputPos', outputPos);
-                // // 计算出范围
-                // let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-                // console.log('ref', ref);
-                // // 构建 workbook 对象
-                // let wb = {
-                //     SheetNames: ['mySheet'],
-                //     Sheets: {
-                //         'mySheet': Object.assign({}, output, { '!ref': ref })
-                //     }
-                // };
-                // XLSX.writeFile(wb, 'output.xlsx');
-
                 let totalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
@@ -1273,54 +1197,22 @@ export default class LocmeasureTable extends Component {
                             title: '状态',
                             dataIndex: 'statusname',
                             render: (text, record) => {
-                                let superName = '';
-                                let ownerName = '';
-                                if (
+                                let statusname = '';
+                                if (record.Status === 2) {
+                                    statusname = '不合格';
+                                } else if (
                                     record.SupervisorCheck === -1 &&
                                     record.CheckStatus === -1
                                 ) {
-                                    return <span>未抽查</span>;
+                                    statusname = '未抽查';
                                 } else {
-                                    if (record.SupervisorCheck === 0) {
-                                        superName = '监理抽查退回';
-                                    } else if (record.SupervisorCheck === 1) {
-                                        superName = '监理抽查通过';
-                                    }
-                                    if (record.CheckStatus === 0) {
-                                        ownerName = '业主抽查退回';
-                                    } else if (record.CheckStatus === 1) {
-                                        ownerName = '业主抽查通过';
-                                    } else if (record.CheckStatus === 2) {
-                                        ownerName = '业主抽查退回后修改';
-                                    }
-                                    if (superName && ownerName) {
-                                        return (
-                                            <div>
-                                                <div>{superName}</div>
-                                                <div>{ownerName}</div>
-                                            </div>
-                                        );
-                                    } else if (superName) {
-                                        return <span>{superName}</span>;
-                                    } else {
-                                        return <span>{ownerName}</span>;
+                                    if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
+                                        statusname = '抽查退回';
+                                    } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
+                                        statusname = '抽查通过';
                                     }
                                 }
-                            }
-                        },
-                        {
-                            title: '抽查状态',
-                            dataIndex: 'samplingStatusName',
-                            render: (text, record) => {
-                                let samplingStatusName = '';
-                                if (record.Status === 0) {
-                                    samplingStatusName = '未抽检';
-                                } else if (record.Status === 1) {
-                                    samplingStatusName = '已抽检';
-                                } else if (record.Status === 2) {
-                                    samplingStatusName = '不合格';
-                                }
-                                return <span>{samplingStatusName}</span>;
+                                return <span>{statusname}</span>;
                             }
                         },
                         {
@@ -1389,55 +1281,22 @@ export default class LocmeasureTable extends Component {
                             title: '状态',
                             dataIndex: 'statusname',
                             render: (text, record) => {
-                                let superName = '';
-                                let ownerName = '';
-                                if (
+                                let statusname = '';
+                                if (record.Status === 2) {
+                                    statusname = '不合格';
+                                } else if (
                                     record.SupervisorCheck === -1 &&
                                     record.CheckStatus === -1
                                 ) {
-                                    return <span>未抽查</span>;
+                                    statusname = '未抽查';
                                 } else {
-                                    if (record.SupervisorCheck === 0) {
-                                        superName = '监理抽查退回';
-                                    } else if (record.SupervisorCheck === 1) {
-                                        superName = '监理抽查通过';
-                                    }
-
-                                    if (record.CheckStatus === 0) {
-                                        ownerName = '业主抽查退回';
-                                    } else if (record.CheckStatus === 1) {
-                                        ownerName = '业主抽查通过';
-                                    } else if (record.CheckStatus === 2) {
-                                        ownerName = '业主抽查退回后修改';
-                                    }
-                                    if (superName && ownerName) {
-                                        return (
-                                            <div>
-                                                <div>{superName}</div>
-                                                <div>{ownerName}</div>
-                                            </div>
-                                        );
-                                    } else if (superName) {
-                                        return <span>{superName}</span>;
-                                    } else {
-                                        return <span>{ownerName}</span>;
+                                    if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
+                                        statusname = '抽查退回';
+                                    } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
+                                        statusname = '抽查通过';
                                     }
                                 }
-                            }
-                        },
-                        {
-                            title: '抽查状态',
-                            dataIndex: 'samplingStatusName',
-                            render: (text, record) => {
-                                let samplingStatusName = '';
-                                if (record.Status === 0) {
-                                    samplingStatusName = '未抽检';
-                                } else if (record.Status === 1) {
-                                    samplingStatusName = '已抽检';
-                                } else if (record.Status === 2) {
-                                    samplingStatusName = '不合格';
-                                }
-                                return <span>{samplingStatusName}</span>;
+                                return <span>{statusname}</span>;
                             }
                         },
                         {
@@ -1670,7 +1529,6 @@ export default class LocmeasureTable extends Component {
             exportsize,
             thinclass = '',
             status = '',
-            samplingStatus = '',
             smallclassData = '',
             thinclassData = '',
             XJFirst = 0,
@@ -1766,13 +1624,22 @@ export default class LocmeasureTable extends Component {
         } else if (TQZJFirst >= 0 && !TQZJSecond) {
             tqzj = TQZJFirst;
         }
+        let searchStatus = '';
+        let searchSamplingStatus = '';
+        if (status === '未抽查') {
+            searchSamplingStatus = -1;
+        } else if (status === '不合格') {
+            searchSamplingStatus = 2;
+        } else {
+            searchStatus = status;
+        }
         let postdata = {
             no: keycode,
             sxm,
             section,
             treetype,
-            status,
-            samplingStatus,
+            status: searchStatus,
+            samplingStatus: searchSamplingStatus,
             // locationstatus,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
             lstime: lstime && moment(lstime).format('YYYY-MM-DD HH:mm:ss'),

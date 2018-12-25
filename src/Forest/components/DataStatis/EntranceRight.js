@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { DatePicker, Spin, Card } from 'antd';
 import { Cards } from '../../components';
 import moment from 'moment';
+import XLSX from 'xlsx';
+
 var echarts = require('echarts');
 const { RangePicker } = DatePicker;
 
@@ -14,7 +16,9 @@ export default class EntranceRight extends Component {
                 .subtract(10, 'days')
                 .format('YYYY/MM/DD 00:00:00'),
             etime: moment().format('YYYY/MM/DD 23:59:59'),
-            loading: false
+            loading: false,
+            tblData: [],
+            _headers: []
         };
     }
 
@@ -80,6 +84,13 @@ export default class EntranceRight extends Component {
                 <Spin spinning={this.state.loading}>
                     <Card
                         title='各树种进场强度分析'
+                        extra={
+                            <div>
+                                <a onClick={this.handleEntranceRightDataExport.bind(this)}>
+                                    导出
+                                </a>
+                            </div>
+                        }
                     >
                         <Cards search={this.searchRender()} title={`进场强度分析`}>
                             <div
@@ -163,7 +174,8 @@ export default class EntranceRight extends Component {
         let times = [];
         let time = [];
         let legend = ['总数'];
-
+        let _headers = ['时间', '总数'];
+        let tblData = [];
         if (rst && rst instanceof Array) {
             // 将 Time 单独列为一个数组
             for (let i = 0; i < rst.length; i++) {
@@ -174,34 +186,32 @@ export default class EntranceRight extends Component {
             // 时间数组去重
             times = [...new Set(time)];
 
-            if (rst && rst instanceof Array) {
-                sectionData.map(project => {
-                    // 获取正确的项目
-                    if (leftkeycode.indexOf(project.No) > -1) {
-                        // 获取项目下的标段
-                        let sections = project.children;
-                        // 将各个标段的数据设置为0
-                        sections.map((section, index) => {
-                            // 定义一个二维数组，分为多个标段
-                            gpshtnum[index] = new Array();
-                            data[index] = new Array();
-                            legend.push(section.Name);
-                        });
-
+            sectionData.map(project => {
+                // 获取正确的项目
+                if (leftkeycode.indexOf(project.No) > -1) {
+                    // 获取项目下的标段
+                    let sections = project.children;
+                    sections.map((section, index) => {
+                        // 定义一个二维数组，分为多个标段
+                        gpshtnum[index] = new Array();
+                        data[index] = new Array();
+                        legend.push(section.Name);
+                        _headers.push(section.Name);
                         rst.map(item => {
                             if (item && item.Section) {
-                                sections.map((section, index) => {
-                                    if (item.Section === section.No) {
-                                        gpshtnum[index].push(item);
-                                    }
-                                });
+                                if (item.Section === section.No) {
+                                    gpshtnum[index].push(item);
+                                }
                             }
                         });
-                    }
-                });
-            }
+                    });
+                }
+            });
 
             times.map((time, index) => {
+                let obj = {};
+                obj['时间'] = time;
+                tblData.push(obj);
                 data.map(sectionData => {
                     sectionData[index] = 0;
                 });
@@ -215,7 +225,7 @@ export default class EntranceRight extends Component {
             });
             for (let i = 0; i < times.length; i++) {
                 total[i] = 0;
-                data.map(sectionData => {
+                data.map((sectionData, order) => {
                     total[i] = total[i] + sectionData[i];
                 });
             }
@@ -235,7 +245,16 @@ export default class EntranceRight extends Component {
                 }
             }
         ];
+        total.map((num, order) => {
+            let obj = tblData[order];
+            obj['总数'] = num;
+        });
         data.map((sectionData, index) => {
+            let sectionName = legend[index + 1];
+            sectionData.map((num, order) => {
+                let obj = tblData[order] || {};
+                obj[sectionName] = num;
+            });
             series.push({
                 name: legend[index + 1],
                 type: 'line',
@@ -257,7 +276,41 @@ export default class EntranceRight extends Component {
         };
         myChart2.setOption(options2);
         this.setState({
-            loading: false
+            loading: false,
+            tblData,
+            _headers
         });
+    }
+
+    handleEntranceRightDataExport = async () => {
+        const {
+            tblData,
+            _headers
+        } = this.state;
+        if (!(tblData && tblData instanceof Array && tblData.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, `各树种进场强度分析.xlsx`);
     }
 }

@@ -45,7 +45,6 @@ export default class SupervisorTable extends Component {
             smallclass: '',
             thinclass: '',
             status: '',
-            samplingStatus: '',
             SupervisorCheck: '',
             role: '',
             rolename: '',
@@ -96,7 +95,6 @@ export default class SupervisorTable extends Component {
             treetypeoption,
             thinclassoption,
             statusoption,
-            samplingStatusOption,
             users,
             typeoption
         } = this.props;
@@ -107,7 +105,6 @@ export default class SupervisorTable extends Component {
             smallclass,
             thinclass,
             status,
-            samplingStatus,
             bigType,
             treetypename
         } = this.state;
@@ -148,55 +145,22 @@ export default class SupervisorTable extends Component {
                 title: '状态',
                 dataIndex: 'statusname',
                 render: (text, record) => {
-                    let superName = '';
-                    let ownerName = '';
-                    if (
+                    let statusname = '';
+                    if (record.Status === 2) {
+                        statusname = '不合格';
+                    } else if (
                         record.SupervisorCheck === -1 &&
                         record.CheckStatus === -1
                     ) {
-                        return <span>未抽查</span>;
+                        statusname = '未抽查';
                     } else {
-                        if (record.SupervisorCheck === 0) {
-                            superName = '监理抽查退回';
-                        } else if (record.SupervisorCheck === 1) {
-                            superName = '监理抽查通过';
-                        }
-
-                        if (record.CheckStatus === 0) {
-                            ownerName = '业主抽查退回';
-                        } else if (record.CheckStatus === 1) {
-                            ownerName = '业主抽查通过';
-                        } else if (record.CheckStatus === 2) {
-                            ownerName = '业主抽查退回后修改';
-                        }
-                        if (superName && ownerName) {
-                            return (
-                                <div>
-                                    <div>{superName}</div>
-                                    <div>{ownerName}</div>
-                                </div>
-                            );
-                        } else if (superName) {
-                            return <span>{superName}</span>;
-                        } else {
-                            return <span>{ownerName}</span>;
+                        if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
+                            statusname = '抽查退回';
+                        } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
+                            statusname = '抽查通过';
                         }
                     }
-                }
-            },
-            {
-                title: '抽查状态',
-                dataIndex: 'samplingStatusName',
-                render: (text, record) => {
-                    let samplingStatusName = '';
-                    if (record.Status === 0) {
-                        samplingStatusName = '未抽检';
-                    } else if (record.Status === 1) {
-                        samplingStatusName = '已抽检';
-                    } else if (record.Status === 2) {
-                        samplingStatusName = '不合格';
-                    }
-                    return <span>{samplingStatusName}</span>;
+                    return <span>{statusname}</span>;
                 }
             },
             {
@@ -322,18 +286,6 @@ export default class SupervisorTable extends Component {
                             onChange={this.onStatusChange.bind(this)}
                         >
                             {statusoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>抽查状态：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={samplingStatus}
-                            onChange={this.onSamplingStatusChange.bind(this)}
-                        >
-                            {samplingStatusOption}
                         </Select>
                     </div>
                     <div className='forest-mrg10'>
@@ -520,10 +472,6 @@ export default class SupervisorTable extends Component {
         this.setState({ SupervisorCheck, status: value || '' });
     }
 
-    onSamplingStatusChange (value) {
-        this.setState({ samplingStatus: value || '' });
-    }
-
     onRoleNameChange (value) {
         this.setState({ rolename: value.target.value });
     }
@@ -597,7 +545,6 @@ export default class SupervisorTable extends Component {
             sstime = '',
             setime = '',
             status = '',
-            samplingStatus = '',
             size,
             bigType = '',
             treetype = '',
@@ -616,14 +563,23 @@ export default class SupervisorTable extends Component {
             treetypes
         } = this.props;
         let thinClassTree = tree.thinClassTree;
+        let searchStatus = '';
+        let searchSamplingStatus = '';
+        if (status === '未抽查') {
+            searchSamplingStatus = -1;
+        } else if (status === '不合格') {
+            searchSamplingStatus = 2;
+        } else {
+            searchStatus = status;
+        }
         let postdata = {
             no: keycode,
             sxm,
             section,
             smallclass: smallclassData,
             thinclass: thinclassData,
-            status,
-            samplingStatus,
+            status: searchStatus,
+            samplingStatus: searchSamplingStatus,
             SupervisorCheck,
             sstime: sstime && moment(sstime).format('YYYY-MM-DD HH:mm:ss'),
             setime: setime && moment(setime).format('YYYY-MM-DD HH:mm:ss'),

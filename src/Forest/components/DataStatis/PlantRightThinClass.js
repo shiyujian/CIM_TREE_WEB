@@ -129,7 +129,6 @@ export default class PlantRightThinClass extends Component {
         } = this.state;
 
         let smallClassOption = [];
-        console.log('sectionsData', sectionsData);
         sectionsData.map(sectionData => {
             // 获取正确的项目
             if (section.indexOf(sectionData.No) > -1) {
@@ -159,7 +158,7 @@ export default class PlantRightThinClass extends Component {
             <Spin spinning={this.state.loading}>
                 <Card
                     title='各细班种植进度分析'
-                    extra={<a href="#" onClick={this.toExport.bind(this)}>导出</a>}
+                    extra={<a href='#' onClick={this.toExport.bind(this)}>导出</a>}
                 >
                     <Cards
                         style={{ margin: '20px 5px 5px 5px' }}
@@ -197,7 +196,6 @@ export default class PlantRightThinClass extends Component {
     // 标题左侧下拉框
     title1 () {
         const { section, smallClassSelect, sectionOption, smallClassOption } = this.state;
-        console.log('smallClassOption33', smallClassOption);
         return (
             <div>
                 <Select
@@ -223,10 +221,10 @@ export default class PlantRightThinClass extends Component {
         const { sectionOption } = this.state;
         let sectionName = '';
         sectionOption.map(item => {
-            if(item.props && item.props.value === value){
+            if (item.props && item.props.value === value) {
                 sectionName = item.props.children;
             }
-        })
+        });
         this.setState({
             section: value,
             sectionName
@@ -234,15 +232,13 @@ export default class PlantRightThinClass extends Component {
     }
     // 选择小班
     handleSmallClassChange (value) {
-        console.log(value);
         const { smallClassOption } = this.state;
         let sectionClassName = '';
         smallClassOption.map(item => {
-            if(item.props && item.props.value === value){
+            if (item.props && item.props.value === value) {
                 sectionClassName = item.props.children;
             }
-        })
-        console.log('sectionClassName', sectionClassName);
+        });
         this.setState({
             smallClassSelect: value,
             sectionClassName
@@ -259,33 +255,6 @@ export default class PlantRightThinClass extends Component {
         }, () => {
             this.query();
         });
-    }
-    toExport () {
-        const { exportData, sectionName, sectionClassName } = this.state;
-        let tblData = exportData;
-        if(!tblData.length){
-            message.warning('没有数据供导出');
-            return;
-        }
-        let _headers = ['细班编号', '未种植', '已种植'];   
-        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
-        .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
-        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
-        .reduce((prev, next) => prev.concat(next))
-        .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
-        let output = Object.assign({}, headers, testttt);
-        // 获取所有单元格的位置
-        let outputPos = Object.keys(output);
-        // 计算出范围
-        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-        // 构建 workbook 对象
-        let wb = {
-            SheetNames: ['mySheet'],
-            Sheets: {
-            'mySheet': Object.assign({}, output, { '!ref': ref })
-            }
-        };
-        XLSX.writeFile(wb, sectionName + sectionClassName + '各细班种植进度表.xlsx');
     }
     // 查询数据
     async query () {
@@ -341,8 +310,8 @@ export default class PlantRightThinClass extends Component {
                             exportData.push({
                                 '细班编号': thinClass.Name,
                                 '未种植': item.UnComplete,
-                                '已种植': item.Complete,
-                            })
+                                '已种植': item.Complete
+                            });
                         }
                     });
                 });
@@ -357,7 +326,7 @@ export default class PlantRightThinClass extends Component {
             console.log(e);
         }
     }
-    renderChart(label, unComplete, complete){
+    renderChart (label, unComplete, complete) {
         let myChart4 = echarts.init(document.getElementById('PlantRightThinClass'));
         let options4 = {
             legend: {
@@ -411,5 +380,36 @@ export default class PlantRightThinClass extends Component {
         };
         myChart4.setOption(options4);
         this.setState({ loading: false });
+    }
+
+    toExport () {
+        const { exportData, sectionName, sectionClassName } = this.state;
+        let tblData = exportData;
+        if (!(tblData && tblData instanceof Array && tblData.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
+        let _headers = ['细班编号', '未种植', '已种植'];
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, {[next.position]: {v: next.v}}), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, sectionName + sectionClassName + '各细班种植进度表.xlsx');
     }
 }

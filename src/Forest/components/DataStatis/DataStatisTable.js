@@ -362,6 +362,13 @@ export default class DataStatisTable extends Component {
             statByTreetype
         } = this.state;
         let tblData = [];
+        if (!(statByTreetype && statByTreetype instanceof Array && statByTreetype.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
         statByTreetype.sort(function (a, b) {
             if (a.Num > b.Num) {
                 return -1;
@@ -403,6 +410,13 @@ export default class DataStatisTable extends Component {
         const {
             statByTreetype
         } = this.state;
+        if (!(statByTreetype && statByTreetype instanceof Array && statByTreetype.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
         let tblData = [];
         let treetypeData = this.getTreetypeData();
         if (statByTreetype && statByTreetype instanceof Array) {

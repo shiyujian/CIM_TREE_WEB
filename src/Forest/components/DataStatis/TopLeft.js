@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Spin, Card } from 'antd';
+import { Spin, Card, Notification } from 'antd';
 import XLSX from 'xlsx';
 
 export default class Top extends Component {
@@ -122,13 +122,7 @@ export default class Top extends Component {
                 if (data && data instanceof Array && data.length === 2) {
                     queryData = data;
                     let unPlantNum = Number(data[0]);
-                    // if (unPlantNum < 0) {
-                    //     unPlantNum = -unPlantNum;
-                    // }
                     let plantNum = Number(data[1]);
-                    // if (plantNum < 0) {
-                    //     plantNum = -plantNum;
-                    // }
                     let myChart = echarts.init(document.getElementById('topLeft'));
                     let option = {
                         series: [
@@ -183,6 +177,11 @@ export default class Top extends Component {
                 }
             };
             XLSX.writeFile(wb, `栽植量.xlsx`);
+        } else {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
         }
     }
 }

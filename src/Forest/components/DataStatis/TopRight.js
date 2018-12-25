@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import echarts from 'echarts';
-import { Spin, Card } from 'antd';
+import { Spin, Card, Notification } from 'antd';
 import XLSX from 'xlsx';
 
 export default class Top extends Component {
@@ -143,7 +143,7 @@ export default class Top extends Component {
                 });
             }
         } catch (e) {
-
+            console.log('query', e);
         }
     }
 
@@ -178,6 +178,11 @@ export default class Top extends Component {
                 }
             };
             XLSX.writeFile(wb, `定位量.xlsx`);
+        } else {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
         }
     }
 }

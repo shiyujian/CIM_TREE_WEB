@@ -45,7 +45,6 @@ export default class Locmeasureinfo extends Component {
             typeoption: [],
             statusoption: [],
             locationoption: [],
-            samplingStatusOption: [],
             leftkeycode: '',
             resetkey: 0,
             bigType: '',
@@ -125,44 +124,46 @@ export default class Locmeasureinfo extends Component {
             </Option>
         ];
         this.setState({ typeoption });
+        // // 状态
+        // let statusoption = [
+        //     <Option key={'-1'} value={''} title={'全部'}>
+        //         全部
+        //     </Option>,
+        //     <Option key={'1'} value={'-1'} title={'未确认'}>
+        //         未确认
+        //     </Option>,
+        //     <Option key={'2'} value={'0'} title={'监理抽查通过'}>
+        //         监理抽查通过
+        //     </Option>,
+        //     <Option key={'3'} value={'1'} title={'监理抽查退回'}>
+        //         监理抽查退回
+        //     </Option>,
+        //     <Option key={'4'} value={'2'} title={'业主抽查退回'}>
+        //         业主抽查退回
+        //     </Option>,
+        //     <Option key={'5'} value={'3'} title={'业主抽查通过'}>
+        //         业主抽查通过
+        //     </Option>
+        // ];
         // 状态
         let statusoption = [
             <Option key={'-1'} value={''} title={'全部'}>
                 全部
             </Option>,
-            <Option key={'1'} value={'-1'} title={'未确认'}>
-                未确认
+            <Option key={'1'} value={'未抽查'} title={'未抽查'}>
+                未抽查
             </Option>,
-            <Option key={'2'} value={'0'} title={'监理抽查通过'}>
-                监理抽查通过
+            <Option key={'2'} value={'0,3'} title={'抽查通过'}>
+                抽查通过
             </Option>,
-            <Option key={'3'} value={'1'} title={'监理抽查退回'}>
-                监理抽查退回
+            <Option key={'3'} value={'1,2'} title={'抽查退回'}>
+                抽查退回
             </Option>,
-            <Option key={'4'} value={'2'} title={'业主抽查退回'}>
-                业主抽查退回
-            </Option>,
-            <Option key={'5'} value={'3'} title={'业主抽查通过'}>
-                业主抽查通过
-            </Option>
-        ];
-        this.setState({ statusoption });
-        // 抽查状态
-        let samplingStatusOption = [
-            <Option key={'-1'} value={''} title={'全部'}>
-                全部
-            </Option>,
-            <Option key={'0'} value={'0'} title={'未抽检'}>
-                未抽检
-            </Option>,
-            <Option key={'1'} value={'1'} title={'已抽检'}>
-                已抽检
-            </Option>,
-            <Option key={'2'} value={'2'} title={'不合格'}>
+            <Option key={'4'} value={'不合格'} title={'不合格'}>
                 不合格
             </Option>
         ];
-        this.setState({ samplingStatusOption });
+        this.setState({ statusoption });
         // 定位
         let locationoption = [
             <Option key={'-1'} value={''} title={'全部'}>
@@ -191,7 +192,6 @@ export default class Locmeasureinfo extends Component {
             bigType,
             statusoption,
             locationoption,
-            samplingStatusOption,
             resetkey
         } = this.state;
         const {
@@ -229,7 +229,6 @@ export default class Locmeasureinfo extends Component {
                             treetypelist={treetypelist}
                             statusoption={statusoption}
                             locationoption={locationoption}
-                            samplingStatusOption={samplingStatusOption}
                             leftkeycode={leftkeycode}
                             keycode={keycode}
                             resetinput={this.resetinput.bind(this)}

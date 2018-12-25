@@ -42,7 +42,6 @@ export default class Supervisorinfo extends Component {
             smallclassoption: [],
             thinclassoption: [],
             statusoption: [],
-            samplingStatusOption: [],
             leftkeycode: '',
             resetkey: 0,
             treetypeoption: [],
@@ -104,12 +103,27 @@ export default class Supervisorinfo extends Component {
                 地被
             </Option>
         ];
+        // // 状态
+        // let statusoption = [
+        //     <Option key={'-1'} value={''} title={'全部'}>
+        //         全部
+        //     </Option>,
+        //     <Option key={'1'} value={'-1'} title={'未抽查'}>
+        //         未抽查
+        //     </Option>,
+        //     <Option key={'2'} value={'0'} title={'监理抽查通过'}>
+        //         监理抽查通过
+        //     </Option>,
+        //     <Option key={'3'} value={'1'} title={'监理抽查退回'}>
+        //         监理抽查退回
+        //     </Option>
+        // ];
         // 状态
         let statusoption = [
             <Option key={'-1'} value={''} title={'全部'}>
                 全部
             </Option>,
-            <Option key={'1'} value={'-1'} title={'未抽查'}>
+            <Option key={'1'} value={'未抽查'} title={'未抽查'}>
                 未抽查
             </Option>,
             <Option key={'2'} value={'0'} title={'监理抽查通过'}>
@@ -117,25 +131,13 @@ export default class Supervisorinfo extends Component {
             </Option>,
             <Option key={'3'} value={'1'} title={'监理抽查退回'}>
                 监理抽查退回
-            </Option>
-        ];
-        this.setState({ statusoption, typeoption });
-        // 抽查状态
-        let samplingStatusOption = [
-            <Option key={'-1'} value={''} title={'全部'}>
-                全部
             </Option>,
-            <Option key={'0'} value={'0'} title={'未抽检'}>
-                未抽检
-            </Option>,
-            <Option key={'1'} value={'1'} title={'已抽检'}>
-                已抽检
-            </Option>,
-            <Option key={'2'} value={'2'} title={'不合格'}>
+            <Option key={'4'} value={'不合格'} title={'不合格'}>
                 不合格
             </Option>
         ];
-        this.setState({ samplingStatusOption });
+        this.setState({ statusoption });
+        this.setState({ statusoption, typeoption });
     }
 
     render () {
@@ -146,7 +148,6 @@ export default class Supervisorinfo extends Component {
             smallclassoption,
             thinclassoption,
             statusoption,
-            samplingStatusOption,
             resetkey,
             treetypeoption,
             typeoption,
@@ -185,7 +186,6 @@ export default class Supervisorinfo extends Component {
                             treetypeoption={treetypeoption}
                             thinClassSelect={this.thinClassSelect.bind(this)}
                             statusoption={statusoption}
-                            samplingStatusOption={samplingStatusOption}
                             leftkeycode={leftkeycode}
                             keycode={keycode}
                             resetinput={this.resetinput.bind(this)}
