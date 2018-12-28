@@ -13,7 +13,7 @@ import ManMachineBottom from '../components/ScheduleDisplay/ManMachineSchedule/M
 import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import { getDefaultProject } from '_platform/auth';
-import * as actions from '../store/ScheduleDisplay';
+import * as actions from '../store/scheduleDisplay';
 const Option = Select.Option;
 const TabPane = Tabs.TabPane;
 @connect(

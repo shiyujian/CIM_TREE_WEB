@@ -1,7 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
 import { FOREST_API } from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
-const ID = 'entry';
+const ID = 'ENTRY';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
 export const gettreetype = forestFetchAction(

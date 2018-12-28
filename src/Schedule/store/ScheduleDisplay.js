@@ -1,7 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import { FOREST_API } from '_platform/api';
-const ID = 'ScheduleDisplay';
+const ID = 'SCHEDULEDISPLAY';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
 // 查询计划栽植量接口
