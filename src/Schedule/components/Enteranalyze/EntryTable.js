@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
-import { Row, Col, DatePicker, Select, Spin } from 'antd';
+import { Spin } from 'antd';
 import { SumTotal, DateImg } from '../../components';
 import moment from 'moment';
-import { groupBy } from 'lodash';
-var echarts = require('echarts');
-const Option = Select.Option;
-const { RangePicker } = DatePicker;
 
 export default class EntryTable extends Component {
     constructor (props) {
@@ -15,9 +11,9 @@ export default class EntryTable extends Component {
             // 今日进场总数
             today: 0,
             nurserys: 0,
+            loading1: false,
+            loading2: false,
             loading3: false,
-            loading4: false,
-            loading6: false,
             isOpen: [false, false, false],
             nowmessage: [],
             nowmessagelist: []
@@ -28,7 +24,6 @@ export default class EntryTable extends Component {
         const {
             actions: { nowmessage }
         } = this.props;
-        this.query();
         // 实时种植信息
         let rst = await nowmessage();
         if (rst && rst.content) {
@@ -41,7 +36,7 @@ export default class EntryTable extends Component {
     async componentDidUpdate (prevProps, prevState) {
         const { leftkeycode } = this.props;
         // 地块修改，则修改标段
-        if (leftkeycode != prevProps.leftkeycode) {
+        if (leftkeycode !== prevProps.leftkeycode) {
             this.query();
         }
     }
@@ -52,9 +47,9 @@ export default class EntryTable extends Component {
             leftkeycode
         } = this.props;
         this.setState({
-            loading3: true,
-            loading4: true,
-            loading6: true
+            loading1: true,
+            loading2: true,
+            loading3: true
         });
 
         // 获取当前种树信息
@@ -81,9 +76,9 @@ export default class EntryTable extends Component {
         }
 
         this.setState({
+            loading1: false,
+            loading2: false,
             loading3: false,
-            loading4: false,
-            loading6: false,
             amount,
             today
         });
@@ -95,7 +90,7 @@ export default class EntryTable extends Component {
         return (
             <div>
                 <div style={{display: 'flex'}}>
-                    <Spin spinning={this.state.loading3}>
+                    <Spin spinning={this.state.loading1}>
                         <SumTotal
                             search={this.searchSum(0)}
                             title='苗木累计进场总数'
@@ -103,7 +98,7 @@ export default class EntryTable extends Component {
                             <div>{amount}</div>
                         </SumTotal>
                     </Spin>
-                    <Spin spinning={this.state.loading4}>
+                    <Spin spinning={this.state.loading2}>
                         <SumTotal
                             search={this.searchSum(1)}
                             title='苗木今日进场总数'
@@ -111,7 +106,7 @@ export default class EntryTable extends Component {
                             <div>{this.state.today}</div>
                         </SumTotal>
                     </Spin>
-                    <Spin spinning={this.state.loading6}>
+                    <Spin spinning={this.state.loading3}>
                         <div
                             className='nowmessage'
                             style={{ border: '1px solid #666' }}

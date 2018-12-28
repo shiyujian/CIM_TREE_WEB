@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Row, Col } from 'antd';
-import * as actions from '../store/entry';
+import * as actions from '../store/enterAnalyze';
 import { PkCodeTree } from '../components';
 import { EntryTable } from '../components/EnterAnalyze';
 import { actions as platformActions } from '_platform/store/global';

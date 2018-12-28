@@ -213,6 +213,7 @@ export default class BottomRight extends Component {
                     onChange={this.datepick.bind(this)}
                     onOk={this.datepick.bind(this)}
                 />
+                <a>导出</a>
             </div>
         );
     }

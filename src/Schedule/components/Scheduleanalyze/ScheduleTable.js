@@ -1,21 +1,7 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { Select, Row, Col, DatePicker, Spin } from 'antd';
+import { Spin } from 'antd';
 import moment from 'moment';
-import {
-    Main,
-    Aside,
-    Body,
-    Sidebar,
-    Content,
-    DynamicTitle
-} from '_platform/components/layout';
-import { Cards, SumTotal, DateImg } from '../../components';
-import { groupBy } from 'lodash';
-var echarts = require('echarts');
-const { RangePicker } = DatePicker;
-const Option = Select.Option;
+import { SumTotal, DateImg } from '../../components';
 
 export default class ScheduleTable extends Component {
     constructor (props) {
@@ -24,18 +10,11 @@ export default class ScheduleTable extends Component {
             amount: 0,
             today: 0,
             total: 0,
-            loading5: false,
-            loading6: false,
-            loading7: false,
+            loading1: false,
+            loading2: false,
+            loading3: false,
             isShow: true,
             isOpen: [false, false, false],
-            nowmessage: {
-                CreateTime: '',
-                Factory: '',
-                nowmessage: '',
-                nowmessage: '',
-                TreeTypeObj: { TreeTypeName: '' }
-            },
             nowmessagelist: []
         };
     }
@@ -46,8 +25,6 @@ export default class ScheduleTable extends Component {
                 nowmessage
             }
         } = this.props;
-        this.query();
-
         // 实时种植信息
         let message = await nowmessage();
 
@@ -75,9 +52,9 @@ export default class ScheduleTable extends Component {
             leftkeycode
         } = this.props;
         this.setState({
-            loading5: true,
-            loading6: true,
-            loading7: true
+            loading1: true,
+            loading2: true,
+            loading3: true
         });
 
         let postdata = {
@@ -115,9 +92,9 @@ export default class ScheduleTable extends Component {
             amount,
             today: today,
             total: total,
-            loading5: false,
-            loading6: false,
-            loading7: false
+            loading1: false,
+            loading2: false,
+            loading3: false
         });
     }
 
@@ -136,7 +113,7 @@ export default class ScheduleTable extends Component {
         return (
             <div>
                 <div style={{display: 'flex'}}>
-                    <Spin spinning={this.state.loading5}>
+                    <Spin spinning={this.state.loading1}>
                         <SumTotal
                             search={this.searchSum(0)}
                             title='苗木累计种植总数'
@@ -144,7 +121,7 @@ export default class ScheduleTable extends Component {
                             <div>{this.state.amount}</div>
                         </SumTotal>
                     </Spin>
-                    <Spin spinning={this.state.loading6}>
+                    <Spin spinning={this.state.loading2}>
                         <SumTotal
                             search={this.searchSum(1)}
                             title='苗木今日种植总数'
@@ -152,7 +129,7 @@ export default class ScheduleTable extends Component {
                             <div>{this.state.today}</div>
                         </SumTotal>
                     </Spin>
-                    <Spin spinning={this.state.loading7}>
+                    <Spin spinning={this.state.loading3}>
                         <SumTotal
                             search={this.searchSum(2)}
                             title='种植完工率'

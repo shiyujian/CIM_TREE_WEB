@@ -1,9 +1,10 @@
-import { createAction, handleActions, combineActions } from 'redux-actions';
+import { handleActions, combineActions } from 'redux-actions';
 import { actionsMap } from '_platform/store/util';
 import entryReducer, { actions as entryActions } from './entry';
 import stageReducer, { actions as stageActions } from './stage';
-import scheduleDisplayReducer, { actions as scheduleDisplayActions } from './ScheduleDisplay';
-import scheduleReportReducer, { actions as scheduleReportActions } from './ScheduleReport';
+import scheduleDisplayReducer, { actions as scheduleDisplayActions } from './scheduleDisplay';
+import enterAnalyzeReducer, { actions as enterAnalyzeActions } from './enterAnalyze';
+import scheduleAnalyzeReducer, { actions as scheduleAnalyzeActions } from './scheduleAnalyze';
 
 export default handleActions(
     {
@@ -19,16 +20,22 @@ export default handleActions(
                 stage: stageReducer(state.stage, action)
             };
         },
+        [combineActions(...actionsMap(enterAnalyzeActions))]: (state = {}, action) => {
+            return {
+                ...state,
+                enterAnalyze: enterAnalyzeReducer(state.enterAnalyze, action)
+            };
+        },
+        [combineActions(...actionsMap(scheduleAnalyzeActions))]: (state = {}, action) => {
+            return {
+                ...state,
+                scheduleAnalyze: scheduleAnalyzeReducer(state.scheduleAnalyze, action)
+            };
+        },
         [combineActions(...actionsMap(scheduleDisplayActions))]: (state = {}, action) => {
             return {
                 ...state,
                 scheduleDisplay: scheduleDisplayReducer(state.scheduleDisplay, action)
-            };
-        },
-        [combineActions(...actionsMap(scheduleReportActions))]: (state = {}, action) => {
-            return {
-                ...state,
-                scheduleReport: scheduleReportReducer(state.scheduleReport, action)
             };
         }
     },
