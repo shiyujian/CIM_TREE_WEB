@@ -50,7 +50,7 @@ export default class LocmeasureTable extends Component {
             status: '',
             SupervisorCheck: '',
             CheckStatus: '',
-            islocation: '',
+            // islocation: '',
             role: 'inputer',
             rolename: '',
             percent: 0,
@@ -366,8 +366,8 @@ export default class LocmeasureTable extends Component {
             thinclass,
             bigType,
             treetypename,
-            status,
-            islocation
+            status
+            // islocation
         } = this.state;
         const suffix1 = sxm ? (
             <Icon type='close-circle' onClick={this.emitEmpty1} />
@@ -462,7 +462,7 @@ export default class LocmeasureTable extends Component {
                             {statusoption}
                         </Select>
                     </div>
-                    <div className='forest-mrg10'>
+                    {/* <div className='forest-mrg10'>
                         <span className='forest-search-span'>定位：</span>
                         <Select
                             allowClear
@@ -473,7 +473,7 @@ export default class LocmeasureTable extends Component {
                         >
                             {locationoption}
                         </Select>
-                    </div>
+                    </div> */}
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>测量人：</span>
                         <Input
@@ -983,7 +983,7 @@ export default class LocmeasureTable extends Component {
             section = '',
             bigType = '',
             treetype = '',
-            islocation = '',
+            // islocation = '',
             role = '',
             rolename = '',
             stime = '',
@@ -1105,7 +1105,7 @@ export default class LocmeasureTable extends Component {
             section,
             bigType,
             treetype,
-            islocation,
+            // islocation,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
             lstime: lstime && moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
