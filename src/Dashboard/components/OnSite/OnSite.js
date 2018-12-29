@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-19 09:42:05
+ * @Last Modified time: 2018-12-29 16:22:34
  */
 import React, { Component } from 'react';
 import {
@@ -1433,6 +1433,7 @@ class OnSite extends Component {
                 }
                 if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement') {
                     let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                    let selectSectionNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
                     if (me.tileTreeLayerBasic) {
                         me.map.removeLayer(me.tileTreeLayerBasic);
                     }
@@ -1441,7 +1442,7 @@ class OnSite extends Component {
                         realThinClassLayerList[eventKey].addTo(me.map);
                     } else {
                         var url = window.config.DASHBOARD_TREETYPE +
-                        `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27`;
+                        `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27%20and%20Section+LIKE+%27%25${selectSectionNo}%25%27`;
                         let thinClassLayer = L.tileLayer.wms(url,
                             {
                                 layers: 'xatree:treelocation',
