@@ -20,8 +20,6 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import { SERVICE_API } from '_platform/api';
-import { getUser } from '_platform/auth';
-var moment = require('moment');
 var download = window.config.nurseryLocation;
 @connect(
     state => {
@@ -36,40 +34,59 @@ var download = window.config.nurseryLocation;
     })
 )
 export default class Dataimport extends Component {
-    //
-    user = {};
     constructor (props) {
         super(props);
         this.state = {
             imgvisible: false,
             imgsrc: '',
             title: '',
-            dataSource: []
+            dataSource: [],
+            loginUser: '',
+            forestUser: '',
+            loginUserSections: ''
         };
     }
-    componentDidMount () {
-        if (!this.user.id) {
-            this.user = getUser();
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getForestUsers
+            }
+        } = this.props;
+        const loginUser = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        let username = loginUser && loginUser.username;
+        let loginUserSections = loginUser && loginUser.account && loginUser.account.sections;
+        let forestUserData = await getForestUsers({}, {username: username});
+        let forestUser = '';
+
+        if (forestUserData && forestUserData.content && forestUserData.content.length > 0) {
+            forestUser = forestUserData.content[0];
         }
+        this.setState({
+            loginUser,
+            loginUserSections,
+            forestUser
+        });
     }
 
     render () {
-        let jthis = this;
+        let that = this;
         const props = {
             action: `${SERVICE_API}/excel/upload-api/`,
             headers: {},
             showUploadList: false,
             beforeUpload (file) {
-                let sections = JSON.parse(jthis.user.sections);
+                const {
+                    loginUserSections
+                } = that.state;
                 if (
                     file.name.indexOf('xls') !== -1 ||
                     file.name.indexOf('xlxs') !== -1
                 ) {
-                    if (sections.length === 0) {
+                    if (loginUserSections && loginUserSections instanceof Array && loginUserSections.length > 0) {
+                        return true;
+                    } else {
                         message.info('该用户未关联标段，不能上传文件。');
                         return false;
-                    } else {
-                        return true;
                     }
                 } else {
                     message.warning('只能上传excel文件');
@@ -87,7 +104,7 @@ export default class Dataimport extends Component {
                         });
                         return;
                     }
-                    jthis.handleExcelData(importData);
+                    that.handleExcelData(importData);
                 } else if (info.file.status === 'error') {
                     Notification.error({
                         message: `${info.file.name}解析失败，请检查输入`
@@ -174,17 +191,27 @@ export default class Dataimport extends Component {
             </Body>
         );
     }
-    async handleExcelData (data) {
-        let sections = JSON.parse(this.user.sections);
+    handleExcelData = async (data) => {
+        const {
+            loginUser,
+            loginUserSections,
+            forestUser
+        } = this.state;
+        if (!(loginUser && forestUser)) {
+            Notification.error({
+                message: `当前登录用户数据错误，请确认后再次上传`
+            });
+            return;
+        }
         let flag = false;
         let patt = /^\d{4,}-(?:0?\d|1[12])-(?:[012]?\d|3[01]) (?:[01]?\d|2[0-4]):(?:[0-5]?\d|60):(?:[0-5]?\d|60)$/;
         data.splice(0, 1);
         let dataSource = [];
-        data.map(item => {
-            if (item[0] !== '') {
+        data.map((item, index) => {
+            if (item[1] !== '') {
                 let single = {
-                    index: item[0] || '',
-                    Section: sections[0],
+                    index: item[0] || (index + 1),
+                    Section: loginUserSections[0],
                     SXM: item[1] || '',
                     X: item[2] || '',
                     Y: item[3] || '',
@@ -193,9 +220,8 @@ export default class Dataimport extends Component {
                 };
                 if (!patt.test(single.CreateTime)) {
                     message.info(
-                        '第' +
-                            single.index +
-                            '条信息时间格式错误，请确认后再次提交'
+                        single.index +
+                            '信息时间格式错误，请确认后再次提交'
                     );
                     flag = true;
                     return;
@@ -211,22 +237,44 @@ export default class Dataimport extends Component {
             this.setState({ dataSource });
         }
     }
-    postData () {
+    postData = async () => {
         const {
-            actions: { postPositionData }
+            actions: { postPositionData, getTreeMess }
         } = this.props;
-        const { dataSource } = this.state;
+        const {
+            dataSource,
+            loginUserSections,
+            forestUser
+        } = this.state;
         if (dataSource.length === 0) {
             message.info('上传数据不能为空');
             return;
         }
-        postPositionData({ id: this.user.id }, dataSource).then(rst => {
-            if (rst.code) {
-                message.info('定位数据导入成功');
-            } else {
-                message.error('定位信息导入失败，请确认模板正确！');
+        let sectionCheckStatus = false;
+        let gettreeMessArr = [];
+        for (let i = 0; i < 5; i++) {
+            if (dataSource[i]) {
+                gettreeMessArr.push(getTreeMess({sxm: dataSource[i].SXM}));
+            };
+        }
+        let checkDatas = await Promise.all(gettreeMessArr);
+        checkDatas.map((checkData) => {
+            if (checkData && checkData.Section && checkData.Section !== loginUserSections[0]) {
+                sectionCheckStatus = true;
             }
         });
+        if (sectionCheckStatus) {
+            Notification.error({
+                message: `当前登录用户与上传数据不属于同一标段，请确认后再上传`
+            });
+            return;
+        }
+        let rst = await postPositionData({ id: forestUser.ID }, dataSource);
+        if (rst.code) {
+            message.info('定位数据导入成功');
+        } else {
+            message.error('定位信息导入失败，请确认模板正确！');
+        }
     }
     onDownloadClick () {
         window.open(download);
