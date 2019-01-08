@@ -26,7 +26,6 @@ export default class FaithModal extends Component {
 
     componentWillReceiveProps (nextProps) {
         const { honestyList = [] } = nextProps;
-        console.log('honestyList', honestyList);
         if (honestyList.length != 0) {
             this.setState({
                 loading1: false
@@ -39,13 +38,11 @@ export default class FaithModal extends Component {
     }
 
     render () {
-        const { tblData } = this.state;
         const {
             faith: { visibleModal } = false,
             honestyList = [],
             nurseryName = ''
         } = this.props;
-        console.log('this.props', this.props);
         let newList = [];
         honestyList.map((item, index) => {
             item.order = index + 1;

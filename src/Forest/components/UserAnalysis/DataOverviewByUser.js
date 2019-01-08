@@ -169,9 +169,6 @@ export default class DataOverviewByUser extends Component {
             }
         } = this.props;
         try {
-            console.log('stime', stime);
-            console.log('etime', etime);
-            console.log('tabKey', tabKey);
             this.setState({
                 loading: true
             });
@@ -181,9 +178,7 @@ export default class DataOverviewByUser extends Component {
             };
             let data = await getTencentOffLineUser({}, postData);
             if (data && data.ret_msg && data.ret_msg === 'success') {
-                console.log('data', data);
                 let content = data.ret_data;
-                console.log('data', data);
                 this.setState({
                     content
                 }, () => {
@@ -215,7 +210,6 @@ export default class DataOverviewByUser extends Component {
             let tmp = new Date(start);
             dateList.push(moment(tmp).format('YYYY-MM-DD'));
         }
-        console.log('dateList', dateList);
         if (tabKey === 'NewUser') {
             let yGrandData = [];
             for (let i in content) {

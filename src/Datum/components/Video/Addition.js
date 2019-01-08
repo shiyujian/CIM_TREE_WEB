@@ -231,7 +231,6 @@ class Addition extends Component {
                 formdata.append('a_file', file);
                 formdata.append('name', file.name);
                 postForsetVideo({}, formdata).then(rst => {
-                    console.log('rstrstrst', rst);
                     if (rst) {
                         let src = getForestImgUrl(rst);
                         this.setState({
@@ -270,11 +269,6 @@ class Addition extends Component {
                 isUploading: false
             });
             const status = file.status;
-            if (status === 'done') {
-                console.log('donedonefile', file);
-            } else if (status === 'error') {
-                console.log('errorerrorfile', file);
-            }
         }
     };
     uploadFileSave () {
@@ -320,7 +314,6 @@ class Addition extends Component {
                         VideoCover: ''// 视频封面  可为空
                     };
                     let reportData = await reportForsetVideo({}, postData);
-                    console.log('reportData', reportData);
                     if (reportData && reportData.code && reportData.code === 1) {
                         Notification.success({
                             message: '视频上报成功',

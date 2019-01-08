@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-29 16:22:34
+ * @Last Modified time: 2019-01-07 10:53:13
  */
 import React, { Component } from 'react';
 import {
@@ -2606,7 +2606,11 @@ class OnSite extends Component {
                     },
                     type: 'survivalRate'
                 };
-                let survivalRateLayer = this._createMarker(iconData);
+                let survivalRateLayer = L.popup()
+                    .setLatLng([y, x])
+                    .setContent(genPopUpContent(iconData))
+                    .addTo(this.map);
+                // let survivalRateLayer = this._createMarker(iconData);
                 survivalRateMarkerLayerList[properties.ID] = survivalRateLayer;
                 this.setState({
                     survivalRateMarkerLayerList
@@ -2675,12 +2679,15 @@ class OnSite extends Component {
         } = this.props;
         await setUserMapPositionName(view.name);
         await this.map.setZoom(view.zoom);
-        if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
-            let center = [view.center[0].lat, view.center[0].lng];
-            await this.map.panTo(center);
-        } else {
-            await this.map.panTo(view.center);
-        }
+        // 因先设置放大层级，然后直接跳转无法展示，知恩那个在设置放大层级后，再设置跳转
+        setTimeout(async () => {
+            if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
+                let center = [view.center[0].lat, view.center[0].lng];
+                await this.map.panTo(center);
+            } else {
+                await this.map.panTo(view.center);
+            }
+        }, 500);
     }
     // 删除选择的视图
     handleDeleteMapCustomPosition = async (view) => {

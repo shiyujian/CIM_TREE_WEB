@@ -494,7 +494,6 @@ export default class LocmeasureTable extends Component {
                     plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                     let noArr = plan.No.split('-');
                     plan.place = getSmallThinNameByPlaceData(plan.Section, noArr[2], noArr[3], thinClassTree);
-                    console.log('plan.place', plan.place);
                 });
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;

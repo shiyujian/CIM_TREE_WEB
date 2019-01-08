@@ -88,7 +88,6 @@ export default class SupervisorTable extends Component {
         );
     }
     treeTable (details) {
-        console.log('details', details);
         const {
             sectionoption,
             smallclassoption,
@@ -502,7 +501,6 @@ export default class SupervisorTable extends Component {
         let srcs = [];
         try {
             let arr = data.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);
@@ -591,7 +589,6 @@ export default class SupervisorTable extends Component {
         if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
         getqueryTree({}, postdata).then(rst => {
-            console.log('rst', rst);
             this.setState({ loading: false, percent: 100 });
             if (!rst) return;
             let tblData = rst.content;
@@ -602,7 +599,6 @@ export default class SupervisorTable extends Component {
                     plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
                     plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                     plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    console.log('plan.place', plan.place);
                     let statusname = '';
 
                     plan.SupervisorCheck = plan.SupervisorCheck;

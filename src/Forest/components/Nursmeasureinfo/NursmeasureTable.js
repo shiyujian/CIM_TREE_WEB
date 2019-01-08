@@ -662,7 +662,6 @@ export default class NursmeasureTable extends Component {
         let srcs = [];
         try {
             let arr = data.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);
@@ -712,7 +711,6 @@ export default class NursmeasureTable extends Component {
             ispack = '',
             mmtype = ''
         } = this.state;
-        console.log('sxm', sxm);
         if (section === '' && sxm === '') {
             message.info('请选择项目及标段信息或输入顺序码');
             return;

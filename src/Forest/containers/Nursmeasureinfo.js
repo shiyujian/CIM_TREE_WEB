@@ -217,7 +217,6 @@ export default class Nursmeasureinfo extends Component {
             leftkeycode: keycode,
             resetkey: ++this.state.resetkey
         });
-        console.log('info', info);
         let sectionsData = [];
         if (keycode) {
             treeList.map((treeData) => {
@@ -233,7 +232,6 @@ export default class Nursmeasureinfo extends Component {
         this.typeselect('');
         // 标段
         let sections = JSON.parse(user.sections);
-        console.log('sections', sections);
         let permission = getUserIsManager();
         if (permission) {
             // 是admin或者业主
@@ -289,7 +287,6 @@ export default class Nursmeasureinfo extends Component {
         let selectTreeType = [];
         treetypes.map(item => {
             if (item.TreeTypeNo == null) {
-                // console.log('itemitemitemitemitem',item)
             }
             if (item.TreeTypeNo) {
                 try {

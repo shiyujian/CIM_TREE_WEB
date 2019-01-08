@@ -113,8 +113,6 @@ export const createFetchActionWithHeaders = (
             let u = getUrl(url, pathnames);
 
             params.body = data;
-            console.log('fwh', params);
-            console.log('u', u);
             return fetch(u, params)
                 .then(response => {
                     const contentType = response.headers.get('content-type');

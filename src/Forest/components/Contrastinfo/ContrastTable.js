@@ -80,7 +80,6 @@ export default class ContrastTable extends Component {
         );
     }
     treeTable (details) {
-        console.log('details', details);
         const {
             treetypeoption,
             sectionoption,
@@ -554,7 +553,6 @@ export default class ContrastTable extends Component {
         let srcs = [];
         try {
             let arr = data.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);
@@ -627,9 +625,7 @@ export default class ContrastTable extends Component {
                 tblData.forEach((plan, i) => {
                     plan.order = (page - 1) * size + i + 1;
                     plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    console.log('plan.place', plan.place);
                     plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-                    console.log('plan.sectionName', plan.sectionName);
                     let liftertime1 = plan.LifterTime
                         ? moment(plan.LifterTime).format('YYYY-MM-DD')
                         : '/';

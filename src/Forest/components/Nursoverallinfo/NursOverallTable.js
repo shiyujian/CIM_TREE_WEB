@@ -447,7 +447,6 @@ export default class NursOverallTable extends Component {
         let srcs = [];
         try {
             let arr = data.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);
@@ -475,7 +474,6 @@ export default class NursOverallTable extends Component {
         let srcs = [];
         try {
             let arr = remarkPics.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);
@@ -971,7 +969,6 @@ export default class NursOverallTable extends Component {
                 queryTreeData.ThinClass +
                 '-' +
                 sections[2];
-            console.log('No', No);
             noList.map(rst => {
                 if (rst.No.indexOf(No) !== -1) {
                     SmallClassName = rst.SmallClassName
@@ -1070,8 +1067,6 @@ export default class NursOverallTable extends Component {
         let sectionName = getSectionNameBySection(Section, thinClassTree);
         // 项目名称
         let landName = getProjectNameBySection(Section, thinClassTree);
-        console.log('sectionName', sectionName);
-        console.log('landName', landName);
         // 根据树木的定位坐标获取定位地址
         let location = '';
         if (treeLocationData && treeLocationData.X && treeLocationData.Y) {
@@ -1117,7 +1112,6 @@ export default class NursOverallTable extends Component {
             }
         ];
 
-        console.log('treeflowData', treeflowData);
         let flowMess = [];
 
         if (treeflowData instanceof Array) {
@@ -1157,9 +1151,6 @@ export default class NursOverallTable extends Component {
             curingMess.push(data);
         }
 
-        console.log('seedlingMess', seedlingMess);
-        console.log('treeMess', treeMess);
-        console.log('flowMess', flowMess);
         this.setState(
             {
                 seedlingMess,

@@ -32,13 +32,6 @@ export default class FaithinfoTable extends Component {
             factory: ''
         };
     }
-    componentDidMount () {
-        console.log('hi man i am here again!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    }
-    componentWillUnmount () {
-        console.log('oh why you got destroy');
-    }
-
     render () {
         const { tblData } = this.state;
         return <div>{this.treeTable(tblData)}</div>;
@@ -199,7 +192,6 @@ export default class FaithinfoTable extends Component {
         this.setState({ factory: '' });
     };
     showModal (name) {
-        console.log('name', name);
         this.setState({ loading1: true });
         const {
             actions: {
@@ -352,7 +344,6 @@ export default class FaithinfoTable extends Component {
     //     		}
     //     		getexportTree({},postdata)
     //     		.then(rst3 => {
-    //     			console.log('rst3',rst3)
     //     			this.setState({loading:false,percent:100})
     //     			// window.location.href =
     //     		})

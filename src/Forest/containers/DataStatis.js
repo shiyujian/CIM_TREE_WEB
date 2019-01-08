@@ -294,7 +294,6 @@ export default class DataStatis extends Component {
         let selectTreeType = [];
         treetypes.map(item => {
             if (item.TreeTypeNo == null) {
-                // console.log('itemitemitemitemitem',item)
             }
             if (item.TreeTypeNo) {
                 try {

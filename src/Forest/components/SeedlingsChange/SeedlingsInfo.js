@@ -145,16 +145,13 @@ export default class SeedlingsChange extends Component {
                 const formdata = new FormData();
                 formdata.append('a_file', file);
                 formdata.append('name', file.name);
-                let downloadState = true;
                 postForsetPic({}, formdata).then(rst => {
-                    console.log('rstrstrst', rst);
                     let len = TreatmentData.length;
                     TreatmentData.push({
                         index: len + 1,
                         fileName: file.name,
                         a_file: rst
                     });
-                    console.log('TreatmentData', TreatmentData);
                     // notification.success({
                     // 	message:'文件上传成功',
                     // 	duration:3
@@ -177,15 +174,6 @@ export default class SeedlingsChange extends Component {
             this.setState({
                 loading: true
             });
-            const status = file.status;
-            // const { newFileLists } = this.state;
-
-            let newdata = [];
-            if (status === 'done') {
-                console.log('file', file);
-            } else if (status === 'error') {
-
-            }
         }
     };
 
@@ -667,7 +655,6 @@ export default class SeedlingsChange extends Component {
         let srcs = [];
         try {
             let arr = data.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);

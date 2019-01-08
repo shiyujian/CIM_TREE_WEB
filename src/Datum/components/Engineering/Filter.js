@@ -311,9 +311,8 @@ class Filter extends Component {
             form: { validateFields }
         } = this.props;
         validateFields((err, values) => {
-            console.log('values', values);
-            let search = {};
             console.log('err', err);
+            let search = {};
             // if (values.searchProject) {
             //     search.searchProject = values.searchProject;
             // }
@@ -340,7 +339,6 @@ class Filter extends Component {
             // getdocument({ code: currentcode.code }, search);
 
             let postData = Object.assign({}, search);
-            console.log('postData', postData);
             searchEnginMessage(postData);
             searchEnginVisible(true);
         });

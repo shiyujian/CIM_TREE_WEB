@@ -114,13 +114,10 @@ export default class Engineering extends Component {
             this.setState({ loading: true });
             this.user = localStorage.getItem('QH_USER_DATA');
             this.user = JSON.parse(this.user);
-            console.log('this.user', this.user);
             if (this.user.username !== 'admin') {
                 let orgCode = this.user.account.org_code;
                 let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                console.log('parent', parent);
                 this.orgCode = parent.code;
-                console.log('this.orgCode', this.orgCode);
             }
             await setkeycode('');
             await searchEnginVisible(false);
@@ -179,11 +176,8 @@ export default class Engineering extends Component {
                 searchEnginVisible
             }
         } = this.props;
-        console.log('keys', keys);
-        console.log('e', e);
         if (e.selected) {
             let folder = JSON.parse(value);
-            console.log('folder', folder);
             let org_code = folder.extra_params.orgCode;
             let code = folder.code;
             if ((this.user && this.user.username === 'admin') || this.orgCode === org_code) {

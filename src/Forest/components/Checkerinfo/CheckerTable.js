@@ -86,7 +86,6 @@ export default class CheckerTable extends Component {
         );
     }
     treeTable (details) {
-        console.log('details', details);
         const {
             treetypeoption,
             sectionoption,
@@ -468,7 +467,6 @@ export default class CheckerTable extends Component {
     }
 
     onStatusChange (value) {
-        console.log('value', value);
         let CheckStatus = '';
         switch (value) {
             case '1':
@@ -520,7 +518,6 @@ export default class CheckerTable extends Component {
         let srcs = [];
         try {
             let arr = data.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);
@@ -601,7 +598,6 @@ export default class CheckerTable extends Component {
                     // const {attrs = {}} = plan;
                     plan.order = (page - 1) * size + i + 1;
                     plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    console.log('plan.place', plan.place);
                     plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
                     plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                     let statusname = '';
@@ -679,7 +675,6 @@ export default class CheckerTable extends Component {
 
         this.setState({ loading: true, percent: 0 });
         getexportTree4Checker({}, postdata).then(rst3 => {
-            console.log('rst3', rst3);
             this.setState({ loading: false });
             if (rst3 === '') {
                 message.info('最近日期没有抽查的数据');

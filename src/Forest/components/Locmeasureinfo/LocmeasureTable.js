@@ -783,7 +783,6 @@ export default class LocmeasureTable extends Component {
     }
     // 胸径
     handleXJChangeFirst (e) {
-        console.log('handleXJChangeFirst', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 XJFirst: 0
@@ -795,7 +794,6 @@ export default class LocmeasureTable extends Component {
         }
     }
     handleXJChangeSecond (e) {
-        console.log('handleXJChangeSecond', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 XJSecond: ''
@@ -808,7 +806,6 @@ export default class LocmeasureTable extends Component {
     }
     // 地径
     handleDJChangeFirst (e) {
-        console.log('handleDJChangeFirst', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 DJFirst: 0
@@ -820,7 +817,6 @@ export default class LocmeasureTable extends Component {
         }
     }
     handleDJChangeSecond (e) {
-        console.log('handleDJChangeSecond', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 DJSecond: ''
@@ -833,7 +829,6 @@ export default class LocmeasureTable extends Component {
     }
     // 高度
     handleGDChangeFirst (e) {
-        console.log('handleGDChangeFirst', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 GDFirst: 0
@@ -845,7 +840,6 @@ export default class LocmeasureTable extends Component {
         }
     }
     handleGDChangeSecond (e) {
-        console.log('handleGDChangeSecond', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 GDSecond: ''
@@ -858,7 +852,6 @@ export default class LocmeasureTable extends Component {
     }
     // 冠幅
     handleGFChangeFirst (e) {
-        console.log('handleGFChangeFirst', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 GFFirst: 0
@@ -870,7 +863,6 @@ export default class LocmeasureTable extends Component {
         }
     }
     handleGFChangeSecond (e) {
-        console.log('handleGFChangeSecond', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 GFSecond: ''
@@ -883,7 +875,6 @@ export default class LocmeasureTable extends Component {
     }
     // 土球厚度
     handleTQHDChangeFirst (e) {
-        console.log('handleTQHDChangeFirst', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 TQHDFirst: 0
@@ -895,7 +886,6 @@ export default class LocmeasureTable extends Component {
         }
     }
     handleTQHDChangeSecond (e) {
-        console.log('handleTQHDChangeSecond', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 TQHDSecond: ''
@@ -908,7 +898,6 @@ export default class LocmeasureTable extends Component {
     }
     // 土球直径
     handleTQZJChangeFirst (e) {
-        console.log('handleTQZJChangeFirst', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 TQZJFirst: 0
@@ -920,7 +909,6 @@ export default class LocmeasureTable extends Component {
         }
     }
     handleTQZJChangeSecond (e) {
-        console.log('handleTQZJChangeSecond', e.target.value);
         if (isNaN(e.target.value)) {
             this.setState({
                 TQZJSecond: ''
@@ -945,7 +933,6 @@ export default class LocmeasureTable extends Component {
         let srcs = [];
         try {
             let arr = data.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);
@@ -1136,7 +1123,6 @@ export default class LocmeasureTable extends Component {
                     plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
                     plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                     plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    console.log('plan.place', plan.place);
                     let statusname = '';
 
                     plan.SupervisorCheck = plan.SupervisorCheck;

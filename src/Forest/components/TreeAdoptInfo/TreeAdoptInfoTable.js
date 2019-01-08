@@ -352,7 +352,6 @@ export default class TreeAdoptInfoTable extends Component {
     }
 
     onStatusChange (value) {
-        console.log('value', value);
         this.setState({ status: value });
     }
 
@@ -432,12 +431,9 @@ export default class TreeAdoptInfoTable extends Component {
                 tblData.forEach((plan, i) => {
                     plan.order = (page - 1) * size + i + 1;
                     plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
-                    console.log('plan.Project', plan.Project);
                     plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
                     plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    console.log('plan.place', plan.place);
                     plan.treeTypeName = getTreeTypeNameByTreeTypeID(plan.TreeType, treetypes);
-                    console.log('plan.sectionName', plan.sectionName);
                     // plan.place = this.getThinClassName(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
                     let inputerObj = plan && plan.InputerObj;
                     plan.Full_Name = inputerObj && inputerObj.Full_Name;

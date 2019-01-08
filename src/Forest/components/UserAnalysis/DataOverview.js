@@ -21,7 +21,6 @@ export default class DataOverview extends Component {
             }
         } = this.props;
         let realTimeUserData = await getTencentRealTimeUser();
-        console.log('realTimeUserData', realTimeUserData);
         if (realTimeUserData && realTimeUserData.ret_msg && realTimeUserData.ret_msg === 'success') {
             let data = realTimeUserData && realTimeUserData.ret_data;
             let NewUser = data && data.NewUser;

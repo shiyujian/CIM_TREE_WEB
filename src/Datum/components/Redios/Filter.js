@@ -146,7 +146,6 @@ class Filter extends Component {
         validateFields((err, values) => {
             let search = {};
             console.log('err', err);
-
             if (values.searchName) {
                 search.searchName = values.searchName;
             }

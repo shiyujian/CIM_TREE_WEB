@@ -49,9 +49,6 @@ export default class Faithinfo extends Component {
             sectionsData: []
         };
     }
-    componentWillUnmount () {
-        console.log('oh why you got destroy11111');
-    }
     componentDidMount = async () => {
         const {
             actions: {
@@ -199,7 +196,6 @@ export default class Faithinfo extends Component {
 
         // 标段
         let sections = JSON.parse(user.sections);
-        console.log('sections', sections);
         let permission = getUserIsManager();
         if (permission) {
             // 是admin或者业主

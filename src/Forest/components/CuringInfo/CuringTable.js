@@ -204,7 +204,6 @@ export default class CuringTable extends Component {
         );
     }
     treeTable (details) {
-        console.log('details', details);
         const {
             sectionoption,
             smallclassoption,
@@ -559,7 +558,6 @@ export default class CuringTable extends Component {
         let srcs = [];
         try {
             let arr = data.split(',');
-            console.log('arr', arr);
             arr.map(rst => {
                 let src = getForestImgUrl(rst);
                 srcs.push(src);

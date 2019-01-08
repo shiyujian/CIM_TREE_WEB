@@ -24,7 +24,6 @@ export default class Datum extends Component {
         const {
             actions: { getTaskPerson }
         } = this.props;
-        const { username = '', name = '', id = '' } = getUser();
         let user = getUser();
         let datas = await getTaskPerson({ userid: user.id });
         let workflowData = [];

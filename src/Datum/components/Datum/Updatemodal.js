@@ -200,7 +200,6 @@ class Updatemodal extends Component {
     }
 
     normFile = e => {
-        console.log('Upload event:', e);
         if (Array.isArray(e)) {
             return e;
         }
@@ -292,7 +291,6 @@ class Updatemodal extends Component {
                         ? values.attachment1[0].name
                         : ''
                     : '';
-                console.log('resp', resp);
                 let postData = {
                     name: values.name1,
                     basic_params: {

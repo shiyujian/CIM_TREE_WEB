@@ -740,13 +740,11 @@ export default class CarPackageTable extends Component {
                     plan.Project = await getProjectNameBySection(plan.Section, thinClassTree);
                     plan.sectionName = await getSectionNameBySection(plan.Section, thinClassTree);
                     let userData = await getForestUserDetail({id: plan.Constructioner});
-                    console.log('userData', userData);
                     plan.ConstructionerName = (userData && userData.Full_Name) || '';
                     plan.ConstructionerUserName = (userData && userData.User_Name) || '';
                     plan.SupervisorName = (plan.SupervisorUser && plan.SupervisorUser.Full_Name) || '';
                     plan.SupervisorUserName = (plan.SupervisorUser && plan.SupervisorUser.User_Name) || '';
                 }
-                console.log('tblData', tblData);
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
