@@ -246,6 +246,7 @@ class Modals extends Component {
                     let newData = {
                         'title': values['title'] || '',
                         'raw': this.state.content,
+                        'degree': values['mergency'],
                         'attachment': {
                             'fileList': newFileList
                         },
@@ -276,6 +277,7 @@ class Modals extends Component {
                     let newData = {
                         'title': values['title'] || '',
                         'raw': this.state.content,
+                        'degree': values['mergency'],
                         'attachment': {
                             'fileList': fileList || []
                         },
