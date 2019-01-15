@@ -145,7 +145,6 @@ export default class Info extends Component {
             sidebar: { node } = {},
             actions: { changeSidebarField, resetAdditionField }
         } = this.props;
-        console.log(11111111, node);
         if (typeof node.extra_params.sections === 'string') {
             node.extra_params.sections = node.extra_params.sections
                 ? node.extra_params.sections.split(',')
