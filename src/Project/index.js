@@ -100,8 +100,6 @@ export default class Project extends Component {
     }
 
     getOnOpenKeys (openKeys) {
-        console.log('openKeys', openKeys);
-        console.log('openKeys', openKeys);
         this.setState({
             defaultOpenKeys: openKeys
         });
@@ -226,6 +224,28 @@ export default class Project extends Component {
                     path: '/project/defects',
                     exact: true,
                     icon: <Icon name='retweet' />
+                }
+            ]
+        },
+        {
+            key: 'plotManage',
+            name: '数据管理',
+            id: 'PROJECT.PLOTMANAGE',
+            icon: <Icon name='won' />,
+            children: [
+                {
+                    key: 'ThinClassStorage',
+                    id: 'PROJECT.THINCLASSTORAGE',
+                    name: '细班导入',
+                    path: '/project/thinClassStorage',
+                    icon: <Icon name='code' />
+                },
+                {
+                    key: 'ThinClassManage',
+                    id: 'PROJECT.THINCLASSMANAGE',
+                    name: '细班管理',
+                    path: '/project/thinClassManage',
+                    icon: <Icon name='code' />
                 }
             ]
         },
