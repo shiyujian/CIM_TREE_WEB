@@ -13,7 +13,7 @@ class Addition extends Component {
             btn: false
         };
     }
-    changeTitle (value) {
+    changeSection (value) {
         const {
             actions: { changeAdditionField }
         } = this.props;
@@ -57,7 +57,8 @@ class Addition extends Component {
                                 required: true,
                                 message: '请输入名称'
                             }
-                        ]
+                        ],
+                        initialValue: (addition && addition.name) || ''
                     })(
                         <Input
                             placeholder='请输入名称'
@@ -75,7 +76,7 @@ class Addition extends Component {
                                 pattern: /^[\w\d\_\-]+$/
                             }
                         ],
-                        initialValue: addition.code
+                        initialValue: (addition && addition.code) || ''
                     })(
                         <Input
                             readOnly={!parent}
@@ -88,7 +89,7 @@ class Addition extends Component {
                     <Select
                         placeholder='标段'
                         value={addition.sections}
-                        onChange={this.changeTitle.bind(this)}
+                        onChange={this.changeSection.bind(this)}
                         // onChange={changeAdditionField.bind(this, 'sections')}
                         mode='multiple'
                         style={{ width: '100%' }}
@@ -114,7 +115,8 @@ class Addition extends Component {
                                             required: false,
                                             message: '是否为公司'
                                         }
-                                    ]
+                                    ],
+                                    initialValue: (addition && addition.extra_params && addition.extra_params.companyStatus) || ''
                                 })(
                                     <Select
                                         placeholder='是否为公司'
@@ -199,8 +201,8 @@ class Addition extends Component {
                 changeOrgTreeDataStatus
             }
         } = this.props;
-        const { extra_params: extra = {} } = node || {};
-        const { extra_params } = node || {};
+        // const { extra_params: extra = {} } = node || {};
+        const { extra_params = '' } = node || {};
         let companyVisible = false;
         if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
             companyVisible = true;
@@ -211,53 +213,47 @@ class Addition extends Component {
         const sections = addition.sections ? addition.sections.join() : [];
         this.props.form.validateFields(async (err, values) => {
             console.log('err', err);
-            console.log('values', values);
             if (!err) {
                 if (parent) {
-                    let rst = await postOrg(
-                        {},
-                        {
-                            name: addition.name,
-                            code: addition.code,
-
-                            obj_type: 'C_ORG',
-                            status: 'A',
-                            extra_params: {
-                                introduction: addition.introduction,
-                                sections: sections,
-                                companyStatus: companyVisible ? values.companyStatus : ''
-                            },
-                            parent: {
-                                pk: parent.pk,
-                                code: parent.code,
-                                obj_type: 'C_ORG'
-                            }
+                    let postData = {
+                        name: addition.name,
+                        code: addition.code,
+                        obj_type: 'C_ORG',
+                        status: 'A',
+                        extra_params: {
+                            introduction: addition.introduction,
+                            sections: sections,
+                            companyStatus: companyVisible ? values.companyStatus : ''
+                        },
+                        parent: {
+                            pk: parent.pk,
+                            code: parent.code,
+                            obj_type: 'C_ORG'
                         }
-                    );
+                    };
+                    let rst = await postOrg({}, postData);
                     if (rst.pk) {
                         await clearAdditionField();
                         await getOrgTree({}, { depth: 4 });
                         await changeOrgTreeDataStatus(true);
                     }
                 } else {
-                    let rst = await putOrg(
-                        { code: addition.code },
-                        {
-                            obj_type: 'C_ORG',
-                            status: 'A',
-                            name: addition.name,
-                            extra_params: {
-                                introduction: addition.introduction,
-                                sections: sections,
-                                companyStatus: companyVisible ? values.companyStatus : ''
-                            }
+                    let postData = {
+                        obj_type: 'C_ORG',
+                        status: 'A',
+                        name: addition.name,
+                        extra_params: {
+                            introduction: addition.introduction,
+                            sections: sections,
+                            companyStatus: companyVisible ? values.companyStatus : ''
                         }
-                    );
+                    };
+                    let rst = await putOrg({ code: addition.code }, postData);
                     await this.forceUpdate();
                     if (rst.pk) {
-                        if (this.state.btn) {
-                            extra.sections = this.state.sections;
-                        }
+                        // if (this.state.btn) {
+                        //     extra.sections = this.state.sections;
+                        // }
                         await changeSidebarField('addition', false);
                         parent && await changeSidebarField('parent', null);
                         addition.code && await clearAdditionField();

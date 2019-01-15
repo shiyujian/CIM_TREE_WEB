@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-01-07 10:53:13
+ * @Last Modified time: 2019-01-10 15:07:04
  */
 import React, { Component } from 'react';
 import {
@@ -2678,15 +2678,23 @@ class OnSite extends Component {
             }
         } = this.props;
         await setUserMapPositionName(view.name);
-        await this.map.setZoom(view.zoom);
-        // 因先设置放大层级，然后直接跳转无法展示，知恩那个在设置放大层级后，再设置跳转
+        // 修改地图聚焦点
+        if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
+            let center = [view.center[0].lat, view.center[0].lng];
+            await this.map.panTo(center);
+        } else {
+            await this.map.panTo(view.center);
+        }
+        // await this.map.setZoom(view.zoom);
+        // 因先设置直接跳转,然后直接修改放大层级，无法展示，只能在跳转坐标之后，设置时间再重新修改放大层级
         setTimeout(async () => {
-            if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
-                let center = [view.center[0].lat, view.center[0].lng];
-                await this.map.panTo(center);
-            } else {
-                await this.map.panTo(view.center);
-            }
+            // if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
+            //     let center = [view.center[0].lat, view.center[0].lng];
+            //     await this.map.panTo(center);
+            // } else {
+            //     await this.map.panTo(view.center);
+            // }
+            await this.map.setZoom(view.zoom);
         }, 500);
     }
     // 删除选择的视图

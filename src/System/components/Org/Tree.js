@@ -51,7 +51,6 @@ export default class Tree extends Component {
             platform: { org: { children = [] } = {} },
             sidebar: { node = {} } = {}
         } = this.props;
-        console.log(children);
         const { code } = node || {};
         return (
             <div>
@@ -101,7 +100,6 @@ export default class Tree extends Component {
             await this.setListStore();
         }
         if (orgTreeDataChangeStatus && orgTreeDataChangeStatus !== prevProps.orgTreeDataChangeStatus) {
-            console.log('aaaaaaaaaaaaaaa');
             await this.getOrgDataList();
         }
     }
