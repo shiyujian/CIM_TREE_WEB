@@ -6,7 +6,7 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { actions } from '../store/supplierManagement';
+import { actions } from '../store/thinClassManage';
 import { Table } from '../components/ThinClassManage';
 @connect(
     state => {

@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
-import {FOREST_API} from '_platform/api';
 
 const FormItem = Form.Item;
+window.config = window.config || {};
 class Tablelevel extends Component {
     constructor (props) {
         super(props);
@@ -16,8 +16,7 @@ class Tablelevel extends Component {
             fileList: [],
             page: 1,
             total: 0,
-            number: '',
-            treetype: ''
+            number: ''
         };
         this.dataList = []; // 暂存数据
         this.onSearch = this.onSearch.bind(this); // 查询细班
@@ -39,17 +38,22 @@ class Tablelevel extends Component {
             {
                 key: '2',
                 title: '细班编号',
-                dataIndex: 'ThinClass'
+                dataIndex: 'no'
             },
             {
                 key: '3',
                 title: '树木类型',
-                dataIndex: 'TreeType'
+                dataIndex: 'treetype'
             },
             {
                 key: '4',
                 title: '细班面积',
-                dataIndex: 'Area'
+                dataIndex: 'area'
+            },
+            {
+                key: '5',
+                title: '栽植量',
+                dataIndex: 'num'
             },
             {
                 key: '6',
@@ -65,15 +69,48 @@ class Tablelevel extends Component {
             }
         ];
     }
+    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
     tileUrls = {
         1: window.config.IMG_W,
         2: window.config.VEC_W
     };
     componentDidMount () {
         this.initMap();
+        this.onSearch();
     }
     initMap () {
-        
+        // 基础设置
+        this.map = L.map('mapid', {
+            zoom: 14,
+            center: [39.04882729053497, 115.90790748596191],
+            crs: L.CRS.EPSG4326,
+            zoomControl: false
+        });
+        // 基础图层
+        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+        // 道路图层
+        L.tileLayer(this.WMSTileLayerUrl, {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+        // 树木瓦片图层
+        L.tileLayer(
+            window.config.DASHBOARD_ONSITE + '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
+                opacity: 1.0,
+                subdomains: [1, 2, 3],
+                minZoom: 11,
+                maxZoom: 21,
+                storagetype: 0,
+                tiletype: 'wtms'
+            }
+        ).addTo(this.map);
     }
     render () {
         const { dataList, total, page } = this.state;
@@ -96,36 +133,38 @@ class Tablelevel extends Component {
                             <Input style={{width: 200}} onChange={this.handleNumber.bind(this)} />
                         </FormItem>
                         <FormItem>
-                            <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
+                            <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
                         </FormItem>
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 600, height: 600, float: 'left'}}>
+                    <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
                         <Table columns={this.columns} dataSource={dataList} pagination={false} rowKey='ID' />
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
-                    <div style={{marginLeft: 600, height: 600, overflow: 'hidden'}}>
-                        <div id='mapid' />
+                    <div style={{marginLeft: 620, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
+                        <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
             </div>
         );
     }
-    onSearch () {
-        const { treetype, number } = this.state;
+    onSearch (page = 1) {
+        const { number } = this.state;
         let { getThinClass } = this.props.actions;
         getThinClass({}, {
             no: number,
-            treetype: treetype,
-            page: 1,
+            treetype: '',
+            page: page,
             size: 10
         }).then(rep => {
             if (rep.code === 200) {
-                // this.setState({
-                //     dataList: rep.content
-                // });
+                this.setState({
+                    dataList: rep.content,
+                    total: rep.pageinfo && rep.pageinfo.total,
+                    page: rep.pageinfo && rep.pageinfo.page
+                });
             }
         });
     }
@@ -147,10 +186,7 @@ class Tablelevel extends Component {
         });
     }
     handlePage (page, pageSize = 10) {
-        page = page - 1;
-        this.setState({
-            dataList: this.dataList.slice(page * 10, page * 10 + 9)
-        });
+        this.onSearch(page);
     }
 }
 

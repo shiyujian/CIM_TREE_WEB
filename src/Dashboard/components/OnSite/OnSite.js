@@ -346,6 +346,7 @@ class OnSite extends Component {
                 mapInitialization.center = center;
                 mapInitialization.zoom = zoom;
             };
+            console.log('mapInitialization', mapInitialization);
             this.map = L.map('mapid', mapInitialization);
 
             // L.control.zoom({ position: 'bottomright' }).addTo(this.map);

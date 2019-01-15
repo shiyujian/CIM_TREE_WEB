@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
-import {FOREST_API} from '_platform/api';
 
 const FormItem = Form.Item;
+window.config = window.config || {};
 class Tablelevel extends Component {
     constructor (props) {
         super(props);
@@ -16,17 +16,16 @@ class Tablelevel extends Component {
             fileList: [],
             page: 1,
             total: 0,
-            number: '',
-            treetype: ''
+            number: ''
         };
         this.dataList = []; // 暂存数据
         this.onSearch = this.onSearch.bind(this); // 查询细班
         this.handleNumber = this.handleNumber.bind(this); // 细班编号
         this.handleOk = this.handleOk.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.onAdd = this.onAdd.bind(this);
+        this.onAdd = this.onAdd.bind(this); // 暂存细班
         this.onEdit = this.onEdit.bind(this);
-        this.onUpload = this.onUpload.bind(this);
+        this.onUpload = this.onUpload.bind(this); // 细班入库
         this.handlePage = this.handlePage.bind(this);
         this.columns = [
             {
@@ -55,6 +54,11 @@ class Tablelevel extends Component {
                 dataIndex: 'Area'
             },
             {
+                key: '5',
+                title: '计划栽植量',
+                dataIndex: 'Num'
+            },
+            {
                 key: '6',
                 title: '操作',
                 dataIndex: 'action',
@@ -68,6 +72,7 @@ class Tablelevel extends Component {
             }
         ];
     }
+    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
     tileUrls = {
         1: window.config.IMG_W,
         2: window.config.VEC_W
@@ -76,7 +81,38 @@ class Tablelevel extends Component {
         this.initMap();
     }
     initMap () {
-        
+        // 基础设置
+        this.map = L.map('mapid', {
+            zoom: 14,
+            center: [39.04882729053497, 115.90790748596191],
+            crs: L.CRS.EPSG4326,
+            zoomControl: false
+        });
+        // 基础图层
+        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+        // 道路图层
+        L.tileLayer(this.WMSTileLayerUrl, {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+        // 树木瓦片图层
+        L.tileLayer(
+            window.config.DASHBOARD_ONSITE + '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
+                opacity: 1.0,
+                subdomains: [1, 2, 3],
+                minZoom: 11,
+                maxZoom: 21,
+                storagetype: 0,
+                tiletype: 'wtms'
+            }
+        ).addTo(this.map);
     }
     render () {
         const { dataList, total, page } = this.state;
@@ -103,19 +139,19 @@ class Tablelevel extends Component {
                         </FormItem>
                         <FormItem>
                             {
-                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)}>导入细班</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}}>上传细班</Button>
+                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)}>上传细班</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}}>细班入库</Button>
                             }
                         </FormItem>
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 600, height: 600, float: 'left'}}>
-                        <Table columns={this.columns} dataSource={dataList} pagination={false} rowKey='ID' />
-                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />               
+                    <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
+                        <Table columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
+                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
-                    <div style={{marginLeft: 600, height: 600, overflow: 'hidden'}}>
-                        <div id='mapid' />
+                    <div style={{marginLeft: 620, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
+                        <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
                 <Modal
@@ -144,18 +180,18 @@ class Tablelevel extends Component {
         );
     }
     onSearch () {
-        const { treetype, number } = this.state;
-        let { getThinClass } = this.props.actions;
-        getThinClass({}, {
-            no: number,
-            treetype: treetype,
-            page: 1,
-            size: 10
-        }).then(rep => {
-            if (rep.code === 200) {
-                // this.setState({
-                //     dataList: rep.content
-                // });
+        const { number } = this.state;
+        console.log(number);
+        if (!number) {
+            this.setState({
+                dataList: this.dataList.slice(0, 10)
+            });
+        }
+        this.dataList.map(item => {
+            if (item.ThinClass === number) {
+                this.setState({
+                    dataList: [item]
+                });
             }
         });
     }
@@ -184,10 +220,11 @@ class Tablelevel extends Component {
         const formdata = new FormData();
         formdata.append('file', fileList[0]);
         const { shapeUploadHandler } = this.props.actions;
+        console.log('shapeUploadHandler', this.props.actions);
         shapeUploadHandler({
             name: fileList[0].name.split('.')[0]
         }, formdata).then(rep => {
-            console.log(typeof rep);
+            console.log(rep);
             rep = JSON.parse(rep);
             this.dataList = rep.features;
             console.log(this.dataList);
@@ -195,8 +232,7 @@ class Tablelevel extends Component {
                 indexBtn: 0,
                 page: 1,
                 total: this.dataList.length,
-                dataList: this.dataList.slice(0, 9)
-                // dataList: rep.features
+                dataList: this.dataList.slice(0, 10)
             }, () => {
                 // 隐藏弹框
                 this.handleCancel();
@@ -213,7 +249,7 @@ class Tablelevel extends Component {
     handlePage (page, pageSize = 10) {
         page = page - 1;
         this.setState({
-            dataList: this.dataList.slice(page * 10, page * 10 + 9)
+            dataList: this.dataList.slice(page * 10, page * 10 + 10)
         });
     }
 }
