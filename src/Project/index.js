@@ -246,6 +246,20 @@ export default class Project extends Component {
                     name: '细班管理',
                     path: '/project/thinClassManage',
                     icon: <Icon name='code' />
+                },
+                {
+                    key: 'ParcelStorage',
+                    id: 'PROJECT.PARCELSTORAGE',
+                    name: '地块导入',
+                    path: '/project/parcelStorage',
+                    icon: <Icon name='tag' />
+                },
+                {
+                    key: 'ParcelManage',
+                    id: 'PROJECT.PARCELMANAGE',
+                    name: '地块管理',
+                    path: '/project/parcelManage',
+                    icon: <Icon name='tag' />
                 }
             ]
         },

@@ -24,13 +24,11 @@ class Tablelevel extends Component {
             areaLayerList: [] // 区域地块图层list
         };
         this.dataList = []; // 暂存数据
-        this.onSearch = this.onSearch.bind(this); // 查询细班
-        this.handleNumber = this.handleNumber.bind(this); // 细班编号
+        this.onSearch = this.onSearch.bind(this); // 查询地块
+        this.handleNumber = this.handleNumber.bind(this); // 地块编号
         this.onHistory = this.onHistory.bind(this); // 历史导入数据
-        this.handleOk = this.handleOk.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
-        this.onEdit = this.onEdit.bind(this);
         this.handlePage = this.handlePage.bind(this);
+
         this.columns = [
             {
                 key: '1',
@@ -84,8 +82,6 @@ class Tablelevel extends Component {
     componentDidMount () {
         // 初始化地图
         this.initMap();
-        // 获取表格数据
-        this.onSearch();
     }
     initMap () {
         // 基础设置
@@ -133,7 +129,7 @@ class Tablelevel extends Component {
             <div className='table-level'>
                 <div>
                     <Form layout='inline'>
-                        <FormItem label='细班编号'>
+                        <FormItem label='地块编号'>
                             <Input style={{width: 200}} onChange={this.handleNumber.bind(this)} />
                         </FormItem>
                         <FormItem>
@@ -154,113 +150,20 @@ class Tablelevel extends Component {
                         <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
-                <Modal
-                    title='历史列表'
-                    visible={this.state.showModal}
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
-                >
-                    列表
-                </Modal>
             </div>
         );
     }
-    onSearch (page = 1) {
-        const { number } = this.state;
-        let { getThinClass } = this.props.actions;
-        getThinClass({}, {
-            no: number,
-            treetype: '',
-            page: page,
-            size: 10
-        }).then(rep => {
-            if (rep.code === 200) {
-                this.setState({
-                    dataList: rep.content,
-                    total: rep.pageinfo && rep.pageinfo.total,
-                    page: rep.pageinfo && rep.pageinfo.page
-                });
-            }
-        });
+    onSearch () {
+
     }
     onHistory () {
-        this.setState({
-            showModal: true
-        });
+
     }
-    handleOk () {
-        this.handleCancel();
+    handleNumber () {
+
     }
-    handleCancel () {
-        this.setState({
-            showModal: false
-        });
-    }
-    onLocation (recordArr) {
-        let { areaLayerList } = this.state;
-        areaLayerList.map(item => {
-            item.remove();
-        });
-        recordArr.map(record => {
-            let coords = getCoordsArr(record.coords);
-            console.log('coords', coords);
-            if (coords && coords instanceof Array && coords.length > 0) {
-                for (let i = 0; i < coords.length; i++) {
-                    let str = coords[i];
-                    let treearea = handleCoordinates(str);
-                    console.log('treearea', treearea);
-                    let message = {
-                        key: 3,
-                        type: 'Feature',
-                        properties: {name: '', type: 'area'},
-                        geometry: { type: 'Polygon', coordinates: treearea }
-                    };
-                    let layer = this._createMarker(message);
-                    // 放大该处视角
-                    this.map.fitBounds(layer.getBounds());
-                    areaLayerList.push(layer);
-                }
-            };
-        });
-        this.setState({
-            areaLayerList
-        });
-    }
-    /* 在地图上添加marker和polygan */
-    _createMarker (geo) {
-        try {
-            if (geo.properties.type === 'area') {
-                // 创建区域图形
-                let layer = L.polygon(geo.geometry.coordinates, {
-                    color: '#201ffd',
-                    fillColor: fillAreaColor(geo.key),
-                    fillOpacity: 0.3
-                }).addTo(this.map);
-                return layer;
-            }
-        } catch (e) {
-            console.log('e', e);
-        }
-    }
-    handleNumber (e) {
-        this.setState({
-            number: e.target.value
-        });
-    }
-    onAdd () {
-        this.setState({
-            showModal: true
-        });
-    }
-    onEdit (record, e) {
-        e.preventDefault();
-        this.setState({
-            showModal: true,
-            record
-        });
-    }
-    handlePage (page, pageSize = 10) {
-        this.onSearch(page);
+    handlePage () {
+
     }
 }
 

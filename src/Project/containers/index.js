@@ -17,6 +17,8 @@ export RelevanceManagement from './RelevanceManagement';
 export AuxiliaryAcceptance from './AuxiliaryAcceptance';
 export ProjectImage from './ProjectImage';
 
-export ThinClassManage from './ThinClassManage';
 export ThinClassStorage from './ThinClassStorage';
+export ThinClassManage from './ThinClassManage';
+export ParcelStorage from './ParcelStorage';
+export ParcelManage from './ParcelManage';
 

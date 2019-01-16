@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
-
+import {
+    fillAreaColor,
+    getCoordsArr,
+    handleCoordinates
+} from '../auth';
 const FormItem = Form.Item;
 window.config = window.config || {};
 class Tablelevel extends Component {
@@ -16,18 +20,20 @@ class Tablelevel extends Component {
             fileList: [],
             page: 1,
             total: 0,
+            number: '',
             confirmLoading: false,
-            number: ''
+            areaLayerList: [] // 区域地块图层list
         };
         this.dataList = []; // 暂存数据
-        this.onSearch = this.onSearch.bind(this); // 查询细班
-        this.handleNumber = this.handleNumber.bind(this); // 细班编号
-        this.handleOk = this.handleOk.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
-        this.onAdd = this.onAdd.bind(this); // 暂存细班
-        this.onEdit = this.onEdit.bind(this);
-        this.onUpload = this.onUpload.bind(this); // 细班入库
+        this.onSearch = this.onSearch.bind(this); // 查询地块
+        this.handleNumber = this.handleNumber.bind(this); // 地块编号
+        this.onHistory = this.onHistory.bind(this); // 历史导入数据
         this.handlePage = this.handlePage.bind(this);
+        this.onAdd = this.onAdd.bind(this);
+        this.onUpload = this.onUpload.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+        this.handleOk = this.handleOk.bind(this);
+
         this.columns = [
             {
                 key: '1',
@@ -41,23 +47,8 @@ class Tablelevel extends Component {
             },
             {
                 key: '2',
-                title: '细班编号',
-                dataIndex: 'ThinClass'
-            },
-            {
-                key: '3',
-                title: '树木类型',
-                dataIndex: 'TreeType'
-            },
-            {
-                key: '4',
-                title: '细班面积',
-                dataIndex: 'Area'
-            },
-            {
-                key: '5',
-                title: '计划栽植量',
-                dataIndex: 'Num'
+                title: '标段',
+                dataIndex: 'Section'
             },
             {
                 key: '6',
@@ -79,6 +70,7 @@ class Tablelevel extends Component {
         2: window.config.VEC_W
     };
     componentDidMount () {
+        // 初始化地图
         this.initMap();
     }
     initMap () {
@@ -116,7 +108,13 @@ class Tablelevel extends Component {
         ).addTo(this.map);
     }
     render () {
-        const { dataList, total, page, confirmLoading } = this.state;
+        const { dataList, confirmLoading, total, page } = this.state;
+        const rowSelection = {
+            onChange: (selectedRowKeys, selectedRows) => {
+                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+                this.onLocation(selectedRows);
+            }
+        };
         const propsUpload = {
             name: 'file',
             action: '',
@@ -132,31 +130,31 @@ class Tablelevel extends Component {
             <div className='table-level'>
                 <div>
                     <Form layout='inline'>
-                        <FormItem label='细班编号'>
+                        <FormItem label='地块编号'>
                             <Input style={{width: 200}} onChange={this.handleNumber.bind(this)} />
                         </FormItem>
                         <FormItem>
-                            <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
+                            <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
                         </FormItem>
                         <FormItem>
                             {
-                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)}>上传细班</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}}>细班入库</Button>
+                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)}>上传地块</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}}>地块入库</Button>
                             }
                         </FormItem>
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 600, height: 700, float: 'left', overflow: 'hidden'}}>
-                        <Table columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
+                    <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
+                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='index' />
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
-                    <div style={{marginLeft: 620, height: 700, overflow: 'hidden', border: '3px solid #ccc'}}>
-                        <div id='mapid' style={{height: 700, width: '100%'}} />
+                    <div style={{marginLeft: 620, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
+                        <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
                 <Modal
-                    title='新增细班'
+                    title='新增地块'
                     visible={this.state.showModal}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -181,60 +179,58 @@ class Tablelevel extends Component {
             </div>
         );
     }
-    onLocation () {
-
-    }
-    onSearch () {
-        const { number } = this.state;
-        console.log(number);
-        if (!number) {
-            this.setState({
-                dataList: this.dataList.slice(0, 10)
-            });
-        }
-        this.dataList.map(item => {
-            if (item.ThinClass === number) {
-                this.setState({
-                    dataList: [item]
+    onLocation (recordArr) {
+        let { areaLayerList } = this.state;
+        areaLayerList.map(item => {
+            item.remove();
+        });
+        recordArr.map(item => {
+            let treearea = [];
+            if (item.Geom && item.Geom.coordinates) {
+                console.log(item.Geom.coordinates[0]);
+                item.Geom.coordinates[0].map(item => {
+                    treearea.push([
+                        item[1],
+                        item[0]
+                    ]);
                 });
             }
+            console.log(treearea);
+            let message = {
+                key: 3,
+                type: 'Feature',
+                properties: {name: '', type: 'area'},
+                geometry: { type: 'Polygon', coordinates: treearea }
+            };
+            let layer = this._createMarker(message);
+            // 放大该处视角
+            this.map.fitBounds(layer.getBounds());
+            areaLayerList.push(layer);
         });
     }
-    onUpload () {
-        console.log(this.props.actions);
-        let pro = [];
-        this.dataList.map(item => {
-            pro.push({
-                no: item.ThinClass,
-                treetype: item.TreeType,
-                Section: item.Section,
-                num: item.Num, // 细班计划种植数量
-                area: item.Area, // 面积
-                Level: item.Spec, // 规格
-                coords: '' // WKT格式item.Geom
-            });
-        });
-        const { importThinClass } = this.props.actions;
-        console.log(pro);
-        importThinClass({}, pro).then(rep => {
-            console.log(rep);
-        });
+    onSearch () {
+
     }
-    handleNumber (e) {
-        this.setState({
-            number: e.target.value
-        });
+    onHistory () {
+
+    }
+    handleNumber () {
+
+    }
+    handlePage () {
+
     }
     onAdd () {
         this.setState({
             showModal: true
         });
     }
-    onEdit (record, e) {
-        e.preventDefault();
+    onUpload () {
+
+    }
+    handleCancel () {
         this.setState({
-            showModal: true,
-            record
+            showModal: false
         });
     }
     handleOk () {
@@ -264,18 +260,8 @@ class Tablelevel extends Component {
             });
         });
     }
-    handleCancel () {
-        this.setState({
-            showModal: false,
-            fileList: [],
-            record: {}
-        });
-    }
-    handlePage (page, pageSize = 10) {
-        page = page - 1;
-        this.setState({
-            dataList: this.dataList.slice(page * 10, page * 10 + 10)
-        });
+    onEdit () {
+        
     }
 }
 
