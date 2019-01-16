@@ -1473,7 +1473,9 @@ class OnSite extends Component {
             actions: { getTreearea }
         } = this.props;
         try {
+            console.log('eventKey', eventKey);
             let coords = await handleAreaLayerData(eventKey, getTreearea);
+            console.log('coords2', coords);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];

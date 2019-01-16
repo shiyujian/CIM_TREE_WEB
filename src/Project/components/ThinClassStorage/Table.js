@@ -145,13 +145,13 @@ class Tablelevel extends Component {
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
+                    <div style={{width: 600, height: 700, float: 'left', overflow: 'hidden'}}>
                         <Table columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
-                    <div style={{marginLeft: 620, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
-                        <div id='mapid' style={{height: 640, width: '100%'}} />
+                    <div style={{marginLeft: 620, height: 700, overflow: 'hidden', border: '3px solid #ccc'}}>
+                        <div id='mapid' style={{height: 700, width: '100%'}} />
                     </div>
                 </div>
                 <Modal
@@ -196,7 +196,24 @@ class Tablelevel extends Component {
         });
     }
     onUpload () {
-        
+        console.log(this.props.actions);
+        let pro = [];
+        this.dataList.map(item => {
+            pro.push({
+                no: item.ThinClass,
+                treetype: item.TreeType,
+                Section: item.Section,
+                num: item.Num, // 细班计划种植数量
+                area: item.Area, // 面积
+                Level: item.Spec, // 规格
+                coords: '' // WKT格式item.Geom
+            });
+        });
+        const { importThinClass } = this.props.actions;
+        console.log(pro);
+        importThinClass({}, pro).then(rep => {
+            console.log(rep);
+        });
     }
     handleNumber (e) {
         this.setState({

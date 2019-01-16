@@ -41,7 +41,7 @@ export const getForestUserDetail = forestFetchAction(
     [],
     'GET'
 );
-export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET');
+export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET'); // 获取细班详情
 
 export default handleActions(
     {
