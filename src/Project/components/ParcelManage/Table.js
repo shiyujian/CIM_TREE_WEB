@@ -7,25 +7,27 @@ import {
     getCoordsArr,
     handleCoordinates
 } from '../auth';
+import { tokensToRegExp } from 'path-to-regexp';
 const FormItem = Form.Item;
 window.config = window.config || {};
 class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            dataList: [],
+            dataList: [], // 地块列表
+            dataListHistory: [], // 历史数据列表
             showModal: false,
             record: {},
             indexBtn: 1,
             fileList: [],
             page: 1,
             total: 0,
-            number: '',
+            section: '',
             areaLayerList: [] // 区域地块图层list
         };
         this.dataList = []; // 暂存数据
         this.onSearch = this.onSearch.bind(this); // 查询地块
-        this.handleNumber = this.handleNumber.bind(this); // 地块编号
+        this.handleSection = this.handleSection.bind(this); // 所属标段
         this.onHistory = this.onHistory.bind(this); // 历史导入数据
         this.handlePage = this.handlePage.bind(this);
 
@@ -42,23 +44,8 @@ class Tablelevel extends Component {
             },
             {
                 key: '2',
-                title: '细班编号',
-                dataIndex: 'no'
-            },
-            {
-                key: '3',
-                title: '树木类型',
-                dataIndex: 'treetype'
-            },
-            {
-                key: '4',
-                title: '细班面积',
-                dataIndex: 'area'
-            },
-            {
-                key: '5',
-                title: '栽植量',
-                dataIndex: 'num'
+                title: '标段',
+                dataIndex: 'Section'
             },
             {
                 key: '6',
@@ -82,6 +69,10 @@ class Tablelevel extends Component {
     componentDidMount () {
         // 初始化地图
         this.initMap();
+        // 获取历史数据
+        this.getDataHistory();
+        // 获取所有地块
+        this.onSearch(1);
     }
     initMap () {
         // 基础设置
@@ -117,6 +108,23 @@ class Tablelevel extends Component {
             }
         ).addTo(this.map);
     }
+    getDataHistory () {
+        const { getDataimports } = this.props.actions;
+        getDataimports({}, {
+            section: '',
+            datatype: 'land',
+            stime: '',
+            etime: '',
+            page: 1,
+            size: 10
+        }).then(rep => {
+            if (rep.code === 200) {
+                this.setState({
+                    dataListHistory: rep.content
+                });
+            }
+        });
+    }
     render () {
         const { dataList, total, page } = this.state;
         const rowSelection = {
@@ -129,8 +137,8 @@ class Tablelevel extends Component {
             <div className='table-level'>
                 <div>
                     <Form layout='inline'>
-                        <FormItem label='地块编号'>
-                            <Input style={{width: 200}} onChange={this.handleNumber.bind(this)} />
+                        <FormItem label='所属标段'>
+                            <Input style={{width: 200}} onChange={this.handleSection.bind(this)} />
                         </FormItem>
                         <FormItem>
                             <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
@@ -142,7 +150,7 @@ class Tablelevel extends Component {
                 </div>
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
-                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ID' />
+                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} />
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
@@ -153,16 +161,46 @@ class Tablelevel extends Component {
             </div>
         );
     }
-    onSearch () {
-
+    onSearch (page) {
+        console.log('获取列表');
+        const { section } = this.state;
+        const { getLands } = this.props.actions;
+        getLands({}, {
+            section,
+            page,
+            size: 10
+        }).then(rep => {
+            if (rep.code === 200) {
+                rep.content.map((item, index) => {
+                    item.key = index;
+                    this.dataList.push({
+                        Section: item.Section,
+                        coords: item.coords,
+                        key: index
+                    });
+                });
+                console.log(this.dataList.slice(0, 10));
+                page = page - 1;
+                this.setState({
+                    dataList: this.dataList.slice(page * 10, page * 10 + 10),
+                    total: rep.pageinfo && rep.pageinfo.total,
+                    size: rep.pageinfo && rep.pageinfo.size
+                });
+            }
+        });
     }
     onHistory () {
 
     }
-    handleNumber () {
-
+    handleSection (e) {
+        this.setState({
+            section: e.target.value
+        });
     }
-    handlePage () {
+    handlePage (page) {
+        this.onSearch(page);
+    }
+    onEdit () {
 
     }
 }
