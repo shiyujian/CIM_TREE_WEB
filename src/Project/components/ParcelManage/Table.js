@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
+import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message, List } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import {
     fillAreaColor,
     getCoordsArr,
     handleCoordinates
 } from '../auth';
-import { tokensToRegExp } from 'path-to-regexp';
 const FormItem = Form.Item;
 window.config = window.config || {};
 class Tablelevel extends Component {
@@ -30,6 +29,8 @@ class Tablelevel extends Component {
         this.handleSection = this.handleSection.bind(this); // 所属标段
         this.onHistory = this.onHistory.bind(this); // 历史导入数据
         this.handlePage = this.handlePage.bind(this);
+        this.handleOk = this.handleOk.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
 
         this.columns = [
             {
@@ -118,6 +119,7 @@ class Tablelevel extends Component {
             page: 1,
             size: 10
         }).then(rep => {
+            console.log('历史数据', rep.content);
             if (rep.code === 200) {
                 this.setState({
                     dataListHistory: rep.content
@@ -126,7 +128,7 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, total, page } = this.state;
+        const { dataList, dataListHistory, total, page } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -144,7 +146,7 @@ class Tablelevel extends Component {
                             <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
                         </FormItem>
                         <FormItem>
-                            <Button type='primary' onClick={this.onHistory.bind(this)}>历史数据</Button>
+                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>历史数据</Button>
                         </FormItem>
                     </Form>
                 </div>
@@ -158,8 +160,87 @@ class Tablelevel extends Component {
                         <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
+                <Modal
+                    title='历史列表'
+                    visible={this.state.showModal}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                >
+                    <List
+                        bordered
+                        dataSource={dataListHistory}
+                        renderItem={item => {
+                            return (
+                                <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
+                                    <div>{item.DataType}</div>
+                                    <div style={{marginLeft: 20}}>
+                                        {item.CreateTime}
+                                    </div>
+                                </List.Item>
+                            );
+                        }}
+                    />
+                </Modal>
             </div>
         );
+    }
+    onLocation (selectedRows) {
+        const { areaLayerList } = this.state;
+        areaLayerList.map(item => {
+            item.remove();
+        });
+        let coordinatesArr = []; // 多维数据
+        selectedRows.map(item => {
+            let coordsArr = getCoordsArr(item.coords);
+            console.log(coordsArr, 'coordsArr');
+            let treearea = [];
+            coordsArr.map(item => {
+                let arr = item.split(' ');
+                treearea.push([arr[1], arr[0]]);
+            });
+            coordinatesArr.push(treearea);
+        });
+        console.log(coordinatesArr, 'coordinatesArr');
+        // 如果地块存在，则定位过去
+        if (coordinatesArr.length !== 0) {
+            let message = {
+                key: 3,
+                type: 'Feature',
+                properties: {name: '', type: 'area'},
+                geometry: { type: 'Polygon', coordinates: coordinatesArr }
+            };
+            let polygon = this._createMarker(message);
+            // 放大该处视角
+            this.map.fitBounds(polygon.getBounds());
+            this.setState({
+                areaLayerList: [ polygon ]
+            });
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        try {
+            if (geo.properties.type === 'area') {
+                // 创建区域图形
+                let polygon = L.polygon(geo.geometry.coordinates, {
+                    color: '#201ffd',
+                    fillColor: fillAreaColor(geo.key),
+                    fillOpacity: 0.3
+                }).addTo(this.map);
+                return polygon;
+            }
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+    deleteRecord (ID) {
+        const { deleteDataimport } = this.props.actions;
+        deleteDataimport({
+            id: ID
+        }, {}).then(rep => {
+            console.log(rep);
+            this.getDataHistory();
+        });
     }
     onSearch (page) {
         console.log('获取列表');
@@ -190,7 +271,9 @@ class Tablelevel extends Component {
         });
     }
     onHistory () {
-
+        this.setState({
+            showModal: true
+        });
     }
     handleSection (e) {
         this.setState({
@@ -202,6 +285,14 @@ class Tablelevel extends Component {
     }
     onEdit () {
 
+    }
+    handleOk () {
+        this.handleCancel();
+    }
+    handleCancel () {
+        this.setState({
+            showModal: false
+        });
     }
 }
 

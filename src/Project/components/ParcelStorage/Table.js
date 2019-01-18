@@ -14,19 +14,21 @@ class Tablelevel extends Component {
         super(props);
         this.state = {
             dataList: [],
+            newDataList: [],
             showModal: false,
             record: {},
             indexBtn: 1,
             fileList: [],
             page: 1,
             total: 0,
-            number: '',
+            section: '',
             confirmLoading: false,
             areaLayerList: [] // 区域地块图层list
         };
         this.dataList = []; // 暂存数据
+        this.newDataList = [];
         this.onSearch = this.onSearch.bind(this); // 查询地块
-        this.handleNumber = this.handleNumber.bind(this); // 地块编号
+        this.handleSection = this.handleSection.bind(this); // 地块编号
         this.onHistory = this.onHistory.bind(this); // 历史导入数据
         this.handlePage = this.handlePage.bind(this);
         this.onAdd = this.onAdd.bind(this);
@@ -108,7 +110,7 @@ class Tablelevel extends Component {
         ).addTo(this.map);
     }
     render () {
-        const { dataList, confirmLoading, total, page } = this.state;
+        const { dataList, newDataList, confirmLoading, total, page } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -131,21 +133,21 @@ class Tablelevel extends Component {
                 <div>
                     <Form layout='inline'>
                         <FormItem label='地块编号'>
-                            <Input style={{width: 200}} onChange={this.handleNumber.bind(this)} />
+                            <Input style={{width: 200}} onChange={this.handleSection.bind(this)} />
                         </FormItem>
                         <FormItem>
                             <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
                         </FormItem>
                         <FormItem>
                             {
-                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)}>上传地块</Button> : <Button type='primary' onClick={this.onPutStorage.bind(this)} style={{marginLeft: 50}}>地块入库</Button>
+                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传地块</Button> : <Button type='primary' onClick={this.onPutStorage.bind(this)} style={{marginLeft: 50}}>地块入库</Button>
                             }
                         </FormItem>
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
-                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} />
+                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={newDataList.length === 0 ? dataList : newDataList} pagination={false} />
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
@@ -232,16 +234,40 @@ class Tablelevel extends Component {
         }
     }
     onSearch () {
+        const { section } = this.state;
+        console.log(section);
+        console.log(this.dataList);
+        if (!section) {
+            this.setState({
+                newDataList: []
+            });
+            return;
+        }
+        this.dataList.map(item => {
+            if (section === item.Section) {
+                this.newDataList.push(item);
+            }
+        });
+        console.log(this.newDataList);
 
+        this.setState({
+            newDataList: this.newDataList
+        });
     }
     onHistory () {
 
     }
-    handleNumber () {
-
+    handleSection (e) {
+        this.setState({
+            section: e.target.value
+        });
     }
-    handlePage () {
-
+    handlePage (page) {
+        console.log(page, 'page');
+        page = page - 1;
+        this.setState({
+            dataList: this.dataList.slice(page * 10, page * 10 + 10)
+        });
     }
     onAdd () {
         this.setState({

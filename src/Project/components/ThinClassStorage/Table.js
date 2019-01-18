@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
-
+import {
+    fillAreaColor,
+    getCoordsArr,
+    getPolygonByCoordArr
+} from '../auth';
 const FormItem = Form.Item;
 window.config = window.config || {};
 class Tablelevel extends Component {
@@ -17,7 +21,8 @@ class Tablelevel extends Component {
             page: 1,
             total: 0,
             confirmLoading: false,
-            number: ''
+            number: '',
+            areaLayerList: [] // 区域地块图层list
         };
         this.dataList = []; // 暂存数据
         this.onSearch = this.onSearch.bind(this); // 查询细班
@@ -117,6 +122,12 @@ class Tablelevel extends Component {
     }
     render () {
         const { dataList, total, page, confirmLoading } = this.state;
+        const rowSelection = {
+            onChange: (selectedRowKeys, selectedRows) => {
+                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+                this.onLocation(selectedRows);
+            }
+        };
         const propsUpload = {
             name: 'file',
             action: '',
@@ -140,14 +151,14 @@ class Tablelevel extends Component {
                         </FormItem>
                         <FormItem>
                             {
-                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)}>上传细班</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}}>细班入库</Button>
+                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传细班</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}}>细班入库</Button>
                             }
                         </FormItem>
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 700, float: 'left', overflow: 'hidden'}}>
-                        <Table columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
+                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
@@ -181,8 +192,58 @@ class Tablelevel extends Component {
             </div>
         );
     }
-    onLocation () {
-
+    onLocation (recordArr) {
+        const { areaLayerList } = this.state;
+        areaLayerList.map(item => {
+            item.remove();
+        });
+        let coordinatesArr = []; // 多维数据
+        recordArr.map(item => {
+            let treearea = [];
+            if (item.Geom) {
+                let coordsArr = getCoordsArr(item.Geom);
+                coordsArr.map(item => {
+                    let arr = item.split(' ');
+                    treearea.push([
+                        arr[1],
+                        arr[0]
+                    ]);
+                });
+            }
+            coordinatesArr.push(treearea);
+        });
+        console.log('coordinatesArr', coordinatesArr);
+        // 如果地块存在，则定位过去
+        if (coordinatesArr.length !== 0) {
+            let message = {
+                key: 3,
+                type: 'Feature',
+                properties: {name: '', type: 'area'},
+                geometry: { type: 'Polygon', coordinates: coordinatesArr }
+            };
+            let polygon = this._createMarker(message);
+            // 放大该处视角
+            this.map.fitBounds(polygon.getBounds());
+            this.setState({
+                areaLayerList: [ polygon ]
+            });
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        try {
+            if (geo.properties.type === 'area') {
+                // 创建区域图形
+                let polygon = L.polygon(geo.geometry.coordinates, {
+                    color: '#201ffd',
+                    fillColor: fillAreaColor(geo.key),
+                    fillOpacity: 0.3
+                }).addTo(this.map);
+                return polygon;
+            }
+        } catch (e) {
+            console.log('e', e);
+        }
     }
     onSearch () {
         const { number } = this.state;
@@ -271,7 +332,7 @@ class Tablelevel extends Component {
             record: {}
         });
     }
-    handlePage (page, pageSize = 10) {
+    handlePage (page) {
         page = page - 1;
         this.setState({
             dataList: this.dataList.slice(page * 10, page * 10 + 10)

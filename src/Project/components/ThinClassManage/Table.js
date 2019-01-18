@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
+import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message, List, Skeleton } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import {
     fillAreaColor,
@@ -143,7 +143,7 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, total, page } = this.state;
+        const { dataList, dataListHistory, total, page } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -161,7 +161,7 @@ class Tablelevel extends Component {
                             <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
                         </FormItem>
                         <FormItem>
-                            <Button type='primary' onClick={this.onHistory.bind(this)}>历史数据</Button>
+                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>历史数据</Button>
                         </FormItem>
                     </Form>
                 </div>
@@ -181,7 +181,20 @@ class Tablelevel extends Component {
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                 >
-                    列表
+                    <List
+                        bordered
+                        dataSource={dataListHistory}
+                        renderItem={item => {
+                            return (
+                                <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
+                                    <div>{item.DataType}</div>
+                                    <div style={{marginLeft: 20}}>
+                                        {item.CreateTime}
+                                    </div>
+                                </List.Item>
+                            );
+                        }}
+                    />
                 </Modal>
             </div>
         );
@@ -207,6 +220,15 @@ class Tablelevel extends Component {
     onHistory () {
         this.setState({
             showModal: true
+        });
+    }
+    deleteRecord (ID) {
+        const { deleteDataimport } = this.props.actions;
+        deleteDataimport({
+            id: ID
+        }, {}).then(rep => {
+            console.log(rep);
+            this.getDataHistory();
         });
     }
     handleOk () {
