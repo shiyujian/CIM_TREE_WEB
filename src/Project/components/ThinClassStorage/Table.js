@@ -278,7 +278,14 @@ class Tablelevel extends Component {
         const { importThinClass } = this.props.actions;
         console.log(pro);
         importThinClass({}, pro).then(rep => {
-            console.log(rep);
+            if (rep.code === 1) {
+                message.success('细班数据入库成功');
+                console.log(rep);
+                this.dataList = [];
+                this.setState({
+                    dataList: []
+                });
+            }
         });
     }
     handleNumber (e) {

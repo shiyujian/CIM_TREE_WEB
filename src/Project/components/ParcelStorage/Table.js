@@ -29,7 +29,6 @@ class Tablelevel extends Component {
         this.newDataList = [];
         this.onSearch = this.onSearch.bind(this); // 查询地块
         this.handleSection = this.handleSection.bind(this); // 地块编号
-        this.onHistory = this.onHistory.bind(this); // 历史导入数据
         this.handlePage = this.handlePage.bind(this);
         this.onAdd = this.onAdd.bind(this);
         this.onPutStorage = this.onPutStorage.bind(this);
@@ -253,9 +252,6 @@ class Tablelevel extends Component {
         this.setState({
             newDataList: this.newDataList
         });
-    }
-    onHistory () {
-
     }
     handleSection (e) {
         this.setState({

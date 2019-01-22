@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message, List, Skeleton } from 'antd';
+import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message, List, InputNumber } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import {
     fillAreaColor,
@@ -8,13 +8,17 @@ import {
     handleCoordinates
 } from '../auth';
 const FormItem = Form.Item;
+const Option = Select.Option;
 window.config = window.config || {};
+
 class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
             dataList: [],
             dataListHistory: [], // 历史数据列表
+            dataListPlan: [], // 子表格数据
+            treeType: [], // 选择框选项
             showModal: false,
             record: {},
             indexBtn: 1,
@@ -24,13 +28,13 @@ class Tablelevel extends Component {
             number: '',
             areaLayerList: [] // 区域地块图层list
         };
+        this.treeType = []; // 所有树种类型
         this.dataList = []; // 暂存数据
         this.onSearch = this.onSearch.bind(this); // 查询细班
         this.handleNumber = this.handleNumber.bind(this); // 细班编号
         this.onHistory = this.onHistory.bind(this); // 历史导入数据
         this.handleOk = this.handleOk.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.onEdit = this.onEdit.bind(this);
         this.handlePage = this.handlePage.bind(this);
         this.columns = [
             {
@@ -62,18 +66,6 @@ class Tablelevel extends Component {
                 key: '5',
                 title: '栽植量',
                 dataIndex: 'num'
-            },
-            {
-                key: '6',
-                title: '操作',
-                dataIndex: 'action',
-                render: (text, record, index) => {
-                    return (
-                        <div>
-                            <a onClick={this.onEdit.bind(this, record)}>编辑</a>
-                        </div>
-                    );
-                }
             }
         ];
     }
@@ -89,6 +81,32 @@ class Tablelevel extends Component {
         this.onSearch();
         // 获取历史数据
         this.getDataHistory();
+        this.getTreeTypes();
+        this.getThinClassPlans();
+    }
+    getTreeTypes () {
+        const { getTreeTypes } = this.props.actions;
+        getTreeTypes().then(rep => {
+            console.log(rep);
+            this.treeType = rep;
+            this.setState({
+                treeType: rep
+            });
+        });
+    }
+    getThinClassPlans () {
+        const { getThinClassPlans } = this.props.actions;
+        getThinClassPlans({}, {
+            section: 'P018-01-06',
+            thinclass: 'P018-01-534-001',
+            treetype: '',
+            page: '',
+            size: ''
+        }).then(rep => {
+            if (rep.code) {
+                console.log(rep.content);
+            }
+        });
     }
     initMap () {
         // 基础设置
@@ -150,6 +168,56 @@ class Tablelevel extends Component {
                 this.onLocation(selectedRows);
             }
         };
+        // 子表格
+        let expandedRowRender = (record) => {
+            console.log('渲染了');
+            console.log('record', record);
+            let { dataListPlan } = this.state;
+            console.log('dataListPlan', dataListPlan);
+            dataListPlan.push({
+                ID: record.ID,
+                Num: record.Num,
+                Section: record.Section,
+                no: record.no,
+                treeType: record.treeType
+            });
+            const columns = [{
+                title: '树木类型',
+                key: '1',
+                render: (text, rec) => {
+                    return (
+                        <Select showSearch filterOption={false} style={{width: 200}}
+                            placeholder='请输入树木类型名称' onChange={this.handleTreeType.bind(this, dataListPlan)}
+                            onSearch={this.handleSearch.bind(this)}>
+                            {
+                                this.state.treeType.length > 0 ? this.state.treeType.map(item => {
+                                    return <Option value={item.ID}>{item.TreeTypeName}</Option>;
+                                }) : []
+                            }
+                        </Select>
+                    );
+                }
+            }, {
+                title: '栽植量',
+                key: '2',
+                render: (text, rec) => {
+                    return (
+                        <InputNumber min={1} max={record.num} onChange={this.handleNum.bind(this, dataListPlan)} />
+                    );
+                }
+            }, {
+                title: '操作',
+                key: '3',
+                render: (text, rec) => {
+                    return (
+                        <a onClick={this.onSavePlan.bind(this, rec)}>保存</a>
+                    );
+                }
+            }];
+            return (
+                <Table columns={columns} dataSource={this.state.dataListPlan} pagination={false} rowKey='ID' />
+            );
+        };
         return (
             <div className='table-level'>
                 <div>
@@ -166,8 +234,8 @@ class Tablelevel extends Component {
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
-                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ID' />
+                    <div style={{width: 600, height: 640, float: 'left'}}>
+                        <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ID' />
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
@@ -199,6 +267,50 @@ class Tablelevel extends Component {
             </div>
         );
     }
+    onSavePlan (rec) {
+        console.log(rec);
+        const { postThinClassPlans } = this.props.actions;
+        postThinClassPlans({}, {
+            ThinClass: rec.no,
+            Section: rec.Section,
+            TreeType: rec.treeType,
+            Num: rec.Num
+        }).then(rep => {
+            if (rep.code === 1) {
+                message.success('细班栽植计划分项上报成功');
+                this.onSearch();
+            }
+        });
+    }
+    handleNum (dataListPlan, value) {
+        dataListPlan.map(item => {
+            item.Num = value;
+        });
+        this.setState({
+            dataListPlan
+        });
+    }
+    handleTreeType (dataListPlan, value) {
+        dataListPlan.map(item => {
+            item.treeType = value;
+        });
+        this.setState({
+            dataListPlan
+        });
+    };
+    handleSearch (value) {
+        let treeType = [];
+        console.log(this.treeType);
+        this.treeType.map(item => {
+            if (item.TreeTypeName.includes(value)) {
+                treeType.push(item);
+            }
+        });
+        console.log('treeType', treeType);
+        this.setState({
+            treeType
+        });
+    };
     onSearch (page = 1) {
         const { number } = this.state;
         let { getThinClass } = this.props.actions;
@@ -227,7 +339,9 @@ class Tablelevel extends Component {
         deleteDataimport({
             id: ID
         }, {}).then(rep => {
-            console.log(rep);
+            if (rep.code === 1) {
+                message.success('该次上传的数据已全部删除');
+            }
             this.getDataHistory();
         });
     }
@@ -296,13 +410,6 @@ class Tablelevel extends Component {
     onAdd () {
         this.setState({
             showModal: true
-        });
-    }
-    onEdit (record, e) {
-        e.preventDefault();
-        this.setState({
-            showModal: true,
-            record
         });
     }
     handlePage (page, pageSize = 10) {
