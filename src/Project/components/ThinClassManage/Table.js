@@ -18,6 +18,7 @@ class Tablelevel extends Component {
             dataList: [],
             dataListHistory: [], // 历史数据列表
             dataListPlan: [], // 子表格数据
+            expandedRowKeys: [], // 展开行
             treeType: [], // 选择框选项
             showModal: false,
             record: {},
@@ -59,13 +60,13 @@ class Tablelevel extends Component {
             },
             {
                 key: '4',
-                title: '细班面积',
-                dataIndex: 'area'
+                title: '栽植量',
+                dataIndex: 'num'
             },
             {
                 key: '5',
-                title: '栽植量',
-                dataIndex: 'num'
+                title: '细班面积',
+                dataIndex: 'area'
             }
         ];
     }
@@ -81,8 +82,8 @@ class Tablelevel extends Component {
         this.onSearch();
         // 获取历史数据
         this.getDataHistory();
+        // 获取所有树种
         this.getTreeTypes();
-        this.getThinClassPlans();
     }
     getTreeTypes () {
         const { getTreeTypes } = this.props.actions;
@@ -92,20 +93,6 @@ class Tablelevel extends Component {
             this.setState({
                 treeType: rep
             });
-        });
-    }
-    getThinClassPlans () {
-        const { getThinClassPlans } = this.props.actions;
-        getThinClassPlans({}, {
-            section: 'P018-01-06',
-            thinclass: 'P018-01-534-001',
-            treetype: '',
-            page: '',
-            size: ''
-        }).then(rep => {
-            if (rep.code) {
-                console.log(rep.content);
-            }
         });
     }
     initMap () {
@@ -161,7 +148,7 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, dataListHistory, total, page } = this.state;
+        const { dataList, dataListHistory, total, page, expandedRowKeys } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -169,28 +156,24 @@ class Tablelevel extends Component {
             }
         };
         // 子表格
-        let expandedRowRender = (record) => {
-            console.log('渲染了');
-            console.log('record', record);
-            let { dataListPlan } = this.state;
-            console.log('dataListPlan', dataListPlan);
-            dataListPlan.push({
-                ID: record.ID,
-                Num: record.Num,
-                Section: record.Section,
-                no: record.no,
-                treeType: record.treeType
-            });
-            const columns = [{
+        let expandedRowRender = (record, index, indent, expanded) => {
+            console.log('渲染record', record, index, indent, expanded);
+            let { treeType, dataListPlan } = this.state;
+            let columns = [{
                 title: '树木类型',
                 key: '1',
-                render: (text, rec) => {
+                dataIndex: 'treeType',
+                render: (text, rec, index) => {
+                    let disabled = true;
+                    if (index === 0) {
+                        disabled = false;
+                    }
                     return (
-                        <Select showSearch filterOption={false} style={{width: 200}}
-                            placeholder='请输入树木类型名称' onChange={this.handleTreeType.bind(this, dataListPlan)}
+                        <Select showSearch filterOption={false} style={{width: 200}} value={text} disabled={disabled}
+                            placeholder='请输入树木类型名称' onChange={this.handleTreeType.bind(this, index)}
                             onSearch={this.handleSearch.bind(this)}>
                             {
-                                this.state.treeType.length > 0 ? this.state.treeType.map(item => {
+                                treeType.length > 0 ? treeType.map(item => {
                                     return <Option value={item.ID}>{item.TreeTypeName}</Option>;
                                 }) : []
                             }
@@ -200,22 +183,36 @@ class Tablelevel extends Component {
             }, {
                 title: '栽植量',
                 key: '2',
-                render: (text, rec) => {
+                dataIndex: 'Num',
+                render: (text, rec, index) => {
                     return (
-                        <InputNumber min={1} max={record.num} onChange={this.handleNum.bind(this, dataListPlan)} />
+                        <InputNumber min={1} max={record.num} value={text} onChange={this.handleNum.bind(this, index)} />
+                    );
+                }
+            }, {
+                title: '栽植面积',
+                key: '3',
+                dataIndex: 'Area',
+                render: (text, rec, index) => {
+                    return (
+                        <InputNumber min={1} max={record.Area} value={text} onChange={this.handleArea.bind(this, index)} />
                     );
                 }
             }, {
                 title: '操作',
-                key: '3',
-                render: (text, rec) => {
-                    return (
-                        <a onClick={this.onSavePlan.bind(this, rec)}>保存</a>
-                    );
+                key: '4',
+                render: (text, rec, index) => {
+                    if (index === 0) {
+                        return <a onClick={this.onSavePlan.bind(this, rec)}>保存</a>;
+                    } else {
+                        return <a onClick={this.onUpdatePlan.bind(this, rec)}>更新</a>;
+                    }
                 }
             }];
+            console.log('dataListPlan', dataListPlan);
+            console.log('columns', columns);
             return (
-                <Table columns={columns} dataSource={this.state.dataListPlan} pagination={false} rowKey='ID' />
+                <Table columns={columns} dataSource={dataListPlan} pagination={false} rowKey='ID' />
             );
         };
         return (
@@ -235,8 +232,10 @@ class Tablelevel extends Component {
                 </div>
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 640, float: 'left'}}>
-                        <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ID' />
-                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
+                        <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection}
+                            columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
+                            rowKey='ID' onExpand={this.handleExpanded.bind(this)} />
+                        <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
                     <div style={{marginLeft: 620, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
@@ -267,6 +266,53 @@ class Tablelevel extends Component {
             </div>
         );
     }
+    handleExpanded (expanded, record) {
+        console.log('触发', expanded, record);
+        if (!expanded) {
+            this.setState({
+                dataListPlan: [],
+                expandedRowKeys: []
+            });
+            return;
+        }
+        let dataListPlan = [];
+        let expandedRowKeys = [];
+        dataListPlan.push({
+            ID: record.ID + '1',
+            Num: '',
+            Section: record.Section,
+            no: record.no,
+            treeType: '',
+            Area: ''
+        });
+        const { getThinClassPlans } = this.props.actions;
+        getThinClassPlans({}, {
+            section: record.Section,
+            thinclass: record.no,
+            treetype: '',
+            page: '',
+            size: ''
+        }).then(rep => {
+            if (rep.code === 200) {
+                rep.content.map(item => {
+                    dataListPlan.push({
+                        ID: item.ID,
+                        Num: item.Num,
+                        Section: item.Section,
+                        no: item.ThinClass,
+                        treeType: item.TreeType,
+                        Area: item.Area
+                    });
+                });
+                console.log(dataListPlan, '-----');
+                expandedRowKeys.push(record.ID);
+                this.setState({
+                    dataListPlan,
+                    expandedRowKeys
+                });
+            }
+        });
+    }
     onSavePlan (rec) {
         console.log(rec);
         const { postThinClassPlans } = this.props.actions;
@@ -274,25 +320,67 @@ class Tablelevel extends Component {
             ThinClass: rec.no,
             Section: rec.Section,
             TreeType: rec.treeType,
-            Num: rec.Num
+            Num: rec.Num,
+            Area: rec.Area
         }).then(rep => {
             if (rep.code === 1) {
                 message.success('细班栽植计划分项上报成功');
                 this.onSearch();
+                this.setState({
+                    page: 1,
+                    expandedRowKeys: [],
+                    dataListPlan: []
+                });
             }
         });
     }
-    handleNum (dataListPlan, value) {
-        dataListPlan.map(item => {
-            item.Num = value;
+    onUpdatePlan (rec) {
+        const { putThinClassPlans } = this.props.actions;
+        console.log('rec', rec);
+        putThinClassPlans({}, {
+            ID: rec.ID,
+            Num: rec.Num,
+            Area: rec.Area
+        }).then(rep => {
+            if (rep.code === 1) {
+                message.success('细班栽植计划分项更新成功');
+                this.onSearch();
+                this.setState({
+                    page: 1,
+                    expandedRowKeys: [],
+                    dataListPlan: []
+                });
+            }
+        });
+    }
+    handleArea (index, value) {
+        let { dataListPlan } = this.state;
+        dataListPlan.map((item, ind) => {
+            if (index === ind) {
+                item.Area = value;
+            }
         });
         this.setState({
             dataListPlan
         });
     }
-    handleTreeType (dataListPlan, value) {
-        dataListPlan.map(item => {
-            item.treeType = value;
+    handleNum (index, value) {
+        let { dataListPlan } = this.state;
+        dataListPlan.map((item, ind) => {
+            if (index === ind) {
+                item.Num = value;
+            }
+        });
+        this.setState({
+            dataListPlan
+        });
+    }
+    handleTreeType (index, value) {
+        let { dataListPlan } = this.state;
+        dataListPlan.map((item, ind) => {
+            if (index === ind) {
+                item.treeType = value;
+            }
         });
         this.setState({
             dataListPlan
