@@ -982,8 +982,25 @@ export const MODULES = [
                         name: '质量缺陷'
                     }
                 ]
-            },
-            {
+            }, {
+                id: 'PROJECT.PLOTMANAGE.NONE',
+                name: '数据管理',
+                children: [
+                    {
+                        id: 'PROJECT.THINCLASSTORAGE',
+                        name: '细班导入'
+                    }, {
+                        id: 'PROJECT.THINCLASSMANAGE',
+                        name: '细班管理'
+                    }, {
+                        id: 'PROJECT.PARCELSTORAGE',
+                        name: '地块导入'
+                    }, {
+                        id: 'PROJECT.PARCELMANAGE',
+                        name: '地块管理'
+                    }
+                ]
+            }, {
                 id: 'PROJECT.NURSERY.NONE',
                 name: '苗木管理',
                 children: [

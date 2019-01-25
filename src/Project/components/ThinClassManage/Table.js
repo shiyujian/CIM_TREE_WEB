@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import moment from 'moment';
-import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message, List, InputNumber } from 'antd';
-import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
+import { Input, Button, Select, Table, Pagination, Modal, Form, message, List, InputNumber } from 'antd';
 import {
     fillAreaColor,
     getCoordsArr,
@@ -37,6 +35,7 @@ class Tablelevel extends Component {
         this.handleOk = this.handleOk.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.handlePage = this.handlePage.bind(this);
+        this.getItemList = this.getItemList.bind(this);
         this.columns = [
             {
                 key: '1',
@@ -169,7 +168,7 @@ class Tablelevel extends Component {
                         disabled = false;
                     }
                     return (
-                        <Select showSearch filterOption={false} style={{width: 200}} value={text} disabled={disabled}
+                        <Select showSearch filterOption={false} style={{width: 150}} value={text} disabled={disabled}
                             placeholder='请输入树木类型名称' onChange={this.handleTreeType.bind(this, index)}
                             onSearch={this.handleSearch.bind(this)}>
                             {
@@ -205,7 +204,10 @@ class Tablelevel extends Component {
                     if (index === 0) {
                         return <a onClick={this.onSavePlan.bind(this, rec)}>保存</a>;
                     } else {
-                        return <a onClick={this.onUpdatePlan.bind(this, rec)}>更新</a>;
+                        return <span>
+                            <a onClick={this.onUpdatePlan.bind(this, rec)}>更新</a>
+                            <a onClick={this.onDeletePlan.bind(this, rec)} style={{marginLeft: 10}}>删除</a>
+                        </span>;
                     }
                 }
             }];
@@ -251,19 +253,21 @@ class Tablelevel extends Component {
                     <List
                         bordered
                         dataSource={dataListHistory}
-                        renderItem={item => {
-                            return (
-                                <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
-                                    <div>{item.DataType}</div>
-                                    <div style={{marginLeft: 20}}>
-                                        {item.CreateTime}
-                                    </div>
-                                </List.Item>
-                            );
-                        }}
+                        renderItem={this.getItemList.bind(this)}
                     />
                 </Modal>
             </div>
+        );
+    }
+    getItemList (item) {
+        return (
+            <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
+                <div>{item.Section}</div>
+                <div style={{marginLeft: 20}}>
+                    {item.CreateTime}
+                </div>
+                <div style={{marginLeft: 20}}>{item.DataType === 'thinclass' ? '细班' : ''}</div>
+            </List.Item>
         );
     }
     handleExpanded (expanded, record) {
@@ -344,6 +348,22 @@ class Tablelevel extends Component {
         }).then(rep => {
             if (rep.code === 1) {
                 message.success('细班栽植计划分项更新成功');
+                this.onSearch();
+                this.setState({
+                    page: 1,
+                    expandedRowKeys: [],
+                    dataListPlan: []
+                });
+            }
+        });
+    }
+    onDeletePlan (rec) {
+        const { deleteThinClassPlans } = this.props.actions;
+        deleteThinClassPlans({
+            ID: rec.ID
+        }).then(rep => {
+            if (rep.code === 1) {
+                message.success('细班栽植计划分项删除成功');
                 this.onSearch();
                 this.setState({
                     page: 1,

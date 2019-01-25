@@ -31,6 +31,7 @@ class Tablelevel extends Component {
         this.handlePage = this.handlePage.bind(this);
         this.handleOk = this.handleOk.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.getItemList = this.getItemList.bind(this);
 
         this.columns = [
             {
@@ -169,19 +170,19 @@ class Tablelevel extends Component {
                     <List
                         bordered
                         dataSource={dataListHistory}
-                        renderItem={item => {
-                            return (
-                                <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
-                                    <div>{item.DataType}</div>
-                                    <div style={{marginLeft: 20}}>
-                                        {item.CreateTime}
-                                    </div>
-                                </List.Item>
-                            );
-                        }}
+                        renderItem={this.getItemList.bind(this)}
                     />
                 </Modal>
             </div>
+        );
+    }
+    getItemList (item) {
+        return (
+            <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
+                <div>{item.Section}</div>
+                <div style={{marginLeft: 20}}>{item.CreateTime}</div>
+                <div style={{marginLeft: 20}}>{item.DataType === 'land' ? '地块' : ''}</div>
+            </List.Item>
         );
     }
     onLocation (selectedRows) {

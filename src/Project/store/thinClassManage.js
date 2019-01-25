@@ -12,6 +12,7 @@ export const deleteDataimport = forestFetchAction(`${FOREST_API}/route/dataimpor
 export const getThinClassPlans = forestFetchAction(`${FOREST_API}/route/thinclassplans`); // 获取细班栽植计划分项
 export const postThinClassPlans = forestFetchAction(`${FOREST_API}/route/thinclassplan`, [], 'POST'); // 增加细班栽植计划分项
 export const putThinClassPlans = createFetchAction(`${FOREST_API}/route/thinclassplan`, [], 'PUT'); // 更新细班栽植计划分项
+export const deleteThinClassPlans = createFetchAction(`${FOREST_API}/route/thinclassplan/{{ID}}`, [], 'DELETE'); // 更新细班栽植计划分项
 export const getTreeTypes = forestFetchAction(`${FOREST_API}/tree/treetypes`); // 获取所有树种类型
 
 export const actions = {
@@ -22,6 +23,7 @@ export const actions = {
     getThinClassPlans,
     postThinClassPlans,
     putThinClassPlans,
+    deleteThinClassPlans,
     getTreeTypes
 };
 
