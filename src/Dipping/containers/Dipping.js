@@ -26,13 +26,12 @@ export default class Dipping extends Component {
     }
 
     render () {
-        console.log('sssssssssssssssss');
         return (
             <div>
                 <Content>
                     <iframe
                         src='/dippingdemo/index.html'
-                        style={{ height: '810', width: '100%' }}
+                        style={{ height: '870', width: '100%' }}
                     />
                 </Content>
             </div>
