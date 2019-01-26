@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>ImageryLayer</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+</head>
+
+<body style="margin:0px;scroll:no" >
+   
+    <div>
+        <object id="__g" type="application/x-cm-3d8" style="height: 100%; width: 100%;position: absolute; "></object>
+    </div>  
+</body>
+
+<script type="text/javascript">
+	var layer;
+    window.onload = function () {
+		
+	 
+        //初始化三维控件
+        debugger
+		initAxControl();
+		
+        // loadFDBTest(serUrl,"guoshengAa123456");
+		layer = loadtdbx("http:容东倾斜@144.7.122.35:8040")
+			    
+     }
+
+	
+	var serUrl="ConnType=CMS7HTTP; Server=144.7.122.35; Port=8040; DataBase=容东单体化;FeatureDataset=容东;FeatureClass=南文";
+    function loadFDBTest(serviceurl,tocken){
+		if (serviceurl && serviceurl.indexOf(";") > -1) {
+            conn = serviceurl.split(";");
+            var haspas = false;
+            var connectstr = conn[0] + ";" + conn[1] + ";" + conn[2] + ";" + conn[3];
+            if (serviceurl && serviceurl.toLowerCase().indexOf("password") > -1) {
+                haspas = true;
+                connectstr += ";" + conn[4];
+            }
+			loadFDBServer(connectstr, haspas ? conn[5].split("=")[1] : conn[4].split("=")[1], haspas ? conn[6].split("=")[1] : conn[5].split("=")[1], "Geometry", null, null, false, tocken);
+                      
+        } 
+			
+	}    
+     
+	var __g;
+	var __rootId;
+	function initAxControl() {
+	    __g = document.getElementById("__g");
+	    var bInit = __g.initialize(true, null);
+	    if (!bInit) {
+	        alert("三维控件初始化失败!");
+	        return false;
+	    }
+	    __g.camera.flyTime = 1;
+		
+	    __rootId = __g.objectManager.getProjectTree().rootID; //也可直接用字符串"11111111-1111-1111-1111-111111111111"
+		
+	    // 设置天空盒
+	    var flag = unescape(location.pathname).lastIndexOf("Samples");
+	    if (flag < 0) {
+			return false;
+			}
+		return true;
+	}
+	
+	function encodeServiceName(str){
+		return encodeURIComponent(str).replace(/-/g,"%2D")
+			.replace(/\(/g,"%28")
+			.replace(/\)/g,"%29")
+			.replace(/\./g,"%2E")
+						.replace(/=/g,"%3D")
+						.replace(/\+/g,"%2B")
+						.replace(/!/g,"%21")
+						.replace(/'/g,"%27")
+						.replace(/~/g,"%7E")
+			.replace(/_/g,"%5F");
+	}
+	
+	function loadFDBServer(connectstr,datasetname, fcname, geometryfield,georenderxml,textrenderxml,isbasiclayer, token){
+		if(connectstr){
+			var ds = null, fds = null;
+			try{
+				connectstr = connectstr.trim().replace(/\s/g,"");
+				var ip,port, dsname;
+				var tokens = [];
+				var t = token;
+				if(token && connectstr.toLowerCase().indexOf("server=") > -1 && connectstr.toLowerCase().indexOf("port=") > -1 && connectstr.toLowerCase().indexOf("database=") > -1 ){
+					ip = connectstr.toLowerCase().split("server=")[1].split(";port=")[0];
+					port = connectstr.toLowerCase().split("port=")[1].split(";database=")[0];
+					dsname = connectstr.split(";")[3].split("=")[1];
+					tokens = token.split(",");
+				}
+				if( ds == null){
+					__g.addToken("http://"+ip+":"+port+"/rest/services/featureService/datasources/"+encodeServiceName(dsname)+"/*",token);
+					ds = __g.dataSourceFactory.openDataSourceByString(connectstr);    //利用数据源工厂打开数据库
+					if(ds == null ) return;
+					
+				}
+
+			   __g.addToken("http://"+ip+":"+port+"/rest/services/featureService/datasources/"+encodeServiceName(dsname)+"/datasets/"+encodeServiceName(datasetname)+"/*",token );
+				fds = ds.openFeatureDataset(datasetname);//打开数据集
+				if(fds == null ) return;
+
+				__g.addToken("http://"+ip+":"+port+"/rest/services/featureService/datasources/"+encodeServiceName(dsname)+"/datasets/"+encodeServiceName(datasetname)+"/featureClasses/"+encodeServiceName(fcname)+"/*",token);
+				var fc = fds.openFeatureClass(fcname);//通过名称打开要素类
+				if(fc == null ) return;                                         
+				 
+				var georender = null, textrender = null;
+				if(georenderxml){
+					georender = __g.objectManager.createGeometryRenderFromXML(georenderxml);
+				}
+				if(textrenderxml){
+					textrender = __g.objectManager.createTextRenderFromXML(textrenderxml);
+				}
+				
+				var layer = __g.objectManager.createFeatureLayer(fc, geometryfield, textrender,georender, __rootId); //创建几何字段名称为“Geometry”的图层
+			
+					__g.camera.flyToObject(layer.guid,0);
+			   
+			}catch(e){
+				console.error("gviErr",e,connectstr);
+			}
+		}
+	}
+	
+	function loadtdbx(path){
+		if(path != ""){
+            path = path.trim();
+            if(path.indexOf("@") > -1 && path.indexOf(":") > -1 ){
+                var ip = path.split("@")[1].split(":")[0];
+                var port = path.split("@")[1].split(":")[1];
+                var dsname = path.split("@")[0].split(":")[1];
+            }
+
+			var layer = __g.objectManager.create3DTileLayer(path,"","11111111-1111-1111-1111-111111111111");
+			if(layer){
+				layer.visibleMask = 15;
+				layer.mouseSelectMask=gviViewportMask.gviViewAllNormalView; 
+				__g.camera.flyToObject(layer.guid,0);
+				return layer;
+			}else{
+				console.log("gviErr:","tdbx加载失败["+path+"]");
+			}
+		}
+	}
+	
+	gviViewportMask = {
+    gviViewNone: 0,
+    gviView0: 1,
+    gviView1: 2,
+    gviView2: 4,
+    gviView3: 8,
+    gviViewAllNormalView: 15,
+    gviViewPIP: 16
+	}
+</script>
+</html>

@@ -154,6 +154,13 @@ export default class Header extends Component {
                 title: '项目管理',
                 path: '/project/nurseryManagement',
                 icon: <Icon name='sitemap' />
+            },
+            {
+                key: 'dipping',
+                id: 'DIPPING',
+                title: '三维倾斜',
+                path: '/dipping/dipping',
+                icon: <Icon name='plane' />
             }
         ];
         const { match: { params: { module = '' } = {} } = {} } = this.props;

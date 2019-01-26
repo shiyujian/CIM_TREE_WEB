@@ -114,6 +114,13 @@ export const tree_menus = [
         title: '项目管理',
         path: '/project/nurserymanagement',
         icon: <Icon name='cogs' />
+    },
+    {
+        key: 'dipping',
+        id: 'DIPPING',
+        title: '三维倾斜',
+        path: '/dipping/dipping',
+        icon: <Icon name='plane' />
     }
 ];
 
