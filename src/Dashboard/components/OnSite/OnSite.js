@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-01-10 15:07:04
+ * @Last Modified time: 2019-01-28 10:50:31
  */
 import React, { Component } from 'react';
 import {
@@ -410,6 +410,7 @@ class OnSite extends Component {
                     if (me.state.polygonData) {
                         me.map.removeLayer(me.state.polygonData);
                     }
+                    console.log('coordinates', coordinates);
                     let polygonData = L.polygon(coordinates, {
                         color: 'white',
                         fillColor: '#93B9F2',
