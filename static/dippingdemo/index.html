@@ -18,15 +18,27 @@
 		
 	 
         //初始化三维控件
+        debugger
 		initAxControl();
-		
         // loadFDBTest(serUrl,"guoshengAa123456");
-		layer = loadtdbx("http:容东倾斜@144.7.122.35:8040")
+		// loadtdbx("http:容东倾斜@144.7.122.35:8040");
+		loadtdbx("http:9号地块倾斜@144.7.122.35:8040");
+
+		layer = loadFDBTest("ConnType=CMS7HTTP; Server=144.7.122.35; Port=8040; DataBase=植树造林小苗;FeatureDataset=植树造林;FeatureClass=1标段","guoshengAa123456");
+		layer.maxVisibleDistance=80000
+		layer = loadFDBTest("ConnType=CMS7HTTP; Server=144.7.122.35; Port=8040; DataBase=植树造林小苗;FeatureDataset=植树造林;FeatureClass=2标段","guoshengAa123456");
+		layer.maxVisibleDistance=80000
+		layer = loadFDBTest("ConnType=CMS7HTTP; Server=144.7.122.35; Port=8040; DataBase=植树造林小苗;FeatureDataset=植树造林;FeatureClass=3标段","guoshengAa123456");
+		layer.maxVisibleDistance=80000
+		layer = loadFDBTest("ConnType=CMS7HTTP; Server=144.7.122.35; Port=8040; DataBase=植树造林小苗;FeatureDataset=植树造林;FeatureClass=4标段","guoshengAa123456");
+		layer.maxVisibleDistance=80000
+		layer = loadFDBTest("ConnType=CMS7HTTP; Server=144.7.122.35; Port=8040; DataBase=植树造林小苗;FeatureDataset=植树造林;FeatureClass=5标段","guoshengAa123456");
+		layer.maxVisibleDistance=80000
 			    
      }
 
 	
-	var serUrl="ConnType=CMS7HTTP; Server=144.7.122.35; Port=8040; DataBase=容东单体化;FeatureDataset=容东;FeatureClass=南文";
+	var serUrl="ConnType=CMS7HTTP; Server=144.7.122.35; Port=8040; DataBase=植树造林小苗;FeatureDataset=植树造林;FeatureClass=1标段";
     function loadFDBTest(serviceurl,tocken){
 		if (serviceurl && serviceurl.indexOf(";") > -1) {
             conn = serviceurl.split(";");
@@ -36,7 +48,8 @@
                 haspas = true;
                 connectstr += ";" + conn[4];
             }
-			loadFDBServer(connectstr, haspas ? conn[5].split("=")[1] : conn[4].split("=")[1], haspas ? conn[6].split("=")[1] : conn[5].split("=")[1], "Geometry", null, null, false, tocken);
+			var layer = loadFDBServer(connectstr, haspas ? conn[5].split("=")[1] : conn[4].split("=")[1], haspas ? conn[6].split("=")[1] : conn[5].split("=")[1], "Geometry", null, null, false, tocken);
+			return layer;
                       
         } 
 			
@@ -116,6 +129,8 @@
 				var layer = __g.objectManager.createFeatureLayer(fc, geometryfield, textrender,georender, __rootId); //创建几何字段名称为“Geometry”的图层
 			
 					__g.camera.flyToObject(layer.guid,0);
+
+				return layer;
 			   
 			}catch(e){
 				console.error("gviErr",e,connectstr);
