@@ -262,6 +262,20 @@ export default class Project extends Component {
                     icon: <Icon name='tag' />
                 }
             ]
+        }, {
+            key: 'volunteer',
+            name: '志愿管理',
+            id: 'PROJECT.VOLUNTEER',
+            icon: <Icon name='won' />,
+            children: [
+                {
+                    key: 'VolunteerManage',
+                    id: 'PROJECT.VOLUNTEERMANAGE',
+                    name: '志愿者管理',
+                    path: '/project/volunteerManage',
+                    icon: <Icon name='code' />
+                }
+            ]
         },
         {
             key: 'nursery',
