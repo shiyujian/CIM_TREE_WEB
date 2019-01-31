@@ -3,6 +3,7 @@ import {FOREST_API} from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
 
 export const ID = 'volunteerManage';
+export const setkeycode = createAction(`${ID}_setkeycode`);
 export const getTreeListOK = createAction(`${ID}_gettreeListlist`);
 export const getTreeList = forestFetchAction(`${FOREST_API}/tree/treetypes`, [getTreeListOK]);
 export const postNursery = forestFetchAction(`${FOREST_API}/tree/nurseryconfig`, [], 'POST');
@@ -20,14 +21,21 @@ export const actions = {
     deleteNursery,
     changeEditVisible,
     getVolunteertrees,
-    postInitvolunteertree
+    postInitvolunteertree,
+    setkeycode
 };
 
 export default handleActions({
     [getTreeListOK]: (state, {payload}) => ({
         ...state,
-        treeList: payload
+        treetypes: payload
     }),
+    [setkeycode]: (state, { payload }) => {
+        return {
+            ...state,
+            keycode: payload
+        };
+    },
     [changeEditVisible]: (state, {payload}) => ({
         ...state,
         editVisible: payload
