@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-18 14:03:10
+ * @Last Modified time: 2019-02-15 10:32:35
  */
 /**
  *
@@ -286,91 +286,8 @@ export const FOREST_LOGIN_DATA = {
     phone: 'zhaozz1010',
     pwd: '130718'
 };
-// 获取单位工程
-export const PROJECT_UNITS = [
-    {
-        code: 'P009',
-        value: '九号地块',
-        units: [
-            {
-                code: 'P009-01-01',
-                value: '一标段'
-            },
-            {
-                code: 'P009-01-02',
-                value: '二标段'
-            },
-            {
-                code: 'P009-01-03',
-                value: '三标段'
-            },
-            {
-                code: 'P009-01-04',
-                value: '四标段'
-            },
-            {
-                code: 'P009-01-05',
-                value: '五标段'
-            },
-            {
-                code: 'P009-99-99',
-                value: '市民中心造林'
-            }
-        ]
-    },
-    {
-        code: 'P010',
-        value: '苗景兼用林',
-        units: [
-            {
-                code: 'P010-01-01',
-                value: '一标段'
-            },
-            {
-                code: 'P010-01-02',
-                value: '二标段'
-            },
-            {
-                code: 'P010-01-03',
-                value: '三标段'
-            },
-            {
-                code: 'P010-01-04',
-                value: '四标段'
-            },
-            {
-                code: 'P010-02-05',
-                value: '五标段'
-            },
-            {
-                code: 'P010-03-06',
-                value: '六标段'
-            }
-        ]
-    },
-    {
-        code: 'P999',
-        value: '市民中心景观',
-        units: [
-            {
-                code: 'P999-01-01',
-                value: '市民中心景观'
-            }
-        ]
-    },
-    {
-        code: 'P998',
-        value: '截洪渠景观一期工程',
-        units: [
-            {
-                code: 'P998-01-01',
-                value: '一标段'
-            }
-        ]
-    }
-];
 
-// 各个项目的中心坐标
+// 综合展示 各个项目的中心坐标
 export const PROJECTPOSITIONCENTER = [
     {
         name: '九号地块',
@@ -393,17 +310,7 @@ export const PROJECTPOSITIONCENTER = [
         zoom: 13
     }
 ];
-
-// echarts图表的颜色
-export const ECHARTSCOLOR = [
-    'black',
-    'orange',
-    'yellow',
-    'blue',
-    'green',
-    'purple'
-];
-
+// 树种大类
 export const TREETYPENO = [
     {
         id: '1',
@@ -453,7 +360,7 @@ export const CULTIVATIONMODE = [
         name: '山苗'
     }
 ];
-
+// 进度管理 进度填报和进度展示
 export const SCHEDULRPROJECT = [
     {
         id: 1,
@@ -549,6 +456,14 @@ export const SCHEDULRPROJECT = [
         type: '其他',
         typeFirst: false
     }
+];
+// 项目管理  树种管理 苗圃测量
+export const NURSERYPARAM = [
+    '土球直径', '土球厚度', '高度', '冠幅', '胸径', '地径', '分枝数量', '地径超过1cm分枝数量'
+];
+// 项目管理  树种管理 现场测量
+export const TREEPARAM = [
+    '地径', '高度', '胸径', '密度', '面积', '分枝数量', '地径超过1cm分枝数量'
 ];
 
 export const MODULES = [

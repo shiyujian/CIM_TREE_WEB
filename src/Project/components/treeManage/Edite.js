@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { TREETYPENO, NURSERYPARAM, TREEPARAM } from '../../../_platform/api';
+import { getForestImgUrl } from '_platform/auth';
 import {
     Form,
     Input,
@@ -10,45 +11,125 @@ import {
     Upload,
     Icon,
     message,
-    Table,
+    Select,
+    Radio,
     notification
 } from 'antd';
 const FormItem = Form.Item;
-const InputTextArea = Input.TextArea;
+const Option = Select.Option;
+const RadioGroup = Radio.Group;
 
 class Edite extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
-            newKey: Math.random()
+            fileList: [],
+            picsSrc: '',
+            treeParam: [],
+            nurseryParam: [],
+            samplingParam: [],
+            loading: false
         };
     }
-
-    static layoutT = {
-        labelCol: { span: 8 },
-        wrapperCol: { span: 16 }
-    };
     static layout = {
         labelCol: { span: 3 },
         wrapperCol: { span: 20 }
     };
 
+    componentDidMount = async () => {
+        const {
+            record,
+            form: { setFieldsValue }
+        } = this.props;
+        console.log('record', record);
+        let TreeType = '1';
+        if (record && record.TreeTypeNo) {
+            TreeType = record.TreeTypeNo.slice(0, 1);
+        }
+        if (record && record.Pics) {
+            let src = getForestImgUrl(record.Pics);
+            let nameArr = record.Pics.split('/');
+            let name = nameArr[nameArr.length - 1];
+            let fileList = [{
+                uid: '-1',
+                name: name,
+                status: 'done',
+                url: src
+            }];
+            this.setState({
+                fileList: fileList,
+                picsSrc: record.Pics,
+                loading: false
+            });
+            await setFieldsValue({
+                TreePics: fileList
+            });
+        } else {
+            await setFieldsValue({
+                TreePics: undefined
+            });
+        }
+
+        if (record && record.NurseryParam) {
+            let nurseryParam = this.changeStringToArr(record.NurseryParam);
+            await setFieldsValue({
+                NurseryParam: nurseryParam
+            });
+            this.setState({
+                nurseryParam
+            });
+        }
+        if (record && record.TreeParam) {
+            let treeParam = this.changeStringToArr(record.TreeParam);
+            await setFieldsValue({
+                TreeParam: treeParam
+            });
+            this.setState({
+                treeParam
+            });
+        }
+        if (record && record.SamplingParam) {
+            let samplingParam = this.changeStringToArr(record.SamplingParam);
+            let samplingParamText = '';
+            samplingParam.map((param, index) => {
+                if (index === 0) {
+                    samplingParamText = samplingParamText + param;
+                } else {
+                    samplingParamText = samplingParamText + '，' + param;
+                }
+            });
+            await setFieldsValue({
+                SamplingParamText: samplingParamText
+            });
+            this.setState({
+                samplingParam
+            });
+        }
+
+        await setFieldsValue({
+            TreeName: record.TreeTypeName,
+            TreeType: TreeType,
+            TreeSpecies: record.TreeTypeGenera,
+            TreeMorphologicalCharacter: record.MorphologicalCharacter,
+            TreeHabit: record.GrowthHabit,
+            IsLocation: record.IsLocation
+        });
+    }
+
+    changeStringToArr = (stringData) => {
+        let arrData = [];
+        if (stringData) {
+            arrData = stringData.split(',');
+        }
+        return arrData;
+    }
+
     render () {
         const {
             form: { getFieldDecorator },
-            record = {},
             editVisible
         } = this.props;
-        console.log('renderrecord', record);
-        console.log('editVisible', editVisible);
-        const uploadProps = {
-            name: 'file',
-            action: 'http://47.104.159.127/upload/treetype',
-            headers: {
-                authorization: 'authorization-text'
-            }
-        };
         return (
             <div>
                 <Modal
@@ -56,7 +137,6 @@ class Edite extends Component {
                     width={920}
                     visible={editVisible}
                     onOk={this.save.bind(this)}
-                    key={this.state.newKey}
                     onCancel={this.cancel.bind(this)}
                 >
                     <Form>
@@ -66,94 +146,76 @@ class Edite extends Component {
                                     <Col span={24}>
                                         <FormItem
                                             {...Edite.layout}
-                                            label='树种ID:'
+                                            label='名称:'
                                         >
-                                            {getFieldDecorator('EID', {
-                                                initialValue: `${
-                                                    record.ID ? record.ID : ''
-                                                }`,
+                                            {getFieldDecorator('TreeName', {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '树种ID'
+                                                        message: '请输入树种名称'
                                                     }
                                                 ]
                                             })(
-                                                <Input placeholder='请输入树种ID' />
+                                                <Input placeholder='请输入树种名称' />
                                             )}
                                         </FormItem>
                                     </Col>
                                     <Col span={24}>
                                         <FormItem
                                             {...Edite.layout}
-                                            label='树种学名:'
+                                            label='类别:'
                                         >
-                                            {getFieldDecorator(
-                                                'ETreeTypeName',
-                                                {
-                                                    initialValue: `${
-                                                        record.TreeTypeName
-                                                            ? record.TreeTypeName
-                                                            : ''
-                                                    }`,
-                                                    rules: [
-                                                        {
-                                                            required: true,
-                                                            message:
-                                                                '请输入树种学名'
-                                                        }
-                                                    ]
-                                                }
-                                            )(
-                                                <Input placeholder='请输入树种学名' />
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='所属类型:'
-                                        >
-                                            {getFieldDecorator(
-                                                'ETreeTypeGenera',
-                                                {
-                                                    initialValue: `${
-                                                        record.TreeTypeGenera
-                                                            ? record.TreeTypeGenera
-                                                            : ''
-                                                    }`,
-                                                    rules: [
-                                                        {
-                                                            required: true,
-                                                            message:
-                                                                '请输入所属类型'
-                                                        }
-                                                    ]
-                                                }
-                                            )(
-                                                <Input placeholder='请输入所属类型' />
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='编码:'
-                                        >
-                                            {getFieldDecorator('ETreeTypeNo', {
-                                                initialValue: `${
-                                                    record.TreeTypeNo
-                                                        ? record.TreeTypeNo
-                                                        : ''
-                                                }`,
+                                            {getFieldDecorator('TreeType', {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入编码'
+                                                        message:
+                                                            '请选择树种类别'
                                                     }
                                                 ]
                                             })(
-                                                <Input placeholder='请输入编码' />
+                                                <Select>
+                                                    {
+                                                        TREETYPENO.map((type) => {
+                                                            return <Option value={type.id} key={type.name}>{type.name}</Option>;
+                                                        })
+                                                    }
+                                                </Select>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='科属:'
+                                        >
+                                            {getFieldDecorator('TreeSpecies', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message:
+                                                            '请输入树种科属'
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请输入树种科属' />
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='形态特征:'
+                                        >
+                                            {getFieldDecorator('TreeMorphologicalCharacter', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请输入树种形态特征'
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请输入树种形态特征' />
                                             )}
                                         </FormItem>
                                     </Col>
@@ -162,56 +224,121 @@ class Edite extends Component {
                                             {...Edite.layout}
                                             label='习性:'
                                         >
-                                            {getFieldDecorator(
-                                                'EGrowthHabite',
-                                                {
-                                                    initialValue: `${
-                                                        record.GrowthHabit
-                                                            ? record.GrowthHabit
-                                                            : ''
-                                                    }`,
-                                                    rules: [
-                                                        {
-                                                            required: true,
-                                                            message:
-                                                                '请输入习性'
-                                                        }
-                                                    ]
-                                                }
-                                            )(
-                                                <InputTextArea
-                                                    placeholder='请输入习性'
-                                                    autosize={{
-                                                        minRows: 3,
-                                                        maxRows: 8
-                                                    }}
-                                                />
+                                            {getFieldDecorator('TreeHabit', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请输入树种习性'
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请输入树种习性' />
                                             )}
                                         </FormItem>
                                     </Col>
                                     <Col span={24}>
                                         <FormItem
                                             {...Edite.layout}
-                                            label='Pics:'
+                                            label='苗圃测量项:'
                                         >
-                                            {getFieldDecorator('EPics', {
-                                                initialValue: `${
-                                                    record.Pics
-                                                        ? record.Pics
-                                                        : ''
-                                                }`,
+                                            {getFieldDecorator('NurseryParam', {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入Pics'
+                                                        message: '请选择苗圃测量项'
                                                     }
                                                 ]
                                             })(
-                                                <Upload {...uploadProps}>
-                                                    <Icon
-                                                        type='plus'
-                                                        className='avatar-uploader-trigger'
-                                                    />
+                                                <Select mode='multiple' onChange={this.handleNurseryParamChange.bind(this)}>
+                                                    {
+                                                        NURSERYPARAM.map((param) => {
+                                                            return <Option value={param} key={param}>{param}</Option>;
+                                                        })
+                                                    }
+                                                </Select>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='现场测量项:'
+                                        >
+                                            {getFieldDecorator('TreeParam', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请选择现场测量项'
+                                                    }
+                                                ]
+                                            })(
+                                                <Select mode='multiple' onChange={this.handleTreeParamChange.bind(this)}>
+                                                    {
+                                                        TREEPARAM.map((param) => {
+                                                            return <Option value={param} key={param}>{param}</Option>;
+                                                        })
+                                                    }
+                                                </Select>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='抽检测量项:'
+                                        >
+                                            {getFieldDecorator('SamplingParamText', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请选择苗圃测量项和现场测量项'
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请选择苗圃测量项和现场测量项' readOnly />
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='是否需要挂牌:'
+                                        >
+                                            {getFieldDecorator('IsLocation', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请选择抽检测量项'
+                                                    }
+                                                ]
+                                            })(
+                                                <RadioGroup>
+                                                    <Radio value={1} key={'是'}>是(即需要定位)</Radio>
+                                                    <Radio value={0} key={'否'}>否(即不需要定位)</Radio>
+                                                </RadioGroup>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='树种图片:'
+                                        >
+                                            {getFieldDecorator('TreePics', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请上传图片'
+                                                    }
+                                                ]
+                                            })(
+                                                <Upload {...this.uploadProps}
+                                                    onRemove={this.onRemove.bind(this)}
+                                                    fileList={this.state.fileList}>
+                                                    <Button>
+                                                        <Icon type='upload' />
+                                                        上传图片
+                                                    </Button>
                                                 </Upload>
                                             )}
                                         </FormItem>
@@ -225,80 +352,285 @@ class Edite extends Component {
         );
     }
 
-    cancel () {
+    // 选择苗圃测量项
+    handleNurseryParamChange = (values) => {
         const {
-            actions: { changeEditVisible }
+            form: { setFieldsValue }
         } = this.props;
+        const {
+            treeParam
+        } = this.state;
+        let samplingParam = values.concat(treeParam.filter((item) => { return !(values.indexOf(item) > -1); }));
+        let samplingParamText = '';
+        samplingParam.map((param, index) => {
+            if (index === 0) {
+                samplingParamText = samplingParamText + param;
+            } else {
+                samplingParamText = samplingParamText + '，' + param;
+            }
+        });
         this.setState({
-            newKey: Math.random()
+            nurseryParam: values,
+            samplingParam
+        });
+        setFieldsValue({
+            SamplingParamText: samplingParamText
+        });
+    }
+    // 选择现场测量项
+    handleTreeParamChange = (values) => {
+        const {
+            form: { setFieldsValue }
+        } = this.props;
+        const {
+            nurseryParam
+        } = this.state;
+        let samplingParam = nurseryParam.concat(values.filter((item) => { return !(nurseryParam.indexOf(item) > -1); }));
+        let samplingParamText = '';
+        samplingParam.map((param, index) => {
+            if (index === 0) {
+                samplingParamText = samplingParamText + param;
+            } else {
+                samplingParamText = samplingParamText + '，' + param;
+            }
+        });
+        this.setState({
+            treeParam: values,
+            samplingParam
+        });
+        setFieldsValue({
+            SamplingParamText: samplingParamText
+        });
+    }
+    // 上传文件
+    uploadProps = {
+        name: 'a_file',
+        // multiple: false,
+        // action: `${FOREST_API}/UploadHandler.ashx?filetype=treetype`,
+        beforeUpload: file => {
+            const {
+                actions: { postForsetPic },
+                form: { setFieldsValue }
+            } = this.props;
+            let type = file.name.toString().split('.');
+            let len = type.length;
+            if (
+                type[len - 1] === 'jpg' ||
+            type[len - 1] === 'jpeg' ||
+            type[len - 1] === 'png' ||
+            type[len - 1] === 'JPG' ||
+            type[len - 1] === 'JPEG' ||
+            type[len - 1] === 'PNG'
+            ) {
+                const formdata = new FormData();
+                formdata.append('a_file', file);
+                formdata.append('name', file.name);
+                postForsetPic({}, formdata).then(rst => {
+                    if (rst) {
+                        let src = getForestImgUrl(rst);
+                        let fileList = [{
+                            uid: '-1',
+                            name: file.name,
+                            status: 'done',
+                            url: src
+                        }];
+                        // notification.success({
+                        // 	message:'文件上传成功',
+                        // 	duration:3
+                        // })
+                        this.setState({
+                            fileList: fileList,
+                            picsSrc: rst,
+                            loading: false
+                        });
+                        return false;
+                    } else {
+                        this.setState({
+                            fileList: [],
+                            picsSrc: '',
+                            loading: false
+                        });
+                        setFieldsValue({
+                            TreePics: undefined
+                        });
+                        return false;
+                    }
+                });
+            } else {
+                message.error('请上传jpg,jpeg,png 文件');
+                this.setState({
+                    loading: false
+                });
+                return false;
+            }
+        },
+        onChange: ({ file, fileList, event }) => {
+            this.setState({
+                loading: true
+            });
+        }
+    };
+
+    onRemove = (file) => {
+        const {
+            form: { setFieldsValue }
+        } = this.props;
+        setFieldsValue({
+            TreePics: undefined
+        });
+        this.setState({
+            fileList: []
+        });
+    }
+
+    cancel = async () => {
+        const {
+            actions: { changeEditVisible },
+            form: { setFieldsValue }
+        } = this.props;
+        await setFieldsValue({
+            TreeName: undefined,
+            TreeType: undefined,
+            TreeSpecies: undefined,
+            TreeMorphologicalCharacter: undefined,
+            TreeHabit: undefined,
+            NurseryParam: undefined,
+            TreeParam: undefined,
+            SamplingParamText: undefined,
+            IsLocation: undefined,
+            TreePics: undefined
+        });
+
+        this.setState({
+            fileList: [],
+            picsSrc: '',
+            treeParam: [],
+            nurseryParam: [],
+            samplingParam: [],
+            loading: false
         });
         changeEditVisible(false);
     }
 
-    save () {
+    save = () => {
         const {
-            actions: { putNursery, getNurseryList, changeEditVisible },
+            actions: { putTreeType, getTreeTypeList, changeEditVisible },
             form: { setFieldsValue },
-            record
+            record,
+            treeTypeList
         } = this.props;
-
-        let me = this;
-        me.props.form.validateFields((err, values) => {
-            console.log('Received err of form: ', err);
-            console.log('Received values of form: ', values);
-            console.log('Received record of form: ', record);
+        const {
+            picsSrc = '',
+            samplingParam = []
+        } = this.state;
+        console.log('record', record);
+        this.props.form.validateFields(async (err, values) => {
+            // 设置最新的树种编号
+            let treeType = values.TreeType;
+            // 如果树种的类型没有修改，不需要修改树种编码
+            let treeTypeNo = record.TreeTypeNo;
+            if (Number(treeTypeNo.slice(0, 1)) !== Number(treeType)) {
+                let treeTypeArr = [];
+                treeTypeList.map((item) => {
+                    let no = item.TreeTypeNo;
+                    let bigType = no.slice(0, 1);
+                    if (Number(bigType) === Number(treeType)) {
+                        treeTypeArr.push(no);
+                    }
+                });
+                let bigNumber = 0;
+                treeTypeArr.map((number) => {
+                    if (Number(number) > bigNumber) {
+                        bigNumber = Number(number);
+                    }
+                });
+                treeTypeNo = bigNumber + 1;
+            }
             if (!err) {
+                let postData = {
+                    'TreeTypeNo': treeTypeNo, // 树种编码  如4001
+                    'TreeTypeName': values.TreeName,
+                    'TreeTypeGenera': values.TreeSpecies, // 科属
+                    'MorphologicalCharacter': values.TreeMorphologicalCharacter, // 形态特征
+                    'GrowthHabit': values.TreeHabit, // 生长习性
+                    'Pics': picsSrc, // 照片
+                    'NurseryParam': this.changeArrToString(values.NurseryParam), // 苗圃测量参数
+                    'TreeParam': this.changeArrToString(values.TreeParam), // 现场测量参数
+                    'SamplingParam': this.changeArrToString(samplingParam), // 进场抽检参数
+                    'IsLocation': values.IsLocation, // 是否需要定位
+                    'HaveQRCode': values.IsLocation, // 是否需要挂二维码
+                    'ID': record.ID
+                };
+                console.log('postData', postData);
                 if (
-                    values.EFactory === record.Factory &&
-                    values.ENurseryName === record.NurseryName &&
-                    values.ERegionCode === record.RegionCode &&
-                    values.ERegionName === record.RegionName &&
-                    values.ETreePlace === record.TreePlace
+                    postData.TreeTypeNo === record.TreeTypeNo &&
+                    postData.TreeTypeName === record.TreeTypeName &&
+                    postData.TreeTypeGenera === record.TreeTypeGenera &&
+                    postData.MorphologicalCharacter === record.MorphologicalCharacter &&
+                    postData.GrowthHabit === record.GrowthHabit &&
+                    postData.Pics === record.Pics &&
+                    postData.NurseryParam === record.NurseryParam &&
+                    postData.TreeParam === record.TreeParam &&
+                    postData.SamplingParam === record.SamplingParam &&
+                    postData.IsLocation === record.IsLocation &&
+                    postData.HaveQRCode === record.HaveQRCode &&
+                    postData.ID === record.ID
                 ) {
                     notification.info({
                         message: '请进行修改后再进行提交',
                         duration: 3
                     });
                 } else {
-                    let postdata = {
-                        Factory: values.EFactory,
-                        NurseryName: values.ENurseryName,
-                        RegionCode: values.ERegionCode,
-                        RegionName: values.ERegionName,
-                        TreePlace: values.ETreePlace,
-                        ID: record.ID
-                    };
-                    putNursery({}, postdata).then(rst => {
-                        if (rst && rst.code) {
-                            if (rst.msg && rst.msg === '苗圃已存在') {
-                                notification.error({
-                                    message: '名称已存在',
-                                    duration: 3
-                                });
-                            } else {
-                                notification.success({
-                                    message: '更新苗圃信息成功',
-                                    duration: 2
-                                });
-                                getNurseryList();
-
-                                changeEditVisible(false);
-                                this.setState({
-                                    newKey: Math.random()
-                                });
-                            }
-                        } else {
-                            notification.error({
-                                message: '苗圃信息更改失败',
-                                duration: 3
-                            });
-                        }
-                    });
-
-                    changeEditVisible(false);
+                    let rst = await putTreeType({}, postData);
+                    console.log('rst', rst);
+                    if (rst && rst.code && rst.code === 1) {
+                        await setFieldsValue({
+                            TreeName: undefined,
+                            TreeType: undefined,
+                            TreeSpecies: undefined,
+                            TreeMorphologicalCharacter: undefined,
+                            TreeHabit: undefined,
+                            NurseryParam: undefined,
+                            TreeParam: undefined,
+                            SamplingParamText: undefined,
+                            IsLocation: undefined,
+                            TreePics: undefined
+                        });
+                        this.setState({
+                            fileList: [],
+                            picsSrc: '',
+                            treeParam: [],
+                            nurseryParam: [],
+                            samplingParam: [],
+                            loading: false
+                        });
+                        notification.success({
+                            message: '修改树种成功',
+                            duration: 3
+                        });
+                        await changeEditVisible(false);
+                    } else {
+                        notification.error({
+                            message: '新增树种失败',
+                            duration: 3
+                        });
+                    }
+                    await getTreeTypeList();
                 }
             }
         });
+    }
+
+    changeArrToString = (arrData) => {
+        let stringData = '';
+        arrData.map((param, index) => {
+            if (index === 0) {
+                stringData = stringData + param;
+            } else {
+                stringData = stringData + ',' + param;
+            }
+        });
+        return stringData;
     }
 }
 

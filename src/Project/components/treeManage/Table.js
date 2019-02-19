@@ -12,6 +12,7 @@ import {
     Divider
 } from 'antd';
 import { getForestImgUrl } from '_platform/auth';
+import { TREETYPENO } from '../../../_platform/api';
 import Addition from './Addition';
 import Edite from './Edite';
 import './index.less';
@@ -39,14 +40,14 @@ export default class Tablelevel extends Component {
     };
 
     render () {
-        const { treeList = [] } = this.props;
+        const { treeTypeList = [], editVisible = false } = this.props;
         const { search } = this.state;
         let dataSource = [];
         let searchList = this.query();
         if (search) {
             dataSource = searchList;
         } else {
-            dataSource = treeList;
+            dataSource = treeTypeList;
         }
 
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
@@ -54,9 +55,6 @@ export default class Tablelevel extends Component {
         if (user && user.is_superuser) {
             superuser = true;
         }
-        console.log('user', user);
-        console.log('superuser', superuser);
-        console.log('dataSource', dataSource);
         return (
             <div>
                 <div>
@@ -109,10 +107,9 @@ export default class Tablelevel extends Component {
                                 bordered
                                 key='ID'
                             />
-                            <Edite {...this.props} {...this.state} />
+                            {editVisible ? <Edite {...this.props} {...this.state} /> : ''}
                         </Col>
                     </Row>
-
                     <Modal
                         width={522}
                         title='Picture'
@@ -133,7 +130,7 @@ export default class Tablelevel extends Component {
     }
 
     componentWillReceiveProps (nextProps) {
-        if (nextProps.treeList != this.props.treeList) {
+        if (nextProps.treeTypeList !== this.props.treeTypeList) {
             this.search();
         }
     }
@@ -146,16 +143,14 @@ export default class Tablelevel extends Component {
 
     query () {
         let text = document.getElementById('TreeData');
-        console.log('text', text);
         let value = '';
         if (text && text.value) {
             value = text.value;
         }
-        console.log('value', value);
         let searchList = [];
-        const { treeList = [] } = this.props;
+        const { treeTypeList = [] } = this.props;
         if (value) {
-            treeList.map(item => {
+            treeTypeList.map(item => {
                 if (item && item.TreeTypeName) {
                     if (item.TreeTypeName.indexOf(value) > -1) {
                         searchList.push(item);
@@ -164,7 +159,7 @@ export default class Tablelevel extends Component {
             });
             return searchList;
         } else {
-            return treeList;
+            return treeTypeList;
         }
     }
     clear () {
@@ -176,16 +171,15 @@ export default class Tablelevel extends Component {
 
     componentDidMount () {
         const {
-            actions: { getTreeList }
+            actions: { getTreeTypeList }
         } = this.props;
-        getTreeList();
+        getTreeTypeList();
     }
 
     edite (record) {
         const {
             actions: { changeEditVisible }
         } = this.props;
-        console.log('editerecord', record);
         this.setState(
             {
                 record: record
@@ -195,31 +189,27 @@ export default class Tablelevel extends Component {
             }
         );
     }
-    delet (record) {
+    delet = async (record) => {
         const {
-            actions: { deleteNursery, getTreeList }
+            actions: { deleteTreeType, getTreeTypeList }
         } = this.props;
-        let me = this;
         let deleteID = {
             ID: record.ID
         };
-        deleteNursery(deleteID).then(rst => {
-            console.log('rst', rst);
-            if (rst && rst.code && rst.code === 1) {
-                notification.success({
-                    message: '树种删除成功',
-                    duration: 3
-                });
-            } else {
-                notification.error({
-                    message: '树种删除失败',
-                    duration: 3
-                });
-            }
-            getTreeList().then(item => {
-                me.search();
+        let rst = await deleteTreeType(deleteID);
+        if (rst && rst.code && rst.code === 1) {
+            notification.success({
+                message: '树种删除成功',
+                duration: 3
             });
-        });
+        } else {
+            notification.error({
+                message: '树种删除失败',
+                duration: 3
+            });
+        }
+        await getTreeTypeList();
+        await this.search();
     }
     onImgClick (src) {
         src = getForestImgUrl(src);
@@ -250,7 +240,26 @@ export default class Tablelevel extends Component {
             width: '10%'
         },
         {
-            title: '所属类型',
+            title: '类别',
+            key: 'TreeType',
+            dataIndex: 'TreeType',
+            width: '10%',
+            render: (text, record, index) => {
+                let typeName = '';
+                if (record && record.TreeTypeNo) {
+                    let no = record.TreeTypeNo;
+                    let bigType = no.slice(0, 1);
+                    TREETYPENO.map((type) => {
+                        if (bigType === type.id) {
+                            typeName = type.name;
+                        }
+                    });
+                }
+                return typeName;
+            }
+        },
+        {
+            title: '科属',
             key: '3',
             dataIndex: 'TreeTypeGenera',
             width: '10%'
@@ -265,7 +274,7 @@ export default class Tablelevel extends Component {
             title: '习性',
             key: '5',
             dataIndex: 'GrowthHabit',
-            width: '55%'
+            width: '45%'
         },
         {
             title: 'Pics',
@@ -275,7 +284,6 @@ export default class Tablelevel extends Component {
             render: (text, record) => {
                 if (record.Pics) {
                     let img = getForestImgUrl(record.Pics);
-                    console.log('img', img);
                     return (
                         <div style={{ textAlign: 'center', height: '32px' }}>
                             <a
@@ -345,7 +353,26 @@ export default class Tablelevel extends Component {
             width: '10%'
         },
         {
-            title: '所属类型',
+            title: '类别',
+            key: 'TreeType',
+            dataIndex: 'TreeType',
+            width: '10%',
+            render: (text, record, index) => {
+                let typeName = '';
+                if (record && record.TreeTypeNo) {
+                    let no = record.TreeTypeNo;
+                    let bigType = no.slice(0, 1);
+                    TREETYPENO.map((type) => {
+                        if (bigType === type.id) {
+                            typeName = type.name;
+                        }
+                    });
+                }
+                return typeName;
+            }
+        },
+        {
+            title: '科属',
             key: '3',
             dataIndex: 'TreeTypeGenera',
             width: '10%'
@@ -360,7 +387,7 @@ export default class Tablelevel extends Component {
             title: '习性',
             key: '5',
             dataIndex: 'GrowthHabit',
-            width: '55%'
+            width: '45%'
         },
         {
             title: 'Pics',
@@ -369,7 +396,6 @@ export default class Tablelevel extends Component {
             render: (text, record) => {
                 if (record.Pics) {
                     let img = getForestImgUrl(record.Pics);
-                    console.log('pppp', record.Pics);
                     return (
                         <div style={{ textAlign: 'center', height: '30px' }}>
                             <a
