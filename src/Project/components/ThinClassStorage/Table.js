@@ -20,7 +20,7 @@ class Tablelevel extends Component {
             fileList: [],
             page: 1,
             total: 0,
-            confirmLoading: false,
+            confirmLoading: false, // 是否允许取消
             number: '',
             areaLayerList: [] // 区域地块图层list
         };
@@ -157,7 +157,7 @@ class Tablelevel extends Component {
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 600, height: 700, float: 'left', overflow: 'hidden'}}>
+                    <div style={{width: 600, height: 700, float: 'left'}}>
                         <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
@@ -168,6 +168,7 @@ class Tablelevel extends Component {
                 </div>
                 <Modal
                     title='新增细班'
+                    maskClosable={false}
                     visible={this.state.showModal}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
@@ -333,6 +334,10 @@ class Tablelevel extends Component {
         });
     }
     handleCancel () {
+        if (this.state.confirmLoading) {
+            message.warning('文件上传中不允许取消');
+            return;
+        }
         this.setState({
             showModal: false,
             fileList: [],
