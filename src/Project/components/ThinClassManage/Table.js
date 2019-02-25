@@ -318,7 +318,6 @@ class Tablelevel extends Component {
         });
     }
     onSavePlan (rec) {
-        console.log(rec);
         const { postThinClassPlans } = this.props.actions;
         postThinClassPlans({}, {
             ThinClass: rec.no,
@@ -329,9 +328,8 @@ class Tablelevel extends Component {
         }).then(rep => {
             if (rep.code === 1) {
                 message.success('细班栽植计划分项上报成功');
-                this.onSearch();
+                this.onSearch(this.state.page);
                 this.setState({
-                    page: 1,
                     expandedRowKeys: [],
                     dataListPlan: []
                 });
@@ -340,7 +338,6 @@ class Tablelevel extends Component {
     }
     onUpdatePlan (rec) {
         const { putThinClassPlans } = this.props.actions;
-        console.log('rec', rec);
         putThinClassPlans({}, {
             ID: rec.ID,
             Num: rec.Num,
@@ -348,9 +345,8 @@ class Tablelevel extends Component {
         }).then(rep => {
             if (rep.code === 1) {
                 message.success('细班栽植计划分项更新成功');
-                this.onSearch();
+                this.onSearch(this.state.page);
                 this.setState({
-                    page: 1,
                     expandedRowKeys: [],
                     dataListPlan: []
                 });
@@ -364,9 +360,8 @@ class Tablelevel extends Component {
         }).then(rep => {
             if (rep.code === 1) {
                 message.success('细班栽植计划分项删除成功');
-                this.onSearch();
+                this.onSearch(this.state.page);
                 this.setState({
-                    page: 1,
                     expandedRowKeys: [],
                     dataListPlan: []
                 });

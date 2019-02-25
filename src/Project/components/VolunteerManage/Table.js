@@ -314,7 +314,7 @@ class Tablelevel extends Component {
     }
     handleStatus (value) {
         this.setState({
-            status: value || ''
+            status: value === undefined ? '' : value
         });
     }
     onAdd () {
