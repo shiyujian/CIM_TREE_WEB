@@ -42,9 +42,15 @@ class Addition extends Component {
         const { addVisible = false } = this.state;
 
         const {
-            form: { getFieldDecorator }
+            form: { getFieldDecorator, getFieldValue }
         } = this.props;
-
+        let treeParamValue = getFieldValue('TreeParam');
+        let paramRequired = true;
+        if (treeParamValue && treeParamValue instanceof Array && treeParamValue.length === 2) {
+            if ((treeParamValue[0] === '密度' && treeParamValue[1] === '面积') || (treeParamValue[0] === '面积' && treeParamValue[1] === '密度')) {
+                paramRequired = false;
+            }
+        }
         return (
             <div>
                 <div style={{ float: 'right', marginBottom: 12 }}>
@@ -164,12 +170,12 @@ class Addition extends Component {
                                             {getFieldDecorator('NurseryParam', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: paramRequired,
                                                         message: '请选择苗圃测量项'
                                                     }
                                                 ]
                                             })(
-                                                <Select mode='multiple' onChange={this.handleNurseryParamChange.bind(this)}>
+                                                <Select mode='multiple' disabled={!paramRequired} onChange={this.handleNurseryParamChange.bind(this)}>
                                                     {
                                                         NURSERYPARAM.map((param) => {
                                                             return <Option value={param} key={param}>{param}</Option>;
@@ -210,7 +216,7 @@ class Addition extends Component {
                                             {getFieldDecorator('SamplingParamText', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: paramRequired,
                                                         message: '请选择苗圃测量项和现场测量项'
                                                     }
                                                 ]
@@ -277,7 +283,7 @@ class Addition extends Component {
         });
     }
     // 选择苗圃测量项
-    handleNurseryParamChange = (values) => {
+    handleNurseryParamChange = async (values) => {
         const {
             form: { setFieldsValue }
         } = this.props;
@@ -309,22 +315,35 @@ class Addition extends Component {
         const {
             nurseryParam
         } = this.state;
-        let samplingParam = nurseryParam.concat(values.filter((item) => { return !(nurseryParam.indexOf(item) > -1); }));
-        let samplingParamText = '';
-        samplingParam.map((param, index) => {
-            if (index === 0) {
-                samplingParamText = samplingParamText + param;
-            } else {
-                samplingParamText = samplingParamText + '，' + param;
-            }
-        });
-        this.setState({
-            treeParam: values,
-            samplingParam
-        });
-        setFieldsValue({
-            SamplingParamText: samplingParamText
-        });
+        // 如果现场测量项只有面积和密度，则其他两项为空，设置为不必填
+        if (values && values instanceof Array && values.length === 2 && ((values[0] === '密度' && values[1] === '面积') || (values[0] === '面积' && values[1] === '密度'))) {
+            this.setState({
+                treeParam: values,
+                samplingParam: [],
+                nurseryParam: []
+            });
+            setFieldsValue({
+                SamplingParamText: '',
+                NurseryParam: []
+            });
+        } else {
+            let samplingParam = nurseryParam.concat(values.filter((item) => { return !(nurseryParam.indexOf(item) > -1); }));
+            let samplingParamText = '';
+            samplingParam.map((param, index) => {
+                if (index === 0) {
+                    samplingParamText = samplingParamText + param;
+                } else {
+                    samplingParamText = samplingParamText + '，' + param;
+                }
+            });
+            this.setState({
+                treeParam: values,
+                samplingParam
+            });
+            setFieldsValue({
+                SamplingParamText: samplingParamText
+            });
+        }
     }
 
     // 上传文件
@@ -524,13 +543,15 @@ class Addition extends Component {
 
     changeArrToString = (arrData) => {
         let stringData = '';
-        arrData.map((param, index) => {
-            if (index === 0) {
-                stringData = stringData + param;
-            } else {
-                stringData = stringData + ',' + param;
-            }
-        });
+        if (arrData && arrData instanceof Array && arrData.length > 0) {
+            arrData.map((param, index) => {
+                if (index === 0) {
+                    stringData = stringData + param;
+                } else {
+                    stringData = stringData + ',' + param;
+                }
+            });
+        }
         return stringData;
     }
 }

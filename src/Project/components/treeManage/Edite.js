@@ -43,10 +43,12 @@ class Edite extends Component {
             form: { setFieldsValue }
         } = this.props;
         console.log('record', record);
+        // 树种类别
         let TreeType = '1';
         if (record && record.TreeTypeNo) {
             TreeType = record.TreeTypeNo.slice(0, 1);
         }
+        // 树种图片
         if (record && record.Pics) {
             let src = getForestImgUrl(record.Pics);
             let nameArr = record.Pics.split('/');
@@ -70,7 +72,7 @@ class Edite extends Component {
                 TreePics: undefined
             });
         }
-
+        // 将苗圃测量信息转为数组，成为Select的每一项
         if (record && record.NurseryParam) {
             let nurseryParam = this.changeStringToArr(record.NurseryParam);
             await setFieldsValue({
@@ -80,6 +82,7 @@ class Edite extends Component {
                 nurseryParam
             });
         }
+        // 将现场测量信息转为数组，成为Select的每一项
         if (record && record.TreeParam) {
             let treeParam = this.changeStringToArr(record.TreeParam);
             await setFieldsValue({
@@ -89,6 +92,7 @@ class Edite extends Component {
                 treeParam
             });
         }
+        // 将抽检测量信息转为数组，成为Select的每一项
         if (record && record.SamplingParam) {
             let samplingParam = this.changeStringToArr(record.SamplingParam);
             let samplingParamText = '';
@@ -108,28 +112,40 @@ class Edite extends Component {
         }
 
         await setFieldsValue({
-            TreeName: record.TreeTypeName,
+            TreeName: record.TreeTypeName || '',
             TreeType: TreeType,
-            TreeSpecies: record.TreeTypeGenera,
-            TreeMorphologicalCharacter: record.MorphologicalCharacter,
-            TreeHabit: record.GrowthHabit,
+            TreeSpecies: record.TreeTypeGenera || '',
+            TreeMorphologicalCharacter: record.MorphologicalCharacter || '',
+            TreeHabit: record.GrowthHabit || '',
             IsLocation: record.IsLocation
         });
     }
 
     changeStringToArr = (stringData) => {
-        let arrData = [];
-        if (stringData) {
-            arrData = stringData.split(',');
+        try {
+            let arrData = [];
+            if (stringData) {
+                arrData = stringData.split(',');
+            }
+            return arrData;
+        } catch (e) {
+            console.log('changeStringToArr', e);
         }
-        return arrData;
     }
 
     render () {
         const {
-            form: { getFieldDecorator },
+            form: { getFieldDecorator, getFieldValue },
             editVisible
         } = this.props;
+        // 当现场测量信息只有密度和面积时，其他两项为非必填，并且设置为不可选择，清空信息
+        let treeParamValue = getFieldValue('TreeParam');
+        let paramRequired = true;
+        if (treeParamValue && treeParamValue instanceof Array && treeParamValue.length === 2) {
+            if ((treeParamValue[0] === '密度' && treeParamValue[1] === '面积') || (treeParamValue[0] === '面积' && treeParamValue[1] === '密度')) {
+                paramRequired = false;
+            }
+        }
         return (
             <div>
                 <Modal
@@ -244,12 +260,12 @@ class Edite extends Component {
                                             {getFieldDecorator('NurseryParam', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: paramRequired,
                                                         message: '请选择苗圃测量项'
                                                     }
                                                 ]
                                             })(
-                                                <Select mode='multiple' onChange={this.handleNurseryParamChange.bind(this)}>
+                                                <Select mode='multiple' disabled={!paramRequired} onChange={this.handleNurseryParamChange.bind(this)}>
                                                     {
                                                         NURSERYPARAM.map((param) => {
                                                             return <Option value={param} key={param}>{param}</Option>;
@@ -290,7 +306,7 @@ class Edite extends Component {
                                             {getFieldDecorator('SamplingParamText', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: paramRequired,
                                                         message: '请选择苗圃测量项和现场测量项'
                                                     }
                                                 ]
@@ -385,22 +401,35 @@ class Edite extends Component {
         const {
             nurseryParam
         } = this.state;
-        let samplingParam = nurseryParam.concat(values.filter((item) => { return !(nurseryParam.indexOf(item) > -1); }));
-        let samplingParamText = '';
-        samplingParam.map((param, index) => {
-            if (index === 0) {
-                samplingParamText = samplingParamText + param;
-            } else {
-                samplingParamText = samplingParamText + '，' + param;
-            }
-        });
-        this.setState({
-            treeParam: values,
-            samplingParam
-        });
-        setFieldsValue({
-            SamplingParamText: samplingParamText
-        });
+        // 如果现场测量项只有面积和密度，则其他两项为空，设置为不必填
+        if (values && values instanceof Array && values.length === 2 && ((values[0] === '密度' && values[1] === '面积') || (values[0] === '面积' && values[1] === '密度'))) {
+            this.setState({
+                treeParam: values,
+                samplingParam: [],
+                nurseryParam: []
+            });
+            setFieldsValue({
+                SamplingParamText: '',
+                NurseryParam: []
+            });
+        } else {
+            let samplingParam = nurseryParam.concat(values.filter((item) => { return !(nurseryParam.indexOf(item) > -1); }));
+            let samplingParamText = '';
+            samplingParam.map((param, index) => {
+                if (index === 0) {
+                    samplingParamText = samplingParamText + param;
+                } else {
+                    samplingParamText = samplingParamText + '，' + param;
+                }
+            });
+            this.setState({
+                treeParam: values,
+                samplingParam
+            });
+            setFieldsValue({
+                SamplingParamText: samplingParamText
+            });
+        }
     }
     // 上传文件
     uploadProps = {
@@ -623,13 +652,15 @@ class Edite extends Component {
 
     changeArrToString = (arrData) => {
         let stringData = '';
-        arrData.map((param, index) => {
-            if (index === 0) {
-                stringData = stringData + param;
-            } else {
-                stringData = stringData + ',' + param;
-            }
-        });
+        if (arrData && arrData instanceof Array && arrData.length > 0) {
+            arrData.map((param, index) => {
+                if (index === 0) {
+                    stringData = stringData + param;
+                } else {
+                    stringData = stringData + ',' + param;
+                }
+            });
+        }
         return stringData;
     }
 }

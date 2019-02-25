@@ -23,7 +23,7 @@
 window.config = {
     /** *********************公共资源服务**************************/
     // 基础服务域名
-    DOMAIN: 'http://47.104.160.65:6530',
+    DOMAIN: 'http://39.105.221.187:6530',
     // //升级后的植树测试基础服务域名
     // 'DOMAIN': 'http://47.96.136.67:6530',
     // 林总用户接口地址
@@ -31,7 +31,7 @@ window.config = {
     // 林总图片新接口
     ALIIMG: 'https://xatree-1.oss-cn-qingdao.aliyuncs.com',
     // 静态文件存储服务IP
-    STATIC_FILE_IP: 'http://47.104.160.65',
+    STATIC_FILE_IP: 'http://39.105.221.187',
     // 静态文件存储服务预览端口
     STATIC_PREVIEW_PORT: '6510',
     // 静态文件存储服务上传端口
@@ -41,17 +41,17 @@ window.config = {
     // 静态文件存储服务访问用户和密码
     STATIC_FILE_USER: 'bimxan',
     STATIC_FILE_PASSWORD: 'ecidibim',
-    // 二维展示获取树木详情端口
-    DASHBOARD_ONSITE: 'http://47.104.160.65:8081',
-    // 二维展示获取树种筛选端口
+    // 二维展示根据坐标获取树木顺序码端口
+    DASHBOARD_ONSITE: 'http://39.105.221.187:8081',
+    // 二维展示获取树种筛选的geoserver服务端口
     DASHBOARD_TREETYPE: 'http://47.104.107.55:8080',
     // 现场收发文接口的端口
-    DOC_EXCHANGE_URL: 'http://47.104.160.65:6545',
+    DOC_EXCHANGE_URL: 'http://39.105.221.187:6545',
     // 现场收发文接口验证用的用户名和密码
     DOC_EXCHANGE_USER_PASSWORD: 'bimtest:bimtest',
 
     // node服务,验评表单转化Word,pdf转word
-    NODE_FILE_STATIC_URL: 'http://47.104.160.65:6546',
+    NODE_FILE_STATIC_URL: 'http://39.105.221.187:6546',
 
     // word在线预览地址
     previewWord_API: 'http://docs.ecidi.com:6500/view/url?url=',
@@ -96,7 +96,7 @@ window.config = {
 
     // 视频监控插件下载配置
     Video_PLUGIN_URL:
-        'http://47.104.160.65:6512/media/documents/meta/WebComponentsKithas_rem_cfg.exe',
+        'http://39.105.221.187:6512/media/documents/meta/WebComponentsKithas_rem_cfg.exe',
 
     /** *********************单模块资源服务**************************/
     // 智慧森林
@@ -109,7 +109,7 @@ window.config = {
     // 'FORESTPORT':"6540",//院内
     // 苗圃定位模板
     nurseryLocation:
-        'http://47.104.160.65:6512/media/documents/meta/nurseryLocation.xlsx',
+        'http://39.105.221.187:6512/media/documents/meta/nurseryLocation.xlsx',
 
     // 720云
     PANORAMAGRAM_LOC_CODE: 'PANORAMA_ROOT', // 全景图位置树根节点编码值
