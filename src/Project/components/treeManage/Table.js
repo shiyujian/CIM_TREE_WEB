@@ -15,6 +15,7 @@ import { getForestImgUrl } from '_platform/auth';
 import { TREETYPENO } from '../../../_platform/api';
 import Addition from './Addition';
 import Edite from './Edite';
+import View from './View';
 import './index.less';
 
 export default class Tablelevel extends Component {
@@ -26,7 +27,8 @@ export default class Tablelevel extends Component {
             search: false,
             record: {},
             imgvisible: false,
-            imgSrc: false
+            imgSrc: false,
+            pagination: {}
         };
     }
 
@@ -40,10 +42,12 @@ export default class Tablelevel extends Component {
     };
 
     render () {
-        const { treeTypeList = [], editVisible = false } = this.props;
-        const { search } = this.state;
+        const { treeTypeList = [], editVisible = false, viewVisible = false } = this.props;
+        const {
+            search,
+            searchList
+        } = this.state;
         let dataSource = [];
-        let searchList = this.query();
         if (search) {
             dataSource = searchList;
         } else {
@@ -106,8 +110,11 @@ export default class Tablelevel extends Component {
                                 }
                                 bordered
                                 key='ID'
+                                pagination={this.state.pagination}
+                                onChange={this.handleTableChange.bind(this)}
                             />
                             {editVisible ? <Edite {...this.props} {...this.state} /> : ''}
+                            {viewVisible ? <View {...this.props} {...this.state} /> : ''}
                         </Col>
                     </Row>
                     <Modal
@@ -135,13 +142,18 @@ export default class Tablelevel extends Component {
         }
     }
 
-    search () {
+    handleTableChange (pagination) {
+        const pager = { ...this.state.pagination };
+        pager.current = pagination.current;
         this.setState({
-            search: true
+            pagination: pager
         });
     }
 
-    query () {
+    search () {
+        const {
+            pagination
+        } = this.state;
         let text = document.getElementById('TreeData');
         let value = '';
         if (text && text.value) {
@@ -157,23 +169,52 @@ export default class Tablelevel extends Component {
                     }
                 }
             });
-            return searchList;
-        } else {
-            return treeTypeList;
         }
-    }
-    clear () {
-        document.getElementById('TreeData').value = '';
+        pagination.current = 1;
+        pagination.total = searchList && searchList.length;
+        pagination.pageSize = 10;
         this.setState({
-            search: false
+            search: true,
+            pagination,
+            searchList
         });
     }
 
-    componentDidMount () {
+    clear () {
+        const {
+            pagination
+        } = this.state;
+        const { treeTypeList = [] } = this.props;
+        document.getElementById('TreeData').value = '';
+        pagination.current = 1;
+        pagination.total = treeTypeList && treeTypeList.length;
+        pagination.pageSize = 10;
+        this.setState({
+            search: false,
+            pagination
+        });
+    }
+
+    componentDidMount = async () => {
         const {
             actions: { getTreeTypeList }
         } = this.props;
-        getTreeTypeList();
+        try {
+            document.getElementById('TreeData').value = '';
+            let treeTypeList = await getTreeTypeList();
+            if (treeTypeList && treeTypeList instanceof Array) {
+                let pagination = {};
+                pagination.current = 1;
+                pagination.pageSize = 10;
+                pagination.total = treeTypeList && treeTypeList.length;
+                this.setState({
+                    pagination,
+                    search: false
+                });
+            }
+        } catch (e) {
+
+        }
     }
 
     edite (record) {
@@ -186,6 +227,19 @@ export default class Tablelevel extends Component {
             },
             () => {
                 changeEditVisible(true);
+            }
+        );
+    }
+    view = (record) => {
+        const {
+            actions: { changeViewVisible }
+        } = this.props;
+        this.setState(
+            {
+                record: record
+            },
+            () => {
+                changeViewVisible(true);
             }
         );
     }
@@ -274,7 +328,7 @@ export default class Tablelevel extends Component {
             title: '习性',
             key: '5',
             dataIndex: 'GrowthHabit',
-            width: '45%'
+            width: '40%'
         },
         {
             title: 'Pics',
@@ -319,10 +373,12 @@ export default class Tablelevel extends Component {
             title: '操作',
             key: '7',
             dataIndex: 'operate',
-            width: '10%',
+            width: '15%',
             render: (text, record, index) => {
                 return (
                     <div>
+                        <a onClick={this.view.bind(this, record)}>查看</a>
+                        <Divider type='vertical' />
                         <a onClick={this.edite.bind(this, record)}>修改</a>
                         <Divider type='vertical' />
                         <Popconfirm
@@ -387,7 +443,7 @@ export default class Tablelevel extends Component {
             title: '习性',
             key: '5',
             dataIndex: 'GrowthHabit',
-            width: '45%'
+            width: '40%'
         },
         {
             title: 'Pics',
@@ -422,10 +478,12 @@ export default class Tablelevel extends Component {
             title: '操作',
             key: '7',
             dataIndex: 'operate',
-            width: '10%',
+            width: '15%',
             render: (text, record, index) => {
                 return (
                     <div>
+                        <a onClick={this.view.bind(this, record)}>查看</a>
+                        <Divider type='vertical' />
                         <a onClick={this.edite.bind(this, record)}>修改</a>
                     </div>
                 );

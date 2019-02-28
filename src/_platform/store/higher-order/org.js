@@ -32,6 +32,10 @@ export default (ID, service = '') => {
     const orgReducer = handleActions(
         {
             [getOrgTreeOK]: (state, { payload = {} }) => payload
+            // [getOrgTreeOK]: (state, {payload}) => ({
+            //     ...state,
+            //     orgTree: payload
+            // })
         },
         []
     );

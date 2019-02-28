@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Row, Col, Form, Input, Select } from 'antd';
+import { Modal, Form, Input, Select } from 'antd';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -30,12 +30,16 @@ class Addition extends Component {
         } = this.props;
         const { extra_params } = node || {};
         let companyVisible = false;
+        if (JSON.stringify(node) === '{}') {
+            companyVisible = true;
+        }
         if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
             companyVisible = true;
         }
         if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
             companyVisible = true;
         }
+        console.log('additionadditionaddition', addition);
         const title = Addition.getTitle(node, parent);
         let units = this.getUnits();
         return (
@@ -57,12 +61,12 @@ class Addition extends Component {
                                 required: true,
                                 message: '请输入名称'
                             }
-                        ],
-                        initialValue: (addition && addition.name) || ''
+                        ]
+                        // initialValue: (addition && addition.name) || ''
                     })(
                         <Input
                             placeholder='请输入名称'
-                            value={addition.name}
+                            value={(addition && addition.name) || undefined}
                             onChange={changeAdditionField.bind(this, 'name')}
                         />
                     )}
@@ -75,8 +79,8 @@ class Addition extends Component {
                                 message: '必须为英文字母、数字以及 -_的组合',
                                 pattern: /^[\w\d\_\-]+$/
                             }
-                        ],
-                        initialValue: (addition && addition.code) || ''
+                        ]
+                        // initialValue: (addition && addition.code) || ''
                     })(
                         <Input
                             readOnly={!parent}
@@ -88,7 +92,7 @@ class Addition extends Component {
                 <FormItem {...Addition.layout} label={`${title}标段`}>
                     <Select
                         placeholder='标段'
-                        value={addition.sections}
+                        value={(addition && addition.sections) || undefined}
                         onChange={this.changeSection.bind(this)}
                         // onChange={changeAdditionField.bind(this, 'sections')}
                         mode='multiple'
@@ -112,11 +116,11 @@ class Addition extends Component {
                                 {getFieldDecorator('companyStatus', {
                                     rules: [
                                         {
-                                            required: false,
+                                            required: companyVisible,
                                             message: '是否为公司'
                                         }
-                                    ],
-                                    initialValue: (addition && addition.extra_params && addition.extra_params.companyStatus) || ''
+                                    ]
+                                    // initialValue: (addition && addition.extra_params && addition.extra_params.companyStatus) || ''
                                 })(
                                     <Select
                                         placeholder='是否为公司'
@@ -136,7 +140,7 @@ class Addition extends Component {
                 <FormItem {...Addition.layout} label={`${title}简介`}>
                     <Input
                         placeholder='请输入简介'
-                        value={addition.introduction}
+                        value={(addition && addition.introduction) || undefined}
                         type='textarea'
                         rows={4}
                         onChange={changeAdditionField.bind(
@@ -198,10 +202,11 @@ class Addition extends Component {
                 getOrgTree,
                 changeSidebarField,
                 clearAdditionField,
-                changeOrgTreeDataStatus
+                changeOrgTreeDataStatus,
+                changeAdditionField,
+                addDir
             }
         } = this.props;
-        // const { extra_params: extra = {} } = node || {};
         const { extra_params = '' } = node || {};
         let companyVisible = false;
         if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
@@ -233,6 +238,23 @@ class Addition extends Component {
                     };
                     let rst = await postOrg({}, postData);
                     if (rst.pk) {
+                        let dirPostData = {
+                            name: addition.name,
+                            code: `gcwd_${addition.code}`,
+                            obj_type: 'C_DIR',
+                            status: 'A',
+                            parent: {
+                                // pk: datumpk,
+                                code: `gcwd_${parent.code}`,
+                                obj_type: 'C_DIR'
+                            },
+                            extra_params: {
+                                orgLeaf: values.dirOrgLeaf,
+                                orgCode: addition.code,
+                                orgDel: false
+                            }
+                        };
+                        // let dirData = await addDir({}, dirPostData);
                         await clearAdditionField();
                         await getOrgTree({}, { depth: 4 });
                         await changeOrgTreeDataStatus(true);
@@ -251,9 +273,6 @@ class Addition extends Component {
                     let rst = await putOrg({ code: addition.code }, postData);
                     await this.forceUpdate();
                     if (rst.pk) {
-                        // if (this.state.btn) {
-                        //     extra.sections = this.state.sections;
-                        // }
                         await changeSidebarField('addition', false);
                         parent && await changeSidebarField('parent', null);
                         addition.code && await clearAdditionField();
