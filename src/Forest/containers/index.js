@@ -10,6 +10,10 @@ export Contrastinfo from './Contrastinfo';
 export DataExport from './DataExport';
 export SeedlingsChange from './SeedlingsChange';
 export CuringInfo from './CuringInfo';
-export DataStatis from './DataStatis';
 export TreeAdoptInfo from './TreeAdoptInfo';
 export UserAnalysis from './UserAnalysis';
+
+export DataStatis from './DataStatis';
+export UserAnalysi from './UserAnalysi';
+export NurserySourseAnalysi from './NurserySourseAnalysi';
+
