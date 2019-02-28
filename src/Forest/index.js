@@ -61,7 +61,9 @@ export default class ForestContainer extends Component {
             CuringInfo = null,
             DataStatis = null,
             TreeAdoptInfo = null,
-            UserAnalysis = null
+            UserAnalysis = null,
+            UserAnalysi = null,
+            NurserySourseAnalysi = null,
         } = this.state || {};
         return (
             <Body>
@@ -184,6 +186,18 @@ export default class ForestContainer extends Component {
                             component={UserAnalysis}
                         />
                     )}
+                    {UserAnalysi && (
+                        <Route
+                            path='/forest/useranalysi'
+                            component={UserAnalysi}
+                        />
+                    )}
+                    {NurserySourseAnalysi && (
+                        <Route
+                            path='/forest/nurserysourseanalysi'
+                            component={NurserySourseAnalysi}
+                        />
+                    )}
                 </Main>
             </Body>
         );
@@ -302,6 +316,18 @@ export default class ForestContainer extends Component {
             id: 'FOREST.STATIS',
             name: '统计图表',
             children: [
+                {
+                    key: 'useranalysi',
+                    id: 'FOREST.USERANALYSI',
+                    path: '/forest/useranalysi',
+                    name: '用户分析'
+                },
+                {
+                    key: 'nurserysourseanalysi',
+                    id: 'FOREST.NURSERYSOURSEANALYSI',
+                    path: '/forest/nurserysourseanalysi',
+                    name: '苗木来源地分析'
+                },
                 {
                     key: 'datastatis',
                     id: 'FOREST.DATASTATIS',
