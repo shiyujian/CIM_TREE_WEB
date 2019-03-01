@@ -158,7 +158,7 @@ class Tablelevel extends Component {
                             <Select style={{ width: 150 }} onChange={this.handleSection.bind(this)} allowClear>
                                 {
                                     sectionList.map(item => {
-                                        return <Option value={item.No}>{item.Name}</Option>;
+                                        return <Option value={item.No} key={item.No}>{item.Name}</Option>;
                                     })
                                 }
                             </Select>
