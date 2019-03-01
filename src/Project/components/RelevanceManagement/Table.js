@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import moment from 'moment';
-import { Input, Select, Table, Modal, Form, Button, Row, Col, Spin, message, Pagination } from 'antd';
+import { Select, Table, Modal, Form, Button, Row, Col, Spin, message, Pagination } from 'antd';
 import { getUser, formItemLayout } from '_platform/auth';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
-const { TextArea } = Input;
 
 class Tablelevel extends Component {
     constructor (props) {
