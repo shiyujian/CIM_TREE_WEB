@@ -34,6 +34,8 @@ class ThinClassManage extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            leftkeycode: '', // 项目
+            sectionList: [] // 标段列表
         };
     }
     componentDidMount = async () => {
@@ -96,9 +98,23 @@ class ThinClassManage extends Component {
     }
     onSelect (keys) {
         let keycode = keys[0] || '';
-        console.log(keycode);
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let treeList = [];
+        let sectionList = [];
+        if (tree.bigTreeList) {
+            treeList = tree.bigTreeList;
+        }
+        treeList.map(item => {
+            if (item.No === keycode) {
+                sectionList = item.children;
+            }
+        });
+        console.log('treeList', sectionList);
         this.setState({
-            leftkeycode: keycode
+            leftkeycode: keycode,
+            sectionList
         });
     }
 }
