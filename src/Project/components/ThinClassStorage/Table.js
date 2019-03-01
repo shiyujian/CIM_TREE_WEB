@@ -33,7 +33,7 @@ class Tablelevel extends Component {
         this.handleCancel = this.handleCancel.bind(this);
         this.onAdd = this.onAdd.bind(this); // 暂存细班
         this.onEdit = this.onEdit.bind(this);
-        this.onUpload = this.onUpload.bind(this); // 细班入库
+        this.onPutStorage = this.onPutStorage.bind(this); // 细班入库
         this.handlePage = this.handlePage.bind(this);
         this.columns = [
             {
@@ -153,7 +153,7 @@ class Tablelevel extends Component {
                         </FormItem>
                         <FormItem>
                             {
-                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传细班</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}} loading={spinning}>细班入库</Button>
+                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传细班</Button> : <Button type='primary' onClick={this.onPutStorage.bind(this)} style={{marginLeft: 50}} loading={spinning}>细班入库</Button>
                             }
                         </FormItem>
                     </Form>
@@ -266,7 +266,7 @@ class Tablelevel extends Component {
             }
         });
     }
-    onUpload () {
+    onPutStorage () {
         console.log(this.props.actions);
         this.setState({
             spinning: true

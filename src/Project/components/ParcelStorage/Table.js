@@ -23,7 +23,8 @@ class Tablelevel extends Component {
             total: 0,
             section: '',
             confirmLoading: false,
-            areaLayerList: [] // 区域地块图层list
+            areaLayerList: [], // 区域地块图层list
+            spinning: false // 加载中
         };
         this.dataList = []; // 暂存数据
         this.newDataList = [];
@@ -109,7 +110,7 @@ class Tablelevel extends Component {
         ).addTo(this.map);
     }
     render () {
-        const { dataList, newDataList, confirmLoading, total, page } = this.state;
+        const { dataList, newDataList, confirmLoading, total, page, spinning } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -139,14 +140,16 @@ class Tablelevel extends Component {
                         </FormItem>
                         <FormItem>
                             {
-                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传地块</Button> : <Button type='primary' onClick={this.onPutStorage.bind(this)} style={{marginLeft: 50}}>地块入库</Button>
+                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传地块</Button> : <Button type='primary' onClick={this.onPutStorage.bind(this)} style={{marginLeft: 50}} loading={spinning}>地块入库</Button>
                             }
                         </FormItem>
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
-                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={newDataList.length === 0 ? dataList : newDataList} pagination={false} />
+                        <Spin spinning={spinning}>
+                            <Table rowSelection={rowSelection} columns={this.columns} dataSource={newDataList.length === 0 ? dataList : newDataList} pagination={false} />
+                        </Spin>
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
@@ -272,6 +275,9 @@ class Tablelevel extends Component {
     }
     onPutStorage () {
         console.log('dataList', this.dataList);
+        this.setState({
+            spinning: true
+        });
         let pro = [];
         this.dataList.map(item => {
             let coordsArr = getCoordsArr(item.Geom);
@@ -291,6 +297,12 @@ class Tablelevel extends Component {
         importThinClass({}, pro).then(rep => {
             if (rep.code === 1) {
                 message.success('地块数据入库成功');
+                this.dataList = [];
+                this.setState({
+                    dataList: [],
+                    indexBtn: 1,
+                    spinning: false
+                })
             }
         });
     }
@@ -311,6 +323,16 @@ class Tablelevel extends Component {
             name: fileList[0].name.split('.')[0]
         }, formdata).then(rep => {
             rep = JSON.parse(rep);
+            if (rep.errorinfo) {
+                message.error(rep.errorinfo);
+                this.setState({
+                    confirmLoading: false,
+                    fileList: [],
+                    showModal: false
+                }, () => {
+                    return;
+                })
+            }
             rep.features.map((item, index) => {
                 item.key = index;
             });
