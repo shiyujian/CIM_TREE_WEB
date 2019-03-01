@@ -16,4 +16,6 @@ export UserAnalysis from './UserAnalysis';
 export DataStatis from './DataStatis';
 export UserAnalysi from './UserAnalysi';
 export NurserySourseAnalysi from './NurserySourseAnalysi';
+export EnterStrengthAnalysi from './EnterStrengthAnalysi';
+export PlantStrengthAnalysi from './PlantStrengthAnalysi';
 

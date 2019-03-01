@@ -1,0 +1,1 @@
+export PlantStrength from './PlantStrength';
