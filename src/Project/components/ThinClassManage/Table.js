@@ -350,6 +350,7 @@ class Tablelevel extends Component {
     onEdit (record) {
         console.log('record', record);
         this.setState({
+            area: record.area,
             treetype: record.treetype,
             num: record.num,
             recordData: record,
