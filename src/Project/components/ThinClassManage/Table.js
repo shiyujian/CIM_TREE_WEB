@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Button, Select, Table, Pagination, Modal, Form, message, List, InputNumber } from 'antd';
+import { Input, Button, Select, Table, Pagination, Modal, Form, message, List, InputNumber, Spin } from 'antd';
 import {
     fillAreaColor,
     getCoordsArr,
@@ -13,6 +13,7 @@ class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            leftkeycode: '', // 项目
             dataList: [],
             dataListHistory: [], // 历史数据列表
             dataListPlan: [], // 子表格数据
@@ -25,7 +26,8 @@ class Tablelevel extends Component {
             page: 1,
             total: 0,
             number: '',
-            areaLayerList: [] // 区域地块图层list
+            areaLayerList: [], // 区域地块图层list
+            spinning: true // loading
         };
         this.treeType = []; // 所有树种类型
         this.dataList = []; // 暂存数据
@@ -77,17 +79,24 @@ class Tablelevel extends Component {
     componentDidMount () {
         // 初始化地图
         this.initMap();
-        // 获取表格数据
-        this.onSearch();
         // 获取历史数据
         this.getDataHistory();
         // 获取所有树种
         this.getTreeTypes();
     }
+    componentWillReceiveProps (nextProps) {
+        if (nextProps.leftkeycode) {
+            this.setState({
+                leftkeycode: nextProps.leftkeycode
+            }, () => {
+                // 获取表格数据
+                this.onSearch(1);
+            });
+        }
+    }
     getTreeTypes () {
         const { getTreeTypes } = this.props.actions;
         getTreeTypes().then(rep => {
-            console.log(rep);
             this.treeType = rep;
             this.setState({
                 treeType: rep
@@ -138,7 +147,6 @@ class Tablelevel extends Component {
             page: 1,
             size: 10
         }).then(rep => {
-            console.log(rep);
             if (rep.code === 200) {
                 this.setState({
                     dataListHistory: rep.content
@@ -147,7 +155,7 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, dataListHistory, total, page, expandedRowKeys } = this.state;
+        const { dataList, dataListHistory, total, page, expandedRowKeys, spinning } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -156,7 +164,6 @@ class Tablelevel extends Component {
         };
         // 子表格
         let expandedRowRender = (record, index, indent, expanded) => {
-            console.log('渲染record', record, index, indent, expanded);
             let { treeType, dataListPlan } = this.state;
             let columns = [{
                 title: '树木类型',
@@ -211,8 +218,6 @@ class Tablelevel extends Component {
                     }
                 }
             }];
-            console.log('dataListPlan', dataListPlan);
-            console.log('columns', columns);
             return (
                 <Table columns={columns} dataSource={dataListPlan} pagination={false} rowKey='ID' />
             );
@@ -233,10 +238,12 @@ class Tablelevel extends Component {
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 600, height: 640, float: 'left'}}>
-                        <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection}
-                            columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
-                            rowKey='ID' onExpand={this.handleExpanded.bind(this)} />
+                    <div style={{width: 600, minHeight: 640, float: 'left'}}>
+                        <Spin spinning={spinning}>
+                            <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection}
+                                columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
+                                rowKey='ID' onExpand={this.handleExpanded.bind(this)} />
+                        </Spin>
                         <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
@@ -415,19 +422,25 @@ class Tablelevel extends Component {
         });
     };
     onSearch (page = 1) {
-        const { number } = this.state;
+        const { number, leftkeycode } = this.state;
+        this.setState({
+            spinning: true
+        });
         let { getThinClass } = this.props.actions;
         getThinClass({}, {
+            section: leftkeycode,
             no: number,
             treetype: '',
             page: page,
             size: 10
         }).then(rep => {
+            console.log(rep.content, 'rep.content');
             if (rep.code === 200) {
                 this.setState({
                     dataList: rep.content,
                     total: rep.pageinfo && rep.pageinfo.total,
-                    page: rep.pageinfo && rep.pageinfo.page
+                    page: rep.pageinfo && rep.pageinfo.page,
+                    spinning: false
                 });
             }
         });

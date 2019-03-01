@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Form, Input, Button, Table, Select, Pagination, Modal, message, Row, Col } from 'antd';
+import { Form, Input, Button, Table, Select, Pagination, Modal, message, Row, Col, Spin } from 'antd';
 import { formItemLayout } from '_platform/auth';
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -29,7 +29,8 @@ class Tablelevel extends Component {
             No: '', // 搜索条件-证书号
             photoUrl: '',
             showModal: false,
-            showPhotoModal: false
+            showPhotoModal: false,
+            spinning: true // 加载中
         };
         this.onSearch = this.onSearch.bind(this);
         this.onSection = this.onSection.bind(this);
@@ -100,7 +101,7 @@ class Tablelevel extends Component {
     }
     render () {
         let { sectionsData, treetypelist } = this.props;
-        let { dataList, showModal, showPhotoModal, total, page, smallClassData, thinClassData, photoUrl, valueSXM, TextAreaSXM } = this.state;
+        let { dataList, showModal, showPhotoModal, total, page, smallClassData, thinClassData, photoUrl, valueSXM, TextAreaSXM, spinning } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (<div className='Tablelevel'>
             <Form layout='inline'>
@@ -142,7 +143,9 @@ class Tablelevel extends Component {
                     <Button type='primary' onClick={this.onAdd.bind(this)}>新增</Button>
                 </FormItem>
             </Form>
-            <Table columns={this.columns} dataSource={dataList} style={{marginTop: 10}} pagination={false} rowKey='ID' />
+            <Spin spinning={spinning}>
+                <Table columns={this.columns} dataSource={dataList} style={{marginTop: 10}} pagination={false} rowKey='ID' />
+            </Spin>
             <Pagination total={total} current={page} pageSize={10} style={{marginTop: 10}} onChange={this.handlePage.bind(this)} />
             <Modal
                 title='新增' visible={showModal}
@@ -275,6 +278,9 @@ class Tablelevel extends Component {
     onSearch (page = 1) {
         const { getVolunteertrees } = this.props.actions;
         let { section, SXM, No, status } = this.state;
+        this.setState({
+            spinning: true
+        });
         getVolunteertrees({}, {
             creater: '',
             sxm: SXM,
@@ -292,7 +298,8 @@ class Tablelevel extends Component {
                 this.setState({
                     dataList: rep.content,
                     page: rep.pageinfo.page,
-                    total: rep.pageinfo.total
+                    total: rep.pageinfo.total,
+                    spinning: false
                 });
             }
         });

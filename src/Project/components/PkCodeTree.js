@@ -30,7 +30,6 @@ export default class PkCodeTree extends Component {
 
     render () {
         const { treeData = [] } = this.props;
-        // console.log(this.props.onSelect)
         return (
             <div>
                 {treeData.length ? (
