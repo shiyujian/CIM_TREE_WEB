@@ -8,18 +8,22 @@ class Addition extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            Arrays: [],
-            sections: [],
-            btn: false
+            Arrays: []
         };
     }
-    changeSection (value) {
+    componentDidMount = () => {
         const {
-            actions: { changeAdditionField }
+            form: {
+                setFieldsValue
+            },
+            addition
         } = this.props;
-        this.setState({ sections: value, btn: true });
-
-        changeAdditionField('sections', value);
+        setFieldsValue({
+            name: (addition && addition.name) || undefined,
+            code: (addition && addition.code) || undefined,
+            sections: (addition && addition.extra_params && addition.extra_params.sections) || undefined,
+            companyStatus: (addition && addition.extra_params && addition.extra_params.companyStatus) || undefined
+        });
     }
     render () {
         const {
@@ -30,16 +34,24 @@ class Addition extends Component {
         } = this.props;
         const { extra_params } = node || {};
         let companyVisible = false;
-        if (JSON.stringify(node) === '{}') {
+        // 新建项目时，默认显示
+        if (parent && parent.code && parent.code === 'ORG_ROOT') {
             companyVisible = true;
+        } else {
+            // 未选中任何部门 ，说明新增项目，需要显示
+            if (JSON.stringify(node) === '{}') {
+                companyVisible = true;
+            }
+            // 新增信息时   需要显示
+            if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
+                companyVisible = true;
+                console.log('nnnnnnnnnnnnn', companyVisible);
+            }
+            // 编辑公司信息时，需要显示
+            if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
+                companyVisible = true;
+            }
         }
-        if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
-            companyVisible = true;
-        }
-        if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
-            companyVisible = true;
-        }
-        console.log('additionadditionaddition', addition);
         const title = Addition.getTitle(node, parent);
         let units = this.getUnits();
         return (
@@ -62,12 +74,10 @@ class Addition extends Component {
                                 message: '请输入名称'
                             }
                         ]
-                        // initialValue: (addition && addition.name) || ''
                     })(
                         <Input
                             placeholder='请输入名称'
-                            value={(addition && addition.name) || undefined}
-                            onChange={changeAdditionField.bind(this, 'name')}
+                            onChange={this.changeAdditionName.bind(this)}
                         />
                     )}
                 </FormItem>
@@ -80,34 +90,41 @@ class Addition extends Component {
                                 pattern: /^[\w\d\_\-]+$/
                             }
                         ]
-                        // initialValue: (addition && addition.code) || ''
                     })(
                         <Input
                             readOnly={!parent}
                             placeholder='请输入编码'
-                            onChange={changeAdditionField.bind(this, 'code')}
+                            onChange={this.changeAdditionCode.bind(this)}
                         />
                     )}
                 </FormItem>
                 <FormItem {...Addition.layout} label={`${title}标段`}>
-                    <Select
-                        placeholder='标段'
-                        value={(addition && addition.sections) || undefined}
-                        onChange={this.changeSection.bind(this)}
-                        // onChange={changeAdditionField.bind(this, 'sections')}
-                        mode='multiple'
-                        style={{ width: '100%' }}
-                    >
-                        {units
-                            ? units.map(item => {
-                                return (
-                                    <Option key={item.No} value={item.No}>
-                                        {item.Name}
-                                    </Option>
-                                );
-                            })
-                            : ''}
-                    </Select>
+                    {getFieldDecorator('sections', {
+                        rules: [
+                            {
+                                required: false,
+                                message: '请选择标段'
+                            }
+                        ]
+                    })(
+                        <Select
+                            placeholder='标段'
+                            onChange={this.changeSection.bind(this)}
+                            mode='multiple'
+                            style={{ width: '100%' }}
+                        >
+                            {units
+                                ? units.map(item => {
+                                    return (
+                                        <Option key={item.No} value={item.No}>
+                                            {item.Name}
+                                        </Option>
+                                    );
+                                })
+                                : ''}
+                        </Select>
+                    )}
+
                 </FormItem>
                 {
                     companyVisible
@@ -120,11 +137,11 @@ class Addition extends Component {
                                             message: '是否为公司'
                                         }
                                     ]
-                                    // initialValue: (addition && addition.extra_params && addition.extra_params.companyStatus) || ''
                                 })(
                                     <Select
                                         placeholder='是否为公司'
                                         style={{ width: '100%' }}
+                                        onChange={this.changeCompany.bind(this)}
                                     >
                                         <Option key={'是'} value={'公司'}>
                                             是
@@ -154,7 +171,7 @@ class Addition extends Component {
     }
 
     // 获取项目的标段
-    getUnits () {
+    getUnits = () => {
         try {
             const {
                 sidebar: { node = {} } = {},
@@ -186,10 +203,56 @@ class Addition extends Component {
         }
     }
 
-    changeCompanyStatus (value) {
-        this.setState({
+    changeAdditionName = (e) => {
+        const {
+            actions: { changeAdditionField },
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        setFieldsValue({
+            name: e.target.value
+        });
+        changeAdditionField('name', e.target.value);
+    }
+
+    changeAdditionCode = (e) => {
+        const {
+            actions: { changeAdditionField },
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        setFieldsValue({
+            code: e.target.value
+        });
+        changeAdditionField('code', e.target.value);
+    }
+
+    changeSection (value) {
+        const {
+            actions: { changeAdditionField },
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        setFieldsValue({
+            sections: value
+        });
+        changeAdditionField('sections', value);
+    }
+
+    changeCompany = (value) => {
+        const {
+            actions: { changeAdditionField },
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        setFieldsValue({
             companyStatus: value
         });
+        changeAdditionField('companyStatus', value);
     }
 
     save = async () => {
@@ -203,17 +266,23 @@ class Addition extends Component {
                 changeSidebarField,
                 clearAdditionField,
                 changeOrgTreeDataStatus,
-                changeAdditionField,
                 addDir
             }
         } = this.props;
         const { extra_params = '' } = node || {};
         let companyVisible = false;
-        if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
+        if (parent && parent.code && parent.code === 'ORG_ROOT') {
             companyVisible = true;
-        }
-        if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
-            companyVisible = true;
+        } else {
+            if (JSON.stringify(node) === '{}') {
+                companyVisible = true;
+            }
+            if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
+                companyVisible = true;
+            }
+            if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
+                companyVisible = true;
+            }
         }
         const sections = addition.sections ? addition.sections.join() : [];
         this.props.form.validateFields(async (err, values) => {
@@ -238,23 +307,27 @@ class Addition extends Component {
                     };
                     let rst = await postOrg({}, postData);
                     if (rst.pk) {
-                        let dirPostData = {
-                            name: addition.name,
-                            code: `gcwd_${addition.code}`,
-                            obj_type: 'C_DIR',
-                            status: 'A',
-                            parent: {
-                                // pk: datumpk,
-                                code: `gcwd_${parent.code}`,
-                                obj_type: 'C_DIR'
-                            },
-                            extra_params: {
-                                orgLeaf: values.dirOrgLeaf,
-                                orgCode: addition.code,
-                                orgDel: false
-                            }
-                        };
-                        // let dirData = await addDir({}, dirPostData);
+                        if (companyVisible) {
+                            let dirPostData = {
+                                name: addition.name,
+                                code: `gcwd_${addition.code}`,
+                                obj_type: 'C_DIR',
+                                status: 'A',
+                                parent: {
+                                    // pk: datumpk,
+                                    code: `gcwd_${parent.code}`,
+                                    obj_type: 'C_DIR'
+                                },
+                                extra_params: {
+                                    orgLeaf: values.dirOrgLeaf,
+                                    orgCode: addition.code,
+                                    orgDel: false
+                                }
+                            };
+                            // let dirData = await addDir({}, dirPostData);
+                        }
+                        await changeSidebarField('addition', false);
+                        await changeSidebarField('parent', null);
                         await clearAdditionField();
                         await getOrgTree({}, { depth: 4 });
                         await changeOrgTreeDataStatus(true);
@@ -271,11 +344,10 @@ class Addition extends Component {
                         }
                     };
                     let rst = await putOrg({ code: addition.code }, postData);
-                    await this.forceUpdate();
                     if (rst.pk) {
                         await changeSidebarField('addition', false);
-                        parent && await changeSidebarField('parent', null);
-                        addition.code && await clearAdditionField();
+                        await changeSidebarField('parent', null);
+                        await clearAdditionField();
                         await getOrgTree({}, { depth: 4 });
                         await changeOrgTreeDataStatus(true);
                         await this.forceUpdate();

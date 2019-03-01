@@ -30,6 +30,9 @@ export default class Org extends Component {
     static propTypes = {};
 
     render () {
+        const {
+            addition
+        } = this.props;
         return (
             <div>
                 <DynamicTitle title='组织机构' {...this.props} />
@@ -39,7 +42,7 @@ export default class Org extends Component {
                 <Content>
                     <Info {...this.props} />
                 </Content>
-                <Addition {...this.props} />
+                {(addition && addition.visible) ? <Addition {...this.props} /> : ''}
             </div>
         );
     }
