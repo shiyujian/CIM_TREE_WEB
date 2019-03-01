@@ -12,7 +12,7 @@ export default class RiskTree extends Component {
         this.state = {
             stime: '',
             etime: '',
-            timeType: 'all',
+            timeType: 'week',
             searchData: [],
             riskRectify: false,
             riskNotRectify: true
