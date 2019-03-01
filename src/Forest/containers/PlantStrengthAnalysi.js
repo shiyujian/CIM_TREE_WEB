@@ -13,6 +13,7 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import { PlantStrength } from '../components/PlantStrengthAnalysi';
+import { getAreaTreeData, getDefaultProject } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 @connect(
     state => {
