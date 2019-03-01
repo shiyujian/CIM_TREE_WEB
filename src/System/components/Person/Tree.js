@@ -87,7 +87,7 @@ export default class Tree extends Component {
         this.state = {
             childList: [],
             listVisible: true,
-            orgTreeData: [],
+            orgTreeArrList: [],
             permission: false
         };
         this.orgTreeDataArr = [];
@@ -182,7 +182,7 @@ export default class Tree extends Component {
                 });
             }
             if (permission) {
-                let rst = await getOrgTree({});
+                let rst = await getOrgTree({}, {depth: 7});
                 if (rst && rst.children) {
                     rst.children.map(item => {
                         if (item.name === '供应商') {
@@ -301,14 +301,14 @@ export default class Tree extends Component {
             }
         } = this.props;
         const {
-            orgTreeData,
+            orgTreeArrList,
             permission
         } = this.state;
         let topProject = '';
         if (permission) {
             topProject = Tree.loop(children, eventKey);
         } else {
-            topProject = Tree.loop([orgTreeData], eventKey);
+            topProject = Tree.loop(orgTreeArrList, eventKey);
         }
         if (this.compare(user, topProject, eventKey)) {
             if (topProject.code) {
