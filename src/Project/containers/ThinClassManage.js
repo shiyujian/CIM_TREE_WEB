@@ -97,6 +97,7 @@ class ThinClassManage extends Component {
         );
     }
     onSelect (keys) {
+        console.log('点击', keys);
         let keycode = keys[0] || '';
         const {
             platform: { tree = {} }
@@ -111,7 +112,6 @@ class ThinClassManage extends Component {
                 sectionList = item.children;
             }
         });
-        console.log('treeList', sectionList);
         this.setState({
             leftkeycode: keycode,
             sectionList

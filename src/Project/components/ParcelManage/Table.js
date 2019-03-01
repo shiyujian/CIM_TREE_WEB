@@ -15,6 +15,7 @@ class Tablelevel extends Component {
         this.state = {
             dataList: [], // 地块列表
             dataListHistory: [], // 历史数据列表
+            sectionList: [], // 标段列表
             showModal: false,
             record: {},
             indexBtn: 1,
@@ -22,7 +23,8 @@ class Tablelevel extends Component {
             page: 1,
             total: 0,
             section: '',
-            areaLayerList: [] // 区域地块图层list
+            areaLayerList: [], // 区域地块图层list
+            spinning: true // loading
         };
         this.dataList = []; // 暂存数据
         this.onSearch = this.onSearch.bind(this); // 查询地块
@@ -74,7 +76,19 @@ class Tablelevel extends Component {
         // 获取历史数据
         this.getDataHistory();
         // 获取所有地块
-        this.onSearch(1);
+        // this.onSearch(1);
+    }
+    componentWillReceiveProps (nextProps) {
+        if (nextProps.leftkeycode) {
+            console.log(nextProps, 'nextProps');
+            this.setState({
+                leftkeycode: nextProps.leftkeycode,
+                sectionList: nextProps.sectionList
+            }, () => {
+                // 获取表格数据
+                this.onSearch(1);
+            });
+        }
     }
     initMap () {
         // 基础设置
@@ -129,7 +143,7 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, dataListHistory, total, page } = this.state;
+        const { dataList, dataListHistory, total, page, sectionList, spinning } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -140,20 +154,28 @@ class Tablelevel extends Component {
             <div className='table-level'>
                 <div>
                     <Form layout='inline'>
-                        <FormItem label='所属标段'>
-                            <Input style={{width: 200}} onChange={this.handleSection.bind(this)} />
+                        <FormItem label='标段'>
+                            <Select style={{ width: 150 }} onChange={this.handleSection.bind(this)} allowClear>
+                                {
+                                    sectionList.map(item => {
+                                        return <Option value={item.No}>{item.Name}</Option>;
+                                    })
+                                }
+                            </Select>
                         </FormItem>
                         <FormItem>
                             <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
                         </FormItem>
                         <FormItem>
-                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>历史数据</Button>
+                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>历史导入列表</Button>
                         </FormItem>
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 640, float: 'left', overflow: 'hidden'}}>
-                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} />
+                        <Spin spinning={spinning}>
+                            <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} />
+                        </Spin>
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
@@ -162,12 +184,17 @@ class Tablelevel extends Component {
                     </div>
                 </div>
                 <Modal
-                    title='历史列表'
+                    title='历史导入列表'
                     visible={this.state.showModal}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                 >
                     <List
+                        header={<div>
+                            <div style={{float: 'left', width: 150}}>标段</div>
+                            <div style={{float: 'left', width: 220}}>入库时间</div>
+                            <div>操作</div>
+                        </div>}
                         bordered
                         dataSource={dataListHistory}
                         renderItem={this.getItemList.bind(this)}
@@ -179,9 +206,8 @@ class Tablelevel extends Component {
     getItemList (item) {
         return (
             <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
-                <div>{item.Section}</div>
-                <div style={{marginLeft: 20}}>{item.CreateTime}</div>
-                <div style={{marginLeft: 20}}>{item.DataType === 'land' ? '地块' : ''}</div>
+                <div style={{width: 150}}>{item.Section}</div>
+                <div>{item.CreateTime}</div>
             </List.Item>
         );
     }
@@ -245,6 +271,9 @@ class Tablelevel extends Component {
     }
     onSearch (page) {
         console.log('获取列表');
+        this.setState({
+            spinning: true
+        });
         const { section } = this.state;
         const { getLands } = this.props.actions;
         getLands({}, {
@@ -266,7 +295,8 @@ class Tablelevel extends Component {
                 this.setState({
                     dataList: this.dataList.slice(page * 10, page * 10 + 10),
                     total: rep.pageinfo && rep.pageinfo.total,
-                    size: rep.pageinfo && rep.pageinfo.size
+                    size: rep.pageinfo && rep.pageinfo.size,
+                    spinning: false
                 });
             }
         });
@@ -276,9 +306,10 @@ class Tablelevel extends Component {
             showModal: true
         });
     }
-    handleSection (e) {
+    handleSection (value) {
+        console.log(value);
         this.setState({
-            section: e.target.value
+            section: value
         });
     }
     handlePage (page) {
