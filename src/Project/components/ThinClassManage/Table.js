@@ -267,7 +267,7 @@ class Tablelevel extends Component {
                             <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
                         </FormItem>
                         <FormItem>
-                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>历史数据</Button>
+                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>导入列表</Button>
                         </FormItem>
                     </Form>
                 </div>
@@ -286,12 +286,17 @@ class Tablelevel extends Component {
                     </div>
                 </div>
                 <Modal
-                    title='历史列表'
+                    title='历史导入列表'
                     visible={this.state.showModalHistory}
                     onOk={this.handleOkHistory}
                     onCancel={this.handleCancel}
                 >
                     <List
+                        header={<div>
+                            <div style={{float: 'left', width: 150}}>标段</div>
+                            <div style={{float: 'left', width: 220}}>创建时间</div>
+                            <div>操作</div>
+                        </div>}
                         bordered
                         dataSource={dataListHistory}
                         renderItem={this.getItemList.bind(this)}
@@ -388,11 +393,10 @@ class Tablelevel extends Component {
     getItemList (item) {
         return (
             <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
-                <div>{item.Section}</div>
-                <div style={{marginLeft: 20}}>
+                <div style={{width: 150}}>{item.Section}</div>
+                <div>
                     {item.CreateTime}
                 </div>
-                <div style={{marginLeft: 20}}>{item.DataType === 'thinclass' ? '细班' : ''}</div>
             </List.Item>
         );
     }
@@ -566,7 +570,7 @@ class Tablelevel extends Component {
     }
     onHistory () {
         this.setState({
-            showModal: true
+            showModalHistory: true
         });
     }
     deleteRecord (ID) {

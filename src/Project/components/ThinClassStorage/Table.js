@@ -18,7 +18,7 @@ class Tablelevel extends Component {
             showModal: false,
             record: {}, // 行数据
             indexBtn: 1, // 是否为上传细班选项
-            fileList: [],
+            fileList: [], // 上传的文件列表
             page: 1,
             total: 0,
             confirmLoading: false, // 是否允许取消
@@ -304,6 +304,7 @@ class Tablelevel extends Component {
         });
     }
     onAdd () {
+        console.log('123', this.state.fileList);
         this.setState({
             showModal: true
         });
@@ -326,10 +327,19 @@ class Tablelevel extends Component {
         shapeUploadHandler({
             name: fileList[0].name.split('.')[0]
         }, formdata).then(rep => {
-            console.log(rep);
             rep = JSON.parse(rep);
+            console.log('上传成功', rep);
+            if (rep.errorinfo) {
+                message.error(rep.errorinfo);
+                this.setState({
+                    confirmLoading: false,
+                    fileList: [],
+                    showModal: false
+                }, () => {
+                    return;
+                })
+            }
             this.dataList = rep.features;
-            console.log(this.dataList);
             this.setState({
                 confirmLoading: false,
                 indexBtn: 0,
