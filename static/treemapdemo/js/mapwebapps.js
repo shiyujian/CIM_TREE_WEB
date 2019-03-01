@@ -28,7 +28,7 @@ function initMap () {
         maxZoom: 21,
         storagetype: 0
     });
-    TREELAYER = new L.tileLayer('http://47.104.107.55:200/thinclass', {
+    TREELAYER = new L.tileLayer('http://39.96.47.88:200/thinclass', {
         opacity: 1.0,
         subdomains: [1, 2, 3],
         minZoom: 11,
@@ -39,7 +39,7 @@ function initMap () {
     TREELAYER.addTo(map);
     MAPLABELLAYER.addTo(map);
 
-    var _treeLayer = L.tileLayer('http://47.104.107.55:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
+    var _treeLayer = L.tileLayer('http://39.96.47.88:8080/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
         opacity: 1.0,
         subdomains: [1, 2, 3],
         minZoom: 11,

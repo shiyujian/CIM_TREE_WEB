@@ -85,13 +85,13 @@ export default class Header extends Component {
                 path: '/datum/standard',
                 icon: <Icon name='book' />
             },
-            {
-                key: 'quality',
-                id: 'QUALITY',
-                title: '质量管理',
-                path: '/quality/appraising',
-                icon: <Icon name='list-alt' />
-            },
+            // {
+            //     key: 'quality',
+            //     id: 'QUALITY',
+            //     title: '质量管理',
+            //     path: '/quality/appraising',
+            //     icon: <Icon name='list-alt' />
+            // },
             {
                 key: 'schedule',
                 id: 'SCHEDULE',
@@ -99,13 +99,13 @@ export default class Header extends Component {
                 path: '/schedule/stagereport',
                 icon: <Icon name='random' />
             },
-            {
-                key: 'safety',
-                title: '安环管理',
-                id: 'SAFETY',
-                path: '/safety/trend',
-                icon: <Icon name='shield' />
-            },
+            // {
+            //     key: 'safety',
+            //     title: '安环管理',
+            //     id: 'SAFETY',
+            //     path: '/safety/trend',
+            //     icon: <Icon name='shield' />
+            // },
             {
                 key: 'forest',
                 id: 'FOREST',
