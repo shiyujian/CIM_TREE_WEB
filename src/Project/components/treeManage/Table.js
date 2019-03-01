@@ -24,7 +24,7 @@ export default class Tablelevel extends Component {
         super(props);
         this.state = {
             searchList: [],
-            search: false,
+            searchVisible: false,
             record: {},
             imgvisible: false,
             imgSrc: false,
@@ -32,23 +32,42 @@ export default class Tablelevel extends Component {
         };
     }
 
-    static layoutT = {
-        labelCol: { span: 8 },
-        wrapperCol: { span: 16 }
-    };
-    static layout = {
-        labelCol: { span: 4 },
-        wrapperCol: { span: 20 }
-    };
+    componentDidMount = async () => {
+        const {
+            actions: { getTreeTypeList }
+        } = this.props;
+        try {
+            document.getElementById('TreeData').value = '';
+            let treeTypeList = await getTreeTypeList();
+            if (treeTypeList && treeTypeList instanceof Array) {
+                let pagination = {};
+                pagination.current = 1;
+                pagination.pageSize = 10;
+                pagination.total = treeTypeList && treeTypeList.length;
+                this.setState({
+                    pagination,
+                    searchVisible: false
+                });
+            }
+        } catch (e) {
+
+        }
+    }
+
+    componentWillReceiveProps (nextProps) {
+        if (nextProps.treeTypeList !== this.props.treeTypeList) {
+            this.search();
+        }
+    }
 
     render () {
         const { treeTypeList = [], editVisible = false, viewVisible = false } = this.props;
         const {
-            search,
+            searchVisible,
             searchList
         } = this.state;
         let dataSource = [];
-        if (search) {
+        if (searchVisible) {
             dataSource = searchList;
         } else {
             dataSource = treeTypeList;
@@ -136,12 +155,6 @@ export default class Tablelevel extends Component {
         );
     }
 
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.treeTypeList !== this.props.treeTypeList) {
-            this.search();
-        }
-    }
-
     handleTableChange (pagination) {
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
@@ -169,15 +182,15 @@ export default class Tablelevel extends Component {
                     }
                 }
             });
+            pagination.current = 1;
+            pagination.total = searchList && searchList.length;
+            pagination.pageSize = 10;
+            this.setState({
+                searchVisible: true,
+                pagination,
+                searchList
+            });
         }
-        pagination.current = 1;
-        pagination.total = searchList && searchList.length;
-        pagination.pageSize = 10;
-        this.setState({
-            search: true,
-            pagination,
-            searchList
-        });
     }
 
     clear () {
@@ -190,31 +203,9 @@ export default class Tablelevel extends Component {
         pagination.total = treeTypeList && treeTypeList.length;
         pagination.pageSize = 10;
         this.setState({
-            search: false,
+            searchVisible: false,
             pagination
         });
-    }
-
-    componentDidMount = async () => {
-        const {
-            actions: { getTreeTypeList }
-        } = this.props;
-        try {
-            document.getElementById('TreeData').value = '';
-            let treeTypeList = await getTreeTypeList();
-            if (treeTypeList && treeTypeList instanceof Array) {
-                let pagination = {};
-                pagination.current = 1;
-                pagination.pageSize = 10;
-                pagination.total = treeTypeList && treeTypeList.length;
-                this.setState({
-                    pagination,
-                    search: false
-                });
-            }
-        } catch (e) {
-
-        }
     }
 
     edite (record) {
@@ -273,12 +264,6 @@ export default class Tablelevel extends Component {
     }
     handleCancel () {
         this.setState({ imgvisible: false });
-    }
-    imgError () {
-        console.log('error');
-        document
-            .getElementById('TreeImg')
-            .replaceWith("<Avatar shape='square' icon='picture'></Avatar>");
     }
     columns = [
         {
@@ -350,7 +335,6 @@ export default class Tablelevel extends Component {
                                 <img
                                     id='TreeImg'
                                     src={img}
-                                    onError={this.imgError.bind(this)}
                                     style={{
                                         width: '32px',
                                         height: '32px',

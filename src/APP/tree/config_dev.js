@@ -44,7 +44,7 @@ window.config = {
     // 二维展示根据坐标获取树木顺序码端口
     DASHBOARD_ONSITE: 'http://39.105.221.187:8081',
     // 二维展示获取树种筛选的geoserver服务端口
-    DASHBOARD_TREETYPE: 'http://47.104.107.55:8080',
+    DASHBOARD_TREETYPE: 'http://39.96.47.88:8080',
     // 现场收发文接口的端口
     DOC_EXCHANGE_URL: 'http://39.105.221.187:6545',
     // 现场收发文接口验证用的用户名和密码
