@@ -8,6 +8,7 @@ import {
     getPolygonByCoordArr
 } from '../auth';
 const FormItem = Form.Item;
+const Option = Select.Option;
 window.config = window.config || {};
 class Tablelevel extends Component {
     constructor (props) {
@@ -15,14 +16,15 @@ class Tablelevel extends Component {
         this.state = {
             dataList: [],
             showModal: false,
-            record: {},
-            indexBtn: 1,
-            fileList: [],
+            record: {}, // 行数据
+            indexBtn: 1, // 是否为上传细班选项
+            fileList: [], // 上传的文件列表
             page: 1,
             total: 0,
             confirmLoading: false, // 是否允许取消
             number: '',
-            areaLayerList: [] // 区域地块图层list
+            areaLayerList: [], // 区域地块图层list
+            spinning: false // 加载中
         };
         this.dataList = []; // 暂存数据
         this.onSearch = this.onSearch.bind(this); // 查询细班
@@ -63,19 +65,19 @@ class Tablelevel extends Component {
                 key: '5',
                 title: '计划栽植量',
                 dataIndex: 'Num'
-            },
-            {
-                key: '6',
-                title: '操作',
-                dataIndex: 'action',
-                render: (text, record, index) => {
-                    return (
-                        <div>
-                            <a onClick={this.onEdit.bind(this, record)}>编辑</a>
-                        </div>
-                    );
-                }
             }
+            // {
+            //     key: '6',
+            //     title: '操作',
+            //     dataIndex: 'action',
+            //     render: (text, record, index) => {
+            //         return (
+            //             <div>
+            //                 <a onClick={this.onEdit.bind(this, record)}>编辑</a>
+            //             </div>
+            //         );
+            //     }
+            // }
         ];
     }
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -121,7 +123,7 @@ class Tablelevel extends Component {
         ).addTo(this.map);
     }
     render () {
-        const { dataList, total, page, confirmLoading } = this.state;
+        const { dataList, total, page, confirmLoading, spinning } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -151,14 +153,16 @@ class Tablelevel extends Component {
                         </FormItem>
                         <FormItem>
                             {
-                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传细班</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}}>细班入库</Button>
+                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传细班</Button> : <Button type='primary' onClick={this.onUpload.bind(this)} style={{marginLeft: 50}} loading={spinning}>细班入库</Button>
                             }
                         </FormItem>
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 700, float: 'left'}}>
-                        <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
+                        <Spin spinning={spinning}>
+                            <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
+                        </Spin>
                         <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
@@ -264,6 +268,9 @@ class Tablelevel extends Component {
     }
     onUpload () {
         console.log(this.props.actions);
+        this.setState({
+            spinning: true
+        });
         let pro = [];
         this.dataList.map(item => {
             pro.push({
@@ -284,7 +291,9 @@ class Tablelevel extends Component {
                 console.log(rep);
                 this.dataList = [];
                 this.setState({
-                    dataList: []
+                    dataList: [],
+                    indexBtn: 1,
+                    spinning: false
                 });
             }
         });
@@ -295,6 +304,7 @@ class Tablelevel extends Component {
         });
     }
     onAdd () {
+        console.log('123', this.state.fileList);
         this.setState({
             showModal: true
         });
@@ -317,10 +327,19 @@ class Tablelevel extends Component {
         shapeUploadHandler({
             name: fileList[0].name.split('.')[0]
         }, formdata).then(rep => {
-            console.log(rep);
             rep = JSON.parse(rep);
+            console.log('上传成功', rep);
+            if (rep.errorinfo) {
+                message.error(rep.errorinfo);
+                this.setState({
+                    confirmLoading: false,
+                    fileList: [],
+                    showModal: false
+                }, () => {
+                    return;
+                })
+            }
             this.dataList = rep.features;
-            console.log(this.dataList);
             this.setState({
                 confirmLoading: false,
                 indexBtn: 0,

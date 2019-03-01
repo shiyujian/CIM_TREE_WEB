@@ -5,6 +5,7 @@ import {
     getCoordsArr,
     handleCoordinates
 } from '../auth';
+import { formItemLayout } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 window.config = window.config || {};
@@ -15,29 +16,43 @@ class Tablelevel extends Component {
         this.state = {
             leftkeycode: '', // 项目
             dataList: [],
+            sectionList: [], // 标段列表
+            section: '', // 标段
             dataListHistory: [], // 历史数据列表
             dataListPlan: [], // 子表格数据
             expandedRowKeys: [], // 展开行
-            treeType: [], // 选择框选项
+            treeTypeList: [], // 选择框选项
             showModal: false,
-            record: {},
+            showModalHistory: false,
+            record: {}, // 历史数据记录
+            recordData: {}, // 表格记录
+            newRecordData: {}, // 新记录
             indexBtn: 1,
             fileList: [],
             page: 1,
             total: 0,
             number: '',
             areaLayerList: [], // 区域地块图层list
-            spinning: true // loading
+            spinning: true, // loading
+            treetype: '', // 表单树种
+            num: '', // 表单栽植量
+            area: '' // 栽植面积
         };
-        this.treeType = []; // 所有树种类型
+        this.treeTypeList = []; // 所有树种类型
         this.dataList = []; // 暂存数据
         this.onSearch = this.onSearch.bind(this); // 查询细班
+        this.onEdit = this.onEdit.bind(this); // 编辑
+        this.handleSection = this.handleSection.bind(this); // 标段
         this.handleNumber = this.handleNumber.bind(this); // 细班编号
         this.onHistory = this.onHistory.bind(this); // 历史导入数据
-        this.handleOk = this.handleOk.bind(this);
+        this.handleOk = this.handleOk.bind(this); // 确认修改
+        this.handleOkHistory = this.handleOkHistory.bind(this); // 历史数据
         this.handleCancel = this.handleCancel.bind(this);
         this.handlePage = this.handlePage.bind(this);
         this.getItemList = this.getItemList.bind(this);
+        this.handleTreeTypeForm = this.handleTreeTypeForm.bind(this); // 栽植类型修改
+        this.handleNumberForm = this.handleNumberForm.bind(this); // 栽植量修改
+        this.handleAreaForm = this.handleAreaForm.bind(this); // 栽植面积修改
         this.columns = [
             {
                 key: '1',
@@ -68,6 +83,14 @@ class Tablelevel extends Component {
                 key: '5',
                 title: '细班面积',
                 dataIndex: 'area'
+            },
+            {
+                key: '6',
+                title: '操作',
+                dataIndex: 'action',
+                render: (text, record, index) => {
+                    return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
+                }
             }
         ];
     }
@@ -86,8 +109,10 @@ class Tablelevel extends Component {
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
+            console.log(nextProps, 'nextProps');
             this.setState({
-                leftkeycode: nextProps.leftkeycode
+                leftkeycode: nextProps.leftkeycode,
+                sectionList: nextProps.sectionList
             }, () => {
                 // 获取表格数据
                 this.onSearch(1);
@@ -97,9 +122,9 @@ class Tablelevel extends Component {
     getTreeTypes () {
         const { getTreeTypes } = this.props.actions;
         getTreeTypes().then(rep => {
-            this.treeType = rep;
+            this.treeTypeList = rep;
             this.setState({
-                treeType: rep
+                treeTypeList: rep
             });
         });
     }
@@ -155,7 +180,7 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, dataListHistory, total, page, expandedRowKeys, spinning } = this.state;
+        const { dataList, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -164,7 +189,7 @@ class Tablelevel extends Component {
         };
         // 子表格
         let expandedRowRender = (record, index, indent, expanded) => {
-            let { treeType, dataListPlan } = this.state;
+            let { dataListPlan } = this.state;
             let columns = [{
                 title: '树木类型',
                 key: '1',
@@ -179,7 +204,7 @@ class Tablelevel extends Component {
                             placeholder='请输入树木类型名称' onChange={this.handleTreeType.bind(this, index)}
                             onSearch={this.handleSearch.bind(this)}>
                             {
-                                treeType.length > 0 ? treeType.map(item => {
+                                treeTypeList.length > 0 ? treeTypeList.map(item => {
                                     return <Option value={item.ID}>{item.TreeTypeName}</Option>;
                                 }) : []
                             }
@@ -226,6 +251,15 @@ class Tablelevel extends Component {
             <div className='table-level'>
                 <div>
                     <Form layout='inline'>
+                        <FormItem label='标段'>
+                            <Select style={{ width: 120 }} onChange={this.handleSection.bind(this)} allowClear>
+                                {
+                                    sectionList.map(item => {
+                                        return <Option value={item.No}>{item.Name}</Option>;
+                                    })
+                                }
+                            </Select>
+                        </FormItem>
                         <FormItem label='细班编号'>
                             <Input style={{width: 200}} onChange={this.handleNumber.bind(this)} />
                         </FormItem>
@@ -233,7 +267,7 @@ class Tablelevel extends Component {
                             <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
                         </FormItem>
                         <FormItem>
-                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>历史数据</Button>
+                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>导入列表</Button>
                         </FormItem>
                     </Form>
                 </div>
@@ -252,28 +286,117 @@ class Tablelevel extends Component {
                     </div>
                 </div>
                 <Modal
-                    title='历史列表'
-                    visible={this.state.showModal}
-                    onOk={this.handleOk}
+                    title='历史导入列表'
+                    visible={this.state.showModalHistory}
+                    onOk={this.handleOkHistory}
                     onCancel={this.handleCancel}
                 >
                     <List
+                        header={<div>
+                            <div style={{float: 'left', width: 150}}>标段</div>
+                            <div style={{float: 'left', width: 220}}>创建时间</div>
+                            <div>操作</div>
+                        </div>}
                         bordered
                         dataSource={dataListHistory}
                         renderItem={this.getItemList.bind(this)}
                     />
                 </Modal>
+                <Modal
+                    title='编辑'
+                    visible={this.state.showModal}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                >
+                    <Form>
+                        <FormItem label='细班编号' {...formItemLayout}>
+                            <Input style={{width: 200}} value={recordData.no} disabled />
+                        </FormItem>
+                        <FormItem label='树木类型' {...formItemLayout}>
+                            <Select showSearch filterOption={false} style={{width: 200}} value={treetype}
+                                placeholder='请输入树木类型名称' onChange={this.handleTreeTypeForm.bind(this)}
+                                onSearch={this.handleSearch.bind(this)}>
+                                {
+                                    treeTypeList.length > 0 ? treeTypeList.map(item => {
+                                        return <Option value={item.TreeTypeName}>{item.TreeTypeName}</Option>;
+                                    }) : []
+                                }
+                            </Select>
+                        </FormItem>
+                        <FormItem label='种植量' {...formItemLayout}>
+                            <Input style={{width: 200}} value={num} onChange={this.handleNumberForm.bind(this)} />
+                        </FormItem>
+                        <FormItem label='细班面积' {...formItemLayout}>
+                            <Input style={{width: 200}} defaultValue={area} onChange={this.handleAreaForm.bind(this)} />
+                        </FormItem>
+                    </Form>
+                </Modal>
             </div>
         );
+    }
+    handleTreeTypeForm (value) {
+        let { treetype } = this.state;
+        this.setState({
+            treetype: value
+        });
+    }
+    handleNumberForm (e) {
+        let { num } = this.state;
+        this.setState({
+            num: e.target.value
+        });
+    }
+    handleAreaForm (e) {
+        let { area } = this.state;
+        this.setState({
+            area: e.target.value
+        });
+    }
+    onEdit (record) {
+        console.log('record', record);
+        this.setState({
+            area: record.area,
+            treetype: record.treetype,
+            num: record.num,
+            recordData: record,
+            showModal: true
+        });
+    }
+    handleOk () {
+        const { newRecordData, recordData, treetype, num, area } = this.state;
+        const { postThinclass } = this.props.actions;
+        console.log('123', newRecordData, recordData);
+        postThinclass({}, {
+            Section: recordData.Section,
+            no: recordData.no,
+            treetype: treetype || recordData.treetype,
+            area: area || recordData.area,
+            num: parseInt(num) || recordData.num,
+            coords: recordData.coords
+        }).then(rep => {
+            if (rep.code === 1) {
+                message.success('数据更新成功');
+                this.setState({
+                    showModal: false
+                }, () => {
+                    this.onSearch();
+                });
+            }
+        });
+    }
+    handleSection (value) {
+        console.log(value);
+        this.setState({
+            section: value
+        });
     }
     getItemList (item) {
         return (
             <List.Item actions={[<a onClick={this.deleteRecord.bind(this, item.ID)}>删除</a>]}>
-                <div>{item.Section}</div>
-                <div style={{marginLeft: 20}}>
+                <div style={{width: 150}}>{item.Section}</div>
+                <div>
                     {item.CreateTime}
                 </div>
-                <div style={{marginLeft: 20}}>{item.DataType === 'thinclass' ? '细班' : ''}</div>
             </List.Item>
         );
     }
@@ -409,26 +532,26 @@ class Tablelevel extends Component {
         });
     };
     handleSearch (value) {
-        let treeType = [];
+        let treeTypeList = [];
         console.log(this.treeType);
-        this.treeType.map(item => {
+        this.treeTypeList.map(item => {
             if (item.TreeTypeName.includes(value)) {
-                treeType.push(item);
+                treeTypeList.push(item);
             }
         });
-        console.log('treeType', treeType);
+        console.log('treeTypeList', treeTypeList);
         this.setState({
-            treeType
+            treeTypeList
         });
     };
     onSearch (page = 1) {
-        const { number, leftkeycode } = this.state;
+        const { number, leftkeycode, section } = this.state;
         this.setState({
             spinning: true
         });
         let { getThinClass } = this.props.actions;
         getThinClass({}, {
-            section: leftkeycode,
+            section: section || leftkeycode,
             no: number,
             treetype: '',
             page: page,
@@ -447,7 +570,7 @@ class Tablelevel extends Component {
     }
     onHistory () {
         this.setState({
-            showModal: true
+            showModalHistory: true
         });
     }
     deleteRecord (ID) {
@@ -461,12 +584,13 @@ class Tablelevel extends Component {
             this.getDataHistory();
         });
     }
-    handleOk () {
+    handleOkHistory () {
         this.handleCancel();
     }
     handleCancel () {
         this.setState({
-            showModal: false
+            showModal: false,
+            showModalHistory: false
         });
     }
     onLocation (recordArr) {
