@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import SimpleTree from '_platform/components/panels/SimpleTree';
 import { TreeSelect } from 'antd';
 import {getCompanyDataByOrgCode} from '_platform/auth';
+import {ORG_NURSERY_CODE, ORG_SUPPLIER_CODE} from '_platform/api';
 const TreeNode = TreeSelect.TreeNode;
 const addGroup = (childrenList, str) => {
     const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
@@ -76,7 +77,6 @@ const addGroup = (childrenList, str) => {
             children: provinceChildren
         });
     });
-    console.log(newChildren, 'newChildren');
     return newChildren;
 };
 
@@ -87,24 +87,10 @@ export default class Tree extends Component {
         this.state = {
             childList: [],
             listVisible: true,
-            orgTreeData: []
+            orgTreeArrList: [],
+            permission: false
         };
         this.orgTreeDataArr = [];
-    }
-
-    render () {
-        const {
-            platform: { org: { children = [] } = {} },
-            sidebar: { node = {} } = {}
-        } = this.props;
-        const { code } = node || {};
-        return (
-            <SimpleTree
-                dataSource={children}
-                selectedKey={code}
-                onSelect={this.select.bind(this)}
-            />
-        );
     }
 
     componentWillMount () {
@@ -148,13 +134,29 @@ export default class Tree extends Component {
         } = this.props;
         try {
             const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+            let permission = false;
+            let groups = user.groups || [];
+            groups.map((group) => {
+                if (group.name.indexOf('业主') !== -1) {
+                    permission = true;
+                }
+            });
+            if (user.username === 'admin') {
+                permission = true;
+            }
+            this.setState({
+                permission
+            });
+            let orgTreeData = {};
+            let orgTreeArrList = [];
             if (user && user.username !== 'admin') {
                 // 获取登录用户的公司的信息
                 let org_code = user.account.org_code;
                 let parentOrgData = await getCompanyDataByOrgCode(org_code, getOrgTreeByCode);
                 let parentOrgCode = parentOrgData.code;
                 // 获取公司线下的所有部门信息
-                let orgTreeData = await getOrgTreeByCode({code: parentOrgCode});
+                orgTreeData = await getOrgTreeByCode({code: parentOrgCode});
+                orgTreeArrList.push(orgTreeData);
                 // 将公司下的所有部门设置为Select的选项
                 let orgTreeSelectData = Tree.orgloop([orgTreeData]);
                 this.orgTreeDataArr = [];
@@ -162,28 +164,74 @@ export default class Tree extends Component {
                 // 将公司的部门的code全部进行存储
                 await this.orgArrLoop([orgTreeData], 0);
                 await getOrgTreeDataArr(this.orgTreeDataArr);
-            }
-            let rst = await getOrgTree({}, { depth: 3 });
-            if (rst && rst.children) {
-                rst.children.map(item => {
+
+                let nurseryData = await getOrgTreeByCode({code: ORG_NURSERY_CODE});
+                let supplierData = await getOrgTreeByCode({code: ORG_SUPPLIER_CODE});
+                orgTreeArrList.push(nurseryData);
+                orgTreeArrList.push(supplierData);
+                orgTreeArrList.map(item => {
                     if (item.name === '供应商') {
                         item.children = addGroup(item.children, '供应商');
                     } else if (item.name === '苗圃基地') {
                         item.children = addGroup(item.children, '苗圃基地');
                     }
                 });
-                this.getList(rst.children);
+
+                this.setState({
+                    orgTreeArrList
+                });
             }
-            const { children: [first] = [] } = rst || {};
-            if (first) {
-                await changeSidebarField('node', first);
-                const codes = Tree.collect(first);
-                await getUsers({}, { org_code: codes, page: 1 });
-                await getTreeModal(false);
+            if (permission) {
+                let rst = await getOrgTree({}, {depth: 7});
+                if (rst && rst.children) {
+                    rst.children.map(item => {
+                        if (item.name === '供应商') {
+                            item.children = addGroup(item.children, '供应商');
+                        } else if (item.name === '苗圃基地') {
+                            item.children = addGroup(item.children, '苗圃基地');
+                        }
+                    });
+                    this.getList(rst.children);
+                }
+                const { children: [first] = [] } = rst || {};
+                if (first) {
+                    await changeSidebarField('node', first);
+                    const codes = Tree.collect(first);
+                    await getUsers({}, { org_code: codes, page: 1 });
+                    await getTreeModal(false);
+                }
+            } else {
+                if (orgTreeData && orgTreeData.pk) {
+                    await changeSidebarField('node', orgTreeData);
+                    const codes = Tree.collect(orgTreeData);
+                    console.log('codes', codes);
+                    await getUsers({}, { org_code: codes, page: 1 });
+                    await getTreeModal(false);
+                }
             }
         } catch (e) {
             console.log('e', e);
         }
+    }
+
+    render () {
+        const {
+            platform: { org: { children = [] } = {} },
+            sidebar: { node = {} } = {}
+        } = this.props;
+        const {
+            orgTreeArrList,
+            permission
+        } = this.state;
+        console.log('orgTreeArrList', orgTreeArrList);
+        const { code } = node || {};
+        return (
+            <SimpleTree
+                dataSource={permission ? children : orgTreeArrList}
+                selectedKey={code}
+                onSelect={this.select.bind(this)}
+            />
+        );
     }
 
     // 将二维数组传入store中
@@ -252,9 +300,16 @@ export default class Tree extends Component {
                 getTreeCode
             }
         } = this.props;
-
-        const topProject = Tree.loop(children, eventKey);
-        console.log('topProject', topProject);
+        const {
+            orgTreeArrList,
+            permission
+        } = this.state;
+        let topProject = '';
+        if (permission) {
+            topProject = Tree.loop(children, eventKey);
+        } else {
+            topProject = Tree.loop(orgTreeArrList, eventKey);
+        }
         if (this.compare(user, topProject, eventKey)) {
             if (topProject.code) {
                 await getTreeModal(true);
@@ -329,7 +384,6 @@ export default class Tree extends Component {
         if (data.length === 0) {
             return;
         }
-        console.log('data', data);
         return data.map((item) => {
             if (item.children && item.children.length > 0) {
                 return (

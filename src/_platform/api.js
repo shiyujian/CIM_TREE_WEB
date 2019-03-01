@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-02-15 10:32:35
+ * @Last Modified time: 2019-03-01 17:34:51
  */
 /**
  *
@@ -286,6 +286,9 @@ export const FOREST_LOGIN_DATA = {
     phone: 'zhaozz1010',
     pwd: '130718'
 };
+
+export const ORG_NURSERY_CODE = 'ORG_NURSERY';
+export const ORG_SUPPLIER_CODE = 'ORG_SUPPLIER';
 
 // 综合展示 各个项目的中心坐标
 export const PROJECTPOSITIONCENTER = [

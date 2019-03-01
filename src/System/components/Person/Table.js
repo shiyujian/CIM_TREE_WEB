@@ -619,11 +619,7 @@ class Users extends Component {
                 window.localStorage.getItem('QH_USER_DATA')
             );
             let userName = userc.username;
-            console.log('searchOveralSituation', searchOveralSituation);
-            console.log('userName', userName !== 'admin');
-            debugger;
             if (!searchOveralSituation || userName !== 'admin') {
-                console.log('aaaaaaaaaaa');
                 postData.org_code = getTreeCodes;
             }
             this.setState({ loading: true });
@@ -702,7 +698,6 @@ class Users extends Component {
             } else {
                 sectiona = node.extra_params.sections.split(',');
             }
-            console.log('sectiona', sectiona);
             getSection(sectiona);
         }
 
@@ -872,7 +867,6 @@ class Users extends Component {
             actions: { getSection }
         } = this.props;
         let sectiona = [];
-        console.log('aaaaaaaaaaaaaa', node);
         getSection(sectiona);
         if (node.extra_params.sections) {
             if (node.extra_params.sections instanceof Array) {
@@ -880,7 +874,6 @@ class Users extends Component {
             } else {
                 sectiona = node.extra_params.sections.split(',');
             }
-            console.log('sectiona', sectiona);
             getSection(sectiona);
         }
 
