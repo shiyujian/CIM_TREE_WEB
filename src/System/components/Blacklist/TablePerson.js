@@ -296,7 +296,7 @@ class TablePerson extends Component {
                     if (record.id) {
                         const current = this.state.serialNumber.current;
                         const pageSize = this.state.serialNumber.pageSize;
-                        if (current !== undefined && pageSize != undefined) {
+                        if (current !== undefined && pageSize !== undefined) {
                             return index + 1 + (current - 1) * pageSize;
                         } else {
                             return index + 1;
