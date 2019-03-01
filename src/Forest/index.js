@@ -64,6 +64,8 @@ export default class ForestContainer extends Component {
             UserAnalysis = null,
             UserAnalysi = null,
             NurserySourseAnalysi = null,
+            EnterStrengthAnalysi = null,
+            PlantStrengthAnalysi = null,
         } = this.state || {};
         return (
             <Body>
@@ -198,6 +200,18 @@ export default class ForestContainer extends Component {
                             component={NurserySourseAnalysi}
                         />
                     )}
+                    {EnterStrengthAnalysi && (
+                        <Route
+                            path='/forest/enterstrengthanalysi'
+                            component={EnterStrengthAnalysi}
+                        />
+                    )}
+                    {PlantStrengthAnalysi && (
+                        <Route
+                            path='/forest/plantstrengthanalysi'
+                            component={PlantStrengthAnalysi}
+                        />
+                    )}
                 </Main>
             </Body>
         );
@@ -327,6 +341,18 @@ export default class ForestContainer extends Component {
                     id: 'FOREST.NURSERYSOURSEANALYSI',
                     path: '/forest/nurserysourseanalysi',
                     name: '苗木来源地分析'
+                },
+                {
+                    key: 'enterstrengthanalysi',
+                    id: 'FOREST.ENTERSTRENGTHANALYSI',
+                    path: '/forest/enterstrengthanalysi',
+                    name: '进场强度分析'
+                },
+                {
+                    key: 'plantstrengthanalysi',
+                    id: 'FOREST.PLANTSTRENGTHANALYSI',
+                    path: '/forest/plantstrengthanalysi',
+                    name: '栽植强度分析'
                 },
                 {
                     key: 'datastatis',
