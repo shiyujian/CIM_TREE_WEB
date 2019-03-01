@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import {getAreaData, handleRiskData, handleTrackData, handleCuringTaskData} from '../auth';
 import {TREETYPENO} from '_platform/api';
 
@@ -165,18 +166,26 @@ export default class GetMenuTree extends Component {
             // loading开始
             await getRiskTreeLoading(true);
             let content = [];
+            let stime = moment().subtract(7, 'days').format('YYYY-MM-DD 00:00:00');
+            let etime = moment().format('YYYY-MM-DD 23:59:59');
             let postdata1 = {
-                status: -1
+                status: -1,
+                stime,
+                etime
             };
             let data1 = await getRisk({}, postdata1);
 
             let postdata2 = {
-                status: 0
+                status: 0,
+                stime,
+                etime
             };
             let data2 = await getRisk({}, postdata2);
 
             let postdata3 = {
-                status: 1
+                status: 1,
+                stime,
+                etime
             };
             let data3 = await getRisk({}, postdata3);
             if (data1 && data1.content) {
@@ -206,9 +215,11 @@ export default class GetMenuTree extends Component {
             }
         } = this.props;
         try {
+            let stime = moment().subtract(7, 'days').format('YYYY-MM-DD 00:00:00');
+            let etime = moment().format('YYYY-MM-DD 23:59:59');
             // loading开始
             await getTrackTreeLoading(true);
-            let routes = await getInspectRouter({}, {status: 2});
+            let routes = await getInspectRouter({}, {status: 2, stime, etime});
             let trackTree = handleTrackData(routes);
             await getTrackTree(trackTree);
             // loading结束
@@ -242,15 +253,22 @@ export default class GetMenuTree extends Component {
             let curingTaskTreeData = [];
             if (curingTypesData && curingTypesData.length > 0) {
                 let curingTasks = [];
+                let stime = moment().subtract(7, 'days').format('YYYY-MM-DD 00:00:00');
+                let etime = moment().format('YYYY-MM-DD 23:59:59');
                 // 有效和退回的任务都是都是属于未完成的任务，上报的任务才属于完成了的任务
                 // 状态为有效
                 let postdata1 = {
-                    status: 0
+                    status: 0,
+                    stime,
+                    etime
                 };
                 let data1 = await getCuring({}, postdata1);
+                
                 // 状态为退回
                 let postdata2 = {
-                    status: 1
+                    status: 1,
+                    stime,
+                    etime
                 };
                 let data2 = await getCuring({}, postdata2);
                 if (data1 && data1.content) {
