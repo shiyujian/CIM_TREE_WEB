@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Input, Select, Table, Modal, Form, Button, Row, Col, Spin, message } from 'antd';
+import { Input, Select, Table, Modal, Form, Button, Row, Col, Spin, message, Pagination } from 'antd';
 import { getUser, formItemLayout } from '_platform/auth';
 
 const Option = Select.Option;
@@ -127,7 +127,6 @@ class Tablelevel extends Component {
                 <Spin tip='Loading...' spinning={this.state.loading}>
                     <Table columns={this.columns} bordered
                         dataSource={dataList}
-                        pagination={false}
                         rowKey='ID'
                     />
                 </Spin>

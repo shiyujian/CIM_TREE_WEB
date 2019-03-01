@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-11 14:22:58
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-18 10:38:16
+ * @Last Modified time: 2019-03-01 15:47:29
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -153,80 +153,80 @@ export default class Project extends Component {
                 }
             ]
         },
-        {
-            key: 'safetyManage',
-            name: '安环管理',
-            id: 'PROJECT.SAFETYMANAGE',
-            icon: <Icon name='won' />,
-            children: [
-                {
-                    key: 'SafetySystem',
-                    id: 'PROJECT.SAFETYSYSTEM',
-                    name: '安全体系',
-                    path: '/project/safetySystem',
-                    exact: true,
-                    icon: <Icon name='retweet' />
-                },
-                {
-                    key: 'Danger',
-                    id: 'PROJECT.DANGER',
-                    name: '危险源',
-                    path: '/project/danger',
-                    icon: <Icon name='code' />
-                },
-                {
-                    key: 'Unbearable',
-                    id: 'PROJECT.UNBEARABLE',
-                    name: '环境保护',
-                    path: '/project/unbearable',
-                    icon: <Icon name='tag' />
-                },
-                {
-                    key: 'HiddenDanger',
-                    id: 'PROJECT.HIDDENDANGER',
-                    name: '安全隐患',
-                    path: '/project/hiddendanger',
-                    icon: <Icon name='money' />
-                },
-                {
-                    key: 'RiskFactor',
-                    id: 'PROJECT.RISKFACTOR',
-                    name: '文明施工',
-                    path: '/project/riskFactor',
-                    icon: <Icon name='code' />
-                },
-                {
-                    key: 'RiskEvaluation',
-                    id: 'PROJECT.RISKEVALUATION',
-                    name: '危险源风险评价',
-                    path: '/project/riskEvaluation',
-                    icon: <Icon name='retweet' />
-                },
-                {
-                    key: 'EducationRegister',
-                    id: 'PROJECT.EDUCATIONREGISTER',
-                    name: '安全教育',
-                    path: '/project/educationRegister',
-                    icon: <Icon name='tag' />
-                }
-            ]
-        },
-        {
-            key: 'massManage',
-            name: '质量管理',
-            id: 'PROJECT.MASSMANAGE',
-            icon: <Icon name='won' />,
-            children: [
-                {
-                    key: 'Defects',
-                    id: 'PROJECT.DEFECTS',
-                    name: '质量缺陷',
-                    path: '/project/defects',
-                    exact: true,
-                    icon: <Icon name='retweet' />
-                }
-            ]
-        },
+        // {
+        //     key: 'safetyManage',
+        //     name: '安环管理',
+        //     id: 'PROJECT.SAFETYMANAGE',
+        //     icon: <Icon name='won' />,
+        //     children: [
+        //         {
+        //             key: 'SafetySystem',
+        //             id: 'PROJECT.SAFETYSYSTEM',
+        //             name: '安全体系',
+        //             path: '/project/safetySystem',
+        //             exact: true,
+        //             icon: <Icon name='retweet' />
+        //         },
+        //         {
+        //             key: 'Danger',
+        //             id: 'PROJECT.DANGER',
+        //             name: '危险源',
+        //             path: '/project/danger',
+        //             icon: <Icon name='code' />
+        //         },
+        //         {
+        //             key: 'Unbearable',
+        //             id: 'PROJECT.UNBEARABLE',
+        //             name: '环境保护',
+        //             path: '/project/unbearable',
+        //             icon: <Icon name='tag' />
+        //         },
+        //         {
+        //             key: 'HiddenDanger',
+        //             id: 'PROJECT.HIDDENDANGER',
+        //             name: '安全隐患',
+        //             path: '/project/hiddendanger',
+        //             icon: <Icon name='money' />
+        //         },
+        //         {
+        //             key: 'RiskFactor',
+        //             id: 'PROJECT.RISKFACTOR',
+        //             name: '文明施工',
+        //             path: '/project/riskFactor',
+        //             icon: <Icon name='code' />
+        //         },
+        //         {
+        //             key: 'RiskEvaluation',
+        //             id: 'PROJECT.RISKEVALUATION',
+        //             name: '危险源风险评价',
+        //             path: '/project/riskEvaluation',
+        //             icon: <Icon name='retweet' />
+        //         },
+        //         {
+        //             key: 'EducationRegister',
+        //             id: 'PROJECT.EDUCATIONREGISTER',
+        //             name: '安全教育',
+        //             path: '/project/educationRegister',
+        //             icon: <Icon name='tag' />
+        //         }
+        //     ]
+        // },
+        // {
+        //     key: 'massManage',
+        //     name: '质量管理',
+        //     id: 'PROJECT.MASSMANAGE',
+        //     icon: <Icon name='won' />,
+        //     children: [
+        //         {
+        //             key: 'Defects',
+        //             id: 'PROJECT.DEFECTS',
+        //             name: '质量缺陷',
+        //             path: '/project/defects',
+        //             exact: true,
+        //             icon: <Icon name='retweet' />
+        //         }
+        //     ]
+        // },
         {
             key: 'plotManage',
             name: '数据管理',
