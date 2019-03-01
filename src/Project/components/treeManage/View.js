@@ -165,7 +165,7 @@ class View extends Component {
                                             {getFieldDecorator('TreeName', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: false,
                                                         message: '请输入树种名称'
                                                     }
                                                 ]
@@ -182,7 +182,7 @@ class View extends Component {
                                             {getFieldDecorator('TreeType', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: false,
                                                         message:
                                                             '请选择树种类别'
                                                     }
@@ -200,7 +200,7 @@ class View extends Component {
                                             {getFieldDecorator('TreeSpecies', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: false,
                                                         message:
                                                             '请输入树种科属'
                                                     }
@@ -218,7 +218,7 @@ class View extends Component {
                                             {getFieldDecorator('TreeMorphologicalCharacter', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: false,
                                                         message: '请输入树种形态特征'
                                                     }
                                                 ]
@@ -235,7 +235,7 @@ class View extends Component {
                                             {getFieldDecorator('TreeHabit', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: false,
                                                         message: '请输入树种习性'
                                                     }
                                                 ]
@@ -252,7 +252,7 @@ class View extends Component {
                                             {getFieldDecorator('NurseryParam', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: false,
                                                         message: '请选择苗圃测量项'
                                                     }
                                                 ]
@@ -269,7 +269,7 @@ class View extends Component {
                                             {getFieldDecorator('TreeParam', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: false,
                                                         message: '请选择现场测量项'
                                                     }
                                                 ]
@@ -323,7 +323,7 @@ class View extends Component {
                                             {getFieldDecorator('TreePics', {
                                                 rules: [
                                                     {
-                                                        required: true,
+                                                        required: false,
                                                         message: '请上传图片'
                                                     }
                                                 ]
