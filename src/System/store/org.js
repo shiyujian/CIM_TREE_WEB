@@ -1,5 +1,7 @@
 import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
+import createFetchAction from 'fetch-action';
+import { SERVICE_API } from '_platform/api';
 
 import fieldFactory from '_platform/store/service/field';
 
@@ -9,12 +11,13 @@ const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
 export const getListStore = createAction(`${ID}getListStore`);
 export const changeOrgTreeDataStatus = createAction(`${ID}changeOrgTreeDataStatus`);
-
+const addDir = createFetchAction(`${SERVICE_API}/directories/`, 'POST');
 export const actions = {
     ...sidebarReducer,
     ...additionReducer,
     getListStore,
-    changeOrgTreeDataStatus
+    changeOrgTreeDataStatus,
+    addDir
 };
 
 export default handleActions({

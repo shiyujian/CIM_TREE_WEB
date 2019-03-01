@@ -10,6 +10,7 @@ export const postTreeType = forestFetchAction(`${FOREST_API}/tree/treetype`, [],
 export const putTreeType = forestFetchAction(`${FOREST_API}/tree/treetype`, [], 'PUT');
 export const deleteTreeType = forestFetchAction(`${FOREST_API}/tree/treetype/{{ID}}`, [], 'DELETE');
 export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
+export const changeViewVisible = createAction(`${ID}changeViewVisible`);
 export const postForsetPic = myFetch(
     `${FOREST_API}/UploadHandler.ashx?filetype=treetype`,
     [],
@@ -23,6 +24,7 @@ export const actions = {
     putTreeType,
     deleteTreeType,
     changeEditVisible,
+    changeViewVisible,
     postForsetPic
 };
 
@@ -34,5 +36,9 @@ export default handleActions({
     [changeEditVisible]: (state, {payload}) => ({
         ...state,
         editVisible: payload
+    }),
+    [changeViewVisible]: (state, {payload}) => ({
+        ...state,
+        viewVisible: payload
     })
 }, {});

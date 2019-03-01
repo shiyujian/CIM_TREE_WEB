@@ -14,9 +14,12 @@ export default class Tree extends Component {
     }
     componentDidMount = async () => {
         const {
-            actions: { getOrgTree }
+            actions: { getOrgTree },
+            platform: { org: { children = [] } = {} }
         } = this.props;
-        await getOrgTree({}, { depth: 4 });
+        if (!(children && children instanceof Array && children.length > 0)) {
+            await getOrgTree({}, { depth: 4 });
+        }
         await this.getOrgDataList();
     }
 
@@ -34,6 +37,7 @@ export default class Tree extends Component {
                     return item;
                 }
             });
+            console.log('dataList', dataList);
             await this.setState({
                 dataList
             });
@@ -48,7 +52,6 @@ export default class Tree extends Component {
     render () {
         const { dataList } = this.state;
         const {
-            platform: { org: { children = [] } = {} },
             sidebar: { node = {} } = {}
         } = this.props;
         const { code } = node || {};
