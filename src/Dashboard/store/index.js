@@ -54,9 +54,12 @@ export const switchDashboardMenuType = createAction(`${ID}切换建设和运营�
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
 export const getAreaTree = createAction(`${ID}区域地块树`);
 export const getRiskTree = createAction(`${ID}安全隐患树`);
+export const getRiskTreeDay = createAction(`${ID}安全隐患树天`);
 export const getTrackTree = createAction(`${ID}巡检路线树`);
+export const getTrackTreeDay = createAction(`${ID}巡检路线树天`);
 export const getTreetypesTree = createAction(`${ID}树种筛选树`);
 export const getCuringTaskTree = createAction(`${ID}养护任务树`);
+export const getCuringTaskTreeDay = createAction(`${ID}养护任务树天`);
 export const getSurvivalRateTree = createAction(`${ID}成活率树`);
 export const getCuringTypeData = createAction(`${ID}养护类型`);
 export const getMenuTreeVisible = createAction(`${ID}是否显示树`);
@@ -103,9 +106,12 @@ export const actions = {
     switchDashboardCompoment,
     getAreaTree,
     getRiskTree,
+    getRiskTreeDay,
     getTrackTree,
+    getTrackTreeDay,
     getTreetypesTree,
     getCuringTaskTree,
+    getCuringTaskTreeDay,
     getSurvivalRateTree,
     getCuringTypeData,
     getMenuTreeVisible,
@@ -146,10 +152,22 @@ export default handleActions(
                 riskTree: payload
             };
         },
+        [getRiskTreeDay]: (state, { payload }) => {
+            return {
+                ...state,
+                riskTreeDay: payload
+            };
+        },
         [getTrackTree]: (state, { payload }) => {
             return {
                 ...state,
                 trackTree: payload
+            };
+        },
+        [getTrackTreeDay]: (state, { payload }) => {
+            return {
+                ...state,
+                trackTreeDay: payload
             };
         },
         [getTreetypesTree]: (state, { payload }) => {
@@ -162,6 +180,12 @@ export default handleActions(
             return {
                 ...state,
                 curingTaskTree: payload
+            };
+        },
+        [getCuringTaskTreeDay]: (state, { payload }) => {
+            return {
+                ...state,
+                curingTaskTreeDay: payload
             };
         },
         [getSurvivalRateTree]: (state, { payload }) => {

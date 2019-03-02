@@ -158,7 +158,7 @@ export default class GetMenuTree extends Component {
         const {
             actions: {
                 getRisk,
-                getRiskTree,
+                getRiskTreeDay,
                 getRiskTreeLoading
             }
         } = this.props;
@@ -166,7 +166,7 @@ export default class GetMenuTree extends Component {
             // loading开始
             await getRiskTreeLoading(true);
             let content = [];
-            let stime = moment().subtract(7, 'days').format('YYYY-MM-DD 00:00:00');
+            let stime = moment().format('YYYY-MM-DD 00:00:00');
             let etime = moment().format('YYYY-MM-DD 23:59:59');
             let postdata1 = {
                 status: -1,
@@ -198,7 +198,7 @@ export default class GetMenuTree extends Component {
                 content = content.concat(data3.content);
             }
             let risks = handleRiskData(content);
-            await getRiskTree(risks);
+            await getRiskTreeDay(risks);
             // loading结束
             await getRiskTreeLoading(false);
         } catch (e) {
@@ -210,18 +210,18 @@ export default class GetMenuTree extends Component {
         const {
             actions: {
                 getInspectRouter,
-                getTrackTree,
+                getTrackTreeDay,
                 getTrackTreeLoading
             }
         } = this.props;
         try {
-            let stime = moment().subtract(7, 'days').format('YYYY-MM-DD 00:00:00');
+            let stime = moment().format('YYYY-MM-DD 00:00:00');
             let etime = moment().format('YYYY-MM-DD 23:59:59');
             // loading开始
             await getTrackTreeLoading(true);
             let routes = await getInspectRouter({}, {status: 2, stime, etime});
             let trackTree = handleTrackData(routes);
-            await getTrackTree(trackTree);
+            await getTrackTreeDay(trackTree);
             // loading结束
             await getTrackTreeLoading(false);
         } catch (e) {
@@ -234,7 +234,7 @@ export default class GetMenuTree extends Component {
             actions: {
                 getCuring,
                 getCuringTypes,
-                getCuringTaskTree,
+                getCuringTaskTreeDay,
                 getCuringTypeData,
                 getCuringTaskTreeLoading
             },
@@ -253,7 +253,7 @@ export default class GetMenuTree extends Component {
             let curingTaskTreeData = [];
             if (curingTypesData && curingTypesData.length > 0) {
                 let curingTasks = [];
-                let stime = moment().subtract(7, 'days').format('YYYY-MM-DD 00:00:00');
+                let stime = moment().format('YYYY-MM-DD 00:00:00');
                 let etime = moment().format('YYYY-MM-DD 23:59:59');
                 // 有效和退回的任务都是都是属于未完成的任务，上报的任务才属于完成了的任务
                 // 状态为有效
@@ -279,7 +279,7 @@ export default class GetMenuTree extends Component {
                 }
                 curingTaskTreeData = await handleCuringTaskData(curingTypesData, curingTasks);
             }
-            await getCuringTaskTree(curingTaskTreeData);
+            await getCuringTaskTreeDay(curingTaskTreeData);
             await getCuringTypeData(curingTypesData);
             // loading结束
             await getCuringTaskTreeLoading(false);

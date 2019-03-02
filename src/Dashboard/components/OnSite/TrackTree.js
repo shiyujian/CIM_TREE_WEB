@@ -12,7 +12,7 @@ export default class TrackTree extends Component {
         this.state = {
             stime: '',
             etime: '',
-            timeType: 'week',
+            timeType: 'today',
             searchDateData: [],
             searchNameData: [],
             searchName: ''
@@ -252,6 +252,9 @@ export default class TrackTree extends Component {
     }
 
     handleTimeChange = (e) => {
+        let {
+            trackTree = []
+        } = this.props;
         try {
             let target = e.target;
             let timeType = target.getAttribute('id');
@@ -267,6 +270,10 @@ export default class TrackTree extends Component {
                 this.setState({
                     stime,
                     etime
+                }, () => {
+                    if (trackTree.length === 0) {
+                        this.query()
+                    }
                 });
                 return;
             } else if (timeType === 'today') {
@@ -301,12 +308,14 @@ export default class TrackTree extends Component {
         const {
             actions: {
                 getInspectRouter,
+                getTrackTree,
                 getTrackTreeLoading
             }
         } = this.props;
         const {
             stime,
-            etime
+            etime,
+            timeType
         } = this.state;
         try {
             this.props.onRemoveAllLayer();
@@ -317,9 +326,10 @@ export default class TrackTree extends Component {
                 status: 2
             };
             let routes = await getInspectRouter({}, postdata);
-            console.log('routes', routes);
             let searchDateData = handleTrackData(routes);
-            console.log('searchDateData', searchDateData);
+            if (timeType === 'all') {
+                await getTrackTree(searchDateData)
+            }
             await getTrackTreeLoading(false);
             this.setState({
                 searchDateData

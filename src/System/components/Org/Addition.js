@@ -329,7 +329,7 @@ class Addition extends Component {
                         await changeSidebarField('addition', false);
                         await changeSidebarField('parent', null);
                         await clearAdditionField();
-                        await getOrgTree({}, { depth: 4 });
+                        await getOrgTree({}, { depth: 7 });
                         await changeOrgTreeDataStatus(true);
                     }
                 } else {
@@ -348,7 +348,7 @@ class Addition extends Component {
                         await changeSidebarField('addition', false);
                         await changeSidebarField('parent', null);
                         await clearAdditionField();
-                        await getOrgTree({}, { depth: 4 });
+                        await getOrgTree({}, { depth: 7 });
                         await changeOrgTreeDataStatus(true);
                         await this.forceUpdate();
                     }

@@ -12,7 +12,7 @@ export default class RiskTree extends Component {
         this.state = {
             stime: '',
             etime: '',
-            timeType: 'week',
+            timeType: 'today',
             searchData: [],
             riskRectify: false,
             riskNotRectify: true
@@ -21,10 +21,10 @@ export default class RiskTree extends Component {
 
     componentDidMount = async () => {
         const {
-            riskTree
+            riskTreeDay
         } = this.props;
-        if (riskTree && riskTree instanceof Array && riskTree.length > 0) {
-            await this.props.onSearchData(riskTree);
+        if (riskTreeDay && riskTreeDay instanceof Array && riskTreeDay.length > 0) {
+            await this.props.onSearchData(riskTreeDay);
         }
     }
 
@@ -225,10 +225,14 @@ export default class RiskTree extends Component {
                     stime,
                     etime
                 }, () => {
-                    if (riskRectify) {
-                        this.query();
+                    if(riskTree && riskTree instanceof Array && riskTree.length > 0) {
+                        if (riskRectify) {
+                            this.query();
+                        } else { // 如果之前发起过请求，直接赋值
+                            this.props.onSearchData(riskTree);
+                        }
                     } else {
-                        this.props.onSearchData(riskTree);
+                        this.query()
                     }
                 });
                 return;
@@ -263,6 +267,7 @@ export default class RiskTree extends Component {
         const {
             actions: {
                 getRisk,
+                getRiskTree,
                 getRiskTreeLoading
             },
             riskTree
@@ -270,11 +275,12 @@ export default class RiskTree extends Component {
         const {
             stime,
             etime,
+            timeType,
             riskNotRectify,
             riskRectify
         } = this.state;
         try {
-            if (!stime && !etime && riskNotRectify) {
+            if (!stime && !etime && riskNotRectify && riskTree) {
                 await this.props.onSearchData(riskTree);
                 return;
             }
@@ -311,6 +317,9 @@ export default class RiskTree extends Component {
                     content = content.concat(data3.content);
                 }
                 let risks = handleRiskData(content);
+                if (timeType === 'all') {
+                    await getRiskTree(risks);
+                }
                 await getRiskTreeLoading(false);
                 await this.props.onSearchData(risks);
                 this.setState({

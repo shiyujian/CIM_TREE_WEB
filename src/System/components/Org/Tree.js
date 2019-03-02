@@ -18,7 +18,7 @@ export default class Tree extends Component {
             platform: { org: { children = [] } = {} }
         } = this.props;
         if (!(children && children instanceof Array && children.length > 0)) {
-            await getOrgTree({}, { depth: 4 });
+            await getOrgTree({}, { depth: 7 });
         }
         await this.getOrgDataList();
     }
@@ -220,7 +220,7 @@ export default class Tree extends Component {
         } = this.props;
         try {
             await deleteOrg({ code: node.code });
-            await getOrgTree({}, { depth: 4 });
+            await getOrgTree({}, { depth: 7 });
             await changeOrgTreeDataStatus(true);
         } catch (e) {
             console.log('remove', e);
