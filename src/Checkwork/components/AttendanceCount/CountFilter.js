@@ -282,7 +282,8 @@ class CountFilter extends Component {
                     '文明负责人',
                     '普通员工',
                     '施工文书',
-                    '测量员'
+                    '测量员',
+                    '施工整改人'
                 ],
                 value: roles.filter(role => role.grouptype === 1)
             });
@@ -333,7 +334,8 @@ class CountFilter extends Component {
                                 '文明负责人',
                                 '普通员工',
                                 '施工文书',
-                                '测量员'
+                                '测量员',
+                                '施工整改人'
                             ],
                             value: roles.filter(role => role.grouptype === 1)
                         });
