@@ -51,7 +51,7 @@ class CountFilter extends Component {
             let permission = getUserIsManager();
             if (permission) {
                 if (!(tree && tree.org && tree.org.children && tree.org.children instanceof Array && tree.org.children.length > 0)) {
-                    let orgData = await getOrgTree({}, { depth: 4 });
+                    let orgData = await getOrgTree({}, { depth: 7 });
                     console.log('orgData', orgData);
                     await orgData.children.map(async (child) => {
                         if (child.name !== '苗圃基地' && child.name !== '供应商') {

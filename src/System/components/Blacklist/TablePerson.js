@@ -41,87 +41,79 @@ class TablePerson extends Component {
     async componentDidMount () {
         this.setState({ loading: true });
         const {
-            actions: { getOrgTree }
-        } = this.props;
-        const {
             actions: { getPersonInfo }
         } = this.props;
         let rst = await getPersonInfo({}, { is_black: 1 });
-        getOrgTree({}, { depth: 3 }).then(rstc => {
-            this.setState({
-                projectTree: rstc
-            });
 
-            // 分页获取数据
-            let personlist = rst;
-            this.setState({ resultInfo: rst });
-            // let total = rst.result.total;
-            let persons = [];
-            for (let i = 0; i < personlist.length; i++) {
-                const element = personlist[i];
-                persons.push(element);
+        // 分页获取数据
+        let personlist = rst;
+        this.setState({ resultInfo: rst });
+        // let total = rst.result.total;
+        let persons = [];
+        for (let i = 0; i < personlist.length; i++) {
+            const element = personlist[i];
+            persons.push(element);
+        }
+
+        let pagination = {
+            current: 1,
+            total: rst.count
+        };
+        this.setState({
+            pagination: pagination
+        });
+
+        let data_person = persons.map((item, index) => {
+            let groupsId = [];
+            const groups = item.groups || [];
+            for (let j = 0; j < groups.length; j++) {
+                const groupss = groups[j].id.toString();
+                groupsId.push(groupss);
             }
-
-            let pagination = {
-                current: 1,
-                total: rst.count
+            return {
+                index: index + 1,
+                id: item.id,
+                username: item.username || '',
+                email: item.email || '',
+                account: {
+                    person_name: item.account.person_name,
+                    person_type: 'C_PER',
+                    person_avatar_url: item.account.person_avatar_url,
+                    person_signature_url: item.account.person_signature_url,
+                    organization: {
+                        // pk: node.pk,
+                        code: item.account.org_code,
+                        obj_type: 'C_ORG',
+                        rel_type: 'member',
+                        name: item.account.organization
+                    }
+                },
+                tags: item.account.tags,
+                sections: item.account.sections,
+                groups: item.groups,
+                black_remark: item.account.black_remark,
+                is_active: item.is_active,
+                id_num: item.account.id_num,
+                is_black: item.account.is_black,
+                id_image: item.account.id_image,
+                basic_params: {
+                    info: {
+                        电话: item.account.person_telephone || '',
+                        性别: item.account.gender || '',
+                        title: item.account.title || '',
+                        phone: item.account.person_telephone || '',
+                        sex: item.account.gender || '',
+                        duty: ''
+                    }
+                },
+                extra_params: {},
+                title: item.account.title || ''
             };
-            this.setState({
-                pagination: pagination
-            });
-
-            let data_person = persons.map((item, index) => {
-                let groupsId = [];
-                const groups = item.groups || [];
-                for (let j = 0; j < groups.length; j++) {
-                    const groupss = groups[j].id.toString();
-                    groupsId.push(groupss);
-                }
-                return {
-                    index: index + 1,
-                    id: item.id,
-                    username: item.username || '',
-                    email: item.email || '',
-                    account: {
-                        person_name: item.account.person_name,
-                        person_type: 'C_PER',
-                        person_avatar_url: item.account.person_avatar_url,
-                        person_signature_url: item.account.person_signature_url,
-                        organization: {
-                            // pk: node.pk,
-                            code: item.account.org_code,
-                            obj_type: 'C_ORG',
-                            rel_type: 'member',
-                            name: item.account.organization
-                        }
-                    },
-                    tags: item.account.tags,
-                    sections: item.account.sections,
-                    groups: item.groups,
-                    black_remark: item.account.black_remark,
-                    is_active: item.is_active,
-                    id_num: item.account.id_num,
-                    is_black: item.account.is_black,
-                    id_image: item.account.id_image,
-                    basic_params: {
-                        info: {
-                            电话: item.account.person_telephone || '',
-                            性别: item.account.gender || '',
-                            title: item.account.title || '',
-                            phone: item.account.person_telephone || '',
-                            sex: item.account.gender || '',
-                            duty: ''
-                        }
-                    },
-                    extra_params: {},
-                    title: item.account.title || ''
-                };
-            });
-            this.setState({
-                dataSource: data_person,
-                tempData: data_person,
-                loading: false
-            });
+        });
+        this.setState({
+            dataSource: data_person,
+            tempData: data_person,
+            loading: false
         });
     }
     getProjectName = (section) => {
