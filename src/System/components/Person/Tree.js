@@ -210,7 +210,7 @@ export default class Tree extends Component {
                 }
             }
         } catch (e) {
-            console.log('e', e);
+            console.log('componentDidMount', e);
         }
     }
 

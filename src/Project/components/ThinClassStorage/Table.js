@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
-import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
+import { getUser, formItemLayout } from '_platform/auth';
 import {
     fillAreaColor,
-    getCoordsArr,
-    getPolygonByCoordArr
+    getCoordsArr
 } from '../auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -27,6 +26,7 @@ class Tablelevel extends Component {
             spinning: false // 加载中
         };
         this.dataList = []; // 暂存数据
+        this.userSection = ''; // 用户所属标段
         this.onSearch = this.onSearch.bind(this); // 查询细班
         this.handleNumber = this.handleNumber.bind(this); // 细班编号
         this.handleOk = this.handleOk.bind(this);
@@ -87,6 +87,10 @@ class Tablelevel extends Component {
     };
     componentDidMount () {
         this.initMap();
+        let userData = getUser();
+        this.userSection = userData.sections.slice(2, -2);
+        console.log('123', userData.sections);
+        console.log('123', userData.sections.slice(2, -2));
     }
     initMap () {
         // 基础设置
@@ -124,11 +128,21 @@ class Tablelevel extends Component {
     }
     render () {
         const { dataList, total, page, confirmLoading, spinning } = this.state;
+        console.log(this.dataList, '所有数据');
+        console.log(this.userSection, typeof this.userSection, '所有数据');
+        let arr = [];
+        this.dataList.map(item => {
+            if (item.Section === this.userSection) {
+                arr.push(item.ThinClass);
+            }
+        });
+        console.log(arr);
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
                 this.onLocation(selectedRows);
-            }
+            },
+            selectedRowKeys: arr
         };
         const propsUpload = {
             name: 'file',
@@ -328,7 +342,6 @@ class Tablelevel extends Component {
             name: fileList[0].name.split('.')[0]
         }, formdata).then(rep => {
             rep = JSON.parse(rep);
-            console.log('上传成功', rep);
             if (rep.errorinfo) {
                 message.error(rep.errorinfo);
                 this.setState({
@@ -337,9 +350,10 @@ class Tablelevel extends Component {
                     showModal: false
                 }, () => {
                     return;
-                })
+                });
             }
             this.dataList = rep.features;
+            console.log(this.dataList, '上传的数据');
             this.setState({
                 confirmLoading: false,
                 indexBtn: 0,
