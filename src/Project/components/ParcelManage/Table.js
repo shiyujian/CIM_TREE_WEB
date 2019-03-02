@@ -16,6 +16,7 @@ class Tablelevel extends Component {
         this.state = {
             leftkeycode: '', // 项目
             dataList: [], // 地块列表
+            selectedRowKeysList: [], // 选中的地块列表
             dataListHistory: [], // 历史数据列表
             sectionList: [], // 标段列表
             showModal: false,
@@ -82,8 +83,8 @@ class Tablelevel extends Component {
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
-            console.log(nextProps, 'nextProps');
             this.setState({
+                section: '',
                 leftkeycode: nextProps.leftkeycode,
                 sectionList: nextProps.sectionList
             }, () => {
@@ -136,7 +137,6 @@ class Tablelevel extends Component {
             page: 1,
             size: 10
         }).then(rep => {
-            console.log('历史数据', rep.content);
             if (rep.code === 200) {
                 this.setState({
                     dataListHistory: rep.content
@@ -145,19 +145,22 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, dataListHistory, total, page, sectionList, spinning } = this.state;
+        const { dataList, section, dataListHistory, total, page, sectionList, spinning, selectedRowKeysList } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
-                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+                this.setState({
+                    selectedRowKeysList: selectedRowKeys
+                });
                 this.onLocation(selectedRows);
-            }
+            },
+            selectedRowKeys: selectedRowKeysList
         };
         return (
             <div className='table-level'>
                 <div>
                     <Form layout='inline'>
                         <FormItem label='标段'>
-                            <Select style={{ width: 150 }} onChange={this.handleSection.bind(this)} allowClear>
+                            <Select style={{ width: 150 }} value={section} onChange={this.handleSection.bind(this)} allowClear>
                                 {
                                     sectionList.map(item => {
                                         return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -178,7 +181,7 @@ class Tablelevel extends Component {
                         <Spin spinning={spinning}>
                             <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} />
                         </Spin>
-                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
+                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
                     </div>
                     {/* 地图 */}
                     <div style={{marginLeft: 620, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
@@ -221,7 +224,6 @@ class Tablelevel extends Component {
         let coordinatesArr = []; // 多维数据
         selectedRows.map(item => {
             let coordsArr = getCoordsArr(item.coords);
-            console.log(coordsArr, 'coordsArr');
             let treearea = [];
             coordsArr.map(item => {
                 let arr = item.split(' ');
@@ -229,7 +231,6 @@ class Tablelevel extends Component {
             });
             coordinatesArr.push(treearea);
         });
-        console.log(coordinatesArr, 'coordinatesArr');
         // 如果地块存在，则定位过去
         if (coordinatesArr.length !== 0) {
             let message = {
@@ -267,7 +268,6 @@ class Tablelevel extends Component {
         deleteDataimport({
             id: ID
         }, {}).then(rep => {
-            console.log(rep);
             this.getDataHistory();
         });
     }
@@ -288,6 +288,7 @@ class Tablelevel extends Component {
                 });
                 this.setState({
                     dataList: rep.content,
+                    selectedRowKeysList: [],
                     total: rep.pageinfo && rep.pageinfo.total,
                     size: rep.pageinfo && rep.pageinfo.size,
                     spinning: false
@@ -301,7 +302,6 @@ class Tablelevel extends Component {
         });
     }
     handleSection (value) {
-        console.log(value);
         this.setState({
             section: value
         });
