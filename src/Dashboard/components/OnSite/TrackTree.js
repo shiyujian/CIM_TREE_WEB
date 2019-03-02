@@ -12,7 +12,7 @@ export default class TrackTree extends Component {
         this.state = {
             stime: '',
             etime: '',
-            timeType: 'all',
+            timeType: 'week',
             searchDateData: [],
             searchNameData: [],
             searchName: ''

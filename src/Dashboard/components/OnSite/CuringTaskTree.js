@@ -12,7 +12,7 @@ export default class CuringTaskTree extends Component {
         this.state = {
             stime: '',
             etime: '',
-            timeType: 'all',
+            timeType: 'week',
             searchData: [],
             curingTaskComplete: false,
             curingTaskUnComplete: true

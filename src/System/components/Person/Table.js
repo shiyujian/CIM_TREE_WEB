@@ -275,28 +275,32 @@ class Users extends Component {
     // 人员标段和组织机构标段比较器，如果满足条件返回true
     compare (user, node, eventKey) {
         const {
-            orgTreeDataArr
+            orgTreeDataArr = []
         } = this.props;
-        let groups = user.groups;
-        let isClericalStaff = false;
-        groups.map((group) => {
-            if (group.name === '施工文书') {
-                isClericalStaff = true;
+        try {
+            let groups = user.groups;
+            let isClericalStaff = false;
+            groups.map((group) => {
+                if (group.name === '施工文书') {
+                    isClericalStaff = true;
+                }
+            });
+            if (isClericalStaff && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
+                return true;
             }
-        });
-        if (isClericalStaff && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
-            return true;
-        }
-        if (user.is_superuser) {
-            return true;
-        }
-        let status = false;
-        orgTreeDataArr.map((code) => {
-            if (code === eventKey) {
-                status = true;
+            if (user.is_superuser) {
+                return true;
             }
-        });
-        return status;
+            let status = false;
+            orgTreeDataArr.map((code) => {
+                if (code === eventKey) {
+                    status = true;
+                }
+            });
+            return status;
+        } catch (e) {
+            console.log('Table-compare', e);
+        }
     }
     // 添加和删除用户的按钮
     confirms () {
