@@ -8,11 +8,13 @@ import {
     handleCoordinates
 } from '../auth';
 const FormItem = Form.Item;
+const Option = Select.Option;
 window.config = window.config || {};
 class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            leftkeycode: '', // 项目
             dataList: [], // 地块列表
             dataListHistory: [], // 历史数据列表
             sectionList: [], // 标段列表
@@ -269,31 +271,23 @@ class Tablelevel extends Component {
             this.getDataHistory();
         });
     }
-    onSearch (page) {
-        console.log('获取列表');
+    onSearch (page = 1) {
         this.setState({
             spinning: true
         });
-        const { section } = this.state;
+        const { section, leftkeycode } = this.state;
         const { getLands } = this.props.actions;
         getLands({}, {
-            section,
+            section: section || leftkeycode,
             page,
             size: 10
         }).then(rep => {
             if (rep.code === 200) {
                 rep.content.map((item, index) => {
                     item.key = index;
-                    this.dataList.push({
-                        Section: item.Section,
-                        coords: item.coords,
-                        key: index
-                    });
                 });
-                console.log(this.dataList.slice(0, 10));
-                page = page - 1;
                 this.setState({
-                    dataList: this.dataList.slice(page * 10, page * 10 + 10),
+                    dataList: rep.content,
                     total: rep.pageinfo && rep.pageinfo.total,
                     size: rep.pageinfo && rep.pageinfo.size,
                     spinning: false
