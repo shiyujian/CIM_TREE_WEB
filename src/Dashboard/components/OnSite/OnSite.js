@@ -1264,7 +1264,8 @@ class OnSite extends Component {
                                     {
                                         this.riskTypeOptions.map((option) => {
                                             return (
-                                                <div style={{display: 'inlineBlock', marginTop: 10}} key={option.id}>
+                                                <div style={{display: 'inlineBlock', marginTop: 10, height: 20}} key={option.id}>
+                                                    <p className='dashboard-menuLabel'>{option.label}</p>
                                                     <img src={option.img}
                                                         title={option.label}
                                                         className='dashboard-rightMenuRiskTypeImgLayout' />
@@ -1289,7 +1290,8 @@ class OnSite extends Component {
                                             {
                                                 this.curingTaskTypeOptions.map((option) => {
                                                     return (
-                                                        <div style={{display: 'inlineBlock'}} key={option.id}>
+                                                        <div style={{display: 'inlineBlock', height: 20}} key={option.id}>
+                                                            <p className='dashboard-menuLabel1'>{option.label}</p>
                                                             <img src={option.img}
                                                                 title={option.label}
                                                                 className='dashboard-rightMenuCuringTaskTypeImgLayout' />

@@ -12,7 +12,7 @@ export default class CuringTaskTree extends Component {
         this.state = {
             stime: '',
             etime: '',
-            timeType: 'week',
+            timeType: 'today',
             searchData: [],
             curingTaskComplete: false,
             curingTaskUnComplete: true
@@ -21,10 +21,10 @@ export default class CuringTaskTree extends Component {
 
     componentDidMount = async () => {
         const {
-            curingTaskTree
+            curingTaskTreeDay
         } = this.props;
-        if (curingTaskTree && curingTaskTree instanceof Array && curingTaskTree.length > 0) {
-            await this.props.onSearchData(curingTaskTree);
+        if (curingTaskTreeDay && curingTaskTreeDay instanceof Array && curingTaskTreeDay.length > 0) {
+            await this.props.onSearchData(curingTaskTreeDay);
         }
     }
 
@@ -226,10 +226,14 @@ export default class CuringTaskTree extends Component {
                     stime,
                     etime
                 }, () => {
-                    if (curingTaskComplete) {
-                        this.query();
+                    if (curingTaskTree && curingTaskTree instanceof Array && curingTaskTree.length > 0) {
+                        if (curingTaskComplete) {
+                            this.query();
+                        } else {
+                            this.props.onSearchData(curingTaskTree);
+                        }
                     } else {
-                        this.props.onSearchData(curingTaskTree);
+                        this.query();
                     }
                 });
                 return;
@@ -265,6 +269,7 @@ export default class CuringTaskTree extends Component {
             actions: {
                 getCuring,
                 getCuringTypes,
+                getCuringTaskTree,
                 getCuringTaskTreeLoading
             },
             curingTypes,
@@ -273,11 +278,12 @@ export default class CuringTaskTree extends Component {
         const {
             stime,
             etime,
+            timeType,
             curingTaskUnComplete,
             curingTaskComplete
         } = this.state;
         try {
-            if (!stime && !etime && curingTaskUnComplete) {
+            if (!stime && !etime && curingTaskUnComplete && curingTaskTree) {
                 await this.props.onSearchData(curingTaskTree);
                 return;
             }
@@ -315,6 +321,9 @@ export default class CuringTaskTree extends Component {
                     }
                     curingTaskTreeData = await handleCuringTaskData(curingTypesData, curingTasks);
                     await getCuringTaskTreeLoading(false);
+                    if (timeType === 'all') {
+                        await getCuringTaskTree(curingTaskTreeData)
+                    }
                     await this.props.onSearchData(curingTaskTreeData);
                     this.setState({
                         searchData: curingTaskTreeData
