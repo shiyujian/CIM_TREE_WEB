@@ -53,6 +53,7 @@ class Tablelevel extends Component {
         this.handleTreeTypeForm = this.handleTreeTypeForm.bind(this); // 栽植类型修改
         this.handleNumberForm = this.handleNumberForm.bind(this); // 栽植量修改
         this.handleAreaForm = this.handleAreaForm.bind(this); // 栽植面积修改
+        this.handleExpanded = this.handleExpanded.bind(this); // 展开子表格
         this.columns = [
             {
                 key: '1',
@@ -180,7 +181,7 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area } = this.state;
+        const { dataList, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -188,8 +189,7 @@ class Tablelevel extends Component {
             }
         };
         // 子表格
-        let expandedRowRender = (record, index, indent, expanded) => {
-            let { dataListPlan } = this.state;
+        let expandedRowRender = (record) => {
             let columns = [{
                 title: '树木类型',
                 key: '1',
@@ -272,7 +272,7 @@ class Tablelevel extends Component {
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 600, minHeight: 640, float: 'left'}}>
+                    <div style={{width: 650, minHeight: 640, float: 'left'}}>
                         <Spin spinning={spinning}>
                             <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection}
                                 columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
@@ -335,19 +335,16 @@ class Tablelevel extends Component {
         );
     }
     handleTreeTypeForm (value) {
-        let { treetype } = this.state;
         this.setState({
             treetype: value
         });
     }
     handleNumberForm (e) {
-        let { num } = this.state;
         this.setState({
             num: e.target.value
         });
     }
     handleAreaForm (e) {
-        let { area } = this.state;
         this.setState({
             area: e.target.value
         });
@@ -401,7 +398,6 @@ class Tablelevel extends Component {
         );
     }
     handleExpanded (expanded, record) {
-        console.log('触发', expanded, record);
         if (!expanded) {
             this.setState({
                 dataListPlan: [],
@@ -412,7 +408,7 @@ class Tablelevel extends Component {
         let dataListPlan = [];
         let expandedRowKeys = [];
         dataListPlan.push({
-            ID: record.ID + '1',
+            ID: record.key + '1',
             Num: '',
             Section: record.Section,
             no: record.no,
@@ -438,8 +434,7 @@ class Tablelevel extends Component {
                         Area: item.Area
                     });
                 });
-                console.log(dataListPlan, '-----');
-                expandedRowKeys.push(record.ID);
+                expandedRowKeys.push(record.key);
                 this.setState({
                     dataListPlan,
                     expandedRowKeys
