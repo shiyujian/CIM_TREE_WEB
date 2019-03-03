@@ -18,6 +18,8 @@ class Tablelevel extends Component {
             record: {}, // 行数据
             indexBtn: 1, // 是否为上传细班选项
             fileList: [], // 上传的文件列表
+            newDataListKey: [], // 可以上传的数据选项
+            newDataList: [], // 可以上传的数据选项
             page: 1,
             total: 0,
             confirmLoading: false, // 是否允许取消
@@ -89,8 +91,6 @@ class Tablelevel extends Component {
         this.initMap();
         let userData = getUser();
         this.userSection = userData.sections.slice(2, -2);
-        console.log('123', userData.sections);
-        console.log('123', userData.sections.slice(2, -2));
     }
     initMap () {
         // 基础设置
@@ -127,22 +127,13 @@ class Tablelevel extends Component {
         ).addTo(this.map);
     }
     render () {
-        const { dataList, total, page, confirmLoading, spinning } = this.state;
-        console.log(this.dataList, '所有数据');
-        console.log(this.userSection, typeof this.userSection, '所有数据');
-        let arr = [];
-        this.dataList.map(item => {
-            if (item.Section === this.userSection) {
-                arr.push(item.ThinClass);
-            }
-        });
-        console.log(arr);
+        const { dataList, total, page, confirmLoading, spinning, newDataListKey } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
                 this.onLocation(selectedRows);
             },
-            selectedRowKeys: arr
+            selectedRowKeys: newDataListKey
         };
         const propsUpload = {
             name: 'file',
@@ -354,11 +345,25 @@ class Tablelevel extends Component {
             }
             this.dataList = rep.features;
             console.log(this.dataList, '上传的数据');
+            console.log(this.dataList, '所有数据');
+            console.log(this.userSection, typeof this.userSection, '所有数据');
+            let newDataListKey = [];
+            let newDataList = [];
+            this.dataList.map(item => {
+                if (item.Section === this.userSection) {
+                    newDataListKey.push(item.ThinClass);
+                    newDataList.push(item);
+                }
+            });
+            console.log(newDataListKey);
+            console.log(newDataList);
             this.setState({
                 confirmLoading: false,
                 indexBtn: 0,
                 page: 1,
                 total: this.dataList.length,
+                newDataListKey,
+                newDataList,
                 dataList: this.dataList.slice(0, 10)
             }, () => {
                 // 隐藏弹框
