@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-01-28 10:50:31
+ * @Last Modified time: 2019-03-03 17:08:45
  */
 import React, { Component } from 'react';
 import {
@@ -95,6 +95,7 @@ class OnSite extends Component {
             mapLayerBtnType: true, // 切换卫星图和地图
             // 树木详情弹窗数据
             treeMessModalVisible: false,
+            treeMessModalLoading: true,
             seedlingMess: '', // 树木信息
             treeMess: '', // 苗木信息
             flowMess: '', // 流程信息
@@ -2381,6 +2382,10 @@ class OnSite extends Component {
         jQuery.getJSON(url, null, async function (data) {
             if (data.features && data.features.length) {
                 if (type === 'treeMess') {
+                    await that.setState({
+                        treeMessModalVisible: true,
+                        treeMessModalLoading: true
+                    });
                     await that.getTreeMessData(data, x, y);
                     await that.handleOkTreeMessModal(data, x, y);
                 } else if (type === 'geojsonFeature_survivalRate') {
@@ -2563,7 +2568,8 @@ class OnSite extends Component {
                 treeMarkerLayer.addTo(this.map);
                 this.setState({
                     treeMarkerLayer,
-                    treeMessModalVisible: true
+                    // treeMessModalVisible: true,
+                    treeMessModalLoading: false
                 });
             }
         } catch (e) {
@@ -2574,7 +2580,8 @@ class OnSite extends Component {
     handleCancelTreeMessModal () {
         this.handleModalMessData();
         this.setState({
-            treeMessModalVisible: false
+            treeMessModalVisible: false,
+            treeMessModalLoading: true
         });
     }
     // 点击地图上的区域的成活率

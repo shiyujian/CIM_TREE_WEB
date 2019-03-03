@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-01 17:34:51
+ * @Last Modified time: 2019-03-03 17:43:40
  */
 /**
  *
@@ -280,7 +280,7 @@ export const FORM_WORKFLOW = [
     }
 ];
 // 当前执行的项目
-export const DEFAULT_PROJECT = 'P018';
+export const DEFAULT_PROJECT = 'P191';
 // admin登录林总接口所用的账号
 export const FOREST_LOGIN_DATA = {
     phone: 'zhaozz1010',
