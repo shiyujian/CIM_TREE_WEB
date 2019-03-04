@@ -114,7 +114,8 @@ class Tablelevel extends Component {
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
-            console.log('nextProps', nextProps.leftkeycode);
+            console.log('nextProps', nextProps.sectionList);
+            console.log('userSection', this.userSection);
             this.setState({
                 section: '',
                 number: '',

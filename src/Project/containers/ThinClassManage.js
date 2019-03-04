@@ -13,7 +13,7 @@ import { TreeProjectList } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import { actions } from '../store/thinClassManage';
 import { Table } from '../components/ThinClassManage';
-import { getAreaTreeData, getDefaultProject } from '_platform/auth';
+import { getAreaTreeData, getDefaultProject, getUser } from '_platform/auth';
 @connect(
     state => {
         const {
@@ -37,8 +37,11 @@ class ThinClassManage extends Component {
             leftkeycode: '', // 项目
             sectionList: [] // 标段列表
         };
+        this.userSection = ''; // 用户所属标段
     }
     componentDidMount = async () => {
+        let userData = getUser();
+        this.userSection = userData.sections.slice(2, -2);
         const {
             actions: {
                 getTreeNodeList,
@@ -48,7 +51,6 @@ class ThinClassManage extends Component {
             platform: { tree = {} }
         } = this.props;
         try {
-            console.log('1', tree);
             if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
                 let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
                 let projectList = data.projectList || [];
@@ -56,7 +58,6 @@ class ThinClassManage extends Component {
                 await getThinClassTree(projectList);
             }
             let defaultProject = await getDefaultProject();
-            console.log(defaultProject, 'defaultProject');
             if (defaultProject) {
                 this.onSelect([defaultProject]);
             }
@@ -72,9 +73,12 @@ class ThinClassManage extends Component {
             leftkeycode
         } = this.state;
         let treeList = [];
-        console.log(tree, '树数据');
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
+        }
+        if (this.userSection) {
+            console.log('userSection', this.userSection);
+            console.log('treeList', treeList);
         }
         return (
             <Body>
@@ -97,7 +101,6 @@ class ThinClassManage extends Component {
         );
     }
     onSelect (keys) {
-        console.log('点击', keys);
         let keycode = keys[0] || '';
         const {
             platform: { tree = {} }

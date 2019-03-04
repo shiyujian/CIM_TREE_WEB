@@ -13,13 +13,12 @@ class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            dataList: [],
+            dataList: [], // 每页的数据
             showModal: false,
             record: {}, // 行数据
             indexBtn: 1, // 是否为上传细班选项
             fileList: [], // 上传的文件列表
             newDataListKey: [], // 可以上传的数据选项
-            newDataList: [], // 可以上传的数据选项
             page: 1,
             total: 0,
             confirmLoading: false, // 是否允许取消
@@ -27,7 +26,7 @@ class Tablelevel extends Component {
             areaLayerList: [], // 区域地块图层list
             spinning: false // 加载中
         };
-        this.dataList = []; // 暂存数据
+        this.dataList = []; // 所有的暂存数据
         this.userSection = ''; // 用户所属标段
         this.onSearch = this.onSearch.bind(this); // 查询细班
         this.handleNumber = this.handleNumber.bind(this); // 细班编号
@@ -130,16 +129,28 @@ class Tablelevel extends Component {
         const { dataList, total, page, confirmLoading, spinning, newDataListKey } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
-                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+                console.log('定位过去');
                 this.onLocation(selectedRows);
             },
+            onSelect: (record, selected) => {
+                if (selected) {
+                    // 增加
+                    if (record.Section === this.userSection) {
+                        newDataListKey.push(record.key);
+                    }
+                } else {
+                    // 减少
+                    let index = newDataListKey.indexOf(record.key);
+                    newDataListKey.splice(index, 1);
+                }
+            },
+            hideDefaultSelections: true,
             selectedRowKeys: newDataListKey
         };
         const propsUpload = {
             name: 'file',
             action: '',
             beforeUpload: (file, fileList) => {
-                console.log(file);
                 this.setState({
                     fileList
                 });
@@ -166,9 +177,9 @@ class Tablelevel extends Component {
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 700, float: 'left'}}>
                         <Spin spinning={spinning}>
-                            <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} rowKey='ThinClass' />
+                            <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} />
                         </Spin>
-                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
+                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
                     </div>
                     {/* 地图 */}
                     <div style={{marginLeft: 620, height: 700, overflow: 'hidden', border: '3px solid #ccc'}}>
@@ -203,6 +214,7 @@ class Tablelevel extends Component {
         );
     }
     onLocation (recordArr) {
+        console.log('定位数据', recordArr);
         const { areaLayerList } = this.state;
         areaLayerList.map(item => {
             item.remove();
@@ -222,7 +234,6 @@ class Tablelevel extends Component {
             }
             coordinatesArr.push(treearea);
         });
-        console.log('coordinatesArr', coordinatesArr);
         // 如果地块存在，则定位过去
         if (coordinatesArr.length !== 0) {
             let message = {
@@ -257,7 +268,6 @@ class Tablelevel extends Component {
     }
     onSearch () {
         const { number } = this.state;
-        console.log(number);
         if (!number) {
             this.setState({
                 dataList: this.dataList.slice(0, 10)
@@ -272,36 +282,49 @@ class Tablelevel extends Component {
         });
     }
     onPutStorage () {
-        console.log(this.props.actions);
         this.setState({
             spinning: true
         });
         let pro = [];
+        const { newDataListKey } = this.state;
+        console.log('所有数据', this.dataList);
         this.dataList.map(item => {
-            pro.push({
-                no: item.ThinClass,
-                treetype: item.TreeType,
-                Section: item.Section,
-                num: item.Num, // 细班计划种植数量
-                area: item.Area, // 面积
-                Level: item.Spec, // 规格
-                coords: '' // WKT格式item.Geom
+            // 入库选中的数据
+            newDataListKey.map(row => {
+                if (item.key === row) {
+                    pro.push({
+                        no: item.ThinClass,
+                        treetype: item.TreeType,
+                        Section: item.Section,
+                        num: item.Num, // 细班计划种植数量
+                        area: item.Area, // 面积
+                        Level: item.Spec, // 规格
+                        coords: item.Geom // WKT格式item.Geom
+                    });
+                }
             });
         });
         const { importThinClass } = this.props.actions;
         console.log(pro);
-        importThinClass({}, pro).then(rep => {
-            if (rep.code === 1) {
-                message.success('细班数据入库成功');
-                console.log(rep);
-                this.dataList = [];
-                this.setState({
-                    dataList: [],
-                    indexBtn: 1,
-                    spinning: false
-                });
-            }
-        });
+        if (pro.length === 0) {
+            message.error('没有可供入库的数据');
+            this.setState({
+                spinning: false
+            });
+            return;
+        } else {
+            importThinClass({}, pro).then(rep => {
+                if (rep.code === 1) {
+                    message.success('细班数据入库成功');
+                    this.dataList = [];
+                    this.setState({
+                        dataList: [],
+                        indexBtn: 1,
+                        spinning: false
+                    });
+                }
+            });
+        }
     }
     handleNumber (e) {
         this.setState({
@@ -309,7 +332,6 @@ class Tablelevel extends Component {
         });
     }
     onAdd () {
-        console.log('123', this.state.fileList);
         this.setState({
             showModal: true
         });
@@ -343,27 +365,23 @@ class Tablelevel extends Component {
                     return;
                 });
             }
+            rep.features.map((item, index) => {
+                item.key = index;
+            });
             this.dataList = rep.features;
-            console.log(this.dataList, '上传的数据');
-            console.log(this.dataList, '所有数据');
-            console.log(this.userSection, typeof this.userSection, '所有数据');
+            console.log('最初数据', this.dataList);
             let newDataListKey = [];
-            let newDataList = [];
             this.dataList.map(item => {
                 if (item.Section === this.userSection) {
-                    newDataListKey.push(item.ThinClass);
-                    newDataList.push(item);
+                    newDataListKey.push(item.key);
                 }
             });
-            console.log(newDataListKey);
-            console.log(newDataList);
             this.setState({
                 confirmLoading: false,
                 indexBtn: 0,
                 page: 1,
                 total: this.dataList.length,
                 newDataListKey,
-                newDataList,
                 dataList: this.dataList.slice(0, 10)
             }, () => {
                 // 隐藏弹框
