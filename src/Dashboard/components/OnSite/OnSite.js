@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-03 17:08:45
+ * @Last Modified time: 2019-03-04 15:25:06
  */
 import React, { Component } from 'react';
 import {
@@ -134,6 +134,7 @@ class OnSite extends Component {
             switchSurvivalRateFirst: false, // 第一次切换至成活率模块时，因标段数据初始化太麻烦，所以用此字段代表未曾选择过标段数据，只需要根据成活率范围查找
             // 苗木结缘弹窗
             adoptTreeModalVisible: false,
+            adoptTreeModalLoading: true,
             adoptTreeMess: '',
             // 成活率范围的点击状态，展示是否选中的图片
             survivalRateHundred: true,
@@ -2393,6 +2394,10 @@ class OnSite extends Component {
                 } else if (type === 'geojsonFeature_treeAdopt') {
                     let adoptTreeMess = await that.getTreeAdoptInfo(data, x, y);
                     if (adoptTreeMess) {
+                        await that.setState({
+                            adoptTreeModalVisible: true,
+                            adoptTreeModalLoading: true
+                        });
                         await that.getTreeMessData(data, x, y);
                         await that.handleOkAdoptTreeMessModal();
                     }
@@ -2663,14 +2668,15 @@ class OnSite extends Component {
     // 显示苗木结缘Modal
     handleOkAdoptTreeMessModal () {
         this.setState({
-            adoptTreeModalVisible: true
+            adoptTreeModalLoading: false
         });
     }
     // 关闭苗木结缘Modal
     handleCancelAdoptTreeMessModal () {
         this.handleModalMessData();
         this.setState({
-            adoptTreeModalVisible: false
+            adoptTreeModalVisible: false,
+            adoptTreeModalLoading: true
         });
     }
     // 清除苗木结缘弹窗内用到的数据
