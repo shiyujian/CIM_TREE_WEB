@@ -259,6 +259,7 @@ class Users extends Component {
         this.setState({ TreeCodes: this.props.getTreeCodes });
         if (this.state.TreeCodes !== this.props.getTreeCodes) {
             // 在重新选择树节点之后，将页数进行修改
+            console.log('sssssssssssss');
             this.setState({
                 searchRoles: [],
                 searchUserStatus: '',

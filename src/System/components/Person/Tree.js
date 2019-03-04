@@ -54,7 +54,8 @@ export default class Tree extends Component {
                 getTreeModal,
                 getOrgTreeSelect,
                 getOrgTreeByCode,
-                getOrgTreeDataArr
+                getOrgTreeDataArr,
+                getTablePage
             }
         } = this.props;
         try {
@@ -130,7 +131,14 @@ export default class Tree extends Component {
                     // 作为选中的节点，将机构的数据上传至redux
                     await changeSidebarField('node', first);
                     const codes = Tree.collect(first);
-                    await getUsers({}, { org_code: codes, page: 1 });
+                    let userList = await getUsers({}, { org_code: codes, page: 1 });
+                    if (userList && userList.count) {
+                        let pagination = {
+                            current: 1,
+                            total: userList.count
+                        };
+                        await getTablePage(pagination);
+                    }
                     await getTreeModal(false);
                 }
             } else {
@@ -139,7 +147,14 @@ export default class Tree extends Component {
                     await changeSidebarField('node', orgTreeData);
                     const codes = Tree.collect(orgTreeData);
                     console.log('codes', codes);
-                    await getUsers({}, { org_code: codes, page: 1 });
+                    let userList = await getUsers({}, { org_code: codes, page: 1 });
+                    if (userList && userList.count) {
+                        let pagination = {
+                            current: 1,
+                            total: userList.count
+                        };
+                        await getTablePage(pagination);
+                    }
                     await getTreeModal(false);
                 }
             }

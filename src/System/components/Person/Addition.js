@@ -1018,15 +1018,6 @@ class Addition extends Component {
                                                 ''
                                             )}
                                         </Col>
-                                        {/* <Col span={6}>
-											{user.is_superuser ?
-												<FormItem {...Addition.layoutY} label="关联用户">
-													<Switch checked={addition.id ? addition.change_all : false}
-														onChange={this.changeChange_all.bind(this)}
-														// onChange={changeAdditionField.bind(this, 'change_all')}
-													/>
-												</FormItem> : ''}
-										</Col> */}
                                         <Col span={16}>
                                             {user.is_superuser ? (
                                                 <FormItem
@@ -1249,40 +1240,6 @@ class Addition extends Component {
             section
         } = this.state;
         const roles = addition.roles || [];
-        // 取消身份证照片限制
-        // if (!addition.id_image || !addition.id_image.length) {
-        //     if (!this.props.postUploadFilesNums) {
-        //         message.warn('请上传身份证正面照片');
-        //         return;
-        //     }
-        //     if (!this.props.postUploadNegatives) {
-        //         message.warn('请上传身份证反面照片');
-        //         return;
-        //     }
-        // } else {
-        //     if (
-        //         !this.props.postUploadFilesNums &&
-        //         !addition.id_image[0].filepath
-        //     ) {
-        //         message.warn('请上传身份证正面照片');
-        //         return;
-        //     }
-        //     if (this.state.btnf === false) {
-        //         message.warn('请上传身份证正面照片');
-        //         return;
-        //     }
-        //     if (
-        //         !this.props.postUploadNegatives &&
-        //         !addition.id_image[1].filepath
-        //     ) {
-        //         message.warn('请上传身份证反面照片');
-        //         return;
-        //     }
-        //     if (this.state.btns === false) {
-        //         message.warn('请上传身份证反面照片');
-        //         return;
-        //     }
-        // }
         if (this.props.fileList) {
             addition.person_avatar_url = this.props.fileList;
         } else {
@@ -1294,7 +1251,6 @@ class Addition extends Component {
             addition.relative_signature_url = addition.relative_signature_url;
         }
         let blacksa = null;
-        let actives;
         if (this.state.checkedBtn === true) {
             if (addition.is_black === true) {
                 addition.is_active = false;
@@ -1333,36 +1289,8 @@ class Addition extends Component {
                 }
             });
         }
-        // 取消身份证照片限制
-        // let UploadFilesNums;
-        // let UploadNegatives;
-
         let imgBtnZ = true;
-        // 取消身份证照片限制
-        // if (this.state.btnf === false && !this.props.postUploadFilesNums) {
-        //     UploadFilesNums = null;
-        //     imgBtnZ = false;
-        // } else if (this.state.btnf === true && this.props.postUploadFilesNums) {
-        //     UploadFilesNums = this.props.postUploadFilesNums;
-        //     // addition.id_image=[]
-        //     imgBtnZ = false;
-        // } else {
-        //     UploadFilesNums = addition.id_image[0];
-        //     imgBtnZ = false;
-        // }
-
         let imgBtnF = true;
-        // 取消身份证照片限制
-        // if (this.state.btns === false && !this.props.postUploadNegatives) {
-        //     UploadNegatives = null;
-        //     imgBtnF = false;
-        // } else if (this.state.btns === true && this.props.postUploadNegatives) {
-        //     UploadNegatives = this.props.postUploadNegatives;
-        //     imgBtnF = false;
-        // } else {
-        //     UploadNegatives = addition.id_image[1];
-        //     imgBtnF = false;
-        // }
         if (!imgBtnZ) {
             this.setState({ btnf: true });
         }
