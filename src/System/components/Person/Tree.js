@@ -55,7 +55,8 @@ export default class Tree extends Component {
                 getOrgTreeSelect,
                 getOrgTreeByCode,
                 getOrgTreeDataArr,
-                getTablePage
+                getTablePage,
+                getTreeCode
             }
         } = this.props;
         try {
@@ -131,6 +132,7 @@ export default class Tree extends Component {
                     // 作为选中的节点，将机构的数据上传至redux
                     await changeSidebarField('node', first);
                     const codes = Tree.collect(first);
+                    await getTreeCode(codes);
                     let userList = await getUsers({}, { org_code: codes, page: 1 });
                     if (userList && userList.count) {
                         let pagination = {
@@ -146,7 +148,7 @@ export default class Tree extends Component {
                     // 作为选中的节点，将机构的数据上传至redux
                     await changeSidebarField('node', orgTreeData);
                     const codes = Tree.collect(orgTreeData);
-                    console.log('codes', codes);
+                    await getTreeCode(codes);
                     let userList = await getUsers({}, { org_code: codes, page: 1 });
                     if (userList && userList.count) {
                         let pagination = {
@@ -179,7 +181,6 @@ export default class Tree extends Component {
             orgTreeArrList,
             permission
         } = this.state;
-        console.log('orgTreeArrList', orgTreeArrList);
         const { code } = node || {};
         return (
             <SimpleTree

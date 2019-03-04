@@ -400,6 +400,12 @@ class Addition extends Component {
         }
     }
 
+    componentDidMount () {
+        const {
+            actions: { getRoles }
+        } = this.props;
+        getRoles();
+    }
     componentDidUpdate (prevProps, prevState) {
         const {
             sidebar,
@@ -1148,12 +1154,6 @@ class Addition extends Component {
         return units;
     }
 
-    componentDidMount () {
-        const {
-            actions: { getRoles }
-        } = this.props;
-        getRoles();
-    }
     // 设置部门的code和pk
     handleOrgName (value) {
         const {
@@ -1251,6 +1251,7 @@ class Addition extends Component {
             addition.relative_signature_url = addition.relative_signature_url;
         }
         let blacksa = null;
+        let actives;
         if (this.state.checkedBtn === true) {
             if (addition.is_black === true) {
                 addition.is_active = false;
@@ -1578,10 +1579,6 @@ class Addition extends Component {
     };
     static layoutT = {
         labelCol: { span: 18 },
-        wrapperCol: { span: 6 }
-    };
-    static layoutY = {
-        labelCol: { span: 14 },
         wrapperCol: { span: 6 }
     };
     static layoutR = {

@@ -259,7 +259,6 @@ class Users extends Component {
         this.setState({ TreeCodes: this.props.getTreeCodes });
         if (this.state.TreeCodes !== this.props.getTreeCodes) {
             // 在重新选择树节点之后，将页数进行修改
-            console.log('sssssssssssss');
             this.setState({
                 searchRoles: [],
                 searchUserStatus: '',
@@ -267,6 +266,7 @@ class Users extends Component {
                 searchKeyword: ''
             });
         }
+        console.log('nextProps.platform.users', nextProps.platform.users);
         if (nextProps.platform.users) {
             this.setState({
                 dataList: nextProps.platform.users
@@ -863,6 +863,7 @@ class Users extends Component {
     }
     // 用户编辑按钮
     edit (user, event) {
+        console.log('user', user);
         if (user.is_black === 1 || user.is_black === true) {
             message.warn('用户已加入黑名单,不可编辑');
             return;
@@ -893,8 +894,8 @@ class Users extends Component {
         resetAdditionField({
             visible: true,
             roles: groups.map(group => String(group.id)),
-            ...user
-            // ...account,
+            ...user,
+            ...user.account
         });
     }
     // 单个用户的删除功能
