@@ -355,6 +355,7 @@ class Tablelevel extends Component {
             name: fileList[0].name.split('.')[0]
         }, formdata).then(rep => {
             rep = JSON.parse(rep);
+            // 解析文件失败
             if (rep.errorinfo) {
                 message.error(rep.errorinfo);
                 this.setState({
@@ -364,29 +365,30 @@ class Tablelevel extends Component {
                 }, () => {
                     return;
                 });
+            } else {
+                rep.features.map((item, index) => {
+                    item.key = index;
+                });
+                this.dataList = rep.features;
+                console.log('最初数据', this.dataList);
+                let newDataListKey = [];
+                this.dataList.map(item => {
+                    if (item.Section === this.userSection) {
+                        newDataListKey.push(item.key);
+                    }
+                });
+                this.setState({
+                    confirmLoading: false,
+                    indexBtn: 0,
+                    page: 1,
+                    total: this.dataList.length,
+                    newDataListKey,
+                    dataList: this.dataList.slice(0, 10)
+                }, () => {
+                    // 隐藏弹框
+                    this.handleCancel();
+                });
             }
-            rep.features.map((item, index) => {
-                item.key = index;
-            });
-            this.dataList = rep.features;
-            console.log('最初数据', this.dataList);
-            let newDataListKey = [];
-            this.dataList.map(item => {
-                if (item.Section === this.userSection) {
-                    newDataListKey.push(item.key);
-                }
-            });
-            this.setState({
-                confirmLoading: false,
-                indexBtn: 0,
-                page: 1,
-                total: this.dataList.length,
-                newDataListKey,
-                dataList: this.dataList.slice(0, 10)
-            }, () => {
-                // 隐藏弹框
-                this.handleCancel();
-            });
         });
     }
     handleCancel () {
