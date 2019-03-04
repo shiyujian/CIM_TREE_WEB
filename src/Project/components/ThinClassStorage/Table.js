@@ -14,19 +14,21 @@ class Tablelevel extends Component {
         super(props);
         this.state = {
             dataList: [], // 每页的数据
+            newDataList: [], // 查询后每页数据
             showModal: false,
             record: {}, // 行数据
             indexBtn: 1, // 是否为上传细班选项
             fileList: [], // 上传的文件列表
-            newDataListKey: [], // 可以上传的数据选项
+            selectKey: [], // 选中的可上传细班
             page: 1,
             total: 0,
             confirmLoading: false, // 是否允许取消
-            number: '',
+            number: '', // 细班编号
             areaLayerList: [], // 区域地块图层list
             spinning: false // 加载中
         };
         this.dataList = []; // 所有的暂存数据
+        this.newDataList = []; // 筛选后数据
         this.userSection = ''; // 用户所属标段
         this.onSearch = this.onSearch.bind(this); // 查询细班
         this.handleNumber = this.handleNumber.bind(this); // 细班编号
@@ -126,7 +128,7 @@ class Tablelevel extends Component {
         ).addTo(this.map);
     }
     render () {
-        const { dataList, total, page, confirmLoading, spinning, newDataListKey } = this.state;
+        const { dataList, newDataList, total, page, confirmLoading, spinning, selectKey } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log('定位过去');
@@ -136,16 +138,16 @@ class Tablelevel extends Component {
                 if (selected) {
                     // 增加
                     if (record.Section === this.userSection) {
-                        newDataListKey.push(record.key);
+                        selectKey.push(record.key);
                     }
                 } else {
                     // 减少
-                    let index = newDataListKey.indexOf(record.key);
-                    newDataListKey.splice(index, 1);
+                    let index = selectKey.indexOf(record.key);
+                    selectKey.splice(index, 1);
                 }
             },
             hideDefaultSelections: true,
-            selectedRowKeys: newDataListKey
+            selectedRowKeys: selectKey
         };
         const propsUpload = {
             name: 'file',
@@ -177,9 +179,9 @@ class Tablelevel extends Component {
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 700, float: 'left'}}>
                         <Spin spinning={spinning}>
-                            <Table rowSelection={rowSelection} columns={this.columns} dataSource={dataList} pagination={false} />
+                            <Table rowSelection={rowSelection} columns={this.columns} dataSource={newDataList.length === 0 ? dataList : newDataList} pagination={false} />
                         </Spin>
-                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
+                        <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
                     </div>
                     {/* 地图 */}
                     <div style={{marginLeft: 620, height: 700, overflow: 'hidden', border: '3px solid #ccc'}}>
@@ -270,27 +272,52 @@ class Tablelevel extends Component {
         const { number } = this.state;
         if (!number) {
             this.setState({
-                dataList: this.dataList.slice(0, 10)
+                newDataList: []
+            });
+        } else {
+            // 查询之后
+            let newDataList = [];
+            this.dataList.map(item => {
+                if (item.ThinClass === number) {
+                    newDataList.push(item);
+                }
+            });
+            this.newDataList = newDataList;
+            console.log('查询后数据', this.newDataList);
+            this.setState({
+                newDataList: this.newDataList.slice(0, 10),
+                total: this.newDataList.length,
+                page: 1
             });
         }
-        this.dataList.map(item => {
-            if (item.ThinClass === number) {
-                this.setState({
-                    dataList: [item]
-                });
-            }
-        });
+    }
+    handlePage (page) {
+        console.log('换页', page);
+        let index = page - 1;
+        if (this.state.number) {
+            console.log('新数据');
+            this.setState({
+                page,
+                newDataList: this.newDataList.slice(index * 10, index * 10 + 10)
+            });
+        } else {
+            console.log('老数据');
+            this.setState({
+                page,
+                dataList: this.dataList.slice(index * 10, index * 10 + 10)
+            });
+        }
     }
     onPutStorage () {
         this.setState({
             spinning: true
         });
         let pro = [];
-        const { newDataListKey } = this.state;
+        const { selectKey } = this.state;
         console.log('所有数据', this.dataList);
         this.dataList.map(item => {
             // 入库选中的数据
-            newDataListKey.map(row => {
+            selectKey.map(row => {
                 if (item.key === row) {
                     pro.push({
                         no: item.ThinClass,
@@ -371,10 +398,10 @@ class Tablelevel extends Component {
                 });
                 this.dataList = rep.features;
                 console.log('最初数据', this.dataList);
-                let newDataListKey = [];
+                let selectKey = [];
                 this.dataList.map(item => {
                     if (item.Section === this.userSection) {
-                        newDataListKey.push(item.key);
+                        selectKey.push(item.key);
                     }
                 });
                 this.setState({
@@ -382,7 +409,7 @@ class Tablelevel extends Component {
                     indexBtn: 0,
                     page: 1,
                     total: this.dataList.length,
-                    newDataListKey,
+                    selectKey,
                     dataList: this.dataList.slice(0, 10)
                 }, () => {
                     // 隐藏弹框
@@ -400,12 +427,6 @@ class Tablelevel extends Component {
             showModal: false,
             fileList: [],
             record: {}
-        });
-    }
-    handlePage (page) {
-        page = page - 1;
-        this.setState({
-            dataList: this.dataList.slice(page * 10, page * 10 + 10)
         });
     }
 }
