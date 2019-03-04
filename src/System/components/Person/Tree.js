@@ -1,84 +1,9 @@
 import React, { Component } from 'react';
 import SimpleTree from '_platform/components/panels/SimpleTree';
 import { TreeSelect } from 'antd';
-import {getCompanyDataByOrgCode} from '_platform/auth';
+import {getCompanyDataByOrgCode, addGroup} from '_platform/auth';
 import {ORG_NURSERY_CODE, ORG_SUPPLIER_CODE} from '_platform/api';
 const TreeNode = TreeSelect.TreeNode;
-const addGroup = (childrenList, str) => {
-    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
-    const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));
-    const regionCode_name = JSON.parse(window.sessionStorage.getItem('regionCode_name'));
-    if (str === '供应商') {
-        childrenList.map(item => {
-            item.RegionCode = supplier_regionCode[item.code];
-            if (regionCode_name[item.RegionCode]) {
-                const regionNameArr = regionCode_name[item.RegionCode].split(',');
-                item.province = regionNameArr[1];
-                item.city = regionNameArr[2];
-                item.county = regionNameArr[3];
-            }
-        });
-    } else {
-        childrenList.map(item => {
-            item.RegionCode = nursery_regionCode[item.code];
-            if (regionCode_name[item.RegionCode]) {
-                const regionNameArr = regionCode_name[item.RegionCode].split(',');
-                item.province = regionNameArr[1];
-                item.city = regionNameArr[2];
-                item.county = regionNameArr[3];
-            }
-        });
-    }
-    let provinceArr = [];
-    childrenList.map(item => {
-        if (!provinceArr.includes(item.province)) {
-            provinceArr.push(item.province);
-        }
-    });
-    let newChildren = [];
-    provinceArr.map((item) => {
-        let cityArr = [];
-        childrenList.map(row => {
-            if (item === row.province && !cityArr.includes(row.city)) {
-                cityArr.push(row.city);
-            }
-        });
-        let provinceChildren = [];
-        cityArr.map((row) => {
-            let cityChildren = [];
-            let countyArr = [];
-            childrenList.map(record => {
-                if (row === record.city && !countyArr.includes(record.county)) {
-                    countyArr.push(record.county);
-                }
-            });
-            countyArr.map(record => {
-                let countyChildren = [];
-                childrenList.map(ite => {
-                    if (row === ite.city && record === ite.county) {
-                        countyChildren.push(ite);
-                    }
-                });
-                cityChildren.push({
-                    name: record || '其他',
-                    code: str + item + row + record,
-                    children: countyChildren
-                });
-            });
-            provinceChildren.push({
-                name: row || '其他',
-                code: str + item + row,
-                children: cityChildren
-            });
-        });
-        newChildren.push({
-            name: item || '其他',
-            code: str + item,
-            children: provinceChildren
-        });
-    });
-    return newChildren;
-};
 
 export default class Tree extends Component {
     static propTypes = {};
@@ -129,16 +54,21 @@ export default class Tree extends Component {
                 getTreeModal,
                 getOrgTreeSelect,
                 getOrgTreeByCode,
-                getOrgTreeDataArr
+                getOrgTreeDataArr,
+                getTablePage,
+                getTreeCode
             }
         } = this.props;
         try {
             const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+            // 管理员可以查看全部，其他人只能查看自己公司
             let permission = false;
+            // 施工文书可以查看苗圃基地和供应商
+            let isClericalStaff = false;
             let groups = user.groups || [];
             groups.map((group) => {
-                if (group.name.indexOf('业主') !== -1) {
-                    permission = true;
+                if (group.name.indexOf('施工文书') !== -1) {
+                    isClericalStaff = true;
                 }
             });
             if (user.username === 'admin') {
@@ -152,6 +82,7 @@ export default class Tree extends Component {
             if (user && user.username !== 'admin') {
                 // 获取登录用户的公司的信息
                 let org_code = user.account.org_code;
+                // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
                 let parentOrgData = await getCompanyDataByOrgCode(org_code, getOrgTreeByCode);
                 let parentOrgCode = parentOrgData.code;
                 // 获取公司线下的所有部门信息
@@ -164,25 +95,28 @@ export default class Tree extends Component {
                 // 将公司的部门的code全部进行存储
                 await this.orgArrLoop([orgTreeData], 0);
                 await getOrgTreeDataArr(this.orgTreeDataArr);
-
-                let nurseryData = await getOrgTreeByCode({code: ORG_NURSERY_CODE});
-                let supplierData = await getOrgTreeByCode({code: ORG_SUPPLIER_CODE});
-                orgTreeArrList.push(nurseryData);
-                orgTreeArrList.push(supplierData);
-                orgTreeArrList.map(item => {
-                    if (item.name === '供应商') {
-                        item.children = addGroup(item.children, '供应商');
-                    } else if (item.name === '苗圃基地') {
-                        item.children = addGroup(item.children, '苗圃基地');
-                    }
-                });
-
+                // 如果是施工文书，需要获取苗木基地和供应商，对这两种机构下的人进行审核
+                if (isClericalStaff) {
+                    let nurseryData = await getOrgTreeByCode({code: ORG_NURSERY_CODE});
+                    let supplierData = await getOrgTreeByCode({code: ORG_SUPPLIER_CODE});
+                    orgTreeArrList.push(nurseryData);
+                    orgTreeArrList.push(supplierData);
+                    orgTreeArrList.map(item => {
+                        if (item.name === '供应商') {
+                            item.children = addGroup(item.children, '供应商');
+                        } else if (item.name === '苗圃基地') {
+                            item.children = addGroup(item.children, '苗圃基地');
+                        }
+                    });
+                }
                 this.setState({
                     orgTreeArrList
                 });
             }
+            // 如果是管理员，获取全部数据
             if (permission) {
                 let rst = await getOrgTree({}, {depth: 7});
+                // 对苗圃基地和供应商按照区号进行省份和地区的划分
                 if (rst && rst.children) {
                     rst.children.map(item => {
                         if (item.name === '供应商') {
@@ -195,22 +129,46 @@ export default class Tree extends Component {
                 }
                 const { children: [first] = [] } = rst || {};
                 if (first) {
+                    // 作为选中的节点，将机构的数据上传至redux
                     await changeSidebarField('node', first);
                     const codes = Tree.collect(first);
-                    await getUsers({}, { org_code: codes, page: 1 });
+                    await getTreeCode(codes);
+                    let userList = await getUsers({}, { org_code: codes, page: 1 });
+                    if (userList && userList.count) {
+                        let pagination = {
+                            current: 1,
+                            total: userList.count
+                        };
+                        await getTablePage(pagination);
+                    }
                     await getTreeModal(false);
                 }
             } else {
                 if (orgTreeData && orgTreeData.pk) {
+                    // 作为选中的节点，将机构的数据上传至redux
                     await changeSidebarField('node', orgTreeData);
                     const codes = Tree.collect(orgTreeData);
-                    console.log('codes', codes);
-                    await getUsers({}, { org_code: codes, page: 1 });
+                    await getTreeCode(codes);
+                    let userList = await getUsers({}, { org_code: codes, page: 1 });
+                    if (userList && userList.count) {
+                        let pagination = {
+                            current: 1,
+                            total: userList.count
+                        };
+                        await getTablePage(pagination);
+                    }
                     await getTreeModal(false);
                 }
             }
         } catch (e) {
             console.log('componentDidMount', e);
+        }
+    }
+
+    componentDidUpdate () {
+        const { childList, listVisible } = this.state;
+        if (childList && childList.length > 0 && listVisible) {
+            this.setListStore();
         }
     }
 
@@ -223,7 +181,6 @@ export default class Tree extends Component {
             orgTreeArrList,
             permission
         } = this.state;
-        console.log('orgTreeArrList', orgTreeArrList);
         const { code } = node || {};
         return (
             <SimpleTree
@@ -246,6 +203,21 @@ export default class Tree extends Component {
         });
     }
 
+    // 将项目分为二维数组，以项目的个数来划分
+    getList (data = []) {
+        const { childList } = this.state;
+        return data.map((item, index) => {
+            childList[index] = [];
+            if (item.children && item.children.length) {
+                childList[index].push({
+                    code: item.code,
+                    name: item.name
+                });
+                this.getChildrenArr(item.children, childList[index]);
+            }
+        });
+    }
+
     // 获取项目下的所有节点的名字和code
     getChildrenArr (data = [], List = []) {
         return data.map(item => {
@@ -263,27 +235,6 @@ export default class Tree extends Component {
                 });
             }
         });
-    }
-    // 将项目分为二维数组，以项目的个数来划分
-    getList (data = []) {
-        const { childList } = this.state;
-        return data.map((item, index) => {
-            childList[index] = [];
-            if (item.children && item.children.length) {
-                childList[index].push({
-                    code: item.code,
-                    name: item.name
-                });
-                this.getChildrenArr(item.children, childList[index]);
-            }
-        });
-    }
-
-    componentDidUpdate () {
-        const { childList, listVisible } = this.state;
-        if (childList && childList.length > 0 && listVisible) {
-            this.setListStore();
-        }
     }
 
     select = async (s, node) => {
@@ -320,10 +271,10 @@ export default class Tree extends Component {
             const codes = Tree.collect(topProject);
 
             await getTreeCode(codes);
-            let e = await getUsers({}, { org_code: codes, page: 1 });
+            let userList = await getUsers({}, { org_code: codes, page: 1 });
             let pagination = {
                 current: 1,
-                total: e.count
+                total: userList.count
             };
             await getTreeModal(false);
             await setUpdate(true);
@@ -405,7 +356,7 @@ export default class Tree extends Component {
             }
         });
     };
-    // 设置登录用户所在公司的所有部门选项数组
+    // 设置登录用户所在公司的所有部门作为选项数组
     orgArrLoop (data = [], loopTimes = 0) {
         try {
             if (data.length === 0) {
