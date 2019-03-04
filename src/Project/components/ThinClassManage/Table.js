@@ -92,7 +92,11 @@ class Tablelevel extends Component {
                 title: '操作',
                 dataIndex: 'action',
                 render: (text, record, index) => {
-                    return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
+                    if (this.userSection === record.Section) {
+                        return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
+                    } else {
+                        return '';
+                    }
                 }
             }
         ];
@@ -114,7 +118,8 @@ class Tablelevel extends Component {
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
-            console.log('nextProps', nextProps.leftkeycode);
+            console.log('nextProps', nextProps.sectionList);
+            console.log('userSection', this.userSection);
             this.setState({
                 section: '',
                 number: '',
@@ -241,14 +246,22 @@ class Tablelevel extends Component {
             }, {
                 title: '操作',
                 key: '4',
-                render: (text, rec, index) => {
-                    if (index === 0) {
-                        return <a onClick={this.onSavePlan.bind(this, rec)}>保存</a>;
+                render: (text, record, index) => {
+                    console.log(this.userSection, '用户所属');
+                    console.log(record, '行数据');
+                    if (this.userSection === record.Section) {
+                        // 可编辑
+                        if (index === 0) {
+                            return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
+                        } else {
+                            return <span>
+                                <a onClick={this.onUpdatePlan.bind(this, record)}>更新</a>
+                                <a onClick={this.onDeletePlan.bind(this, record)} style={{marginLeft: 10}}>删除</a>
+                            </span>;
+                        }
                     } else {
-                        return <span>
-                            <a onClick={this.onUpdatePlan.bind(this, rec)}>更新</a>
-                            <a onClick={this.onDeletePlan.bind(this, rec)} style={{marginLeft: 10}}>删除</a>
-                        </span>;
+                        // 不可编辑
+                        return '';
                     }
                 }
             }];

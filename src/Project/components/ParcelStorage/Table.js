@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
-import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
+import { getUser, formItemLayout } from '_platform/auth';
 import {
     fillAreaColor,
     getCoordsArr,
@@ -13,21 +13,22 @@ class Tablelevel extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            dataList: [],
-            newDataList: [],
+            dataList: [], // 单页数据
+            newDataList: [], // 查询后每页数据
             showModal: false,
             record: {},
             indexBtn: 1,
             fileList: [],
             page: 1,
             total: 0,
-            section: '',
+            section: '', // 搜索条件-地块编号
             confirmLoading: false,
             areaLayerList: [], // 区域地块图层list
             spinning: false // 加载中
         };
         this.dataList = []; // 暂存数据
-        this.newDataList = [];
+        this.userSection = ''; // 用户所属标段
+        this.newDataList = []; // 筛选后的数据
         this.onSearch = this.onSearch.bind(this); // 查询地块
         this.handleSection = this.handleSection.bind(this); // 地块编号
         this.handlePage = this.handlePage.bind(this);
@@ -51,19 +52,19 @@ class Tablelevel extends Component {
                 key: '2',
                 title: '标段',
                 dataIndex: 'Section'
-            },
-            {
-                key: '6',
-                title: '操作',
-                dataIndex: 'action',
-                render: (text, record, index) => {
-                    return (
-                        <div>
-                            <a onClick={this.onEdit.bind(this, record)}>编辑</a>
-                        </div>
-                    );
-                }
             }
+            // {
+            //     key: '6',
+            //     title: '操作',
+            //     dataIndex: 'action',
+            //     render: (text, record, index) => {
+            //         return (
+            //             <div>
+            //                 <a onClick={this.onEdit.bind(this, record)}>编辑</a>
+            //             </div>
+            //         );
+            //     }
+            // }
         ];
     }
     WMSTileLayerUrl = window.config.WMSTileLayerUrl;
@@ -74,6 +75,8 @@ class Tablelevel extends Component {
     componentDidMount () {
         // 初始化地图
         this.initMap();
+        let userData = getUser();
+        this.userSection = userData.sections.slice(2, -2);
     }
     initMap () {
         // 基础设置
@@ -150,7 +153,7 @@ class Tablelevel extends Component {
                         <Spin spinning={spinning}>
                             <Table rowSelection={rowSelection} columns={this.columns} dataSource={newDataList.length === 0 ? dataList : newDataList} pagination={false} />
                         </Spin>
-                        <Pagination style={{float: 'right', marginTop: 10}} defaultCurrent={page} total={total} onChange={this.handlePage.bind(this)} />
+                        <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} />
                     </div>
                     {/* 地图 */}
                     <div style={{marginLeft: 620, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
@@ -237,35 +240,42 @@ class Tablelevel extends Component {
     }
     onSearch () {
         const { section } = this.state;
-        console.log(section);
-        console.log(this.dataList);
         if (!section) {
+            // 没条件
             this.setState({
                 newDataList: []
             });
-            return;
+        } else {
+            // 查询之后
+            this.dataList.map(item => {
+                if (section === item.Section) {
+                    this.newDataList.push(item);
+                }
+            });
+            this.setState({
+                newDataList: this.newDataList.slice(0, 10),
+                total: this.newDataList.length,
+                page: 1
+            });
         }
-        this.dataList.map(item => {
-            if (section === item.Section) {
-                this.newDataList.push(item);
-            }
-        });
-        console.log(this.newDataList);
-
-        this.setState({
-            newDataList: this.newDataList
-        });
+    }
+    handlePage (page) {
+        let index = page - 1;
+        if (this.state.section) {
+            this.setState({
+                page,
+                newDataList: this.newDataList.slice(index * 10, index * 10 + 10)
+            });
+        } else {
+            this.setState({
+                page,
+                dataList: this.dataList.slice(index * 10, index * 10 + 10)
+            });
+        }
     }
     handleSection (e) {
         this.setState({
             section: e.target.value
-        });
-    }
-    handlePage (page) {
-        console.log(page, 'page');
-        page = page - 1;
-        this.setState({
-            dataList: this.dataList.slice(page * 10, page * 10 + 10)
         });
     }
     onAdd () {
@@ -302,7 +312,7 @@ class Tablelevel extends Component {
                     dataList: [],
                     indexBtn: 1,
                     spinning: false
-                })
+                });
             }
         });
     }
@@ -329,28 +339,26 @@ class Tablelevel extends Component {
                     confirmLoading: false,
                     fileList: [],
                     showModal: false
+                });
+            } else {
+                rep.features.map((item, index) => {
+                    item.key = index;
+                });
+                this.dataList = rep.features;
+                console.log(this.userSection, '123');
+                console.log(this.dataList);
+                this.setState({
+                    confirmLoading: false,
+                    indexBtn: 0,
+                    page: 1,
+                    total: this.dataList.length,
+                    dataList: this.dataList.slice(0, 10)
                 }, () => {
-                    return;
-                })
+                    // 隐藏弹框
+                    this.handleCancel();
+                });
             }
-            rep.features.map((item, index) => {
-                item.key = index;
-            });
-            this.dataList = rep.features;
-            this.setState({
-                confirmLoading: false,
-                indexBtn: 0,
-                page: 1,
-                total: this.dataList.length,
-                dataList: this.dataList.slice(0, 10)
-            }, () => {
-                // 隐藏弹框
-                this.handleCancel();
-            });
         });
-    }
-    onEdit () {
-        
     }
 }
 
