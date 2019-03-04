@@ -326,7 +326,8 @@ class Tablelevel extends Component {
                         num: item.Num, // 细班计划种植数量
                         area: item.Area, // 面积
                         Level: item.Spec, // 规格
-                        coords: item.Geom // WKT格式item.Geom
+                        coords: item.Geom, // WKT格式item.Geom
+                        TCNo: item.TCNo // 细班唯一顺序属性
                     });
                 }
             });
