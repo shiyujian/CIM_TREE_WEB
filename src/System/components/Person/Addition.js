@@ -9,9 +9,7 @@ import {
     message,
     Upload,
     Icon,
-    Button,
-    Switch,
-    TreeSelect
+    Button
 } from 'antd';
 import { getUserIsDocument } from '../../../_platform/auth';
 import {getSectionNameBySection} from '_platform/gisAuth';

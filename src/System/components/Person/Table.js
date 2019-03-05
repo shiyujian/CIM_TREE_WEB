@@ -712,7 +712,7 @@ class Users extends Component {
         }
     }
     // 删除用户
-    remove () {
+    remove = async () => {
         if (this.state.selectedRowKeys.length === 0) {
             message.warn('请选择需要删除的数据！');
         } else {
@@ -725,22 +725,21 @@ class Users extends Component {
             this.selectedCodes.map(userId => {
                 actionArr.push(deleteUser({ userID: userId }));
             });
-            Promise.all(actionArr).then((rst) => {
-                let code = 1;
-                rst.map(item => {
-                    if (!item.code === 1) {
-                        code = 0;
-                    }
-                });
-                if (code === 1) {
-                    message.success('批量删除成功');
+            let rst = await Promise.all(actionArr);
+            let code = 1;
+            rst.map(item => {
+                if (!item.code === 1) {
+                    code = 0;
                 }
-                const pager = { ...getTablePages };
-                this.setState({
-                    selectedRowKeys: []
-                });
-                this.search(pager.current || 1);
             });
+            if (code === 1) {
+                message.success('批量删除成功');
+            }
+            const pager = { ...getTablePages };
+            this.setState({
+                selectedRowKeys: []
+            });
+            await this.search(pager.current || 1);
         }
     }
     // 关闭审核弹窗
@@ -792,7 +791,7 @@ class Users extends Component {
         });
     }
     // 禁用或启用
-    disable (user, event) {
+    disable = async (user, event) => {
         const {
             sidebar: { node } = {},
             actions: { putUser }
@@ -815,50 +814,47 @@ class Users extends Component {
             const element = user.groups[j];
             groupe.push(element.id);
         }
-        putUser(
-            {},
-            {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                account: {
-                    person_name: user.person_name,
-                    person_type: 'C_PER',
-                    person_avatar_url: user.person_avatar_url || '',
-                    person_signature_url: user.person_signature_url || '',
-                    organization: {
-                        pk: node.pk,
-                        code: user.org_code,
-                        obj_type: 'C_ORG',
-                        rel_type: 'member',
-                        name: user.organization
-                    }
-                },
-                tags: user.tags || [],
-                sections: user.sections,
-                // groups: [7],
-                groups: groupe,
-                is_active: actives,
-                // black_remark: user.black_remark,
-                id_num: user.id_num,
-                // is_black: userblack,
-                id_image: user.id_image,
-                basic_params: {
-                    info: {
-                        电话: user.person_telephone || '',
-                        性别: user.gender || '',
-                        技术职称: user.title || '',
-                        phone: user.person_telephone || '',
-                        sex: user.gender || '',
-                        duty: ''
-                    }
-                },
-                extra_params: {},
-                title: user.title || ''
-            }
-        ).then(rst => {
-            this.forceUpdate();
-        });
+        let putUserPostData = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            account: {
+                person_name: user.person_name,
+                person_type: 'C_PER',
+                person_avatar_url: user.person_avatar_url || '',
+                person_signature_url: user.person_signature_url || '',
+                organization: {
+                    pk: node.pk,
+                    code: user.org_code,
+                    obj_type: 'C_ORG',
+                    rel_type: 'member',
+                    name: user.organization
+                }
+            },
+            tags: user.tags || [],
+            sections: user.sections,
+            // groups: [7],
+            groups: groupe,
+            is_active: actives,
+            // black_remark: user.black_remark,
+            id_num: user.id_num,
+            // is_black: userblack,
+            id_image: user.id_image,
+            basic_params: {
+                info: {
+                    电话: user.person_telephone || '',
+                    性别: user.gender || '',
+                    技术职称: user.title || '',
+                    phone: user.person_telephone || '',
+                    sex: user.gender || '',
+                    duty: ''
+                }
+            },
+            extra_params: {},
+            title: user.title || ''
+        };
+        await putUser({}, putUserPostData);
+        await this.forceUpdate();
     }
     // 用户编辑按钮
     edit (user, event) {
