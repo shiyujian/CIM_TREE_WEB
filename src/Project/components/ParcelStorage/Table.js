@@ -313,6 +313,8 @@ class Tablelevel extends Component {
                     indexBtn: 1,
                     spinning: false
                 });
+            } else {
+                message.error('操作失败，请联系管理员查找失败原因');
             }
         });
     }

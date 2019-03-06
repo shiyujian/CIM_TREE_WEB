@@ -135,10 +135,13 @@ class Tablelevel extends Component {
                 this.onLocation(selectedRows);
             },
             onSelect: (record, selected) => {
+                console.log('选择');
                 if (selected) {
                     // 增加
                     if (record.Section === this.userSection) {
                         selectKey.push(record.key);
+                    } else {
+                        message.error('勾选失败，当前用户所属标段与该细班所属标段不符');
                     }
                 } else {
                     // 减少
@@ -270,9 +273,13 @@ class Tablelevel extends Component {
     }
     onSearch () {
         const { number } = this.state;
+        console.log('查询条件', number);
         if (!number) {
             this.setState({
-                newDataList: []
+                newDataList: [],
+                dataList: this.dataList.slice(0, 10),
+                page: 1,
+                total: this.dataList.length
             });
         } else {
             // 查询之后
@@ -284,11 +291,18 @@ class Tablelevel extends Component {
             });
             this.newDataList = newDataList;
             console.log('查询后数据', this.newDataList);
-            this.setState({
-                newDataList: this.newDataList.slice(0, 10),
-                total: this.newDataList.length,
-                page: 1
-            });
+            if (this.newDataList.length === 0) {
+                this.setState({
+                    newDataList: [],
+                    dataList: []
+                });
+            } else {
+                this.setState({
+                    newDataList: this.newDataList.slice(0, 10),
+                    total: this.newDataList.length,
+                    page: 1
+                });
+            }
         }
     }
     handlePage (page) {
@@ -324,10 +338,10 @@ class Tablelevel extends Component {
                         treetype: item.TreeType,
                         Section: item.Section,
                         num: item.Num, // 细班计划种植数量
-                        area: item.Area, // 面积
+                        area: item.Area || '', // 面积
                         Level: item.Spec, // 规格
                         coords: item.Geom, // WKT格式item.Geom
-                        TCNo: item.TCNo // 细班唯一顺序属性
+                        TCNo: item.TCNo || '' // 细班唯一顺序属性
                     });
                 }
             });
@@ -335,7 +349,7 @@ class Tablelevel extends Component {
         const { importThinClass } = this.props.actions;
         console.log(pro);
         if (pro.length === 0) {
-            message.error('没有可供入库的数据');
+            message.error('请从以下列表，勾选你要上传的数据');
             this.setState({
                 spinning: false
             });
@@ -350,6 +364,8 @@ class Tablelevel extends Component {
                         indexBtn: 1,
                         spinning: false
                     });
+                } else {
+                    message.error('操作失败，请联系管理员查找失败原因');
                 }
             });
         }
@@ -394,6 +410,7 @@ class Tablelevel extends Component {
                     return;
                 });
             } else {
+                message.success('数据导入成功，已默认勾选可以的入库的数据');
                 rep.features.map((item, index) => {
                     item.key = index;
                 });
