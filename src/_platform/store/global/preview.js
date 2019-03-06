@@ -6,9 +6,6 @@ export const closeLoading = createAction('关闭loading效果');
 export default handleActions(
     {
         [openPreview]: (state, { payload }) => {
-            console.log('state', state);
-            console.log('payload', payload);
-            console.log('getFileData(payload)', getFileData(payload));
             return {
                 ...state,
                 ...getFileData(payload)

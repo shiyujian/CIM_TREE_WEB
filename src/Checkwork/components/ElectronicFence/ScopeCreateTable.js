@@ -337,7 +337,6 @@ export default class ScopeCreateTable extends Component {
             areaTreeLoading,
             checkGroupsData = []
         } = this.props;
-        console.log('groupTreeLoading', groupTreeLoading);
         if (option && option.value) {
             switch (option.value) {
                 // 区域地块

@@ -172,7 +172,6 @@ export default class GeneralTable extends Component {
 
         } else {
             const filed = file.basic_params.files[0];
-            console.log('filed', filed);
             openPreview(filed);
         }
     }
