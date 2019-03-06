@@ -25,7 +25,8 @@ export default class Datum extends Component {
             actions: { getTaskPerson }
         } = this.props;
         let user = getUser();
-        let datas = await getTaskPerson({ userid: user.id });
+        let datas = [];
+        datas = await getTaskPerson({ userid: user.id }, {pagination: true, page: 1});
         let workflowData = [];
         if (datas && datas instanceof Array && datas.length > 0) {
             datas.map(data => {

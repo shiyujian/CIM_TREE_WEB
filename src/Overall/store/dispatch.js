@@ -19,7 +19,7 @@ export const postUploadFilesAc = createAction(`${ID}上传的文件列表`);
 // 获取组织机构列表
 export const getOrgListAcOK = createAction(`${ID}获取组织机构列表`);
 export const getOrgListAc = createFetchActionT(
-    `${SERVICE_API}/org-tree/?depth=3`,
+    `${SERVICE_API}/org-tree/?depth=7`,
     [getOrgListAcOK]
 );
 // 获取抄送的人员列表

@@ -12,11 +12,19 @@ export default class DelDirPanel extends Component {
 
     onDeleteDir () {
         let {
-            actions: { removeDir, refreshPanelTo, getworkTree },
+            actions: {
+                removeDir,
+                refreshPanelTo,
+                getworkTree,
+                setcurrentcode,
+                setcurrentpk
+            },
             currentcode = {}
         } = this.props;
         console.log(currentcode);
         removeDir({ code: currentcode }).then(() => {
+            setcurrentcode({});
+            setcurrentpk({});
             getworkTree({ code: Datumcode }).then(() => {
                 console.log('miao!');
             });
@@ -36,7 +44,7 @@ export default class DelDirPanel extends Component {
                 console.log(toDeleteDir.name);
                 return toDeleteDir.name;
             } else {
-                if (rst.children.length !== 0) {
+                if (rst && rst.children && rst.children.length !== 0) {
                     return rst.children.map((rst1, index1) => {
                         if (rst1.code === currentcode) {
                             let toDeleteDir = rst1;

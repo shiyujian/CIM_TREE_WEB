@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-05 15:03:45
+ * @Last Modified time: 2019-03-06 09:49:39
  */
 /**
  *
@@ -102,6 +102,9 @@ export const STATIC_UPLOAD_API = `${STATIC_FILE_IP}:${
 }`;
 export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
     window.config.STATIC_DOWNLOAD_PORT
+}`;
+export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
+    window.config.STATIC_PREVIEW_PORT
 }`;
 export const modelServerAddress = `${STATIC_FILE_IP}:${
     window.config.STATIC_PREVIEW_PORT
@@ -213,7 +216,6 @@ export const UPLOADFILE_API =
 // 视频监控
 // 三维全景
 // 720云预览API
-export const VIDEO_PLUGIN_URL = window.config.Video_PLUGIN_URL;
 export const Panorama_Root = window.config.PANORAMAGRAM_LOC_CODE;
 export const Video360_API = window.config.Video360_API;
 export const Video360_API2 = window.config.Video360_API2;
@@ -283,8 +285,10 @@ export const FORM_WORKFLOW = [
 export const DEFAULT_PROJECT = 'P191';
 // admin登录林总接口所用的账号
 export const FOREST_LOGIN_DATA = {
-    phone: 'zhaozz99',
-    pwd: '666666'
+    // phone: 'zhaozz99',
+    // pwd: '666666'
+    phone: 'zhaozz1010',
+    pwd: '130718'
 };
 
 export const ORG_NURSERY_CODE = 'ORG_NURSERY';

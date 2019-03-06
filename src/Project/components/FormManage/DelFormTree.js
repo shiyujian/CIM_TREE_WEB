@@ -12,11 +12,19 @@ export default class DelFormTree extends Component {
 
     onDeleteDir () {
         let {
-            actions: { removeDir, refreshPanelTo, getworkTree },
+            actions: {
+                removeDir,
+                refreshPanelTo,
+                getworkTree,
+                setcurrentcode,
+                setcurrentpk
+            },
             currentcode = {}
         } = this.props;
         console.log(currentcode);
         removeDir({ code: currentcode }).then(() => {
+            setcurrentcode({});
+            setcurrentpk({});
             getworkTree({ code: Datumcode }).then(() => {
                 console.log('miao!');
             });
