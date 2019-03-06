@@ -2,7 +2,7 @@ import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
 import moment from 'moment';
 // import createFetchAction from 'fetch-action';
-import { MAIN_API, SERVICE_API } from '_platform/api';
+import { MAIN_API } from '_platform/api';
 const ID = 'home';
 // 获取新闻列表
 export const getNewsListOK = createAction('home获取新闻列表');
@@ -18,21 +18,14 @@ export const getTipsList = createFetchAction(
     [getTipsListOK]
 );
 
-export const getDatumListOK = createAction(`${ID}_getDatumList`);
-export const getDatumList = createFetchAction(`${SERVICE_API}/recentdocs/`, [
-    getDatumListOK
-]);
 export const setnewdoc = createAction(`${ID}_setnewdoc`);
 
 export const setTabActive = createAction('home设置当前选中的tab');
 export const actions = {
     getNewsListOK,
     getNewsList,
-    getDatumListOK,
-    getDatumList,
     setnewdoc,
     setTabActive,
-
     getTipsListOK,
     getTipsList
 };
@@ -42,10 +35,6 @@ export default handleActions(
         [getNewsListOK]: (state, { payload }) => ({
             ...state,
             newsList: payload
-        }),
-        [getDatumListOK]: (state, { payload }) => ({
-            ...state,
-            Doc: payload.result
         }),
         [setnewdoc]: (state, { payload }) => ({
             ...state,
