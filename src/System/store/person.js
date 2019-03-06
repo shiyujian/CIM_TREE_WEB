@@ -19,31 +19,33 @@ const getOrgTreeSelect = createAction(`${ID}获取组织机构TreeSelect`);
 const getOrgTreeDataArr = createAction(`${ID}获取登录用户所在公司的所有部门的code数组`);
 
 // 设置上传的文件列表
-export const postUploadFilesImg = createAction('xhy设置上传的文件列表');
+export const postUploadFilesImg = createAction(`${ID}xhy设置上传的文件列表`);
 
 // 设置上传的用户签名
-export const postUploadAutograph = createAction('设置上传的用户签名');
+export const postUploadAutograph = createAction(`${ID}设置上传的用户签名`);
 
 // 控制只能上传一张用户照片签名
-export const getAutographBtn = createAction('控制只能上传一张用户照片签名');
+export const getAutographBtn = createAction(`${ID}控制只能上传一张用户照片签名`);
 
 // 设置上传的身份证正面照片
-export const postUploadFilesNum = createAction('设置上传的身份证照片');
+export const postUploadFilesNum = createAction(`${ID}设置上传的身份证照片`);
 // 设置上传的身份证反面照片
-export const postUploadNegative = createAction('设置上传的身份证反面照片');
+export const postUploadNegative = createAction(`${ID}设置上传的身份证反面照片`);
 
 // 控制只能上传一张用户照片
-export const getImgBtn = createAction('控制只能上传一张用户照片');
+export const getImgBtn = createAction(`${ID}控制只能上传一张用户照片`);
 // 控制只能上传一张身份证正面照片
-export const getImgNumBtn = createAction('控制只能上传一张身份证正面照片');
+export const getImgNumBtn = createAction(`${ID}控制只能上传一张身份证正面照片`);
 
 // 控制只能上传一张身份证反面照片
-export const getImgNegative = createAction('控制只能上传一张身份证反面照片');
+export const getImgNegative = createAction(`${ID}控制只能上传一张身份证反面照片`);
 
 // 编辑时如果有照片就显示照片
-export const getImgArr = createAction('编辑时如果有照片就显示照片');
+export const getImgArr = createAction(`${ID}编辑时如果有照片就显示照片`);
 // 黑名单控制开关
-export const getSwitch = createAction('黑名单控制开关');
+export const getSwitch = createAction(`${ID}黑名单控制开关`);
+// 编辑人员Visible
+export const changeEditUserVisible = createAction(`${ID}编辑人员Visible`);
 
 const getTags = forestFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 const checkUsers = forestFetchAction(`${FOREST_API}/system/checksuser`, [], 'POST'); // 审核用户
@@ -80,6 +82,7 @@ export const actions = {
     postUploadFilesNum,
     getImgNumBtn,
     getSwitch,
+    changeEditUserVisible,
     postUploadAutograph,
     getAutographBtn,
     postUploadNegative,
@@ -164,6 +167,10 @@ export default handleActions({
     [getSwitch]: (state, {payload}) => ({
         ...state,
         getSwitchBtn: payload
+    }),
+    [changeEditUserVisible]: (state, {payload}) => ({
+        ...state,
+        editUserVisible: payload
     }),
     [postUploadAutograph]: (state, {payload}) => ({
         ...state,

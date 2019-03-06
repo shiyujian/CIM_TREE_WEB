@@ -27,7 +27,7 @@ window.config = {
     // //升级后的植树测试基础服务域名
     // 'DOMAIN': 'http://47.96.136.67:6530',
     // 林总用户接口地址
-    SDOMAIN: 'http://47.104.159.127',
+    SDOMAIN: 'http://39.97.163.176',
     // 林总图片新接口
     ALIIMG: 'https://xatree-1.oss-cn-qingdao.aliyuncs.com',
     // 静态文件存储服务IP
@@ -58,7 +58,7 @@ window.config = {
     // 高德地图逆地理编码
     LBSAMAP: 'https://restapi.amap.com',
     // 腾讯移动分析
-    TENCENTANALYSIS: 'http://47.104.159.127',
+    TENCENTANALYSIS: 'http://39.97.163.176',
 
     // 领导带班服务,安全监测动态加载模板
     Leader_Class_URL: 'http://10.215.160.38:6592',
@@ -86,13 +86,13 @@ window.config = {
         // 'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
         'http://t{s}.tianditu.gov.cn/vec_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=vec&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=87c942f4f4a2b17270f52f797df4537c',
 
-    IMG_1: 'http://47.104.159.127:200/1',
-    IMG_2: 'http://47.104.159.127:200/2',
-    IMG_3: 'http://47.104.159.127:200/3',
-    IMG_4: 'http://47.104.159.127:200/4',
-    IMG_5: 'http://47.104.159.127:200/5',
-    IMG_6: 'http://47.104.159.127:200/6',
-    IMG_7: 'http://47.104.159.127:200/7',
+    IMG_1: 'http://39.97.163.176:200/1',
+    IMG_2: 'http://39.97.163.176:200/2',
+    IMG_3: 'http://39.97.163.176:200/3',
+    IMG_4: 'http://39.97.163.176:200/4',
+    IMG_5: 'http://39.97.163.176:200/5',
+    IMG_6: 'http://39.97.163.176:200/6',
+    IMG_7: 'http://39.97.163.176:200/7',
 
     // 视频监控插件下载配置
     Video_PLUGIN_URL:

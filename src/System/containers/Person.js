@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions } from '../store/person';
 import { actions as platformActions } from '_platform/store/global';
-import { Tree, Table, Addition } from '../components/Person';
+import { Tree, Table, Addition, Edit } from '../components/Person';
 
 @connect(
     state => {
@@ -32,6 +32,7 @@ export default class Person extends Component {
                     <Table {...this.props} />
                 </Content>
                 <Addition {...this.props} />
+                <Edit {...this.props} />
             </div>
         );
     }

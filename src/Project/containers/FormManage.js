@@ -87,9 +87,6 @@ export default class FormManage extends Component {
     };
 
     selectMaterialDir (value = [], node) {
-        console.log('value', value);
-        console.log('node', node);
-        console.log(node);
         let data = node.node.props.data[0].children
             ? node.node.props.data[0].children
             : 'undefined';
@@ -110,9 +107,9 @@ export default class FormManage extends Component {
             actions: { setcurrentcode, savecode, setcurrentpk, refreshPanelTo }
         } = this.props;
         if (code === undefined) {
-            setcurrentcode(code);
-            setcurrentpk(code);
-            savecode(code);
+            setcurrentcode({});
+            setcurrentpk({});
+            savecode({});
             refreshPanelTo('NOR');
         } else {
             console.log(code.split('--')[1]);
@@ -127,7 +124,8 @@ export default class FormManage extends Component {
             // platform: {dir: {list = [],} = {}} = {},
             worktree = [],
             adddelpanel = 'NOR',
-            keycode = []
+            keycode = [],
+            currentcode
         } = this.props;
         console.log('keycode', keycode);
         const { hadSelectDir } = this.state;
@@ -148,9 +146,9 @@ export default class FormManage extends Component {
                     >
                         <Button
                             style={
-                                this.state.depth === '3'
-                                    ? this.state.hidden
-                                    : this.state.show
+                                (this.state.depth !== '3' || JSON.stringify(currentcode) === '{}')
+                                    ? this.state.show
+                                    : this.state.hidden
                             }
                             onClick={() => {
                                 refreshPanelTo('ADD');

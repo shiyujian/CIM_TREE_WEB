@@ -277,6 +277,7 @@ export default class Dataimport extends Component {
         }
     }
     onDownloadClick () {
+        console.log('download', download);
         window.open(download);
     }
 }

@@ -10,7 +10,7 @@ import {
     Upload
 } from 'antd';
 import './PersonModify.less';
-import { STATIC_UPLOAD_API } from '_platform/api';
+import { STATIC_UPLOAD_API, STATIC_PREVIEW_API } from '_platform/api';
 
 const { Option, OptGroup } = Select;
 const FormItem = Form.Item;
@@ -73,9 +73,7 @@ class PersonModify extends Component {
                 .split('/')
                 .pop();
             const avatar_url =
-                window.config.STATIC_FILE_IP +
-                ':' +
-                window.config.STATIC_PREVIEW_PORT +
+                STATIC_PREVIEW_API +
                 '/media' +
                 addition.account.person_avatar_url;
             fileList = [
@@ -98,9 +96,7 @@ class PersonModify extends Component {
                 .split('/')
                 .pop();
             const avatar_url3 =
-                window.config.STATIC_FILE_IP +
-                ':' +
-                window.config.STATIC_PREVIEW_PORT +
+                STATIC_PREVIEW_API +
                 '/media' +
                 addition.account.person_signature_url;
             fileList1 = [
@@ -123,9 +119,7 @@ class PersonModify extends Component {
                 // filepath: STATIC_DOWNLOAD_API + "/media" + file.file.response.download_url.split('/media')[1]
                 const id_img = addition.id_image[0].filepath.split('/media')[1];
                 const id_imgs =
-                    window.config.STATIC_FILE_IP +
-                    ':' +
-                    window.config.STATIC_PREVIEW_PORT +
+                    STATIC_PREVIEW_API +
                     '/media' +
                     id_img;
                 id_image_url = id_imgs || addition.id_image[0].thumbUrl;
@@ -148,9 +142,7 @@ class PersonModify extends Component {
             if (addition.id_image[1].name && addition.id_image[1].filepath) {
                 const id_img = addition.id_image[1].filepath.split('/media')[1];
                 const id_imgs =
-                    window.config.STATIC_FILE_IP +
-                    ':' +
-                    window.config.STATIC_PREVIEW_PORT +
+                    STATIC_PREVIEW_API +
                     '/media' +
                     id_img;
                 id_image_urlName1 = addition.id_image[1].name;

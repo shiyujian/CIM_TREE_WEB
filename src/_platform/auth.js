@@ -477,3 +477,79 @@ export const getDefaultProject = async () => {
         console.log('getUserIsManager', e);
     }
 };
+// 对苗圃基地和供应商按照行政区划进行划分
+export const addGroup = (childrenList, str) => {
+    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
+    const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));
+    const regionCode_name = JSON.parse(window.sessionStorage.getItem('regionCode_name'));
+    if (str === '供应商') {
+        childrenList.map(item => {
+            item.RegionCode = supplier_regionCode[item.code];
+            if (regionCode_name[item.RegionCode]) {
+                const regionNameArr = regionCode_name[item.RegionCode].split(',');
+                item.province = regionNameArr[1];
+                item.city = regionNameArr[2];
+                item.county = regionNameArr[3];
+            }
+        });
+    } else {
+        childrenList.map(item => {
+            item.RegionCode = nursery_regionCode[item.code];
+            if (regionCode_name[item.RegionCode]) {
+                const regionNameArr = regionCode_name[item.RegionCode].split(',');
+                item.province = regionNameArr[1];
+                item.city = regionNameArr[2];
+                item.county = regionNameArr[3];
+            }
+        });
+    }
+    let provinceArr = [];
+    childrenList.map(item => {
+        if (!provinceArr.includes(item.province)) {
+            provinceArr.push(item.province);
+        }
+    });
+    let newChildren = [];
+    provinceArr.map((item) => {
+        let cityArr = [];
+        childrenList.map(row => {
+            if (item === row.province && !cityArr.includes(row.city)) {
+                cityArr.push(row.city);
+            }
+        });
+        let provinceChildren = [];
+        cityArr.map((row) => {
+            let cityChildren = [];
+            let countyArr = [];
+            childrenList.map(record => {
+                if (row === record.city && !countyArr.includes(record.county)) {
+                    countyArr.push(record.county);
+                }
+            });
+            countyArr.map(record => {
+                let countyChildren = [];
+                childrenList.map(ite => {
+                    if (row === ite.city && record === ite.county) {
+                        countyChildren.push(ite);
+                    }
+                });
+                cityChildren.push({
+                    name: record || '其他',
+                    code: str + item + row + record,
+                    children: countyChildren
+                });
+            });
+            provinceChildren.push({
+                name: row || '其他',
+                code: str + item + row,
+                children: cityChildren
+            });
+        });
+        newChildren.push({
+            name: item || '其他',
+            code: str + item,
+            children: provinceChildren
+        });
+    });
+    return newChildren;
+};

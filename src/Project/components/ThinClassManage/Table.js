@@ -5,7 +5,7 @@ import {
     getCoordsArr,
     handleCoordinates
 } from '../auth';
-import { formItemLayout } from '_platform/auth';
+import { formItemLayout, getUser } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 window.config = window.config || {};
@@ -16,6 +16,7 @@ class Tablelevel extends Component {
         this.state = {
             leftkeycode: '', // 项目
             dataList: [],
+            selectedRowKeysList: [], // 选中的细班列表
             sectionList: [], // 标段列表
             section: '', // 标段
             dataListHistory: [], // 历史数据列表
@@ -40,6 +41,7 @@ class Tablelevel extends Component {
         };
         this.treeTypeList = []; // 所有树种类型
         this.dataList = []; // 暂存数据
+        this.userSection = ''; // 用户所属标段
         this.onSearch = this.onSearch.bind(this); // 查询细班
         this.onEdit = this.onEdit.bind(this); // 编辑
         this.handleSection = this.handleSection.bind(this); // 标段
@@ -90,7 +92,11 @@ class Tablelevel extends Component {
                 title: '操作',
                 dataIndex: 'action',
                 render: (text, record, index) => {
-                    return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
+                    if (this.userSection === record.Section) {
+                        return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
+                    } else {
+                        return '';
+                    }
                 }
             }
         ];
@@ -101,6 +107,8 @@ class Tablelevel extends Component {
         2: window.config.VEC_W
     };
     componentDidMount () {
+        let userData = getUser();
+        this.userSection = userData.sections.slice(2, -2);
         // 初始化地图
         this.initMap();
         // 获取历史数据
@@ -110,8 +118,11 @@ class Tablelevel extends Component {
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
-            console.log(nextProps, 'nextProps');
+            console.log('nextProps', nextProps.sectionList);
+            console.log('userSection', this.userSection);
             this.setState({
+                section: '',
+                number: '',
                 leftkeycode: nextProps.leftkeycode,
                 sectionList: nextProps.sectionList
             }, () => {
@@ -166,7 +177,7 @@ class Tablelevel extends Component {
     getDataHistory () {
         const { getDataimports } = this.props.actions;
         getDataimports({}, {
-            section: '',
+            section: this.userSection,
             datatype: 'thinclass',
             stime: '',
             etime: '',
@@ -181,12 +192,15 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan } = this.state;
+        const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan, selectedRowKeysList } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
-                console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+                this.setState({
+                    selectedRowKeysList: selectedRowKeys
+                });
                 this.onLocation(selectedRows);
-            }
+            },
+            selectedRowKeys: selectedRowKeysList
         };
         // 子表格
         let expandedRowRender = (record) => {
@@ -232,14 +246,22 @@ class Tablelevel extends Component {
             }, {
                 title: '操作',
                 key: '4',
-                render: (text, rec, index) => {
-                    if (index === 0) {
-                        return <a onClick={this.onSavePlan.bind(this, rec)}>保存</a>;
+                render: (text, record, index) => {
+                    console.log(this.userSection, '用户所属');
+                    console.log(record, '行数据');
+                    if (this.userSection === record.Section) {
+                        // 可编辑
+                        if (index === 0) {
+                            return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
+                        } else {
+                            return <span>
+                                <a onClick={this.onUpdatePlan.bind(this, record)}>更新</a>
+                                <a onClick={this.onDeletePlan.bind(this, record)} style={{marginLeft: 10}}>删除</a>
+                            </span>;
+                        }
                     } else {
-                        return <span>
-                            <a onClick={this.onUpdatePlan.bind(this, rec)}>更新</a>
-                            <a onClick={this.onDeletePlan.bind(this, rec)} style={{marginLeft: 10}}>删除</a>
-                        </span>;
+                        // 不可编辑
+                        return '';
                     }
                 }
             }];
@@ -252,7 +274,7 @@ class Tablelevel extends Component {
                 <div>
                     <Form layout='inline'>
                         <FormItem label='标段'>
-                            <Select style={{ width: 120 }} onChange={this.handleSection.bind(this)} allowClear>
+                            <Select style={{ width: 120 }} value={section} onChange={this.handleSection.bind(this)} allowClear>
                                 {
                                     sectionList.map(item => {
                                         return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -261,7 +283,7 @@ class Tablelevel extends Component {
                             </Select>
                         </FormItem>
                         <FormItem label='细班编号'>
-                            <Input style={{width: 200}} onChange={this.handleNumber.bind(this)} />
+                            <Input style={{width: 200}} value={number} onChange={this.handleNumber.bind(this)} />
                         </FormItem>
                         <FormItem>
                             <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
@@ -278,10 +300,10 @@ class Tablelevel extends Component {
                                 columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
                                 onExpand={this.handleExpanded.bind(this)} />
                         </Spin>
-                        <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} />
+                        <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
                     </div>
                     {/* 地图 */}
-                    <div style={{marginLeft: 620, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
+                    <div style={{marginLeft: 670, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
                         <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
@@ -318,7 +340,7 @@ class Tablelevel extends Component {
                                 onSearch={this.handleSearch.bind(this)}>
                                 {
                                     treeTypeList.length > 0 ? treeTypeList.map(item => {
-                                        return <Option value={item.TreeTypeName} key={item.TreeTypeName}>{item.TreeTypeName}</Option>;
+                                        return <Option value={item.ID} key={item.ID}>{item.TreeTypeName}</Option>;
                                     }) : []
                                 }
                             </Select>
@@ -335,8 +357,15 @@ class Tablelevel extends Component {
         );
     }
     handleTreeTypeForm (value) {
+        let treetype = '';
+        this.state.treeTypeList.map(item => {
+            if (item.ID === value) {
+                treetype = item.TreeTypeName;
+            };
+        });
         this.setState({
-            treetype: value
+            treeTypeList: this.treeTypeList,
+            treetype: treetype
         });
     }
     handleNumberForm (e) {
@@ -350,7 +379,6 @@ class Tablelevel extends Component {
         });
     }
     onEdit (record) {
-        console.log('record', record);
         this.setState({
             area: record.area,
             treetype: record.treetype,
@@ -360,9 +388,8 @@ class Tablelevel extends Component {
         });
     }
     handleOk () {
-        const { newRecordData, recordData, treetype, num, area } = this.state;
+        const { recordData, treetype, num, area } = this.state;
         const { postThinclass } = this.props.actions;
-        console.log('123', newRecordData, recordData);
         postThinclass({}, {
             Section: recordData.Section,
             no: recordData.no,
@@ -378,11 +405,12 @@ class Tablelevel extends Component {
                 }, () => {
                     this.onSearch();
                 });
+            } else {
+                message.error('操作失败，请联系管理员查找失败原因');
             }
         });
     }
     handleSection (value) {
-        console.log(value);
         this.setState({
             section: value
         });
@@ -458,6 +486,8 @@ class Tablelevel extends Component {
                     expandedRowKeys: [],
                     dataListPlan: []
                 });
+            } else {
+                message.error('操作失败，请联系管理员查找失败原因');
             }
         });
     }
@@ -475,6 +505,8 @@ class Tablelevel extends Component {
                     expandedRowKeys: [],
                     dataListPlan: []
                 });
+            } else {
+                message.error('操作失败，请联系管理员查找失败原因');
             }
         });
     }
@@ -490,6 +522,8 @@ class Tablelevel extends Component {
                     expandedRowKeys: [],
                     dataListPlan: []
                 });
+            } else {
+                message.error('操作失败，请联系管理员查找失败原因');
             }
         });
     }
@@ -523,18 +557,17 @@ class Tablelevel extends Component {
             }
         });
         this.setState({
+            treeTypeList: this.treeTypeList,
             dataListPlan
         });
     };
     handleSearch (value) {
         let treeTypeList = [];
-        console.log(this.treeType);
         this.treeTypeList.map(item => {
             if (item.TreeTypeName.includes(value)) {
                 treeTypeList.push(item);
             }
         });
-        console.log('treeTypeList', treeTypeList);
         this.setState({
             treeTypeList
         });
@@ -555,10 +588,10 @@ class Tablelevel extends Component {
             rep.content.map((item, index) => {
                 item.key = index;
             });
-            console.log('rep.content', rep.content);
             if (rep.code === 200) {
                 this.setState({
                     dataList: rep.content,
+                    selectedRowKeysList: [],
                     total: rep.pageinfo && rep.pageinfo.total,
                     page: rep.pageinfo && rep.pageinfo.page,
                     spinning: false
@@ -577,13 +610,18 @@ class Tablelevel extends Component {
             id: ID
         }, {}).then(rep => {
             if (rep.code === 1) {
-                message.success('该次上传的数据已全部删除');
+                message.success('该次上传的数据已全部删除，请刷新网页获取最新数据');
+            } else {
+                message.error('删除失败，请联系管理员查找失败原因');
             }
             this.getDataHistory();
+            this.onSearch();
         });
     }
     handleOkHistory () {
-        this.handleCancel();
+        this.setState({
+            showModalHistory: false
+        });
     }
     handleCancel () {
         this.setState({
@@ -603,7 +641,6 @@ class Tablelevel extends Component {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
                     let treearea = handleCoordinates(str);
-                    console.log('treearea', treearea);
                     coordinatesArr.push(treearea);
                 }
             };

@@ -9,12 +9,13 @@ import {
     message,
     Upload,
     Icon,
-    Button
+    Button,
+    Switch,
+    TreeSelect
 } from 'antd';
 import { getUserIsDocument } from '../../../_platform/auth';
 import {getSectionNameBySection} from '_platform/gisAuth';
 import { UPLOAD_API, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API, STATIC_PREVIEW_API } from '../../../_platform/api';
-import { Promise } from 'es6-promise';
 let fileTypes =
     'application/jpeg,application/gif,application/png,image/jpeg,image/gif,image/png,image/jpg';
 
@@ -22,27 +23,7 @@ window.config = window.config || {};
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 
-const RealName = (addition) => {
-    return new Promise((resolve) => {
-        fetch(`http://idcert.market.alicloudapi.com/idcard?idCard=${addition.id_num}&name=${addition.person_name}`, {
-            headers: {
-                'Authorization': 'APPCODE ' + 'c091fa7360bc48ff87a3471f028d5645'
-            }
-        }).then(rep => {
-            return rep.json();
-        }).then(rst => {
-            if (rst.status === '01') {
-                message.success('实名认证通过');
-                resolve();
-            } else {
-                message.warning('实名认证失败，请确认信息是否正确');
-            }
-        });
-    });
-};
-
-// export default class Addition extends Component {
-class Addition extends Component {
+class Edit extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -53,7 +34,9 @@ class Addition extends Component {
             newKey: Math.random(),
             idImgF: true,
             idImgZ: true,
+            isBlackChecked: null, // 黑名单按键
             change_alValue: null,
+            black_remarkValue: null,
             section: ''
         };
     }
@@ -316,7 +299,6 @@ class Addition extends Component {
             let newFileList = file.file.response.download_url.split(
                 '/media'
             )[1];
-            // postUploadVideo(newFileList)
             getAutographBtn(true);
             postUploadAutograph(newFileList);
         }
@@ -328,7 +310,6 @@ class Addition extends Component {
             let { percent } = event;
             if (percent !== undefined) {
             }
-            // this.setState({ progress: parseFloat(percent.toFixed(1)) });
         }
     }
     // 上传身份证正面照片
@@ -336,10 +317,8 @@ class Addition extends Component {
         const status = file.file.status;
         const {
             actions: { postUploadFilesNum, getImgNumBtn }
-            // postUploadFilesNums = []
         } = this.props;
         if (status === 'done') {
-            // let newFileList = postUploadFilesNums;
             let newFile = {
                 name: file.file.name,
                 filepath:
@@ -367,10 +346,8 @@ class Addition extends Component {
         const status = file.file.status;
         const {
             actions: { postUploadNegative, getImgNegative }
-            // postUploadNegatives = []
         } = this.props;
         if (status === 'done') {
-            // let newFileList = postUploadNegatives;
             let newFile = {
                 name: file.file.name,
                 filepath:
@@ -404,14 +381,13 @@ class Addition extends Component {
     componentDidUpdate (prevProps, prevState) {
         const {
             sidebar,
-            addition,
+            editUserVisible,
             isSection,
             actions: { changeAdditionField }
         } = this.props;
         if (
-            addition &&
-            addition.visible &&
-            addition.visible !== prevProps.addition.visible
+            editUserVisible &&
+            editUserVisible !== prevProps.editUserVisible
         ) {
             let node = sidebar && sidebar.node;
             if (!node) {
@@ -435,7 +411,9 @@ class Addition extends Component {
         const {
             form: { getFieldDecorator },
             addition = {},
+            editUserVisible,
             actions: { changeAdditionField },
+            orgTreeSelect = [],
             isSection = []
         } = this.props;
         const {
@@ -546,9 +524,9 @@ class Addition extends Component {
         }
         return (
             <div>
-                {addition.visible && (
+                {editUserVisible && (
                     <Modal
-                        title={'新增人员'}
+                        title={'编辑人员信息'}
                         visible
                         className='large-modal'
                         width='80%'
@@ -561,10 +539,15 @@ class Addition extends Component {
                             <Row gutter={24}>
                                 <Col span={12}>
                                     <FormItem
-                                        {...Addition.layout}
+                                        {...Edit.layout}
                                         label='用户名:'
                                     >
                                         {getFieldDecorator('UserName', {
+                                            initialValue: `${
+                                                addition.username
+                                                    ? addition.username
+                                                    : ''
+                                            }`,
                                             rules: [
                                                 {
                                                     required: true,
@@ -574,19 +557,21 @@ class Addition extends Component {
                                             ]
                                         })(
                                             <Input
+                                                readOnly
                                                 placeholder='请输入用户名'
-                                                onChange={changeAdditionField.bind(
-                                                    this,
-                                                    'username'
-                                                )}
                                             />
                                         )}
                                     </FormItem>
                                     <FormItem
-                                        {...Addition.layout}
+                                        {...Edit.layout}
                                         label='姓名:'
                                     >
                                         {getFieldDecorator('FullName', {
+                                            initialValue: `${
+                                                addition.person_name
+                                                    ? addition.person_name
+                                                    : ''
+                                            }`,
                                             rules: [
                                                 {
                                                     required: true,
@@ -595,19 +580,21 @@ class Addition extends Component {
                                             ]
                                         })(
                                             <Input
+                                                readOnly
                                                 placeholder='请输入姓名'
-                                                onChange={changeAdditionField.bind(
-                                                    this,
-                                                    'person_name'
-                                                )}
                                             />
                                         )}
                                     </FormItem>
                                     <FormItem
-                                        {...Addition.layout}
+                                        {...Edit.layout}
                                         label='性别:'
                                     >
                                         {getFieldDecorator('sexName', {
+                                            initialValue: `${
+                                                addition.gender
+                                                    ? addition.gender
+                                                    : ''
+                                            }`,
                                             rules: [
                                                 {
                                                     required: true,
@@ -629,10 +616,15 @@ class Addition extends Component {
                                         )}
                                     </FormItem>
                                     <FormItem
-                                        {...Addition.layout}
+                                        {...Edit.layout}
                                         label='身份证号码:'
                                     >
                                         {getFieldDecorator('idcard', {
+                                            initialValue: `${
+                                                addition.id_num
+                                                    ? addition.id_num
+                                                    : ''
+                                            }`,
                                             rules: [
                                                 {
                                                     required: true,
@@ -642,16 +634,13 @@ class Addition extends Component {
                                         })(
                                             <Input
                                                 placeholder='请输入身份证号码'
-                                                onChange={changeAdditionField.bind(
-                                                    this,
-                                                    'id_num'
-                                                )}
+                                                readOnly
                                             />
                                         )}
                                     </FormItem>
                                     {(user.is_superuser) ? (
                                         <FormItem
-                                            {...Addition.layout}
+                                            {...Edit.layout}
                                             label='部门编码'
                                         >
                                             <Input
@@ -664,29 +653,16 @@ class Addition extends Component {
                                         ''
                                     )}
                                     <FormItem
-                                        {...Addition.layout}
-                                        label='密码:'
+                                        {...Edit.layout}
+                                        label='密码'
                                     >
-                                        {getFieldDecorator('PassWord', {
-                                            rules: [
-                                                {
-                                                    required: true,
-                                                    message: '请输入密码，且不超过15位',
-                                                    max: 15
-                                                }
-                                            ]
-                                        })(
-                                            <Input
-                                                placeholder='请输入密码'
-                                                onChange={changeAdditionField.bind(
-                                                    this,
-                                                    'password'
-                                                )}
-                                            />
-                                        )}
+                                        <Input
+                                            disabled
+                                            placeholder='请输入密码'
+                                        />
                                     </FormItem>
 
-                                    <FormItem {...Addition.layout} label='标段'>
+                                    <FormItem {...Edit.layout} label='标段'>
                                         <Select
                                             placeholder='标段'
                                             value={
@@ -697,7 +673,6 @@ class Addition extends Component {
                                             onChange={this.changeSection.bind(
                                                 this
                                             )}
-                                            // mode='multiple'
                                             style={{ width: '100%' }}
                                         >
                                             {units
@@ -719,7 +694,6 @@ class Addition extends Component {
                                             name='file'
                                             multiple
                                             accept={fileTypes}
-                                            // showUploadList: false,
                                             action={UPLOAD_API}
                                             listType='picture'
                                             data={file => ({
@@ -758,7 +732,6 @@ class Addition extends Component {
                                             name='file'
                                             multiple
                                             accept={fileTypes}
-                                            // showUploadList: false,
                                             action={UPLOAD_API}
                                             listType='picture'
                                             data={file => ({
@@ -792,7 +765,7 @@ class Addition extends Component {
                                     </div>
                                 </Col>
                                 <Col span={12}>
-                                    <FormItem {...Addition.layout} label='邮箱'>
+                                    <FormItem {...Edit.layout} label='邮箱'>
                                         <Input
                                             placeholder='请输入邮箱'
                                             value={addition.email}
@@ -803,10 +776,15 @@ class Addition extends Component {
                                         />
                                     </FormItem>
                                     <FormItem
-                                        {...Addition.layout}
+                                        {...Edit.layout}
                                         label='手机号码:'
                                     >
                                         {getFieldDecorator('telephone', {
+                                            initialValue: `${
+                                                addition.person_telephone
+                                                    ? addition.person_telephone
+                                                    : ''
+                                            }`,
                                             rules: [
                                                 {
                                                     required: true,
@@ -815,19 +793,21 @@ class Addition extends Component {
                                             ]
                                         })(
                                             <Input
+                                                readOnly
                                                 placeholder='请输入手机号码'
-                                                onChange={changeAdditionField.bind(
-                                                    this,
-                                                    'person_telephone'
-                                                )}
                                             />
                                         )}
                                     </FormItem>
                                     <FormItem
-                                        {...Addition.layout}
+                                        {...Edit.layout}
                                         label='职务:'
                                     >
                                         {getFieldDecorator('titles', {
+                                            initialValue: `${
+                                                addition.title
+                                                    ? addition.title
+                                                    : ''
+                                            }`,
                                             rules: [
                                                 {
                                                     required: true,
@@ -848,10 +828,11 @@ class Addition extends Component {
                                         )}
                                     </FormItem>
                                     <FormItem
-                                        {...Addition.layout}
+                                        {...Edit.layout}
                                         label='角色:'
                                     >
                                         {getFieldDecorator('rolesNmae', {
+                                            initialValue: addition.roles,
                                             rules: [
                                                 {
                                                     required: true,
@@ -872,7 +853,6 @@ class Addition extends Component {
                                                 onChange={this.changeRoles.bind(
                                                     this
                                                 )}
-                                                // mode='multiple'
                                                 style={{ width: '100%' }}
                                             >
                                                 {this.renderContent()}
@@ -880,19 +860,89 @@ class Addition extends Component {
                                         )}
                                     </FormItem>
                                     {(user.is_superuser || userIsDocument) ? (
-                                        <FormItem
-                                            {...Addition.layout}
-                                            label='部门名称'
-                                        >
-                                            <Input
-                                                placeholder='部门名称'
-                                                value={addition.organizationName}
-                                                readOnly
-                                            />
-                                        </FormItem>
+                                        addition.id
+                                            ? (<FormItem
+                                                {...Edit.layout}
+                                                label='部门名称'
+                                            >
+                                                {getFieldDecorator('orgName', {
+                                                    initialValue: addition.organizationName,
+                                                    rules: [
+                                                        {
+                                                            required: true,
+                                                            message: '请选择部门'
+                                                        }
+                                                    ]
+                                                })(
+                                                    <TreeSelect
+                                                        showSearch
+                                                        treeDefaultExpandAll
+                                                        onChange={this.handleOrgName.bind(this)}
+                                                    >
+                                                        {orgTreeSelect}
+                                                    </TreeSelect>
+                                                )}
+
+                                            </FormItem>)
+                                            : (
+                                                <FormItem
+                                                    {...Edit.layout}
+                                                    label='部门名称'
+                                                >
+                                                    <Input
+                                                        placeholder='部门名称'
+                                                        value={addition.organizationName}
+                                                        readOnly
+                                                    />
+                                                </FormItem>
+                                            )
                                     ) : (
                                         ''
                                     )}
+                                    <Row>
+                                        <Col span={8}>
+                                            {user.is_superuser ? (
+                                                <FormItem
+                                                    {...Edit.layoutT}
+                                                    label='黑名单'
+                                                >
+                                                    <Switch
+                                                        checked={
+                                                            addition.id
+                                                                ? addition.is_black !==
+                                                                  0
+                                                                : false
+                                                        }
+                                                        onChange={this.changeblack.bind(
+                                                            this
+                                                        )}
+                                                    />
+                                                </FormItem>
+                                            ) : (
+                                                ''
+                                            )}
+                                        </Col>
+                                        <Col span={16}>
+                                            {user.is_superuser ? (
+                                                <FormItem
+                                                    {...Edit.layoutR}
+                                                    label='原因'
+                                                >
+                                                    <Input
+                                                        value={
+                                                            addition.black_remark
+                                                        }
+                                                        onChange={this.changeBlack_remark.bind(
+                                                            this
+                                                        )}
+                                                    />
+                                                </FormItem>
+                                            ) : (
+                                                ''
+                                            )}
+                                        </Col>
+                                    </Row>
+
                                     <div
                                         style={{
                                             marginLeft: '25%',
@@ -941,8 +991,6 @@ class Addition extends Component {
                                             name='file'
                                             multiple
                                             accept={fileTypes}
-                                            // className='form-item-required'
-                                            // showUploadList: false,
                                             action={UPLOAD_API}
                                             listType='picture'
                                             data={file => ({
@@ -988,7 +1036,6 @@ class Addition extends Component {
         } = this.props;
         let bigTreeList = tree.bigTreeList;
         let units = [];
-
         sections.map((section) => {
             let name = getSectionNameBySection(section, bigTreeList);
             units.push({
@@ -997,6 +1044,20 @@ class Addition extends Component {
             });
         });
         return units;
+    }
+
+    // 设置部门的code和pk
+    handleOrgName (value) {
+        const {
+            actions: { changeAdditionField }
+        } = this.props;
+        value = JSON.parse(value);
+        // 设置编辑人员时所选部门code
+        changeAdditionField('org_code', value && value.code);
+        // 设置编辑人员时所选部门名称
+        changeAdditionField('organizationName', value && value.name);
+        // 设置编辑人员时所选部门pk
+        changeAdditionField('organizationPk', value && value.pk);
     }
 
     changeRoles (value) {
@@ -1014,12 +1075,26 @@ class Addition extends Component {
         });
         changeAdditionField('sections', [value]);
     }
-    changeChange_all (value) {
+    changeblack (checked) {
         const {
             actions: { changeAdditionField }
         } = this.props;
-        this.setState({ change_alValue: value });
-        changeAdditionField('change_all', value);
+        this.setState({
+            isBlackChecked: checked
+        });
+        // 如果拉黑为true的话，则is_active就为false
+        changeAdditionField('is_black', checked);
+        changeAdditionField('is_active', !checked);
+    }
+    changeBlack_remark (value) {
+        const {
+            addition = {},
+            actions: { changeAdditionField }
+        } = this.props;
+        if (value !== addition.black_remark) {
+            this.setState({ black_remarkValue: value });
+            changeAdditionField('black_remark', value);
+        }
     }
 
     save = async () => {
@@ -1027,24 +1102,24 @@ class Addition extends Component {
             addition = {},
             sidebar: { node } = {},
             actions: {
-                postUser,
                 clearAdditionField,
                 getUsers,
                 postUploadFilesImg,
-                getImgBtn,
                 postUploadNegative,
-                getImgNegative,
-                getAutographBtn,
+                putUser,
+                getTablePage,
                 postUploadFilesNum,
-                getImgNumBtn,
+                getSwitch,
                 postUploadAutograph,
-                getTablePage
+                putUserBlackList,
+                changeEditUserVisible
             }
         } = this.props;
         const {
-            section
+            isBlackChecked
         } = this.state;
         const roles = addition.roles || [];
+        // 设置各个图片
         if (this.props.fileList) {
             addition.person_avatar_url = this.props.fileList;
         } else {
@@ -1055,43 +1130,46 @@ class Addition extends Component {
         } else {
             addition.relative_signature_url = addition.relative_signature_url;
         }
-        // addition.id_image = [UploadFilesNums, UploadNegatives];
         addition.id_image = [];
-        if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
-            message.warn('请输入英文字符、数字');
-        } else {
+        if (addition.id) {
             this.props.form.validateFields(async (err, values) => {
                 if (!err) {
-                    let postUserPostData = {
-                        is_person: true,
+                    // 拉黑处理
+                    if (isBlackChecked) {
+                        let blackPoseData = {
+                            is_black: isBlackChecked,
+                            change_all: true,
+                            black_remark: addition.black_remark
+                        };
+                        await putUserBlackList({ userID: addition.id }, blackPoseData);
+                    }
+                    // 修改人员信息
+                    let putUserPostData = {
+                        id: addition.id,
                         username: addition.username,
-                        email: addition.email || '',
-                        password: addition.password,
+                        email: addition.email,
                         account: {
-                            person_code: addition.code,
                             person_name: addition.person_name,
                             person_type: 'C_PER',
-                            person_avatar_url:
-                                this.props.fileList || '',
+                            person_avatar_url: this.props.fileList || '',
                             person_signature_url:
                                 this.props.postUploadAutographs || '',
                             organization: {
-                                pk: node.pk,
-                                code: node.code,
+                                pk: addition.organizationPk,
+                                code: addition.org_code,
                                 obj_type: 'C_ORG',
                                 rel_type: 'member',
-                                name: node.name
+                                name: addition.organizationName
                             }
                         },
                         tags: addition.tags || [],
-                        sections: addition.id
-                            ? addition.sections
-                            : [section],
+                        sections: addition.sections,
                         groups: roles.map(role => +role),
-                        is_active: true,
                         // black_remark: addition.black_remark,
+                        // change_all:addition.change_all,
+                        is_active: addition.is_active,
                         id_num: addition.id_num,
-                        // is_black: 0,
+                        // is_black: blacksa,
                         // 取消身份证照片限制
                         // id_image: [UploadFilesNums, UploadNegatives],
                         id_image: [],
@@ -1108,62 +1186,31 @@ class Addition extends Component {
                         extra_params: {},
                         title: addition.title || ''
                     };
-                    // 先进行实名认证再注册用户
-                    let realNameData = await RealName(addition);
-                    console.log('realNameData', realNameData);
-                    let userData = await postUser({}, postUserPostData);
+                    let userData = await putUser({}, putUserPostData);
                     if (userData.code === 1) {
-                        const msgs = JSON.parse(userData.msg);
-                        if (
-                            msgs.status === 400 &&
-                                    msgs.error === 'This id_num is blacklist'
-                        ) {
-                            message.warning('身份证号已经加入黑名单');
-                            return;
-                        } else {
-                            message.info('新增人员成功');
-                        }
-                        await clearAdditionField();
+                        message.info('修改人员成功');
+                        await getSwitch();
                         await postUploadFilesImg();
                         await postUploadFilesNum();
                         await postUploadNegative();
                         await postUploadAutograph();
-                        await getAutographBtn();
-                        await getImgBtn();
-                        await getImgNumBtn();
-                        await getImgNegative();
-                        const codes = Addition.collect(node);
-                        let paget = '';
-                        const totals = this.props.getTablePages.total;
-                        if (totals >= 9) {
-                            if (totals.toString().length > 1) {
-                                const strs1 = totals.toString();
-                                const strs2 = strs1.substring(
-                                    0,
-                                    strs1.length - 1
-                                );
-                                paget = strs2 * 1 + 1;
-                            } else {
-                                paget = 1;
-                            }
-                        } else {
-                            paget = 1;
-                        }
-                        let uerList = await getUsers({}, { org_code: codes, page: paget });
+                        await clearAdditionField();
+                        await changeEditUserVisible(false);
+                        // 之前不修改人员的部门   所以不需要重新获取人员列表 但是现在要修改部门   所以要重新获取人员列表
+                        const codes = node.code;
+                        let userList = await getUsers({}, { org_code: codes, page: 1 });
                         let pagination = {
-                            current: paget,
-                            total: uerList.count
+                            current: 1,
+                            total: userList.count
                         };
-                        getTablePage(pagination);
+                        await getTablePage(pagination);
                         this.setState({
-                            newKey: Math.random()
+                            newKey: Math.random(),
+                            isBlackChecked: null,
+                            black_remarkValue: null
                         });
                     } else {
-                        if (userData.code === 2) {
-                            message.warn('用户名已存在！');
-                        } else {
-                            message.warn('服务器端报错！');
-                        }
+                        message.warn('服务器端报错！');
                     }
                 }
             });
@@ -1178,7 +1225,8 @@ class Addition extends Component {
                 getImgNumBtn,
                 getSwitch,
                 getImgNegative,
-                getAutographBtn
+                getAutographBtn,
+                changeEditUserVisible
             }
         } = this.props;
         getImgBtn();
@@ -1186,8 +1234,10 @@ class Addition extends Component {
         getImgNegative();
         getAutographBtn();
         getSwitch();
+        changeEditUserVisible(false);
         this.setState({
             newKey: Math.random(),
+            isBlackChecked: null,
             idImgF: true,
             idImgZ: true
         });
@@ -1214,4 +1264,4 @@ class Addition extends Component {
         wrapperCol: { span: 20 }
     };
 }
-export default Form.create()(Addition);
+export default Form.create()(Edit);
