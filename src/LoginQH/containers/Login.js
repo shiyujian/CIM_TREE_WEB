@@ -17,8 +17,7 @@ import {
     removePermissions,
     getUser
 } from '../../_platform/auth';
-import QRCode from '../components/QRCode';
-import { QRCODE_API, FOREST_LOGIN_DATA } from '_platform/api';
+import { FOREST_LOGIN_DATA } from '_platform/api';
 import './Login.less';
 
 const FormItem = Form.Item;

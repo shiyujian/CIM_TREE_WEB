@@ -43,19 +43,9 @@ window.config = {
     DOC_EXCHANGE_USER_PASSWORD: 'bimqh:bimqh',
 
     // 开发环境配置,部署时记得修改
-    // node服务,验评表单转化Word,pdf转word
-    NODE_FILE_STATIC_URL: 'http://10.215.160.38:6546',
 
     // word在线预览地址
     previewWord_API: 'http://192.168.192.11:80/view/url?url=',
-    // 下载文档--未转发过的地址
-    Leader_Class_URL: 'http://10.215.160.38:6593',
-
-    // WJH插件的下载地址
-    WJH_CITY_MARKER:
-        'http://192.168.192.10:7512/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
-    // 三维展示里面的cep模型数据
-    WJH_CEP: 'http://192.168.192.12:80/qianhai/qhtdbx.cep',
 
     // 地图瓦片地址
     cus_tilemap: 'http://192.168.192.10:8100',
@@ -66,24 +56,9 @@ window.config = {
     VEC_W: 'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
     /** *********************单模块资源服务**************************/
     // 智慧森林
-    // 智慧森林域名
-    FORESTDOMAIN: 'http://120.79.72.17', // 阿里云
-    // 'FORESTDOMAIN':"http://10.215.160.45",//院内
-    // 'FORESTDOMAIN':"http://192.168.3.33",
-    // 智慧森林端口
-    FORESTPORT: '227', // 阿里云
-    // 'FORESTPORT':"6540",//院内
     // 苗圃定位模板
     nurseryLocation:
         'http://10.215.160.38:6540/media/documents/2017/11/nurseryLocation.xlsx',
-
-    // 720云
-    // 'Video360_API' : 'http://720yun.com/t/59e24jfOcya',
-    PANORAMAGRAM_LOC_CODE: 'PANORAMA_ROOT', // 全景图位置树根节点编码值
-    Video360_API:
-        'http://720yun.com/t/16fjzOmksu8?from=singlemessage&isappinstalled=0&pano_id=6700576',
-    Video360_API2:
-        'http://720yun.com/t/16fjzOmksu8?from=singlemessage&isappinstalled=0&pano_id=6700576',
     /** *********************临时资源服务**************************/
 
     /** ****************Leaflet Map ****************/

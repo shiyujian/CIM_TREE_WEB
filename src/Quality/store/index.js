@@ -1,11 +1,8 @@
 import { actionsMap } from '_platform/store/util';
 import itemReducer, { actions as itemActions } from './item';
-import cellReducer, { actions as cellActions } from './cell';
 import inspectionReducer, { actions as inspectionActions } from './inspection';
-import cellsReducer, { actions as cellsActions } from './cells';
 import defectReducer, { actions as defectActions } from './defect';
 import faithInfoReducer, { actions as faithActions } from './faithInfo';
-
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
 
@@ -221,22 +218,12 @@ export default handleActions(
             ...state,
             item: itemReducer(state.item, action)
         }),
-        [combineActions(...actionsMap(cellActions))]: (state, action) => {
-            return { ...state, cell: cellReducer(state.cell, action) };
-        },
         [combineActions(...actionsMap(inspectionActions))]: (
             state = {},
             action
         ) => ({
             ...state,
             inspection: inspectionReducer(state.inspection, action)
-        }),
-        [combineActions(...actionsMap(cellsActions))]: (
-            state = {},
-            action
-        ) => ({
-            ...state,
-            cells: cellsReducer(state.cells, action)
         }),
         [combineActions(...actionsMap(defectActions))]: (
             state = {},
