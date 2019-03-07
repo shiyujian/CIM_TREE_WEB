@@ -122,6 +122,7 @@ export default class Top extends Component {
                 let data = locationStat.split(',');
                 if (data && data instanceof Array && data.length === 2) {
                     queryData = data;
+                    console.log('已定位数据', data);
                     let unLocationNum = Number(data[0]);
                     let locationNum = Number(data[1]);
                     let myChart = echarts.init(document.getElementById('topRight'));

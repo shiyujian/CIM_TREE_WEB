@@ -398,6 +398,12 @@ class Tablelevel extends Component {
         shapeUploadHandler({
             name: fileList[0].name.split('.')[0]
         }, formdata).then(rep => {
+            if (rep === '未将对象引用设置到对象的实例。') {
+                message.error('文件格式有问题，请联系管理人员查找原因');
+                this.setState({
+                    confirmLoading: false
+                });
+            }
             rep = JSON.parse(rep);
             // 解析文件失败
             if (rep.errorinfo) {
@@ -409,7 +415,7 @@ class Tablelevel extends Component {
                 }, () => {
                     return;
                 });
-            } else {
+            } else if (rep.features) {
                 message.success('数据导入成功，已默认勾选可以的入库的数据');
                 rep.features.map((item, index) => {
                     item.key = index;
