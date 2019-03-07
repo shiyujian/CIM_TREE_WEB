@@ -35,15 +35,6 @@ export default class Quality extends Component {
                     <Submenu {...this.props} menus={menus} />
                 </Aside>
                 <Main>
-                    {/* {Search && (
-                        <Route path='/quality/search' component={Search} />
-                    )} */}
-                    {Appraising && (
-                        <Route
-                            path='/quality/appraising'
-                            component={Appraising}
-                        />
-                    )}
                     {Defect && (
                         <Route path='/quality/defect' component={Defect} />
                     )}

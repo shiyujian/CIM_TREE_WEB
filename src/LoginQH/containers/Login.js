@@ -17,8 +17,7 @@ import {
     removePermissions,
     getUser
 } from '../../_platform/auth';
-import QRCode from '../components/QRCode';
-import { QRCODE_API, FOREST_LOGIN_DATA } from '_platform/api';
+import { FOREST_LOGIN_DATA } from '_platform/api';
 import './Login.less';
 
 const FormItem = Form.Item;
@@ -36,11 +35,8 @@ class Login extends Component {
         super(props);
         this.state = {
             isPwd: true,
-            loginState: true,
             forgectState: false,
-            appDownload: false,
             token: null,
-            QRUrl: '',
             userMessage: null,
             checked: ''
         };
@@ -74,128 +70,14 @@ class Login extends Component {
         }
     }
 
-    shouldComponentUpdate (nextProps, nextState) {
-        let me = this;
-        if (this.state.QRUrl !== nextState.QRUrl && nextState.QRUrl !== '') {
-            const { token } = nextState;
-
-            const {
-                actions: { getLoginState }
-            } = this.props;
-
-            me.intervalID = setInterval(function () {
-                getLoginState({ token: token }).then(rst => {
-                    if (rst && rst.user) {
-                        clearInterval(me.intervalID);
-                        const {
-                            actions: { getTasks },
-                            history: { replace }
-                        } = me.props;
-                        clearUser();
-                        clearUser();
-                        clearUser();
-                        clearUser();
-                        clearUser();
-                        removePermissions();
-                        removePermissions();
-                        rst = rst.user;
-                        const data = {
-                            username: rst.username,
-                            password: rst.password
-                        };
-                        getTasks(
-                            {},
-                            { task: 'processing', executor: rst.id }
-                        ).then((tasks = []) => {
-                            notification.open({
-                                message: '登录成功',
-                                description: rst.username
-                            });
-                            window.localStorage.setItem(
-                                'QH_USER_DATA',
-                                JSON.stringify(rst)
-                            );
-                            const {
-                                username,
-                                id,
-                                account = {},
-                                all_permissions: permissions = [],
-                                is_superuser = false
-                            } = rst;
-                            const {
-                                person_name: name,
-                                organization: org,
-                                person_code: code,
-                                org_code,
-                                sections,
-                                person_telephone
-                            } = account;
-                            const isOwnerClerk = rst.isOwnerClerk;
-                            setUser(
-                                username,
-                                id,
-                                name,
-                                org,
-                                tasks.length,
-                                data.password,
-                                code,
-                                is_superuser,
-                                org_code,
-                                sections,
-                                isOwnerClerk,
-                                person_telephone
-                            );
-                            console.log(getUser(), 'cookie存的信息');
-
-                            // cookie('QH_USER_DATA', JSON.stringify(userMessage));
-                            setPermissions(permissions);
-                            window.localStorage.setItem(
-                                'QH_LOGIN_USER',
-                                JSON.stringify(data)
-                            );
-                            window.localStorage.setItem(
-                                'QH_LOGIN_REMEMBER',
-                                false
-                            );
-                            setTimeout(() => {
-                                replace('/');
-                            }, 500);
-                        });
-                        return true;
-                    } else if (rst && rst.token) {
-                        return true;
-                    } else {
-                        notification.error({
-                            message:
-                                '扫码登录时间已经超时,请刷新网页重新扫码登陆',
-                            duration: 2
-                        });
-                        clearInterval(me.intervalID);
-                        return true;
-                    }
-                });
-            }, 5000);
-            return true;
-        } else if (nextState.loginState) {
-            clearInterval(me.intervalID);
-            return true;
-        } else {
-            return true;
-        }
-    }
-
     render () {
         const { getFieldDecorator } = this.props.form;
         const {
-            QRUrl,
-            loginState,
-            forgectState,
-            appDownload
+            forgectState
         } = this.state;
         const loginTitle = require('./images/logo1.png');
         const docDescibe = require('./images/doc.png');
         const hello = require('./images/hello.png');
-        const appImg = require('./images/app.png');
         const pwdType = this.state.isPwd ? 'password' : 'text';
         /// 密码输入框类型改变时图标变化
         let chgTypeImg = require('./images/icon_eye1.png');
@@ -204,10 +86,6 @@ class Login extends Component {
         } else {
             chgTypeImg = require('./images/icon_eye2.png');
         }
-        let size = 180;
-        let level = 'H';
-        let bgColor = '#FFFFFF';
-        let fgColor = '#000000';
 
         return (
             <div className='login-wrap'>
@@ -220,7 +98,7 @@ class Login extends Component {
                         </a>
                     </div>
 
-                    {loginState ? (
+                    {
                         !forgectState ? (
                             <div className='main-box'>
                                 <div className='main-at' />
@@ -455,66 +333,7 @@ class Login extends Component {
                                 </div>
                             </div>
                         )
-                    ) : appDownload ? (
-                        <div className='imgbox'>
-                            <a className='Imgtitle'>
-                                <img src={appImg} />
-                            </a>
-                            <p
-                                onClick={this.backLogin.bind(this)}
-                                style={{
-                                    fontSize: 16,
-                                    marginTop: '10px',
-                                    color: 'red',
-                                    cursor: 'pointer',
-                                    textDecoration: 'underline',
-                                    textAlign: 'center'
-                                }}
-                            >
-                                返回扫码登录
-                            </p>
-                        </div>
-                    ) : (
-                        <div className='picture-box'>
-                            <QRCode
-                                {...this.props}
-                                size={size}
-                                level={level}
-                                bgColor={bgColor}
-                                fgColor={fgColor}
-                                value={QRUrl}
-                            />
-                            <p
-                                style={{
-                                    fontSize: 16,
-                                    color: 'white',
-                                    marginTop: '10px'
-                                }}
-                            >
-                                请打开移动端"扫一扫"
-                            </p>
-                            <p
-                                style={{
-                                    fontSize: 16,
-                                    color: 'white',
-                                    marginTop: '10px'
-                                }}
-                            >
-                                还没有移动端?<span
-                                    onClick={this.nowDownload.bind(this)}
-                                    style={{
-                                        fontSize: 16,
-                                        color: 'red',
-                                        marginTop: '10',
-                                        textDecoration: 'underline',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    立即下载
-                                </span>
-                            </p>
-                        </div>
-                    )}
+                    }
                 </div>
             </div>
         );
@@ -528,55 +347,10 @@ class Login extends Component {
             window.localStorage.setItem('QH_LOGIN_REMEMBER', false);
         }
     }
-
-    loginChange (e) {
-        const {
-            actions: { getToken }
-        } = this.props;
-        if (e.target.value === 'account') {
-            this.setState({
-                loginState: true,
-                forgectState: false,
-                appDownload: false,
-                QRUrl: '',
-                token: null,
-                userMessage: null
-            });
-        } else if (e.target.value === 'code') {
-            getToken().then(rst => {
-                if (rst.token) {
-                    let token = rst.token;
-                    let QRUrl = QRCODE_API + rst.url;
-                    this.setState({
-                        token: token,
-                        QRUrl: QRUrl
-                    });
-                }
-            });
-            this.setState({
-                loginState: false
-                // forgectState:false,
-            });
-        }
-    }
     // 忘记密码
     ForgetPassword () {
         this.setState({
             forgectState: true,
-            loginState: true,
-            appDownload: false,
-            QRUrl: '',
-            token: null,
-            userMessage: null
-        });
-    }
-    // 立即下载
-    nowDownload () {
-        this.setState({
-            appDownload: true,
-            forgectState: false,
-            loginState: false,
-            QRUrl: '',
             token: null,
             userMessage: null
         });
@@ -626,10 +400,7 @@ class Login extends Component {
                             });
                         } else {
                             this.setState({
-                                appDownload: false,
                                 forgectState: false,
-                                loginState: true,
-                                QRUrl: '',
                                 token: null,
                                 userMessage: null
                             });
@@ -641,10 +412,7 @@ class Login extends Component {
     }
     cancel () {
         this.setState({
-            appDownload: false,
             forgectState: false,
-            loginState: true,
-            QRUrl: '',
             token: null,
             userMessage: null
         });
@@ -652,10 +420,7 @@ class Login extends Component {
     // 返回登录
     backLogin () {
         this.setState({
-            appDownload: false,
             forgectState: false,
-            loginState: false,
-            QRUrl: '',
             token: null,
             userMessage: null
         });
@@ -719,14 +484,15 @@ class Login extends Component {
                         JSON.stringify(forestLoginUserData)
                     );
                 }
-                let tasks = await getTasks({}, { task: 'processing', executor: rst.id });
+                let tasks = [];
+                tasks = await getTasks({}, { task: 'processing', executor: rst.id, pagination: true, page: 1 });
                 notification.open({
                     message: loginType
                         ? '自动登录成功'
                         : '登录成功',
                     description: rst.username
                 });
-                console.log('rst', rst);
+                let count = (tasks && tasks.count) || 0;
                 const {
                     username,
                     id,
@@ -760,7 +526,7 @@ class Login extends Component {
                     id,
                     name,
                     org,
-                    tasks.length,
+                    count,
                     data.password,
                     code,
                     is_superuser,

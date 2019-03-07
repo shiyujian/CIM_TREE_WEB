@@ -42,52 +42,19 @@ window.config = {
     // 现场收发文接口验证用的用户名和密码
     DOC_EXCHANGE_USER_PASSWORD: 'bimqh:bimqh',
 
-    // node服务,验评表单转化Word,pdf转word
-    NODE_FILE_STATIC_URL: 'http://10.215.160.38:6546',
-
     // word在线预览地址
     previewWord_API: 'http://10.215.160.40:6500/view/url?url=',
-
-    // 领导带班服务,安全监测动态加载模板
-    Leader_Class_URL: 'http://10.215.160.38:6592',
-
-    // FDBServer 上传FDB文件服务
-    FDBServer_API: 'http://10.215.160.37:8045/api',
-    // WJH插件的下载地址
-    WJH_CITY_MARKER:
-        'http://10.215.160.38:6542/media/documents/meta/CityMaker_IE_Plugin_vConnect8.0.171106.exe',
-    // 三维展示里面的cep模型数据
-    WJH_CEP: 'http://10.215.160.37:8006/qhtdbx20171212/qhtdbx.cep',
-
     // 地图瓦片地址
     cus_tilemap: 'http://10.215.160.39:6580',
     WMSTileLayerUrl:
         'http://t{s}.tianditu.cn/DataServer?T=cva_w&X={x}&Y={y}&L={z}',
     IMG_W: 'http://t{s}.tianditu.cn/DataServer?T=img_w&X={x}&Y={y}&L={z}',
     VEC_W: 'http://t{s}.tianditu.cn/DataServer?T=vec_w&X={x}&Y={y}&L={z}',
-    // 视频监控插件下载配置
-    Video_PLUGIN_URL:
-        'http://10.215.160.38:6542/media/documents/meta/WebComponentsKithas_rem_cfg.exe',
-
     /** *********************单模块资源服务**************************/
     // 智慧森林
-    // 智慧森林域名
-    FORESTDOMAIN: 'http://120.79.72.17', // 阿里云
-    // 'FORESTDOMAIN':"http://10.215.160.45",//院内
-    // 'FORESTDOMAIN':"http://192.168.3.33",
-    // 智慧森林端口
-    FORESTPORT: '227', // 阿里云
-    // 'FORESTPORT':"6540",//院内
     // 苗圃定位模板
     nurseryLocation:
         'http://10.215.160.38:6540/media/documents/2017/11/nurseryLocation.xlsx',
-
-    // 720云
-    PANORAMAGRAM_LOC_CODE: 'PANORAMA_ROOT', // 全景图位置树根节点编码值
-    Video360_API:
-        'http://720yun.com/t/16fjzOmksu8?from=singlemessage&isappinstalled=0&pano_id=6700576',
-    Video360_API2:
-        'http://720yun.com/t/16fjzOmksu8?from=singlemessage&isappinstalled=0&pano_id=6700576',
 
     /** *********************临时资yu源服务**************************/
     initLeaflet: {
@@ -97,12 +64,6 @@ window.config = {
         maxZoom: 18,
         minZoom: 13,
         maxBounds: [[22.564885, 113.827781], [22.468466, 113.931283]]
-    },
-    fullExtent: {
-        minlat: 22.468466,
-        maxlat: 22.564885,
-        minlng: 113.827781,
-        maxlng: 113.931283
     },
     // 个人考勤的上下班时间，如果当前的部门未配置的话拿此上下班时间，用[--]分开，此处必须配置
     IN_OFF_DUTY: '08:30:00--18:00:00',

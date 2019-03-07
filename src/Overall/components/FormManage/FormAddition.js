@@ -99,7 +99,6 @@ class FormAddition extends Component {
     };
 
     async componentDidMount () {
-        console.log('componentDidMountcomponentDidMount');
         this.setState({
             TreatmentData: []
         });
@@ -165,12 +164,13 @@ class FormAddition extends Component {
             : '';
         let arr = '';
         try {
-            arr = flow.split('--')[0];
+            if (flow) {
+                arr = flow.split('--')[0];
+            }
         } catch (e) {
             console.log(e);
         }
 
-        console.log('arr', arr);
         return (
             <div>
                 {formAddVisible ? (
@@ -355,7 +355,6 @@ class FormAddition extends Component {
             const status = file.status;
             const { TreatmentData = [] } = this.state;
             if (status === 'done') {
-                console.log('file', file);
                 // const { actions: { postUploadFilesAc } } = this.props;
                 let len = TreatmentData.length;
                 TreatmentData.push({
@@ -372,7 +371,6 @@ class FormAddition extends Component {
                     misc: file.response.misc,
                     mime_type: file.response.mime_type
                 });
-                console.log('TreatmentData', TreatmentData);
                 notification.success({
                     message: '文件上传成功',
                     duration: 3
@@ -424,7 +422,6 @@ class FormAddition extends Component {
         if (memberInfo) {
             let memberValue = memberInfo.toString().split('#');
             if (memberValue[0] === 'C_PER') {
-                console.log('memberValue', memberValue);
                 this.member = {
                     username: memberValue[4],
                     person_code: memberValue[1],
@@ -467,7 +464,6 @@ class FormAddition extends Component {
             currentSectionName,
             currentSection
         } = this.state;
-        console.log('TreatmentData', TreatmentData);
         let user = getUser(); // 当前登录用户
         let sections = user.sections || [];
         if (!sections || sections.length === 0) {
@@ -481,10 +477,6 @@ class FormAddition extends Component {
         let me = this;
         let postData = {};
         me.props.form.validateFields((err, values) => {
-            console.log('Received values of form: ', values);
-            // console.log('currentSection: ', currentSection);
-            // console.log('currentSectionName: ', currentSectionName);
-            // console.log('projectName: ', projectName);
             if (!err) {
                 if (TreatmentData.length === 0) {
                     notification.error({
@@ -529,7 +521,6 @@ class FormAddition extends Component {
                 // 在项目管理时关联的流程
                 let flow = selectedDir.extra_params.workflow;
                 let arr = flow.split('--');
-                console.log('arr', arr);
 
                 let WORKFLOW_MAP = {
                     name: arr[1],

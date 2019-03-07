@@ -119,7 +119,9 @@ class TableInfo extends Component {
         let flowCode = '';
         let document = selectedDir.name ? selectedDir.name : '';
         try {
-            flowCode = flow.split('--')[0];
+            if (flow) {
+                flowCode = flow.split('--')[0];
+            }
         } catch (e) {
             console.log(e);
         }
@@ -130,9 +132,6 @@ class TableInfo extends Component {
 
         let reqData = {};
         this.props.form.validateFields((err, values) => {
-            console.log('表单管理流程', values);
-            console.log('err', err);
-
             values.ssection
                 ? (reqData.subject_sectionName__contains = values.ssection)
                 : '';
@@ -162,8 +161,6 @@ class TableInfo extends Component {
                     : '';
         });
         document ? (reqData.subject_document__contains = document) : '';
-
-        console.log('reqData', reqData);
 
         let tmpData = Object.assign({}, reqData);
 
@@ -328,8 +325,6 @@ class TableInfo extends Component {
     }
 
     onSelectChange = (selectedRowKeys, selectedRows) => {
-        console.log('selectedRowKeys', selectedRowKeys);
-        console.log('selectedRows', selectedRows);
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     };
 
@@ -383,7 +378,6 @@ class TableInfo extends Component {
             });
 
             Promise.all(promises).then(rst => {
-                console.log('rst', rst);
                 notification.success({
                     message: '删除流程成功',
                     duration: 3

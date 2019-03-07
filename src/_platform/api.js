@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-05 15:03:45
+ * @Last Modified time: 2019-03-07 19:49:27
  */
 /**
  *
@@ -57,45 +57,31 @@ STATIC_FILE_IP = window.config.STATIC_FILE_IP;
 
 /** *********************公共资源服务**************************/
 export { DOMAIN, USER, PASSWORD, TREE_CODE };
-export const CODE_PROJECT = '前海BIM';
+export const CODE_PROJECT = '森林大数据';
 export const base = `${DOMAIN}`;
-export const EXCHANGE_API = `${DOMAIN}:${window.config.DOC_EXCHANGE_PORT}`;
-export const SOURCE_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_PREVIEW_PORT
-}`;
+export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
 export const USER_API = `${base}/accounts/api`;
 export const SUSER_API = `${SDOMAIN}`;
 export const SERVICE_API = `${base}/service/construction/api`;
 export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
 export const MAIN_API = `${base}/main/api`;
-export const PDF_FILE_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_PREVIEW_PORT
-}`;
-export const DOWNLOAD_FILE = `${SDOMAIN}:${window.config.STATIC_DOWNLOAD_PORT}`;
 export const CUS_TILEMAP = window.config.cus_tilemap;
 export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
-export const NODE_FILE_EXCHANGE_API = window.config.NODE_FILE_STATIC_URL;
 // 高德地图逆坐标查询
 export const LBSAMAP_API = window.config.LBSAMAP;
 export const LBSAMAP_KEY = '8325164e247e15eea68b59e89200988b';
 // 腾讯移动分析
 export const TENCENTANALYSIS_API = window.config.TENCENTANALYSIS;
-// FDBServer API
-export const FDBSERVICE_API = `${window.config.FDBServer_API}`;
-export const SAFETY_MONITOR = `${base}/service/appserver`;
-
 // 质量监控地图
 export const WMSTILELAYERURL = window.config.WMSTileLayerUrl;
 export const TILEURLS = {
     1: window.config.IMG_W,
     2: window.config.VEC_W
 };
-export const DefaultZoomLevel = 14;
 // 文件预览的接口
 export const previewWord_API = window.config.previewWord_API;
-export const SAFETY_MONITOR_DOWN = window.config.Leader_Class_URL;
 // 静态资源文件服务==========STATIC_FILE_IP
 export const STATIC_UPLOAD_API = `${STATIC_FILE_IP}:${
     window.config.STATIC_UPLOAD_PORT
@@ -103,150 +89,13 @@ export const STATIC_UPLOAD_API = `${STATIC_FILE_IP}:${
 export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
     window.config.STATIC_DOWNLOAD_PORT
 }`;
-export const modelServerAddress = `${STATIC_FILE_IP}:${
+export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
     window.config.STATIC_PREVIEW_PORT
-}/api/user/meta-files/?category=1`;
-export const excelServerAddress = `${STATIC_FILE_IP}:${
-    window.config.STATIC_PREVIEW_PORT
-}/api/user/meta-files/?category=2`;
-export const wordServerAddress = `${STATIC_FILE_IP}:${
-    window.config.STATIC_PREVIEW_PORT
-}/api/user/meta-files/?category=3`;
-export const DGNAddress = `${STATIC_FILE_IP}:${
-    window.config.STATIC_UPLOAD_PORT
-}/api/user/meta-files/?category=4`;
-export const modelDownloadAddress = `${STATIC_FILE_IP}:${
-    window.config.STATIC_DOWNLOAD_PORT
-}/media/documents/meta/`;
-
-/** *********************单模块资源服务**************************/
-// 登录管理
-export const QRCODE_API = `${base}/service/appserver`;
-// 综合展示
-// 资料管理
-// 设计管理
-// 质量管理
-// export const SubItem_WordTemplate = STATIC_UPLOAD_API + '/media/documents/meta/'+encodeURI('分项工程质量验收记录模板.docx')
-
+}`;
 // 智慧森林
 export const FOREST_API = `${window.config.SDOMAIN}`;
 export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
-// 苗圃定位模板
-export const nurseryLocation_template =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/2017/11/' +
-    encodeURI('nurseryLocation.xlsx');
-
-export const SubItem_WordTemplate =
-    `${window.config.NODE_FILE_STATIC_URL}` +
-    '/media/documents/meta/' +
-    encodeURI('分项工程质量验收记录模板.docx');
-export const Fenbu_WordTemplate =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('分部子分部工程质量验收记录_ibqFgFg.docx');
-export const Danwei_WordTemplate =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/2017/10/%E5%8D%95%E4%BD%8D%E5%AD%90%E5%8D%95%E4%BD%8D%E5%B7%A5%E7%A8%8B%E8%B4%A8%E9%87%8F%E9%AA%8C%E6%94%B6%E8%AE%B0%E5%BD%952.docx';
-// 检验批
-export const JYPMOD_API =
-    STATIC_DOWNLOAD_API + '/media/documents/meta/' + 'jianyanpi.xlsx';
-// 进度管理DGN模型名称
-export const SCHEDULE_DGN_NAME = '10号冷战-地下室-编码-0925';
-export const SCHEDULE_DGN_DOWNLOAD_URL =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('10号冷战-地下室-编码-0925_0.00.zip');
-export const SCHEDULE_TOTAL_PLAN_URL =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('scheduleTemplate.xlsx');
-// 安全管理
-export const SMUrl_template0 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('测斜项目监测点批量添加模板.xlsx');
-export const SMUrl_template1 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('测斜项目监测数据填报模板.xlsx');
-export const SMUrl_template2 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('监测项目批量添加模板.xlsx');
-export const SMUrl_template3 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('一般监测项目监测点批量添加模板.xlsx');
-export const SMUrl_template4 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('一般项目监测数据填报模板.xlsx');
-export const SMUrl_template11 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('scheduler.xlsx');
-export const SMUrl_template12 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('RiskEvaluation.xlsx');
-export const SMUrl_template13 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('Unbearable.xlsx');
-export const SMUrl_template14 =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('RiskFactor.xlsx');
-
-// 造价管理
-export const ESTIMATET =
-    STATIC_DOWNLOAD_API + '/media/documents/meta/zjt-05_.xlsx';
-export const CONSTRACTT =
-    STATIC_DOWNLOAD_API + '/media/documents/meta/zjt-03_.xlsx';
-export const WORKT =
-    STATIC_DOWNLOAD_API + '/media/documents/meta/template.xlsx';
-// 造价管理模块api
-export const UPLOADFILE_API =
-    STATIC_FILE_IP + window.config.STATIC_UPLOAD_PORT + '/api/user/files/';
-// 视频监控
-// 三维全景
-// 720云预览API
-export const VIDEO_PLUGIN_URL = window.config.Video_PLUGIN_URL;
-export const Panorama_Root = window.config.PANORAMAGRAM_LOC_CODE;
-export const Video360_API = window.config.Video360_API;
-export const Video360_API2 = window.config.Video360_API2;
-export const DashboardVideo360API = window.config.dashboardVideo360API;
-// 数据资源
-// 数据资源
-export const DATASOURCENAME = 'dataresource';
-export const DATASOURCECODE = 'dataresource_total_dir';
-// 数据目录
-export const DATASOURCEDIRNAME = 'dataresourceDir';
-export const DATASOURCEDIRCODE = 'dataresource_dir';
-// 数据目录-类型
-export const DATASOURCEDIRTYPENAME = 'dataresourceDirType';
-export const DATASOURCEDIRTYPECODE = 'dataresource_dir_type';
-// 数据目录-项目
-export const DATASOURCEDIRITEMNAME = 'dataresourceDirItem';
-export const DATASOURCEDIRITEMCODE = 'dataresource_dir_item';
-
-// 数据报送模板下载
-export const DataReportTemplate_ConstructionUnits =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('参建单位数据填报模版.xlsx');
-export const DataReportTemplate_PersonInformation =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('人员信息数据填报模版.xlsx');
-export const DataReportTemplate_Organization =
-    STATIC_DOWNLOAD_API +
-    '/media/documents/meta/' +
-    encodeURI('组织机构数据填报模版.xlsx');
-
-/** *********************临时资源服务**************************/
 
 /** *********************静态常量**************************/
 export const WORKFLOW_CODE = {
@@ -285,6 +134,8 @@ export const DEFAULT_PROJECT = 'P191';
 export const FOREST_LOGIN_DATA = {
     phone: 'zhaozz99',
     pwd: '666666'
+    // phone: 'zhaozz1010',
+    // pwd: '130718'
 };
 
 export const ORG_NURSERY_CODE = 'ORG_NURSERY';

@@ -13,7 +13,6 @@ import DatumTree from '../components/DatumTree';
 // import DatumTree from '../components/RiskFactor/DatumTree';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import { SOURCE_API, STATIC_DOWNLOAD_API, WORKFLOW_CODE, DefaultZoomLevel } from '_platform/api';
 import './Register.css';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -21,23 +20,22 @@ export const Datumcode = window.DeathCode.SAFETY_WMSG;
 moment.locale('zh-cn');
 const Option = Select.Option;
 
-
 @connect(
     state => {
         const { safety: { riskFactor = {} } = {}, platform } = state;
-        return { ...riskFactor, platform }
+        return { ...riskFactor, platform };
     },
     dispatch => ({
         actions: bindActionCreators({ ...actions, ...platformActions, ...previewActions }, dispatch)
     })
 )
 
-export default class RiskFactor extends Component {  
-    constructor(props) {
+export default class RiskFactor extends Component {
+    constructor (props) {
         super(props);
         this.state = {
             isTreeSelected: false,
-            loading:false,
+            loading: false,
             dataSet: [],
             currentUnitCode: '',
             currentSteps: 0,
@@ -46,36 +44,36 @@ export default class RiskFactor extends Component {
             modalVisible: false,
             dataSous: {},
             leafletCenter: [22.516818, 113.868495]
-        }
+        };
     }
-    componentDidMount() {
-        const {actions: {getTree}} = this.props;
-        this.setState({loading:true});
-        getTree({code:Datumcode}).then(({children}) => {
-            this.setState({loading:false});
+    componentDidMount () {
+        const { actions: { getTree } } = this.props;
+        this.setState({ loading: true });
+        getTree({ code: Datumcode }).then(({ children }) => {
+            this.setState({ loading: false });
         });
-        if(this.props.Doc){
-            this.setState({isTreeSelected:true})
-        }        
+        if (this.props.Doc) {
+            this.setState({ isTreeSelected: true });
+        }
     }
 
     onSearch = (value) => {
         const {
             actions: {
-                getRisk,
+                getRisk
             }
-        } = this.props; 
-        getRisk( ).then(rst => {
+        } = this.props;
+        getRisk().then(rst => {
             const { dataSet } = this.state;
             let datas = [];
             for (let i = 0; i < rst.content.length; i++) {
                 let data = {};
-                if(rst.content[i].ProblemType.indexOf(value) >= 0){
-                    data.problemType=rst.content[i].ProblemType;
-                    data.level='三';
-                    data.reorganizeRequireTime=rst.content[i].ReorganizeRequireTime;
+                if (rst.content[i].ProblemType.indexOf(value) >= 0) {
+                    data.problemType = rst.content[i].ProblemType;
+                    data.level = '三';
+                    data.reorganizeRequireTime = rst.content[i].ReorganizeRequireTime;
                     data.status = this.getRiskState(rst.content[i].Status);
-                    data.resPeople=rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                    data.resPeople = rst.content[i].ReorganizerObj ? rst.content[i].ReorganizerObj.Full_Name : '';
                     data.id = rst.content[i].id;
                     datas.push(data);
                 }
@@ -84,26 +82,26 @@ export default class RiskFactor extends Component {
         });
     }
 
-    getRiskState(status){
+    getRiskState (status) {
         switch (status) {
             case -1:
-                return "确认中"; 
+                return '确认中';
             case 0:
-                return "整改中";
+                return '整改中';
             case 1:
-                return "审核中";
+                return '审核中';
             case 2:
-                return "完成";
-            case "确认中":
+                return '完成';
+            case '确认中':
                 return -1;
-            case "整改中":
+            case '整改中':
                 return 0;
-            case "审核中":
+            case '审核中':
                 return 1;
-            case "完成":
+            case '完成':
                 return 2;
             default:
-                return "确认中";
+                return '确认中';
         }
     }
 
@@ -119,20 +117,20 @@ export default class RiskFactor extends Component {
     //     getdocument({code:code.split("--")[1]});
     // }
 
-    onSelect(selectedKeys, e) {
-        console.log('selectedKeys',selectedKeys,e)
+    onSelect (selectedKeys, e) {
+        console.log('selectedKeys', selectedKeys, e);
         if (!e.selected) {
-            return
+            return;
         }
         this.setState({ currentUnitCode: selectedKeys });
         const {
             actions: {
-                getRisk,
+                getRisk
             }
         } = this.props;
 
         const { currentSelectValue } = this.state;
-         getRisk( ).then(rst => {
+        getRisk().then(rst => {
             const { dataSet } = this.state;
             let datas = [];
             // debugger
@@ -142,15 +140,15 @@ export default class RiskFactor extends Component {
                     duration: 2
                 });
                 this.setState({ dataSet: datas });
-                return;
-            }else{
+                
+            } else {
                 for (let i = 0; i < rst.content.length; i++) {
                     let data = {};
-                    data.problemType=rst.content[i].ProblemType;
-                    data.level='三';
-                    data.reorganizeRequireTime=rst.content[i].ReorganizeRequireTime;
+                    data.problemType = rst.content[i].ProblemType;
+                    data.level = '三';
+                    data.reorganizeRequireTime = rst.content[i].ReorganizeRequireTime;
                     data.status = this.getRiskState(rst.content[i].Status);
-                    data.resPeople= rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                    data.resPeople = rst.content[i].ReorganizerObj ? rst.content[i].ReorganizerObj.Full_Name : '';
                     data.id = rst.content[i].id;
                     datas.push(data);
                 }
@@ -165,7 +163,7 @@ export default class RiskFactor extends Component {
                 getRisk
             }
         } = this.props;
-         getRisk({status:value}).then(rst => {
+        getRisk({ status: value }).then(rst => {
             const { dataSet } = this.state;
             let datas = [];
             if (rst.content.length === 0) {
@@ -174,15 +172,15 @@ export default class RiskFactor extends Component {
                     duration: 2
                 });
                 this.setState({ dataSet: datas });
-                return;
-            }else{
+                
+            } else {
                 for (let i = 0; i < rst.content.length; i++) {
                     let data = {};
-                    data.problemType=rst.content[i].ProblemType;
-                    data.level='三';
-                    data.reorganizeRequireTime=rst.content[i].ReorganizeRequireTime;
+                    data.problemType = rst.content[i].ProblemType;
+                    data.level = '三';
+                    data.reorganizeRequireTime = rst.content[i].ReorganizeRequireTime;
                     data.status = this.getRiskState(rst.content[i].Status);
-                    data.resPeople= rst.content[i].ReorganizerObj?rst.content[i].ReorganizerObj.Full_Name:'';
+                    data.resPeople = rst.content[i].ReorganizerObj ? rst.content[i].ReorganizerObj.Full_Name : '';
                     data.id = rst.content[i].id;
                     datas.push(data);
                 }
@@ -192,15 +190,15 @@ export default class RiskFactor extends Component {
     }
 
     onDetailClick = (record, index) => {
-        const {dataSous} = this.state;
+        const { dataSous } = this.state;
         this.setState({ dataSous: record, modalVisible: true });
     }
 
-    cancel() {
-        this.setState({modalVisible: false})
+    cancel () {
+        this.setState({ modalVisible: false });
     }
 
-    render() {
+    render () {
         // const {
         //     platform: {
         //         dir:{
@@ -209,11 +207,11 @@ export default class RiskFactor extends Component {
         //     } = {},
         //     Doc=[],
         //     keycode,
-        // } = this.props; 
+        // } = this.props;
         const {
-            tree=[],
-            Doc=[],
-            keycode,
+            tree = [],
+            Doc = [],
+            keycode
         } = this.props;
         const columns = [
             {
@@ -244,7 +242,7 @@ export default class RiskFactor extends Component {
                 dataIndex: 'status',
                 width: '10%'
             }, {
-                title: '负责人',  
+                title: '负责人',
                 dataIndex: 'resPeople',
                 width: '10%'
             }, {
@@ -253,20 +251,20 @@ export default class RiskFactor extends Component {
                 width: '15%',
                 render: (text, record, index) => {
                     return <div>
-                        <a href="javascript:;" onClick={this.onDetailClick.bind(this, record, index)}>详情</a>
-                    </div>
+                        <a href='javascript:;' onClick={this.onDetailClick.bind(this, record, index)}>详情</a>
+                    </div>;
                 }
             }
         ];
 
         return (
             <div>
-                <DynamicTitle title="文明施工" {...this.props} />
+                <DynamicTitle title='文明施工' {...this.props} />
                 <Sidebar>
                     <DatumTree treeData={tree}
-                                selectedKeys={keycode}
-                                onSelect={this.onSelect.bind(this)}
-                                {...this.state}/>
+                        selectedKeys={keycode}
+                        onSelect={this.onSelect.bind(this)}
+                        {...this.state} />
                 </Sidebar>
                 <Content>
                     <Row>
@@ -274,17 +272,17 @@ export default class RiskFactor extends Component {
                             <Row>
                                 <Col span={6}>
                                     <Input.Search
-                                        placeholder="请输入搜索关键词"
+                                        placeholder='请输入搜索关键词'
                                         style={{ width: '80%', display: 'block' }}
                                         onSearch={(value) => this.onSearch(value)}
-                                    ></Input.Search>
+                                     />
                                 </Col>
                                 <Col span={6}>
-                                    <div style={{ width: '80%', marginLeft:'10%'}} >
-                                        <span style={{ fontSize: 16,marginRight:5 }}>状态</span>
+                                    <div style={{ width: '80%', marginLeft: '10%' }} >
+                                        <span style={{ fontSize: 16, marginRight: 5 }}>状态</span>
                                         <Select
-                                            defaultValue=""
-                                            style={{ width:80}}
+                                            defaultValue=''
+                                            style={{ width: 80 }}
                                             onChange={(value) => this.onSelectChange(value)}>
                                             <Option value={-1}>确认中</Option>
                                             <Option value={0}>整改中</Option>
@@ -296,28 +294,25 @@ export default class RiskFactor extends Component {
                                 </Col>
                             </Row>
                             <Table
-                                className = 'foresttable'
+                                className='foresttable'
                                 columns={columns}
-                                dataSource = {this.state.dataSet}
+                                dataSource={this.state.dataSet}
                                 bordered
                                 style={{ marginTop: 20 }}
                             />
                         </Col>
                     </Row>
-                    {this.state.modalVisible && 
-                     <RiskModle 
-                        {...this.props} 
-                        onok = {this.onDetailClick.bind(this)} 
-                        oncancel = {this.cancel.bind(this)}
-                        data = {this.state.dataSet}
-                        dataSous = {this.state.dataSous}
-                    />}
+                    {this.state.modalVisible &&
+                        <RiskModle
+                            {...this.props}
+                            onok={this.onDetailClick.bind(this)}
+                            oncancel={this.cancel.bind(this)}
+                            data={this.state.dataSet}
+                            dataSous={this.state.dataSous}
+                        />}
                 </Content>
             </div>
 
         );
     }
 }
-
-
-

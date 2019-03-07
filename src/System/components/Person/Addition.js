@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { getUserIsDocument } from '../../../_platform/auth';
 import {getSectionNameBySection} from '_platform/gisAuth';
-import { UPLOAD_API, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API } from '../../../_platform/api';
+import { UPLOAD_API, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API, STATIC_PREVIEW_API } from '../../../_platform/api';
 import { Promise } from 'es6-promise';
 let fileTypes =
     'application/jpeg,application/gif,application/png,image/jpeg,image/gif,image/png,image/jpg';
@@ -455,9 +455,7 @@ class Addition extends Component {
         ) {
             avatar_urlName = addition.person_avatar_url.split('/').pop();
             avatar_url =
-                window.config.STATIC_FILE_IP +
-                ':' +
-                window.config.STATIC_PREVIEW_PORT +
+                STATIC_PREVIEW_API +
                 '/media' +
                 addition.person_avatar_url;
             fileList = [
@@ -480,9 +478,7 @@ class Addition extends Component {
                 .split('/')
                 .pop();
             const avatar_url3 =
-                window.config.STATIC_FILE_IP +
-                ':' +
-                window.config.STATIC_PREVIEW_PORT +
+                STATIC_PREVIEW_API +
                 '/media' +
                 addition.relative_signature_url;
             autographList = [
@@ -504,9 +500,7 @@ class Addition extends Component {
                 id_image_urlName = addition.id_image[0].name;
                 const id_img = addition.id_image[0].filepath.split('/media')[1];
                 const id_imgs =
-                    window.config.STATIC_FILE_IP +
-                    ':' +
-                    window.config.STATIC_PREVIEW_PORT +
+                    STATIC_PREVIEW_API +
                     '/media' +
                     id_img;
                 id_image_url = id_imgs || addition.id_image[0].thumbUrl;
@@ -530,9 +524,7 @@ class Addition extends Component {
             if (addition.id_image[1].name && addition.id_image[1].filepath) {
                 const id_img = addition.id_image[1].filepath.split('/media')[1];
                 const id_imgs =
-                    window.config.STATIC_FILE_IP +
-                    ':' +
-                    window.config.STATIC_PREVIEW_PORT +
+                    STATIC_PREVIEW_API +
                     '/media' +
                     id_img;
                 id_image_urlName1 = addition.id_image[1].name;

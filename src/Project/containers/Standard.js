@@ -46,106 +46,10 @@ export default class Standard extends Component {
                 'margin-right': '8px',
                 visibility: 'visible'
             },
-            data: ''
+            data: '',
+            addOrDel: 'NOR',
+            hadSelectDir: false
         };
-    }
-    state = {
-        addOrDel: 'NOR',
-        hadSelectDir: false
-    };
-
-    selectStandardDir (value = [], node) {
-        console.log(node);
-        let data = node.node.props.data[0].children
-            ? node.node.props.data[0].children
-            : 'undefined';
-        this.setState({
-            data: data
-        });
-        this.setState({ hadSelectDir: true });
-        const [code] = value;
-        const {
-            actions: { setcurrentcode, savecode, setcurrentpk, refreshPanelTo }
-        } = this.props;
-        if (code === undefined) {
-            setcurrentcode(code);
-            setcurrentpk(code);
-            savecode(code);
-            refreshPanelTo('NOR');
-        } else {
-            console.log(code.split('--')[1]);
-            setcurrentcode(code.split('--')[1]);
-            setcurrentpk(code.split('--')[0]);
-            savecode(code);
-            refreshPanelTo('NOR');
-        }
-    }
-
-    render () {
-        console.log(this.props);
-        const {
-            // platform: {dir: {list = [],} = {}} = {},
-            worktree = [],
-            adddelpanel = 'NOR',
-            keycode = []
-        } = this.props;
-        const { hadSelectDir } = this.state;
-
-        let {
-            actions: { refreshPanelTo }
-        } = this.props;
-
-        return (
-            <div>
-                <DynamicTitle title='制度标准' {...this.props} />
-                <Sidebar>
-                    <div
-                        style={{
-                            borderBottom: 'solid 1px #999',
-                            paddingBottom: 8
-                        }}
-                    >
-                        <Button
-                            style={
-                                this.state.data === 'undefined'
-                                    ? this.state.hidden
-                                    : this.state.show
-                            }
-                            onClick={() => {
-                                refreshPanelTo('ADD');
-                            }}
-                        >
-                            新增目录
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                refreshPanelTo('DEL');
-                            }}
-                        >
-                            删除目录
-                        </Button>
-                    </div>
-                    <PkCodeTree
-                        treeData={worktree}
-                        selectedKeys={keycode}
-                        onSelect={this.selectStandardDir.bind(this)}
-                    />
-                </Sidebar>
-                <Content>
-                    {adddelpanel === 'NOR' ? null : adddelpanel === 'ADD' ? (
-                        <AddDirPanel {...this.props} />
-                    ) : hadSelectDir ? (
-                        <DelDirPanel {...this.props} />
-                    ) : (
-                        <Alert
-                            message='请在左侧选择需要删除的目录'
-                            type='error'
-                            closable
-                        />
-                    )}
-                </Content>
-            </div>
-        );
     }
 
     componentDidMount () {
@@ -173,5 +77,103 @@ export default class Standard extends Component {
                 savepk(rst.pk);
             }
         });
+    }
+
+    render () {
+        console.log(this.props);
+        const {
+            // platform: {dir: {list = [],} = {}} = {},
+            worktree = [],
+            adddelpanel = 'NOR',
+            keycode = []
+        } = this.props;
+        const { hadSelectDir } = this.state;
+
+        let {
+            actions: { refreshPanelTo }
+        } = this.props;
+
+        return (
+            <div>
+                <DynamicTitle title='制度标准' {...this.props} />
+                <Sidebar>
+                    <div
+                        style={{
+                            borderBottom: 'solid 1px #999',
+                            paddingBottom: 8
+                        }}
+                    >
+                        <Button
+                            onClick={this.handleAddDir.bind(this)}
+                        >
+                            新增目录
+                        </Button>
+                        <Button
+                            onClick={this.handleDelDir.bind(this)}
+                        >
+                            删除目录
+                        </Button>
+                    </div>
+                    <PkCodeTree
+                        treeData={worktree}
+                        selectedKeys={keycode}
+                        onSelect={this.selectStandardDir.bind(this)}
+                    />
+                </Sidebar>
+                <Content>
+                    {adddelpanel === 'NOR' ? null : adddelpanel === 'ADD' ? (
+                        <AddDirPanel {...this.props} />
+                    ) : hadSelectDir ? (
+                        <DelDirPanel {...this.props} />
+                    ) : (
+                        <Alert
+                            message='请在左侧选择需要删除的目录'
+                            type='error'
+                            closable
+                        />
+                    )}
+                </Content>
+            </div>
+        );
+    }
+
+    selectStandardDir (value = [], node) {
+        console.log('node', node);
+        console.log('value', value);
+        this.setState({ hadSelectDir: true });
+        const [code] = value;
+        const {
+            actions: { setcurrentcode, savecode, setcurrentpk, refreshPanelTo }
+        } = this.props;
+        if (code === undefined) {
+            setcurrentcode(code);
+            setcurrentpk(code);
+            savecode(code);
+            refreshPanelTo('NOR');
+        } else {
+            console.log(code.split('--')[1]);
+            setcurrentcode(code.split('--')[1]);
+            setcurrentpk(code.split('--')[0]);
+            savecode(code);
+            refreshPanelTo('NOR');
+        }
+    }
+
+    handleAddDir = (e) => {
+        const {
+            actions: {
+                refreshPanelTo
+            }
+        } = this.props;
+        refreshPanelTo('ADD');
+    }
+
+    handleDelDir = (e) => {
+        const {
+            actions: {
+                refreshPanelTo
+            }
+        } = this.props;
+        refreshPanelTo('DEL');
     }
 }

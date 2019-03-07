@@ -1,43 +1,24 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import reducer, { actions } from '../store/hiddenDanger';
+import { actions } from '../store/hiddenDanger';
 import { actions as platformActions } from '_platform/store/global';
 import {
-    Main,
-    Aside,
-    Body,
     Sidebar,
     Content,
     DynamicTitle
 } from '_platform/components/layout';
 import {
     Table,
-    Button,
     Row,
     Col,
-    Icon,
-    Modal,
     Input,
-    message,
     notification,
-    DatePicker,
-    Select,
-    Form,
-    Upload,
-    Steps
+    Select
 } from 'antd';
 import HiddenModle from './HiddenModle';
-// import WorkPackageTree from '../components/WorkPackageTree';
 import DatumTree from '../components/DatumTree';
-import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import {
-    SOURCE_API,
-    STATIC_DOWNLOAD_API,
-    WORKFLOW_CODE,
-    DefaultZoomLevel
-} from '_platform/api';
 import './Register.css';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
