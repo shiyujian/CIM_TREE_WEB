@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-07 21:03:47
+ * @Last Modified time: 2019-03-07 21:55:22
  */
 /**
  *
@@ -187,7 +187,7 @@ export const TREETYPENO = [
         name: '草本'
     }
 ];
-
+// 苗木市场  需求发布
 export const CULTIVATIONMODE = [
     {
         id: 0,
@@ -805,14 +805,7 @@ export const MODULES = [
         ]
     }
 ];
-// const APPLABEL = 'accounts';
 
-// const CONTENTTYPE = 'appmeta';
-
-export const DOMAIN_CODES = {
-    dir: '文档222',
-    workPackage: '施工包111'
-};
 // 获取新闻发布单位
 export const DEPARTMENT = [
     {
