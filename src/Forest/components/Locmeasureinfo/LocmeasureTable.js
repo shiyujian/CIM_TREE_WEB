@@ -126,6 +126,7 @@ export default class LocmeasureTable extends Component {
                 title: '测量人',
                 dataIndex: 'Inputer',
                 render: (text, record) => {
+                    const { users } = this.props;
                     return (
                         <span>
                             {users && users[text]
@@ -150,18 +151,18 @@ export default class LocmeasureTable extends Component {
                     );
                 }
             },
-            {
-                title: '定位时间',
-                render: (text, record) => {
-                    const { createtime3 = '', createtime4 = '' } = record;
-                    return (
-                        <div>
-                            <div>{createtime3}</div>
-                            <div>{createtime4}</div>
-                        </div>
-                    );
-                }
-            },
+            // {
+            //     title: '定位时间',
+            //     render: (text, record) => {
+            //         const { createtime3 = '', createtime4 = '' } = record;
+            //         return (
+            //             <div>
+            //                 <div>{createtime3}</div>
+            //                 <div>{createtime4}</div>
+            //             </div>
+            //         );
+            //     }
+            // },
             {
                 title: (
                     <div>
@@ -499,7 +500,7 @@ export default class LocmeasureTable extends Component {
                             onOk={this.datepick.bind(this)}
                         />
                     </div>
-                    <div className='forest-mrg-datePicker'>
+                    {/* <div className='forest-mrg-datePicker'>
                         <span className='forest-search-span'>定位时间：</span>
                         <RangePicker
                             className='forest-forestcalcw4'
@@ -509,7 +510,7 @@ export default class LocmeasureTable extends Component {
                             onChange={this.datepick1.bind(this)}
                             onOk={this.datepick1.bind(this)}
                         />
-                    </div>
+                    </div> */}
                     <div className='forest-mrg-standard2'>
                         <span className='forest-search-span'>胸径：</span>
                         <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
@@ -769,18 +770,18 @@ export default class LocmeasureTable extends Component {
         });
     }
 
-    datepick1 (value) {
-        this.setState({
-            lstime: value[0]
-                ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
-                : ''
-        });
-        this.setState({
-            letime: value[1]
-                ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
-                : ''
-        });
-    }
+    // datepick1 (value) {
+    //     this.setState({
+    //         lstime: value[0]
+    //             ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
+    //             : ''
+    //     });
+    //     this.setState({
+    //         letime: value[1]
+    //             ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
+    //             : ''
+    //     });
+    // }
     // 胸径
     handleXJChangeFirst (e) {
         if (isNaN(e.target.value)) {
@@ -1320,21 +1321,21 @@ export default class LocmeasureTable extends Component {
                                 );
                             }
                         },
-                        {
-                            title: '定位时间',
-                            render: (text, record) => {
-                                const {
-                                    createtime3 = '',
-                                    createtime4 = ''
-                                } = record;
-                                return (
-                                    <div>
-                                        <div>{createtime3}</div>
-                                        <div>{createtime4}</div>
-                                    </div>
-                                );
-                            }
-                        },
+                        // {
+                        //     title: '定位时间',
+                        //     render: (text, record) => {
+                        //         const {
+                        //             createtime3 = '',
+                        //             createtime4 = ''
+                        //         } = record;
+                        //         return (
+                        //             <div>
+                        //                 <div>{createtime3}</div>
+                        //                 <div>{createtime4}</div>
+                        //             </div>
+                        //         );
+                        //     }
+                        // },
                         {
                             title: (
                                 <div>
