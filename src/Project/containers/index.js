@@ -19,7 +19,8 @@ export ProjectImage from './ProjectImage';
 export VolunteerManage from './VolunteerManage';
 
 export ThinClassStorage from './ThinClassStorage';
-export ThinClassManage from './ThinClassManage';
+export ThinClassParcelManage from './ThinClassParcelManage';
+export ThinClassTreeTypeManage from './ThinClassTreeTypeManage';
 export ParcelStorage from './ParcelStorage';
 export ParcelManage from './ParcelManage';
 

@@ -908,8 +908,11 @@ export const MODULES = [
                         id: 'PROJECT.THINCLASSTORAGE',
                         name: '细班导入'
                     }, {
-                        id: 'PROJECT.THINCLASSMANAGE',
-                        name: '细班管理'
+                        id: 'PROJECT.THINCLASSPARCELMANAGE',
+                        name: '细班分块管理'
+                    }, {
+                        id: 'PROJECT.THINCLASSTREETYPEMANAGE',
+                        name: '细班树种管理'
                     }, {
                         id: 'PROJECT.PARCELSTORAGE',
                         name: '地块导入'
