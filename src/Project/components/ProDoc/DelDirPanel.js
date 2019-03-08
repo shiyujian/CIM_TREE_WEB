@@ -45,7 +45,7 @@ export default class DelDirPanel extends Component {
                 console.log(toDeleteDir.name);
                 return toDeleteDir.name;
             } else {
-                if (rst.children.length !== 0) {
+                if (rst && rst.children && rst.children.length !== 0) {
                     return rst.children.map((rst1, index1) => {
                         if (rst1.code === currentcode) {
                             let toDeleteDir = rst1;

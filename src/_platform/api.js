@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-07 19:49:27
+ * @Last Modified time: 2019-03-07 21:55:22
  */
 /**
  *
@@ -187,7 +187,7 @@ export const TREETYPENO = [
         name: '草本'
     }
 ];
-
+// 苗木市场  需求发布
 export const CULTIVATIONMODE = [
     {
         id: 0,
@@ -379,28 +379,28 @@ export const MODULES = [
             }
         ]
     },
-    {
-        id: 'QUALITY',
-        name: '质量管理',
-        children: [
-            {
-                id: 'QUALITY.APPRAISING',
-                name: '质量评优'
-            },
-            {
-                id: 'QUALITY.DEFECT',
-                name: '质量缺陷'
-            },
-            {
-                id: 'QUALITY.QUALITYANALYZE',
-                name: '种植质量分析'
-            },
-            {
-                id: 'QUALITY.FAITHANALYZE',
-                name: '诚信供应商分析'
-            }
-        ]
-    },
+    // {
+    //     id: 'QUALITY',
+    //     name: '质量管理',
+    //     children: [
+    //         {
+    //             id: 'QUALITY.APPRAISING',
+    //             name: '质量评优'
+    //         },
+    //         {
+    //             id: 'QUALITY.DEFECT',
+    //             name: '质量缺陷'
+    //         },
+    //         {
+    //             id: 'QUALITY.QUALITYANALYZE',
+    //             name: '种植质量分析'
+    //         },
+    //         {
+    //             id: 'QUALITY.FAITHANALYZE',
+    //             name: '诚信供应商分析'
+    //         }
+    //     ]
+    // },
     {
         id: 'SCHEDULE',
         name: '进度管理',
@@ -427,50 +427,50 @@ export const MODULES = [
             }
         ]
     },
-    {
-        id: 'SAFETY',
-        name: '安环管理',
-        children: [
-            {
-                id: 'SAFETY.TREND',
-                name: '安全动态'
-            },
-            {
-                id: 'SAFETY.SYSTEM',
-                name: '安全体系'
-            },
-            {
-                id: 'SAFETY.HIDDENDANGER',
-                name: '安全隐患'
-            },
-            {
-                id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT.NONE',
-                name: '安全文明施工',
-                children: [
-                    {
-                        id: 'SAFETY.RISKEVALUATION',
-                        name: '危险源风险评价'
-                    },
-                    {
-                        id: 'SAFETY.UNBEARABLE',
-                        name: '环境保护'
-                    },
-                    {
-                        id: 'SAFETY.RISKFACTOR',
-                        name: '文明施工'
-                    }
-                ]
-            },
-            {
-                id: 'SAFETY.EDUCATIONREGISTER',
-                name: '安全教育'
-            },
-            {
-                id: 'SAFETY.SAFETYTREND',
-                name: '安全动态管理'
-            }
-        ]
-    },
+    // {
+    //     id: 'SAFETY',
+    //     name: '安环管理',
+    //     children: [
+    //         {
+    //             id: 'SAFETY.TREND',
+    //             name: '安全动态'
+    //         },
+    //         {
+    //             id: 'SAFETY.SYSTEM',
+    //             name: '安全体系'
+    //         },
+    //         {
+    //             id: 'SAFETY.HIDDENDANGER',
+    //             name: '安全隐患'
+    //         },
+    //         {
+    //             id: 'SAFETY.DANGEROUSSOURCEMANAGEMENT.NONE',
+    //             name: '安全文明施工',
+    //             children: [
+    //                 {
+    //                     id: 'SAFETY.RISKEVALUATION',
+    //                     name: '危险源风险评价'
+    //                 },
+    //                 {
+    //                     id: 'SAFETY.UNBEARABLE',
+    //                     name: '环境保护'
+    //                 },
+    //                 {
+    //                     id: 'SAFETY.RISKFACTOR',
+    //                     name: '文明施工'
+    //                 }
+    //             ]
+    //         },
+    //         {
+    //             id: 'SAFETY.EDUCATIONREGISTER',
+    //             name: '安全教育'
+    //         },
+    //         {
+    //             id: 'SAFETY.SAFETYTREND',
+    //             name: '安全动态管理'
+    //         }
+    //     ]
+    // },
     {
         id: 'FOREST',
         name: '森林大数据',
@@ -805,14 +805,7 @@ export const MODULES = [
         ]
     }
 ];
-// const APPLABEL = 'accounts';
 
-// const CONTENTTYPE = 'appmeta';
-
-export const DOMAIN_CODES = {
-    dir: '文档222',
-    workPackage: '施工包111'
-};
 // 获取新闻发布单位
 export const DEPARTMENT = [
     {
