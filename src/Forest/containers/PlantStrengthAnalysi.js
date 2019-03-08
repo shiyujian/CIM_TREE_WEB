@@ -104,8 +104,8 @@ export default class PlantStrengthAnalysi extends Component {
         } = this.props;
         let treeList = [];
         let sectionList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
+        if (tree.thinClassTree) {
+            treeList = tree.thinClassTree;
         }
         treeList.map(item => {
             if (item.No === keycode) {

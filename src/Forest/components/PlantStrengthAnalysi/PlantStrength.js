@@ -20,12 +20,20 @@ class PlantStrength extends Component {
         this.state = {
             leftkeycode: '', // 项目code
             sectionList: [], // 标段列表
+            smallClassList: [], // 小班列表
+            thinClassList: [], // 细班列表
+            section: '', // 标段
+            smallClass: '', // 标段
+            thinClass: '', // 细班
             plantAmount: 0, // 累计种植数量
             plantToday: 0, // 今日种植总数
             locationToday: 0, // 今日定位数量
             locationAmount: 0, // 累计定位总数
             realTimeDataList: [] // 实时种植数据列表
         };
+        this.handleSection = this.handleSection.bind(this); // 标段改变
+        this.handleSmallClass = this.handleSmallClass.bind(this); // 小班改变
+        this.handleThinClass = this.handleThinClass.bind(this); // 细班改变
     }
     componentDidMount = async () => {
     }
@@ -83,7 +91,7 @@ class PlantStrength extends Component {
 
     render () {
         const {
-            realTimeDataList, plantAmount, locationAmount, plantToday, locationToday, sectionList
+            realTimeDataList, plantAmount, locationAmount, plantToday, locationToday, sectionList, smallClassList, thinClassList
         } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
@@ -120,33 +128,35 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='标段'
                             >
-                                {getFieldDecorator('section')(
-                                    <Select style={{ width: 120 }}>
-                                        {
-                                            sectionList.map(item => {
-                                                return <Option value={item.No} key={item.No}>{item.Name}</Option>;
-                                            })
-                                        }
-                                    </Select>
-                                )}
+                                <Select style={{ width: 120 }} onChange={this.handleSection.bind(this)}>
+                                    {
+                                        sectionList.map(item => {
+                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                        })
+                                    }
+                                </Select>
                             </Form.Item>
                             <Form.Item
                                 label='小班'
                             >
-                                {getFieldDecorator('section')(
-                                    <Select style={{ width: 120 }} disabled>
-                                        <Option value='lucy'>Lucy</Option>
-                                    </Select>
-                                )}
+                                <Select style={{ width: 120 }} onChange={this.handleSmallClass.bind(this)}>
+                                    {
+                                        smallClassList.map(item => {
+                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                        })
+                                    }
+                                </Select>
                             </Form.Item>
                             <Form.Item
                                 label='细班'
                             >
-                                {getFieldDecorator('section')(
-                                    <Select style={{ width: 120 }} disabled>
-                                        <Option value='lucy'>Lucy</Option>
-                                    </Select>
-                                )}
+                                <Select style={{ width: 120 }} onChange={this.handleThinClass.bind(this)}>
+                                    {
+                                        thinClassList.map(item => {
+                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                        })
+                                    }
+                                </Select>
                             </Form.Item>
                             <Form.Item
                             >
@@ -173,9 +183,12 @@ class PlantStrength extends Component {
                                 label='标段'
                             >
                                 {getFieldDecorator('section')(
-                                    <Select style={{ width: 120 }} disabled>
-
-                                        <Option value='lucy'>Lucy</Option>
+                                    <Select style={{ width: 120 }}>
+                                        {
+                                            sectionList.map(item => {
+                                                return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                            })
+                                        }
                                     </Select>
                                 )}
                             </Form.Item>
@@ -302,6 +315,39 @@ class PlantStrength extends Component {
                 </div>
             </div>
         );
+    }
+    handleSection (value) {
+        const { sectionList } = this.state;
+        let smallClassList = [];
+        sectionList.map(item => {
+            if (item.No === value) {
+                smallClassList = item.children;
+            }
+        });
+        this.setState({
+            section: value,
+            smallClassList
+        });
+    }
+    handleSmallClass (value) {
+        const { smallClassList } = this.state;
+        console.log('123', value);
+        console.log('1233', smallClassList);
+        let thinClassList = [];
+        smallClassList.map(item => {
+            if (item.No === value) {
+                thinClassList = item.children;
+            }
+        });
+        this.setState({
+            smallClass: value,
+            thinClassList
+        });
+    }
+    handleThinClass (value) {
+        this.setState({
+            thinClass: value
+        });
     }
 }
 

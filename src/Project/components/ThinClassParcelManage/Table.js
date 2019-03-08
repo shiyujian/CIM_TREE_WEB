@@ -59,13 +59,9 @@ class Tablelevel extends Component {
         this.columns = [
             {
                 key: '1',
-                title: '序号',
-                dataIndex: '',
-                render: (text, record, index) => {
-                    return (
-                        <span>{index + 1}</span>
-                    );
-                }
+                width: 120,
+                title: '所属标段',
+                dataIndex: 'Section'
             },
             {
                 key: '2',
@@ -74,6 +70,7 @@ class Tablelevel extends Component {
             },
             {
                 key: '3',
+                width: 150,
                 title: '树木类型',
                 dataIndex: 'treetype'
             },
@@ -202,73 +199,6 @@ class Tablelevel extends Component {
             },
             selectedRowKeys: selectedRowKeysList
         };
-        // 子表格
-        let expandedRowRender = (record) => {
-            let columns = [{
-                title: '树木类型',
-                key: '1',
-                dataIndex: 'treeType',
-                render: (text, rec, index) => {
-                    let disabled = true;
-                    if (index === 0) {
-                        disabled = false;
-                    }
-                    return (
-                        <Select showSearch filterOption={false} style={{width: 150}} value={text} disabled={disabled}
-                            placeholder='请输入树木类型名称' onChange={this.handleTreeType.bind(this, index)}
-                            onSearch={this.handleSearch.bind(this)}>
-                            {
-                                treeTypeList.length > 0 ? treeTypeList.map(item => {
-                                    return <Option value={item.ID} key={item.ID}>{item.TreeTypeName}</Option>;
-                                }) : []
-                            }
-                        </Select>
-                    );
-                }
-            }, {
-                title: '栽植量',
-                key: '2',
-                dataIndex: 'Num',
-                render: (text, rec, index) => {
-                    return (
-                        <InputNumber min={1} max={record.num} value={text} onChange={this.handleNum.bind(this, index)} />
-                    );
-                }
-            }, {
-                title: '栽植面积',
-                key: '3',
-                dataIndex: 'Area',
-                render: (text, rec, index) => {
-                    return (
-                        <InputNumber min={1} max={record.Area} value={text} onChange={this.handleArea.bind(this, index)} />
-                    );
-                }
-            }, {
-                title: '操作',
-                key: '4',
-                render: (text, record, index) => {
-                    console.log(this.userSection, '用户所属');
-                    console.log(record, '行数据');
-                    if (this.userSection === record.Section) {
-                        // 可编辑
-                        if (index === 0) {
-                            return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
-                        } else {
-                            return <span>
-                                <a onClick={this.onUpdatePlan.bind(this, record)}>更新</a>
-                                <a onClick={this.onDeletePlan.bind(this, record)} style={{marginLeft: 10}}>删除</a>
-                            </span>;
-                        }
-                    } else {
-                        // 不可编辑
-                        return '';
-                    }
-                }
-            }];
-            return (
-                <Table columns={columns} dataSource={dataListPlan} pagination={false} rowKey='ID' />
-            );
-        };
         return (
             <div className='table-level'>
                 <div>
@@ -294,16 +224,16 @@ class Tablelevel extends Component {
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 650, minHeight: 640, float: 'left'}}>
+                    <div style={{width: 720, minHeight: 640, float: 'left'}}>
                         <Spin spinning={spinning}>
-                            <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection}
+                            <Table rowSelection={rowSelection}
                                 columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
                                 onExpand={this.handleExpanded.bind(this)} />
                         </Spin>
                         <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
                     </div>
                     {/* 地图 */}
-                    <div style={{marginLeft: 670, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
+                    <div style={{marginLeft: 740, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
                         <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
@@ -589,6 +519,7 @@ class Tablelevel extends Component {
                 item.key = index;
             });
             if (rep.code === 200) {
+                console.log('表格数据', rep.content);
                 this.setState({
                     dataList: rep.content,
                     selectedRowKeysList: [],

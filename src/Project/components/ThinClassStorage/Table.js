@@ -419,6 +419,7 @@ class Tablelevel extends Component {
                 message.success('数据导入成功，已默认勾选可以的入库的数据');
                 rep.features.map((item, index) => {
                     item.key = index;
+                    item.Geom = item.Geom.replace(/\s{1}0{1}/g, '');
                 });
                 this.dataList = rep.features;
                 console.log('最初数据', this.dataList);

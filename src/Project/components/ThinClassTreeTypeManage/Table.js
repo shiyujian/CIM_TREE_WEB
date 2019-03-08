@@ -59,13 +59,9 @@ class Tablelevel extends Component {
         this.columns = [
             {
                 key: '1',
-                title: '序号',
-                dataIndex: '',
-                render: (text, record, index) => {
-                    return (
-                        <span>{index + 1}</span>
-                    );
-                }
+                width: 120,
+                title: '所属标段',
+                dataIndex: 'Section'
             },
             {
                 key: '2',
@@ -74,6 +70,7 @@ class Tablelevel extends Component {
             },
             {
                 key: '3',
+                width: 150,
                 title: '树木类型',
                 dataIndex: 'treetype'
             },
@@ -294,7 +291,7 @@ class Tablelevel extends Component {
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 650, minHeight: 640, float: 'left'}}>
+                    <div style={{width: 720, minHeight: 640, float: 'left'}}>
                         <Spin spinning={spinning}>
                             <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection}
                                 columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
@@ -303,7 +300,7 @@ class Tablelevel extends Component {
                         <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
                     </div>
                     {/* 地图 */}
-                    <div style={{marginLeft: 670, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
+                    <div style={{marginLeft: 740, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
                         <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
@@ -577,11 +574,11 @@ class Tablelevel extends Component {
         this.setState({
             spinning: true
         });
-        let { getThinClass } = this.props.actions;
-        getThinClass({}, {
+        let { getDistinctThinClasses } = this.props.actions;
+        getDistinctThinClasses({}, {
             section: section || leftkeycode,
+            // section: 'P191-01-01',
             no: number,
-            treetype: '',
             page: page,
             size: 10
         }).then(rep => {
