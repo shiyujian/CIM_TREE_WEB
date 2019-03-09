@@ -48,16 +48,20 @@ class Tablelevel extends Component {
         this.columns = [
             {
                 title: '标段',
-                key: '1',
+                key: '0',
                 dataIndex: 'Section'
             }, {
                 title: '小班',
-                key: '2',
+                key: '1',
                 dataIndex: 'SmallClass'
             }, {
                 title: '细班',
-                key: '3',
+                key: '2',
                 dataIndex: 'ThinClass'
+            }, {
+                title: '二维码',
+                key: '3',
+                dataIndex: 'SXM'
             }, {
                 title: '树种',
                 key: '4',

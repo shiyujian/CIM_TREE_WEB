@@ -192,11 +192,14 @@ class Tablelevel extends Component {
         const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan, selectedRowKeysList } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
+                console.log('selectedRowKeys', selectedRowKeys, selectedRows);
                 this.setState({
                     selectedRowKeysList: selectedRowKeys
+                }, () => {
+                    this.onLocation(selectedRows);
                 });
-                this.onLocation(selectedRows);
             },
+            type: 'radio',
             selectedRowKeys: selectedRowKeysList
         };
         // 子表格
@@ -626,37 +629,52 @@ class Tablelevel extends Component {
             showModalHistory: false
         });
     }
-    onLocation (recordArr) {
+    onLocation (selectedRows) {
         let { areaLayerList } = this.state;
         areaLayerList.map(item => {
             item.remove();
         });
         let coordinatesArr = []; // 多维数据
-        recordArr.map(record => {
-            let coords = getCoordsArr(record.coords);
-            if (coords && coords instanceof Array && coords.length > 0) {
-                for (let i = 0; i < coords.length; i++) {
-                    let str = coords[i];
-                    let treearea = handleCoordinates(str);
-                    coordinatesArr.push(treearea);
-                }
-            };
-        });
-        // 如果地块存在，则定位过去
-        if (coordinatesArr.length !== 0) {
-            let message = {
-                key: 3,
-                type: 'Feature',
-                properties: {name: '', type: 'area'},
-                geometry: { type: 'Polygon', coordinates: coordinatesArr }
-            };
-            let polygon = this._createMarker(message);
-            // 放大该处视角
-            this.map.fitBounds(polygon.getBounds());
-            this.setState({
-                areaLayerList: [ polygon ]
-            });
+        let no = selectedRows[0].no;
+        let { getThinClass } = this.props.actions;
+        if (!no) {
+            return;
         }
+        getThinClass({}, {
+            section: '',
+            no: no,
+            treetype: '',
+            page: '',
+            size: ''
+        }).then(rep => {
+            console.log('表格数据', rep.content);
+            rep.content.map(record => {
+                let coordsArr = getCoordsArr(record.coords);
+                console.log('coordsArr', coordsArr);
+                let treearea = [];
+                coordsArr.map(item => {
+                    let arr = item.split(' ');
+                    treearea.push([arr[1], arr[0]]);
+                });
+                coordinatesArr.push(treearea);
+            });
+            console.log('coordinatesArr', coordinatesArr);
+            // 如果地块存在，则定位过去
+            if (coordinatesArr.length !== 0) {
+                let message = {
+                    key: 3,
+                    type: 'Feature',
+                    properties: {name: '', type: 'area'},
+                    geometry: { type: 'Polygon', coordinates: coordinatesArr }
+                };
+                let polygon = this._createMarker(message);
+                // 放大该处视角
+                this.map.fitBounds(polygon.getBounds());
+                this.setState({
+                    areaLayerList: [ polygon ]
+                });
+            }
+        });
     }
     /* 在地图上添加marker和polygan */
     _createMarker (geo) {
