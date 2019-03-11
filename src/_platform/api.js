@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-07 21:55:22
+ * @Last Modified time: 2019-03-11 15:25:21
  */
 /**
  *
@@ -92,10 +92,21 @@ export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
 export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
     window.config.STATIC_PREVIEW_PORT
 }`;
+export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
 // 智慧森林
 export const FOREST_API = `${window.config.SDOMAIN}`;
 export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
+export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
+export const FOREST_GIS_TREETYPE_API = `${window.config.DASHBOARD_TREETYPE}`;
+export const TREEPIPE_API = `${window.config.TREEPIPE}`;
+export const INITLEAFLET_API = window.config.initLeaflet;
+
+// 考勤打卡
+export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
+
+// 现场收发文
+export const DISPATCH_MSG_API = window.config.DISPATCH_MSG;
 
 /** *********************静态常量**************************/
 export const WORKFLOW_CODE = {

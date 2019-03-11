@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Radio } from 'antd';
+import { WMSTILELAYERURL, TILEURLS, INITLEAFLET_API } from '_platform/api';
 import './ProjectImageGis.less';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -27,10 +28,7 @@ export default class ProjectImageGis extends Component {
         };
     }
 
-    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
     tileUrls = {
-        // 1: window.config.IMG_W,
-        // 2: window.config.VEC_W,
         1: window.config.IMG_1,
         2: window.config.IMG_2,
         3: window.config.IMG_3,
@@ -63,16 +61,16 @@ export default class ProjectImageGis extends Component {
     }
     /* 初始化地图 */
     initMap () {
-        this.map = L.map('mapid', window.config.initLeaflet);
+        this.map = L.map('mapid', INITLEAFLET_API);
 
-        this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
+        this.imgTileLayer = L.tileLayer(TILEURLS[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 20,
             storagetype: 0
         }).addTo(this.map);
 
-        this.cvaTileLayer = L.tileLayer(`${window.config.WMSTileLayerUrl}`, {
+        this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 20,
@@ -89,16 +87,16 @@ export default class ProjectImageGis extends Component {
         }).addTo(this.map);
     }
     initMap2 () {
-        this.map2 = L.map('mapid2', window.config.initLeaflet);
+        this.map2 = L.map('mapid2', INITLEAFLET_API);
 
-        this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
+        this.imgTileLayer = L.tileLayer(TILEURLS[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 20,
             storagetype: 0
         }).addTo(this.map2);
 
-        this.cvaTileLayer = L.tileLayer(`${window.config.WMSTileLayerUrl}`, {
+        this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 20,

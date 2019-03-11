@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
     Button, Collapse, Notification, Spin, Checkbox
 } from 'antd';
+import {FOREST_GIS_API, TILEURLS, INITLEAFLET_API} from '_platform/api';
 import AreaTreeCreate from '../AreaTreeCreate';
 import TaskCheckTree from '../TaskCheckTree';
 import {
@@ -91,13 +92,7 @@ export default class TaskCreateTable extends Component {
         // { label: '养护任务', value: 'geojsonFeature_task', IconName: 'task' }
     ];
 
-    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
     subDomains = ['7'];
-
-    tileUrls = {
-        1: window.config.IMG_W,
-        2: window.config.VEC_W
-    };
     /* 渲染菜单panel */
     renderPanel (option) {
         const {
@@ -171,11 +166,11 @@ export default class TaskCreateTable extends Component {
     /* 初始化地图 */
     _initMap () {
         let me = this;
-        this.map = L.map('mapid', window.config.initLeaflet);
+        this.map = L.map('mapid', INITLEAFLET_API);
         // 放大缩小地图的按钮
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
         // 加载基础图层
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+        this.tileLayer = L.tileLayer(TILEURLS[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 17,
@@ -268,7 +263,7 @@ export default class TaskCreateTable extends Component {
             this.tileTreeLayerBasic.addTo(this.map);
         } else {
             this.tileTreeLayerBasic = L.tileLayer(
-                window.config.DASHBOARD_ONSITE +
+                FOREST_GIS_API +
                         '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
@@ -1091,9 +1086,9 @@ export default class TaskCreateTable extends Component {
     }
     // 切换为2D
     _toggleTileLayer (index) {
-        this.tileLayer.setUrl(this.tileUrls[index]);
+        this.tileLayer.setUrl(TILEURLS[index]);
         this.setState({
-            TileLayerUrl: this.tileUrls[index],
+            TileLayerUrl: TILEURLS[index],
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
     }

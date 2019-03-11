@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-04 15:25:06
+ * @Last Modified time: 2019-03-11 16:37:14
  */
 import React, { Component } from 'react';
 import {
@@ -52,7 +52,14 @@ import {
     getTreeMessFun,
     getCuringMess
 } from './TreeInfo';
-import { PROJECTPOSITIONCENTER } from '_platform/api';
+import {
+    PROJECTPOSITIONCENTER,
+    FOREST_GIS_API,
+    FOREST_GIS_TREETYPE_API,
+    WMSTILELAYERURL,
+    TILEURLS,
+    INITLEAFLET_API
+} from '_platform/api';
 import MenuSwitch from '../MenuSwitch';
 import {getCompanyDataByOrgCode} from '_platform/auth';
 // 存活率图片
@@ -182,16 +189,10 @@ class OnSite extends Component {
         this.tileTreeWinterProjectLayerBasic = null;
         this.tileTreeTypeLayerFilter = null; // 树种筛选图层
         this.tileSurvivalRateLayerFilter = null; // 成活率范围和标段筛选图层
+        this.tileTreePipeBasic = null; // 灌溉管网图层
         this.map = null;
         this.userDetailList = {}; // 人员信息List
     }
-
-    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
-
-    tileUrls = {
-        1: window.config.IMG_W,
-        2: window.config.VEC_W
-    };
     // 左侧菜单栏的Tree型数据
     options = [
         {
@@ -323,7 +324,7 @@ class OnSite extends Component {
         }
     ]
     // 初始化地图，获取目录树数据
-    async componentDidMount () {
+    componentDidMount = async () => {
         const {
             actions: {
                 getCustomViewByUserID
@@ -340,7 +341,7 @@ class OnSite extends Component {
         } = this.props;
         try {
             let me = this;
-            let mapInitialization = window.config.initLeaflet;
+            let mapInitialization = INITLEAFLET_API;
             if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
                 let view = customViewByUserID[0];
                 let center = [view.center[0].lat, view.center[0].lng];
@@ -348,19 +349,18 @@ class OnSite extends Component {
                 mapInitialization.center = center;
                 mapInitialization.zoom = zoom;
             };
-            console.log('mapInitialization', mapInitialization);
             this.map = L.map('mapid', mapInitialization);
 
             // L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-            this.tileLayer = L.tileLayer(this.tileUrls[1], {
+            this.tileLayer = L.tileLayer(TILEURLS[1], {
                 subdomains: [1, 2, 3],
                 minZoom: 1,
                 maxZoom: 17,
                 storagetype: 0
             }).addTo(this.map);
             // 巡检路线的代码   地图上边的地点的名称
-            L.tileLayer(this.WMSTileLayerUrl, {
+            L.tileLayer(WMSTILELAYERURL, {
                 subdomains: [1, 2, 3],
                 minZoom: 1,
                 maxZoom: 17,
@@ -369,6 +369,7 @@ class OnSite extends Component {
             this.getTileLayerTreeBasic();
             this.getTileTreeWinterThinClassLayerBasic();
             this.getTileTreeWinterProjectLayerBasic();
+            this.getTreePipeLayer();
             // 隐患详情点击事件
             document.querySelector('.leaflet-popup-pane').addEventListener('click', async function (e) {
                 let target = e.target;
@@ -641,7 +642,7 @@ class OnSite extends Component {
                 this.tileTreeLayerBasic.addTo(this.map);
             } else {
                 this.tileTreeLayerBasic = L.tileLayer(
-                    window.config.DASHBOARD_ONSITE +
+                    FOREST_GIS_API +
                             '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                     {
                         opacity: 1.0,
@@ -668,7 +669,7 @@ class OnSite extends Component {
                 this.tileTreeLayerBasic.addTo(this.map);
             } else {
                 this.tileTreeWinterThinClassLayerBasic = L.tileLayer(
-                    window.config.DASHBOARD_ONSITE +
+                    FOREST_GIS_API +
                             'geoserver/gwc/service/wmts?layer=xatree%3Aland&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                     {
                         opacity: 1.0,
@@ -692,7 +693,7 @@ class OnSite extends Component {
                 this.tileTreeLayerBasic.addTo(this.map);
             } else {
                 this.tileTreeWinterProjectLayerBasic = L.tileLayer(
-                    window.config.DASHBOARD_ONSITE +
+                    FOREST_GIS_API +
                             'geoserver/gwc/service/wmts?layer=xatree%3Athinclass&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                     {
                         opacity: 1.0,
@@ -714,7 +715,7 @@ class OnSite extends Component {
             this.tileTreeSurvivalRateLayerBasic.addTo(this.map);
         } else {
             this.tileTreeSurvivalRateLayerBasic = L.tileLayer(
-                window.config.DASHBOARD_ONSITE +
+                FOREST_GIS_API +
                 '/geoserver/gwc/service/wmts?layer=xatree%3Asurvivalrate&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
@@ -742,7 +743,7 @@ class OnSite extends Component {
             this.tileTreeAdoptLayerBasic.addTo(this.map);
         } else {
             this.tileTreeAdoptLayerBasic = L.tileLayer(
-                window.config.DASHBOARD_ONSITE +
+                FOREST_GIS_API +
                 // '/geoserver/gwc/service/wmts?layer=xatree%3Aalladopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 '/geoserver/gwc/service/wmts?layer=xatree%3Aadopttree&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
@@ -768,6 +769,21 @@ class OnSite extends Component {
             this.map.removeLayer(this.tileTreeTypeLayerFilter);
             this.tileTreeTypeLayerFilter = null;
         }
+    }
+    // 加载灌溉管网图层
+    getTreePipeLayer = async () => {
+        this.tileTreePipeBasic = L.tileLayer(
+            FOREST_GIS_TREETYPE_API +
+                    '/geoserver/gwc/service/wmts?layer=xatree%3Apipe&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
+            {
+                opacity: 1.0,
+                subdomains: [1, 2, 3],
+                minZoom: 11,
+                maxZoom: 21,
+                storagetype: 0,
+                tiletype: 'wtms'
+            }
+        ).addTo(this.map);
     }
     // 各个模块之间切换时，去除除当前模块外所有后来添加的图层
     removeAllLayer = () => {
@@ -1447,7 +1463,7 @@ class OnSite extends Component {
                     if (realThinClassLayerList[eventKey]) {
                         realThinClassLayerList[eventKey].addTo(me.map);
                     } else {
-                        var url = window.config.DASHBOARD_TREETYPE +
+                        var url = FOREST_GIS_TREETYPE_API +
                         `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27%20and%20Section+LIKE+%27%25${selectSectionNo}%25%27`;
                         let thinClassLayer = L.tileLayer.wms(url,
                             {
@@ -1737,7 +1753,7 @@ class OnSite extends Component {
         }
         await this.removeTileTreeLayerBasic();
         await this.removeTileTreeTypeLayerFilter();
-        let url = window.config.DASHBOARD_TREETYPE +
+        let url = FOREST_GIS_TREETYPE_API +
             `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${queryData})`;
         // this.tileTreeTypeLayerFilter指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
         this.tileTreeTypeLayerFilter = L.tileLayer.wms(url,
@@ -2166,22 +2182,22 @@ class OnSite extends Component {
             let url = '';
             // 之前任意一种状态存在 都可以进行搜索
             // if (survivalRateRateData && survivalRateSectionData) {
-            //     url = window.config.DASHBOARD_TREETYPE +
+            //     url = FOREST_GIS_TREETYPE_API +
             //     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
             // } else if (survivalRateRateData && !survivalRateSectionData) {
-            //     url = window.config.DASHBOARD_TREETYPE +
+            //     url = FOREST_GIS_TREETYPE_API +
             //     `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
             // } else if (!survivalRateRateData && survivalRateSectionData) {
-            //      url = window.config.DASHBOARD_TREETYPE +
+            //      url = FOREST_GIS_TREETYPE_API +
             //      `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})`;
             // }
             // 初次进入成活率模块，没有对标段数据进行处理，选择了范围数据直接对图层进行更改
             if (switchSurvivalRateFirst) {
-                url = window.config.DASHBOARD_TREETYPE +
+                url = FOREST_GIS_TREETYPE_API +
                 `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
             } else if (survivalRateRateData && survivalRateSectionData) {
                 // 在点击过标段数据之后，只有两种状态都存在，才能进行搜索
-                url = window.config.DASHBOARD_TREETYPE +
+                url = FOREST_GIS_TREETYPE_API +
                 `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
             }
             if (url) {
@@ -2253,9 +2269,9 @@ class OnSite extends Component {
     }
     // 切换为2D
     toggleTileLayer (index) {
-        this.tileLayer.setUrl(this.tileUrls[index]);
+        this.tileLayer.setUrl(TILEURLS[index]);
         this.setState({
-            TileLayerUrl: this.tileUrls[index],
+            TileLayerUrl: TILEURLS[index],
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
     }
@@ -2355,7 +2371,7 @@ class OnSite extends Component {
         // let rowp = row % 256;
         row = Math.floor(row / 256);
         let url =
-            window.config.DASHBOARD_ONSITE +
+            FOREST_GIS_API +
             '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:' +
             zoom +
             '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
@@ -2368,7 +2384,7 @@ class OnSite extends Component {
             rowp;
         if (type === 'geojsonFeature_survivalRate') {
             url =
-            window.config.DASHBOARD_ONSITE +
+            FOREST_GIS_API +
             '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:thinclass&STYLE=&TILEMATRIX=EPSG:4326:' +
             zoom +
             '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +

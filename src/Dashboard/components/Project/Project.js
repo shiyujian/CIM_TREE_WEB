@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../store';
 import { Radio, Button } from 'antd';
-// import { CUS_TILEMAP } from '_platform/api';
+import { WMSTILELAYERURL, TILEURLS, INITLEAFLET_API } from '_platform/api';
 import './Project.less';
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -61,11 +61,8 @@ export default class Project extends Component {
         });
     }
 
-    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
     subDomains = ['7'];
     tileUrls = {
-        // 1: window.config.IMG_W,
-        // 2: window.config.VEC_W,
         1: window.config.IMG_1,
         2: window.config.IMG_2,
         3: window.config.IMG_3,
@@ -76,18 +73,18 @@ export default class Project extends Component {
     };
     /* 初始化地图 */
     initMap () {
-        this.map = L.map('mapid', window.config.initLeaflet);
+        this.map = L.map('mapid', INITLEAFLET_API);
 
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-        this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
+        this.imgTileLayer = L.tileLayer(TILEURLS[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 20,
             storagetype: 0
         }).addTo(this.map);
 
-        this.cvaTileLayer = L.tileLayer(`${window.config.WMSTileLayerUrl}`, {
+        this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 20,
@@ -111,18 +108,18 @@ export default class Project extends Component {
         // });
     }
     initMap2 () {
-        this.map2 = L.map('mapid2', window.config.initLeaflet);
+        this.map2 = L.map('mapid2', INITLEAFLET_API);
 
         L.control.zoom({ position: 'bottomright' }).addTo(this.map2);
 
-        this.imgTileLayer = L.tileLayer(window.config.IMG_W, {
+        this.imgTileLayer = L.tileLayer(TILEURLS[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 20,
             storagetype: 0
         }).addTo(this.map2);
 
-        this.cvaTileLayer = L.tileLayer(`${window.config.WMSTileLayerUrl}`, {
+        this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 20,

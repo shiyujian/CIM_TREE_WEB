@@ -6,6 +6,7 @@ import {
     fillAreaColor,
     getCoordsArr
 } from '../auth';
+import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
 const FormItem = Form.Item;
 const Option = Select.Option;
 window.config = window.config || {};
@@ -83,11 +84,6 @@ class Tablelevel extends Component {
             // }
         ];
     }
-    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
-    tileUrls = {
-        1: window.config.IMG_W,
-        2: window.config.VEC_W
-    };
     componentDidMount () {
         this.initMap();
         let userData = getUser();
@@ -102,14 +98,14 @@ class Tablelevel extends Component {
             zoomControl: false
         });
         // 基础图层
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+        this.tileLayer = L.tileLayer(TILEURLS[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 17,
             storagetype: 0
         }).addTo(this.map);
         // 道路图层
-        L.tileLayer(this.WMSTileLayerUrl, {
+        L.tileLayer(WMSTILELAYERURL, {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 17,
@@ -117,7 +113,7 @@ class Tablelevel extends Component {
         }).addTo(this.map);
         // 树木瓦片图层
         L.tileLayer(
-            window.config.DASHBOARD_ONSITE + '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
+            FOREST_GIS_API + '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
                 opacity: 1.0,
                 subdomains: [1, 2, 3],
                 minZoom: 11,
@@ -353,7 +349,6 @@ class Tablelevel extends Component {
             this.setState({
                 spinning: false
             });
-            return;
         } else {
             importThinClass({}, pro).then(rep => {
                 if (rep.code === 1) {
@@ -413,7 +408,7 @@ class Tablelevel extends Component {
                     fileList: [],
                     showModal: false
                 }, () => {
-                    return;
+
                 });
             } else if (rep.features) {
                 message.success('数据导入成功，已默认勾选可以的入库的数据');

@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { Row, Col, Modal, Card, Steps, Button } from 'antd';
-import { CUS_TILEMAP } from '_platform/api';
+import { CUS_TILEMAP, WMSTILELAYERURL, TILEURLS, INITLEAFLET_API } from '_platform/api';
 import './Register.css';
 const Step = Steps.Step;
-const leafletCenter = window.config.initLeaflet.center;
-const URL = window.config.VEC_W;
 
 export default class HiddenModle extends Component {
     constructor (props) {
@@ -40,33 +38,27 @@ export default class HiddenModle extends Component {
         }
     }
 
-    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
     subDomains = ['7'];
-    tileUrls = {
-        1: window.config.IMG_W,
-        2: window.config.VEC_W
-    };
-    /* 初始化地图*/
+    /* 初始化地图 */
     initMap () {
-        this.map = L.map('mapid', window.config.initLeaflet);
+        this.map = L.map('mapid', INITLEAFLET_API);
 
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+        this.tileLayer = L.tileLayer(TILEURLS[1], {
             attribution: '&copy;<a href="">ecidi</a>',
             id: 'tiandi-map',
             subdomains: this.subDomains
         }).addTo(this.map);
         // 航拍影像
-        if (CUS_TILEMAP)
-            {L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);}
+        if (CUS_TILEMAP) { L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map); }
 
-        L.tileLayer.wms(this.WMSTileLayerUrl, {
+        L.tileLayer.wms(WMSTILELAYERURL, {
             subdomains: this.subDomains
         }).addTo(this.map);
     }
 
-    /* 在地图上添加marker和polygan*/
+    /* 在地图上添加marker和polygan */
     createMarker () {
         let geo = this.props.dataSous;
         if (!geo.geometry.coordinates[0] || !geo.geometry.coordinates[1]) {
