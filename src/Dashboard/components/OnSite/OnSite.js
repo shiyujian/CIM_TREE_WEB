@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-11 16:37:14
+ * @Last Modified time: 2019-03-12 17:23:20
  */
 import React, { Component } from 'react';
 import {
@@ -222,6 +222,10 @@ class OnSite extends Component {
         {
             label: '苗木结缘',
             value: 'geojsonFeature_treeAdopt'
+        },
+        {
+            label: '灌溉管网',
+            value: 'geojsonFeature_treePipe'
         }
     ];
     // 右侧成活率范围
@@ -369,7 +373,7 @@ class OnSite extends Component {
             this.getTileLayerTreeBasic();
             this.getTileTreeWinterThinClassLayerBasic();
             this.getTileTreeWinterProjectLayerBasic();
-            this.getTreePipeLayer();
+            // this.getTreePipeLayer();
             // 隐患详情点击事件
             document.querySelector('.leaflet-popup-pane').addEventListener('click', async function (e) {
                 let target = e.target;
@@ -566,6 +570,10 @@ class OnSite extends Component {
                 });
                 await this.getTileLayerTreeBasic();
                 await this.handleRiskTypeAddLayer();
+            } else if (dashboardCompomentMenu === 'geojsonFeature_treePipe') {
+                // 选择灌溉管网菜单
+                await this.getTileLayerTreeBasic();
+                await this.getTreePipeLayer();
             } else {
                 await this.getTileLayerTreeBasic();
             }
@@ -785,6 +793,12 @@ class OnSite extends Component {
             }
         ).addTo(this.map);
     }
+    // 去除灌溉管网图层
+    removeTileTreePipeLayer = async () => {
+        if (this.tileTreePipeBasic) {
+            this.map.removeLayer(this.tileTreePipeBasic);
+        }
+    }
     // 各个模块之间切换时，去除除当前模块外所有后来添加的图层
     removeAllLayer = () => {
         const {
@@ -841,6 +855,9 @@ class OnSite extends Component {
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement') {
                 this.handleRemoveRealThinClassLayer();
+            }
+            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treePipe') {
+                this.removeTileTreePipeLayer();
             }
         } catch (e) {
             console.log('去除所有图层', e);
@@ -1055,18 +1072,22 @@ class OnSite extends Component {
                         menuTreeVisible
                             ? (
                                 this.options.map(option => {
-                                    if (dashboardCompomentMenu === option.value) {
-                                        return (
-                                            <div className='dashboard-menuPanel' key={option.value}>
-                                                <aside className='dashboard-aside' draggable='false'>
-                                                    <div className='dashboard-asideTree'>
-                                                        {this.renderPanel(option)}
-                                                    </div>
-                                                </aside>
-                                            </div>
-                                        );
-                                    } else {
+                                    if (option.value === 'geojsonFeature_treePipe') {
                                         return '';
+                                    } else {
+                                        if (dashboardCompomentMenu === option.value) {
+                                            return (
+                                                <div className='dashboard-menuPanel' key={option.value}>
+                                                    <aside className='dashboard-aside' draggable='false'>
+                                                        <div className='dashboard-asideTree'>
+                                                            {this.renderPanel(option)}
+                                                        </div>
+                                                    </aside>
+                                                </div>
+                                            );
+                                        } else {
+                                            return '';
+                                        }
                                     }
                                 })
                             ) : ''
