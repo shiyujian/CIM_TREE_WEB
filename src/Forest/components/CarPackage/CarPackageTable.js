@@ -39,7 +39,7 @@ export default class CarPackageTable extends Component {
             leftkeycode: '',
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
-            sxm: '',
+            licenseplate: '',
             section: '',
             bigType: '',
             treetype: '',
@@ -280,12 +280,12 @@ export default class CarPackageTable extends Component {
             statusoption
         } = this.props;
         const {
-            sxm,
+            licenseplate,
             section,
             status,
             mmtype
         } = this.state;
-        const suffix1 = sxm ? (
+        const suffix1 = licenseplate ? (
             <Icon type='close-circle' onClick={this.emitEmpty1} />
         ) : null;
         let columns = [];
@@ -447,9 +447,9 @@ export default class CarPackageTable extends Component {
                         <span className='forest-search-span'>车牌号：</span>
                         <Input
                             suffix={suffix1}
-                            value={sxm}
+                            value={licenseplate}
                             className='forest-forestcalcw4'
-                            onChange={this.sxmChange.bind(this)}
+                            onChange={this.licenseplateChange.bind(this)}
                         />
                     </div>
                     <div className='forest-mrg10'>
@@ -515,17 +515,17 @@ export default class CarPackageTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={20} className='forest-quryrstcnt'>
+                    <Col span={18} className='forest-quryrstcnt'>
                         <span>
                             此次查询共有车辆：
                             {this.state.pagination.total}辆
                         </span>
                     </Col>
-                    {/* <Col span={2}>
-							<Button type='primary' onClick={this.exportexcel.bind(this)}>
+                    <Col span={2}>
+                        <Button type='primary' onClick={this.exportexcel.bind(this)}>
 								导出
-							</Button>
-						</Col> */}
+                        </Button>
+                    </Col>
                     <Col span={2}>
                         <Button
                             type='primary'
@@ -618,11 +618,11 @@ export default class CarPackageTable extends Component {
     }
 
     emitEmpty1 = () => {
-        this.setState({ sxm: '' });
+        this.setState({ licenseplate: '' });
     };
 
-    sxmChange (value) {
-        this.setState({ sxm: value.target.value });
+    licenseplateChange (value) {
+        this.setState({ licenseplate: value.target.value });
     }
 
     onSectionChange (value) {
@@ -685,7 +685,7 @@ export default class CarPackageTable extends Component {
 
     qury = async (page) => {
         const {
-            sxm = '',
+            licenseplate = '',
             section = '',
             stime = '',
             etime = '',
@@ -693,7 +693,7 @@ export default class CarPackageTable extends Component {
             status = '',
             mmtype = ''
         } = this.state;
-        if (section === '' && sxm === '') {
+        if (section === '' && licenseplate === '') {
             message.info('请选择项目及标段信息或输入车牌号');
             return;
         }
@@ -708,7 +708,7 @@ export default class CarPackageTable extends Component {
         try {
             let thinClassTree = tree.thinClassTree;
             let postdata = {
-                licenseplate: sxm,
+                licenseplate: licenseplate,
                 section: section === '' ? keycode : section,
                 isshrub: mmtype,
                 stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
@@ -755,44 +755,41 @@ export default class CarPackageTable extends Component {
         }
     }
 
-    exportexcel () {
+    exportexcel = async () => {
         const {
-            sxm = '',
+            licenseplate = '',
             section = '',
             stime = '',
             etime = '',
-            exportsize,
             status = '',
             mmtype = ''
         } = this.state;
+        if (section === '' && licenseplate === '') {
+            message.info('请选择项目及标段信息或输入车牌号');
+            return;
+        }
         const {
             actions: { getexportcarpackage },
             keycode = ''
         } = this.props;
-        if (section === '' && sxm === '') {
-            message.info('请选择项目及标段信息或输入车牌号');
-            return;
-        }
         let postdata = {
-            licenseplate: sxm,
+            licenseplate: licenseplate,
             section: section === '' ? keycode : section,
             isshrub: mmtype,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            page: 1,
-            size: exportsize,
             status
         };
 
         this.setState({ loading: true, percent: 0 });
-        getexportcarpackage({}, postdata).then(rst3 => {
-            if (rst3 === '') {
-                message.info('没有符合条件的信息');
-            } else {
-                this.createLink(this, `${FOREST_API}/${rst3}`);
-            }
-            this.setState({ loading: false });
-        });
+        let rst3 = await getexportcarpackage({}, postdata);
+        console.log('rst3', rst3);
+        if (rst3 === '') {
+            message.info('没有符合条件的信息');
+        } else {
+            this.createLink(this, `${FOREST_API}/${rst3}`);
+        }
+        this.setState({ loading: false });
     }
 
     createLink (name, url) {
