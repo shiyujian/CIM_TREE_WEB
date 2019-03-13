@@ -77,6 +77,10 @@ export default class MenuSwitch extends Component {
 
     options = [
         {
+            label: '灌溉管网',
+            value: 'geojsonFeature_treePipe'
+        },
+        {
             label: '树种筛选',
             value: 'geojsonFeature_treetype'
         },

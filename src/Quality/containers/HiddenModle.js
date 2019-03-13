@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Modal, Card, Steps, Button } from 'antd';
 import {
-    CUS_TILEMAP
+    CUS_TILEMAP, WMSTILELAYERURL, TILEURLS, INITLEAFLET_API
 } from '_platform/api';
 import './Register.css';
 const Step = Steps.Step;
@@ -40,19 +40,14 @@ export default class HiddenModle extends Component {
         }
     }
 
-    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
     subDomains = ['7'];
-    tileUrls = {
-        1: window.config.IMG_W,
-        2: window.config.VEC_W
-    };
     /* 初始化地图 */
     initMap () {
-        this.map = L.map('mapid', window.config.initLeaflet);
+        this.map = L.map('mapid', INITLEAFLET_API);
 
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+        this.tileLayer = L.tileLayer(TILEURLS[1], {
             attribution: '&copy;<a href="">ecidi</a>',
             id: 'tiandi-map',
             subdomains: this.subDomains
@@ -65,7 +60,7 @@ export default class HiddenModle extends Component {
         }
 
         L.tileLayer
-            .wms(this.WMSTileLayerUrl, {
+            .wms(WMSTILELAYERURL, {
                 subdomains: this.subDomains
             })
             .addTo(this.map);

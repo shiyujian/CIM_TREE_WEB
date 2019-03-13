@@ -695,20 +695,21 @@ class TablePerson extends Component {
             });
         }
     };
-    async confirm (record) {
+    confirm = async (record) => {
         const {
             actions: { putUserBlackList }
         } = this.props;
-        console.log('record', record);
-        this.setState({ loading: true });
-        putUserBlackList(
-            { userID: record.children[0].id },
-            {
-                is_black: 0,
-                change_all: true,
-                black_remark: ''
-            }
-        ).then(rst => {
+        try {
+            console.log('record', record);
+            this.setState({ loading: true });
+            let rst = await putUserBlackList(
+                { userID: record.children[0].id },
+                {
+                    is_black: 0,
+                    change_all: true,
+                    black_remark: ''
+                }
+            );
             console.log('rst111111111111', rst);
             let tempDatas = [];
             this.state.tempData.map(item => {
@@ -728,7 +729,9 @@ class TablePerson extends Component {
                 loading: false
             });
             this.querys();
-        });
+        } catch (e) {
+            console.log('confirm', e);
+        }
     }
 }
 export default Form.create()(TablePerson);

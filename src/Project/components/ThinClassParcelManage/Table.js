@@ -6,6 +6,7 @@ import {
     handleCoordinates
 } from '../auth';
 import { formItemLayout, getUser } from '_platform/auth';
+import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
 const FormItem = Form.Item;
 const Option = Select.Option;
 window.config = window.config || {};
@@ -59,13 +60,9 @@ class Tablelevel extends Component {
         this.columns = [
             {
                 key: '1',
-                title: '序号',
-                dataIndex: '',
-                render: (text, record, index) => {
-                    return (
-                        <span>{index + 1}</span>
-                    );
-                }
+                width: 120,
+                title: '所属标段',
+                dataIndex: 'Section'
             },
             {
                 key: '2',
@@ -74,17 +71,18 @@ class Tablelevel extends Component {
             },
             {
                 key: '3',
-                title: '树木类型',
+                width: 150,
+                title: '树种',
                 dataIndex: 'treetype'
             },
             {
                 key: '4',
-                title: '栽植量',
+                title: '设计量',
                 dataIndex: 'num'
             },
             {
                 key: '5',
-                title: '细班面积',
+                title: '设计面积',
                 dataIndex: 'area'
             },
             {
@@ -101,11 +99,6 @@ class Tablelevel extends Component {
             }
         ];
     }
-    WMSTileLayerUrl = window.config.WMSTileLayerUrl;
-    tileUrls = {
-        1: window.config.IMG_W,
-        2: window.config.VEC_W
-    };
     componentDidMount () {
         let userData = getUser();
         this.userSection = userData.sections.slice(2, -2);
@@ -118,8 +111,6 @@ class Tablelevel extends Component {
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
-            console.log('nextProps', nextProps.sectionList);
-            console.log('userSection', this.userSection);
             this.setState({
                 section: '',
                 number: '',
@@ -149,14 +140,14 @@ class Tablelevel extends Component {
             zoomControl: false
         });
         // 基础图层
-        this.tileLayer = L.tileLayer(this.tileUrls[1], {
+        this.tileLayer = L.tileLayer(TILEURLS[1], {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 17,
             storagetype: 0
         }).addTo(this.map);
         // 道路图层
-        L.tileLayer(this.WMSTileLayerUrl, {
+        L.tileLayer(WMSTILELAYERURL, {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 17,
@@ -164,7 +155,7 @@ class Tablelevel extends Component {
         }).addTo(this.map);
         // 树木瓦片图层
         L.tileLayer(
-            window.config.DASHBOARD_ONSITE + '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
+            FOREST_GIS_API + '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
                 opacity: 1.0,
                 subdomains: [1, 2, 3],
                 minZoom: 11,
@@ -202,73 +193,6 @@ class Tablelevel extends Component {
             },
             selectedRowKeys: selectedRowKeysList
         };
-        // 子表格
-        let expandedRowRender = (record) => {
-            let columns = [{
-                title: '树木类型',
-                key: '1',
-                dataIndex: 'treeType',
-                render: (text, rec, index) => {
-                    let disabled = true;
-                    if (index === 0) {
-                        disabled = false;
-                    }
-                    return (
-                        <Select showSearch filterOption={false} style={{width: 150}} value={text} disabled={disabled}
-                            placeholder='请输入树木类型名称' onChange={this.handleTreeType.bind(this, index)}
-                            onSearch={this.handleSearch.bind(this)}>
-                            {
-                                treeTypeList.length > 0 ? treeTypeList.map(item => {
-                                    return <Option value={item.ID} key={item.ID}>{item.TreeTypeName}</Option>;
-                                }) : []
-                            }
-                        </Select>
-                    );
-                }
-            }, {
-                title: '栽植量',
-                key: '2',
-                dataIndex: 'Num',
-                render: (text, rec, index) => {
-                    return (
-                        <InputNumber min={1} max={record.num} value={text} onChange={this.handleNum.bind(this, index)} />
-                    );
-                }
-            }, {
-                title: '栽植面积',
-                key: '3',
-                dataIndex: 'Area',
-                render: (text, rec, index) => {
-                    return (
-                        <InputNumber min={1} max={record.Area} value={text} onChange={this.handleArea.bind(this, index)} />
-                    );
-                }
-            }, {
-                title: '操作',
-                key: '4',
-                render: (text, record, index) => {
-                    console.log(this.userSection, '用户所属');
-                    console.log(record, '行数据');
-                    if (this.userSection === record.Section) {
-                        // 可编辑
-                        if (index === 0) {
-                            return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
-                        } else {
-                            return <span>
-                                <a onClick={this.onUpdatePlan.bind(this, record)}>更新</a>
-                                <a onClick={this.onDeletePlan.bind(this, record)} style={{marginLeft: 10}}>删除</a>
-                            </span>;
-                        }
-                    } else {
-                        // 不可编辑
-                        return '';
-                    }
-                }
-            }];
-            return (
-                <Table columns={columns} dataSource={dataListPlan} pagination={false} rowKey='ID' />
-            );
-        };
         return (
             <div className='table-level'>
                 <div>
@@ -294,16 +218,16 @@ class Tablelevel extends Component {
                     </Form>
                 </div>
                 <div style={{marginTop: 20}}>
-                    <div style={{width: 650, minHeight: 640, float: 'left'}}>
+                    <div style={{width: 720, minHeight: 640, float: 'left'}}>
                         <Spin spinning={spinning}>
-                            <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection}
+                            <Table rowSelection={rowSelection}
                                 columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
                                 onExpand={this.handleExpanded.bind(this)} />
                         </Spin>
                         <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
                     </div>
                     {/* 地图 */}
-                    <div style={{marginLeft: 670, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
+                    <div style={{marginLeft: 740, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
                         <div id='mapid' style={{height: 640, width: '100%'}} />
                     </div>
                 </div>
@@ -629,22 +553,36 @@ class Tablelevel extends Component {
             showModalHistory: false
         });
     }
-    onLocation (recordArr) {
+    onLocation (selectedRows) {
         let { areaLayerList } = this.state;
         areaLayerList.map(item => {
             item.remove();
         });
-        let coordinatesArr = []; // 多维数据
-        recordArr.map(record => {
-            let coords = getCoordsArr(record.coords);
-            if (coords && coords instanceof Array && coords.length > 0) {
-                for (let i = 0; i < coords.length; i++) {
-                    let str = coords[i];
-                    let treearea = handleCoordinates(str);
-                    coordinatesArr.push(treearea);
-                }
-            };
+        let coordinatesArr = []; // 多维数据[[], [], []]
+        let patternArr = []; // 图形数组['135.12 39.80,135.12 39.80', '125.12 39.80,125.12 39.80']
+        console.log('selectedRows', selectedRows);
+        selectedRows.map(record => {
+            console.log(record.coords, '最初数据');
+            let temporaryWKT = record.coords;
+            if (temporaryWKT.indexOf('MULTIPOLYGON') !== -1) {
+                temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('(((') + 3, temporaryWKT.indexOf(')))'));
+                patternArr = patternArr.concat(temporaryWKT.split(')),(('));
+            } else {
+                temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('((') + 2, temporaryWKT.indexOf('))'));
+                patternArr.push(temporaryWKT);
+            }
         });
+        console.log('patternArr', patternArr);
+        patternArr.map(item => {
+            let coordsArr = item.split(',');
+            let treearea = [];
+            coordsArr.map(record => {
+                let arr = record.split(' ');
+                treearea.push([arr[1], arr[0]]);
+            });
+            coordinatesArr.push(treearea);
+        });
+        console.log('coordinatesArr', coordinatesArr);
         // 如果地块存在，则定位过去
         if (coordinatesArr.length !== 0) {
             let message = {

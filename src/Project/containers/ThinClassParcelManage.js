@@ -1,24 +1,26 @@
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Tabs } from 'antd';
-import * as actions from '../store';
-import { PkCodeTree } from '../components';
-import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
     Body,
+    DynamicTitle,
     Sidebar,
-    Content,
-    DynamicTitle
+    Content
 } from '_platform/components/layout';
-import { PlantStrength } from '../components/PlantStrengthAnalysi';
-import { getAreaTreeData, getDefaultProject } from '_platform/auth';
-const TabPane = Tabs.TabPane;
+import { TreeProjectList } from '../components';
+import { actions as platformActions } from '_platform/store/global';
+import { actions } from '../store/thinClassParcelManage';
+import { Table } from '../components/ThinClassParcelManage';
+import { getAreaTreeData, getDefaultProject, getUser } from '_platform/auth';
 @connect(
     state => {
-        const { forest, platform } = state;
-        return { ...forest, platform };
+        const {
+            project: { nurseryManagement = {} },
+            platform
+        } = state || {};
+        return { ...nurseryManagement, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -27,21 +29,23 @@ const TabPane = Tabs.TabPane;
         )
     })
 )
-export default class PlantStrengthAnalysi extends Component {
+class ThinClassParcelManage extends Component {
+    static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
             leftkeycode: '', // 项目
             sectionList: [] // 标段列表
         };
+        this.userSection = ''; // 用户所属标段
     }
-
     componentDidMount = async () => {
+        let userData = getUser();
+        this.userSection = userData.sections.slice(2, -2);
         const {
             actions: {
                 getTreeNodeList,
                 getThinClassList,
-                getTotalThinClass,
                 getThinClassTree
             },
             platform: { tree = {} }
@@ -49,10 +53,7 @@ export default class PlantStrengthAnalysi extends Component {
         try {
             if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
                 let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
-                let totalThinClass = data.totalThinClass || [];
                 let projectList = data.projectList || [];
-                // 获取所有的小班数据，用来计算养护任务的位置
-                await getTotalThinClass(totalThinClass);
                 // 区域地块树
                 await getThinClassTree(projectList);
             }
@@ -64,7 +65,6 @@ export default class PlantStrengthAnalysi extends Component {
             console.log('e', e);
         }
     }
-
     render () {
         const {
             platform: { tree = {} }
@@ -76,22 +76,25 @@ export default class PlantStrengthAnalysi extends Component {
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
         }
+        if (this.userSection) {
+            console.log('userSection', this.userSection);
+            console.log('treeList', treeList);
+        }
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='栽植进度分析' {...this.props} />
+                    <DynamicTitle title='细班分块管理' {...this.props} />
                     <Sidebar width={190}>
-                        <PkCodeTree
-                            treeData={treeList}
-                            selectedKeys={leftkeycode}
-                            onSelect={this.onSelect.bind(this)}
-                        />
+                        {
+                            treeList.length > 0 ? <TreeProjectList
+                                treeData={treeList}
+                                selectedKeys={leftkeycode}
+                                onSelect={this.onSelect.bind(this)}
+                            /> : ''
+                        }
                     </Sidebar>
                     <Content>
-                        <PlantStrength
-                            {...this.props}
-                            {...this.state}
-                        />
+                        <Table {...this.props} {...this.state} />
                     </Content>
                 </Main>
             </Body>
@@ -104,8 +107,8 @@ export default class PlantStrengthAnalysi extends Component {
         } = this.props;
         let treeList = [];
         let sectionList = [];
-        if (tree.thinClassTree) {
-            treeList = tree.thinClassTree;
+        if (tree.bigTreeList) {
+            treeList = tree.bigTreeList;
         }
         treeList.map(item => {
             if (item.No === keycode) {
@@ -118,3 +121,5 @@ export default class PlantStrengthAnalysi extends Component {
         });
     }
 }
+
+export default ThinClassParcelManage;

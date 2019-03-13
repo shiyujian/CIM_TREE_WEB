@@ -11,8 +11,8 @@ import {
 } from '_platform/components/layout';
 import { TreeProjectList } from '../components';
 import { actions as platformActions } from '_platform/store/global';
-import { actions } from '../store/thinClassManage';
-import { Table } from '../components/ThinClassManage';
+import { actions } from '../store/thinClassTreeTypeManage';
+import { Table } from '../components/ThinClassTreeTypeManage';
 import { getAreaTreeData, getDefaultProject, getUser } from '_platform/auth';
 @connect(
     state => {
@@ -29,7 +29,7 @@ import { getAreaTreeData, getDefaultProject, getUser } from '_platform/auth';
         )
     })
 )
-class ThinClassManage extends Component {
+class ThinClassTreeTypeManage extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -83,7 +83,7 @@ class ThinClassManage extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='细班管理' {...this.props} />
+                    <DynamicTitle title='细班树种管理' {...this.props} />
                     <Sidebar width={190}>
                         {
                             treeList.length > 0 ? <TreeProjectList
@@ -122,4 +122,4 @@ class ThinClassManage extends Component {
     }
 }
 
-export default ThinClassManage;
+export default ThinClassTreeTypeManage;

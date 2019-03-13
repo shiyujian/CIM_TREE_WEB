@@ -241,10 +241,17 @@ export default class Project extends Component {
                     icon: <Icon name='code' />
                 },
                 {
-                    key: 'ThinClassManage',
-                    id: 'PROJECT.THINCLASSMANAGE',
-                    name: '细班管理',
-                    path: '/project/thinClassManage',
+                    key: 'ThinClassParcelManage',
+                    id: 'PROJECT.THINCLASSPARCELMANAGE',
+                    name: '细班分块管理',
+                    path: '/project/thinClassParcelManage',
+                    icon: <Icon name='code' />
+                },
+                {
+                    key: 'ThinClassTreeTypeManage',
+                    id: 'PROJECT.THINCLASSTREETYPEMANAGE',
+                    name: '细班树种管理',
+                    path: '/project/thinClassTreeTypeManage',
                     icon: <Icon name='code' />
                 },
                 {

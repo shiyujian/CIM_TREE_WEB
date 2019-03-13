@@ -1084,7 +1084,6 @@ class Edit extends Component {
         });
         // 如果拉黑为true的话，则is_active就为false
         changeAdditionField('is_black', checked);
-        changeAdditionField('is_active', !checked);
     }
     changeBlack_remark (value) {
         const {

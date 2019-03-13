@@ -14,7 +14,7 @@ import {
     Progress
 } from 'antd';
 import { getUser } from '../../../_platform/auth';
-import { UPLOAD_API, SOURCE_API } from '../../../_platform/api';
+import { UPLOAD_API, SOURCE_API, DISPATCH_MSG_API } from '../../../_platform/api';
 import E from 'wangeditor';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -513,10 +513,10 @@ class ToggleModal extends Component {
                                         msg_all = orgs_all.map(person => {
                                             let obj = {
                                                 sms_free_sign_name:
-                                                window.config.DISPATCH_MSG
+                                                DISPATCH_MSG_API
                                                     .NAME,
                                                 sms_template_code:
-                                                window.config.DISPATCH_MSG
+                                                DISPATCH_MSG_API
                                                     .CODE,
                                                 phone_number: String(
                                                     person.account
@@ -620,10 +620,10 @@ class ToggleModal extends Component {
                                         msg_all = orgs_all.map(person => {
                                             let obj = {
                                                 sms_free_sign_name:
-                                                window.config.DISPATCH_MSG
+                                                DISPATCH_MSG_API
                                                     .NAME,
                                                 sms_template_code:
-                                                window.config.DISPATCH_MSG
+                                                DISPATCH_MSG_API
                                                     .CODE,
                                                 phone_number: String(
                                                     person.account

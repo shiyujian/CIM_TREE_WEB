@@ -10,7 +10,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../../store/defect';
-import { CUS_TILEMAP, WMSTILELAYERURL, TILEURLS } from '../../../_platform/api';
+import { CUS_TILEMAP, WMSTILELAYERURL, TILEURLS, INITLEAFLET_API } from '../../../_platform/api';
 
 @connect(
     state => {
@@ -26,7 +26,7 @@ export class DefectMap extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            leafletCenter: window.config.initLeaflet.center,
+            leafletCenter: INITLEAFLET_API.center,
             oldLayer: null
         };
         this.checkMarkers = {};
@@ -55,43 +55,37 @@ export class DefectMap extends Component {
         );
     }
 
-	WMSTileLayerUrl = WMSTILELAYERURL;
-	subDomains = ['7'];
+    subDomains = ['7'];
+    /* 初始化地图 */
+    initMap () {
+        this.map = L.map('defectmapid', INITLEAFLET_API);
 
-	tileUrls = TILEURLS;
+        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-	/*初始化地图 */
-	initMap () {
-	    this.map = L.map('defectmapid', window.config.initLeaflet);
+        this.tileLayer = L.tileLayer(TILEURLS[1], {
+            attribution: '&copy;<a href="">ecidi</a>',
+            id: 'tiandi-map',
+            subdomains: this.subDomains
+        }).addTo(this.map);
+        // 航拍影像
+        if (CUS_TILEMAP) { L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map); };
 
-	    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+        L.tileLayer.wms(WMSTILELAYERURL, {
+            subdomains: this.subDomains
+        }).addTo(this.map);
+    }
 
-	    this.tileLayer = L.tileLayer(this.tileUrls[1], {
-	        attribution: '&copy;<a href="">ecidi</a>',
-	        id: 'tiandi-map',
-	        subdomains: this.subDomains
-	    }).addTo(this.map);
-	    // 航拍影像
-	    if (CUS_TILEMAP)
-	        {L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map)};
-
-	    L.tileLayer.wms(this.WMSTileLayerUrl, {
-	        subdomains: this.subDomains
-	    }).addTo(this.map);
-	}
-
-	/*在地图上添加marker和polygan */
-	createMarker = (defectData, oldLayer) => {
-	    if (oldLayer)
-	        {oldLayer.remove();}
-	    if (defectData) {
-	        const iconType = L.divIcon({ className: 'mapIcon' });
-	        const coordinates = [defectData.lat, defectData.lng];
-	        const marker = L.marker(coordinates, { icon: iconType }).addTo(this.map)
-	            .bindPopup(`${defectData.defectNum}`)
-	            .openPopup();
-	        return marker;
-	    }
-	    return [];
-	}
+    /* 在地图上添加marker和polygan */
+    createMarker = (defectData, oldLayer) => {
+        if (oldLayer) { oldLayer.remove(); }
+        if (defectData) {
+            const iconType = L.divIcon({ className: 'mapIcon' });
+            const coordinates = [defectData.lat, defectData.lng];
+            const marker = L.marker(coordinates, { icon: iconType }).addTo(this.map)
+                .bindPopup(`${defectData.defectNum}`)
+                .openPopup();
+            return marker;
+        }
+        return [];
+    }
 }

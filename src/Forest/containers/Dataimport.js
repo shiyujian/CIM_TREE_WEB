@@ -19,8 +19,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { SERVICE_API } from '_platform/api';
-var download = window.config.nurseryLocation;
+import { SERVICE_API, NURSERYLOCATION_DOWLOAD } from '_platform/api';
 @connect(
     state => {
         const { forest, platform } = state;
@@ -277,7 +276,6 @@ export default class Dataimport extends Component {
         }
     }
     onDownloadClick () {
-        console.log('download', download);
-        window.open(download);
+        window.open(NURSERYLOCATION_DOWLOAD);
     }
 }

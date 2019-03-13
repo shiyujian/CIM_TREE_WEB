@@ -18,20 +18,80 @@ class PlantStrength extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            realTimeDataList: [], // 实时种植数据列表
-            ActiveUser: 0, // 日最高活跃账号数
-            SessionCount: 0, // 今日用户活跃度
-            TotalUser: 0
+            leftkeycode: '', // 项目code
+            sectionList: [], // 标段列表
+            smallClassList: [], // 小班列表
+            thinClassList: [], // 细班列表
+            section: '', // 标段
+            smallClass: '', // 标段
+            thinClass: '', // 细班
+            plantAmount: 0, // 累计种植数量
+            plantToday: 0, // 今日种植总数
+            locationToday: 0, // 今日定位数量
+            locationAmount: 0, // 累计定位总数
+            realTimeDataList: [] // 实时种植数据列表
         };
+        this.handleSection = this.handleSection.bind(this); // 标段改变
+        this.handleSmallClass = this.handleSmallClass.bind(this); // 小班改变
+        this.handleThinClass = this.handleThinClass.bind(this); // 细班改变
     }
     componentDidMount = async () => {
+    }
+    componentWillReceiveProps = async (nextProps) => {
+        const {
+            actions: { getTotalSat, getLocationStat, getCount, getLocationStatBySpecfield }
+        } = this.props;
+        if (nextProps.leftkeycode) {
+            console.log('nextProps', nextProps.sectionList);
+            console.log('leftkeycode', nextProps.leftkeycode);
+            // 获取当前种树信息
+            let getTotalSatTreePostdata = {
+                statType: 'tree',
+                section: nextProps.leftkeycode
+            };
+            let plantAmount = await getTotalSat({}, getTotalSatTreePostdata);
+            let postdata = {
+                no: nextProps.leftkeycode,
+                section: ''
+            };
+            let locationStat = await getLocationStat({}, postdata);
+            let getCountPostData = {
+                stime: moment().format('YYYY/MM/DD 00:00:00'),
+                etime: moment().format('YYYY/MM/DD 23:59:59'),
+                no: nextProps.leftkeycode
+            };
+            // 今日种植棵数
+            let sectionPlantArr = await getCount({}, getCountPostData);
+            let plantToday = 0;
+            sectionPlantArr.map(item => {
+                plantToday += item.Num;
+            });
+            let param = {
+                stattype: 'smallclass',
+                section: 'P191',
+                stime: '',
+                etime: ''
+            };
+            let sectionLocationToday = await getLocationStatBySpecfield({}, param);
+            let locationToday = 0;
+            sectionLocationToday.map(item => {
+                locationToday += item.Num;
+            });
+            console.log('sectionList', nextProps.sectionList);
+            this.setState({
+                locationToday,
+                plantToday,
+                locationAmount: locationStat.split(',')[1],
+                plantAmount,
+                leftkeycode: nextProps.leftkeycode,
+                sectionList: nextProps.sectionList
+            });
+        }
     }
 
     render () {
         const {
-            realTimeDataList,
-            ActiveUser,
-            SessionCount
+            realTimeDataList, plantAmount, locationAmount, plantToday, locationToday, sectionList, smallClassList, thinClassList
         } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
@@ -39,13 +99,25 @@ class PlantStrength extends Component {
                 <div>
                     <h2>实时数据：{moment().format('HH:mm:ss')}</h2>
                     <div>
-                        <Card title='关键数据' style={{float: 'left', width: 600}}>
-                            <Card.Grid style={gridStyle}>Content</Card.Grid>
-                            <Card.Grid style={gridStyle}>Content</Card.Grid>
-                            <Card.Grid style={gridStyle}>Content</Card.Grid>
-                            <Card.Grid style={gridStyle}>Content</Card.Grid>
+                        <Card title='关键数据' style={{float: 'left', width: 800}}>
+                            <Card.Grid style={gridStyle}>
+                                <h3>苗木累计种植数量</h3>
+                                <div style={{fontSize: 26}}>{plantAmount}</div>
+                            </Card.Grid>
+                            <Card.Grid style={gridStyle}>
+                                <h3>苗木累计定位数量</h3>
+                                <div style={{fontSize: 26}}>{locationAmount}</div>
+                            </Card.Grid>
+                            <Card.Grid style={gridStyle}>
+                                <h3>苗木今日种植数量</h3>
+                                <div style={{fontSize: 26}}>{plantToday}</div>
+                            </Card.Grid>
+                            <Card.Grid style={gridStyle}>
+                                <h3>苗木今日定位数量</h3>
+                                <div style={{fontSize: 26}}>{locationToday}</div>
+                            </Card.Grid>
                         </Card>
-                        <List size='small' style={{marginLeft: 620}}
+                        <List size='small' style={{marginLeft: 820}}
                             header={<div>实时种植数据</div>} dataSource={realTimeDataList} />
                     </div>
                 </div>
@@ -56,29 +128,35 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='标段'
                             >
-                                {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
-                                        <Option value='lucy'>Lucy</Option>
-                                    </Select>
-                                )}
+                                <Select style={{ width: 120 }} onChange={this.handleSection.bind(this)}>
+                                    {
+                                        sectionList.map(item => {
+                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                        })
+                                    }
+                                </Select>
                             </Form.Item>
                             <Form.Item
                                 label='小班'
                             >
-                                {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
-                                        <Option value='lucy'>Lucy</Option>
-                                    </Select>
-                                )}
+                                <Select style={{ width: 120 }} onChange={this.handleSmallClass.bind(this)}>
+                                    {
+                                        smallClassList.map(item => {
+                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                        })
+                                    }
+                                </Select>
                             </Form.Item>
                             <Form.Item
                                 label='细班'
                             >
-                                {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
-                                        <Option value='lucy'>Lucy</Option>
-                                    </Select>
-                                )}
+                                <Select style={{ width: 120 }} onChange={this.handleThinClass.bind(this)}>
+                                    {
+                                        thinClassList.map(item => {
+                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                        })
+                                    }
+                                </Select>
                             </Form.Item>
                             <Form.Item
                             >
@@ -105,8 +183,12 @@ class PlantStrength extends Component {
                                 label='标段'
                             >
                                 {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
-                                        <Option value='lucy'>Lucy</Option>
+                                    <Select style={{ width: 120 }}>
+                                        {
+                                            sectionList.map(item => {
+                                                return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                            })
+                                        }
                                     </Select>
                                 )}
                             </Form.Item>
@@ -114,7 +196,7 @@ class PlantStrength extends Component {
                                 label='小班'
                             >
                                 {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
+                                    <Select style={{ width: 120 }} disabled>
                                         <Option value='lucy'>Lucy</Option>
                                     </Select>
                                 )}
@@ -123,7 +205,7 @@ class PlantStrength extends Component {
                                 label='细班'
                             >
                                 {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
+                                    <Select style={{ width: 120 }} disabled>
                                         <Option value='lucy'>Lucy</Option>
                                     </Select>
                                 )}
@@ -132,7 +214,7 @@ class PlantStrength extends Component {
                                 label='类型'
                             >
                                 {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
+                                    <Select style={{ width: 120 }} disabled>
                                         <Option value='lucy'>Lucy</Option>
                                     </Select>
                                 )}
@@ -141,7 +223,7 @@ class PlantStrength extends Component {
                                 label='树种'
                             >
                                 {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
+                                    <Select style={{ width: 120 }} disabled>
                                         <Option value='lucy'>Lucy</Option>
                                     </Select>
                                 )}
@@ -171,7 +253,7 @@ class PlantStrength extends Component {
                                 label='树种'
                             >
                                 {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
+                                    <Select style={{ width: 120 }} disabled>
                                         <Option value='lucy'>Lucy</Option>
                                     </Select>
                                 )}
@@ -209,7 +291,7 @@ class PlantStrength extends Component {
                                 label='树种'
                             >
                                 {getFieldDecorator('section')(
-                                    <Select defaultValue='lucy' style={{ width: 120 }} disabled>
+                                    <Select style={{ width: 120 }} disabled>
                                         <Option value='lucy'>Lucy</Option>
                                     </Select>
                                 )}
@@ -233,6 +315,39 @@ class PlantStrength extends Component {
                 </div>
             </div>
         );
+    }
+    handleSection (value) {
+        const { sectionList } = this.state;
+        let smallClassList = [];
+        sectionList.map(item => {
+            if (item.No === value) {
+                smallClassList = item.children;
+            }
+        });
+        this.setState({
+            section: value,
+            smallClassList
+        });
+    }
+    handleSmallClass (value) {
+        const { smallClassList } = this.state;
+        console.log('123', value);
+        console.log('1233', smallClassList);
+        let thinClassList = [];
+        smallClassList.map(item => {
+            if (item.No === value) {
+                thinClassList = item.children;
+            }
+        });
+        this.setState({
+            smallClass: value,
+            thinClassList
+        });
+    }
+    handleThinClass (value) {
+        this.setState({
+            thinClass: value
+        });
     }
 }
 
