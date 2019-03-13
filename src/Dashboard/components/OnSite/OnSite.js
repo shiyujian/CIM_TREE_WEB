@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-12 17:23:20
+ * @Last Modified time: 2019-03-13 15:22:54
  */
 import React, { Component } from 'react';
 import {
@@ -17,22 +17,25 @@ import {
     Modal,
     Form,
     Row,
+    Col,
+    Checkbox,
     Notification,
     Popconfirm
 } from 'antd';
 import './OnSite.less';
-import RiskTree from './RiskTree';
-import TrackTree from './TrackTree';
-import TreeTypeTree from './TreeTypeTree';
-import RiskDetail from './RiskDetail';
+import RiskTree from './Risk/RiskTree';
+import TrackTree from './Track/TrackTree';
+import TreeTypeTree from './TreeType/TreeTypeTree';
+import RiskDetail from './Risk/RiskDetail';
 import OnSiteAreaTree from './OnSiteAreaTree';
-import TreeMessModal from './TreeMessModal';
-import CuringTaskTree from './CuringTaskTree';
-import SurvivalRateTree from './SurvivalRateTree';
-import TreeAdoptTree from './TreeAdoptTree';
-import AdoptTreeMessModal from './AdoptTreeMessModal';
-import SaveUserMapCustomPositionModal from './SaveUserMapCustomPositionModal';
+import TreeMessModal from './TreeMess/TreeMessModal';
+import CuringTaskTree from './Curing/CuringTaskTree';
+import SurvivalRateTree from './SurvivalRate/SurvivalRateTree';
+import TreeAdoptTree from './Adopt/TreeAdoptTree';
+import AdoptTreeMessModal from './Adopt/AdoptTreeMessModal';
+import SaveUserMapCustomPositionModal from './MapCustom/SaveUserMapCustomPositionModal';
 import GetMenuTree from './GetMenuTree';
+import TreePipePage from './TreePipe/TreePipePage';
 import {
     genPopUpContent,
     getIconType,
@@ -51,7 +54,7 @@ import {
     getSeedlingMess,
     getTreeMessFun,
     getCuringMess
-} from './TreeInfo';
+} from './TreeMess/TreeInfo';
 import {
     PROJECTPOSITIONCENTER,
     FOREST_GIS_API,
@@ -71,27 +74,27 @@ import sixtyImg from '../SurvivalRateImg/50~60.png';
 import fiftyImg from '../SurvivalRateImg/40~50.png';
 import foutyImg from '../SurvivalRateImg/0~40.png';
 // 安全隐患类型图片
-import riskDangerImg from './RiskImg/danger.png';
-import riskQualityImg from './RiskImg/quality.png';
-import riskOtherImg from './RiskImg/other.png';
+import riskDangerImg from '../RiskImg/danger.png';
+import riskQualityImg from '../RiskImg/quality.png';
+import riskOtherImg from '../RiskImg/other.png';
 // 养护任务类型图片
-import curingTaskDrainImg from './CuringTaskImg/drain.png';
-import curingTaskFeedImg from './CuringTaskImg/feed.png';
-import curingTaskOtherImg from './CuringTaskImg/other.png';
-import curingTaskReplantingImg from './CuringTaskImg/replanting.png';
-import curingTaskTrimImg from './CuringTaskImg/trim.png';
-import curingTaskWateringImg from './CuringTaskImg/watering.png';
-import curingTaskWeedImg from './CuringTaskImg/weed.png';
-import curingTaskWormImg from './CuringTaskImg/worm.png';
+import curingTaskDrainImg from '../CuringTaskImg/drain.png';
+import curingTaskFeedImg from '../CuringTaskImg/feed.png';
+import curingTaskOtherImg from '../CuringTaskImg/other.png';
+import curingTaskReplantingImg from '../CuringTaskImg/replanting.png';
+import curingTaskTrimImg from '../CuringTaskImg/trim.png';
+import curingTaskWateringImg from '../CuringTaskImg/watering.png';
+import curingTaskWeedImg from '../CuringTaskImg/weed.png';
+import curingTaskWormImg from '../CuringTaskImg/worm.png';
 // 自定义视图
-import areaViewImg from './InitialPositionImg/areaView.png';
-import customViewImg from './InitialPositionImg/customView.png';
-import customViewCloseUnSelImg from './InitialPositionImg/delete1.png';
-import customViewCloseSelImg from './InitialPositionImg/delete2.png';
-import distanceMeasureUnSelImg from './MeasureImg/distanceUnSel.png';
-import distanceMeasureSelImg from './MeasureImg/distanceSel.png';
-import areaMeasureUnSelImg from './MeasureImg/areaUnSel.png';
-import areaMeasureSelImg from './MeasureImg/areaSel.png';
+import areaViewImg from '../InitialPositionImg/areaView.png';
+import customViewImg from '../InitialPositionImg/customView.png';
+import customViewCloseUnSelImg from '../InitialPositionImg/delete1.png';
+import customViewCloseSelImg from '../InitialPositionImg/delete2.png';
+import distanceMeasureUnSelImg from '../MeasureImg/distanceUnSel.png';
+import distanceMeasureSelImg from '../MeasureImg/distanceSel.png';
+import areaMeasureUnSelImg from '../MeasureImg/areaUnSel.png';
+import areaMeasureSelImg from '../MeasureImg/areaSel.png';
 
 window.config = window.config || {};
 class OnSite extends Component {
@@ -118,8 +121,6 @@ class OnSite extends Component {
             treeMarkerLayer: '',
             areaLayerList: {}, // 区域地块图层list
             realThinClassLayerList: {}, // 实际细班种植图层
-
-            treeTypeTreeMarkerLayer: '', // 树种筛选树节点图层
 
             trackLayerList: {}, // 轨迹图层List
             trackMarkerLayerList: {}, // 轨迹图标图层List
@@ -187,7 +188,7 @@ class OnSite extends Component {
         this.tileTreeAdoptLayerBasic = null; // 苗木结缘全部图层
         this.tileTreeWinterThinClassLayerBasic = null;
         this.tileTreeWinterProjectLayerBasic = null;
-        this.tileTreeTypeLayerFilter = null; // 树种筛选图层
+        
         this.tileSurvivalRateLayerFilter = null; // 成活率范围和标段筛选图层
         this.tileTreePipeBasic = null; // 灌溉管网图层
         this.map = null;
@@ -327,6 +328,48 @@ class OnSite extends Component {
             img: curingTaskOtherImg
         }
     ]
+    // 灌溉管网类型
+    treePipeTypeOptions = [
+        {
+            id: 'curingTaskFeed',
+            label: '快速取水器'
+        },
+        {
+            id: 'curingTaskDrain',
+            label: '三通'
+        },
+        {
+            id: 'curingTaskReplanting',
+            label: '四通'
+        },
+        {
+            id: 'curingTaskWorm',
+            label: '阀水井'
+        },
+        {
+            id: 'curingTaskTrim',
+            label: '水井'
+        },
+        {
+            id: 'curingTaskWeed',
+            label: '泄水井'
+        }
+    ]
+    // 灌溉管网口径范围
+    treePipeRateOptions = [
+        {
+            id: 'survivalRateHundred',
+            label: '0 ~ 63'
+        },
+        {
+            id: 'survivalRateNinety',
+            label: '63 ~ 100'
+        },
+        {
+            id: 'survivalRateEighty',
+            label: '100 ~ 150'
+        }
+    ]
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
@@ -373,7 +416,6 @@ class OnSite extends Component {
             this.getTileLayerTreeBasic();
             this.getTileTreeWinterThinClassLayerBasic();
             this.getTileTreeWinterProjectLayerBasic();
-            // this.getTreePipeLayer();
             // 隐患详情点击事件
             document.querySelector('.leaflet-popup-pane').addEventListener('click', async function (e) {
                 let target = e.target;
@@ -573,7 +615,6 @@ class OnSite extends Component {
             } else if (dashboardCompomentMenu === 'geojsonFeature_treePipe') {
                 // 选择灌溉管网菜单
                 await this.getTileLayerTreeBasic();
-                await this.getTreePipeLayer();
             } else {
                 await this.getTileLayerTreeBasic();
             }
@@ -771,34 +812,6 @@ class OnSite extends Component {
             this.map.removeLayer(this.tileTreeAdoptLayerBasic);
         }
     }
-    // 去除树种筛选瓦片图层
-    removeTileTreeTypeLayerFilter = () => {
-        if (this.tileTreeTypeLayerFilter) {
-            this.map.removeLayer(this.tileTreeTypeLayerFilter);
-            this.tileTreeTypeLayerFilter = null;
-        }
-    }
-    // 加载灌溉管网图层
-    getTreePipeLayer = async () => {
-        this.tileTreePipeBasic = L.tileLayer(
-            FOREST_GIS_TREETYPE_API +
-                    '/geoserver/gwc/service/wmts?layer=xatree%3Apipe&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-            {
-                opacity: 1.0,
-                subdomains: [1, 2, 3],
-                minZoom: 11,
-                maxZoom: 21,
-                storagetype: 0,
-                tiletype: 'wtms'
-            }
-        ).addTo(this.map);
-    }
-    // 去除灌溉管网图层
-    removeTileTreePipeLayer = async () => {
-        if (this.tileTreePipeBasic) {
-            this.map.removeLayer(this.tileTreePipeBasic);
-        }
-    }
     // 各个模块之间切换时，去除除当前模块外所有后来添加的图层
     removeAllLayer = () => {
         const {
@@ -819,9 +832,6 @@ class OnSite extends Component {
                         [option.id]: false
                     });
                 });
-            }
-            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treetype') {
-                this.removeTileTreeTypeLayerFilter();
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_curingTask') {
                 this.handleRemoveAllCuringTaskLayer();
@@ -855,9 +865,6 @@ class OnSite extends Component {
             }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement') {
                 this.handleRemoveRealThinClassLayer();
-            }
-            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treePipe') {
-                this.removeTileTreePipeLayer();
             }
         } catch (e) {
             console.log('去除所有图层', e);
@@ -971,9 +978,8 @@ class OnSite extends Component {
                         <TreeTypeTree
                             {...this.props}
                             {...this.state}
-                            onCheck={this.handleTreeTypeCheck.bind(this)}
-                            onLocation={this.treeTypeTreeLocation.bind(this)}
-                            cancelLocation={this.treeTypeTreeCancelLocation.bind(this)}
+                            map={this.map}
+                            removeTileTreeLayerBasic={this.removeTileTreeLayerBasic.bind(this)}
                             featureName={option.value}
                             treetypes={treetypes}
                         />
@@ -1346,6 +1352,51 @@ class OnSite extends Component {
 
                                     }
                                 </div>
+                            ) : ''
+                    }
+                    { // 灌溉管网菜单
+                        dashboardCompomentMenu === 'geojsonFeature_treePipe'
+                            ? (
+                                <TreePipePage
+                                    map={this.map}
+                                    {...this.props}
+                                    {...this.state}
+
+                                />
+                                // <div className='dashboard-menuSwitchTreePipeLayout'>
+                                //     <div style={{margin: 10}}>
+                                //         <Row className='dashboard-menuSwitchTreePipeBorder'>
+                                //             <span>类型</span>
+                                //         </Row>
+                                //         <Row>
+                                //             {
+                                //                 this.treePipeTypeOptions.map((option) => {
+                                //                     return (
+                                //                         <Col span={12} style={{marginTop: 5}}>
+                                //                             <Checkbox onChange={this.pipeTypeChange.bind(this, option)}>{option.label}</Checkbox>
+                                //                         </Col>
+                                //                     );
+                                //                 })
+                                //             }
+                                //         </Row>
+                                //     </div>
+                                //     <div style={{margin: 10}}>
+                                //         <Row className='dashboard-menuSwitchTreePipeBorder'>
+                                //             <span>口径</span>
+                                //         </Row>
+                                //         <Row>
+                                //             {
+                                //                 this.treePipeRateOptions.map((option) => {
+                                //                     return (
+                                //                         <Col span={12} style={{marginTop: 5}}>
+                                //                             <Checkbox onChange={this.pipeCaliberChange.bind(this, option)}>{option.label}</Checkbox>
+                                //                         </Col>
+                                //                     );
+                                //                 })
+                                //             }
+                                //         </Row>
+                                //     </div>
+                                // </div>
                             ) : ''
                     }
                     <div className='dashboard-gisTypeBut'>
@@ -1748,76 +1799,6 @@ class OnSite extends Component {
         } catch (e) {
 
         }
-    }
-    /* 树种筛选多选树节点 */
-    handleTreeTypeCheck = async (keys, info) => {
-        let queryData = '';
-        let selectAllStatus = false;
-        for (let i = 0; i < keys.length; i++) {
-            if (keys[i] === '全部') {
-                selectAllStatus = true;
-            }
-            // 字符串中不获取‘全部’的字符串
-            if (keys[i] > 6 && keys[i] !== '全部') {
-                queryData = queryData + keys[i];
-                if (i < keys.length - 1) {
-                    queryData = queryData + ',';
-                }
-            }
-        }
-        // 如果选中全部，并且最后一位为逗号，则去除最后一位的逗号
-        if (selectAllStatus) {
-            let data = queryData.substr(queryData.length - 1, 1);
-            if (data === ',') {
-                queryData = queryData.substr(0, queryData.length - 1);
-            }
-        }
-        await this.removeTileTreeLayerBasic();
-        await this.removeTileTreeTypeLayerFilter();
-        let url = FOREST_GIS_TREETYPE_API +
-            `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${queryData})`;
-        // this.tileTreeTypeLayerFilter指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
-        this.tileTreeTypeLayerFilter = L.tileLayer.wms(url,
-            {
-                layers: 'xatree:treelocation',
-                crs: L.CRS.EPSG4326,
-                format: 'image/png',
-                maxZoom: 22,
-                transparent: true
-            }
-        ).addTo(this.map);
-    }
-    // 树种筛选模块搜索树然后进行定位
-    treeTypeTreeLocation = async (data) => {
-        const {
-            treeTypeTreeMarkerLayer
-        } = this.state;
-        if (treeTypeTreeMarkerLayer) {
-            this.map.removeLayer(treeTypeTreeMarkerLayer);
-        }
-        let iconType = L.divIcon({
-            className: getIconType('treeType')
-        });
-        let marker = L.marker([data.Y, data.X], {
-            icon: iconType
-        });
-        marker.addTo(this.map);
-        this.map.panTo([data.Y, data.X]);
-        this.setState({
-            treeTypeTreeMarkerLayer: marker
-        });
-    }
-    // 取消树节点定位
-    treeTypeTreeCancelLocation = async () => {
-        const {
-            treeTypeTreeMarkerLayer
-        } = this.state;
-        if (treeTypeTreeMarkerLayer) {
-            this.map.removeLayer(treeTypeTreeMarkerLayer);
-        }
-        this.setState({
-            treeTypeTreeMarkerLayer: ''
-        });
     }
     // 搜索之后的养护任务数据
     handleCuringTaskSearchData = (searchData) => {
@@ -2928,6 +2909,14 @@ class OnSite extends Component {
             distanceMeasureLineList: {},
             distanceMeasureMarkerList: {}
         });
+    }
+    // 管网类型选中
+    pipeTypeChange = () => {
+
+    }
+    // 管网口径选中
+    pipeCaliberChange = () => {
+
     }
 }
 export default Form.create()(OnSite);

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Input, Modal, Form, Notification } from 'antd';
 import { PROJECTPOSITIONCENTER } from '_platform/api';
-import './AdoptTreeMess.less';
+import './SaveUserMapCustomPositionModal.less';
 
 class SaveUserMapCustomPositionModal extends Component {
     constructor (props) {

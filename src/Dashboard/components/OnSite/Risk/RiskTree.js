@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
 import './RiskTree.less';
 import moment from 'moment';
-import {handleRiskData} from '../auth';
+import {handleRiskData} from '../../auth';
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
@@ -225,14 +225,14 @@ export default class RiskTree extends Component {
                     stime,
                     etime
                 }, () => {
-                    if(riskTree && riskTree instanceof Array && riskTree.length > 0) {
+                    if (riskTree && riskTree instanceof Array && riskTree.length > 0) {
                         if (riskRectify) {
                             this.query();
                         } else { // 如果之前发起过请求，直接赋值
                             this.props.onSearchData(riskTree);
                         }
                     } else {
-                        this.query()
+                        this.query();
                     }
                 });
                 return;

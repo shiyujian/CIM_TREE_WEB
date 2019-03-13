@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Input } from 'antd';
 import moment from 'moment';
-import {handleTrackData} from '../auth';
+import {handleTrackData} from '../../auth';
 import './TrackTree.less';
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
