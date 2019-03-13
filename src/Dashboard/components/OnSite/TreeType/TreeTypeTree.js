@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree, Input, Spin } from 'antd';
 const TreeNode = Tree.TreeNode;
 const Search = Input.Search;
-export default class TreeAdoptTree extends Component {
+export default class TreeTypeTree extends Component {
     constructor (props) {
         super(props);
         this.state = {

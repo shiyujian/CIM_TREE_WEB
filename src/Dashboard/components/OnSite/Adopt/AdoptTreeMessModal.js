@@ -2,19 +2,19 @@ import React, { Component } from 'react';
 import { Button, Modal, Form, Row, Col, Spin } from 'antd';
 import './AdoptTreeMess.less';
 import moment from 'moment';
-import adoptImg from './TreeAdoptImg/adopt.png';
-import defaultTreeImg from './TreeAdoptImg/defaultTree.jpg';
-import defaultUserImg from './TreeAdoptImg/defaultUser.png';
+import adoptImg from '../../TreeAdoptImg/adopt.png';
+import defaultTreeImg from '../../TreeAdoptImg/defaultTree.jpg';
+import defaultUserImg from '../../TreeAdoptImg/defaultUser.png';
 
-import titleImg from './TreeAdoptImg/title.png';
-import lineImg from './TreeAdoptImg/line.png';
-import codeImg from './TreeAdoptImg/code.png';
-import productLocationImg from './TreeAdoptImg/productLocation.png';
-import liftTimeImg from './TreeAdoptImg/liftTime.png';
-import treeLocationImg from './TreeAdoptImg/treeLocation.png';
-import curingTasksImg from './TreeAdoptImg/curingTask.png';
-import curingTaskMessImg from './TreeAdoptImg/curingTaskMess.png';
-import closeImg from './TreeAdoptImg/close.png';
+import titleImg from '../../TreeAdoptImg/title.png';
+import lineImg from '../../TreeAdoptImg/line.png';
+import codeImg from '../../TreeAdoptImg/code.png';
+import productLocationImg from '../../TreeAdoptImg/productLocation.png';
+import liftTimeImg from '../../TreeAdoptImg/liftTime.png';
+import treeLocationImg from '../../TreeAdoptImg/treeLocation.png';
+import curingTasksImg from '../../TreeAdoptImg/curingTask.png';
+import curingTaskMessImg from '../../TreeAdoptImg/curingTaskMess.png';
+import closeImg from '../../TreeAdoptImg/close.png';
 
 class AdoptTreeMessModal extends Component {
     constructor (props) {

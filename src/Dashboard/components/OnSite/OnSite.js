@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-12 17:23:20
+ * @Last Modified time: 2019-03-13 14:57:27
  */
 import React, { Component } from 'react';
 import {
@@ -17,22 +17,25 @@ import {
     Modal,
     Form,
     Row,
+    Col,
+    Checkbox,
     Notification,
     Popconfirm
 } from 'antd';
 import './OnSite.less';
-import RiskTree from './RiskTree';
-import TrackTree from './TrackTree';
-import TreeTypeTree from './TreeTypeTree';
-import RiskDetail from './RiskDetail';
+import RiskTree from './Risk/RiskTree';
+import TrackTree from './Track/TrackTree';
+import TreeTypeTree from './TreeType/TreeTypeTree';
+import RiskDetail from './Risk/RiskDetail';
 import OnSiteAreaTree from './OnSiteAreaTree';
-import TreeMessModal from './TreeMessModal';
-import CuringTaskTree from './CuringTaskTree';
-import SurvivalRateTree from './SurvivalRateTree';
-import TreeAdoptTree from './TreeAdoptTree';
-import AdoptTreeMessModal from './AdoptTreeMessModal';
-import SaveUserMapCustomPositionModal from './SaveUserMapCustomPositionModal';
+import TreeMessModal from './TreeMess/TreeMessModal';
+import CuringTaskTree from './Curing/CuringTaskTree';
+import SurvivalRateTree from './SurvivalRate/SurvivalRateTree';
+import TreeAdoptTree from './Adopt/TreeAdoptTree';
+import AdoptTreeMessModal from './Adopt/AdoptTreeMessModal';
+import SaveUserMapCustomPositionModal from './MapCustom/SaveUserMapCustomPositionModal';
 import GetMenuTree from './GetMenuTree';
+import TreePipePage from './TreePipe/TreePipePage';
 import {
     genPopUpContent,
     getIconType,
@@ -51,7 +54,7 @@ import {
     getSeedlingMess,
     getTreeMessFun,
     getCuringMess
-} from './TreeInfo';
+} from './TreeMess/TreeInfo';
 import {
     PROJECTPOSITIONCENTER,
     FOREST_GIS_API,
@@ -71,27 +74,27 @@ import sixtyImg from '../SurvivalRateImg/50~60.png';
 import fiftyImg from '../SurvivalRateImg/40~50.png';
 import foutyImg from '../SurvivalRateImg/0~40.png';
 // 安全隐患类型图片
-import riskDangerImg from './RiskImg/danger.png';
-import riskQualityImg from './RiskImg/quality.png';
-import riskOtherImg from './RiskImg/other.png';
+import riskDangerImg from '../RiskImg/danger.png';
+import riskQualityImg from '../RiskImg/quality.png';
+import riskOtherImg from '../RiskImg/other.png';
 // 养护任务类型图片
-import curingTaskDrainImg from './CuringTaskImg/drain.png';
-import curingTaskFeedImg from './CuringTaskImg/feed.png';
-import curingTaskOtherImg from './CuringTaskImg/other.png';
-import curingTaskReplantingImg from './CuringTaskImg/replanting.png';
-import curingTaskTrimImg from './CuringTaskImg/trim.png';
-import curingTaskWateringImg from './CuringTaskImg/watering.png';
-import curingTaskWeedImg from './CuringTaskImg/weed.png';
-import curingTaskWormImg from './CuringTaskImg/worm.png';
+import curingTaskDrainImg from '../CuringTaskImg/drain.png';
+import curingTaskFeedImg from '../CuringTaskImg/feed.png';
+import curingTaskOtherImg from '../CuringTaskImg/other.png';
+import curingTaskReplantingImg from '../CuringTaskImg/replanting.png';
+import curingTaskTrimImg from '../CuringTaskImg/trim.png';
+import curingTaskWateringImg from '../CuringTaskImg/watering.png';
+import curingTaskWeedImg from '../CuringTaskImg/weed.png';
+import curingTaskWormImg from '../CuringTaskImg/worm.png';
 // 自定义视图
-import areaViewImg from './InitialPositionImg/areaView.png';
-import customViewImg from './InitialPositionImg/customView.png';
-import customViewCloseUnSelImg from './InitialPositionImg/delete1.png';
-import customViewCloseSelImg from './InitialPositionImg/delete2.png';
-import distanceMeasureUnSelImg from './MeasureImg/distanceUnSel.png';
-import distanceMeasureSelImg from './MeasureImg/distanceSel.png';
-import areaMeasureUnSelImg from './MeasureImg/areaUnSel.png';
-import areaMeasureSelImg from './MeasureImg/areaSel.png';
+import areaViewImg from '../InitialPositionImg/areaView.png';
+import customViewImg from '../InitialPositionImg/customView.png';
+import customViewCloseUnSelImg from '../InitialPositionImg/delete1.png';
+import customViewCloseSelImg from '../InitialPositionImg/delete2.png';
+import distanceMeasureUnSelImg from '../MeasureImg/distanceUnSel.png';
+import distanceMeasureSelImg from '../MeasureImg/distanceSel.png';
+import areaMeasureUnSelImg from '../MeasureImg/areaUnSel.png';
+import areaMeasureSelImg from '../MeasureImg/areaSel.png';
 
 window.config = window.config || {};
 class OnSite extends Component {
@@ -325,6 +328,48 @@ class OnSite extends Component {
             id: 'curingTaskOther',
             label: '其他',
             img: curingTaskOtherImg
+        }
+    ]
+    // 灌溉管网类型
+    treePipeTypeOptions = [
+        {
+            id: 'curingTaskFeed',
+            label: '快速取水器'
+        },
+        {
+            id: 'curingTaskDrain',
+            label: '三通'
+        },
+        {
+            id: 'curingTaskReplanting',
+            label: '四通'
+        },
+        {
+            id: 'curingTaskWorm',
+            label: '阀水井'
+        },
+        {
+            id: 'curingTaskTrim',
+            label: '水井'
+        },
+        {
+            id: 'curingTaskWeed',
+            label: '泄水井'
+        }
+    ]
+    // 灌溉管网口径范围
+    treePipeRateOptions = [
+        {
+            id: 'survivalRateHundred',
+            label: '0 ~ 63'
+        },
+        {
+            id: 'survivalRateNinety',
+            label: '63 ~ 100'
+        },
+        {
+            id: 'survivalRateEighty',
+            label: '100 ~ 150'
         }
     ]
     // 初始化地图，获取目录树数据
@@ -573,7 +618,7 @@ class OnSite extends Component {
             } else if (dashboardCompomentMenu === 'geojsonFeature_treePipe') {
                 // 选择灌溉管网菜单
                 await this.getTileLayerTreeBasic();
-                await this.getTreePipeLayer();
+                // await this.getTreePipeLayer();
             } else {
                 await this.getTileLayerTreeBasic();
             }
@@ -1346,6 +1391,51 @@ class OnSite extends Component {
 
                                     }
                                 </div>
+                            ) : ''
+                    }
+                    { // 灌溉管网菜单
+                        dashboardCompomentMenu === 'geojsonFeature_treePipe'
+                            ? (
+                                <TreePipePage
+                                    map={this.map}
+                                    {...this.props}
+                                    {...this.state}
+
+                                />
+                                // <div className='dashboard-menuSwitchTreePipeLayout'>
+                                //     <div style={{margin: 10}}>
+                                //         <Row className='dashboard-menuSwitchTreePipeBorder'>
+                                //             <span>类型</span>
+                                //         </Row>
+                                //         <Row>
+                                //             {
+                                //                 this.treePipeTypeOptions.map((option) => {
+                                //                     return (
+                                //                         <Col span={12} style={{marginTop: 5}}>
+                                //                             <Checkbox onChange={this.pipeTypeChange.bind(this, option)}>{option.label}</Checkbox>
+                                //                         </Col>
+                                //                     );
+                                //                 })
+                                //             }
+                                //         </Row>
+                                //     </div>
+                                //     <div style={{margin: 10}}>
+                                //         <Row className='dashboard-menuSwitchTreePipeBorder'>
+                                //             <span>口径</span>
+                                //         </Row>
+                                //         <Row>
+                                //             {
+                                //                 this.treePipeRateOptions.map((option) => {
+                                //                     return (
+                                //                         <Col span={12} style={{marginTop: 5}}>
+                                //                             <Checkbox onChange={this.pipeCaliberChange.bind(this, option)}>{option.label}</Checkbox>
+                                //                         </Col>
+                                //                     );
+                                //                 })
+                                //             }
+                                //         </Row>
+                                //     </div>
+                                // </div>
                             ) : ''
                     }
                     <div className='dashboard-gisTypeBut'>
@@ -2928,6 +3018,14 @@ class OnSite extends Component {
             distanceMeasureLineList: {},
             distanceMeasureMarkerList: {}
         });
+    }
+    // 管网类型选中
+    pipeTypeChange = () => {
+
+    }
+    // 管网口径选中
+    pipeCaliberChange = () => {
+
     }
 }
 export default Form.create()(OnSite);

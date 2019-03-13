@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
 import './CuringTaskTree.less';
 import moment from 'moment';
-import {handleCuringTaskData} from '../auth';
+import {handleCuringTaskData} from '../../auth';
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
@@ -322,7 +322,7 @@ export default class CuringTaskTree extends Component {
                     curingTaskTreeData = await handleCuringTaskData(curingTypesData, curingTasks);
                     await getCuringTaskTreeLoading(false);
                     if (timeType === 'all') {
-                        await getCuringTaskTree(curingTaskTreeData)
+                        await getCuringTaskTree(curingTaskTreeData);
                     }
                     await this.props.onSearchData(curingTaskTreeData);
                     this.setState({
