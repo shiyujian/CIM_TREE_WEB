@@ -23,7 +23,89 @@
     width: 220px;
 }
 
+.dashboard-menuPanel {
+    position: absolute;
+    left: 330px;
+    top: 40px;
+    height: 80%;
+    width: 260px;
+    transition: all 0.3s;
+    z-index: 980;
+
+    .dashboard-aside {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        top: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255, 0.9);
+        color: #333;
+        z-index: 999;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        .dashboard-asideTree {
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+    }
+}
+
 .RiskTree-data-text {
     float: right;
     // margin-right: 23px;
+}
+
+.dashboard-menuSwitchRiskTypeLayout {
+    position: absolute;
+    z-index: 960;
+    top: 350px;
+    right: 40px;
+    width: 122px;
+    height: 122px;
+    display: block;
+    background-image: url('../../RiskImg/background.png');
+}
+.dashboard-menuLabel {
+    display: inline-block;
+    position: relative;
+    width: 56px;
+    left: 7px;
+    bottom: 13px;
+}
+.dashboard-menuLabel1 {
+    display: inline-block;
+    position: relative;
+    width: 84px;
+    left: 7px;
+    bottom: 13px;
+}
+.dashboard-menuSwitchRiskTypeDataLayout {
+    margin-top: 20px;
+}
+.dashboard-rightMenuRiskTypeImgLayout {
+    margin-left: 14px;
+    margin-top: -31px;
+}
+
+.dashboard-rightMenuRiskTypeSelLayout {
+    margin-bottom: 10px;
+    display: inline-block;
+    background-image: url('../../RiskImg/select.png');
+    background-size: 100% 100%;
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    margin-top: 6px;
+}
+
+.dashboard-rightMenuRiskTypeUnSelLayout {
+    margin-bottom: 10px;
+    display: inline-block;
+    background-image: url('../../RiskImg/unSelect.png');
+    background-size: 100% 100%;
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    margin-top: 6px;
 }

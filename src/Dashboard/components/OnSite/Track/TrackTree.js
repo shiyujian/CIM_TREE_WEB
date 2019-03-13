@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Input } from 'antd';
 import moment from 'moment';
-import {handleTrackData} from '../../auth';
+import {handleTrackData, getSectionName, getIconType, genPopUpContent} from '../../auth';
 import './TrackTree.less';
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
@@ -10,25 +10,17 @@ export default class TrackTree extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stime: '',
-            etime: '',
+            stime: moment().format('YYYY-MM-DD 00:00:00'),
+            etime: moment().format('YYYY-MM-DD 23:59:59'),
             timeType: 'today',
             searchDateData: [],
             searchNameData: [],
-            searchName: ''
+            searchName: '',
+            trackLayerList: {}, // 轨迹图层List
+            trackMarkerLayerList: {} // 轨迹图标图层List
         };
+        this.userDetailList = {}; // 人员信息List
     }
-    componentDidMount = async () => {
-    }
-
-    onCheck (keys, info) {
-        this.props.onCheck(keys, info);
-    }
-
-    onSelect (keys, info) {
-        this.props.onSelect(keys, info);
-    }
-
     genIconClass () {
         let icClass = '';
         let featureName = this.props.featureName;
@@ -81,6 +73,19 @@ export default class TrackTree extends Component {
             );
         }
     }
+    componentDidMount = async () => {
+        const {
+            trackTreeDay
+        } = this.props;
+        if (trackTreeDay && trackTreeDay instanceof Array && trackTreeDay.length >= 0) {
+            this.setState({
+                searchDateData: trackTreeDay
+            });
+        }
+    }
+    componentWillUnmount = async () => {
+        await this.handleRemoveAllTrackLayer();
+    }
 
     render () {
         let {
@@ -96,9 +101,6 @@ export default class TrackTree extends Component {
             searchName
         } = this.state;
         let contents = [];
-        console.log('searchName', searchName);
-        console.log('searchNameData', searchNameData);
-
         if (searchName) {
             contents = searchNameData;
         } else if (etime && stime) {
@@ -116,7 +118,6 @@ export default class TrackTree extends Component {
                 }
             }
         };
-        console.log('contents', contents);
         return (
             <div>
                 <Spin spinning={trackTreeLoading}>
@@ -180,18 +181,6 @@ export default class TrackTree extends Component {
                             })
                         }
                     </div>
-                    {/* <div className={this.genIconClass()}>
-                        <Tree
-                            checkable
-                            showIcon
-                            onCheck={this.onCheck.bind(this)}
-                            showLine
-                        >
-                            {contents.map(p => {
-                                return this.loop(p);
-                            })}
-                        </Tree>
-                    </div> */}
                 </Spin>
             </div>
 
@@ -213,7 +202,7 @@ export default class TrackTree extends Component {
                 searchNameData: [],
                 searchName: ''
             });
-            this.props.onLocation([]);
+            this.handleTrackLocation([]);
             return;
         }
         let contents = [];
@@ -243,8 +232,7 @@ export default class TrackTree extends Component {
                 }
             }
         });
-        console.log('ckeckedData', ckeckedData);
-        this.props.onLocation(ckeckedData);
+        this.handleTrackLocation(ckeckedData);
         this.setState({
             searchNameData,
             searchName: value
@@ -272,7 +260,7 @@ export default class TrackTree extends Component {
                     etime
                 }, () => {
                     if (trackTree.length === 0) {
-                        this.query()
+                        this.query();
                     }
                 });
                 return;
@@ -283,7 +271,6 @@ export default class TrackTree extends Component {
                 stime = moment().subtract(7, 'days').format('YYYY-MM-DD 00:00:00');
                 etime = moment().format('YYYY-MM-DD 23:59:59');
             };
-            console.log('wwwwwwwwwwwwww');
             this.setState({
                 stime,
                 etime
@@ -318,7 +305,7 @@ export default class TrackTree extends Component {
             timeType
         } = this.state;
         try {
-            this.props.onRemoveAllLayer();
+            this.handleRemoveAllTrackLayer();
             await getTrackTreeLoading(true);
             let postdata = {
                 stime: stime,
@@ -328,7 +315,7 @@ export default class TrackTree extends Component {
             let routes = await getInspectRouter({}, postdata);
             let searchDateData = handleTrackData(routes);
             if (timeType === 'all') {
-                await getTrackTree(searchDateData)
+                await getTrackTree(searchDateData);
             }
             await getTrackTreeLoading(false);
             this.setState({
@@ -336,6 +323,152 @@ export default class TrackTree extends Component {
             });
         } catch (e) {
             console.log('queryRisk', e);
+        }
+    }
+
+    // 搜索人员姓名定位
+    handleTrackLocation = async (ckeckedData) => {
+        try {
+            this.handleRemoveAllTrackLayer();
+            console.log('ckeckedData', ckeckedData);
+            ckeckedData.forEach((child, index) => {
+                if (index === ckeckedData.length - 1) {
+                    this.handleTrackAddLayer(child, true);
+                } else {
+                    this.handleTrackAddLayer(child, false);
+                }
+            });
+        } catch (e) {
+            console.log('handleTrackLocation', e);
+        }
+    }
+
+    // 加载轨迹图层
+    handleTrackAddLayer = async (data, isFocus) => {
+        const {
+            trackLayerList,
+            trackMarkerLayerList
+        } = this.state;
+        const {
+            actions: {
+                getMapList,
+                getUserDetail
+            },
+            map
+        } = this.props;
+        try {
+            let selectKey = data.ID;
+            if (trackLayerList[selectKey]) {
+                trackLayerList[selectKey].addTo(map);
+                if (trackMarkerLayerList[selectKey]) {
+                    trackMarkerLayerList[selectKey].addTo(map);
+                }
+                if (isFocus) {
+                    map.fitBounds(trackLayerList[selectKey].getBounds());
+                }
+            } else {
+                let routes = await getMapList({ routeID: selectKey });
+                if (!(routes && routes instanceof Array && routes.length > 0)) {
+                    return;
+                }
+                let latlngs = [];
+                routes.forEach(item => {
+                    latlngs.push([item.Y, item.X]);
+                });
+                if (data && data.PatrolerUser && data.PatrolerUser.PK) {
+                    let user = {};
+                    if (this.userDetailList[data.PatrolerUser.PK]) {
+                        user = this.userDetailList[data.PatrolerUser.PK];
+                    } else {
+                        user = await getUserDetail({pk: data.PatrolerUser.PK});
+                        this.userDetailList[data.PatrolerUser.PK] = user;
+                    };
+                    let sectionName = '';
+                    if (user && user.account && user.account.sections && user.account.sections.length > 0) {
+                        let section = user.account.sections[0];
+                        sectionName = getSectionName(section);
+                    }
+
+                    let iconData = {
+                        geometry: {
+                            coordinates: [latlngs[0][0], latlngs[0][1]],
+                            type: 'Point'
+                        },
+                        key: selectKey,
+                        properties: {
+                            name: user.account.person_name ? user.account.person_name : user.username,
+                            organization: user.account.organization ? user.account.organization : '',
+                            person_telephone: user.account.person_telephone ? user.account.person_telephone : '',
+                            sectionName: sectionName,
+                            type: 'track'
+                        },
+                        type: 'track'
+                    };
+                    let trackMarkerLayer = this._createMarker(iconData);
+                    trackMarkerLayerList[selectKey] = trackMarkerLayer;
+                }
+                let polyline = L.polyline(latlngs, { color: 'red' }).addTo(
+                    map
+                );
+                trackLayerList[selectKey] = polyline;
+                if (isFocus) {
+                    map.fitBounds(polyline.getBounds());
+                }
+                this.setState({
+                    trackLayerList,
+                    trackMarkerLayerList
+                });
+            }
+        } catch (e) {
+            console.log('handleTrackAddLayer', e);
+        }
+    }
+
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        try {
+            const {
+                map
+            } = this.props;
+            if (
+                !geo.geometry.coordinates[0] ||
+                    !geo.geometry.coordinates[1]
+            ) {
+                return;
+            }
+            let iconType = L.divIcon({
+                className: getIconType(geo.type)
+            });
+            let marker = L.marker(geo.geometry.coordinates, {
+                icon: iconType,
+                title: geo.properties.name
+            });
+            marker.bindPopup(
+                L.popup({ maxWidth: 240 }).setContent(
+                    genPopUpContent(geo)
+                )
+            );
+            marker.addTo(map);
+            return marker;
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+
+    // 去除全部巡检路线图层
+    handleRemoveAllTrackLayer = () => {
+        const {
+            map
+        } = this.props;
+        const {
+            trackLayerList, // 轨迹图层List
+            trackMarkerLayerList // 轨迹图标图层List
+        } = this.state;
+        for (let v in trackLayerList) {
+            map.removeLayer(trackLayerList[v]);
+        }
+        for (let v in trackMarkerLayerList) {
+            map.removeLayer(trackMarkerLayerList[v]);
         }
     }
 }

@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
 import './RiskTree.less';
 import moment from 'moment';
-import {handleRiskData} from '../../auth';
+import {handleRiskData, fillAreaColor, getIconType, genPopUpContent} from '../../auth';
+// 安全隐患类型图片
+import riskDangerImg from '../../RiskImg/danger.png';
+import riskQualityImg from '../../RiskImg/quality.png';
+import riskOtherImg from '../../RiskImg/other.png';
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
@@ -10,28 +14,39 @@ export default class RiskTree extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            stime: '',
-            etime: '',
+            stime: moment().format('YYYY-MM-DD 00:00:00'),
+            etime: moment().format('YYYY-MM-DD 23:59:59'),
             timeType: 'today',
             searchData: [],
             riskRectify: false,
-            riskNotRectify: true
+            riskNotRectify: true,
+            riskMarkerLayerList: {}, // 安全隐患图标图层List
+            riskSearchData: [],
+            // 安全隐患类型的点击状态，展示是否选中的图片
+            riskTypeQuality: true,
+            riskTypeDanger: true,
+            riskTypeOther: true
         };
     }
 
-    componentDidMount = async () => {
-        const {
-            riskTreeDay
-        } = this.props;
-        if (riskTreeDay && riskTreeDay instanceof Array && riskTreeDay.length > 0) {
-            await this.props.onSearchData(riskTreeDay);
+    // 安全隐患类型
+    riskTypeOptions = [
+        {
+            id: 'riskTypeQuality',
+            label: '质量缺陷',
+            img: riskQualityImg
+        },
+        {
+            id: 'riskTypeDanger',
+            label: '安全隐患',
+            img: riskDangerImg
+        },
+        {
+            id: 'riskTypeOther',
+            label: '其他',
+            img: riskOtherImg
         }
-    }
-
-    onCheck (keys, info) {
-        this.props.onCheck(keys, info);
-    }
-
+    ]
     genIconClass () {
         let icClass = '';
         let featureName = this.props.featureName;
@@ -66,7 +81,73 @@ export default class RiskTree extends Component {
             );
         }
     }
-
+    componentDidMount = async () => {
+        const {
+            riskTreeDay
+        } = this.props;
+        if (riskTreeDay && riskTreeDay instanceof Array && riskTreeDay.length >= 0) {
+            await this.handleRiskSearchData(riskTreeDay);
+        }
+    }
+    componentWillUnmount = async () => {
+        await this.handleRemoveAllRiskLayer();
+    }
+    // 搜索之后的安全隐患数据
+    handleRiskSearchData = (searchData) => {
+        this.setState({
+            riskSearchData: searchData
+        }, () => {
+            this.handleRiskTypeAddLayer();
+        });
+    }
+    // 安全隐患加载图层
+    handleRiskTypeAddLayer = async () => {
+        const {
+            riskSearchData,
+            riskMarkerLayerList
+        } = this.state;
+        const {
+            riskTree,
+            map
+        } = this.props;
+        try {
+            let checkedKeys = [];
+            this.handleRemoveAllRiskLayer();
+            this.riskTypeOptions.map((option) => {
+                if (this.state[option.id]) {
+                    checkedKeys.push(option.label);
+                }
+            });
+            let checkedData = [];
+            if (riskSearchData) {
+                checkedData = riskSearchData;
+            } else {
+                checkedData = riskTree;
+            }
+            checkedData.map((riskData) => {
+                checkedKeys.map((checkedKey) => {
+                    if (riskData && riskData.key === checkedKey) {
+                        let children = riskData.children;
+                        children.forEach((riskData, index) => {
+                            if (riskMarkerLayerList[riskData.key]) {
+                                riskMarkerLayerList[riskData.key].addTo(map);
+                            } else {
+                                riskMarkerLayerList[riskData.key] = this._createMarker(riskData);
+                            }
+                            if (index === children.length - 1) {
+                                map.panTo(riskData.geometry.coordinates);
+                            }
+                        });
+                        this.setState({
+                            riskMarkerLayerList
+                        });
+                    }
+                });
+            });
+        } catch (e) {
+            console.log('handleRiskTypeAddLayer', e);
+        }
+    }
     render () {
         let {
             riskTree = [],
@@ -84,102 +165,115 @@ export default class RiskTree extends Component {
         if (!etime && !stime && riskNotRectify) {
             for (let j = 0; j < riskTree.length; j++) {
                 const element = riskTree[j];
-                if (element != undefined) {
+                if (element !== undefined) {
                     contents.push(element);
                 }
             }
         } else {
             for (let j = 0; j < searchData.length; j++) {
                 const element = searchData[j];
-                if (element != undefined) {
+                if (element !== undefined) {
                     contents.push(element);
                 }
             }
         };
         return (
             <div>
-                <Spin spinning={riskTreeLoading}>
-                    <div className='RiskTree-button'>
-                        <Checkbox className='RiskTree-button-layout'
-                            checked={riskNotRectify}
-                            onChange={this.handleRiskNotRectify.bind(this)}>
-                            未整改
-                        </Checkbox>
-                        <Checkbox className='RiskTree-button-layout'
-                            checked={riskRectify}
-                            onChange={this.handleRiskRectify.bind(this)}>
-                            已整改
-                        </Checkbox>
-                    </div>
-                    <div className='RiskTree-button'>
-                        <Button className='RiskTree-button-layout' style={{marginRight: 10}}
-                            type={timeType === 'all' ? 'primary' : ''}
-                            id='all' onClick={this.handleTimeChange.bind(this)}>
-                        全部
-                        </Button>
-                        <Button className='RiskTree-button-layout' id='today'
-                            type={timeType === 'today' ? 'primary' : ''}
-                            onClick={this.handleTimeChange.bind(this)}>
-                        今天
-                        </Button>
-                    </div>
-                    <div className='RiskTree-button'>
-                        <Button className='RiskTree-button-layout' style={{marginRight: 10}}
-                            type={timeType === 'week' ? 'primary' : ''}
-                            id='week' onClick={this.handleTimeChange.bind(this)}>
-                        一周内
-                        </Button>
-                        <Button className='RiskTree-button-layout' id='custom'
-                            type={timeType === 'custom' ? 'primary' : ''}
-                            onClick={this.handleTimeChange.bind(this)}>
-                        自定义
-                        </Button>
-                    </div>
-                    {
-                        timeType === 'custom'
-                            ? <RangePicker
-                                style={{width: 220, marginBottom: 10}}
-                                showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
-                                format='YYYY-MM-DD HH:mm:ss'
-                                placeholder={['Start Time', 'End Time']}
-                                onChange={this.handleDateChange.bind(this)}
-                            />
-                            : ''
-                    }
-                    <div className='RiskTree-statis-layout'>
-                        <span style={{verticalAlign: 'middle'}}>类型</span>
-                        <span className='RiskTree-data-text'>
-                            数量
-                        </span>
-                    </div>
-                    <div>
+                <div className='dashboard-menuPanel'>
+                    <aside className='dashboard-aside' draggable='false'>
+                        <div className='dashboard-asideTree'>
+                            <Spin spinning={riskTreeLoading}>
+                                <div className='RiskTree-button'>
+                                    <Checkbox className='RiskTree-button-layout'
+                                        checked={riskNotRectify}
+                                        onChange={this.handleRiskNotRectify.bind(this)}>
+                                        未整改
+                                    </Checkbox>
+                                    <Checkbox className='RiskTree-button-layout'
+                                        checked={riskRectify}
+                                        onChange={this.handleRiskRectify.bind(this)}>
+                                        已整改
+                                    </Checkbox>
+                                </div>
+                                <div className='RiskTree-button'>
+                                    <Button className='RiskTree-button-layout' style={{marginRight: 10}}
+                                        type={timeType === 'all' ? 'primary' : ''}
+                                        id='all' onClick={this.handleTimeChange.bind(this)}>
+                                    全部
+                                    </Button>
+                                    <Button className='RiskTree-button-layout' id='today'
+                                        type={timeType === 'today' ? 'primary' : ''}
+                                        onClick={this.handleTimeChange.bind(this)}>
+                                    今天
+                                    </Button>
+                                </div>
+                                <div className='RiskTree-button'>
+                                    <Button className='RiskTree-button-layout' style={{marginRight: 10}}
+                                        type={timeType === 'week' ? 'primary' : ''}
+                                        id='week' onClick={this.handleTimeChange.bind(this)}>
+                                    一周内
+                                    </Button>
+                                    <Button className='RiskTree-button-layout' id='custom'
+                                        type={timeType === 'custom' ? 'primary' : ''}
+                                        onClick={this.handleTimeChange.bind(this)}>
+                                    自定义
+                                    </Button>
+                                </div>
+                                {
+                                    timeType === 'custom'
+                                        ? <RangePicker
+                                            style={{width: 220, marginBottom: 10}}
+                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
+                                            format='YYYY-MM-DD HH:mm:ss'
+                                            placeholder={['Start Time', 'End Time']}
+                                            onChange={this.handleDateChange.bind(this)}
+                                        />
+                                        : ''
+                                }
+                                <div className='RiskTree-statis-layout'>
+                                    <span style={{verticalAlign: 'middle'}}>类型</span>
+                                    <span className='RiskTree-data-text'>
+                                        数量
+                                    </span>
+                                </div>
+                                <div>
+                                    {
+                                        contents.map((content) => {
+                                            return (
+                                                <div className='RiskTree-mrg10' key={content.key}>
+                                                    <span style={{verticalAlign: 'middle'}}>{content.properties.name}</span>
+                                                    <span className='RiskTree-data-text'>
+                                                        {content.children.length}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })
+                                    }
+                                </div>
+                            </Spin>
+                        </div>
+                    </aside>
+                </div>
+                <div>
+                    <div className='dashboard-menuSwitchRiskTypeLayout'>
                         {
-                            contents.map((content) => {
+                            this.riskTypeOptions.map((option) => {
                                 return (
-                                    <div className='RiskTree-mrg10' key={content.key}>
-                                        <span style={{verticalAlign: 'middle'}}>{content.properties.name}</span>
-                                        <span className='RiskTree-data-text'>
-                                            {content.children.length}
-                                        </span>
+                                    <div style={{display: 'inlineBlock', marginTop: 10, height: 20}} key={option.id}>
+                                        <p className='dashboard-menuLabel'>{option.label}</p>
+                                        <img src={option.img}
+                                            title={option.label}
+                                            className='dashboard-rightMenuRiskTypeImgLayout' />
+                                        <a className={this.state[option.id] ? 'dashboard-rightMenuRiskTypeSelLayout' : 'dashboard-rightMenuRiskTypeUnSelLayout'}
+                                            title={option.label}
+                                            key={option.id}
+                                            onClick={this.handleRiskTypeButton.bind(this, option)} />
                                     </div>
                                 );
                             })
                         }
                     </div>
-                    {/* <div className={this.genIconClass()}>
-                        <Tree
-                            checkable
-                            showIcon
-                            onCheck={this.onCheck.bind(this)}
-                            showLine
-                        // defaultExpandAll
-                        >
-                            {contents.map(p => {
-                                return this.loop(p);
-                            })}
-                        </Tree>
-                    </div> */}
-                </Spin>
+                </div>
             </div>
         );
     }
@@ -201,7 +295,6 @@ export default class RiskTree extends Component {
             this.query();
         });
     }
-
     handleTimeChange = (e) => {
         const {
             riskRectify
@@ -229,7 +322,7 @@ export default class RiskTree extends Component {
                         if (riskRectify) {
                             this.query();
                         } else { // 如果之前发起过请求，直接赋值
-                            this.props.onSearchData(riskTree);
+                            this.handleRiskSearchData(riskTree);
                         }
                     } else {
                         this.query();
@@ -253,7 +346,6 @@ export default class RiskTree extends Component {
             console.log('handleTimeChange', e);
         }
     }
-
     handleDateChange = (value) => {
         this.setState({
             stime: value[0] ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss') : '',
@@ -262,7 +354,6 @@ export default class RiskTree extends Component {
             this.query();
         });
     }
-
     query = async () => {
         const {
             actions: {
@@ -281,7 +372,7 @@ export default class RiskTree extends Component {
         } = this.state;
         try {
             if (!stime && !etime && riskNotRectify && riskTree) {
-                await this.props.onSearchData(riskTree);
+                await this.handleRiskSearchData(riskTree);
                 return;
             }
             await getRiskTreeLoading(true);
@@ -321,7 +412,7 @@ export default class RiskTree extends Component {
                     await getRiskTree(risks);
                 }
                 await getRiskTreeLoading(false);
-                await this.props.onSearchData(risks);
+                await this.handleRiskSearchData(risks);
                 this.setState({
                     searchData: risks
                 });
@@ -336,7 +427,7 @@ export default class RiskTree extends Component {
                     let content = data.content;
                     let risks = handleRiskData(content);
                     await getRiskTreeLoading(false);
-                    await this.props.onSearchData(risks);
+                    await this.handleRiskSearchData(risks);
                     this.setState({
                         searchData: risks
                     });
@@ -344,6 +435,61 @@ export default class RiskTree extends Component {
             }
         } catch (e) {
             console.log('queryRisk', e);
+        }
+    }
+
+    // 安全隐患选择类型
+    handleRiskTypeButton (option) {
+        try {
+            this.setState({
+                [option.id]: !this.state[option.id]
+            }, () => {
+                this.handleRiskTypeAddLayer();
+            });
+        } catch (e) {
+            console.log('handleRiskTypeButton', e);
+        }
+    }
+    // 去除全部安全隐患图层
+    handleRemoveAllRiskLayer = () => {
+        const {
+            map
+        } = this.props;
+        const {
+            riskMarkerLayerList // 安全隐患图标图层List
+        } = this.state;
+        for (let v in riskMarkerLayerList) {
+            map.removeLayer(riskMarkerLayerList[v]);
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        const {
+            map
+        } = this.props;
+        try {
+            if (
+                !geo.geometry.coordinates[0] ||
+                    !geo.geometry.coordinates[1]
+            ) {
+                return;
+            }
+            let iconType = L.divIcon({
+                className: getIconType(geo.type)
+            });
+            let marker = L.marker(geo.geometry.coordinates, {
+                icon: iconType,
+                title: geo.properties.name
+            });
+            marker.bindPopup(
+                L.popup({ maxWidth: 240 }).setContent(
+                    genPopUpContent(geo)
+                )
+            );
+            marker.addTo(map);
+            return marker;
+        } catch (e) {
+            console.log('e', e);
         }
     }
 }
