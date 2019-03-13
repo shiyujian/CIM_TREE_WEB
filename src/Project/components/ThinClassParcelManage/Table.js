@@ -72,17 +72,17 @@ class Tablelevel extends Component {
             {
                 key: '3',
                 width: 150,
-                title: '树木类型',
+                title: '树种',
                 dataIndex: 'treetype'
             },
             {
                 key: '4',
-                title: '栽植量',
+                title: '设计量',
                 dataIndex: 'num'
             },
             {
                 key: '5',
-                title: '细班面积',
+                title: '设计面积',
                 dataIndex: 'area'
             },
             {

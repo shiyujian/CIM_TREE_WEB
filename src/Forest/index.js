@@ -66,6 +66,7 @@ export default class ForestContainer extends Component {
             NurserySourseAnalysi = null,
             EnterStrengthAnalysi = null,
             PlantStrengthAnalysi = null,
+            DegitalAccept = null,
         } = this.state || {};
         return (
             <Body>
@@ -210,6 +211,12 @@ export default class ForestContainer extends Component {
                         <Route
                             path='/forest/plantstrengthanalysi'
                             component={PlantStrengthAnalysi}
+                        />
+                    )}
+                    {DegitalAccept && (
+                        <Route
+                            path='/forest/degitalaccept'
+                            component={DegitalAccept}
                         />
                     )}
                 </Main>
@@ -448,6 +455,12 @@ export default class ForestContainer extends Component {
                     name: '定位数据导出'
                 }
             ]
+        },
+        {
+            key: 'degitalaccept',
+            id: 'FOREST.DEGITALACCEPT',
+            path: '/forest/degitalaccept',
+            name: '数字化验收'
         }
     ];
     static defaultOpenKeys = ['statis'];
