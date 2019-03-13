@@ -30,8 +30,6 @@ window.config = {
     SDOMAIN: 'http://39.97.163.176',
     // 林总图片新接口
     ALIIMG: 'https://xatree-1.oss-cn-qingdao.aliyuncs.com',
-    // 灌溉官网服务地址
-    TREEPIPE: 'http://47.104.159.127:809',
     // 静态文件存储服务IP
     STATIC_FILE_IP: 'http://39.105.221.187',
     // 静态文件存储服务预览端口

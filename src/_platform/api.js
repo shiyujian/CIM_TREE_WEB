@@ -99,7 +99,6 @@ export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const FOREST_GIS_TREETYPE_API = `${window.config.DASHBOARD_TREETYPE}`;
-export const TREEPIPE_API = `${window.config.TREEPIPE}`;
 export const INITLEAFLET_API = window.config.initLeaflet;
 
 // 考勤打卡

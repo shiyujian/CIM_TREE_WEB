@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-13 19:33:59
+ * @Last Modified time: 2019-03-13 20:45:58
  */
 import React, { Component } from 'react';
 import {
@@ -65,14 +65,7 @@ import {
 } from '_platform/api';
 import MenuSwitch from '../MenuSwitch';
 import {getCompanyDataByOrgCode} from '_platform/auth';
-// 存活率图片
-import hundredImg from '../SurvivalRateImg/90~100.png';
-import ninetyImg from '../SurvivalRateImg/80~90.png';
-import eightyImg from '../SurvivalRateImg/70~80.png';
-import seventyImg from '../SurvivalRateImg/60~70.png';
-import sixtyImg from '../SurvivalRateImg/50~60.png';
-import fiftyImg from '../SurvivalRateImg/40~50.png';
-import foutyImg from '../SurvivalRateImg/0~40.png';
+
 // 自定义视图
 import areaViewImg from '../InitialPositionImg/areaView.png';
 import customViewImg from '../InitialPositionImg/customView.png';
@@ -116,27 +109,15 @@ class OnSite extends Component {
             curingTaskRealLayerList: {},
             curingTaskMarkerLayerList: {},
             curingTaskMessList: {}, // 养护任务信息List
-
-            survivalRateMarkerLayerList: {},
-
+            
             adoptTreeMarkerLayerList: {}, // 苗木结缘图标List
             adoptTreeDataList: {}, // 苗木结缘数据List
-            // 成活率选项
-            survivalRateRateData: '',
-            survivalRateSectionData: '',
-            switchSurvivalRateFirst: false, // 第一次切换至成活率模块时，因标段数据初始化太麻烦，所以用此字段代表未曾选择过标段数据，只需要根据成活率范围查找
+            
             // 苗木结缘弹窗
             adoptTreeModalVisible: false,
             adoptTreeModalLoading: true,
             adoptTreeMess: '',
-            // 成活率范围的点击状态，展示是否选中的图片
-            survivalRateHundred: true,
-            survivalRateNinety: true,
-            survivalRateEighty: true,
-            survivalRateSeventy: true,
-            survivalRateSixty: true,
-            survivalRateFifty: true,
-            survivalRateFourty: true,
+            
             // 子组件搜索的树数据
             riskSrarchData: '',
             curingTaskSrarchData: '',
@@ -156,12 +137,10 @@ class OnSite extends Component {
         };
         this.tileLayer = null; // 最底部基础图层
         this.tileTreeLayerBasic = null; // 树木区域图层
-        this.tileTreeSurvivalRateLayerBasic = null; // 成活率全部图层
         this.tileTreeAdoptLayerBasic = null; // 苗木结缘全部图层
         this.tileTreeWinterThinClassLayerBasic = null;
         this.tileTreeWinterProjectLayerBasic = null;
-        
-        this.tileSurvivalRateLayerFilter = null; // 成活率范围和标段筛选图层
+
         this.tileTreePipeBasic = null; // 灌溉管网图层
         this.map = null;
     }
@@ -200,44 +179,7 @@ class OnSite extends Component {
             value: 'geojsonFeature_treePipe'
         }
     ];
-    // 右侧成活率范围
-    survivalRateOptions = [
-        {
-            id: 'survivalRateHundred',
-            label: '90~100',
-            img: hundredImg
-        },
-        {
-            id: 'survivalRateNinety',
-            label: '80~90',
-            img: ninetyImg
-        },
-        {
-            id: 'survivalRateEighty',
-            label: '70~80',
-            img: eightyImg
-        },
-        {
-            id: 'survivalRateSeventy',
-            label: '60~70',
-            img: seventyImg
-        },
-        {
-            id: 'survivalRateSixty',
-            label: '50~60',
-            img: sixtyImg
-        },
-        {
-            id: 'survivalRateFifty',
-            label: '40~50',
-            img: fiftyImg
-        },
-        {
-            id: 'survivalRateFourty',
-            label: '0~40',
-            img: foutyImg
-        }
-    ]
+    
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
@@ -419,8 +361,6 @@ class OnSite extends Component {
                     });
                 } else if (dashboardTreeMess === 'treeMess') {
                     me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
-                } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
-                    me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
                 } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
                     me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_treeAdopt');
                 }
@@ -446,22 +386,13 @@ class OnSite extends Component {
         // 在各个菜单之间切换时需要处理的图层
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             await this.removeAllLayer();
-            if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
-                // 选择成活率菜单
-                await this.handleRemoveTreeMarkerLayer();
-                await this.removeTileTreeLayerBasic();
-                await this.getTileTreeSurvivalRateBasic();
-                await this.survivalRateOptions.map(async (option) => {
-                    await this.setState({
-                        [option.id]: true
-                    });
-                });
-                await this.getSurvivalRateRateDataDefault();
-            } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
+            if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
                 // 选择苗木结缘菜单
                 await this.handleRemoveTreeMarkerLayer();
                 await this.removeTileTreeLayerBasic();
                 await this.getTileTreeAdoptBasic();
+            } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
+                await this.removeTileTreeLayerBasic();
             } else {
                 await this.getTileLayerTreeBasic();
             }
@@ -604,34 +535,6 @@ class OnSite extends Component {
             }
         }
     }
-    // 加载成活率全部瓦片图层
-    getTileTreeSurvivalRateBasic = () => {
-        if (this.tileTreeSurvivalRateLayerBasic) {
-            this.tileTreeSurvivalRateLayerBasic.addTo(this.map);
-        } else {
-            this.tileTreeSurvivalRateLayerBasic = L.tileLayer(
-                FOREST_GIS_API +
-                '/geoserver/gwc/service/wmts?layer=xatree%3Asurvivalrate&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
-                {
-                    opacity: 1.0,
-                    subdomains: [1, 2, 3],
-                    minZoom: 11,
-                    maxZoom: 21,
-                    storagetype: 0,
-                    tiletype: 'wtms'
-                }
-            ).addTo(this.map);
-        }
-    }
-    // 去除成活率全部瓦片图层和成活率筛选图层
-    removeTileTreeSurvivalRateLayer = () => {
-        if (this.tileSurvivalRateLayerFilter) {
-            this.map.removeLayer(this.tileSurvivalRateLayerFilter);
-        }
-        if (this.tileTreeSurvivalRateLayerBasic) {
-            this.map.removeLayer(this.tileTreeSurvivalRateLayerBasic);
-        }
-    }
     // 加载苗木结缘全部瓦片图层
     getTileTreeAdoptBasic = () => {
         if (this.tileTreeAdoptLayerBasic) {
@@ -661,29 +564,12 @@ class OnSite extends Component {
     // 各个模块之间切换时，去除除当前模块外所有后来添加的图层
     removeAllLayer = () => {
         const {
-            survivalRateMarkerLayerList, // 成活率图标图层List
             adoptTreeMarkerLayerList
         } = this.state;
         const {
             dashboardCompomentMenu
         } = this.props;
         try {
-            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_survivalRate') {
-                for (let v in survivalRateMarkerLayerList) {
-                    this.map.removeLayer(survivalRateMarkerLayerList[v]);
-                }
-                this.removeTileTreeSurvivalRateLayer();
-                this.survivalRateOptions.map((option) => {
-                    this.setState({
-                        [option.id]: false
-                    });
-                });
-                this.setState({
-                    survivalRateSectionData: '',
-                    survivalRateRateData: '',
-                    switchSurvivalRateFirst: false
-                });
-            }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treeAdopt') {
                 this.removeTileTreeAdoptLayer();
                 for (let t in adoptTreeMarkerLayerList) {
@@ -752,15 +638,6 @@ class OnSite extends Component {
                             removeTileTreeLayerBasic={this.removeTileTreeLayerBasic.bind(this)}
                             featureName={option.value}
                             treetypes={treetypes}
-                        />
-                    );
-                // 成活率
-                case 'geojsonFeature_survivalRate':
-                    return (
-                        <SurvivalRateTree
-                            {...this.props}
-                            {...this.state}
-                            onCheck={this._handleSurvivalRateCheck.bind(this)}
                         />
                     );
                 // 苗木结缘
@@ -1044,23 +921,12 @@ class OnSite extends Component {
                     { // 成活率右侧范围菜单
                         dashboardCompomentMenu === 'geojsonFeature_survivalRate'
                             ? (
-                                <div className='dashboard-menuSwitchSurvivalRateLayout'>
-                                    {
-                                        this.survivalRateOptions.map((option) => {
-                                            return (
-                                                <div style={{display: 'inlineBlock'}} key={option.id}>
-                                                    <img src={option.img}
-                                                        title={option.label}
-                                                        className='dashboard-rightMenuSurvivalRateImgLayout' />
-                                                    <a className={this.state[option.id] ? 'dashboard-rightMenuSurvivalRateSelLayout' : 'dashboard-rightMenuSurvivalRateUnSelLayout'}
-                                                        title={option.label}
-                                                        key={option.id}
-                                                        onClick={this.handleSurvivalRateButton.bind(this, option)} />
-                                                </div>
-                                            );
-                                        })
-                                    }
-                                </div>
+                                <SurvivalRateTree
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                    tileTreeLayerBasic={this.tileTreeLayerBasic}
+                                />
                             ) : ''
                     }
                     { // 安全隐患右侧类型菜单
@@ -1292,140 +1158,6 @@ class OnSite extends Component {
             console.log('加载细班图层', e);
         }
     }
-    // 切换到成活率模块后对成活率标段数据进行处理
-    getSurvivalRateRateDataDefault = () => {
-        let survivalRateRateData = this.handleSurvivalRateRateData();
-        this.setState({
-            survivalRateRateData,
-            switchSurvivalRateFirst: true
-        });
-    }
-    // 成活率选择标段
-    _handleSurvivalRateCheck = async (keys, info) => {
-        const {
-            switchSurvivalRateFirst
-        } = this.state;
-        try {
-            let queryData = '';
-            for (let i = 0; i < keys.length; i++) {
-                if (keys.length > 0 && keys[i] !== '全部') {
-                    let eventKey = keys[i];
-                    let eventKeyArr = eventKey.split('-');
-                    if (eventKeyArr && eventKeyArr.length === 3) {
-                        queryData = queryData + `'` + eventKey + `'`;
-                        if (i < keys.length - 1) {
-                            queryData = queryData + ',';
-                        }
-                    }
-                }
-            }
-            // 如果queryData最后一位为逗号，则去除最后一位的逗号
-            let data = queryData.substr(queryData.length - 1, 1);
-            if (data === ',') {
-                queryData = queryData.substr(0, queryData.length - 1);
-            }
-            // 在选择标段数据后，将首次切换至成活率字段改为false
-            if (switchSurvivalRateFirst) {
-                this.setState({
-                    switchSurvivalRateFirst: false
-                });
-            }
-            this.setState({
-                survivalRateSectionData: queryData
-            }, () => {
-                this.addSurvivalRateLayer();
-            });
-        } catch (e) {
-            console.log('_handleSurvivalRateCheck', e);
-        }
-    }
-    // 成活率选择成活范围
-    handleSurvivalRateButton (option) {
-        try {
-            this.setState({
-                [option.id]: !this.state[option.id]
-            }, () => {
-                this.getSurvivalRateRateData();
-            });
-        } catch (e) {
-            console.log('handleSurvivalRateButton', e);
-        }
-    }
-    // 在获取成活率数据处理后，加载图层
-    getSurvivalRateRateData = () => {
-        let survivalRateRateData = this.handleSurvivalRateRateData();
-        this.setState({
-            survivalRateRateData
-        }, () => {
-            this.addSurvivalRateLayer();
-        });
-    }
-    // 根据选择的成活范围对成活率数据进行处理
-    handleSurvivalRateRateData = () => {
-        let survivalRateRateData = '';
-        this.survivalRateOptions.map((option) => {
-            if (this.state[option.id]) {
-                let data = option.label;
-                let arr = data.split('~');
-                let arr1 = arr[0];
-                let arr2 = arr[1];
-                if (survivalRateRateData) {
-                    survivalRateRateData += `%20or%20SurvivalRate%20%3E%20${arr1}%20and%20SurvivalRate%20%3C%20${arr2}`;
-                } else {
-                    survivalRateRateData += `SurvivalRate%20%3E%20${arr1}%20and%20SurvivalRate%20%3C%20${arr2}`;
-                }
-            }
-        });
-        return survivalRateRateData;
-    }
-    // 成活率加载图层
-    addSurvivalRateLayer = async () => {
-        const {
-            survivalRateSectionData,
-            survivalRateRateData,
-            switchSurvivalRateFirst
-        } = this.state;
-        try {
-            await this.removeTileTreeLayerBasic();
-            await this.removeTileTreeSurvivalRateLayer();
-            let url = '';
-            // 之前任意一种状态存在 都可以进行搜索
-            // if (survivalRateRateData && survivalRateSectionData) {
-            //     url = FOREST_GIS_TREETYPE_API +
-            //     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
-            // } else if (survivalRateRateData && !survivalRateSectionData) {
-            //     url = FOREST_GIS_TREETYPE_API +
-            //     `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
-            // } else if (!survivalRateRateData && survivalRateSectionData) {
-            //      url = FOREST_GIS_TREETYPE_API +
-            //      `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})`;
-            // }
-            // 初次进入成活率模块，没有对标段数据进行处理，选择了范围数据直接对图层进行更改
-            if (switchSurvivalRateFirst) {
-                url = FOREST_GIS_TREETYPE_API +
-                `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
-            } else if (survivalRateRateData && survivalRateSectionData) {
-                // 在点击过标段数据之后，只有两种状态都存在，才能进行搜索
-                url = FOREST_GIS_TREETYPE_API +
-                `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
-            }
-            if (url) {
-                this.tileSurvivalRateLayerFilter = L.tileLayer.wms(url,
-                    {
-                        layers: 'xatree:survivalrate',
-                        crs: L.CRS.EPSG4326,
-                        format: 'image/png',
-                        maxZoom: 22,
-                        transparent: true
-                    }
-                ).addTo(this.map);
-            } else {
-                // await this.getTileTreeSurvivalRateBasic();
-            }
-        } catch (e) {
-            console.log('addSurvivalRateLayer', e);
-        }
-    }
     // 加载苗木结缘图层
     _handleAdoptCheck = async (adoptTrees) => {
         const {
@@ -1600,8 +1332,6 @@ class OnSite extends Component {
                     });
                     await that.getTreeMessData(data, x, y);
                     await that.handleOkTreeMessModal(data, x, y);
-                } else if (type === 'geojsonFeature_survivalRate') {
-                    that.getSurvivalRateInfo(data, x, y);
                 } else if (type === 'geojsonFeature_treeAdopt') {
                     let adoptTreeMess = await that.getTreeAdoptInfo(data, x, y);
                     if (adoptTreeMess) {
@@ -1799,55 +1529,6 @@ class OnSite extends Component {
             treeMessModalVisible: false,
             treeMessModalLoading: true
         });
-    }
-    // 点击地图上的区域的成活率
-    async getSurvivalRateInfo (data, x, y) {
-        const {
-            platform: {
-                tree = {}
-            }
-        } = this.props;
-        const {
-            survivalRateMarkerLayerList
-        } = this.state;
-        let totalThinClass = tree.totalThinClass || [];
-        try {
-            let bigTreeList = (tree && tree.bigTreeList) || [];
-            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
-                let properties = data.features[0].properties;
-                for (let i in survivalRateMarkerLayerList) {
-                    this.map.removeLayer(survivalRateMarkerLayerList[i]);
-                }
-                let areaData = getThinClassName(properties.no, properties.Section, totalThinClass, bigTreeList);
-                let iconData = {
-                    geometry: {
-                        coordinates: [y, x],
-                        type: 'Point'
-                    },
-                    key: properties.ID,
-                    properties: {
-                        sectionName: areaData.SectionName ? areaData.SectionName : '',
-                        smallClassName: areaData.SmallName ? areaData.SmallName : '',
-                        thinClassName: areaData.ThinName ? areaData.ThinName : '',
-                        treetype: properties.treetype,
-                        SurvivalRate: properties.SurvivalRate,
-                        type: 'survivalRate'
-                    },
-                    type: 'survivalRate'
-                };
-                let survivalRateLayer = L.popup()
-                    .setLatLng([y, x])
-                    .setContent(genPopUpContent(iconData))
-                    .addTo(this.map);
-                // let survivalRateLayer = this._createMarker(iconData);
-                survivalRateMarkerLayerList[properties.ID] = survivalRateLayer;
-                this.setState({
-                    survivalRateMarkerLayerList
-                });
-            }
-        } catch (e) {
-            console.log('getSurvivalRateInfo', e);
-        }
     }
     // 获取苗木结缘信息
     getTreeAdoptInfo = async (data, x, y) => {
