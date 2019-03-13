@@ -32,7 +32,7 @@ export const deleteData = createFetchAction(`${MAIN_API}/post/{{pk}}/`, [], 'DEL
 // 设置上传的文件列表
 export const postUploadFiles = createAction('设置上传的文件列表');
 // 获取发布单位列表
-const getPublicUnitList = createFetchAction(`${SERVICE_API}/org-tree/?depth=4`, [], 'GET');
+const getPublicUnitList = createFetchAction(`${SERVICE_API}/org-tree/?depth=7`, [], 'GET');
 
 export const actions = {
     setTabActive,
