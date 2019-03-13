@@ -81,6 +81,16 @@ export default class TreePipePage extends Component {
         ).addTo(map);
     }
 
+    componentWillUnmount = async () => {
+        const {
+            map
+        } = this.props;
+        if (this.tileTreePipeBasic) {
+            map.removeLayer(this.tileTreePipeBasic);
+            this.tileTreePipeBasic = null;
+        }
+    }
+
     render () {
         return (
             <div className='dashboard-menuSwitchTreePipeLayout'>
