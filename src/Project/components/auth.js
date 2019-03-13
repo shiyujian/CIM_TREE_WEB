@@ -1,17 +1,18 @@
 
 // 从 MULTIPOLYGON(((116.0316566299076 38.99911578423726,116.03163110851324 38.99911806579688)))中
-// 得到[116.0316566299076 38.99911578423726, 116.03163110851324 38.99911806579688]
+// 得到116.0316566299076 38.99911578423726, 116.03163110851324 38.99911806579688]
 export const getCoordsArr = (wkt) => {
     let coordsArr = [], str = '';
     if (wkt.indexOf('MULTIPOLYGON') !== -1) {
-        let data = wkt.slice(wkt.indexOf('(((') + 3, wkt.indexOf(')))'));
-        coordsArr = data.split(',');
+        str = wkt.slice(wkt.indexOf('(((') + 3, wkt.indexOf(')))'));
+        coordsArr = str.split(',');
     } else if (wkt.indexOf('POLYGON') !== -1) {
         str = wkt.slice(wkt.indexOf('((') + 2, wkt.indexOf('))'));
         coordsArr = str.split(',');
     }
     return coordsArr;
 };
+
 // 根据[116.0316566299076 38.99911578423726, 116.03163110851324 38.99911806579688]得到MULTIPOLYGON
 export const getWulPolygonByCoordArr = (coordinates) => {
     let muitiPolygon = 'MULTIPOLYGON(((';

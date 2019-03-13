@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { Input, Button, Select, Table, Pagination, Modal, Form, message, List, InputNumber, Spin } from 'antd';
 import {
     fillAreaColor,
-    getCoordsArr,
-    handleCoordinates
+    getCoordsArr
 } from '../auth';
 import { formItemLayout, getUser } from '_platform/auth';
 import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
@@ -112,8 +111,6 @@ class Tablelevel extends Component {
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
-            console.log('nextProps', nextProps.sectionList);
-            console.log('userSection', this.userSection);
             this.setState({
                 section: '',
                 number: '',
@@ -189,7 +186,6 @@ class Tablelevel extends Component {
         const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan, selectedRowKeysList } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
-                console.log('selectedRowKeys', selectedRowKeys, selectedRows);
                 this.setState({
                     selectedRowKeysList: selectedRowKeys
                 }, () => {
@@ -632,25 +628,35 @@ class Tablelevel extends Component {
             item.remove();
         });
         let coordinatesArr = []; // 多维数据
-        let no = selectedRows[0].no;
-        let { getThinClass } = this.props.actions;
-        if (!no) {
+        let patternArr = []; // 图形数组
+        if (!selectedRows[0].no) {
             return;
         }
+        let { getThinClass } = this.props.actions;
         getThinClass({}, {
             section: '',
-            no: no,
+            no: selectedRows[0].no,
             treetype: '',
             page: '',
             size: ''
         }).then(rep => {
             console.log('表格数据', rep.content);
             rep.content.map(record => {
-                let coordsArr = getCoordsArr(record.coords);
-                console.log('coordsArr', coordsArr);
+                let temporaryWKT = record.coords;
+                if (temporaryWKT.indexOf('MULTIPOLYGON') !== -1) {
+                    temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('(((') + 3, temporaryWKT.indexOf(')))'));
+                    patternArr = patternArr.concat(temporaryWKT.split(')),(('));
+                } else {
+                    temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('((') + 2, temporaryWKT.indexOf('))'));
+                    patternArr.push(temporaryWKT);
+                }
+            });
+            console.log('patternArr', patternArr);
+            patternArr.map(item => {
+                let coordsArr = item.split(',');
                 let treearea = [];
-                coordsArr.map(item => {
-                    let arr = item.split(' ');
+                coordsArr.map(record => {
+                    let arr = record.split(' ');
                     treearea.push([arr[1], arr[0]]);
                 });
                 coordinatesArr.push(treearea);
