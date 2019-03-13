@@ -72,17 +72,17 @@ class Tablelevel extends Component {
             {
                 key: '3',
                 width: 150,
-                title: '树木类型',
+                title: '树种',
                 dataIndex: 'treetype'
             },
             {
                 key: '4',
-                title: '栽植量',
+                title: '设计量',
                 dataIndex: 'num'
             },
             {
                 key: '5',
-                title: '细班面积',
+                title: '设计面积',
                 dataIndex: 'area'
             },
             {
@@ -198,7 +198,7 @@ class Tablelevel extends Component {
         // 子表格
         let expandedRowRender = (record) => {
             let columns = [{
-                title: '树木类型',
+                title: '树种',
                 key: '1',
                 dataIndex: 'treeType',
                 render: (text, rec, index) => {
@@ -219,7 +219,7 @@ class Tablelevel extends Component {
                     );
                 }
             }, {
-                title: '栽植量',
+                title: '设计量',
                 key: '2',
                 dataIndex: 'Num',
                 render: (text, rec, index) => {
@@ -228,7 +228,7 @@ class Tablelevel extends Component {
                     );
                 }
             }, {
-                title: '栽植面积',
+                title: '设计面积',
                 key: '3',
                 dataIndex: 'Area',
                 render: (text, rec, index) => {
