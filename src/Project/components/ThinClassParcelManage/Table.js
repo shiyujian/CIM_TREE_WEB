@@ -111,8 +111,6 @@ class Tablelevel extends Component {
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
-            console.log('nextProps', nextProps.sectionList);
-            console.log('userSection', this.userSection);
             this.setState({
                 section: '',
                 number: '',
@@ -515,7 +513,6 @@ class Tablelevel extends Component {
                 item.key = index;
             });
             if (rep.code === 200) {
-                console.log('表格数据', rep.content);
                 this.setState({
                     dataList: rep.content,
                     selectedRowKeysList: [],
@@ -561,14 +558,26 @@ class Tablelevel extends Component {
         areaLayerList.map(item => {
             item.remove();
         });
-        let coordinatesArr = []; // 多维数据
+        let coordinatesArr = []; // 多维数据[[], [], []]
+        let patternArr = []; // 图形数组['135.12 39.80,135.12 39.80', '125.12 39.80,125.12 39.80']
         console.log('selectedRows', selectedRows);
         selectedRows.map(record => {
-            let coordsArr = getCoordsArr(record.coords);
-            console.log('coordsArr', coordsArr);
+            console.log(record.coords, '最初数据');
+            let temporaryWKT = record.coords;
+            if (temporaryWKT.indexOf('MULTIPOLYGON') !== -1) {
+                temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('(((') + 3, temporaryWKT.indexOf(')))'));
+                patternArr = patternArr.concat(temporaryWKT.split(')),(('));
+            } else {
+                temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('((') + 2, temporaryWKT.indexOf('))'));
+                patternArr.push(temporaryWKT);
+            }
+        });
+        console.log('patternArr', patternArr);
+        patternArr.map(item => {
+            let coordsArr = item.split(',');
             let treearea = [];
-            coordsArr.map(item => {
-                let arr = item.split(' ');
+            coordsArr.map(record => {
+                let arr = record.split(' ');
                 treearea.push([arr[1], arr[0]]);
             });
             coordinatesArr.push(treearea);
