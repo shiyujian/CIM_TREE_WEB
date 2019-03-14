@@ -331,7 +331,7 @@ class Users extends Component {
     }
     // 设置拉入黑名单的背景颜色
     setBlackListColor (record, i) {
-        if (record.is_black === 1 || record.is_black === true) {
+        if (record && record.account && (record.account.is_black === 1 || record.is_black === true)) {
             return 'background';
         } else {
             return '';
