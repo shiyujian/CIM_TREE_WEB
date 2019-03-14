@@ -112,7 +112,6 @@ export default class DataStatis extends Component {
             leftkeycode
         } = this.state;
         let treeList = [];
-        console.log(tree, '树数据');
         if (tree.thinClassTree) {
             treeList = tree.thinClassTree;
         }

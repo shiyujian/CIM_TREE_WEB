@@ -28,11 +28,13 @@ const TabPane = Tabs.TabPane;
     })
 )
 export default class PlantStrengthAnalysi extends Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = {
             leftkeycode: '', // 项目
-            sectionList: [] // 标段列表
+            sectionList: [], // 标段列表
+            treetypeoption: [],
+            typeoption: []
         };
     }
 
@@ -42,11 +44,17 @@ export default class PlantStrengthAnalysi extends Component {
                 getTreeNodeList,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree
+                getThinClassTree,
+                getTreeList
             },
+            treetypes,
             platform: { tree = {} }
         } = this.props;
         try {
+            // 避免反复获取森林树种列表，提高效率
+            if (!treetypes) {
+                getTreeList().then(x => this.setTreeTypeOption(x));
+            }
             if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
                 let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
                 let totalThinClass = data.totalThinClass || [];
@@ -60,12 +68,34 @@ export default class PlantStrengthAnalysi extends Component {
             if (defaultProject) {
                 this.onSelect([defaultProject]);
             }
+            // 类型
+            let typeoption = [
+                <Option key={'全部'} value={''} title={'全部'}>
+                    全部
+                </Option>,
+                <Option key={'常绿乔木'} value={'1'} title={'常绿乔木'}>
+                    常绿乔木
+                </Option>,
+                <Option key={'落叶乔木'} value={'2'} title={'落叶乔木'}>
+                    落叶乔木
+                </Option>,
+                <Option key={'亚乔木'} value={'3'} title={'亚乔木'}>
+                    亚乔木
+                </Option>,
+                <Option key={'灌木'} value={'4'} title={'灌木'}>
+                    灌木
+                </Option>,
+                <Option key={'地被'} value={'5'} title={'地被'}>
+                    地被
+                </Option>
+            ];
+            this.setState({ typeoption });
         } catch (e) {
             console.log('e', e);
         }
     }
 
-    render () {
+    render() {
         const {
             platform: { tree = {} }
         } = this.props;
@@ -79,7 +109,7 @@ export default class PlantStrengthAnalysi extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='栽植进度分析' {...this.props} />
+                    <DynamicTitle title='栽植强度分析' {...this.props} />
                     <Sidebar width={190}>
                         <PkCodeTree
                             treeData={treeList}
@@ -88,16 +118,66 @@ export default class PlantStrengthAnalysi extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        <PlantStrength
-                            {...this.props}
-                            {...this.state}
-                        />
+                        <Tabs type='card' tabBarGutter={10}>
+                            <TabPane tab='苗木分析' key='2'>
+                                <PlantStrength
+                                    {...this.props}
+                                    {...this.state}
+                                    typeselect={this.typeselect.bind(this)}
+                                />
+                            </TabPane>
+                            <TabPane tab='车辆包分析' key='1'>
+                                <VehicleAnalysi {...this.props} {...this.state} />
+                            </TabPane>
+                        </Tabs>
+
                     </Content>
                 </Main>
             </Body>
         );
     }
-    onSelect (keys) {
+
+    // 设置树种选项
+    setTreeTypeOption(rst) {
+        debugger
+        if (rst instanceof Array) {
+            let treetypeoption = rst.map(item => {
+                return (
+                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                        {item.TreeTypeName}
+                    </Option>
+                );
+            });
+            treetypeoption.unshift(
+                <Option key={'全部'} value={''} title={'全部'}>
+                    全部
+                </Option>
+            );
+            this.setState({ treetypeoption, treetypelist: rst });
+        }
+    }
+
+    // 类型选择, 重新获取: 树种
+    typeselect(value) {
+        const { treetypes = [] } = this.props;
+        this.setState({ bigType: value });
+        let selectTreeType = [];
+        treetypes.map(item => {
+            if (item.TreeTypeNo == null) {
+            }
+            if (item.TreeTypeNo) {
+                try {
+                    let code = item.TreeTypeNo.substr(0, 1);
+                    if (code === value) {
+                        selectTreeType.push(item);
+                    }
+                } catch (e) { }
+            }
+        });
+        this.setTreeTypeOption(selectTreeType);
+    }
+
+    onSelect(keys) {
         let keycode = keys[0] || '';
         const {
             platform: { tree = {} }

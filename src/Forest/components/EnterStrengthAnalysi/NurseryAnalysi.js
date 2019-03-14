@@ -1,17 +1,31 @@
 import React, {Component} from 'react';
 import { Card, Row, Col } from 'antd';
 import moment from 'moment';
+import XLSX from 'xlsx'
+import DataShow from './DataShow'
 export default class NurseryAnalysi extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            NewUser: 0, // 累计注册账号总数
-            ActiveUser: 0, // 日最高活跃账号数
-            SessionCount: 0, // 今日用户活跃度
-            TotalUser: 0
+            queryTime: 0,
         };
     }
+
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode
+        } = this.props;
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
+            await this.query()
+        }
+    }
     componentDidMount = async () => {
+    }
+
+    query = () => {
+        this.setState({
+            queryTime: moment().unix()
+        })
     }
 
     render () {
@@ -22,6 +36,9 @@ export default class NurseryAnalysi extends Component {
         } = this.state;
         return (
             <div>
+                <DataShow 
+                    {...this.state}
+                    {...this.props}/>
                 hh
             </div>
         );
