@@ -12,7 +12,10 @@ export default class Submenu extends Component {
         const {is_superuser = false} = getUser();
         const permissions = getPermissions() || [];
         return (
-            <Menu mode='inline' selectedKeys={this.selectKey()} defaultOpenKeys={defaultOpenKeys} onOpenChange={this.onOpenChange.bind(this)}>
+            <Menu mode='inline'
+                selectedKeys={this.selectKey()}
+                defaultOpenKeys={defaultOpenKeys}
+                onOpenChange={this.onOpenChange.bind(this)}>
                 {
                     menus.map(menu => {
                         const {key, name, children = [], icon} = menu;

@@ -794,7 +794,7 @@ class Users extends Component {
     disable = async (user, event) => {
         const {
             sidebar: { node } = {},
-            actions: { putUser }
+            actions: { postUserForbidden }
         } = this.props;
         let actives;
         if (user.is_black !== 1) {
@@ -814,46 +814,17 @@ class Users extends Component {
             const element = user.groups[j];
             groupe.push(element.id);
         }
-        let putUserPostData = {
+        let postData = {
             id: user.id,
-            username: user.username,
-            email: user.email,
-            account: {
-                person_name: user.person_name,
-                person_type: 'C_PER',
-                person_avatar_url: user.person_avatar_url || '',
-                person_signature_url: user.person_signature_url || '',
-                organization: {
-                    pk: node.pk,
-                    code: user.org_code,
-                    obj_type: 'C_ORG',
-                    rel_type: 'member',
-                    name: user.organization
-                }
-            },
-            tags: user.tags || [],
-            sections: user.sections,
-            // groups: [7],
-            groups: groupe,
-            is_active: actives,
-            // black_remark: user.black_remark,
-            id_num: user.id_num,
-            // is_black: userblack,
-            id_image: user.id_image,
-            basic_params: {
-                info: {
-                    电话: user.person_telephone || '',
-                    性别: user.gender || '',
-                    技术职称: user.title || '',
-                    phone: user.person_telephone || '',
-                    sex: user.gender || '',
-                    duty: ''
-                }
-            },
-            extra_params: {},
-            title: user.title || ''
+            is_active: actives
         };
-        await putUser({}, putUserPostData);
+        let data = await postUserForbidden({}, postData);
+        if (data && data.code && data.code === 1) {
+            message.success('用户禁用成功');
+        } else {
+            message.error('用户禁用失败');
+        }
+        console.log('data', data);
         await this.forceUpdate();
     }
     // 用户编辑按钮

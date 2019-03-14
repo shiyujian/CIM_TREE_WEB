@@ -16,6 +16,7 @@ export const getNb2ss = forestFetchAction(`${FOREST_API}/system/nb2ss`); // 获�
 export const getRegionCodes = forestFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
 export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
 export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=org`, [], 'POST');
+export const postSupplierBlack = forestFetchAction(`${FOREST_API}/system/blacksupplier`, [], 'POST'); // 供应商拉黑
 
 export const actions = {
     getNurseryList,
@@ -27,7 +28,8 @@ export const actions = {
     getNb2ss,
     getRegionCodes,
     changeEditVisible,
-    postUploadImage
+    postUploadImage,
+    postSupplierBlack
 };
 
 export default handleActions({
