@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-13 20:45:58
+ * @Last Modified time: 2019-03-14 14:54:47
  */
 import React, { Component } from 'react';
 import {
@@ -109,15 +109,17 @@ class OnSite extends Component {
             curingTaskRealLayerList: {},
             curingTaskMarkerLayerList: {},
             curingTaskMessList: {}, // 养护任务信息List
-            
+            // 成活率
+            survivalRateMarkerLayerList: {},
+            // 结缘
             adoptTreeMarkerLayerList: {}, // 苗木结缘图标List
             adoptTreeDataList: {}, // 苗木结缘数据List
-            
+
             // 苗木结缘弹窗
             adoptTreeModalVisible: false,
             adoptTreeModalLoading: true,
             adoptTreeMess: '',
-            
+
             // 子组件搜索的树数据
             riskSrarchData: '',
             curingTaskSrarchData: '',
@@ -179,7 +181,7 @@ class OnSite extends Component {
             value: 'geojsonFeature_treePipe'
         }
     ];
-    
+
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
@@ -361,6 +363,8 @@ class OnSite extends Component {
                     });
                 } else if (dashboardTreeMess === 'treeMess') {
                     me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
+                } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
+                    me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
                 } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
                     me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_treeAdopt');
                 }
@@ -564,12 +568,18 @@ class OnSite extends Component {
     // 各个模块之间切换时，去除除当前模块外所有后来添加的图层
     removeAllLayer = () => {
         const {
-            adoptTreeMarkerLayerList
+            adoptTreeMarkerLayerList,
+            survivalRateMarkerLayerList
         } = this.state;
         const {
             dashboardCompomentMenu
         } = this.props;
         try {
+            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_survivalRate') {
+                for (let v in survivalRateMarkerLayerList) {
+                    this.map.removeLayer(survivalRateMarkerLayerList[v]);
+                }
+            }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treeAdopt') {
                 this.removeTileTreeAdoptLayer();
                 for (let t in adoptTreeMarkerLayerList) {
@@ -874,7 +884,7 @@ class OnSite extends Component {
                                         onClick={this._handleCreateMeasureOk.bind(this)}>
                                         确定
                                     </Button>
-                                    <Button type='info' style={{marginRight: 10}}
+                                    <Button type='default' style={{marginRight: 10}}
                                         disabled={createAreaMeasureBackDisplay}
                                         onClick={this._handleCreateMeasureRetreat.bind(this)}>
                                         上一步
@@ -898,7 +908,7 @@ class OnSite extends Component {
                         areaDistanceMeasureMenu === 'distanceMeasureMenu' ? (
                             <div className='dashboard-editPolygonLayout'>
                                 <div>
-                                    <Button type='info' style={{marginRight: 10}}
+                                    <Button type='default' style={{marginRight: 10}}
                                         disabled={createDistanceMeasureBackDisplay}
                                         onClick={this._handleCreateMeasureRetreat.bind(this)}>
                                         上一步
@@ -966,7 +976,7 @@ class OnSite extends Component {
                                 type={
                                     this.state.mapLayerBtnType
                                         ? 'primary'
-                                        : 'info'
+                                        : 'default'
                                 }
                                 onClick={this.toggleTileLayer.bind(this, 1)}
                             >
@@ -975,7 +985,7 @@ class OnSite extends Component {
                             <Button
                                 type={
                                     this.state.mapLayerBtnType
-                                        ? 'info'
+                                        ? 'default'
                                         : 'primary'
                                 }
                                 onClick={this.toggleTileLayer.bind(this, 2)}
@@ -1332,6 +1342,8 @@ class OnSite extends Component {
                     });
                     await that.getTreeMessData(data, x, y);
                     await that.handleOkTreeMessModal(data, x, y);
+                } else if (type === 'geojsonFeature_survivalRate') {
+                    that.getSurvivalRateInfo(data, x, y);
                 } else if (type === 'geojsonFeature_treeAdopt') {
                     let adoptTreeMess = await that.getTreeAdoptInfo(data, x, y);
                     if (adoptTreeMess) {
@@ -1345,6 +1357,54 @@ class OnSite extends Component {
                 }
             }
         });
+    }
+    // 点击地图上的区域的成活率
+    getSurvivalRateInfo = async (data, x, y) => {
+        const {
+            platform: {
+                tree = {}
+            }
+        } = this.props;
+        const {
+            survivalRateMarkerLayerList
+        } = this.state;
+        let totalThinClass = tree.totalThinClass || [];
+        try {
+            let bigTreeList = (tree && tree.bigTreeList) || [];
+            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
+                let properties = data.features[0].properties;
+                for (let i in survivalRateMarkerLayerList) {
+                    this.map.removeLayer(survivalRateMarkerLayerList[i]);
+                }
+                let areaData = getThinClassName(properties.no, properties.Section, totalThinClass, bigTreeList);
+                let iconData = {
+                    geometry: {
+                        coordinates: [y, x],
+                        type: 'Point'
+                    },
+                    key: properties.ID,
+                    properties: {
+                        sectionName: areaData.SectionName ? areaData.SectionName : '',
+                        smallClassName: areaData.SmallName ? areaData.SmallName : '',
+                        thinClassName: areaData.ThinName ? areaData.ThinName : '',
+                        treetype: properties.treetype,
+                        SurvivalRate: properties.SurvivalRate,
+                        type: 'survivalRate'
+                    },
+                    type: 'survivalRate'
+                };
+                let survivalRateLayer = L.popup()
+                    .setLatLng([y, x])
+                    .setContent(genPopUpContent(iconData))
+                    .addTo(this.map);
+                survivalRateMarkerLayerList[properties.ID] = survivalRateLayer;
+                this.setState({
+                    survivalRateMarkerLayerList
+                });
+            }
+        } catch (e) {
+            console.log('getSurvivalRateInfo', e);
+        }
     }
     // 获取树木详情信息
     getTreeMessData = async (data, x, y) => {

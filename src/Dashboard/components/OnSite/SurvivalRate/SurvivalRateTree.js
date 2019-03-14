@@ -102,34 +102,15 @@ export default class SurvivalRateTree extends Component {
 
     componentDidMount = async () => {
         const {
-            map,
-            tileTreeLayerBasic
+            map
         } = this.props;
         if (map) {
             await this.getTileTreeSurvivalRateBasic();
             await this.getSurvivalRateRateDataDefault();
-            let me = this;
-            map.on('click', function (e) {
-                const {
-                    dashboardCompomentMenu
-                } = me.props;
-                if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
-                    me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
-                }
-            });
         }
     }
     componentWillUnmount = async () => {
-        const {
-            map
-        } = this.props;
-        const {
-            survivalRateMarkerLayerList
-        } = this.state;
         await this.removeTileTreeSurvivalRateLayer();
-        for (let v in survivalRateMarkerLayerList) {
-            map.removeLayer(survivalRateMarkerLayerList[v]);
-        }
     }
     // 加载成活率全部瓦片图层
     getTileTreeSurvivalRateBasic = () => {
@@ -151,131 +132,6 @@ export default class SurvivalRateTree extends Component {
                     tiletype: 'wtms'
                 }
             ).addTo(map);
-        }
-    }
-    // 根据点击的地图坐标与实际树的定位进行对比,根据树节点获取树节点信息
-    getSxmByLocation (x, y, that, type) {
-        const {
-            map
-        } = this.props;
-        var resolutions = [
-            0.703125,
-            0.3515625,
-            0.17578125,
-            0.087890625,
-            0.0439453125,
-            0.02197265625,
-            0.010986328125,
-            0.0054931640625,
-            0.00274658203125,
-            0.001373291015625,
-            6.866455078125e-4,
-            3.4332275390625e-4,
-            1.71661376953125e-4,
-            8.58306884765625e-5,
-            4.291534423828125e-5,
-            2.1457672119140625e-5,
-            1.0728836059570312e-5,
-            5.364418029785156e-6,
-            2.682209014892578e-6,
-            1.341104507446289e-6,
-            6.705522537231445e-7,
-            3.3527612686157227e-7
-        ];
-        let zoom = map.getZoom();
-        let resolution = resolutions[zoom];
-        let col = (x + 180) / resolution;
-        // 林总说明I和J必须是整数
-        let colp = Math.floor(col % 256);
-        // let colp = col % 256;
-        col = Math.floor(col / 256);
-        let row = (90 - y) / resolution;
-        // 林总说明I和J必须是整数
-        let rowp = Math.floor(row % 256);
-        // let rowp = row % 256;
-        row = Math.floor(row / 256);
-        let url =
-            FOREST_GIS_API +
-            '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:treelocation&STYLE=&TILEMATRIX=EPSG:4326:' +
-            zoom +
-            '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
-            col +
-            '&TileRow=' +
-            row +
-            '&I=' +
-            colp +
-            '&J=' +
-            rowp;
-        if (type === 'geojsonFeature_survivalRate') {
-            url =
-            FOREST_GIS_API +
-            '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:thinclass&STYLE=&TILEMATRIX=EPSG:4326:' +
-            zoom +
-            '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
-            col +
-            '&TileRow=' +
-            row +
-            '&I=' +
-            colp +
-            '&J=' +
-            rowp;
-        }
-        jQuery.getJSON(url, null, async function (data) {
-            if (data.features && data.features.length) {
-                if (type === 'geojsonFeature_survivalRate') {
-                    that.getSurvivalRateInfo(data, x, y);
-                }
-            }
-        });
-    }
-
-    // 点击地图上的区域的成活率
-    getSurvivalRateInfo = async (data, x, y) => {
-        const {
-            platform: {
-                tree = {}
-            },
-            map
-        } = this.props;
-        const {
-            survivalRateMarkerLayerList
-        } = this.state;
-        let totalThinClass = tree.totalThinClass || [];
-        try {
-            let bigTreeList = (tree && tree.bigTreeList) || [];
-            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
-                let properties = data.features[0].properties;
-                for (let i in survivalRateMarkerLayerList) {
-                    map.removeLayer(survivalRateMarkerLayerList[i]);
-                }
-                let areaData = getThinClassName(properties.no, properties.Section, totalThinClass, bigTreeList);
-                let iconData = {
-                    geometry: {
-                        coordinates: [y, x],
-                        type: 'Point'
-                    },
-                    key: properties.ID,
-                    properties: {
-                        sectionName: areaData.SectionName ? areaData.SectionName : '',
-                        smallClassName: areaData.SmallName ? areaData.SmallName : '',
-                        thinClassName: areaData.ThinName ? areaData.ThinName : '',
-                        treetype: properties.treetype,
-                        SurvivalRate: properties.SurvivalRate,
-                        type: 'survivalRate'
-                    },
-                    type: 'survivalRate'
-                };
-                let survivalRateLayer = L.popup()
-                    .setLatLng([y, x])
-                    .setContent(genPopUpContent(iconData))
-                    .addTo(map);
-                survivalRateMarkerLayerList[properties.ID] = survivalRateLayer;
-                this.setState({
-                    survivalRateMarkerLayerList
-                });
-            }
-        } catch (e) {
-            console.log('getSurvivalRateInfo', e);
         }
     }
 

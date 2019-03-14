@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-11 15:25:21
+ * @Last Modified time: 2019-03-14 15:20:12
  */
 /**
  *
@@ -147,6 +147,10 @@ export const FOREST_LOGIN_DATA = {
     // phone: 'zhaozz1010',
     // pwd: '130718'
 };
+// 业主审核进度管理列表人员
+export const OWNERCHECKLIST = [
+    '张亮', '陈津陵', '池铭炎', '李红宇', '张大伟', '郝晓飞', '黄雪晨', '李航'
+];
 
 export const ORG_NURSERY_CODE = 'ORG_NURSERY';
 export const ORG_SUPPLIER_CODE = 'ORG_SUPPLIER';
