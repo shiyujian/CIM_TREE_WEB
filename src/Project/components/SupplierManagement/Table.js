@@ -3,7 +3,7 @@ import moment from 'moment';
 import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import AddEdit from './AddEdit';
-
+import './Table.less';
 const confirm = Modal.confirm;
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -30,7 +30,9 @@ class Tablelevel extends Component {
             textCord: '', // 编码
             LegalPerson: '', // 姓名
             optionList: [],
-            permission: false // 是否为业主或管理员
+            permission: false, // 是否为业主或管理员
+            blackRecord: '',
+            blackVisible: false
         };
         this.Checker = '';
         this.groupId = ''; // 用户分组ID
@@ -199,11 +201,38 @@ class Tablelevel extends Component {
                 const {
                     permission
                 } = this.state;
-                if (permission) {
+                const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+                if (user && user.username === 'admin') {
                     return (
                         <span>
                             {
-                                [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>, <span key='2' className='ant-divider' />]
+                                record && record.IsBlack
+                                    ? ''
+                                    : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                        <span key='2' className='ant-divider' />]
+                            }
+                            {
+                                record.CheckStatus === 0 ? [<a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>,
+                                    <span key='4' className='ant-divider' />] : []
+                            }
+                            <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                            {
+                                record && record.IsBlack
+                                    ? '' : ([
+                                        <span key='4' className='ant-divider' />,
+                                        <a onClick={this.toBlack.bind(this, record)}>拉黑</a>
+                                    ])
+                            }
+                        </span>
+                    );
+                } else if (permission) {
+                    return (
+                        <span>
+                            {
+                                record && record.IsBlack
+                                    ? ''
+                                    : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                        <span key='2' className='ant-divider' />]
                             }
                             {
                                 record.CheckStatus === 0 ? [<a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>,
@@ -226,7 +255,26 @@ class Tablelevel extends Component {
     ];
     render () {
         const { getFieldDecorator } = this.props.form;
-        const { supplierList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, imageUrl, record, RegionCodeList, suppliername, status, textCord, LegalPerson } = this.state;
+        const {
+            supplierList,
+            page,
+            total,
+            visible,
+            visibleTitle,
+            seeVisible,
+            auditVisible,
+            optionList,
+            fileList,
+            fileListBack,
+            imageUrl,
+            record,
+            RegionCodeList,
+            suppliername,
+            status,
+            textCord,
+            LegalPerson,
+            blackVisible
+        } = this.state;
 
         let img = getForestImgUrl(imageUrl);
         return (
@@ -284,8 +332,13 @@ class Tablelevel extends Component {
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <Spin tip='Loading...' spinning={this.state.loading}>
-                            <Table columns={this.columns} bordered dataSource={supplierList}
-                                scroll={{ x: 1550 }} pagination={false} rowKey='ID' />
+                            <Table
+                                columns={this.columns}
+                                bordered
+                                rowClassName={this.setBlackListColor.bind(this)}
+                                dataSource={supplierList}
+                                scroll={{ x: 1550 }}
+                                pagination={false} rowKey='ID' />
                             <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
                                 showQuickJumper onChange={this.handlePage} />
                         </Spin>
@@ -340,6 +393,22 @@ class Tablelevel extends Component {
                         onSearch={this.onSearch}
                     /> : null
                 }
+                <Modal title='拉黑' visible={blackVisible}
+                    onCancel={this.handleBlackCancel.bind(this)}
+                    onOk={this.handleBlackOk.bind(this)}
+                >
+                    <Form>
+                        <FormItem
+                            {...formItemLayout}
+                            label='拉黑备注'
+                        >
+                            {getFieldDecorator('BlackInfo', {
+                            })(
+                                <TextArea rows={4} />
+                            )}
+                        </FormItem>
+                    </Form>
+                </Modal>
             </div>
         );
     }
@@ -435,6 +504,115 @@ class Tablelevel extends Component {
 
             }
         });
+    }
+    toBlack = async (record) => {
+        this.setState({
+            blackVisible: true,
+            blackRecord: record
+        });
+    }
+    handleBlackCancel = async () => {
+        this.setState({
+            blackVisible: false,
+            blackRecord: ''
+        });
+    }
+    // 设置拉入黑名单的背景颜色
+    setBlackListColor (record, i) {
+        if (record && record.IsBlack) {
+            return 'background';
+        } else {
+            return '';
+        }
+    }
+    // 拉黑
+    handleBlackOk = async () => {
+        const {
+            actions: {
+                getUsers,
+                postForestUserBlackList,
+                postSupplierBlack
+            }
+        } = this.props;
+        const {
+            blackRecord
+        } = this.state;
+        try {
+            this.props.form.validateFields(async (err, values) => {
+                if (err) {
+                    return;
+                }
+                // 首先需要根据身份证号查到所有的供应商
+                // 然后根据供应商的orgpk查到供应商下的所有人员，将所有人员进行拉黑
+                let supplierList = [];
+                supplierList.push(blackRecord);
+                // 需要对人员列表根据身份证做去重处理，人员身份证List
+                let userIDNumList = [];
+                for (let index = 0; index < supplierList.length; index++) {
+                    let supplier = supplierList[index];
+                    // 当前被拉黑供应商下的人员
+                    let userAllResults = [];
+                    let orgCode = supplier.OrgPK;
+                    let postData = {
+                        org_code: orgCode,
+                        page: 1,
+                        page_size: 20
+                    };
+                    let userList = await getUsers({}, postData);
+                    userAllResults = userAllResults.concat((userList && userList.results) || []);
+                    let total = userList.count;
+                    // 为了防止人员过多，对人员进行分页获取处理
+                    if (total > 20) {
+                        for (let i = 0; i < (total / 20) - 1; i++) {
+                            postData = {
+                                org_code: orgCode,
+                                page: i + 2,
+                                page_size: 20
+                            };
+                            let datas = await getUsers({}, postData);
+                            userAllResults = userAllResults.concat((datas && datas.results) || []);
+                        }
+                    }
+                    // 人员拉黑请求数组
+                    let blackPostRequestList = [];
+                    userAllResults.map((user) => {
+                        // 之前没有对该身份证进行拉黑，则push进入拉黑请求数组中
+                        if (user && user.account && user.account.id_num && !user.account.is_black && userIDNumList.indexOf(user.account.id_num) === -1) {
+                            let blackPostData = {
+                                id: user.id,
+                                is_black: true,
+                                black_remark: `${supplier.SupplierName}: ${values.BlackInfo}`
+                            };
+                            blackPostRequestList.push(postForestUserBlackList({}, blackPostData));
+                            userIDNumList.push(user.account.id_num);
+                        }
+                    });
+                    let blackData = await Promise.all(blackPostRequestList);
+                    console.log('blackData', blackData);
+                    if (blackData && blackData.length > 0) {
+                        message.success('供应商人员拉黑成功');
+                    }
+                    let nurseryPostData = {
+                        ID: supplier.ID,
+                        BlackInfo: values.BlackInfo
+                    };
+                    let supplierBlackData = await postSupplierBlack({}, nurseryPostData);
+                    console.log('supplierBlackData', supplierBlackData);
+                    if (supplierBlackData && supplierBlackData.code && supplierBlackData.code === 1) {
+                        message.success('供应商拉黑成功');
+                    } else {
+                        message.error('供应商拉黑失败');
+                    }
+                }
+                await this.onSearch();
+                this.setState({
+                    blackVisible: false,
+                    blackRecord: ''
+                });
+            });
+        } catch (e) {
+            console.log('handleBlackOk', e);
+        }
     }
     onSearch () {
         const { page, status, suppliername } = this.state;

@@ -1,6 +1,6 @@
 import { handleActions, combineActions } from 'redux-actions';
 import { actionsMap } from '_platform/store/util';
-import blacklistReducer, { actions as blacklistActions } from './blacklist';
+import personBlacklistReducer, { actions as personBlacklistActions } from './personBlacklist';
 import personReducer, { actions as personActions } from './person';
 import orgReducer, { actions as orgActions } from './org';
 import permissionReducer, { actions as permissionActions } from './permission';
@@ -31,12 +31,12 @@ export default handleActions(
             org: orgReducer(state.org, action)
         }),
         // 黑名单
-        [combineActions(...actionsMap(blacklistActions))]: (
+        [combineActions(...actionsMap(personBlacklistActions))]: (
             state = {},
             action
         ) => ({
             ...state,
-            blacklist: blacklistReducer(state.blacklist, action)
+            personBlacklist: personBlacklistReducer(state.blacklist, action)
         })
 
     },

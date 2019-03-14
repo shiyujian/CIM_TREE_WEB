@@ -1110,7 +1110,8 @@ class Edit extends Component {
                 postUploadFilesNum,
                 getSwitch,
                 postUploadAutograph,
-                putUserBlackList,
+                // putUserBlackList,
+                postForestUserBlackList,
                 changeEditUserVisible
             }
         } = this.props;
@@ -1135,12 +1136,23 @@ class Edit extends Component {
                 if (!err) {
                     // 拉黑处理
                     if (isBlackChecked) {
-                        let blackPoseData = {
-                            is_black: isBlackChecked,
-                            change_all: true,
+                        // let blackPostData = {
+                        //     is_black: isBlackChecked,
+                        //     change_all: true,
+                        //     black_remark: addition.black_remark
+                        // };
+                        // await putUserBlackList({ userID: addition.id }, blackPostData);
+                        let blackPostData = {
+                            id: addition.id,
+                            is_black: true,
                             black_remark: addition.black_remark
                         };
-                        await putUserBlackList({ userID: addition.id }, blackPoseData);
+                        let blackData = await postForestUserBlackList({}, blackPostData);
+                        if (blackData && blackData.code && blackData.code === 1) {
+                            message.success('人员拉黑成功');
+                        } else {
+                            message.error('人员拉黑失败');
+                        }
                     }
                     // 修改人员信息
                     let putUserPostData = {

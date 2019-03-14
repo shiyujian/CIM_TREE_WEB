@@ -1,6 +1,5 @@
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
-import { Route, Redirect } from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import ContainerRouters from '_platform/components/panels/ContainerRouters';
@@ -27,7 +26,6 @@ export default class System extends Component {
                         menus={System.menus}
                         containers={this.state}
                     />
-                    {/*				<Redirect path="/" to={{pathname: '/system/person'}} /> */}
                 </Main>
             </Body>
         );
@@ -70,26 +68,34 @@ export default class System extends Component {
             path: '/system/org',
             icon: <Icon name='street-view' />
         },
-        // {
-        //     key: 'Orgdata',
-        //     id: 'SYSTEM.ORGDATA',
-        //     name: '组织机构填报',
-        //     path: '/system/orgdata',
-        //     icon: <Icon name='street-view' />
-        // },
-        // {
-        //     key: 'Personsdata',
-        //     id: 'SYSTEM.PERSONSDATA',
-        //     name: '人员信息填报',
-        //     path: '/system/personsdata',
-        //     icon: <Icon name='street-view' />
-        // },
         {
             key: 'Blacklist',
-            id: 'SYSTEM.BLACKLIST',
             name: '黑名单',
-            path: '/system/blacklist',
-            icon: <Icon name='street-view' />
+            id: 'SYSTEM.BLACKLIST',
+            icon: <Icon name='list-ul' />,
+            children: [
+                {
+                    key: 'PersonBlacklist',
+                    id: 'SYSTEM.PERSONBLACKLIST',
+                    name: '人员黑名单',
+                    path: '/system/personblacklist',
+                    icon: <Icon name='street-view' />
+                },
+                {
+                    key: 'NurseryBlacklist',
+                    id: 'SYSTEM.NURSERYBLACKLIST',
+                    name: '苗圃黑名单',
+                    path: '/system/nurseryblacklist',
+                    icon: <Icon name='leaf' />
+                },
+                {
+                    key: 'SupplierBlacklist',
+                    id: 'SYSTEM.SUPPLIERBLACKLIST',
+                    name: '供应商黑名单',
+                    path: '/system/supplierblacklist',
+                    icon: <Icon name='shopping-cart' />
+                }
+            ]
         }
     ];
 }

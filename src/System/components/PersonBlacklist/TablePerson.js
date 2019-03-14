@@ -697,31 +697,28 @@ class TablePerson extends Component {
     };
     confirm = async (record) => {
         const {
-            actions: { putUserBlackList }
+            actions: { postForestUserBlackList }
         } = this.props;
         try {
             console.log('record', record);
             this.setState({ loading: true });
-            let rst = await putUserBlackList(
-                { userID: record.children[0].id },
-                {
-                    is_black: 0,
-                    change_all: true,
-                    black_remark: ''
-                }
-            );
+            let blackPostData = {
+                id: record.children[0].id,
+                is_black: false,
+                black_remark: ''
+            };
+            let rst = await postForestUserBlackList({}, blackPostData);
             console.log('rst111111111111', rst);
             let tempDatas = [];
             this.state.tempData.map(item => {
-                if (rst.account.is_black === 1) {
-                    message.warn('移除失败');
-                    tempDatas = this.state.tempData;
-                }
-                console.log('item', item);
-                if (rst.account.is_black === 0) {
-                    if (item.id_num !== rst.account.id_num) {
+                if (rst && rst.code && rst.code === 1) {
+                    message.success('移除成功');
+                    if (item.id_num !== record.id_num) {
                         tempDatas.push(item);
                     }
+                } else {
+                    message.warn('移除失败');
+                    tempDatas = this.state.tempData;
                 }
             });
             this.setState({

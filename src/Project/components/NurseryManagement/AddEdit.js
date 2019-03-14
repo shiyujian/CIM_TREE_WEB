@@ -36,7 +36,7 @@ class AddEdit extends Component {
             grade: 3
         }).then(rep => {
             this.regionCode_name = rep;
-        })
+        });
         // 获取本用户的姓名，电话作为联系人，联系方式
         const user = JSON.parse(localStorage.getItem('QH_USER_DATA'));
         if (user.account) {
@@ -342,10 +342,10 @@ class AddEdit extends Component {
 
             let RegionName;
             this.regionCode_name.map(item => {
-                if(item.ID === RegionCode) {
-                    RegionName = item.MergerName
+                if (item.ID === RegionCode) {
+                    RegionName = item.MergerName;
                 }
-            })
+            });
             let regionName = RegionName.split(',')[1] + RegionName.split(',')[2] + RegionName.split(',')[3];
             if (record) {
                 let postdata = {
@@ -366,9 +366,16 @@ class AddEdit extends Component {
                 };
                 putNursery({}, postdata).then(rep => {
                     if (rep && rep.code === 2) {
-                        notification.error({
-                            message: '苗圃基地已存在！'
-                        });
+                        console.log('rep.msg', rep.msg);
+                        if (rep.msg && rep.msg === '该苗圃基地负责人已被拉黑！') {
+                            notification.error({
+                                message: '该苗圃基地负责人已被拉黑！'
+                            });
+                        } else {
+                            notification.error({
+                                message: '苗圃基地已存在！'
+                            });
+                        }
                     } else if (rep.code === 1) {
                         notification.success({
                             message: '编辑苗圃成功'
@@ -398,9 +405,16 @@ class AddEdit extends Component {
                 };
                 postNursery({}, postdata).then(rep => {
                     if (rep && rep.code === 2) {
-                        notification.error({
-                            message: '苗圃基地已存在！'
-                        });
+                        console.log('rep.msg', rep.msg);
+                        if (rep.msg && rep.msg === '该苗圃基地负责人已被拉黑！') {
+                            notification.error({
+                                message: '该苗圃基地负责人已被拉黑！'
+                            });
+                        } else {
+                            notification.error({
+                                message: '苗圃基地已存在！'
+                            });
+                        }
                     } else if (rep.code === 1) {
                         notification.success({
                             message: '新增苗圃成功'

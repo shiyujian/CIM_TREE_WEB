@@ -3,6 +3,7 @@ import moment from 'moment';
 import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import AddEdit from './AddEdit';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
+import './Table.less';
 const confirm = Modal.confirm;
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -27,7 +28,9 @@ class Tablelevel extends Component {
             imageUrl: '', // 身份证正反面
             Leader: '', // 负责人姓名
             optionList: [],
-            permission: false // 是否为业主或管理员
+            permission: false, // 是否为业主或管理员
+            blackVisible: false, // 拉黑modal
+            blackRecord: '' // 拉黑的信息
         };
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
@@ -170,12 +173,38 @@ class Tablelevel extends Component {
                 const {
                     permission
                 } = this.state;
-                if (permission) {
+                const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+                if (user && user.username === 'admin') {
                     return (
                         <span>
                             {
-                                [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
-                                    <span key='2' className='ant-divider' />]
+                                record && record.IsBlack
+                                    ? ''
+                                    : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                        <span key='2' className='ant-divider' />]
+                            }
+                            {
+                                record.CheckStatus === 0 ? [<a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>,
+                                    <span key='4' className='ant-divider' />] : []
+                            }
+                            <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                            {
+                                record && record.IsBlack
+                                    ? '' : ([
+                                        <span key='4' className='ant-divider' />,
+                                        <a onClick={this.toBlack.bind(this, record)}>拉黑</a>
+                                    ])
+                            }
+                        </span>
+                    );
+                } else if (permission) {
+                    return (
+                        <span>
+                            {
+                                record && record.IsBlack
+                                    ? ''
+                                    : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                        <span key='2' className='ant-divider' />]
                             }
                             {
                                 record.CheckStatus === 0 ? [<a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>,
@@ -200,7 +229,25 @@ class Tablelevel extends Component {
         }
     ];
     render () {
-        const { status, nurseryList, page, total, visible, visibleTitle, seeVisible, auditVisible, optionList, fileList, fileListBack, imageUrl, record, RegionCodeList, nurseryname, Leader, textCord } = this.state;
+        const {
+            status,
+            nurseryList,
+            page, total,
+            visible,
+            visibleTitle,
+            seeVisible,
+            auditVisible,
+            optionList,
+            fileList,
+            fileListBack,
+            imageUrl,
+            record,
+            RegionCodeList,
+            nurseryname,
+            Leader,
+            textCord,
+            blackVisible
+        } = this.state;
         const { getFieldDecorator } = this.props.form;
         let img = getForestImgUrl(imageUrl);
         return (
@@ -258,7 +305,11 @@ class Tablelevel extends Component {
                 <Row style={{ marginTop: 10 }}>
                     <Col span={24}>
                         <Spin tip='Loading...' spinning={this.state.loading}>
-                            <Table columns={this.columns} bordered dataSource={nurseryList}
+                            <Table
+                                columns={this.columns}
+                                bordered
+                                rowClassName={this.setBlackListColor.bind(this)}
+                                dataSource={nurseryList}
                                 pagination={false} rowKey='ID' />
                             <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
                                 showQuickJumper page='1' onChange={this.handlePage} />
@@ -314,6 +365,22 @@ class Tablelevel extends Component {
                         onSearch={this.onSearch}
                     /> : null
                 }
+                <Modal title='拉黑' visible={blackVisible}
+                    onCancel={this.handleBlackCancel.bind(this)}
+                    onOk={this.handleBlackOk.bind(this)}
+                >
+                    <Form>
+                        <FormItem
+                            {...formItemLayout}
+                            label='拉黑备注'
+                        >
+                            {getFieldDecorator('BlackInfo', {
+                            })(
+                                <TextArea rows={4} />
+                            )}
+                        </FormItem>
+                    </Form>
+                </Modal>
             </div>
         );
     }
@@ -427,6 +494,116 @@ class Tablelevel extends Component {
 
             }
         });
+    }
+    toBlack = async (record) => {
+        this.setState({
+            blackVisible: true,
+            blackRecord: record
+        });
+    }
+    handleBlackCancel = async () => {
+        this.setState({
+            blackVisible: false,
+            blackRecord: ''
+        });
+    }
+    // 设置拉入黑名单的背景颜色
+    setBlackListColor (record, i) {
+        if (record && record.IsBlack) {
+            return 'background';
+        } else {
+            return '';
+        }
+    }
+    // 拉黑
+    handleBlackOk = async () => {
+        const {
+            actions: {
+                getUsers,
+                postForestUserBlackList,
+                postNurseryBlack
+            }
+        } = this.props;
+        const {
+            blackRecord
+        } = this.state;
+        try {
+            this.props.form.validateFields(async (err, values) => {
+                if (err) {
+                    return;
+                }
+                // 首先需要根据身份证号查到所有的苗圃
+                // 然后根据苗圃的orgpk查到苗圃下的所有人员，将所有人员进行拉黑
+                let nuseryList = [];
+                nuseryList.push(blackRecord);
+                // 需要对人员列表根据身份证做去重处理，人员身份证List
+                let userIDNumList = [];
+                for (let index = 0; index < nuseryList.length; index++) {
+                    let nursery = nuseryList[index];
+                    // 当前被拉黑苗圃下的人员
+                    let userAllResults = [];
+                    let orgCode = nursery.OrgPK;
+                    let postData = {
+                        org_code: orgCode,
+                        page: 1,
+                        page_size: 20
+                    };
+                    let userList = await getUsers({}, postData);
+                    userAllResults = userAllResults.concat((userList && userList.results) || []);
+                    let total = userList.count;
+                    // 为了防止人员过多，对人员进行分页获取处理
+                    if (total > 20) {
+                        for (let i = 0; i < (total / 20) - 1; i++) {
+                            postData = {
+                                org_code: orgCode,
+                                page: i + 2,
+                                page_size: 20
+                            };
+                            let datas = await getUsers({}, postData);
+                            userAllResults = userAllResults.concat((datas && datas.results) || []);
+                        }
+                    }
+                    // 人员拉黑请求数组
+                    let blackPostRequestList = [];
+
+                    userAllResults.map((user) => {
+                        // 之前没有对该身份证进行拉黑，则push进入拉黑请求数组中
+                        if (user && user.account && user.account.id_num && !user.account.is_black && userIDNumList.indexOf(user.account.id_num) === -1) {
+                            let blackPostData = {
+                                id: user.id,
+                                is_black: true,
+                                black_remark: `${nursery.NurseryName}: ${values.BlackInfo}`
+                            };
+                            blackPostRequestList.push(postForestUserBlackList({}, blackPostData));
+                            userIDNumList.push(user.account.id_num);
+                        }
+                    });
+                    let blackData = await Promise.all(blackPostRequestList);
+                    console.log('blackData', blackData);
+                    if (blackData && blackData.length > 0) {
+                        message.success('苗圃人员拉黑成功');
+                    }
+                    let nurseryPostData = {
+                        ID: nursery.ID,
+                        BlackInfo: values.BlackInfo
+                    };
+                    let nurseryBlackData = await postNurseryBlack({}, nurseryPostData);
+                    console.log('nurseryBlackData', nurseryBlackData);
+                    if (nurseryBlackData && nurseryBlackData.code && nurseryBlackData.code === 1) {
+                        message.success('苗圃拉黑成功');
+                    } else {
+                        message.error('苗圃拉黑失败');
+                    }
+                }
+                await this.onSearch();
+                this.setState({
+                    blackVisible: false,
+                    blackRecord: ''
+                });
+            });
+        } catch (e) {
+            console.log('handleBlackOk', e);
+        }
     }
     handleStatus (value) {
         this.setState({

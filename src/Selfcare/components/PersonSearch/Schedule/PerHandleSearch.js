@@ -11,6 +11,7 @@ import { Select } from 'antd';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '_platform/store/global';
+import {OWNERCHECKLIST} from '_platform/api';
 const Option = Select.Option;
 
 @connect(
@@ -45,36 +46,42 @@ export default class PerSearch extends Component {
         console.log('roles', roles);
         let postRole = [];
         roles.map((role) => {
-            if (role && role.id && role.name && role.name === '业主文书') {
+            if (role && role.id && role.name && role.name.indexOf('业主') !== -1) {
                 postRole.push(role.id);
             }
         });
         try {
-            let postdata = {
-                roles: postRole,
-                is_active: true,
-                page: 1,
-                page_size: 20
-            };
             let results = [];
-            let users = await getUsers({}, postdata);
-            console.log('users', users);
-            results = results.concat((users && users.results) || []);
-            let total = users.count;
-            if (total > 20) {
-                for (let i = 0; i < (total / 20) - 1; i++) {
-                    postdata = {
-                        roles: postRole,
-                        is_active: true,
-                        page: i + 2,
-                        page_size: 20
-                    };
-                    let datas = await getUsers({}, postdata);
-                    results = results.concat((datas && datas.results) || []);
+            await OWNERCHECKLIST.map(async (owner) => {
+                let postdata = {
+                    keyword: owner,
+                    roles: postRole,
+                    is_active: true,
+                    page: 1,
+                    page_size: 20
+                };
+
+                let users = await getUsers({}, postdata);
+                console.log('users', users);
+                results = results.concat((users && users.results) || []);
+                let total = users.count;
+                if (total > 20) {
+                    for (let i = 0; i < (total / 20) - 1; i++) {
+                        postdata = {
+                            roles: postRole,
+                            is_active: true,
+                            page: i + 2,
+                            page_size: 20
+                        };
+                        let datas = await getUsers({}, postdata);
+                        results = results.concat((datas && datas.results) || []);
+                    }
                 }
-            }
-            this.setState({
-                users: results
+                console.log('results', results);
+
+                this.setState({
+                    users: results
+                });
             });
         } catch (error) {
             console.log(error);

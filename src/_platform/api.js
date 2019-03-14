@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-11 15:25:21
+ * @Last Modified time: 2019-03-14 15:20:12
  */
 /**
  *
@@ -99,7 +99,6 @@ export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const FOREST_GIS_TREETYPE_API = `${window.config.DASHBOARD_TREETYPE}`;
-export const TREEPIPE_API = `${window.config.TREEPIPE}`;
 export const INITLEAFLET_API = window.config.initLeaflet;
 
 // 考勤打卡
@@ -148,6 +147,10 @@ export const FOREST_LOGIN_DATA = {
     // phone: 'zhaozz1010',
     // pwd: '130718'
 };
+// 业主审核进度管理列表人员
+export const OWNERCHECKLIST = [
+    '张亮', '陈津陵', '池铭炎', '李红宇', '张大伟', '郝晓飞', '黄雪晨', '李航'
+];
 
 export const ORG_NURSERY_CODE = 'ORG_NURSERY';
 export const ORG_SUPPLIER_CODE = 'ORG_SUPPLIER';

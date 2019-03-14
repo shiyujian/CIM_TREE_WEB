@@ -17,6 +17,7 @@ export const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers
 export const getRegionCodes = forestFetchAction(`${FOREST_API}/system/regioncodes`, [], 'GET'); // 获取行政区划编码
 export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
 export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=org`, [], 'POST');
+export const postNurseryBlack = forestFetchAction(`${FOREST_API}/system/blacknurserybase`, [], 'POST'); // 苗圃拉黑
 
 export const actions = {
     getNurseryListOK,
@@ -29,7 +30,8 @@ export const actions = {
     getSupplierList,
     getRegionCodes,
     changeEditVisible,
-    postUploadImage
+    postUploadImage,
+    postNurseryBlack
 };
 
 export default handleActions({
