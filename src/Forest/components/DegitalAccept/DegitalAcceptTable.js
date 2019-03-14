@@ -53,9 +53,9 @@ export default class DegitalAcceptTable extends Component {
             curingSXM: '',
             smallclassData: '',
             thinclassData: '',
-            sgy: '',
-            cly: '',
-            jl: ''
+            sgy: '', // 施工员
+            cly: '', // 测量员
+            jl: '', // 监理
         };
         this.columns = [
             {
@@ -118,6 +118,8 @@ export default class DegitalAcceptTable extends Component {
                             <a onClick={this.remarkDefault.bind(this, record)}>
                                 备注
                             </a>
+                            <Divider type='vertical' />
+                            <a onClick={this.exportFile.bind(this,'single')}>导出</a>
                         </div>
                     );
                 }
@@ -418,13 +420,13 @@ export default class DegitalAcceptTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={18} className='forest-quryrstcnt'>
+                    <Col span={16} className='forest-quryrstcnt'>
                         <span>此次查询共有苗木：{this.state.totalNum}棵</span>
                     </Col>
                     <Col span={2} >
                         <Button
                             type='primary'
-                            style={{display: 'none'}}
+                            onClick={this.exportFile.bind(this,'mutiple')}
                         >
                             导出
                         </Button>
@@ -460,7 +462,7 @@ export default class DegitalAcceptTable extends Component {
                             ),
                             spinning: this.state.loading
                         }}
-                        locale={{ emptyText: '当天无养护信息' }}
+                        locale={{ emptyText: '暂无验收消息' }}
                         dataSource={details}
                         onChange={this.handleTableChange.bind(this)}
                         pagination={this.state.pagination}
@@ -580,6 +582,14 @@ export default class DegitalAcceptTable extends Component {
         resetinput(leftkeycode);
     }
 
+    exportFile (type) {
+        if (type === 'single') { // 单个导出
+
+        } else if (type === 'mutiple') {
+
+        }
+    }
+
     query = async (page) => {
         const {
             section = '',
@@ -588,6 +598,9 @@ export default class DegitalAcceptTable extends Component {
             stime2 = '',
             etime2 = '',
             size,
+            sgy = '',
+            cly = '',
+            jl = '',
             thinclass = '',
             curingTypeSelect = '',
             thinclassData = ''
