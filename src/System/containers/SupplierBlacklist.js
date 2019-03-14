@@ -30,7 +30,7 @@ export default class SupplierBlacklist extends Component {
     render () {
         return (
             <div>
-                <DynamicTitle title='苗圃黑名单' {...this.props} />
+                <DynamicTitle title='供应商黑名单' {...this.props} />
                 <Content>
                    123
                 </Content>
