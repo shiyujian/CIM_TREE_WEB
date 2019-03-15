@@ -209,13 +209,14 @@ class Tablelevel extends Component {
                                 record && record.IsBlack
                                     ? ''
                                     : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
-                                        <span key='2' className='ant-divider' />]
+                                        <span key='2' className='ant-divider' />,
+                                        <a onClick={this.toDelete.bind(this, record)}>删除</a>]
                             }
                             {
-                                record.CheckStatus === 0 ? [<a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>,
-                                    <span key='4' className='ant-divider' />] : []
+                                record.CheckStatus === 0 ? [<span key='4' className='ant-divider' />,
+                                    <a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>
+                                ] : []
                             }
-                            <a onClick={this.toDelete.bind(this, record)}>删除</a>
                             {
                                 record && record.IsBlack
                                     ? '' : ([
@@ -581,7 +582,7 @@ class Tablelevel extends Component {
                             let blackPostData = {
                                 id: user.id,
                                 is_black: true,
-                                black_remark: `${supplier.SupplierName}: ${values.BlackInfo}`
+                                black_remark: `供应商${supplier.SupplierName}: ${values.BlackInfo}`
                             };
                             blackPostRequestList.push(postForestUserBlackList({}, blackPostData));
                             userIDNumList.push(user.account.id_num);

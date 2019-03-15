@@ -12,6 +12,48 @@ export default class MenuSwitch extends Component {
         };
     }
 
+    options = [
+        {
+            label: '灌溉管网',
+            value: 'geojsonFeature_treePipe'
+        },
+        {
+            label: '树种筛选',
+            value: 'geojsonFeature_treetype'
+        },
+        {
+            label: '辅助管理',
+            value: 'geojsonFeature_auxiliaryManagement'
+        },
+        {
+            label: '安全隐患',
+            value: 'geojsonFeature_risk'
+        },
+        {
+            label: '巡检路线',
+            value: 'geojsonFeature_track'
+        }
+    ];
+    options1 = [
+        {
+            label: '养护任务',
+            value: 'geojsonFeature_curingTask'
+        },
+        {
+            label: '成活率',
+            value: 'geojsonFeature_survivalRate'
+        },
+        {
+            label: '苗木结缘',
+            value: 'geojsonFeature_treeAdopt'
+        }
+        // {
+        //     label: '辅助验收',
+        //     value: 'geojsonFeature_assistCheck'
+        // }
+    ]
+
+
     async componentDidMount () {
         const {
             actions: {
@@ -75,47 +117,7 @@ export default class MenuSwitch extends Component {
         };
     }
 
-    options = [
-        {
-            label: '灌溉管网',
-            value: 'geojsonFeature_treePipe'
-        },
-        {
-            label: '树种筛选',
-            value: 'geojsonFeature_treetype'
-        },
-        {
-            label: '辅助管理',
-            value: 'geojsonFeature_auxiliaryManagement'
-        },
-        {
-            label: '安全隐患',
-            value: 'geojsonFeature_risk'
-        },
-        {
-            label: '巡检路线',
-            value: 'geojsonFeature_track'
-        }
-    ];
-    options1 = [
-        {
-            label: '养护任务',
-            value: 'geojsonFeature_curingTask'
-        },
-        {
-            label: '成活率',
-            value: 'geojsonFeature_survivalRate'
-        },
-        {
-            label: '苗木结缘',
-            value: 'geojsonFeature_treeAdopt'
-        }
-        // {
-        //     label: '辅助验收',
-        //     value: 'geojsonFeature_assistCheck'
-        // }
-    ]
-
+    
     checkFull () {
         var isFullScreen = document.mozFullScreen || document.webkitIsFullScreen;
         return isFullScreen;
@@ -285,7 +287,8 @@ export default class MenuSwitch extends Component {
         const {
             actions: {
                 switchDashboardMenuType,
-                getMenuTreeVisible
+                getMenuTreeVisible,
+                switchDashboardCompoment
             },
             dashboardMenuType
         } = this.props;
@@ -296,6 +299,7 @@ export default class MenuSwitch extends Component {
         } else {
             await switchDashboardMenuType(menuType);
         }
+        await switchDashboardCompoment('');
         await getMenuTreeVisible(false);
     }
     // 左侧第二级菜单

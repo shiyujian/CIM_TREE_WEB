@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
 import './RiskTree.less';
 import moment from 'moment';
-import {handleRiskData, fillAreaColor, getIconType, genPopUpContent} from '../../auth';
+import { handleRiskData, fillAreaColor, getIconType, genPopUpContent } from '../../auth';
 // 安全隐患类型图片
 import riskDangerImg from '../../RiskImg/danger.png';
 import riskQualityImg from '../../RiskImg/quality.png';
@@ -11,7 +11,7 @@ const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
 export default class RiskTree extends Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = {
             stime: moment().format('YYYY-MM-DD 00:00:00'),
@@ -47,7 +47,7 @@ export default class RiskTree extends Component {
             img: riskOtherImg
         }
     ]
-    genIconClass () {
+    genIconClass() {
         let icClass = '';
         let featureName = this.props.featureName;
         switch (featureName) {
@@ -64,7 +64,7 @@ export default class RiskTree extends Component {
         return icClass;
     }
 
-    loop (p) {
+    loop(p) {
         let me = this;
         if (p) {
             return (
@@ -148,10 +148,11 @@ export default class RiskTree extends Component {
             console.log('handleRiskTypeAddLayer', e);
         }
     }
-    render () {
+    render() {
         let {
             riskTree = [],
-            riskTreeLoading
+            riskTreeLoading,
+            menuTreeVisible
         } = this.props;
         const {
             timeType,
@@ -179,101 +180,109 @@ export default class RiskTree extends Component {
         };
         return (
             <div>
-                <div className='dashboard-menuPanel'>
-                    <aside className='dashboard-aside' draggable='false'>
-                        <div className='dashboard-asideTree'>
-                            <Spin spinning={riskTreeLoading}>
-                                <div className='RiskTree-button'>
-                                    <Checkbox className='RiskTree-button-layout'
-                                        checked={riskNotRectify}
-                                        onChange={this.handleRiskNotRectify.bind(this)}>
-                                        未整改
-                                    </Checkbox>
-                                    <Checkbox className='RiskTree-button-layout'
-                                        checked={riskRectify}
-                                        onChange={this.handleRiskRectify.bind(this)}>
-                                        已整改
-                                    </Checkbox>
-                                </div>
-                                <div className='RiskTree-button'>
-                                    <Button className='RiskTree-button-layout' style={{marginRight: 10}}
-                                        type={timeType === 'all' ? 'primary' : ''}
-                                        id='all' onClick={this.handleTimeChange.bind(this)}>
-                                    全部
-                                    </Button>
-                                    <Button className='RiskTree-button-layout' id='today'
-                                        type={timeType === 'today' ? 'primary' : ''}
-                                        onClick={this.handleTimeChange.bind(this)}>
-                                    今天
-                                    </Button>
-                                </div>
-                                <div className='RiskTree-button'>
-                                    <Button className='RiskTree-button-layout' style={{marginRight: 10}}
-                                        type={timeType === 'week' ? 'primary' : ''}
-                                        id='week' onClick={this.handleTimeChange.bind(this)}>
-                                    一周内
-                                    </Button>
-                                    <Button className='RiskTree-button-layout' id='custom'
-                                        type={timeType === 'custom' ? 'primary' : ''}
-                                        onClick={this.handleTimeChange.bind(this)}>
-                                    自定义
-                                    </Button>
-                                </div>
-                                {
-                                    timeType === 'custom'
-                                        ? <RangePicker
-                                            style={{width: 220, marginBottom: 10}}
-                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
-                                            format='YYYY-MM-DD HH:mm:ss'
-                                            placeholder={['Start Time', 'End Time']}
-                                            onChange={this.handleDateChange.bind(this)}
-                                        />
-                                        : ''
-                                }
-                                <div className='RiskTree-statis-layout'>
-                                    <span style={{verticalAlign: 'middle'}}>类型</span>
-                                    <span className='RiskTree-data-text'>
-                                        数量
-                                    </span>
-                                </div>
-                                <div>
-                                    {
-                                        contents.map((content) => {
-                                            return (
-                                                <div className='RiskTree-mrg10' key={content.key}>
-                                                    <span style={{verticalAlign: 'middle'}}>{content.properties.name}</span>
+                {
+                    menuTreeVisible ?
+                        (
+                            <div>
+                                <div className='dashboard-menuPanel'>
+                                    <aside className='dashboard-aside' draggable='false'>
+                                        <div className='dashboard-asideTree'>
+                                            <Spin spinning={riskTreeLoading}>
+                                                <div className='RiskTree-button'>
+                                                    <Checkbox className='RiskTree-button-layout'
+                                                        checked={riskNotRectify}
+                                                        onChange={this.handleRiskNotRectify.bind(this)}>
+                                                        未整改
+                                                    </Checkbox>
+                                                    <Checkbox className='RiskTree-button-layout'
+                                                        checked={riskRectify}
+                                                        onChange={this.handleRiskRectify.bind(this)}>
+                                                        已整改
+                                                    </Checkbox>
+                                                </div>
+                                                <div className='RiskTree-button'>
+                                                    <Button className='RiskTree-button-layout' style={{ marginRight: 10 }}
+                                                        type={timeType === 'all' ? 'primary' : ''}
+                                                        id='all' onClick={this.handleTimeChange.bind(this)}>
+                                                        全部
+                                                    </Button>
+                                                    <Button className='RiskTree-button-layout' id='today'
+                                                        type={timeType === 'today' ? 'primary' : ''}
+                                                        onClick={this.handleTimeChange.bind(this)}>
+                                                        今天
+                                                    </Button>
+                                                </div>
+                                                <div className='RiskTree-button'>
+                                                    <Button className='RiskTree-button-layout' style={{ marginRight: 10 }}
+                                                        type={timeType === 'week' ? 'primary' : ''}
+                                                        id='week' onClick={this.handleTimeChange.bind(this)}>
+                                                        一周内
+                                                    </Button>
+                                                    <Button className='RiskTree-button-layout' id='custom'
+                                                        type={timeType === 'custom' ? 'primary' : ''}
+                                                        onClick={this.handleTimeChange.bind(this)}>
+                                                        自定义
+                                                    </Button>
+                                                </div>
+                                                {
+                                                    timeType === 'custom'
+                                                        ? <RangePicker
+                                                            style={{ width: 220, marginBottom: 10 }}
+                                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
+                                                            format='YYYY-MM-DD HH:mm:ss'
+                                                            placeholder={['Start Time', 'End Time']}
+                                                            onChange={this.handleDateChange.bind(this)}
+                                                        />
+                                                        : ''
+                                                }
+                                                <div className='RiskTree-statis-layout'>
+                                                    <span style={{ verticalAlign: 'middle' }}>类型</span>
                                                     <span className='RiskTree-data-text'>
-                                                        {content.children.length}
+                                                        数量
                                                     </span>
                                                 </div>
-                                            );
-                                        })
-                                    }
+                                                <div>
+                                                    {
+                                                        contents.map((content) => {
+                                                            return (
+                                                                <div className='RiskTree-mrg10' key={content.key}>
+                                                                    <span style={{ verticalAlign: 'middle' }}>{content.properties.name}</span>
+                                                                    <span className='RiskTree-data-text'>
+                                                                        {content.children.length}
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    }
+                                                </div>
+                                            </Spin>
+                                        </div>
+                                    </aside>
                                 </div>
-                            </Spin>
-                        </div>
-                    </aside>
-                </div>
-                <div>
-                    <div className='dashboard-menuSwitchRiskTypeLayout'>
-                        {
-                            this.riskTypeOptions.map((option) => {
-                                return (
-                                    <div style={{display: 'inlineBlock', marginTop: 10, height: 20}} key={option.id}>
-                                        <p className='dashboard-menuLabel'>{option.label}</p>
-                                        <img src={option.img}
-                                            title={option.label}
-                                            className='dashboard-rightMenuRiskTypeImgLayout' />
-                                        <a className={this.state[option.id] ? 'dashboard-rightMenuRiskTypeSelLayout' : 'dashboard-rightMenuRiskTypeUnSelLayout'}
-                                            title={option.label}
-                                            key={option.id}
-                                            onClick={this.handleRiskTypeButton.bind(this, option)} />
+                                <div>
+                                    <div className='dashboard-menuSwitchRiskTypeLayout'>
+                                        {
+                                            this.riskTypeOptions.map((option) => {
+                                                return (
+                                                    <div style={{ display: 'inlineBlock', marginTop: 10, height: 20 }} key={option.id}>
+                                                        <p className='dashboard-menuLabel'>{option.label}</p>
+                                                        <img src={option.img}
+                                                            title={option.label}
+                                                            className='dashboard-rightMenuRiskTypeImgLayout' />
+                                                        <a className={this.state[option.id] ? 'dashboard-rightMenuRiskTypeSelLayout' : 'dashboard-rightMenuRiskTypeUnSelLayout'}
+                                                            title={option.label}
+                                                            key={option.id}
+                                                            onClick={this.handleRiskTypeButton.bind(this, option)} />
+                                                    </div>
+                                                );
+                                            })
+                                        }
                                     </div>
-                                );
-                            })
-                        }
-                    </div>
-                </div>
+                                </div>
+                            </div>
+                        ) : ''
+                }
+
             </div>
         );
     }
@@ -439,7 +448,7 @@ export default class RiskTree extends Component {
     }
 
     // 安全隐患选择类型
-    handleRiskTypeButton (option) {
+    handleRiskTypeButton(option) {
         try {
             this.setState({
                 [option.id]: !this.state[option.id]
@@ -463,14 +472,14 @@ export default class RiskTree extends Component {
         }
     }
     /* 在地图上添加marker和polygan */
-    _createMarker (geo) {
+    _createMarker(geo) {
         const {
             map
         } = this.props;
         try {
             if (
                 !geo.geometry.coordinates[0] ||
-                    !geo.geometry.coordinates[1]
+                !geo.geometry.coordinates[1]
             ) {
                 return;
             }

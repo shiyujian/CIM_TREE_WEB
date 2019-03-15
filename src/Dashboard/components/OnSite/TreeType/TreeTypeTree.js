@@ -20,7 +20,6 @@ export default class TreeTypeTree extends Component {
     }
 
     componentDidMount () {
-        console.log('sssssssssssssss');
     }
 
     componentWillUnmount = async () => {

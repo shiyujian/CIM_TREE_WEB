@@ -4,7 +4,8 @@ import {forestFetchAction} from '_platform/store/fetchAction';
 import {
     USER_API,
     FOREST_API,
-    LBSAMAP_API
+    LBSAMAP_API,
+    TREEPIPE_API
 } from '_platform/api';
 const ID = 'dashboard';
 // 获取隐患列表
@@ -49,6 +50,7 @@ export const getCustomViewByUserID = createFetchAction(`${USER_API}/user/{{id}}/
 export const postUserCustomView = createFetchAction(`${USER_API}/custom-view/`, [], 'POST');
 // 用户删除自定义视图
 export const deleteUserCustomView = createFetchAction(`${USER_API}/custom-view/{{id}}/`, [], 'DELETE');
+export const postTreePipeQuery = createFetchAction(`${TREEPIPE_API}/pipe/pipe/query`, [], 'POST')
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -102,6 +104,7 @@ export const actions = {
     getCustomViewByUserID,
     postUserCustomView,
     deleteUserCustomView,
+    postTreePipeQuery,
 
     switchDashboardCompoment,
     getAreaTree,
