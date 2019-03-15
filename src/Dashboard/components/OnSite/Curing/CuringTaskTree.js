@@ -21,7 +21,7 @@ const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
 export default class CuringTaskTree extends Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = {
             stime: moment().format('YYYY-MM-DD 00:00:00'),
@@ -90,7 +90,7 @@ export default class CuringTaskTree extends Component {
             img: curingTaskOtherImg
         }
     ]
-    loop (p, loopTime) {
+    loop(p, loopTime) {
         const that = this;
         if (loopTime) {
             loopTime = loopTime + 1;
@@ -138,10 +138,11 @@ export default class CuringTaskTree extends Component {
         await this.handleRemoveAllCuringTaskLayer();
     }
 
-    render () {
+    render() {
         let {
             curingTaskTree = [],
-            curingTaskTreeLoading
+            curingTaskTreeLoading,
+            menuTreeVisible
         } = this.props;
         const {
             timeType,
@@ -169,107 +170,114 @@ export default class CuringTaskTree extends Component {
         };
         return (
             <div>
-                <div className='dashboard-menuPanel'>
-                    <aside className='dashboard-aside' draggable='false'>
-                        <div className='dashboard-asideTree'>
-                            <Spin spinning={curingTaskTreeLoading}>
-                                <div className='CuringTaskTree-button'>
-                                    <Checkbox className='CuringTaskTree-button-layout'
-                                        checked={curingTaskUnComplete}
-                                        onChange={this.handleCuringTaskUnComplete.bind(this)}>
-                                        未完成
-                                    </Checkbox>
-                                    <Checkbox className='CuringTaskTree-button-layout'
-                                        checked={curingTaskComplete}
-                                        onChange={this.handleCuringTaskComplete.bind(this)}>
-                                        已完成
-                                    </Checkbox>
-                                </div>
-                                <div className='CuringTaskTree-button'>
-                                    <Button className='CuringTaskTree-button-layout' style={{marginRight: 10}}
-                                        type={timeType === 'all' ? 'primary' : ''}
-                                        id='all' onClick={this.handleTimeChange.bind(this)}>
-                                        全部
-                                    </Button>
-                                    <Button className='CuringTaskTree-button-layout' id='today'
-                                        type={timeType === 'today' ? 'primary' : ''}
-                                        onClick={this.handleTimeChange.bind(this)}>
-                                        今天
-                                    </Button>
-                                </div>
-                                <div className='CuringTaskTree-button'>
-                                    <Button className='CuringTaskTree-button-layout' style={{marginRight: 10}}
-                                        type={timeType === 'week' ? 'primary' : ''}
-                                        id='week' onClick={this.handleTimeChange.bind(this)}>
-                                        一周内
-                                    </Button>
-                                    <Button className='CuringTaskTree-button-layout' id='custom'
-                                        type={timeType === 'custom' ? 'primary' : ''}
-                                        onClick={this.handleTimeChange.bind(this)}>
-                                        自定义
-                                    </Button>
-                                </div>
-                                {
-                                    timeType === 'custom'
-                                        ? <RangePicker
-                                            style={{width: 220, marginBottom: 10}}
-                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
-                                            format='YYYY-MM-DD HH:mm:ss'
-                                            placeholder={['Start Time', 'End Time']}
-                                            onChange={this.handleDateChange.bind(this)}
-                                        />
-                                        : ''
-                                }
-                                <div className='CuringTaskTree-statis-layout'>
-                                    <span style={{verticalAlign: 'middle'}}>类型</span>
-                                    <span className='CuringTaskTree-data-text'>
-                                        数量
-                                    </span>
-                                </div>
-                                <div>
-                                    {
-                                        contents.map((content) => {
-                                            return (
-                                                <div className='CuringTaskTree-mrg10' key={content.ID}>
-                                                    <span style={{verticalAlign: 'middle'}}>{content.Name}</span>
+                {
+                    menuTreeVisible ?
+                        (
+                            <div>
+                                <div className='dashboard-menuPanel'>
+                                    <aside className='dashboard-aside' draggable='false'>
+                                        <div className='dashboard-asideTree'>
+                                            <Spin spinning={curingTaskTreeLoading}>
+                                                <div className='CuringTaskTree-button'>
+                                                    <Checkbox className='CuringTaskTree-button-layout'
+                                                        checked={curingTaskUnComplete}
+                                                        onChange={this.handleCuringTaskUnComplete.bind(this)}>
+                                                        未完成
+                                                    </Checkbox>
+                                                    <Checkbox className='CuringTaskTree-button-layout'
+                                                        checked={curingTaskComplete}
+                                                        onChange={this.handleCuringTaskComplete.bind(this)}>
+                                                        已完成
+                                                    </Checkbox>
+                                                </div>
+                                                <div className='CuringTaskTree-button'>
+                                                    <Button className='CuringTaskTree-button-layout' style={{ marginRight: 10 }}
+                                                        type={timeType === 'all' ? 'primary' : ''}
+                                                        id='all' onClick={this.handleTimeChange.bind(this)}>
+                                                        全部
+                                                    </Button>
+                                                    <Button className='CuringTaskTree-button-layout' id='today'
+                                                        type={timeType === 'today' ? 'primary' : ''}
+                                                        onClick={this.handleTimeChange.bind(this)}>
+                                                        今天
+                                                    </Button>
+                                                </div>
+                                                <div className='CuringTaskTree-button'>
+                                                    <Button className='CuringTaskTree-button-layout' style={{ marginRight: 10 }}
+                                                        type={timeType === 'week' ? 'primary' : ''}
+                                                        id='week' onClick={this.handleTimeChange.bind(this)}>
+                                                        一周内
+                                                    </Button>
+                                                    <Button className='CuringTaskTree-button-layout' id='custom'
+                                                        type={timeType === 'custom' ? 'primary' : ''}
+                                                        onClick={this.handleTimeChange.bind(this)}>
+                                                        自定义
+                                                    </Button>
+                                                </div>
+                                                {
+                                                    timeType === 'custom'
+                                                        ? <RangePicker
+                                                            style={{ width: 220, marginBottom: 10 }}
+                                                            showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
+                                                            format='YYYY-MM-DD HH:mm:ss'
+                                                            placeholder={['Start Time', 'End Time']}
+                                                            onChange={this.handleDateChange.bind(this)}
+                                                        />
+                                                        : ''
+                                                }
+                                                <div className='CuringTaskTree-statis-layout'>
+                                                    <span style={{ verticalAlign: 'middle' }}>类型</span>
                                                     <span className='CuringTaskTree-data-text'>
-                                                        {content.children.length}
+                                                        数量
                                                     </span>
                                                 </div>
-                                            );
-                                        })
-                                    }
+                                                <div>
+                                                    {
+                                                        contents.map((content) => {
+                                                            return (
+                                                                <div className='CuringTaskTree-mrg10' key={content.ID}>
+                                                                    <span style={{ verticalAlign: 'middle' }}>{content.Name}</span>
+                                                                    <span className='CuringTaskTree-data-text'>
+                                                                        {content.children.length}
+                                                                    </span>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    }
+                                                </div>
+                                            </Spin>
+                                        </div>
+                                    </aside>
                                 </div>
-                            </Spin>
-                        </div>
-                    </aside>
-                </div>
-                <div>
-                    <div className='dashboard-menuSwitchCuringTaskTypeLayout'>
-                        {
-                            <div>
-                                <div style={{display: 'inlineBlock', marginTop: 8}} />
-                                {
-                                    this.curingTaskTypeOptions.map((option) => {
-                                        return (
-                                            <div style={{display: 'inlineBlock', height: 20}} key={option.id}>
-                                                <p className='dashboard-menuLabel1'>{option.label}</p>
-                                                <img src={option.img}
-                                                    title={option.label}
-                                                    className='dashboard-rightMenuCuringTaskTypeImgLayout' />
-                                                <a className={this.state[option.id] ? 'dashboard-rightMenuCuringTaskTypeSelLayout' : 'dashboard-rightMenuCuringTaskTypeUnSelLayout'}
-                                                    title={option.label}
-                                                    key={option.id}
-                                                    onClick={this.handleCuringTaskTypeButton.bind(this, option)} />
+                                <div>
+                                    <div className='dashboard-menuSwitchCuringTaskTypeLayout'>
+                                        {
+                                            <div>
+                                                <div style={{ display: 'inlineBlock', marginTop: 8 }} />
+                                                {
+                                                    this.curingTaskTypeOptions.map((option) => {
+                                                        return (
+                                                            <div style={{ display: 'inlineBlock', height: 20 }} key={option.id}>
+                                                                <p className='dashboard-menuLabel1'>{option.label}</p>
+                                                                <img src={option.img}
+                                                                    title={option.label}
+                                                                    className='dashboard-rightMenuCuringTaskTypeImgLayout' />
+                                                                <a className={this.state[option.id] ? 'dashboard-rightMenuCuringTaskTypeSelLayout' : 'dashboard-rightMenuCuringTaskTypeUnSelLayout'}
+                                                                    title={option.label}
+                                                                    key={option.id}
+                                                                    onClick={this.handleCuringTaskTypeButton.bind(this, option)} />
+                                                            </div>
+                                                        );
+                                                    })
+                                                }
                                             </div>
-                                        );
-                                    })
-                                }
-                            </div>
 
-                        }
-                    </div>
-                </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        ) : ''
+                }
             </div>
         );
     }
@@ -449,7 +457,7 @@ export default class CuringTaskTree extends Component {
     }
 
     // 养护任务选择类型
-    handleCuringTaskTypeButton (option) {
+    handleCuringTaskTypeButton(option) {
         try {
             this.setState({
                 [option.id]: !this.state[option.id]
@@ -599,7 +607,7 @@ export default class CuringTaskTree extends Component {
         }
     }
     // 养护任务计划区域加载图层
-    _handleCuringPlanCoordLayer (str, taskMess, eventKey, index, isFocus) {
+    _handleCuringPlanCoordLayer(str, taskMess, eventKey, index, isFocus) {
         const {
             curingTaskPlanLayerList,
             curingTaskMarkerLayerList
@@ -665,7 +673,7 @@ export default class CuringTaskTree extends Component {
         }
     }
     // 添加实际养护区域图层
-    _handleCuringRealCoordLayer (str, task, eventKey, index, isFocus) {
+    _handleCuringRealCoordLayer(str, task, eventKey, index, isFocus) {
         const {
             curingTaskRealLayerList,
             curingTaskMarkerLayerList
@@ -757,7 +765,7 @@ export default class CuringTaskTree extends Component {
         }
     }
     /* 在地图上添加marker和polygan */
-    _createMarker (geo) {
+    _createMarker(geo) {
         const {
             map
         } = this.props;

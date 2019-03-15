@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Spin } from 'antd';
-import {FOREST_GIS_TREETYPE_API, FOREST_GIS_API} from '_platform/api';
+import { FOREST_GIS_TREETYPE_API, FOREST_GIS_API } from '_platform/api';
 import './SurvivalRateTree.less';
 // 存活率图片
 import hundredImg from '../../SurvivalRateImg/90~100.png';
@@ -18,7 +18,7 @@ const TreeNode = Tree.TreeNode;
 
 export default class SurvivalRateTree extends Component {
     static propTypes = {};
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = {
             // 成活率范围的点击状态，展示是否选中的图片
@@ -77,7 +77,7 @@ export default class SurvivalRateTree extends Component {
         }
     ]
 
-    loop (data = [], loopTime) {
+    loop(data = [], loopTime) {
         const that = this;
         if (loopTime) {
             loopTime = loopTime + 1;
@@ -135,10 +135,11 @@ export default class SurvivalRateTree extends Component {
         }
     }
 
-    render () {
+    render() {
         const {
             survivalRateTree = [],
-            survivalRateTreeLoading
+            survivalRateTreeLoading,
+            menuTreeVisible
         } = this.props;
         let treeData = [
             {
@@ -149,43 +150,50 @@ export default class SurvivalRateTree extends Component {
         ];
         return (
             <div>
-                <div className='dashboard-menuPanel'>
-                    <aside className='dashboard-aside' draggable='false'>
-                        <div className='dashboard-asideTree'>
-                            <Spin spinning={survivalRateTreeLoading}>
-                                <Tree
-                                    showLine
-                                    checkable
-                                    defaultCheckedKeys={['全部']}
-                                    onCheck={this._handleSurvivalRateCheck.bind(this)}
-                                >
-                                    {treeData.map(p => {
-                                        return this.loop(p);
-                                    })}
-                                </Tree>
-                            </Spin>
-                        </div>
-                    </aside>
-                </div>
-                <div>
-                    <div className='dashboard-menuSwitchSurvivalRateLayout'>
-                        {
-                            this.survivalRateOptions.map((option) => {
-                                return (
-                                    <div style={{display: 'inlineBlock'}} key={option.id}>
-                                        <img src={option.img}
-                                            title={option.label}
-                                            className='dashboard-rightMenuSurvivalRateImgLayout' />
-                                        <a className={this.state[option.id] ? 'dashboard-rightMenuSurvivalRateSelLayout' : 'dashboard-rightMenuSurvivalRateUnSelLayout'}
-                                            title={option.label}
-                                            key={option.id}
-                                            onClick={this.handleSurvivalRateButton.bind(this, option)} />
+                {
+                    menuTreeVisible ?
+                        (
+                            <div>
+                                <div className='dashboard-menuPanel'>
+                                    <aside className='dashboard-aside' draggable='false'>
+                                        <div className='dashboard-asideTree'>
+                                            <Spin spinning={survivalRateTreeLoading}>
+                                                <Tree
+                                                    showLine
+                                                    checkable
+                                                    defaultCheckedKeys={['全部']}
+                                                    onCheck={this._handleSurvivalRateCheck.bind(this)}
+                                                >
+                                                    {treeData.map(p => {
+                                                        return this.loop(p);
+                                                    })}
+                                                </Tree>
+                                            </Spin>
+                                        </div>
+                                    </aside>
+                                </div>
+                                <div>
+                                    <div className='dashboard-menuSwitchSurvivalRateLayout'>
+                                        {
+                                            this.survivalRateOptions.map((option) => {
+                                                return (
+                                                    <div style={{ display: 'inlineBlock' }} key={option.id}>
+                                                        <img src={option.img}
+                                                            title={option.label}
+                                                            className='dashboard-rightMenuSurvivalRateImgLayout' />
+                                                        <a className={this.state[option.id] ? 'dashboard-rightMenuSurvivalRateSelLayout' : 'dashboard-rightMenuSurvivalRateUnSelLayout'}
+                                                            title={option.label}
+                                                            key={option.id}
+                                                            onClick={this.handleSurvivalRateButton.bind(this, option)} />
+                                                    </div>
+                                                );
+                                            })
+                                        }
                                     </div>
-                                );
-                            })
-                        }
-                    </div>
-                </div>
+                                </div>
+                            </div>
+                        ) : ''
+                }
             </div>
         );
     }
@@ -237,7 +245,7 @@ export default class SurvivalRateTree extends Component {
         }
     }
     // 成活率选择成活范围
-    handleSurvivalRateButton (option) {
+    handleSurvivalRateButton(option) {
         try {
             this.setState({
                 [option.id]: !this.state[option.id]
@@ -303,11 +311,11 @@ export default class SurvivalRateTree extends Component {
             // 初次进入成活率模块，没有对标段数据进行处理，选择了范围数据直接对图层进行更改
             if (switchSurvivalRateFirst) {
                 url = FOREST_GIS_TREETYPE_API +
-                `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
+                    `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
             } else if (survivalRateRateData && survivalRateSectionData) {
                 // 在点击过标段数据之后，只有两种状态都存在，才能进行搜索
                 url = FOREST_GIS_TREETYPE_API +
-                `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
+                    `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
             }
             if (url) {
                 this.tileSurvivalRateLayerFilter = L.tileLayer.wms(url,

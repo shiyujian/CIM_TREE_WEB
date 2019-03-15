@@ -408,10 +408,11 @@ class Addition extends Component {
             isSection,
             actions: { changeAdditionField }
         } = this.props;
+        console.log('prevProps.addition', prevProps.addition);
         if (
             addition &&
             addition.visible &&
-            addition.visible !== prevProps.addition.visible
+            (!prevProps.addition || (addition.visible !== prevProps.addition.visible))
         ) {
             let node = sidebar && sidebar.node;
             if (!node) {
@@ -1161,8 +1162,12 @@ class Addition extends Component {
                     } else {
                         if (userData.code === 2) {
                             message.warn('用户名已存在！');
-                        } else {
-                            message.warn('服务器端报错！');
+                        } else if (userData.code === 0) {
+                            if (userData.msg === '账户注册的苗圃基地已被拉黑！') {
+                                message.warn('账户注册的苗圃基地已被拉黑！');
+                            } else {
+                                message.warn('服务器端报错！');
+                            }
                         }
                     }
                 }
