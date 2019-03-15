@@ -13,6 +13,8 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import { PlantStrength } from '../components/PlantStrengthAnalysi';
+import { PositionProgress } from '../components/PlantStrengthAnalysi';
+import { PlantProgress } from '../components/PlantStrengthAnalysi';
 import { getAreaTreeData, getDefaultProject } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 @connect(
@@ -119,18 +121,20 @@ export default class PlantStrengthAnalysi extends Component {
                     </Sidebar>
                     <Content>
                         <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='苗木分析' key='2'>
+                            <TabPane tab='树种统计' key='3'>
                                 <PlantStrength
                                     {...this.props}
                                     {...this.state}
                                     typeselect={this.typeselect.bind(this)}
                                 />
                             </TabPane>
-                            <TabPane tab='车辆包分析' key='1'>
-                                <VehicleAnalysi {...this.props} {...this.state} />
+                            <TabPane tab='种植进度分析' key='2'>
+                                <PlantProgress {...this.props} {...this.state}/>
+                            </TabPane>
+                            <TabPane tab='定位进度分析' key='1'>
+                                <PositionProgress {...this.props} {...this.state}/>
                             </TabPane>
                         </Tabs>
-
                     </Content>
                 </Main>
             </Body>
