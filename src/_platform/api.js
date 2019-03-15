@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-14 15:20:12
+ * @Last Modified time: 2019-03-15 15:13:20
  */
 /**
  *
@@ -61,7 +61,6 @@ export const CODE_PROJECT = '森林大数据';
 export const base = `${DOMAIN}`;
 export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
 export const USER_API = `${base}/accounts/api`;
-export const SUSER_API = `${SDOMAIN}`;
 export const SERVICE_API = `${base}/service/construction/api`;
 export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
@@ -94,12 +93,14 @@ export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
 }`;
 export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
 // 智慧森林
+export const SUSER_API = `${window.config.SDOMAIN}`;
 export const FOREST_API = `${window.config.SDOMAIN}`;
 export const SEEDLING_API = `${window.config.SDOMAIN}:808`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const FOREST_GIS_TREETYPE_API = `${window.config.DASHBOARD_TREETYPE}`;
 export const INITLEAFLET_API = window.config.initLeaflet;
+export const TREEPIPE_API = `${window.config.SDOMAIN}:9001`;
 
 // 考勤打卡
 export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
@@ -176,6 +177,11 @@ export const PROJECTPOSITIONCENTER = [
         name: '2018秋季造林',
         center: [38.784605024411576, 115.73293304652907],
         zoom: 13
+    },
+    {
+        name: '2019春季造林',
+        center: [39.068756148044486, 115.92073061387055],
+        zoom: 12
     }
 ];
 // 树种大类

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-14 14:54:47
+ * @Last Modified time: 2019-03-15 14:17:04
  */
 import React, { Component } from 'react';
 import {
@@ -175,10 +175,6 @@ class OnSite extends Component {
         {
             label: '苗木结缘',
             value: 'geojsonFeature_treeAdopt'
-        },
-        {
-            label: '灌溉管网',
-            value: 'geojsonFeature_treePipe'
         }
     ];
 
@@ -396,6 +392,8 @@ class OnSite extends Component {
                 await this.removeTileTreeLayerBasic();
                 await this.getTileTreeAdoptBasic();
             } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
+                await this.removeTileTreeLayerBasic();
+            } else if (dashboardCompomentMenu === 'geojsonFeature_treePipe') {
                 await this.removeTileTreeLayerBasic();
             } else {
                 await this.getTileLayerTreeBasic();
@@ -726,22 +724,18 @@ class OnSite extends Component {
                         menuTreeVisible
                             ? (
                                 this.options.map(option => {
-                                    if (option.value === 'geojsonFeature_treePipe') {
-                                        return '';
+                                    if (dashboardCompomentMenu === option.value) {
+                                        return (
+                                            <div className='dashboard-menuPanel' key={option.value}>
+                                                <aside className='dashboard-aside' draggable='false'>
+                                                    <div className='dashboard-asideTree'>
+                                                        {this.renderPanel(option)}
+                                                    </div>
+                                                </aside>
+                                            </div>
+                                        );
                                     } else {
-                                        if (dashboardCompomentMenu === option.value) {
-                                            return (
-                                                <div className='dashboard-menuPanel' key={option.value}>
-                                                    <aside className='dashboard-aside' draggable='false'>
-                                                        <div className='dashboard-asideTree'>
-                                                            {this.renderPanel(option)}
-                                                        </div>
-                                                    </aside>
-                                                </div>
-                                            );
-                                        } else {
-                                            return '';
-                                        }
+                                        return '';
                                     }
                                 })
                             ) : ''
