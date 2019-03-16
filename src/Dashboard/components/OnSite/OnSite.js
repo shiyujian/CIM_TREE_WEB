@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-15 14:17:04
+ * @Last Modified time: 2019-03-16 16:56:49
  */
 import React, { Component } from 'react';
 import {
@@ -261,6 +261,7 @@ class OnSite extends Component {
                     areaDistanceMeasureMenu,
                     dashboardTreeMess
                 } = me.props;
+                console.log('dashboardCompomentMenu', dashboardCompomentMenu);
                 // 测量面积
                 if (areaDistanceMeasureMenu === 'areaMeasureMenu') {
                     coordinates.push([e.latlng.lat, e.latlng.lng]);

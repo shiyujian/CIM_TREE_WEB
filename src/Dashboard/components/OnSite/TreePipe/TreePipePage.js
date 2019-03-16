@@ -107,7 +107,7 @@ export default class TreePipePage extends Component {
             map
         } = this.props;
         try {
-            map.on('click', this.handleMapFunction.bind(this));
+            // map.on('click', this.handleMapFunction.bind(this));
             await this.getTileLayerTreeFilter();
             await this.getTileLayerTreeThinClass();
             await this.getTreePipeLayer();
@@ -121,7 +121,7 @@ export default class TreePipePage extends Component {
             map
         } = this.props;
         try {
-            map.off('click', this.handleMapFunction());
+            // map.off('click', this.handleMapFunction());
             if (this.tileTreePipeBasic) {
                 await map.removeLayer(this.tileTreePipeBasic);
                 this.tileTreePipeBasic = null;
@@ -150,7 +150,7 @@ export default class TreePipePage extends Component {
             const {
                 treePipeGisQuery
             } = this.state;
-            if (dashboardCompomentMenu === 'geojsonFeature_treePipe' && treePipeGisQuery) {
+            if (dashboardCompomentMenu === 'geojsonFeature_treePipe' && treePipeGisQuery && e) {
                 console.log('handleMapFunction', e);
                 this.handleQueryPipeByWkt([e.latlng.lat, e.latlng.lng]);
             }
@@ -410,7 +410,7 @@ export default class TreePipePage extends Component {
                                     <aside className='TreePipePage-aside' draggable='false'>
                                         <div className='TreePipePage-asideTree'>
                                             <Spin spinning={treePipeLoading}>
-                                                <div className='TreePipePage-button'>
+                                                {/* <div className='TreePipePage-button'>
                                                     <div className='TreePipePage-GisQueryBorder'>
                                                         <Checkbox className='TreePipePage-button-layout'
                                                             checked={treePipeGisQuery}
@@ -418,7 +418,7 @@ export default class TreePipePage extends Component {
                                                             地图标注
                                                         </Checkbox>
                                                     </div>
-                                                </div>
+                                                </div> */}
                                                 <div className='TreePipePage-button'>
                                                     <Checkbox className='TreePipePage-button-layout'
                                                         checked={treePipe}
