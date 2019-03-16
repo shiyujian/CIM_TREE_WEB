@@ -24,11 +24,13 @@ export const getForestUsers = forestFetchAction(`${FOREST_API}/system/users`, [
 export const getTree = forestFetchAction(`${FOREST_API}/tree/wpunits`, [
     getTreeOK
 ]); //    √
-// 苗木进场
-export const gettreeEntrance = forestFetchAction(
-    `${FOREST_API}/tree/nurserystat?`,
-    []
-);
+export const getNurseryBackstat = forestFetchAction(`${FOREST_API}/tree/nurserybackstat?`); // 苗木整车退苗分析
+export const getCarpackstat = forestFetchAction(`${FOREST_API}/tree/carpackstat?`); // 车辆包大数据统计
+export const getCarinstat = forestFetchAction(`${FOREST_API}/tree/carinstat?`, []); // 车辆进场分析
+export const getCarbackstat = forestFetchAction(`${FOREST_API}/tree/carbackstat?`); // 车辆包退苗分析
+export const getNurseryinstat = forestFetchAction(`${FOREST_API}/tree/nurseryinstat?`); // 苗木进场分析
+export const getNurserybackstat = forestFetchAction(`${FOREST_API}/tree/nurserybackstat?`); // 苗木退苗分析
+
 export const getTreeevery = forestFetchAction(
     `${FOREST_API}/tree/treetypes`,
     []
@@ -287,7 +289,12 @@ export const actions = {
     getTreeOK,
     getTree,
     setkeycode,
-    gettreeEntrance,
+    getCarinstat,
+    getNurseryBackstat,
+    getNurseryinstat,
+    getNurserybackstat,
+    getCarpackstat,
+    getCarbackstat,
     gettreetype,
     getfactoryAnalyse,
     getnurserys,
