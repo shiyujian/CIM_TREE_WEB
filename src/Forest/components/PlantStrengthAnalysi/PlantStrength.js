@@ -34,7 +34,7 @@ class PlantStrength extends Component {
             plantToday: 0, // 今日种植总数
             locationToday: 0, // 今日定位数量
             locationAmount: 0, // 累计定位总数
-            realTimeDataList: [], // 实时种植数据列表
+            nowmessagelist: [], // 实时种植数据列表
             sectionSearch: '',
             smallclassSearch: '',
             thinclassSearch: '',
@@ -64,6 +64,7 @@ class PlantStrength extends Component {
         }
     }
     componentDidMount = async () => {
+        await this.query()
     }
     componentWillReceiveProps = async (nextProps) => {
         const {
@@ -108,7 +109,7 @@ class PlantStrength extends Component {
             this.setState({
                 locationToday,
                 plantToday,
-                locationAmount: locationStat.split(',')[1],
+                locationAmount: locationStat.split(',')[0],
                 plantAmount,
                 leftkeycode: nextProps.leftkeycode,
                 sectionList: nextProps.sectionList
@@ -123,7 +124,8 @@ class PlantStrength extends Component {
             smallClassList1, thinClassList1,
             thinclassName,smallclassName,sectionName,
             thinclassName1,smallclassName1,sectionName1,
-            treeTypeDisplayTable, treetypename,bigTypeSearch
+            treeTypeDisplayTable, treetypename,bigTypeSearch,
+            nowmessagelist
         } = this.state;
         const {
             typeoption,
@@ -154,7 +156,7 @@ class PlantStrength extends Component {
                             </Card.Grid>
                         </Card>
                         <List size='small' style={{marginLeft: 820, height: 180}}
-                            header={<div>实时种植数据</div>} dataSource={realTimeDataList} />
+                            header={<div>实时种植数据</div>} dataSource={nowmessagelist} />
                     </div>
                 </div>
                 <div>
@@ -307,74 +309,6 @@ class PlantStrength extends Component {
                         </Row>
                     </div>
                 </div>
-                <div>
-                    <div>
-                        <h2 style={titleStyle}>种植进度分析</h2>
-                        <Form layout='inline'>
-                            <Form.Item
-                                label='树种'
-                            >
-                                {getFieldDecorator('section')(
-                                    <Select style={{ width: 120 }} disabled>
-                                        <Option value='lucy'>Lucy</Option>
-                                    </Select>
-                                )}
-                            </Form.Item>
-                            <Form.Item
-                            >
-                                <Button type='primary'>查询</Button>
-                            </Form.Item>
-                        </Form>
-                    </div>
-                    <div style={CardStyle}>
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Card title='总种植进度分析' bordered={false}>Card content</Card>
-                            </Col>
-                            <Col span={12}>
-                                <Card title='各标段种植进度分析' bordered={false}>Card content</Card>
-                            </Col>
-                        </Row>
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Card title='各小班种植进度分析' bordered={false}>Card content</Card>
-                            </Col>
-                            <Col span={12}>
-                                <Card title='各细班种植进度分析' bordered={false}>Card content</Card>
-                            </Col>
-                        </Row>
-                    </div>
-                </div>
-                <div>
-                    <div>
-                        <h2 style={titleStyle}>定位进度分析</h2>
-                        <Form layout='inline'>
-                            <Form.Item
-                                label='树种'
-                            >
-                                {getFieldDecorator('section')(
-                                    <Select style={{ width: 120 }} disabled>
-                                        <Option value='lucy'>Lucy</Option>
-                                    </Select>
-                                )}
-                            </Form.Item>
-                            <Form.Item
-                            >
-                                <Button type='primary'>查询</Button>
-                            </Form.Item>
-                        </Form>
-                    </div>
-                    <div style={CardStyle}>
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Card title='各小班定位进度分析' bordered={false}>Card content</Card>
-                            </Col>
-                            <Col span={12}>
-                                <Card title='各细班定位进度分析' bordered={false}>Card content</Card>
-                            </Col>
-                        </Row>
-                    </div>
-                </div>
             </div>
         );
     }
@@ -494,6 +428,29 @@ class PlantStrength extends Component {
             }
         };
         XLSX.writeFile(wb, `树种分布.xlsx`);
+    }
+    async query () {
+        const {
+            actions: { getqueryTree },
+            leftkeycode,
+            section
+        } = this.props;
+        this.setState({loading: true})
+        let getqueryTreePostData = {
+            page: 1,
+            size: 5,
+            no: leftkeycode,
+            section: section
+        };
+        let message = await getqueryTree({}, getqueryTreePostData);
+        let nowmessagelist = [];
+        if (message && message.content) {
+            nowmessagelist = message.content;
+        }
+        this.setState({
+            loading: false,
+            nowmessagelist: nowmessagelist
+        });
     }
     query1 () {
         this.setState({

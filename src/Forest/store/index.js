@@ -273,6 +273,12 @@ export const getTencentOffLineAusage = createFetchAction(
     []
 );
 
+// 获取苗木来源地分析数据
+export const getNurseryFromData = createFetchAction(
+    `${FOREST_API}/tree/nursersourcestat?section={{section}}&regioncode={{regioncode}}&etime={{etime}}`,
+    []
+);
+
 export const actions = {
     getTotalSat,
     getTreeLocations,
@@ -337,7 +343,8 @@ export const actions = {
     getTencentRealTimeUser,
     getTencentOffLineUser,
     getTencentOffLineActive,
-    getTencentOffLineAusage
+    getTencentOffLineAusage,
+    getNurseryFromData
 };
 export default handleActions(
     {
