@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
 import './RiskTree.less';
 import moment from 'moment';
-import { handleRiskData, fillAreaColor, getIconType, genPopUpContent } from '../../auth';
+import { handleRiskData, getIconType, genPopUpContent } from '../../auth';
 // 安全隐患类型图片
 import riskDangerImg from '../../RiskImg/danger.png';
 import riskQualityImg from '../../RiskImg/quality.png';
@@ -11,7 +11,7 @@ const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
 export default class RiskTree extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             stime: moment().format('YYYY-MM-DD 00:00:00'),
@@ -47,7 +47,7 @@ export default class RiskTree extends Component {
             img: riskOtherImg
         }
     ]
-    genIconClass() {
+    genIconClass () {
         let icClass = '';
         let featureName = this.props.featureName;
         switch (featureName) {
@@ -64,7 +64,7 @@ export default class RiskTree extends Component {
         return icClass;
     }
 
-    loop(p) {
+    loop (p) {
         let me = this;
         if (p) {
             return (
@@ -148,7 +148,7 @@ export default class RiskTree extends Component {
             console.log('handleRiskTypeAddLayer', e);
         }
     }
-    render() {
+    render () {
         let {
             riskTree = [],
             riskTreeLoading,
@@ -181,12 +181,12 @@ export default class RiskTree extends Component {
         return (
             <div>
                 {
-                    menuTreeVisible ?
-                        (
+                    menuTreeVisible
+                        ? (
                             <div>
-                                <div className='dashboard-menuPanel'>
-                                    <aside className='dashboard-aside' draggable='false'>
-                                        <div className='dashboard-asideTree'>
+                                <div className='RiskTree-menuPanel'>
+                                    <aside className='RiskTree-aside' draggable='false'>
+                                        <div className='RiskTree-asideTree'>
                                             <Spin spinning={riskTreeLoading}>
                                                 <div className='RiskTree-button'>
                                                     <Checkbox className='RiskTree-button-layout'
@@ -260,16 +260,16 @@ export default class RiskTree extends Component {
                                     </aside>
                                 </div>
                                 <div>
-                                    <div className='dashboard-menuSwitchRiskTypeLayout'>
+                                    <div className='RiskTree-menuSwitchRiskTypeLayout'>
                                         {
                                             this.riskTypeOptions.map((option) => {
                                                 return (
                                                     <div style={{ display: 'inlineBlock', marginTop: 10, height: 20 }} key={option.id}>
-                                                        <p className='dashboard-menuLabel'>{option.label}</p>
+                                                        <p className='RiskTree-menuLabel'>{option.label}</p>
                                                         <img src={option.img}
                                                             title={option.label}
-                                                            className='dashboard-rightMenuRiskTypeImgLayout' />
-                                                        <a className={this.state[option.id] ? 'dashboard-rightMenuRiskTypeSelLayout' : 'dashboard-rightMenuRiskTypeUnSelLayout'}
+                                                            className='RiskTree-rightMenuRiskTypeImgLayout' />
+                                                        <a className={this.state[option.id] ? 'RiskTree-rightMenuRiskTypeSelLayout' : 'RiskTree-rightMenuRiskTypeUnSelLayout'}
                                                             title={option.label}
                                                             key={option.id}
                                                             onClick={this.handleRiskTypeButton.bind(this, option)} />
@@ -448,7 +448,7 @@ export default class RiskTree extends Component {
     }
 
     // 安全隐患选择类型
-    handleRiskTypeButton(option) {
+    handleRiskTypeButton (option) {
         try {
             this.setState({
                 [option.id]: !this.state[option.id]
@@ -472,7 +472,7 @@ export default class RiskTree extends Component {
         }
     }
     /* 在地图上添加marker和polygan */
-    _createMarker(geo) {
+    _createMarker (geo) {
         const {
             map
         } = this.props;

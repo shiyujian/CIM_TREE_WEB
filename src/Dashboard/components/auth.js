@@ -190,6 +190,7 @@ export const getThinClass = (smallClass, list) => {
 // 点击地图上的图标展示的内容
 export const genPopUpContent = (geo) => {
     const { properties = {} } = geo;
+    console.log('geo', geo);
     switch (geo.type) {
         case 'track': {
             return `<div class="popupBox">
@@ -205,9 +206,9 @@ export const genPopUpContent = (geo) => {
                         <h2><span>隐患类型：</span>${properties.riskType}</h2>
                         <h2><span>隐患描述：</span>${properties.Problem}</h2>
 						<h2><span>整改状态：</span>${properties.status}</h2>
-                        <h2 class="btnRow">
+                        <div class="btnRow">
                             <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                        </h2>
+                        </div>
 					</div>`;
         }
         case 'riskDanger': {
@@ -216,9 +217,9 @@ export const genPopUpContent = (geo) => {
                         <h2><span>隐患类型：</span>${properties.riskType}</h2>
                         <h2><span>隐患描述：</span>${properties.Problem}</h2>
 						<h2><span>整改状态：</span>${properties.status}</h2>
-                        <h2 class="btnRow">
+                        <div class="btnRow">
                             <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                        </h2>
+                        </div>
 					</div>`;
         }
         case 'riskOther': {
@@ -227,9 +228,9 @@ export const genPopUpContent = (geo) => {
                         <h2><span>隐患类型：</span>${properties.riskType}</h2>
                         <h2><span>隐患描述：</span>${properties.Problem}</h2>
 						<h2><span>整改状态：</span>${properties.status}</h2>
-                        <h2 class="btnRow">
+                        <div class="btnRow">
                             <a href="javascript:;" class="btnViewRisk" data-id=${geo.key}>查看详情</a>
-                        </h2>
+                        </div>
 					</div>`;
         }
         case 'planCuringTask': {
@@ -288,6 +289,31 @@ export const genPopUpContent = (geo) => {
                         <h2 class="btnRow">
                             <a href="javascript:;" class="btnViewAdopt" data-id=${geo.key}>查看详情</a>
                         </h2>
+					</div>`;
+        }
+        case 'treePipe': {
+            return `<div>
+                        <h2><span>类型：</span>${geo.typeName}</h2>
+                        <h2><span>创建时间：</span>${geo.CreateTime}</h2>
+                        <h2><span>标段：</span>${geo.Section}</h2>
+                        <h2><span>细班：</span>${geo.ThinClass}</h2>
+						<h2><span>材质：</span>${geo.Material}</h2>
+                        <h2><span>管径：</span>${geo.DN}</h2>
+                        <h2><span>埋深：</span>${geo.Depth}</h2>
+                        <h2><span>高程：</span>${geo.Altitude}</h2>
+					</div>`;
+        }
+        case 'treePipeNode': {
+            return `<div>
+                        <h2><span>类型：</span>${geo.typeName}</h2>
+                        <h2><span>创建时间：</span>${geo.CreateTime}</h2>
+                        <h2><span>标段：</span>${geo.Section}</h2>
+                        <h2><span>细班：</span>${geo.ThinClass}</h2>
+                        <h2><span>设备类型：</span>${geo.PipeType}</h2>
+                        <h2><span>埋深：</span>${geo.Depth}</h2>
+                        <h2><span>高程：</span>${geo.Altitude}</h2>
+                        <h2><span>型号：</span>${geo.Model}</h2>
+                        
 					</div>`;
         }
         default: {

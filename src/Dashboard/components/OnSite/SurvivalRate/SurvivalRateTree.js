@@ -18,7 +18,7 @@ const TreeNode = Tree.TreeNode;
 
 export default class SurvivalRateTree extends Component {
     static propTypes = {};
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             // 成活率范围的点击状态，展示是否选中的图片
@@ -77,7 +77,7 @@ export default class SurvivalRateTree extends Component {
         }
     ]
 
-    loop(data = [], loopTime) {
+    loop (data = [], loopTime) {
         const that = this;
         if (loopTime) {
             loopTime = loopTime + 1;
@@ -135,7 +135,7 @@ export default class SurvivalRateTree extends Component {
         }
     }
 
-    render() {
+    render () {
         const {
             survivalRateTree = [],
             survivalRateTreeLoading,
@@ -151,12 +151,12 @@ export default class SurvivalRateTree extends Component {
         return (
             <div>
                 {
-                    menuTreeVisible ?
-                        (
+                    menuTreeVisible
+                        ? (
                             <div>
-                                <div className='dashboard-menuPanel'>
-                                    <aside className='dashboard-aside' draggable='false'>
-                                        <div className='dashboard-asideTree'>
+                                <div className='SurvivalRateTree-menuPanel'>
+                                    <aside className='SurvivalRateTree-aside' draggable='false'>
+                                        <div className='SurvivalRateTree-asideTree'>
                                             <Spin spinning={survivalRateTreeLoading}>
                                                 <Tree
                                                     showLine
@@ -173,15 +173,15 @@ export default class SurvivalRateTree extends Component {
                                     </aside>
                                 </div>
                                 <div>
-                                    <div className='dashboard-menuSwitchSurvivalRateLayout'>
+                                    <div className='SurvivalRateTree-menuSwitchSurvivalRateLayout'>
                                         {
                                             this.survivalRateOptions.map((option) => {
                                                 return (
                                                     <div style={{ display: 'inlineBlock' }} key={option.id}>
                                                         <img src={option.img}
                                                             title={option.label}
-                                                            className='dashboard-rightMenuSurvivalRateImgLayout' />
-                                                        <a className={this.state[option.id] ? 'dashboard-rightMenuSurvivalRateSelLayout' : 'dashboard-rightMenuSurvivalRateUnSelLayout'}
+                                                            className='SurvivalRateTree-rightMenuSurvivalRateImgLayout' />
+                                                        <a className={this.state[option.id] ? 'SurvivalRateTree-rightMenuSurvivalRateSelLayout' : 'SurvivalRateTree-rightMenuSurvivalRateUnSelLayout'}
                                                             title={option.label}
                                                             key={option.id}
                                                             onClick={this.handleSurvivalRateButton.bind(this, option)} />
@@ -245,7 +245,7 @@ export default class SurvivalRateTree extends Component {
         }
     }
     // 成活率选择成活范围
-    handleSurvivalRateButton(option) {
+    handleSurvivalRateButton (option) {
         try {
             this.setState({
                 [option.id]: !this.state[option.id]

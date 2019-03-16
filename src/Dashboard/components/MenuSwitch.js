@@ -53,7 +53,6 @@ export default class MenuSwitch extends Component {
         // }
     ]
 
-
     async componentDidMount () {
         const {
             actions: {
@@ -117,7 +116,6 @@ export default class MenuSwitch extends Component {
         };
     }
 
-    
     checkFull () {
         var isFullScreen = document.mozFullScreen || document.webkitIsFullScreen;
         return isFullScreen;
