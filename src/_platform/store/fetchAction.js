@@ -96,7 +96,7 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                     });
             };
         } else {
-            console.log('aaaaaaaaaaaaaaa');
+            console.log('forestFetchAction');
         }
     };
 };

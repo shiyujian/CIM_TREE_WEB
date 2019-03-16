@@ -53,7 +53,6 @@ export default class MenuSwitch extends Component {
         // }
     ]
 
-
     async componentDidMount () {
         const {
             actions: {
@@ -117,7 +116,6 @@ export default class MenuSwitch extends Component {
         };
     }
 
-    
     checkFull () {
         var isFullScreen = document.mozFullScreen || document.webkitIsFullScreen;
         return isFullScreen;
@@ -142,6 +140,7 @@ export default class MenuSwitch extends Component {
         // 选择成活率，苗木结缘时，不能够点击树木信息开关
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
+                dashboardCompomentMenu === 'geojsonFeature_treePipe' ||
                 dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
                 await switchDashboardTreeMess('');
             }
@@ -182,6 +181,7 @@ export default class MenuSwitch extends Component {
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
             dashboardCompomentMenu === 'geojsonFeature_treetype' ||
             dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement' ||
+            dashboardCompomentMenu === 'geojsonFeature_treePipe' ||
             dashboardCompomentMenu === 'geojsonFeature_treeAdopt'
             ) {
                 await switchDashboardAreaTreeLayer('tileTreeLayerBasic');
@@ -353,6 +353,7 @@ export default class MenuSwitch extends Component {
         } = this.props;
         // 当处于成活率和苗木结缘模块时，不能点击
         if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
+            dashboardCompomentMenu === 'geojsonFeature_treePipe' ||
             dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
             return;
         }
@@ -377,6 +378,7 @@ export default class MenuSwitch extends Component {
         if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
             dashboardCompomentMenu === 'geojsonFeature_treetype' ||
             dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement' ||
+            dashboardCompomentMenu === 'geojsonFeature_treePipe' ||
             dashboardCompomentMenu === 'geojsonFeature_treeAdopt'
         ) {
             return;
