@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-16 17:26:58
+ * @Last Modified time: 2019-03-17 15:57:46
  */
 import React, { Component } from 'react';
 import {
@@ -28,7 +28,7 @@ import TrackTree from './Track/TrackTree';
 import TreeTypeTree from './TreeType/TreeTypeTree';
 import RiskDetail from './Risk/RiskDetail';
 import OnSiteAreaTree from './OnSiteAreaTree';
-import TreeMessModal from './TreeMess/TreeMessModal';
+import TreeMessGisOnClickHandle from './TreeMess/TreeMessGisOnClickHandle';
 import CuringTaskTree from './Curing/CuringTaskTree';
 import SurvivalRateTree from './SurvivalRate/SurvivalRateTree';
 import TreeAdoptTree from './Adopt/TreeAdoptTree';
@@ -84,8 +84,6 @@ class OnSite extends Component {
         this.state = {
             mapLayerBtnType: true, // 切换卫星图和地图
             // 树木详情弹窗数据
-            treeMessModalVisible: false,
-            treeMessModalLoading: true,
             seedlingMess: '', // 树木信息
             treeMess: '', // 苗木信息
             flowMess: '', // 流程信息
@@ -101,16 +99,6 @@ class OnSite extends Component {
             treeMarkerLayer: '',
             areaLayerList: {}, // 区域地块图层list
             realThinClassLayerList: {}, // 实际细班种植图层
-
-            trackLayerList: {}, // 轨迹图层List
-            trackMarkerLayerList: {}, // 轨迹图标图层List
-            // 养护
-            curingTaskPlanLayerList: {},
-            curingTaskRealLayerList: {},
-            curingTaskMarkerLayerList: {},
-            curingTaskMessList: {}, // 养护任务信息List
-            // 成活率
-            survivalRateMarkerLayerList: {},
             // 结缘
             adoptTreeMarkerLayerList: {}, // 苗木结缘图标List
             adoptTreeDataList: {}, // 苗木结缘数据List
@@ -357,10 +345,6 @@ class OnSite extends Component {
                         distanceMeasureMarkerList,
                         distanceMeasureNumList
                     });
-                } else if (dashboardTreeMess === 'treeMess') {
-                    me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'treeMess');
-                } else if (dashboardCompomentMenu === 'geojsonFeature_survivalRate') {
-                    me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_survivalRate');
                 } else if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
                     me.getSxmByLocation(e.latlng.lng, e.latlng.lat, me, 'geojsonFeature_treeAdopt');
                 }
@@ -566,18 +550,12 @@ class OnSite extends Component {
     // 各个模块之间切换时，去除除当前模块外所有后来添加的图层
     removeAllLayer = () => {
         const {
-            adoptTreeMarkerLayerList,
-            survivalRateMarkerLayerList
+            adoptTreeMarkerLayerList
         } = this.state;
         const {
             dashboardCompomentMenu
         } = this.props;
         try {
-            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_survivalRate') {
-                for (let v in survivalRateMarkerLayerList) {
-                    this.map.removeLayer(survivalRateMarkerLayerList[v]);
-                }
-            }
             if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_treeAdopt') {
                 this.removeTileTreeAdoptLayer();
                 for (let t in adoptTreeMarkerLayerList) {
@@ -663,7 +641,6 @@ class OnSite extends Component {
     }
     render () {
         const {
-            treeMessModalVisible,
             coordinates,
             areaMeasure,
             areaMeasureVisible,
@@ -674,6 +651,7 @@ class OnSite extends Component {
         } = this.state;
         const {
             dashboardCompomentMenu,
+            dashboardTreeMess,
             menuTreeVisible,
             dashboardDataMeasurement,
             dashboardRightMenu,
@@ -988,15 +966,15 @@ class OnSite extends Component {
                             </Button>
                         </div>
                     </div>
-                    { // 点击某个树节点展示该节点信息
-                        treeMessModalVisible
-                            ? (
-                                <TreeMessModal
-                                    {...this.props}
-                                    {...this.state}
-                                    onCancel={this.handleCancelTreeMessModal.bind(this)}
-                                />
-                            ) : ''
+                    {
+                        dashboardTreeMess && dashboardTreeMess === 'dashboardTreeMess'
+                        ? (
+                            <TreeMessGisOnClickHandle
+                                {...this.props}
+                                {...this.state}
+                                map={this.map}
+                            />
+                        ) : ''
                     }
                     { // 苗木结缘弹窗展示树木信息
                         adoptTreeModalVisible
@@ -1313,32 +1291,9 @@ class OnSite extends Component {
             colp +
             '&J=' +
             rowp;
-        if (type === 'geojsonFeature_survivalRate') {
-            url =
-            FOREST_GIS_API +
-            '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:thinclass&STYLE=&TILEMATRIX=EPSG:4326:' +
-            zoom +
-            '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
-            col +
-            '&TileRow=' +
-            row +
-            '&I=' +
-            colp +
-            '&J=' +
-            rowp;
-        }
         jQuery.getJSON(url, null, async function (data) {
             if (data.features && data.features.length) {
-                if (type === 'treeMess') {
-                    await that.setState({
-                        treeMessModalVisible: true,
-                        treeMessModalLoading: true
-                    });
-                    await that.getTreeMessData(data, x, y);
-                    await that.handleOkTreeMessModal(data, x, y);
-                } else if (type === 'geojsonFeature_survivalRate') {
-                    that.getSurvivalRateInfo(data, x, y);
-                } else if (type === 'geojsonFeature_treeAdopt') {
+                if (type === 'geojsonFeature_treeAdopt') {
                     let adoptTreeMess = await that.getTreeAdoptInfo(data, x, y);
                     if (adoptTreeMess) {
                         await that.setState({
@@ -1351,54 +1306,6 @@ class OnSite extends Component {
                 }
             }
         });
-    }
-    // 点击地图上的区域的成活率
-    getSurvivalRateInfo = async (data, x, y) => {
-        const {
-            platform: {
-                tree = {}
-            }
-        } = this.props;
-        const {
-            survivalRateMarkerLayerList
-        } = this.state;
-        let totalThinClass = tree.totalThinClass || [];
-        try {
-            let bigTreeList = (tree && tree.bigTreeList) || [];
-            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
-                let properties = data.features[0].properties;
-                for (let i in survivalRateMarkerLayerList) {
-                    this.map.removeLayer(survivalRateMarkerLayerList[i]);
-                }
-                let areaData = getThinClassName(properties.no, properties.Section, totalThinClass, bigTreeList);
-                let iconData = {
-                    geometry: {
-                        coordinates: [y, x],
-                        type: 'Point'
-                    },
-                    key: properties.ID,
-                    properties: {
-                        sectionName: areaData.SectionName ? areaData.SectionName : '',
-                        smallClassName: areaData.SmallName ? areaData.SmallName : '',
-                        thinClassName: areaData.ThinName ? areaData.ThinName : '',
-                        treetype: properties.treetype,
-                        SurvivalRate: properties.SurvivalRate,
-                        type: 'survivalRate'
-                    },
-                    type: 'survivalRate'
-                };
-                let survivalRateLayer = L.popup()
-                    .setLatLng([y, x])
-                    .setContent(genPopUpContent(iconData))
-                    .addTo(this.map);
-                survivalRateMarkerLayerList[properties.ID] = survivalRateLayer;
-                this.setState({
-                    survivalRateMarkerLayerList
-                });
-            }
-        } catch (e) {
-            console.log('getSurvivalRateInfo', e);
-        }
     }
     // 获取树木详情信息
     getTreeMessData = async (data, x, y) => {
@@ -1421,8 +1328,7 @@ class OnSite extends Component {
             platform: {
                 tree = {}
             },
-            curingTypes,
-            dashboardTreeMess
+            curingTypes
         } = this.props;
         try {
             let postdata = {
@@ -1436,10 +1342,6 @@ class OnSite extends Component {
                 queryTreeData = {};
             }
             let treeflowDatas = {};
-            // 树木审批流程信息
-            if (dashboardTreeMess === 'treeMess') {
-                treeflowDatas = await getTreeflows({}, postdata);
-            }
             // 苗圃数据
             let nurserysDatas = await getNurserys({}, postdata);
             // 车辆打包数据
@@ -1546,43 +1448,6 @@ class OnSite extends Component {
         } catch (e) {
             console.log('getTreeMessData', e);
         }
-    }
-    // 显示苗木信息Modal 和 图标
-    handleOkTreeMessModal (data, x, y) {
-        try {
-            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
-                let postdata = {
-                    sxm: data.features[0].properties.SXM
-                    // sxm: 'AUT9860'
-                };
-                if (this.state.treeMarkerLayer) {
-                    this.map.removeLayer(this.state.treeMarkerLayer);
-                }
-                let iconType = L.divIcon({
-                    className: getIconType('tree')
-                });
-                let treeMarkerLayer = L.marker([y, x], {
-                    icon: iconType,
-                    title: postdata.sxm
-                });
-                treeMarkerLayer.addTo(this.map);
-                this.setState({
-                    treeMarkerLayer,
-                    // treeMessModalVisible: true,
-                    treeMessModalLoading: false
-                });
-            }
-        } catch (e) {
-
-        }
-    }
-    // 苗木信息Modal关闭
-    handleCancelTreeMessModal () {
-        this.handleModalMessData();
-        this.setState({
-            treeMessModalVisible: false,
-            treeMessModalLoading: true
-        });
     }
     // 获取苗木结缘信息
     getTreeAdoptInfo = async (data, x, y) => {
