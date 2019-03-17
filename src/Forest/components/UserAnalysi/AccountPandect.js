@@ -3,7 +3,10 @@ import { Card, Row, Col } from 'antd';
 import moment from 'moment';
 import './index.less';
 import DataOverviewByUser from './DataOverviewByUser';
-
+const gridStyle = {
+    width: '25%',
+    textAlign: 'center'
+};
 export default class AccountPandect extends Component {
     constructor (props) {
         super(props);
@@ -45,6 +48,24 @@ export default class AccountPandect extends Component {
                 <div>
                     <h2>实时数据{moment().format('HH:mm:ss')}</h2>
                 </div>
+                {/* <Card title='关键指标'>
+                    <Card.Grid style={gridStyle}>
+                        <h3>累计注册账号总数</h3>
+                        <div>{NewUser}</div>
+                    </Card.Grid>
+                    <Card.Grid style={gridStyle}>
+                        <h3>日最高活跃账号数</h3>
+                        <div>{NewUser}</div>
+                    </Card.Grid>
+                    <Card.Grid style={gridStyle}>
+                        <h3>今日用户活跃度</h3>
+                        <div>{NewUser}</div>
+                    </Card.Grid>
+                    <Card.Grid style={gridStyle}>
+                        <h3>今日用户新增度</h3>
+                        <div>{NewUser}</div>
+                    </Card.Grid>
+                </Card> */}
                 <div className='UserAnalysis-mod_basic'>
                     <div className='UserAnalysis-mod-title'>
                         <h3 className='UserAnalysis-mod-title-h3'>关键指标</h3>
@@ -55,7 +76,7 @@ export default class AccountPandect extends Component {
                                 <td className='UserAnalysis-table-border'>
                                     <div className='UserAnalysis-table-pad'>
                                         <div className='UserAnalysis-table-title'>
-                                            累计注册账号总数
+                                        新增用户
                                         </div>
                                         <div className='UserAnalysis-table-num'>
                                             {NewUser}
@@ -65,7 +86,7 @@ export default class AccountPandect extends Component {
                                 <td className='UserAnalysis-table-border'>
                                     <div className='UserAnalysis-table-pad'>
                                         <div className='UserAnalysis-table-title'>
-                                            日最高活跃账号数
+                                        活跃用户数
                                         </div>
                                         <div className='UserAnalysis-table-num'>
                                             {ActiveUser}
@@ -75,7 +96,7 @@ export default class AccountPandect extends Component {
                                 <td className='UserAnalysis-table-border'>
                                     <div className='UserAnalysis-table-pad'>
                                         <div className='UserAnalysis-table-title'>
-                                            今日用户活跃度
+                                        启动次数
                                         </div>
                                         <div className='UserAnalysis-table-num'>
                                             {SessionCount}

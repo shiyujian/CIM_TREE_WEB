@@ -1,43 +1,36 @@
 import React, { Component } from 'react';
-import { Card, Row, Col, List, Form, Select, Button } from 'antd';
-import ProgressThinClass from './ProgressThinClass'
-import ProgressSmallClass from './ProgressSmallClass'
+import { Card, Row, Col, DatePicker, Spin } from 'antd';
+import moment from 'moment';
 import '../index.less';
-const titleStyle = {
-    float: 'left',
-    marginRight: 20
-};
-const CardStyle = {
-    background: '#ECECEC',
-    padding: '15px'
-};
+const dateFormat = 'YYYY-MM-DD';
 class PlantProgress extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
-            leftkeycode: '', // 项目code
+            spinningEnter: false,
+            spinningReturn: false,
+            leftkeycode: '' // 项目code
         };
+        this.sectionList = []; // 标段列表
+        this.leftkeycode = ''; // 项目code
+        this.handleDate = this.handleDate.bind(this);
     }
     componentDidMount = async () => {
+
     }
     componentWillReceiveProps = async (nextProps) => {
     }
 
-    render() {
+    render () {
+        const { enterDate, returnDate, spinningEnter, spinningReturn } = this.state;
         return (
             <div>
-                <div style={CardStyle}>
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <ProgressSmallClass {...this.state} {...this.props} />
-                        </Col>
-                        <Col span={12}>
-                            <ProgressThinClass {...this.state} {...this.props} />
-                        </Col>
-                    </Row>
-                </div>
+                22
             </div>
         );
+    }
+    handleDate () {
+
     }
 }
 

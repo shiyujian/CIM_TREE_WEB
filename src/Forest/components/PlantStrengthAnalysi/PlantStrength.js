@@ -1,11 +1,6 @@
 import React, {Component} from 'react';
 import { Card, Row, Col, List, Form, Select, Button } from 'antd';
 import moment from 'moment';
-import ZaiZhi from './ZaiZhi'
-import DingWei from './DingWei'
-import FB from './ShuZhongFB'
-import PM1 from './ShuZhongPM1'
-import PM2 from './ShuZhongPM2'
 import '../index.less';
 const gridStyle = {
     width: '25%',
@@ -599,7 +594,7 @@ class PlantStrength extends Component {
     handleThinClass (value) {
         const { thinClassList } = this.state;
         let thinclassName = '';
-        thinClassList.map (item => {
+        thinClassList.map(item => {
             if (item.No === value) {
                 thinclassName = item.Name;
             }

@@ -12,9 +12,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { PlantStrength } from '../components/PlantStrengthAnalysi';
-import { PositionProgress } from '../components/PlantStrengthAnalysi';
-import { PlantProgress } from '../components/PlantStrengthAnalysi';
+import { PlantStrength, PositionProgress, PlantProgress } from '../components/PlantStrengthAnalysi';
 import { getAreaTreeData, getDefaultProject } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 @connect(
@@ -29,14 +27,14 @@ const TabPane = Tabs.TabPane;
         )
     })
 )
-export default class PlantStrengthAnalysi extends Component {
-    constructor(props) {
+class PlantStrengthAnalysi extends Component {
+    constructor (props) {
         super(props);
         this.state = {
             leftkeycode: '', // 项目
             sectionList: [], // 标段列表
-            treetypeoption: [],
-            typeoption: []
+            treetypeList: [], // 树种类型
+            treeCategory: [] // 树种大类
         };
     }
 
@@ -44,70 +42,60 @@ export default class PlantStrengthAnalysi extends Component {
         const {
             actions: {
                 getTreeNodeList,
-                getThinClassList,
                 getTotalThinClass,
+                getThinClassList,
                 getThinClassTree,
                 getTreeList
             },
             treetypes,
             platform: { tree = {} }
         } = this.props;
-        try {
-            // 避免反复获取森林树种列表，提高效率
-            if (!treetypes) {
-                getTreeList().then(x => this.setTreeTypeOption(x));
-            }
-            if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
-                let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
-                let totalThinClass = data.totalThinClass || [];
-                let projectList = data.projectList || [];
-                // 获取所有的小班数据，用来计算养护任务的位置
-                await getTotalThinClass(totalThinClass);
-                // 区域地块树
-                await getThinClassTree(projectList);
-            }
-            let defaultProject = await getDefaultProject();
-            if (defaultProject) {
-                this.onSelect([defaultProject]);
-            }
-            // 类型
-            let typeoption = [
-                <Option key={'全部'} value={''} title={'全部'}>
-                    全部
-                </Option>,
-                <Option key={'常绿乔木'} value={'1'} title={'常绿乔木'}>
-                    常绿乔木
-                </Option>,
-                <Option key={'落叶乔木'} value={'2'} title={'落叶乔木'}>
-                    落叶乔木
-                </Option>,
-                <Option key={'亚乔木'} value={'3'} title={'亚乔木'}>
-                    亚乔木
-                </Option>,
-                <Option key={'灌木'} value={'4'} title={'灌木'}>
-                    灌木
-                </Option>,
-                <Option key={'地被'} value={'5'} title={'地被'}>
-                    地被
-                </Option>
-            ];
-            this.setState({ typeoption });
-        } catch (e) {
-            console.log('e', e);
+        if (!treetypes) {
+            getTreeList().then(rep => this.setTreeTypeOption(rep));
+        }
+        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+            let totalThinClass = data.totalThinClass || [];
+            let projectList = data.projectList || [];
+            await getTotalThinClass(totalThinClass); // 获取所有的小班数据，用来计算养护任务的位置
+            await getThinClassTree(projectList); // 区域地块树
+        }
+        let defaultProject = await getDefaultProject();
+        if (defaultProject) {
+            this.onSelect([defaultProject]);
+        }
+        // 类型
+        const treeCategory = [{
+            value: '',
+            title: '全部'
+        }, {
+            value: '1',
+            title: '常绿乔木'
+        }, {
+            value: '2',
+            title: '落叶乔木'
+        }, {
+            value: '3',
+            title: '亚乔木'
+        }, {
+            value: '4',
+            title: '灌木'
+        }, {
+            value: '5',
+            title: '地被'
+        }];
+        this.setState({ treeCategory });
+    }
+    componentWillReceiveProps (nextProps) {
+        const { tree } = nextProps.platform;
+        if (tree) {
+            this.setState({
+                treeList: tree.bigTreeList
+            });
         }
     }
-
-    render() {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        const {
-            leftkeycode
-        } = this.state;
-        let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
-        }
+    render () {
+        const { leftkeycode, treeList } = this.state;
         return (
             <Body>
                 <Main>
@@ -121,18 +109,18 @@ export default class PlantStrengthAnalysi extends Component {
                     </Sidebar>
                     <Content>
                         <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='树种统计' key='3'>
-                                <PlantStrength
+                            <TabPane tab='种植进度分析' key='2'>
+                                <PlantProgress {...this.props} {...this.state} />
+                            </TabPane>
+                            <TabPane tab='树种统计' key='1'>
+                                {/* <PlantStrength
                                     {...this.props}
                                     {...this.state}
                                     typeselect={this.typeselect.bind(this)}
-                                />
+                                /> */}
                             </TabPane>
-                            <TabPane tab='种植进度分析' key='2'>
-                                <PlantProgress {...this.props} {...this.state}/>
-                            </TabPane>
-                            <TabPane tab='定位进度分析' key='1'>
-                                <PositionProgress {...this.props} {...this.state}/>
+                            <TabPane tab='定位进度分析' key='3'>
+                                {/* <PositionProgress {...this.props} {...this.state} /> */}
                             </TabPane>
                         </Tabs>
                     </Content>
@@ -140,29 +128,23 @@ export default class PlantStrengthAnalysi extends Component {
             </Body>
         );
     }
-
     // 设置树种选项
-    setTreeTypeOption(rst) {
-        debugger
-        if (rst instanceof Array) {
-            let treetypeoption = rst.map(item => {
-                return (
-                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
-                        {item.TreeTypeName}
-                    </Option>
-                );
+    setTreeTypeOption (rst) {
+        console.log('rst树种', rst);
+        let treetypeList = [];
+        rst.map(item => {
+            treetypeList.push({
+                ID: item.ID,
+                TreeTypeName: item.TreeTypeName,
+                TreeTypeNo: item.TreeTypeNo
             });
-            treetypeoption.unshift(
-                <Option key={'全部'} value={''} title={'全部'}>
-                    全部
-                </Option>
-            );
-            this.setState({ treetypeoption, treetypelist: rst });
-        }
+        });
+        this.setState({
+            treetypeList
+        });
     }
-
     // 类型选择, 重新获取: 树种
-    typeselect(value) {
+    typeselect (value) {
         const { treetypes = [] } = this.props;
         this.setState({ bigType: value });
         let selectTreeType = [];
@@ -180,25 +162,21 @@ export default class PlantStrengthAnalysi extends Component {
         });
         this.setTreeTypeOption(selectTreeType);
     }
-
-    onSelect(keys) {
-        let keycode = keys[0] || '';
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let treeList = [];
+    onSelect (keys) {
+        const { tree } = this.props.platform;
+        let leftkeycode = keys[0] || '';
         let sectionList = [];
         if (tree.thinClassTree) {
-            treeList = tree.thinClassTree;
+            tree.thinClassTree.map(item => {
+                if (item.No === leftkeycode) {
+                    sectionList = item.children;
+                }
+            });
         }
-        treeList.map(item => {
-            if (item.No === keycode) {
-                sectionList = item.children;
-            }
-        });
         this.setState({
-            leftkeycode: keycode,
+            leftkeycode,
             sectionList
         });
     }
 }
+export default PlantStrengthAnalysi;

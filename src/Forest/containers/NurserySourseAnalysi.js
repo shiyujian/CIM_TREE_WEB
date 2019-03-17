@@ -29,7 +29,7 @@ const TabPane = Tabs.TabPane;
     })
 )
 export default class NurserySourseAnalysi extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             leftkeycode: '',
@@ -43,10 +43,8 @@ export default class NurserySourseAnalysi extends Component {
                 getTreeNodeList,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree,
-                getTreeList
+                getThinClassTree
             },
-            treetypes,
             platform: { tree = {} }
         } = this.props;
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
@@ -64,7 +62,7 @@ export default class NurserySourseAnalysi extends Component {
         }
     }
 
-    render() {
+    render () {
         const {
             platform: { tree = {} }
         } = this.props;
@@ -101,7 +99,7 @@ export default class NurserySourseAnalysi extends Component {
         );
     }
 
-    onSelect(keys) {
+    onSelect (keys) {
         let keycode = keys[0] || '';
         const {
             platform: { tree = {} }

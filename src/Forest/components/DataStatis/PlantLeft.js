@@ -180,6 +180,7 @@ export default class PlantLeft extends Component {
                         time.push(rst[i].Time);
                     }
                 }
+                console.log('time3', time);
                 // 时间数组去重
                 times = [...new Set(time)];
 
@@ -207,6 +208,7 @@ export default class PlantLeft extends Component {
                         }
                     });
                 }
+                console.log('times1', times);
                 times.map((time, index) => {
                     let obj = {};
                     obj['时间'] = time;
@@ -222,6 +224,7 @@ export default class PlantLeft extends Component {
                         });
                     });
                 });
+                console.log('times2', times);
                 for (let i = 0; i < times.length; i++) {
                     total[i] = 0;
                     data.map(sectionData => {
@@ -260,6 +263,7 @@ export default class PlantLeft extends Component {
                     data: sectionData
                 });
             });
+            console.log('legend', legend);
             let options1 = {
                 legend: {
                     data: legend
