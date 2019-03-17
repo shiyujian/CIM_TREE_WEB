@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-17 15:57:46
+ * @Last Modified time: 2019-03-17 16:30:06
  */
 import React, { Component } from 'react';
 import {
@@ -86,7 +86,6 @@ class OnSite extends Component {
             // 树木详情弹窗数据
             seedlingMess: '', // 树木信息
             treeMess: '', // 苗木信息
-            flowMess: '', // 流程信息
             curingMess: '', // 养护信息
             markers: null, // 点击节点图标
             // 区域地块
@@ -180,7 +179,9 @@ class OnSite extends Component {
     /* 初始化地图 */
     initMap () {
         const {
-            customViewByUserID = []
+            customViewByUserID = [],
+            riskTreeDay = [],
+            riskTree = []
         } = this.props;
         try {
             let me = this;
@@ -219,7 +220,13 @@ class OnSite extends Component {
                 if (target.getAttribute('class') === 'btnViewRisk') {
                     let idRisk = target.getAttribute('data-id');
                     let risk = null;
-                    me.props.riskTree.forEach(v => {
+                    let riskTreeList = [];
+                    if (riskTree && riskTree.length > 0) {
+                        riskTreeList = riskTree;
+                    } else if (riskTreeDay && riskTreeDay.length > 0) {
+                        riskTreeList = riskTreeDay;
+                    }
+                    riskTreeList.forEach(v => {
                         if (!risk) {
                             risk = v.children.find(v1 => v1.key === idRisk);
                         }
@@ -246,8 +253,7 @@ class OnSite extends Component {
                 } = me.state;
                 const {
                     dashboardCompomentMenu,
-                    areaDistanceMeasureMenu,
-                    dashboardTreeMess
+                    areaDistanceMeasureMenu
                 } = me.props;
                 // 测量面积
                 if (areaDistanceMeasureMenu === 'areaMeasureMenu') {
@@ -1341,7 +1347,6 @@ class OnSite extends Component {
             if (!queryTreeData) {
                 queryTreeData = {};
             }
-            let treeflowDatas = {};
             // 苗圃数据
             let nurserysDatas = await getNurserys({}, postdata);
             // 车辆打包数据
@@ -1381,16 +1386,9 @@ class OnSite extends Component {
                 ThinClassName = regionData.ThinName;
             }
 
-            let treeflowData = [];
             let nurserysData = {};
             let curingTaskData = [];
             let curingTaskArr = [];
-            if (
-                treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array &&
-                        treeflowDatas.content.length > 0
-            ) {
-                treeflowData = treeflowDatas.content;
-            }
             if (
                 nurserysDatas && nurserysDatas.content && nurserysDatas.content instanceof Array &&
                         nurserysDatas.content.length > 0
@@ -1409,6 +1407,7 @@ class OnSite extends Component {
                     }
                 });
             }
+
             // 根据苗圃的起苗坐标获取起苗地址
             let nurserysAddressData = await handleGetAddressByCoordinate(nurserysData.location, getLocationNameByCoordinate);
             let nurserysAddressName = (nurserysAddressData && nurserysAddressData.regeocode && nurserysAddressData.regeocode.formatted_address) || '';
@@ -1418,7 +1417,6 @@ class OnSite extends Component {
             if (treeLocationData && treeLocationData.X && treeLocationData.Y) {
                 location = `${treeLocationData.X},${treeLocationData.Y}`;
             }
-            console.log('location', location);
             queryTreeData.locationCoord = location;
             // let treeAddressData = await handleGetAddressByCoordinate(location, getLocationNameByCoordinate);
             // let queryTreeAddressName = (treeAddressData && treeAddressData.regeocode && treeAddressData.regeocode.formatted_address) || '';
@@ -1426,23 +1424,10 @@ class OnSite extends Component {
 
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
-            for (let i = 0; i < treeflowData.length; i++) {
-                let userForestData = await getForestUserDetail({id: treeflowData[i].FromUser});
-                if (userForestData && userForestData.PK) {
-                    let userEcidiData = await getUserDetail({pk: userForestData.PK});
-                    let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
-                    let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                    let companyName = parent.name;
-                    treeflowData[i].companyName = companyName;
-                    treeflowData[i].orgData = parent;
-                }
-            }
-            let flowMess = treeflowData;
             let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);
             this.setState({
                 seedlingMess,
                 treeMess,
-                flowMess,
                 curingMess
             });
         } catch (e) {
@@ -1495,7 +1480,6 @@ class OnSite extends Component {
         this.setState({
             seedlingMess: '',
             treeMess: '',
-            flowMess: '',
             curingMess: '',
             adoptTreeMess: ''
         });

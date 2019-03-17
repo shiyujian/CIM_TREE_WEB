@@ -109,6 +109,9 @@ export default class TreeMessGisOnClickHandle extends Component {
         const {
             map
         } = this.props;
+        const {
+            treeMarkerLayer
+        } = this.state;
         let resolutions = [
             0.703125,
             0.3515625,
@@ -163,6 +166,9 @@ export default class TreeMessGisOnClickHandle extends Component {
                     treeMessModalVisible: true,
                     treeMessModalLoading: true
                 });
+                if (treeMarkerLayer) {
+                    map.removeLayer(treeMarkerLayer);
+                }
                 console.log('xxxxxxxx', x, y)
                 console.log('datadatadata', data)
                 await this.getTreeMessData(data, x, y);

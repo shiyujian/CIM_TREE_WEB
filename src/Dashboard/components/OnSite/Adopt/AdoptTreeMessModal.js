@@ -20,16 +20,32 @@ class AdoptTreeMessModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            curingTypeData: [],
             curingData: []
         };
     }
 
     componentDidMount = async () => {
+        
+    };
+
+    handleTreeModalCancel = async () => {
+        await this.props.onCancel();
+    }
+
+    handleTypeData = (type, curingTypeData) => {
+        let times = 0;
+        for (let i in curingTypeData) {
+            if (i === type && curingTypeData[i]) {
+                times = curingTypeData[i];
+            }
+        }
+        return times;
+    }
+
+    handleCuringMess = () => {
         const {
             curingMess
         } = this.props;
-        console.log('curingMess', curingMess);
         if (curingMess && curingMess instanceof Array && curingMess.length > 0) {
             let curingType = [];
             let curingTimes = [];
@@ -51,31 +67,12 @@ class AdoptTreeMessModal extends Component {
                     curingData.push(data);
                 }
             }
-            console.log('curingTypeData', curingTypeData);
-            this.setState({
+            let curingObject = {
                 curingTypeData,
                 curingData
-            });
-        }
-    };
-
-    handleTreeModalCancel = async () => {
-        await this.props.onCancel();
-    }
-
-    handleTypeData = (type) => {
-        const {
-            curingTypeData = {}
-        } = this.state;
-        let times = 0;
-        console.log('type', type);
-        for (let i in curingTypeData) {
-            console.log('i', i);
-            if (i === type && curingTypeData[i]) {
-                times = curingTypeData[i];
             }
+            return curingObject
         }
-        return times;
     }
 
     render () {
@@ -83,11 +80,13 @@ class AdoptTreeMessModal extends Component {
             seedlingMess,
             treeMess,
             adoptTreeMess,
-            adoptTreeModalLoading
+            adoptTreeModalLoading,
+            curingMess
         } = this.props;
-        const {
-            curingData
-        } = this.state;
+        let curingObject = this.handleCuringMess();
+        let curingTypeData = (curingObject && curingObject.curingTypeData) || {};
+        let curingData = (curingObject && curingObject.curingData) || [];
+
         let name = '';
         try {
             if (adoptTreeMess && adoptTreeMess.Aadopter) {
@@ -147,7 +146,7 @@ class AdoptTreeMessModal extends Component {
                                 <div className='adoptTreeMess-curingTaskTypeNum'
                                     style={{fontSize: 20}}
                                 >
-                                    {this.handleTypeData('排涝')}
+                                    {this.handleTypeData('排涝', curingTypeData)}
                                 </div>
                             </div>
                             <div style={{marginLeft: 23, marginTop: 20, width: 59}}>
@@ -159,7 +158,7 @@ class AdoptTreeMessModal extends Component {
                                 <div className='adoptTreeMess-curingTaskTypeNum'
                                     style={{fontSize: 24}}
                                 >
-                                    {this.handleTypeData('其他')}
+                                    {this.handleTypeData('其他', curingTypeData)}
                                 </div>
                             </div>
                             <div style={{marginLeft: 40, marginTop: 20, width: 70}}>
@@ -171,7 +170,7 @@ class AdoptTreeMessModal extends Component {
                                 <div className='adoptTreeMess-curingTaskTypeNum'
                                     style={{fontSize: 28}}
                                 >
-                                    {this.handleTypeData('病虫害防治')}
+                                    {this.handleTypeData('病虫害防治', curingTypeData)}
                                 </div>
                             </div>
                             <div style={{marginLeft: 34, marginTop: 17, width: 67}}>
@@ -183,7 +182,7 @@ class AdoptTreeMessModal extends Component {
                                 <div className='adoptTreeMess-curingTaskTypeNum'
                                     style={{fontSize: 24}}
                                 >
-                                    {this.handleTypeData('修剪')}
+                                    {this.handleTypeData('修剪', curingTypeData)}
                                 </div>
                             </div>
                             <div style={{marginLeft: 51, marginTop: 15, width: 79}}>
@@ -195,7 +194,7 @@ class AdoptTreeMessModal extends Component {
                                 <div className='adoptTreeMess-curingTaskTypeNum'
                                     style={{fontSize: 28}}
                                 >
-                                    {this.handleTypeData('除草')}
+                                    {this.handleTypeData('除草', curingTypeData)}
                                 </div>
                             </div>
                             <div style={{marginLeft: 38, marginTop: 14, width: 86}}>
@@ -207,7 +206,7 @@ class AdoptTreeMessModal extends Component {
                                 <div className='adoptTreeMess-curingTaskTypeNum'
                                     style={{fontSize: 32}}
                                 >
-                                    {this.handleTypeData('施肥')}
+                                    {this.handleTypeData('施肥', curingTypeData)}
                                 </div>
                             </div>
                             <div style={{marginLeft: 18, marginTop: 42, width: 60}}>
@@ -219,7 +218,7 @@ class AdoptTreeMessModal extends Component {
                                 <div className='adoptTreeMess-curingTaskTypeNum'
                                     style={{fontSize: 28}}
                                 >
-                                    {this.handleTypeData('浇水')}
+                                    {this.handleTypeData('浇水', curingTypeData)}
                                 </div>
                             </div>
                         </div>
@@ -268,7 +267,7 @@ class AdoptTreeMessModal extends Component {
                                     curingData.map((data, index) => {
                                         if (data && data.typeName && data.typeName !== '补植' && index < 3) {
                                             return (
-                                                <div className='adoptTreeMess-mrg20'>
+                                                <div className='adoptTreeMess-mrg20' key={data.ID}>
                                                     <span className='adoptTreeMess-table-type-data'
                                                         style={{marginRight: 15}} >
                                                         {data.typeName ? data.typeName : ''}
