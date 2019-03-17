@@ -190,7 +190,6 @@ export const getThinClass = (smallClass, list) => {
 // 点击地图上的图标展示的内容
 export const genPopUpContent = (geo) => {
     const { properties = {} } = geo;
-    console.log('geo', geo);
     switch (geo.type) {
         case 'track': {
             return `<div class="popupBox">
@@ -850,7 +849,6 @@ export const handleGetAddressByCoordinate = async (location, getLocationNameByCo
             csid: '8A18DA11-6CD2-445E-B0B0-B3DEFEB925B3'
         };
         let addressData = await getLocationNameByCoordinate({}, postData);
-        console.log('addressData', addressData);
         return addressData;
     } catch (e) {
 
