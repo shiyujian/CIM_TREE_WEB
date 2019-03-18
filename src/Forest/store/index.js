@@ -2,7 +2,7 @@ import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
 import { createFetchActionWithHeaders as myFetch } from './fetchAction';
 import faithInfoReducer, { actions as faithActions } from './faithInfo';
-import { FOREST_API, TENCENTANALYSIS_API } from '_platform/api';
+import { FOREST_API, TENCENTANALYSIS_API, USER_API } from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import { actionsMap } from '_platform/store/util';
 const ID = 'forest';
@@ -279,6 +279,26 @@ export const getNurseryFromData = createFetchAction(
     []
 );
 
+// 获取数字化验收列表
+export const getDigitalAcceptList = createFetchAction(
+    `${FOREST_API}/tree/acceptances`,
+    []
+);
+
+// 获取数字化验收详情
+export const getDigitalAcceptDetail = createFetchAction(
+    `${FOREST_API}/tree/acceptancedetails`,
+    []
+);
+
+// 获取数字化验收人员列表
+export const getDigitalAcceptUserList = createFetchAction(
+    `${USER_API}/users/?is_active=true`,
+    []
+);
+
+
+
 export const actions = {
     getTotalSat,
     getTreeLocations,
@@ -344,7 +364,10 @@ export const actions = {
     getTencentOffLineUser,
     getTencentOffLineActive,
     getTencentOffLineAusage,
-    getNurseryFromData
+    getNurseryFromData,
+    getDigitalAcceptList,
+    getDigitalAcceptUserList,
+    getDigitalAcceptDetail
 };
 export default handleActions(
     {
