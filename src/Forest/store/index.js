@@ -12,7 +12,8 @@ import faithInfoReducer, {
 } from './faithInfo';
 import {
     FOREST_API,
-    TENCENTANALYSIS_API
+    TENCENTANALYSIS_API,
+    USER_API
 } from '_platform/api';
 import {
     forestFetchAction
@@ -300,6 +301,24 @@ export const getTreeEntrance = forestFetchAction(
     []
 );
 
+// 获取数字化验收列表
+export const getDigitalAcceptList = createFetchAction(
+    `${FOREST_API}/tree/acceptances`,
+    []
+);
+
+// 获取数字化验收详情
+export const getDigitalAcceptDetail = createFetchAction(
+    `${FOREST_API}/tree/acceptancedetails`,
+    []
+);
+
+// 获取数字化验收人员列表
+export const getDigitalAcceptUserList = createFetchAction(
+    `${USER_API}/users/?is_active=true`,
+    []
+);
+
 export const actions = {
     getTotalSat,
     getTreeLocations,
@@ -371,7 +390,10 @@ export const actions = {
     getTencentOffLineActive,
     getTencentOffLineAusage,
     getNurseryFromData,
-    getTreeEntrance
+    getTreeEntrance,
+    getDigitalAcceptList,
+    getDigitalAcceptUserList,
+    getDigitalAcceptDetail
 };
 export default handleActions({
     [getTreeOK]: (state, {

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import {
-    Icon,
-    Table,
     Modal,
+    Table,
     Row,
     Col,
     Select,
@@ -11,22 +10,35 @@ import {
     Input,
     Progress,
     message,
-    Card
+    Card,
+    Divider
 } from 'antd';
 import moment from 'moment';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import WordView1 from './WordView1';
+import WordView2 from './WordView2';
+import WordView3 from './WordView3';
+import WordView4 from './WordView4';
+import WordView5 from './WordView5';
+import WordView6 from './WordView6';
+import WordView7 from './WordView7';
+import WordView8 from './WordView8';
+import WordView9 from './WordView9';
+import WordView10 from './WordView10';
+import WordView11 from './WordView11';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
 } from '../auth';
 import {
     getSectionNameBySection,
-    getProjectNameBySection
+    getProjectNameBySection,
+    getYsTypeByID,
+    getStatusByID
 } from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
 
 export default class DegitalAcceptTable extends Component {
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.state = {
             curingModalvisible: false,
@@ -56,6 +68,20 @@ export default class DegitalAcceptTable extends Component {
             sgy: '', // 施工员
             cly: '', // 测量员
             jl: '', // 监理
+            shigongOptions: [],
+            jianliOptions: [],
+            visible1: false,
+            visible2: false,
+            visible3: false,
+            visible4: false,
+            visible5: false,
+            visible6: false,
+            visible7: false,
+            visible8: false,
+            visible9: false,
+            visible10: false,
+            visible11: false,
+            itemDetail: {}, // 数字化验收详情
         };
         this.columns = [
             {
@@ -68,58 +94,64 @@ export default class DegitalAcceptTable extends Component {
             },
             {
                 title: '小班',
-                dataIndex: 'place'
+                dataIndex: 'smallclass'
             },
             {
                 title: '细班',
-                dataIndex: 'TreeTypeObj.TreeTypeName'
+                dataIndex: 'thinclass'
             },
             {
                 title: '验收类型',
-                dataIndex: 'statusname'
+                dataIndex: 'ystype'
             },
             {
                 title: '树种',
-                dataIndex: 'islocation'
+                dataIndex: 'treetype',
+                render: () => {
+                    return <span>暂无字段</span>
+                }
             },
             {
                 title: '状态',
-                dataIndex: 'islocation'
+                dataIndex: 'status'
             },
             {
-                title: '测量时间',
+                title: '申请时间',
                 render: (text, record) => {
-                    const { createtime1 = '', createtime2 = '' } = record;
+                    const { ApplyTime = '' } = record;
                     return (
                         <div>
-                            <div>{createtime1}</div>
-                            <div>{createtime2}</div>
+                            <div>{ApplyTime}</div>
+                            {/* <div>{createtime2}</div> */}
                         </div>
                     );
                 }
             },
-            {
-                title: '定位时间',
-                render: (text, record) => {
-                    const { createtime3 = '', createtime4 = '' } = record;
-                    return (
-                        <div>
-                            <div>{createtime3}</div>
-                            <div>{createtime4}</div>
-                        </div>
-                    );
-                }
-            },
+            // {
+            //     title: '定位时间',
+            //     render: (text, record) => {
+            //         const { createtime3 = '', createtime4 = '' } = record;
+            //         return (
+            //             <div>
+            //                 <div>{createtime3}</div>
+            //                 <div>{createtime4}</div>
+            //             </div>
+            //         );
+            //     }
+            // },
             {
                 title: '操作',
                 render: (text, record) => {
+                    if (record.status === '未申请') {
+                        return <span>暂无</span>
+                    }
                     return (
                         <div>
-                            <a onClick={this.remarkDefault.bind(this, record)}>
-                                备注
+                            <a onClick={this.viewWord.bind(this, record)}>
+                                查看
                             </a>
                             <Divider type='vertical' />
-                            <a onClick={this.exportFile.bind(this,'single')}>导出</a>
+                            <a onClick={this.exportFile.bind(this, 'single', record)}>导出</a>
                         </div>
                     );
                 }
@@ -127,140 +159,147 @@ export default class DegitalAcceptTable extends Component {
         ];
     }
     componentDidMount = async () => {
-        try {
-            const {
-                actions: {
-                    getCuringTypes
-                }
-            } = this.props;
-            let curingTypesData = await getCuringTypes();
-            let curingTypes = curingTypesData && curingTypesData.content;
-            this.setState({
-                curingTypes
-            });
-            let user = getUser();
-            this.sections = JSON.parse(user.sections);
-        } catch (e) {
-            console.log('getCuringTypes', e);
-        }
+        debugger
     }
-    render () {
-        const { curingTreeData, curingTreeModalData, curingSXM } = this.state;
+    render() {
+        const { 
+            curingTreeData,
+            visible1,
+            visible2,
+            visible3,
+            visible4,
+            visible5,
+            visible6,
+            visible7,
+            visible8,
+            visible9,
+            visible10,
+            visible11,
+            itemDetail,
+        } = this.state;
         return (
             <div>
                 {this.treeTable(curingTreeData)}
-                <Modal
-                    width={522}
-                    title='详细信息'
-                    style={{ textAlign: 'center' }}
-                    visible={this.state.curingModalvisible}
-                    onOk={this.handleCancel.bind(this)}
-                    onCancel={this.handleCancel.bind(this)}
-                    footer={null}
-                >
-                    <div>
-                        <Input
-                            readOnly
-                            style={{
-                                marginTop: '10px', marginBottom: 10
-                            }}
-                            size='large'
-                            addonBefore='顺序码'
-                            value={curingSXM}
-                        />
-                    </div>
-                    {
-                        curingTreeModalData && curingTreeModalData.length > 0
-                            ? (
-                                curingTreeModalData.map((curing, index) => {
-                                    return (
-                                        <Card title={`任务${index + 1}`} style={{marginBottom: 10}} key={curing.ID}>
-                                            <Input
-                                                readOnly
-                                                style={{
-                                                    marginTop: '10px'
-                                                }}
-                                                size='large'
-                                                addonBefore='养护类型'
-                                                value={curing.typeName}
-                                            />
-                                            <Input
-                                                readOnly
-                                                style={{
-                                                    marginTop: '10px'
-                                                }}
-                                                size='large'
-                                                addonBefore='起止时间'
-                                                value={`${curing.StartTime} ~ ${curing.EndTime}`}
-                                            />
-                                            <Input
-                                                readOnly
-                                                style={{
-                                                    marginTop: '10px'
-                                                }}
-                                                size='large'
-                                                addonBefore='养护人员'
-                                                value={curing.CuringMans}
-                                                title={curing.CuringMans}
-                                            />
-                                            {curing.Pics && curing.Pics.length > 0
-                                                ? curing.Pics.map(
-                                                    src => {
-                                                        return (
-                                                            <div>
-                                                                <img
-                                                                    style={{
-                                                                        width: '150px',
-                                                                        height: '150px',
-                                                                        display: 'block',
-                                                                        marginTop: '10px'
-                                                                    }}
-                                                                    src={
-                                                                        src
-                                                                    }
-                                                                    alt='图片'
-                                                                />
-                                                            </div>
-                                                        );
-                                                    }
-                                                )
-                                                : ''}
-                                        </Card>
-                                    );
-                                })
-                            ) : ''
-                    }
-                    <Row style={{ marginTop: 10 }}>
-                        <Button
-                            onClick={this.handleCancel.bind(this)}
-                            style={{ float: 'right' }}
-                            type='primary'
-                        >
-                            关闭
-                        </Button>
-                    </Row>
-                </Modal>
+                <WordView1 
+                    onPressOk = {this.pressOK.bind(this, 1)}
+                    visible = {visible1}
+                    detail = {itemDetail}
+                />
+                <WordView2
+                    onPressOk = {this.pressOK.bind(this, 2)}
+                    visible = {visible2}
+                    detail = {itemDetail}
+                />
+                <WordView3
+                    onPressOk = {this.pressOK.bind(this, 3)}
+                    visible = {visible3}
+                    detail = {itemDetail}
+                />
+                <WordView4
+                    onPressOk = {this.pressOK.bind(this, 4)}
+                    visible = {visible4}
+                    detail = {itemDetail}
+                />
+                <WordView5
+                    onPressOk = {this.pressOK.bind(this, 5)}
+                    visible = {visible5}
+                    detail = {itemDetail}
+                />
+                <WordView6
+                    onPressOk = {this.pressOK.bind(this, 6)}
+                    visible = {visible6}
+                    detail = {itemDetail}
+                />
+                <WordView7
+                    onPressOk = {this.pressOK.bind(this, 7)}
+                    visible = {visible7}
+                    detail = {itemDetail}
+                />
+                <WordView8
+                    onPressOk = {this.pressOK.bind(this, 8)}
+                    visible = {visible8}
+                    detail = {itemDetail}
+                />
+                <WordView9
+                    onPressOk = {this.pressOK.bind(this, 9)}
+                    visible = {visible9}
+                    detail = {itemDetail}
+                />
+                <WordView10
+                    onPressOk = {this.pressOK.bind(this, 10)}
+                    visible = {visible10}
+                    detail = {itemDetail}
+                />
+                <WordView11
+                    onPressOk = {this.pressOK.bind(this, 11)}
+                    visible = {visible11}
+                    detail = {itemDetail}
+                />
             </div>
         );
     }
-    treeTable (details) {
+    pressOK (which) {
+        switch (which) {
+            case 1:
+                this.setState({ visible1: false })
+                break;
+            case 2:
+                this.setState({ visible2: false })
+                break;
+            case 3:
+                this.setState({ visible3: false })
+                break;
+            case 4:
+                this.setState({ visible4: false })
+                break;
+            case 5:
+                this.setState({ visible5: false })
+                break;
+            case 6:
+                this.setState({ visible6: false })
+                break;
+            case 7:
+                this.setState({ visible7: false })
+                break;
+            case 8:
+                this.setState({ visible8: false })
+                break;
+            case 9:
+                this.setState({ visible9: false })
+                break;
+            case 10:
+                this.setState({ visible10: false })
+                break;
+            case 11:
+                this.setState({ visible11: false })
+                break;
+            default:
+                return ''
+        }
+    }
+    treeTable(details) {
         const {
             treetypeoption,
             sectionoption,
             smallclassoption,
             thinclassoption,
             typeoption,
+            zttypeoption,
+            ystypeoption
         } = this.props;
         const {
             section,
             smallclass,
             thinclass,
             ystype,
+            zt,
             curingTypeSelect,
             treetypename,
             sgy,
             cly,
-            jl
+            jl,
+            shigongOptions,
+            jianliOptions
         } = this.state;
         let header = '';
 
@@ -312,7 +351,7 @@ export default class DegitalAcceptTable extends Component {
                             value={ystype}
                             onChange={this.ysTypeChange.bind(this, 'yslx')}
                         >
-
+                            {ystypeoption}
                         </Select>
                     </div>
                     <div className='forest-mrg10'>
@@ -346,35 +385,47 @@ export default class DegitalAcceptTable extends Component {
                             allowClear
                             className='forest-forestcalcw4'
                             defaultValue='全部'
-                            value={ystype}
+                            value={zt}
                             onChange={this.ysTypeChange.bind(this, 'zt')}
                         >
-
+                            {zttypeoption}
                         </Select>
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>施工员：</span>
-                        <Input
-                            value={sgy}
+                        <Select
+                            allowClear
                             className='forest-forestcalcw4'
-                            onChange={this.inputChange.bind(this, 'sgy')}
-                        />
+                            defaultValue=''
+                            value={sgy}
+                            onChange={this.ysTypeChange.bind(this, 'sgy')}
+                        >
+                            {shigongOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>测量员：</span>
-                        <Input
-                            value={cly}
+                        <Select
+                            allowClear
                             className='forest-forestcalcw4'
-                            onChange={this.inputChange.bind(this, 'cly')}
-                        />
+                            defaultValue=''
+                            value={cly}
+                            onChange={this.ysTypeChange.bind(this, 'cly')}
+                        >
+                            {shigongOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>监理：</span>
-                        <Input
-                            value={jl}
+                        <Select
+                            allowClear
                             className='forest-forestcalcw4'
-                            onChange={this.inputChange.bind(this, 'jl')}
-                        />
+                            defaultValue='全部'
+                            value={jl}
+                            onChange={this.ysTypeChange.bind(this, 'jl')}
+                        >
+                            {jianliOptions}
+                        </Select>
                     </div>
                 </Row>
                 <Row className='forest-search-layout'>
@@ -393,7 +444,7 @@ export default class DegitalAcceptTable extends Component {
                             onOk={this.datepick.bind(this)}
                         />
                     </div>
-                    <div className='forest-mrg20'>
+                    {/* <div className='forest-mrg20'>
                         <span className='forest-search-span6'>验收完成时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
@@ -407,9 +458,9 @@ export default class DegitalAcceptTable extends Component {
                             onChange={this.datepick.bind(this)}
                             onOk={this.datepick.bind(this)}
                         />
-                    </div>
+                    </div> */}
                 </Row>
-                <Row style={{marginTop: 10, marginBottom: 10}}>
+                <Row style={{ marginTop: 10, marginBottom: 10 }}>
                     <Col span={2} >
                         <Button
                             type='primary'
@@ -426,7 +477,7 @@ export default class DegitalAcceptTable extends Component {
                     <Col span={2} >
                         <Button
                             type='primary'
-                            onClick={this.exportFile.bind(this,'mutiple')}
+                            onClick={this.exportFile.bind(this, 'mutiple')}
                         >
                             导出
                         </Button>
@@ -472,15 +523,44 @@ export default class DegitalAcceptTable extends Component {
         );
     }
 
-    ysTypeChange (type, value) {
+    ysTypeChange(type, value) { // 清空select会调用此函数
         if (type === 'yslx') {
             this.setState({ ystype: value || '' });
-        }else if (type === 'zt') {
+        } else if (type === 'zt') {
             this.setState({ zt: value || '' });
+        } else if (type === 'sgy') {
+            this.setState({ sgy: value || '' })
+        } else if (type === 'cly') {
+            this.setState({ cly: value || '' })
+        } else if (type === 'jl') {
+            this.setState({ jl: value || '' })
         }
     }
 
-    onSectionChange (value) {
+    async onSectionChange(value) {
+        const {
+            actions: {
+                getDigitalAcceptUserList
+            }
+        } = this.props;
+        if (!value) {
+            return
+        }
+        // only choose the section, you can search the people
+        let shigong = await getDigitalAcceptUserList({}, { sections: value, grouptype: 1 })
+        let jianli = await getDigitalAcceptUserList({}, { sections: value, grouptype: 2 })
+        let shigongOptions = []
+        let jianliOptions = []
+        if (shigong instanceof Array) {
+            shigong.map(item => {
+                shigongOptions.push(<Option value={item.id}>{item.account.person_name}</Option>)
+            })
+        }
+        if (jianli instanceof Array) {
+            jianli.map(item => {
+                jianliOptions.push(<Option value={item.id}>{item.account.person_name}</Option>)
+            })
+        }
         const { sectionSelect } = this.props;
         sectionSelect(value || '');
         this.setState({
@@ -488,22 +568,13 @@ export default class DegitalAcceptTable extends Component {
             smallclass: '',
             thinclass: '',
             smallclassData: '',
-            thinclassData: ''
+            thinclassData: '',
+            shigongOptions,
+            jianliOptions
         });
     }
 
-    inputChange(value,e) {
-        debugger
-        if (value === 'sgy') {
-            this.setState({sgy: e.target.value})
-        } else if (value === 'cly') {
-            this.setState({cly: e.target.value})
-        } else if (value === 'jl') {
-            this.setState({jl: e.target.value})
-        }
-    }
-
-    onSmallClassChange (value) {
+    onSmallClassChange(value) {
         const { smallClassSelect } = this.props;
         try {
             smallClassSelect(value);
@@ -523,7 +594,7 @@ export default class DegitalAcceptTable extends Component {
         }
     }
 
-    onThinClassChange (value) {
+    onThinClassChange(value) {
         const { thinClassSelect } = this.props;
         try {
             thinClassSelect(value);
@@ -541,30 +612,30 @@ export default class DegitalAcceptTable extends Component {
         }
     }
 
-    onTypeChange (value) {
+    onTypeChange(value) {
         const { typeselect } = this.props;
         typeselect(value || '');
         this.setState({ curingTypeSelect: value || '', treetype: '', treetypename: '' });
     }
 
-    onTreeTypeChange (value) {
+    onTreeTypeChange(value) {
         this.setState({ treetype: value, treetypename: value });
     }
 
-    datepick (value) {
+    datepick(value) {
         this.setState({
-            stime: value[0]
+            stime1: value[0]
                 ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
                 : ''
         });
         this.setState({
-            etime: value[1]
+            etime1: value[1]
                 ? moment(value[1]).format('YYYY-MM-DD HH:mm:ss')
                 : ''
         });
     }
 
-    handleTableChange (pagination) {
+    handleTableChange(pagination) {
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
         this.setState({
@@ -573,20 +644,84 @@ export default class DegitalAcceptTable extends Component {
         this.query(pagination.current);
     }
 
-    handleCancel () {
+    handleCancel() {
         this.setState({ curingModalvisible: false });
     }
 
-    resetinput () {
+    resetinput() {
         const { resetinput, leftkeycode } = this.props;
         resetinput(leftkeycode);
     }
 
-    exportFile (type) {
+    exportFile(type, record) {
+        this.setState({visible1: true})
         if (type === 'single') { // 单个导出
 
         } else if (type === 'mutiple') {
 
+        }
+    }
+
+    async viewWord(record) {
+        const {
+            actions: {
+                getDigitalAcceptDetail
+            }
+        } = this.props;
+        const {
+            stime1 = '',
+            etime1 = '',
+        } = this.state;
+        const postdata = {
+            acceptanceid: record.ID,
+            status: record.Status, // 用当前条目的状态去查询
+            stime: stime1,
+            etime: etime1
+        }
+        let rst = await getDigitalAcceptDetail({}, postdata);
+        if (! rst instanceof Array || rst.length === 0 ) {
+            message.info('查询详情失败'); 
+            return
+        }
+        this.setState({
+            itemDetail: rst[0]
+        })
+        switch (record.CheckType) {
+            case 1:
+                this.setState({ visible1: true })
+                break;
+            case 2:
+                this.setState({ visible2: true })
+                break;
+            case 3:
+                this.setState({ visible3: true })
+                break;
+            case 4:
+                this.setState({ visible4: true })
+                break;
+            case 5:
+                this.setState({ visible5: true })
+                break;
+            case 6:
+                this.setState({ visible6: true })
+                break;
+            case 7:
+                this.setState({ visible7: true })
+                break;
+            case 8:
+                this.setState({ visible8: true })
+                break;
+            case 9:
+                this.setState({ visible9: true })
+                break;
+            case 10:
+                this.setState({ visible10: true })
+                break;
+            case 11:
+                this.setState({ visible11: true })
+                break;
+            default:
+                return ''
         }
     }
 
@@ -603,7 +738,11 @@ export default class DegitalAcceptTable extends Component {
             jl = '',
             thinclass = '',
             curingTypeSelect = '',
-            thinclassData = ''
+            thinclassData = '',
+            smallclassData = '',
+            zt = '',
+            ystype = '',
+            treetypename = ''
         } = this.state;
         if (thinclass === '') {
             message.info('请选择项目，标段，小班及细班信息');
@@ -611,40 +750,51 @@ export default class DegitalAcceptTable extends Component {
         }
 
         const {
-            actions: { getCuringTreeInfo, getqueryTree },
+            actions: { getDigitalAcceptList, getqueryTree },
             platform: { tree = {} }
         } = this.props;
         let thinClassTree = tree.thinClassTree;
+        let array = thinclass.split('-')
+        let array1 = []
+        array.map((item, i) => {
+            if (i !== 2) {
+                array1.push(item)
+            }
+        })
         let postdata = {
-            sxm,
             section,
-            stime1: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
-            etime1: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
-            stime2: stime2 && moment(stime2).format('YYYY-MM-DD HH:mm:ss'),
-            etime2: etime2 && moment(etime2).format('YYYY-MM-DD HH:mm:ss'),
-            curingtype: curingTypeSelect,
-            thinclass: thinclassData,
+            treetype: treetypename,
+            stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
+            // stime2: stime2 && moment(stime2).format('YYYY-MM-DD HH:mm:ss'),
+            // etime2: etime2 && moment(etime2).format('YYYY-MM-DD HH:mm:ss'),
+            treetype: treetypename,
+            thinclass: array1.join('-'),
             page,
-            size: size
+            size: size,
+            status: zt,
+            checktype: ystype
         };
         this.setState({ loading: true, percent: 0 });
         try {
-            let rst = await getCuringTreeInfo({}, postdata);
+            let rst = await getDigitalAcceptList({}, postdata);
             if (!rst) {
                 this.setState({ loading: false, percent: 100 });
                 return;
             };
             let curingTreeData = rst && rst.content;
             if (curingTreeData instanceof Array) {
-                for (let i = 0; i < curingTreeData.length; i++) {
-                    let curingTree = curingTreeData[i];
+                let result = [];
+                curingTreeData.map((curingTree, i) => {
                     curingTree.order = (page - 1) * size + i + 1;
-                    let data = await getqueryTree({}, {sxm: curingTree.SXM});
-                    let treeMess = data && data.content && data.content[0];
+                    curingTree.ystype = getYsTypeByID(curingTree.CheckType)
+                    curingTree.status = getStatusByID(curingTree.Status)
                     curingTree.sectionName = getSectionNameBySection(curingTree.Section, thinClassTree);
                     curingTree.Project = getProjectNameBySection(curingTree.Section, thinClassTree);
-                    curingTree.place = getSmallThinNameByPlaceData(treeMess.Section, treeMess.SmallClass, treeMess.ThinClass, thinClassTree);
-                };
+                    curingTree.smallclass = `${smallclassData}号小班`;
+                    curingTree.thinclass = `${thinclassData}号细班`;
+                    result.push(curingTree)
+                })
                 let totalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
@@ -652,59 +802,13 @@ export default class DegitalAcceptTable extends Component {
                 this.setState({
                     loading: false,
                     percent: 100,
-                    curingTreeData,
+                    curingTreeData: result,
                     pagination: pagination,
                     totalNum: totalNum
                 });
             }
         } catch (e) {
-
+            console.log(e)
         }
-    }
-    handleCuringTreeModalOk = async (record) => {
-        const {
-            actions: {
-                getCuringTreeInfo,
-                getCuringMessage
-            }
-        } = this.props;
-        const {
-            curingTypes
-        } = this.state;
-        let SXM = record.SXM;
-        let rst = await getCuringTreeInfo({}, {sxm: SXM});
-        let curingTreeModalData = rst && rst.content;
-        for (let i = 0; i < curingTreeModalData.length; i++) {
-            let data = curingTreeModalData[i];
-            curingTypes.map((type) => {
-                if (data.CuringType === type.ID) {
-                    data.typeName = type.Base_Name;
-                }
-            });
-            let curingMess = await getCuringMessage({id: data.CuringID});
-            data.Pics = curingMess.Pics ? this.handleImg(curingMess.Pics) : '';
-            data.StartTime = curingMess.StartTime;
-            data.EndTime = curingMess.EndTime;
-            data.CuringMans = curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans;
-        }
-        this.setState({
-            curingTreeModalData,
-            curingModalvisible: true,
-            curingSXM: SXM
-        });
-    }
-
-    handleImg = (data) => {
-        let srcs = [];
-        try {
-            let arr = data.split(',');
-            arr.map(rst => {
-                let src = getForestImgUrl(rst);
-                srcs.push(src);
-            });
-        } catch (e) {
-            console.log('处理图片', e);
-        }
-        return srcs;
     }
 }
