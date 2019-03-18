@@ -41,7 +41,8 @@ export default class TreePipePage extends Component {
             treePipeMaterialData: '', // 管线材质的Sql语句
             treePipeNodeTypeData: '', // 管点设备类型的Sql语句
             contents: [], // 搜索的数据
-            treePipeGisQuery: false // 是否点击查看
+            treePipeGisQuery: false, // 是否点击查看
+            treePipePopLayer: ''
         };
         this.tileLayerTreeFilter = null;
         this.tileTreePipeBasic = null;
@@ -107,7 +108,7 @@ export default class TreePipePage extends Component {
             map
         } = this.props;
         try {
-            // map.on('click', this.handleMapFunction.bind(this));
+            map.on('click', this.handleTreePipeMapClickFunction);
             await this.getTileLayerTreeFilter();
             await this.getTileLayerTreeThinClass();
             await this.getTreePipeLayer();
@@ -120,8 +121,13 @@ export default class TreePipePage extends Component {
         const {
             map
         } = this.props;
+        const {
+            treePipePopLayer
+        } = this.state;
         try {
-            // map.off('click', this.handleMapFunction());
+            map.off('click', this.handleTreePipeMapClickFunction);
+            console.log('是否存在点击事件', map.listens('click'));
+
             if (this.tileTreePipeBasic) {
                 await map.removeLayer(this.tileTreePipeBasic);
                 this.tileTreePipeBasic = null;
@@ -138,11 +144,14 @@ export default class TreePipePage extends Component {
                 await map.removeLayer(this.tileTreePipeNodeBasic);
                 this.tileTreePipeNodeBasic = null;
             }
+            if (treePipePopLayer) {
+                await map.removeLayer(treePipePopLayer);
+            }
         } catch (e) {
             console.log('componentWillUnmount', e);
         }
     }
-    handleMapFunction = (e) => {
+    handleTreePipeMapClickFunction = (e) => {
         try {
             const {
                 dashboardCompomentMenu
@@ -150,8 +159,11 @@ export default class TreePipePage extends Component {
             const {
                 treePipeGisQuery
             } = this.state;
+            console.log('dashboardCompomentMenu', dashboardCompomentMenu);
+            console.log('treePipeGisQuery', treePipeGisQuery);
+            console.log('e', e);
             if (dashboardCompomentMenu === 'geojsonFeature_treePipe' && treePipeGisQuery && e) {
-                console.log('handleMapFunction', e);
+                console.log('handleTreePipeMapClickFunction', e);
                 this.handleQueryPipeByWkt([e.latlng.lat, e.latlng.lng]);
             }
         } catch (e) {
@@ -410,7 +422,7 @@ export default class TreePipePage extends Component {
                                     <aside className='TreePipePage-aside' draggable='false'>
                                         <div className='TreePipePage-asideTree'>
                                             <Spin spinning={treePipeLoading}>
-                                                {/* <div className='TreePipePage-button'>
+                                                <div className='TreePipePage-button'>
                                                     <div className='TreePipePage-GisQueryBorder'>
                                                         <Checkbox className='TreePipePage-button-layout'
                                                             checked={treePipeGisQuery}
@@ -418,7 +430,7 @@ export default class TreePipePage extends Component {
                                                             地图标注
                                                         </Checkbox>
                                                     </div>
-                                                </div> */}
+                                                </div>
                                                 <div className='TreePipePage-button'>
                                                     <Checkbox className='TreePipePage-button-layout'
                                                         checked={treePipe}
@@ -810,72 +822,85 @@ export default class TreePipePage extends Component {
         } = this.props;
         const {
             treePipe,
-            treePipeNode
+            treePipeNode,
+            treePipePopLayer
         } = this.state;
-        let pnt = map.latLngToLayerPoint(latlng);
-        let minPnt = map.layerPointToLatLng([pnt.x - 2, pnt.y - 2]);
-        let maxPnt = map.layerPointToLatLng([pnt.x + 2, pnt.y + 2]);
-        let wkt = 'POLYGON((';
-        wkt += minPnt.lng + ' ' + minPnt.lat + ',' + minPnt.lng + ' ' + maxPnt.lat + ',' + maxPnt.lng + ' ' + maxPnt.lat + ',' + maxPnt.lng + ' ' + minPnt.lat + ',' + minPnt.lng + ' ' + minPnt.lat;
-        wkt += '))';
-        let layers = '';
-        if (treePipe) {
-            layers = 'pipe';
-        } else if (treePipeNode) {
-            layers = 'pipenode';
-        }
-        let postData = {
-            Sql: '',
-            Bbox: wkt,
-            Layers: layers
-        };
-        let queryTreePipeData = await postTreePipeQuery({}, postData);
-        let contents = [];
-        if (treePipe) {
-            contents = queryTreePipeData && queryTreePipeData.Pipes;
-            if (contents.length === 0) {
-                message.warning('未查询到管线数据');
-                return;
+        try {
+            if (treePipePopLayer) {
+                await map.removeLayer(treePipePopLayer);
             }
-        } else if (treePipeNode) {
-            contents = queryTreePipeData && queryTreePipeData.PipeNodes;
-            if (contents.length === 0) {
-                message.warning('未查询到管点数据');
-                return;
-            }
-        }
-        contents.map((content, index) => {
-            if (index !== 0) { return; }
-            let contentMessage = {};
+            let pnt = map.latLngToLayerPoint(latlng);
+            let minPnt = map.layerPointToLatLng([pnt.x - 2, pnt.y - 2]);
+            let maxPnt = map.layerPointToLatLng([pnt.x + 2, pnt.y + 2]);
+            let wkt = 'POLYGON((';
+            wkt += minPnt.lng + ' ' + minPnt.lat + ',' + minPnt.lng + ' ' + maxPnt.lat + ',' + maxPnt.lng + ' ' + maxPnt.lat + ',' + maxPnt.lng + ' ' + minPnt.lat + ',' + minPnt.lng + ' ' + minPnt.lat;
+            wkt += '))';
+            let layers = '';
             if (treePipe) {
-                contentMessage = {
-                    type: 'treePipe',
-                    typeName: '管线',
-                    CreateTime: content.CreateTime,
-                    DN: content.DN,
-                    Depth: content.Depth,
-                    Material: content.Material,
-                    Altitude: content.Altitude,
-                    Section: content.Section,
-                    ThinClass: content.ThinClass
-                };
+                layers = 'pipe';
             } else if (treePipeNode) {
-                contentMessage = {
-                    type: 'treePipeNode',
-                    typeName: '管点',
-                    CreateTime: content.CreateTime,
-                    PipeType: content.PipeType,
-                    Depth: content.Depth,
-                    Altitude: content.Altitude,
-                    Model: content.Model,
-                    Section: content.Section,
-                    ThinClass: content.ThinClass
-                };
+                layers = 'pipenode';
             }
-            L.popup()
-                .setLatLng(latlng)
-                .setContent(genPopUpContent(contentMessage))
-                .addTo(map);
-        });
+            let postData = {
+                Sql: '',
+                Bbox: wkt,
+                Layers: layers
+            };
+            let queryTreePipeData = await postTreePipeQuery({}, postData);
+            let contents = [];
+            console.log('aaaaaaaaaaaaa');
+            if (treePipe) {
+                contents = queryTreePipeData && queryTreePipeData.Pipes;
+                if (contents.length === 0) {
+                    message.warning('未查询到管线数据');
+                    return;
+                }
+            } else if (treePipeNode) {
+                contents = queryTreePipeData && queryTreePipeData.PipeNodes;
+                if (contents.length === 0) {
+                    message.warning('未查询到管点数据');
+                    return;
+                }
+            }
+            contents.map((content, index) => {
+                if (index !== 0) { return; }
+                let contentMessage = {};
+                if (treePipe) {
+                    contentMessage = {
+                        type: 'treePipe',
+                        typeName: '管线',
+                        CreateTime: content.CreateTime,
+                        DN: content.DN,
+                        Depth: content.Depth,
+                        Material: content.Material,
+                        Altitude: content.Altitude,
+                        Section: content.Section,
+                        ThinClass: content.ThinClass
+                    };
+                } else if (treePipeNode) {
+                    contentMessage = {
+                        type: 'treePipeNode',
+                        typeName: '管点',
+                        CreateTime: content.CreateTime,
+                        PipeType: content.PipeType,
+                        Depth: content.Depth,
+                        Altitude: content.Altitude,
+                        Model: content.Model,
+                        Section: content.Section,
+                        ThinClass: content.ThinClass
+                    };
+                }
+                let treePipePopLayer = L.popup()
+                    .setLatLng(latlng)
+                    .setContent(genPopUpContent(contentMessage))
+                    .addTo(map);
+                this.setState({
+                    treePipePopLayer
+                })
+            });
+        } catch (e) {
+            console.log('handleQueryPipeByWkt', e);
+        }
+        
     }
 }

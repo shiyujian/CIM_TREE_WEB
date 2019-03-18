@@ -153,7 +153,7 @@ export default class MenuSwitch extends Component {
             await switchDashboardFocus('');
         }
         // 选择了树木信息，就需要取消数据测量和区域地块，视图管理
-        if (dashboardTreeMess && dashboardTreeMess === 'treeMess' &&
+        if (dashboardTreeMess && dashboardTreeMess === 'dashboardTreeMess' &&
             dashboardTreeMess !== prevProps.dashboardTreeMess) {
             await switchDashboardDataMeasurement('');
             await switchAreaDistanceMeasureMenu('');
@@ -259,8 +259,8 @@ export default class MenuSwitch extends Component {
                         id='mapFoucs'
                         title='视图管理'
                         onClick={this.handleMapFoucsButton.bind(this)} />
-                    <a className={dashboardTreeMess === 'treeMess' ? 'menuSwitch-rightMenuTreeMessButtonSelLayout' : 'menuSwitch-rightMenuTreeMessButtonUnSelLayout'}
-                        id='treeMess'
+                    <a className={dashboardTreeMess === 'dashboardTreeMess' ? 'menuSwitch-rightMenuTreeMessButtonSelLayout' : 'menuSwitch-rightMenuTreeMessButtonUnSelLayout'}
+                        id='dashboardTreeMess'
                         title='树木信息'
                         onClick={this.handleTreeMessButton.bind(this)} />
                     <a className={dashboardAreaTreeLayer === 'removeTileTreeLayerBasic' ? 'menuSwitch-rightMenuTileLayer2ButtonSelLayout' : 'menuSwitch-rightMenuTileLayer2ButtonUnSelLayout'}

@@ -1,0 +1,66 @@
+// 数据测量模块模块
+// 数据测量菜单的位置
+.AreaDistanceMeasure-rightDataMeasureMenu {
+    position: absolute;
+    right: 120px;
+    top: 192px;
+    height: 104px;
+    width: 54px;
+    transition: all 0.3s;
+    z-index: 980;
+    // 数据测量模块整体菜单的UI数据设置
+    .AreaDistanceMeasure-rightDataMeasureMenu-aside {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        top: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255, 0.9);
+        color: #333;
+        z-index: 999;
+        overflow-x: hidden;
+        overflow-y: hidden;
+
+        // 未选中  数据测量图片的背景
+        .AreaDistanceMeasure-rightDataMeasureMenu-back-Unselect {
+            height: 44px;
+            line-height: 44px;
+            display: block;
+            text-align: center;
+            width: 44px;
+            margin: 5px;
+            background-color: #fff; // 背景的颜色
+        }
+        // 选中  数据测量图片的背景
+        .AreaDistanceMeasure-rightDataMeasureMenu-back-Select {
+            height: 40px;
+            line-height: 40px;
+            display: block;
+            text-align: center;
+            width: 44px;
+            margin: 5px;
+            background-color: #1793ff; // 背景的颜色
+        }
+        // 数据测量图片的设置
+        .AreaDistanceMeasure-rightDataMeasureMenu-clickImg {
+            cursor: pointer;
+        }
+    }
+}
+.AreaDistanceMeasure-editPolygonLayout {
+    position: absolute;
+    z-index: 960;
+    top: 40px;
+    left: 600px;
+}
+.AreaDistanceMeasure-areaMeasureLayout {
+    position: absolute;
+    z-index: 960;
+    top: 40px;
+    height: 32px;
+    line-height: 32px;
+    left: 835px;
+    font-size: 20px;
+    color: #333333;
+    background-color: #fff;
+}
