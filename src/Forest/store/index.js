@@ -1,10 +1,25 @@
-import { createAction, handleActions, combineActions } from 'redux-actions';
+import {
+    createAction,
+    handleActions,
+    combineActions
+} from 'redux-actions';
 import createFetchAction from './fetchAction';
-import { createFetchActionWithHeaders as myFetch } from './fetchAction';
-import faithInfoReducer, { actions as faithActions } from './faithInfo';
-import { FOREST_API, TENCENTANALYSIS_API } from '_platform/api';
-import {forestFetchAction} from '_platform/store/fetchAction';
-import { actionsMap } from '_platform/store/util';
+import {
+    createFetchActionWithHeaders as myFetch
+} from './fetchAction';
+import faithInfoReducer, {
+    actions as faithActions
+} from './faithInfo';
+import {
+    FOREST_API,
+    TENCENTANALYSIS_API
+} from '_platform/api';
+import {
+    forestFetchAction
+} from '_platform/store/fetchAction';
+import {
+    actionsMap
+} from '_platform/store/util';
 const ID = 'forest';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
@@ -280,6 +295,10 @@ export const getNurseryFromData = createFetchAction(
     `${FOREST_API}/tree/nursersourcestat?section={{section}}&regioncode={{regioncode}}&etime={{etime}}`,
     []
 );
+export const getTreeEntrance = forestFetchAction(
+    `${FOREST_API}/tree/nurserystat?`,
+    []
+);
 
 export const actions = {
     getTotalSat,
@@ -351,55 +370,69 @@ export const actions = {
     getTencentOffLineUser,
     getTencentOffLineActive,
     getTencentOffLineAusage,
-    getNurseryFromData
+    getNurseryFromData,
+    getTreeEntrance
 };
-export default handleActions(
-    {
-        [getTreeOK]: (state, { payload }) => {
-            return {
-                ...state,
-                treeLists: [payload]
-            };
-        },
-        [setkeycode]: (state, { payload }) => {
-            return {
-                ...state,
-                keycode: payload
-            };
-        },
-        [combineActions(...actionsMap(faithActions))]: (
-            state = {},
-            action
-        ) => ({
+export default handleActions({
+    [getTreeOK]: (state, {
+        payload
+    }) => {
+        return {
             ...state,
-            faith: faithInfoReducer(state.faith, action)
-        }),
-        [getForestUsersOK]: (state, { payload: { content } }) => {
-            let users = {};
-            if (content) {
-                content.forEach(user => (users[user.ID] = user));
-            }
-            return {
-                ...state,
-                users
-            };
-        },
-        [getTreeListOK]: (state, { payload }) => ({
-            ...state,
-            treetypes: payload
-        }),
-        [getHonestyNewDetailOk]: (state, { payload }) => ({
-            ...state,
-            honestyList: payload
-        }),
-        [clearList]: (state, { payload }) => ({
-            ...state,
-            honestyList: payload
-        }),
-        [nurseryName]: (state, { payload }) => ({
-            ...state,
-            nurseryName: payload
-        })
+            treeLists: [payload]
+        };
     },
-    {}
-);
+    [setkeycode]: (state, {
+        payload
+    }) => {
+        return {
+            ...state,
+            keycode: payload
+        };
+    },
+    [combineActions(...actionsMap(faithActions))]: (
+        state = {},
+        action
+    ) => ({
+        ...state,
+        faith: faithInfoReducer(state.faith, action)
+    }),
+    [getForestUsersOK]: (state, {
+        payload: {
+            content
+        }
+    }) => {
+        let users = {};
+        if (content) {
+            content.forEach(user => (users[user.ID] = user));
+        }
+        return {
+            ...state,
+            users
+        };
+    },
+    [getTreeListOK]: (state, {
+        payload
+    }) => ({
+        ...state,
+        treetypes: payload
+    }),
+    [getHonestyNewDetailOk]: (state, {
+        payload
+    }) => ({
+        ...state,
+        honestyList: payload
+    }),
+    [clearList]: (state, {
+        payload
+    }) => ({
+        ...state,
+        honestyList: payload
+    }),
+    [nurseryName]: (state, {
+        payload
+    }) => ({
+        ...state,
+        nurseryName: payload
+    })
+}, {});

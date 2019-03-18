@@ -31,7 +31,7 @@ export default class DataShow extends Component {
     }
     async query () {
         const {
-            actions: { getTotalSat, gettreeEntrance, getCount, getqueryTree },
+            actions: { getTotalSat, getTreeEntrance, getCount, getqueryTree },
             leftkeycode,
             section
         } = this.props;
@@ -64,7 +64,7 @@ export default class DataShow extends Component {
             etime: moment().format('YYYY/MM/DD 23:59:59'),
             no: section || leftkeycode
         };
-        let rst = await gettreeEntrance({}, gettreeEntrancePostData);
+        let rst = await getTreeEntrance({}, gettreeEntrancePostData);
         if (rst && rst instanceof Array) {
             rst.map(item => {
                 if (item && item.Section) {

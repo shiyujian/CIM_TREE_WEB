@@ -43,7 +43,7 @@ export default class DegitalAccept extends Component {
             resetkey: 0,
             sectionsData: [],
             smallClassesData: [],
-            treetypeoption: [], //树种
+            treetypeoption: [] // 树种
         };
     }
     componentDidMount = async () => {
@@ -67,7 +67,7 @@ export default class DegitalAccept extends Component {
             getForestUsers();
         }
         if (!treetypes) {
-            getTreeList().then(x => this.setTreeTypeOption(x))
+            getTreeList().then(x => this.setTreeTypeOption(x));
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
@@ -111,7 +111,7 @@ export default class DegitalAccept extends Component {
             sectionoption,
             smallclassoption,
             thinclassoption,
-            resetkey,
+            resetkey
         } = this.state;
         const {
             platform: { tree = {} }
@@ -181,7 +181,7 @@ export default class DegitalAccept extends Component {
         this.setState({
             sectionsData
         });
-        this.typeselect('')
+        this.typeselect('');
 
         // 标段
         let sections = JSON.parse(user.sections);
@@ -306,7 +306,7 @@ export default class DegitalAccept extends Component {
     typeselect (value) {
         const { treetypes } = this.props;
         this.setState({ bigType: value });
-        debugger
+        debugger;
         let selectTreeType = [];
         treetypes.map(item => {
             if (item.TreeTypeNo == null) {
@@ -327,7 +327,7 @@ export default class DegitalAccept extends Component {
         if (rst instanceof Array) {
             let treetypeoption = rst.map(item => {
                 return (
-                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                    <Option key={item.ID} value={item.ID} title={item.TreeTypeName}>
                         {item.TreeTypeName}
                     </Option>
                 );

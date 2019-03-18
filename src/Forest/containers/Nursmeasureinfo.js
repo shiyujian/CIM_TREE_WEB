@@ -305,7 +305,7 @@ export default class Nursmeasureinfo extends Component {
         if (rst instanceof Array) {
             let treetypeoption = rst.map(item => {
                 return (
-                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                    <Option key={item.ID} value={item.ID} title={item.TreeTypeName}>
                         {item.TreeTypeName}
                     </Option>
                 );
