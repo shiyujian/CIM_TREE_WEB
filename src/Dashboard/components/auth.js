@@ -389,7 +389,7 @@ export const getSectionName = (section, bigTreeList = []) => {
             });
         }
     } catch (e) {
-        console.log('e', e);
+        console.log('getSectionNamee', e);
     }
     return sectionName;
 };
@@ -594,7 +594,7 @@ export const handleAreaLayerData = async (eventKey, getTreearea) => {
         }
         return coords;
     } catch (e) {
-        console.log('await', e);
+        console.log('handleAreaLayerData', e);
     }
 };
 

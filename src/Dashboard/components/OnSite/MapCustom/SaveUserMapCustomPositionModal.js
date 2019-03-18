@@ -51,7 +51,6 @@ class SaveUserMapCustomPositionModal extends Component {
                 return;
             }
             const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-            console.log('user', user);
             let postData = {
                 name: name,
                 zoom: saveUserMapCustomPositionZoom,
@@ -64,7 +63,6 @@ class SaveUserMapCustomPositionModal extends Component {
                 user: user.id
             };
             let data = await postUserCustomView({}, postData);
-            console.log('data', data);
             if (data && data.id) {
                 Notification.success({
                     message: '保存视图成功',
@@ -79,7 +77,7 @@ class SaveUserMapCustomPositionModal extends Component {
             await getCustomViewByUserID({id: user.id});
             await this.props.onCancel();
         } catch (e) {
-            console.log('e', e);
+            console.log('handleSaveCustomPositionOk', e);
         }
     }
 

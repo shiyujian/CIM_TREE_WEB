@@ -158,7 +158,7 @@ export default class EntranceLeft extends Component {
         const {
             platform: { tree = {} },
             leftkeycode,
-            actions: { gettreeEntrance }
+            actions: { getTreeEntrance }
         } = this.props;
         const { etime, stime } = this.state;
         if (!leftkeycode) {
@@ -174,7 +174,7 @@ export default class EntranceLeft extends Component {
         postdata.stime = stime;
         postdata.etime = etime;
         let queryData = [];
-        let rst = await gettreeEntrance({}, postdata);
+        let rst = await getTreeEntrance({}, postdata);
         let units = [];
         let data = [];
 

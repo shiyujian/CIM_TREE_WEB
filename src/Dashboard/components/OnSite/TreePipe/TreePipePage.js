@@ -126,7 +126,6 @@ export default class TreePipePage extends Component {
         } = this.state;
         try {
             map.off('click', this.handleTreePipeMapClickFunction);
-            console.log('是否存在点击事件', map.listens('click'));
 
             if (this.tileTreePipeBasic) {
                 await map.removeLayer(this.tileTreePipeBasic);
@@ -159,11 +158,7 @@ export default class TreePipePage extends Component {
             const {
                 treePipeGisQuery
             } = this.state;
-            console.log('dashboardCompomentMenu', dashboardCompomentMenu);
-            console.log('treePipeGisQuery', treePipeGisQuery);
-            console.log('e', e);
             if (dashboardCompomentMenu === 'geojsonFeature_treePipe' && treePipeGisQuery && e) {
-                console.log('handleTreePipeMapClickFunction', e);
                 this.handleQueryPipeByWkt([e.latlng.lat, e.latlng.lng]);
             }
         } catch (e) {
@@ -848,7 +843,6 @@ export default class TreePipePage extends Component {
             };
             let queryTreePipeData = await postTreePipeQuery({}, postData);
             let contents = [];
-            console.log('aaaaaaaaaaaaa');
             if (treePipe) {
                 contents = queryTreePipeData && queryTreePipeData.Pipes;
                 if (contents.length === 0) {
@@ -896,11 +890,10 @@ export default class TreePipePage extends Component {
                     .addTo(map);
                 this.setState({
                     treePipePopLayer
-                })
+                });
             });
         } catch (e) {
             console.log('handleQueryPipeByWkt', e);
         }
-        
     }
 }

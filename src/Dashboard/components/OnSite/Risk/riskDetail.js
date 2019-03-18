@@ -24,7 +24,7 @@ export default class RiskDetail extends Component {
                 });
             }
         } catch (e) {
-            // console.log('处理图片', e);
+            console.log('处理图片', e);
         }
         return srcs;
     }

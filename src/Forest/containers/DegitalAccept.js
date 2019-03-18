@@ -7,17 +7,18 @@ import { PkCodeTree } from '../components';
 import { DegitalAcceptTable } from '../components/DegitalAccept';
 import { actions as platformActions } from '_platform/store/global';
 import {
+    getUser,
+    getAreaTreeData,
+    getDefaultProject,
+    getUserIsManager
+} from '_platform/auth';
+import {
     Main,
     Body,
     Sidebar,
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import {
-    getUser,
-    getAreaTreeData,
-    getUserIsManager
-} from '_platform/auth';
 const Option = Select.Option;
 @connect(
     state => {
@@ -43,7 +44,7 @@ export default class DegitalAccept extends Component {
             resetkey: 0,
             sectionsData: [],
             smallClassesData: [],
-            treetypeoption: [], //树种
+            treetypeoption: [] // 树种
         };
     }
     componentDidMount = async () => {
@@ -52,7 +53,7 @@ export default class DegitalAccept extends Component {
                 getForestUsers,
                 getTreeNodeList,
                 setkeycode,
-                getCuringTypes,
+                getDigitalAcceptList,
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree,
@@ -67,7 +68,7 @@ export default class DegitalAccept extends Component {
             getForestUsers();
         }
         if (!treetypes) {
-            getTreeList().then(x => this.setTreeTypeOption(x))
+            getTreeList().then(x => this.setTreeTypeOption(x));
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
@@ -78,8 +79,10 @@ export default class DegitalAccept extends Component {
             // 区域地块树
             await getThinClassTree(projectList);
         }
-
-        setkeycode('');
+        let defaultProject = await getDefaultProject();
+        if (defaultProject) {
+            this.onSelect([defaultProject]);
+        }
         // 类型
         let typeoption = [
             <Option key={'全部'} value={''} title={'全部'}>
@@ -101,7 +104,67 @@ export default class DegitalAccept extends Component {
                 地被
             </Option>
         ];
-        this.setState({ typeoption });
+        // 状态
+        let zttypeoption = [
+            <Option key={'全部'} value={''} title={'全部'}>
+                全部
+            </Option>,
+            <Option key={'未申请'} value={'0'} title={'未申请'}>
+                未申请
+            </Option>,
+            <Option key={'待验收'} value={'1'} title={'待验收'}>
+                待验收
+            </Option>,
+            <Option key={'完成'} value={'2'} title={'完成'}>
+                完成
+            </Option>,
+            <Option key={'退回'} value={'3'} title={'退回'}>
+                退回
+            </Option>,
+            <Option key={'暂存'} value={'4'} title={'暂存'}>
+                暂存
+            </Option>
+        ];
+        // 验收类型
+        let ystypeoption = [
+            <Option key={'全部'} value={''} title={'全部'}>
+                全部
+            </Option>,
+            <Option key={'土地整理'} value={'1'} title={'土地整理'}>
+                土地整理
+            </Option>,
+            <Option key={'放样点穴'} value={'2'} title={'放样点穴'}>
+                放样点穴
+            </Option>,
+            <Option key={'挖穴'} value={'3'} title={'挖穴'}>
+                挖穴
+            </Option>,
+            <Option key={'苗木质量'} value={'4'} title={'苗木质量'}>
+                苗木质量
+            </Option>,
+            <Option key={'土球质量'} value={'5'} title={'土球质量'}>
+                土球质量
+            </Option>,
+            <Option key={'苗木栽植'} value={'6'} title={'苗木栽植'}>
+                苗木栽植
+            </Option>,
+            <Option key={'苗木支架'} value={'7'} title={'苗木支架'}>
+                苗木支架
+            </Option>,
+            <Option key={'苗木浇水'} value={'8'} title={'苗木浇水'}>
+                苗木浇水
+            </Option>,
+            <Option key={'大数据'} value={'9'} title={'大数据'}>
+                大数据
+            </Option>,
+            <Option key={'造林面积'} value={'10'} title={'造林面积'}>
+                造林面积
+            </Option>,
+            <Option key={'总体'} value={'11'} title={'总体'}>
+                总体
+            </Option>
+        ];
+        this.setState({ typeoption, zttypeoption, ystypeoption });
     }
 
     render () {
@@ -111,7 +174,7 @@ export default class DegitalAccept extends Component {
             sectionoption,
             smallclassoption,
             thinclassoption,
-            resetkey,
+            resetkey
         } = this.state;
         const {
             platform: { tree = {} }
@@ -181,7 +244,7 @@ export default class DegitalAccept extends Component {
         this.setState({
             sectionsData
         });
-        this.typeselect('')
+        this.typeselect('');
 
         // 标段
         let sections = JSON.parse(user.sections);
@@ -249,7 +312,7 @@ export default class DegitalAccept extends Component {
             });
             smallclassOptions.unshift(
                 <Option key={-1} value={''} title={'全部'}>
-                        全部
+                    全部
                 </Option>
             );
             this.setState({ smallclassoption: smallclassOptions });
@@ -285,7 +348,7 @@ export default class DegitalAccept extends Component {
             });
             thinclassOptions.unshift(
                 <Option key={-1} value={''} title={'全部'}>
-                            全部
+                    全部
                 </Option>
             );
             this.setState({ thinclassoption: thinclassOptions });
@@ -306,7 +369,6 @@ export default class DegitalAccept extends Component {
     typeselect (value) {
         const { treetypes } = this.props;
         this.setState({ bigType: value });
-        debugger
         let selectTreeType = [];
         treetypes.map(item => {
             if (item.TreeTypeNo == null) {
@@ -317,7 +379,7 @@ export default class DegitalAccept extends Component {
                     if (code === value) {
                         selectTreeType.push(item);
                     }
-                } catch (e) {}
+                } catch (e) { }
             }
         });
         this.setTreeTypeOption(selectTreeType);
@@ -327,14 +389,14 @@ export default class DegitalAccept extends Component {
         if (rst instanceof Array) {
             let treetypeoption = rst.map(item => {
                 return (
-                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                    <Option key={item.ID} value={item.ID} title={item.TreeTypeName}>
                         {item.TreeTypeName}
                     </Option>
                 );
             });
             treetypeoption.unshift(
                 <Option key={'全部'} value={''} title={'全部'}>
-                            全部
+                    全部
                 </Option>
             );
             this.setState({ treetypeoption, treetypelist: rst });

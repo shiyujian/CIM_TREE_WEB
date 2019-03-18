@@ -114,7 +114,6 @@ export default class SurvivalRateTree extends Component {
             map
         } = this.props;
         map.off('click', this.handleSurvivalRateMapClickFunction);
-        console.log('是否存在点击事件', map.listens('click'));
         await this.removeTileTreeSurvivalRateLayer();
     }
     // 成活率点击事件
@@ -124,7 +123,6 @@ export default class SurvivalRateTree extends Component {
                 dashboardCompomentMenu
             } = this.props;
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' && e) {
-                console.log('handleSurvivalRateMapClickFunction', e);
                 this.getSxmByLocation(e.latlng.lng, e.latlng.lat);
             }
         } catch (e) {

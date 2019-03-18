@@ -62,7 +62,6 @@ export default class AreaDistanceMeasure extends Component {
             if (this.state.polygonData) {
                 map.removeLayer(this.state.polygonData);
             }
-            console.log('coordinates', coordinates);
             let polygonData = L.polygon(coordinates, {
                 color: 'white',
                 fillColor: '#93B9F2',

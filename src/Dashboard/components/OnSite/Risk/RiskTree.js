@@ -224,8 +224,6 @@ export default class RiskTree extends Component {
             }
         };
 
-        console.log('searchData1111111111111111', searchData);
-        console.log('riskSearchData22222222222222222', this.state.riskSearchData);
         return (
             <div>
                 {
@@ -570,7 +568,7 @@ export default class RiskTree extends Component {
             marker.addTo(map);
             return marker;
         } catch (e) {
-            console.log('e', e);
+            console.log('_createMarker', e);
         }
     }
     // 退出隐患详情查看
