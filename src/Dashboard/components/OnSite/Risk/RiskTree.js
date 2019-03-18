@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
+import { Tree, Button, DatePicker, Spin, Checkbox, Modal, Row } from 'antd';
 import './RiskTree.less';
 import moment from 'moment';
+import RiskDetail from './RiskDetail';
 import { handleRiskData, getIconType, genPopUpContent } from '../../auth';
 // 安全隐患类型图片
 import riskDangerImg from '../../RiskImg/danger.png';
 import riskQualityImg from '../../RiskImg/quality.png';
 import riskOtherImg from '../../RiskImg/other.png';
+
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
@@ -25,7 +27,11 @@ export default class RiskTree extends Component {
             // 安全隐患类型的点击状态，展示是否选中的图片
             riskTypeQuality: true,
             riskTypeDanger: true,
-            riskTypeOther: true
+            riskTypeOther: true,
+            // 隐患详情弹窗
+            riskMess: {}, // 隐患详情
+            isShowRisk: false // 是否显示隐患详情弹窗
+
         };
     }
 
@@ -85,12 +91,51 @@ export default class RiskTree extends Component {
         const {
             riskTreeDay
         } = this.props;
-        if (riskTreeDay && riskTreeDay instanceof Array && riskTreeDay.length >= 0) {
-            await this.handleRiskSearchData(riskTreeDay);
+        try {
+            if (riskTreeDay && riskTreeDay instanceof Array && riskTreeDay.length >= 0) {
+                await this.handleRiskSearchData(riskTreeDay);
+            }
+            // 隐患详情点击事件
+            document.querySelector('.leaflet-popup-pane').addEventListener('click', this.handleRiskModalOk);
+        } catch (e) {
+            console.log('componentDidMount', e);
         }
     }
     componentWillUnmount = async () => {
-        await this.handleRemoveAllRiskLayer();
+        try {
+            await this.handleRemoveAllRiskLayer();
+            document.querySelector('.leaflet-popup-pane').removeEventListener('click', this.handleRiskModalOk);
+        } catch (e) {
+            console.log('componentWillUnmount', e);
+        }
+    }
+    handleRiskModalOk = async (e) => {
+        let target = e.target;
+        // 绑定隐患详情点击事件
+        if (target.getAttribute('class') === 'btnViewRisk') {
+            let idRisk = target.getAttribute('data-id');
+            let risk = null;
+            let riskTreeList = [];
+            if (this.state.riskSearchData && this.state.riskSearchData.length > 0) {
+                riskTreeList = this.state.riskSearchData;
+            }
+            riskTreeList.forEach(v => {
+                if (!risk) {
+                    risk = v.children.find(v1 => v1.key === idRisk);
+                }
+            });
+            if (risk) {
+                // 获取隐患处理措施
+                const { getRiskContactSheet } = this.props.actions;
+                let contact = await getRiskContactSheet({ ID: idRisk });
+                if (contact && contact.ID) {
+                    this.setState({
+                        riskMess: contact,
+                        isShowRisk: true
+                    });
+                }
+            }
+        }
     }
     // 搜索之后的安全隐患数据
     handleRiskSearchData = (searchData) => {
@@ -178,6 +223,9 @@ export default class RiskTree extends Component {
                 }
             }
         };
+
+        console.log('searchData1111111111111111', searchData);
+        console.log('riskSearchData22222222222222222', this.state.riskSearchData);
         return (
             <div>
                 {
@@ -282,7 +330,31 @@ export default class RiskTree extends Component {
                             </div>
                         ) : ''
                 }
-
+                <Modal
+                    title='隐患详情'
+                    width={800}
+                    visible={this.state.isShowRisk}
+                    onCancel={this._handleCancelVisible.bind(this)}
+                    footer={null}
+                >
+                    <div>
+                        <RiskDetail
+                            {...this.props}
+                            riskMess={this.state.riskMess}
+                        />
+                        <Row style={{ marginTop: 10 }}>
+                            <Button
+                                onClick={this._handleCancelVisible.bind(
+                                    this
+                                )}
+                                style={{ float: 'right' }}
+                                type='primary'
+                            >
+                                关闭
+                            </Button>
+                        </Row>
+                    </div>
+                </Modal>
             </div>
         );
     }
@@ -500,5 +572,11 @@ export default class RiskTree extends Component {
         } catch (e) {
             console.log('e', e);
         }
+    }
+    // 退出隐患详情查看
+    _handleCancelVisible () {
+        this.setState({
+            isShowRisk: false
+        });
     }
 }

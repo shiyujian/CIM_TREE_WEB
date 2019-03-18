@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
-import { Tree, Spin } from 'antd';
-import { FOREST_GIS_TREETYPE_API, FOREST_GIS_API } from '_platform/api';
+import React, {
+    Component
+} from 'react';
+import {
+    FOREST_GIS_API
+} from '_platform/api';
 import TreeMessModal from './TreeMessModal';
 import {
     getSeedlingMess,
@@ -12,8 +15,9 @@ import {
     handleGetAddressByCoordinate,
     getIconType
 } from '../../auth';
-import {getCompanyDataByOrgCode} from '_platform/auth';
-const TreeNode = Tree.TreeNode;
+import {
+    getCompanyDataByOrgCode
+} from '_platform/auth';
 
 export default class TreeMessGisOnClickHandle extends Component {
     static propTypes = {};
@@ -29,7 +33,6 @@ export default class TreeMessGisOnClickHandle extends Component {
             treeMarkerLayer: ''
         };
     }
-
 
     componentDidMount = async () => {
         const {
@@ -53,8 +56,8 @@ export default class TreeMessGisOnClickHandle extends Component {
         }
     }
 
-     // 查看苗木信息点击事件
-     handleTreeMessGisClickFunction = (e) => {
+    // 查看苗木信息点击事件
+    handleTreeMessGisClickFunction = (e) => {
         try {
             const {
                 dashboardTreeMess
@@ -67,24 +70,20 @@ export default class TreeMessGisOnClickHandle extends Component {
             console.log('initMap', e);
         }
     }
-   
+
     render () {
         const {
             treeMessModalVisible
         } = this.state;
-        return (
-            <div>
-                { // 点击某个树节点展示该节点信息
-                    treeMessModalVisible
-                        ? (
-                            <TreeMessModal
-                                {...this.props}
-                                {...this.state}
-                                onCancel={this.handleCancelTreeMessModal.bind(this)}
-                            />
-                        ) : ''
-                }
-            </div>
+        return (<div > { // 点击某个树节点展示该节点信息
+            treeMessModalVisible
+                ? (<TreeMessModal
+                    {...this.props}
+                    {...this.state}
+                    onCancel={this.handleCancelTreeMessModal.bind(this)}
+                />
+                ) : ''
+        } </div>
         );
     }
     // 苗木信息Modal关闭
@@ -169,8 +168,6 @@ export default class TreeMessGisOnClickHandle extends Component {
                 if (treeMarkerLayer) {
                     map.removeLayer(treeMarkerLayer);
                 }
-                console.log('xxxxxxxx', x, y)
-                console.log('datadatadata', data)
                 await this.getTreeMessData(data, x, y);
                 await this.handleOkTreeMessModal(data, x, y);
             }
@@ -196,13 +193,13 @@ export default class TreeMessGisOnClickHandle extends Component {
                 let iconType = L.divIcon({
                     className: getIconType('tree')
                 });
-                let treeMarkerLayer = L.marker([y, x], {
+                let treeMarkerLayerNew = L.marker([y, x], {
                     icon: iconType,
                     title: postdata.sxm
                 });
-                treeMarkerLayer.addTo(map);
+                treeMarkerLayerNew.addTo(map);
                 this.setState({
-                    treeMarkerLayer,
+                    treeMarkerLayer: treeMarkerLayerNew,
                     treeMessModalLoading: false
                 });
             }
@@ -273,13 +270,13 @@ export default class TreeMessGisOnClickHandle extends Component {
             if (queryTreeData && queryTreeData.Section && queryTreeData.SmallClass && queryTreeData.ThinClass) {
                 let sections = queryTreeData.Section.split('-');
                 let No =
-                            sections[0] +
-                            '-' +
-                            sections[1] +
-                            '-' +
-                            queryTreeData.SmallClass +
-                            '-' +
-                            queryTreeData.ThinClass;
+                    sections[0] +
+                    '-' +
+                    sections[1] +
+                    '-' +
+                    queryTreeData.SmallClass +
+                    '-' +
+                    queryTreeData.ThinClass;
                 let regionData = getThinClassName(No, queryTreeData.Section, totalThinClass, bigTreeList);
                 SmallClassName = regionData.SmallName;
                 ThinClassName = regionData.ThinName;
@@ -291,19 +288,19 @@ export default class TreeMessGisOnClickHandle extends Component {
             let curingTaskArr = [];
             if (
                 treeflowDatas && treeflowDatas.content && treeflowDatas.content instanceof Array &&
-                        treeflowDatas.content.length > 0
+                treeflowDatas.content.length > 0
             ) {
                 treeflowData = treeflowDatas.content;
             }
             if (
                 nurserysDatas && nurserysDatas.content && nurserysDatas.content instanceof Array &&
-                        nurserysDatas.content.length > 0
+                nurserysDatas.content.length > 0
             ) {
                 nurserysData = nurserysDatas.content[0];
             }
             if (
                 curingTreeData && curingTreeData.content && curingTreeData.content instanceof Array &&
-                        curingTreeData.content.length > 0
+                curingTreeData.content.length > 0
             ) {
                 let content = curingTreeData.content;
                 content.map((task) => {
@@ -331,9 +328,13 @@ export default class TreeMessGisOnClickHandle extends Component {
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
             for (let i = 0; i < treeflowData.length; i++) {
-                let userForestData = await getForestUserDetail({id: treeflowData[i].FromUser});
+                let userForestData = await getForestUserDetail({
+                    id: treeflowData[i].FromUser
+                });
                 if (userForestData && userForestData.PK) {
-                    let userEcidiData = await getUserDetail({pk: userForestData.PK});
+                    let userEcidiData = await getUserDetail({
+                        pk: userForestData.PK
+                    });
                     let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
                     let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
                     let companyName = parent.name;
