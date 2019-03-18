@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
-import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
+import { Tree, Button, DatePicker, Spin, Checkbox, Modal, Row } from 'antd';
 import './RiskTree.less';
 import moment from 'moment';
-import { handleRiskData, fillAreaColor, getIconType, genPopUpContent } from '../../auth';
+import RiskDetail from './RiskDetail';
+import { handleRiskData, getIconType, genPopUpContent } from '../../auth';
 // 安全隐患类型图片
 import riskDangerImg from '../../RiskImg/danger.png';
 import riskQualityImg from '../../RiskImg/quality.png';
 import riskOtherImg from '../../RiskImg/other.png';
+
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
 export default class RiskTree extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             stime: moment().format('YYYY-MM-DD 00:00:00'),
@@ -25,7 +27,11 @@ export default class RiskTree extends Component {
             // 安全隐患类型的点击状态，展示是否选中的图片
             riskTypeQuality: true,
             riskTypeDanger: true,
-            riskTypeOther: true
+            riskTypeOther: true,
+            // 隐患详情弹窗
+            riskMess: {}, // 隐患详情
+            isShowRisk: false // 是否显示隐患详情弹窗
+
         };
     }
 
@@ -47,7 +53,7 @@ export default class RiskTree extends Component {
             img: riskOtherImg
         }
     ]
-    genIconClass() {
+    genIconClass () {
         let icClass = '';
         let featureName = this.props.featureName;
         switch (featureName) {
@@ -64,7 +70,7 @@ export default class RiskTree extends Component {
         return icClass;
     }
 
-    loop(p) {
+    loop (p) {
         let me = this;
         if (p) {
             return (
@@ -85,12 +91,51 @@ export default class RiskTree extends Component {
         const {
             riskTreeDay
         } = this.props;
-        if (riskTreeDay && riskTreeDay instanceof Array && riskTreeDay.length >= 0) {
-            await this.handleRiskSearchData(riskTreeDay);
+        try {
+            if (riskTreeDay && riskTreeDay instanceof Array && riskTreeDay.length >= 0) {
+                await this.handleRiskSearchData(riskTreeDay);
+            }
+            // 隐患详情点击事件
+            document.querySelector('.leaflet-popup-pane').addEventListener('click', this.handleRiskModalOk);
+        } catch (e) {
+            console.log('componentDidMount', e);
         }
     }
     componentWillUnmount = async () => {
-        await this.handleRemoveAllRiskLayer();
+        try {
+            await this.handleRemoveAllRiskLayer();
+            document.querySelector('.leaflet-popup-pane').removeEventListener('click', this.handleRiskModalOk);
+        } catch (e) {
+            console.log('componentWillUnmount', e);
+        }
+    }
+    handleRiskModalOk = async (e) => {
+        let target = e.target;
+        // 绑定隐患详情点击事件
+        if (target.getAttribute('class') === 'btnViewRisk') {
+            let idRisk = target.getAttribute('data-id');
+            let risk = null;
+            let riskTreeList = [];
+            if (this.state.riskSearchData && this.state.riskSearchData.length > 0) {
+                riskTreeList = this.state.riskSearchData;
+            }
+            riskTreeList.forEach(v => {
+                if (!risk) {
+                    risk = v.children.find(v1 => v1.key === idRisk);
+                }
+            });
+            if (risk) {
+                // 获取隐患处理措施
+                const { getRiskContactSheet } = this.props.actions;
+                let contact = await getRiskContactSheet({ ID: idRisk });
+                if (contact && contact.ID) {
+                    this.setState({
+                        riskMess: contact,
+                        isShowRisk: true
+                    });
+                }
+            }
+        }
     }
     // 搜索之后的安全隐患数据
     handleRiskSearchData = (searchData) => {
@@ -148,7 +193,7 @@ export default class RiskTree extends Component {
             console.log('handleRiskTypeAddLayer', e);
         }
     }
-    render() {
+    render () {
         let {
             riskTree = [],
             riskTreeLoading,
@@ -178,15 +223,16 @@ export default class RiskTree extends Component {
                 }
             }
         };
+
         return (
             <div>
                 {
-                    menuTreeVisible ?
-                        (
+                    menuTreeVisible
+                        ? (
                             <div>
-                                <div className='dashboard-menuPanel'>
-                                    <aside className='dashboard-aside' draggable='false'>
-                                        <div className='dashboard-asideTree'>
+                                <div className='RiskTree-menuPanel'>
+                                    <aside className='RiskTree-aside' draggable='false'>
+                                        <div className='RiskTree-asideTree'>
                                             <Spin spinning={riskTreeLoading}>
                                                 <div className='RiskTree-button'>
                                                     <Checkbox className='RiskTree-button-layout'
@@ -260,16 +306,16 @@ export default class RiskTree extends Component {
                                     </aside>
                                 </div>
                                 <div>
-                                    <div className='dashboard-menuSwitchRiskTypeLayout'>
+                                    <div className='RiskTree-menuSwitchRiskTypeLayout'>
                                         {
                                             this.riskTypeOptions.map((option) => {
                                                 return (
                                                     <div style={{ display: 'inlineBlock', marginTop: 10, height: 20 }} key={option.id}>
-                                                        <p className='dashboard-menuLabel'>{option.label}</p>
+                                                        <p className='RiskTree-menuLabel'>{option.label}</p>
                                                         <img src={option.img}
                                                             title={option.label}
-                                                            className='dashboard-rightMenuRiskTypeImgLayout' />
-                                                        <a className={this.state[option.id] ? 'dashboard-rightMenuRiskTypeSelLayout' : 'dashboard-rightMenuRiskTypeUnSelLayout'}
+                                                            className='RiskTree-rightMenuRiskTypeImgLayout' />
+                                                        <a className={this.state[option.id] ? 'RiskTree-rightMenuRiskTypeSelLayout' : 'RiskTree-rightMenuRiskTypeUnSelLayout'}
                                                             title={option.label}
                                                             key={option.id}
                                                             onClick={this.handleRiskTypeButton.bind(this, option)} />
@@ -282,7 +328,31 @@ export default class RiskTree extends Component {
                             </div>
                         ) : ''
                 }
-
+                <Modal
+                    title='隐患详情'
+                    width={800}
+                    visible={this.state.isShowRisk}
+                    onCancel={this._handleCancelVisible.bind(this)}
+                    footer={null}
+                >
+                    <div>
+                        <RiskDetail
+                            {...this.props}
+                            riskMess={this.state.riskMess}
+                        />
+                        <Row style={{ marginTop: 10 }}>
+                            <Button
+                                onClick={this._handleCancelVisible.bind(
+                                    this
+                                )}
+                                style={{ float: 'right' }}
+                                type='primary'
+                            >
+                                关闭
+                            </Button>
+                        </Row>
+                    </div>
+                </Modal>
             </div>
         );
     }
@@ -448,7 +518,7 @@ export default class RiskTree extends Component {
     }
 
     // 安全隐患选择类型
-    handleRiskTypeButton(option) {
+    handleRiskTypeButton (option) {
         try {
             this.setState({
                 [option.id]: !this.state[option.id]
@@ -472,7 +542,7 @@ export default class RiskTree extends Component {
         }
     }
     /* 在地图上添加marker和polygan */
-    _createMarker(geo) {
+    _createMarker (geo) {
         const {
             map
         } = this.props;
@@ -498,7 +568,13 @@ export default class RiskTree extends Component {
             marker.addTo(map);
             return marker;
         } catch (e) {
-            console.log('e', e);
+            console.log('_createMarker', e);
         }
+    }
+    // 退出隐患详情查看
+    _handleCancelVisible () {
+        this.setState({
+            isShowRisk: false
+        });
     }
 }

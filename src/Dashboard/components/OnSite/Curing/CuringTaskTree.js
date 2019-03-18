@@ -21,7 +21,7 @@ const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
 
 export default class CuringTaskTree extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             stime: moment().format('YYYY-MM-DD 00:00:00'),
@@ -66,7 +66,7 @@ export default class CuringTaskTree extends Component {
         },
         {
             id: 'curingTaskWorm',
-            label: '病虫害防治',
+            label: '防病虫',
             img: curingTaskWormImg
         },
         {
@@ -90,7 +90,7 @@ export default class CuringTaskTree extends Component {
             img: curingTaskOtherImg
         }
     ]
-    loop(p, loopTime) {
+    loop (p, loopTime) {
         const that = this;
         if (loopTime) {
             loopTime = loopTime + 1;
@@ -138,7 +138,7 @@ export default class CuringTaskTree extends Component {
         await this.handleRemoveAllCuringTaskLayer();
     }
 
-    render() {
+    render () {
         let {
             curingTaskTree = [],
             curingTaskTreeLoading,
@@ -171,12 +171,12 @@ export default class CuringTaskTree extends Component {
         return (
             <div>
                 {
-                    menuTreeVisible ?
-                        (
+                    menuTreeVisible
+                        ? (
                             <div>
-                                <div className='dashboard-menuPanel'>
-                                    <aside className='dashboard-aside' draggable='false'>
-                                        <div className='dashboard-asideTree'>
+                                <div className='CuringTaskTree-menuPanel'>
+                                    <aside className='CuringTaskTree-aside' draggable='false'>
+                                        <div className='CuringTaskTree-asideTree'>
                                             <Spin spinning={curingTaskTreeLoading}>
                                                 <div className='CuringTaskTree-button'>
                                                     <Checkbox className='CuringTaskTree-button-layout'
@@ -250,7 +250,7 @@ export default class CuringTaskTree extends Component {
                                     </aside>
                                 </div>
                                 <div>
-                                    <div className='dashboard-menuSwitchCuringTaskTypeLayout'>
+                                    <div className='CuringTaskTree-menuSwitchCuringTaskTypeLayout'>
                                         {
                                             <div>
                                                 <div style={{ display: 'inlineBlock', marginTop: 8 }} />
@@ -258,11 +258,11 @@ export default class CuringTaskTree extends Component {
                                                     this.curingTaskTypeOptions.map((option) => {
                                                         return (
                                                             <div style={{ display: 'inlineBlock', height: 20 }} key={option.id}>
-                                                                <p className='dashboard-menuLabel1'>{option.label}</p>
+                                                                <p className='CuringTaskTree-menuLabel1'>{option.label}</p>
                                                                 <img src={option.img}
                                                                     title={option.label}
-                                                                    className='dashboard-rightMenuCuringTaskTypeImgLayout' />
-                                                                <a className={this.state[option.id] ? 'dashboard-rightMenuCuringTaskTypeSelLayout' : 'dashboard-rightMenuCuringTaskTypeUnSelLayout'}
+                                                                    className='CuringTaskTree-rightMenuCuringTaskTypeImgLayout' />
+                                                                <a className={this.state[option.id] ? 'CuringTaskTree-rightMenuCuringTaskTypeSelLayout' : 'CuringTaskTree-rightMenuCuringTaskTypeUnSelLayout'}
                                                                     title={option.label}
                                                                     key={option.id}
                                                                     onClick={this.handleCuringTaskTypeButton.bind(this, option)} />
@@ -457,7 +457,7 @@ export default class CuringTaskTree extends Component {
     }
 
     // 养护任务选择类型
-    handleCuringTaskTypeButton(option) {
+    handleCuringTaskTypeButton (option) {
         try {
             this.setState({
                 [option.id]: !this.state[option.id]
@@ -607,7 +607,7 @@ export default class CuringTaskTree extends Component {
         }
     }
     // 养护任务计划区域加载图层
-    _handleCuringPlanCoordLayer(str, taskMess, eventKey, index, isFocus) {
+    _handleCuringPlanCoordLayer (str, taskMess, eventKey, index, isFocus) {
         const {
             curingTaskPlanLayerList,
             curingTaskMarkerLayerList
@@ -673,7 +673,7 @@ export default class CuringTaskTree extends Component {
         }
     }
     // 添加实际养护区域图层
-    _handleCuringRealCoordLayer(str, task, eventKey, index, isFocus) {
+    _handleCuringRealCoordLayer (str, task, eventKey, index, isFocus) {
         const {
             curingTaskRealLayerList,
             curingTaskMarkerLayerList
@@ -765,7 +765,7 @@ export default class CuringTaskTree extends Component {
         }
     }
     /* 在地图上添加marker和polygan */
-    _createMarker(geo) {
+    _createMarker (geo) {
         const {
             map
         } = this.props;

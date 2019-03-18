@@ -196,7 +196,7 @@ class TreeMessModal extends Component {
                                             ? seedlingMess.GDFJ.map(
                                                 src => {
                                                     return (
-                                                        <div>
+                                                        <div key={src}>
                                                             <img
                                                                 style={{
                                                                     width: '150px',
@@ -234,7 +234,7 @@ class TreeMessModal extends Component {
                                             ? seedlingMess.GFFJ.map(
                                                 src => {
                                                     return (
-                                                        <div>
+                                                        <div key={src}>
                                                             <img
                                                                 style={{
                                                                     width: '150px',
@@ -271,7 +271,7 @@ class TreeMessModal extends Component {
                                             ? seedlingMess.XJFJ.map(
                                                 src => {
                                                     return (
-                                                        <div>
+                                                        <div key={src}>
                                                             <img
                                                                 style={{
                                                                     width: '150px',
@@ -309,7 +309,7 @@ class TreeMessModal extends Component {
                                             ? seedlingMess.DJFJ.map(
                                                 src => {
                                                     return (
-                                                        <div>
+                                                        <div key={src}>
                                                             <img
                                                                 style={{
                                                                     width: '150px',
@@ -347,7 +347,7 @@ class TreeMessModal extends Component {
                                             ? seedlingMess.TQHDFJ.map(
                                                 src => {
                                                     return (
-                                                        <div>
+                                                        <div key={src}>
                                                             <img
                                                                 style={{
                                                                     width: '150px',
@@ -385,7 +385,7 @@ class TreeMessModal extends Component {
                                             ? seedlingMess.TQZJFJ.map(
                                                 src => {
                                                     return (
-                                                        <div>
+                                                        <div key={src}>
                                                             <img
                                                                 style={{
                                                                     width: '150px',
@@ -512,7 +512,7 @@ class TreeMessModal extends Component {
                                         {treeMess.GDFJ
                                             ? treeMess.GDFJ.map(src => {
                                                 return (
-                                                    <div>
+                                                    <div key={src}>
                                                         <img
                                                             style={{
                                                                 width: '150px',
@@ -546,7 +546,7 @@ class TreeMessModal extends Component {
                                         {treeMess.GFFJ
                                             ? treeMess.GFFJ.map(src => {
                                                 return (
-                                                    <div>
+                                                    <div key={src}>
                                                         <img
                                                             style={{
                                                                 width: '150px',
@@ -580,7 +580,7 @@ class TreeMessModal extends Component {
                                         {treeMess.XJFJ
                                             ? treeMess.XJFJ.map(src => {
                                                 return (
-                                                    <div>
+                                                    <div key={src}>
                                                         <img
                                                             style={{
                                                                 width: '150px',
@@ -614,7 +614,7 @@ class TreeMessModal extends Component {
                                         {treeMess.DJFJ
                                             ? treeMess.DJFJ.map(src => {
                                                 return (
-                                                    <div>
+                                                    <div key={src}>
                                                         <img
                                                             style={{
                                                                 width: '150px',
@@ -648,7 +648,7 @@ class TreeMessModal extends Component {
                                         {treeMess.MDFJ
                                             ? treeMess.MDFJ.map(src => {
                                                 return (
-                                                    <div>
+                                                    <div key={src}>
                                                         <img
                                                             style={{
                                                                 width: '150px',
@@ -682,7 +682,7 @@ class TreeMessModal extends Component {
                                         {treeMess.MJFJ
                                             ? treeMess.MJFJ.map(src => {
                                                 return (
-                                                    <div>
+                                                    <div key={src}>
                                                         <img
                                                             style={{
                                                                 width: '150px',
@@ -717,7 +717,7 @@ class TreeMessModal extends Component {
                                             ? treeMess.TQHDFJ.map(
                                                 src => {
                                                     return (
-                                                        <div>
+                                                        <div key={src}>
                                                             <img
                                                                 style={{
                                                                     width: '150px',
@@ -755,7 +755,7 @@ class TreeMessModal extends Component {
                                             ? treeMess.TQZJFJ.map(
                                                 src => {
                                                     return (
-                                                        <div>
+                                                        <div key={src}>
                                                             <img
                                                                 style={{
                                                                     width: '150px',
@@ -820,7 +820,7 @@ class TreeMessModal extends Component {
                                                 }
                                             }
                                             return (
-                                                <div>
+                                                <div key={flow.ID}>
                                                     <Row
                                                         style={{
                                                             marginTop: '10px'
@@ -939,7 +939,7 @@ class TreeMessModal extends Component {
                                     curingMess.length > 0
                                         ? curingMess.map((curing) => {
                                             return (
-                                                <div>
+                                                <div key={curing.ID}>
                                                     <Input
                                                         readOnly
                                                         style={{
@@ -972,7 +972,7 @@ class TreeMessModal extends Component {
                                                         ? curing.Pics.map(
                                                             src => {
                                                                 return (
-                                                                    <div>
+                                                                    <div key={src}>
                                                                         <img
                                                                             style={{
                                                                                 width: '150px',
@@ -991,6 +991,7 @@ class TreeMessModal extends Component {
                                                             }
                                                         )
                                                         : ''}
+                                                        <div style={{marginTop: '10px', borderBottom:'1px dashed #8c8383'}}></div>
                                                 </div>
                                             );
                                         }) : ''

@@ -41,11 +41,11 @@ export default class UserAnalysi extends Component {
                     <DynamicTitle title='用户分析' {...this.props} />
                     <Content>
                         <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='标段分览' key='2'>
-                                <SectionAlone {...this.props} {...this.state} />
-                            </TabPane>
                             <TabPane tab='账号总览' key='1'>
                                 <AccountPandect {...this.props} {...this.state} />
+                            </TabPane>
+                            <TabPane tab='标段分览' key='2'>
+                                <SectionAlone {...this.props} {...this.state} />
                             </TabPane>
                         </Tabs>
                     </Content>

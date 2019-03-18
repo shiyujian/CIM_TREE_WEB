@@ -322,7 +322,7 @@ export default class TrackTree extends Component {
                 searchDateData
             });
         } catch (e) {
-            console.log('queryRisk', e);
+            console.log('query', e);
         }
     }
 
@@ -330,7 +330,6 @@ export default class TrackTree extends Component {
     handleTrackLocation = async (ckeckedData) => {
         try {
             this.handleRemoveAllTrackLayer();
-            console.log('ckeckedData', ckeckedData);
             ckeckedData.forEach((child, index) => {
                 if (index === ckeckedData.length - 1) {
                     this.handleTrackAddLayer(child, true);
@@ -451,7 +450,7 @@ export default class TrackTree extends Component {
             marker.addTo(map);
             return marker;
         } catch (e) {
-            console.log('e', e);
+            console.log('_createMarker', e);
         }
     }
 

@@ -100,7 +100,7 @@ export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const FOREST_GIS_TREETYPE_API = `${window.config.DASHBOARD_TREETYPE}`;
 export const INITLEAFLET_API = window.config.initLeaflet;
-export const TREEPIPE_API = `${window.config.SDOMAIN}:9001`;
+export const TREEPIPE_API = `${window.config.SDOMAIN}:809`;
 
 // 考勤打卡
 export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;

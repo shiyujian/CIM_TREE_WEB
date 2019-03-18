@@ -24,7 +24,7 @@ export default class RiskDetail extends Component {
                 });
             }
         } catch (e) {
-            // console.log('处理图片', e);
+            console.log('处理图片', e);
         }
         return srcs;
     }
@@ -161,7 +161,7 @@ export default class RiskDetail extends Component {
                     {(beforeImgs && beforeImgs.length > 0)
                         ? beforeImgs.map(src => {
                             return (
-                                <div>
+                                <div key={src}>
                                     <h3 style={{
                                         marginTop: '15px'
                                     }}>整改前照片：</h3>
@@ -185,7 +185,7 @@ export default class RiskDetail extends Component {
                     {(afterImgs && afterImgs.length > 0)
                         ? afterImgs.map(src => {
                             return (
-                                <div>
+                                <div key={src}>
                                     <h3 style={{
                                         marginTop: '15px'
                                     }}>整改后照片：</h3>

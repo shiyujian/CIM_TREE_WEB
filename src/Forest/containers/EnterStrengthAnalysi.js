@@ -36,7 +36,9 @@ export default class EnterStrengthAnalysi extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            leftkeycode: ''
+            treeList: [], // 树列表数据
+            sectionList: [], // 标段列表
+            leftkeycode: '' // 项目code
         };
     }
 
@@ -46,7 +48,7 @@ export default class EnterStrengthAnalysi extends Component {
                 getTreeNodeList,
                 getTotalThinClass,
                 getThinClassTree,
-                getThinClassList,
+                getThinClassList
             },
             platform: { tree = {} }
         } = this.props;
@@ -64,64 +66,16 @@ export default class EnterStrengthAnalysi extends Component {
             this.onSelect([defaultProject]);
         }
     }
-
-      // 树选择, 重新获取: 标段、小班、细班、树种并置空
-      onSelect (keys = [], info) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let treeList = tree.thinClassTree;
-
-        let user = getUser();
-        let keycode = keys[0] || '';
-        const {
-            actions: { setkeycode }
-        } = this.props;
-        setkeycode(keycode);
-        this.setState({
-            leftkeycode: keycode,
-            resetkey: ++this.state.resetkey
-        });
-
-        let sectionsData = [];
-        if (keycode) {
-            treeList.map((treeData) => {
-                if (keycode === treeData.No) {
-                    sectionsData = treeData.children;
-                }
-            });
-        }
-        this.setState({
-            sectionsData
-        });
-        this.typeselect('')
-
-        // 标段
-        let sections = JSON.parse(user.sections);
-        let permission = getUserIsManager();
-        if (permission) {
-            // 是admin或者业主
-            this.setSectionOption(sectionsData);
-        } else {
-            sectionsData.map((sectionData) => {
-                if (sections[0] === sectionData.No) {
-                    this.setSectionOption(sectionData);
-                }
+    componentWillReceiveProps (nextProps) {
+        const { tree } = nextProps.platform;
+        if (tree) {
+            this.setState({
+                treeList: tree.bigTreeList
             });
         }
     }
-
     render () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let treeList = [];
-        if (tree.thinClassTree) {
-            treeList = tree.thinClassTree;
-        }
-        const {
-            leftkeycode
-        } = this.state;
+        const { leftkeycode, treeList } = this.state;
         return (
             <Body>
                 <Main>
@@ -135,16 +89,31 @@ export default class EnterStrengthAnalysi extends Component {
                     </Sidebar>
                     <Content>
                         <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='苗木分析' key='2'>
-                                <NurseryAnalysi {...this.props} {...this.state} />
-                            </TabPane>
                             <TabPane tab='车辆包分析' key='1'>
                                 <VehicleAnalysi {...this.props} {...this.state} />
+                            </TabPane>
+                            <TabPane tab='苗木分析' key='2'>
+                                <NurseryAnalysi {...this.props} {...this.state} />
                             </TabPane>
                         </Tabs>
                     </Content>
                 </Main>
             </Body>
         );
+    }
+    // 树选择, 重新获取: 标段、小班、细班、树种并置空
+    onSelect (keys) {
+        const { treeList } = this.state;
+        let leftkeycode = keys[0] || '';
+        let sectionList = [];
+        treeList.map(item => {
+            if (item.No === leftkeycode) {
+                sectionList = item.children;
+            }
+        });
+        this.setState({
+            leftkeycode,
+            sectionList
+        });
     }
 }

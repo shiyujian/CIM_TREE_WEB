@@ -12,8 +12,21 @@ export default class SectionAlone extends Component {
         super(props);
         this.state = {
             treeList: [], // 树列表数据
-            leftkeycode: '' // 选择标段code
+            sectionObjList: [], // 标段对象列表
+            jobSumDate: '', // 施工账号注册总数日期
+            jobNumDate: '', // 施工日活跃账号数日期
+            superviseSumDate: '', // 监理账号注册总数日期
+            superviseNumDate: '', // 监理日活跃账号数日期
+            leftkeycode: '' // 选择项目code
         };
+        this.handleDate = this.handleDate.bind(this); // 切换截至日期1
+        this.handleDateTwo = this.handleDateTwo.bind(this); // 切换截至日期2
+        this.handleDateThree = this.handleDateThree.bind(this); // 切换截至日期3
+        this.handleDateFour = this.handleDateFour.bind(this); // 切换截至日期4
+        this.renderJobRegisterSum = this.renderJobRegisterSum.bind(this); // 渲染施工账号注册总数图表
+        this.renderJobDynamicNum = this.renderJobDynamicNum.bind(this); // 渲染日活跃账号数图表
+        this.renderSuperviseRegisterSum = this.renderSuperviseRegisterSum.bind(this); // 渲染监理账号注册总数图表
+        this.renderSuperviseDynamicNum = this.renderSuperviseDynamicNum.bind(this); // 渲染监理日活跃账号数图表
     }
 
     componentDidMount = async () => {
@@ -33,23 +46,30 @@ export default class SectionAlone extends Component {
                 await getThinClassTree(projectList);
             }
             let defaultProject = await getDefaultProject();
+            console.log('defaultProject', defaultProject);
             if (defaultProject) {
                 this.onSelect([defaultProject]);
             }
+            this.renderJobRegisterSum();
+            this.renderJobDynamicNum();
+            this.renderSuperviseRegisterSum();
+            this.renderSuperviseDynamicNum();
         } catch (e) {
             console.log('e', e);
         }
     }
+    componentWillReceiveProps (nextProps) {
+        const { tree } = nextProps.platform;
+        if (tree) {
+            console.log('componentWillReceiveProps', nextProps.platform.tree);
+            this.setState({
+                treeList: tree.bigTreeList
+            });
+        }
+    }
 
     render () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        const { leftkeycode } = this.state;
-        let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
-        }
+        const { leftkeycode, treeList } = this.state;
         return (
             <div>
                 <Sidebar width={190}>
@@ -64,28 +84,46 @@ export default class SectionAlone extends Component {
                 <div style={{marginLeft: '200px'}}>
                     <div>
                         <h2>施工单位</h2>
-                        <div style={{ background: '#ECECEC', padding: '30px', height: 400 }}>
+                        <div style={{ background: '#ECECEC', padding: '30px', height: 550 }}>
                             <Row gutter={16}>
                                 <Col span={12}>
-                                    <Card title='账号注册总数' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment()} /></span>}>
-                                        hh
+                                    <Card title='账号注册总数' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment()} onChange={this.handleDate.bind(this)} /></span>}>
+                                        <div
+                                            id='jobRegisterSum'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
                                     </Card>
                                 </Col>
                                 <Col span={12}>
-                                    <Card title='日活跃账号数' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment()} /></span>}>Card content</Card>
+                                    <Card title='日活跃账号数' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment()} onChange={this.handleDateTwo.bind(this)} /></span>}>
+                                        <div
+                                            id='jobDynamicNum'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Card>
                                 </Col>
                             </Row>
                         </div>
                     </div>
                     <div>
                         <h2>监理单位</h2>
-                        <div style={{ background: '#ECECEC', padding: '30px' }}>
+                        <div style={{ background: '#ECECEC', padding: '30px', height: 550 }}>
                             <Row gutter={16}>
                                 <Col span={12}>
-                                    <Card title='账号注册总数' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment()} /></span>}>Card content</Card>
+                                    <Card title='账号注册总数' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment()} onChange={this.handleDateThree.bind(this)} /></span>}>
+                                        <div
+                                            id='superviseRegisterSum'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Card>
                                 </Col>
                                 <Col span={12}>
-                                    <Card title='日活跃账号数' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment()} /></span>}>Card content</Card>
+                                    <Card title='日活跃账号数' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment()} onChange={this.handleDateFour.bind(this)} /></span>}>
+                                        <div
+                                            id='superviseDynamicNum'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Card>
                                 </Col>
                             </Row>
                         </div>
@@ -95,10 +133,19 @@ export default class SectionAlone extends Component {
         );
     }
     onSelect (keys) {
-        let keycode = keys[0] || '';
-        console.log(keycode, '123');
+        const { treeList } = this.state;
+        console.log('selct', treeList);
+        let leftkeycode = keys[0] || '';
+        let sectionObjList = [];
+        treeList.map(item => {
+            if (item.No === leftkeycode) {
+                sectionObjList = item.children;
+            }
+        });
+        console.log(leftkeycode, '123');
         this.setState({
-            leftkeycode: keycode
+            leftkeycode,
+            sectionObjList
         });
     }
     // 切换标签页
@@ -106,5 +153,107 @@ export default class SectionAlone extends Component {
         this.setState({
             tabKey: key
         });
+    }
+    handleDate (date, dateString) {
+        this.setState({
+            jobSumDate: dateString
+        }, () => {
+            this.renderJobRegisterSum();
+        });
+    }
+    renderJobRegisterSum () {
+        const { sectionObjList, leftkeycode } = this.state;
+        console.log('treeList', sectionObjList, leftkeycode);
+        let xAxisArr = [];
+        sectionObjList.map(item => {
+            xAxisArr.push(item.Name);
+        });
+        let myChart = echarts.init(document.getElementById('jobRegisterSum'));
+        let option = {
+            xAxis: {
+                type: 'category',
+                data: xAxisArr
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [120, 200, 150, 80, 70, 110, 130],
+                type: 'bar'
+            }]
+        };
+        myChart.setOption(option);
+    }
+    handleDateTwo (date, dateString) {
+        this.setState({
+            jobNumDate: dateString
+        }, () => {
+            this.renderJobDynamicNum();
+        });
+    }
+    renderJobDynamicNum () {
+        let myChart = echarts.init(document.getElementById('jobDynamicNum'));
+        let option = {
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [120, 200, 150, 80, 70, 110, 130],
+                type: 'bar'
+            }]
+        };
+        myChart.setOption(option);
+    }
+    handleDateThree (date, dateString) {
+        this.setState({
+            superviseSumDate: dateString
+        }, () => {
+            this.renderSuperviseRegisterSum();
+        });
+    }
+    renderSuperviseRegisterSum () {
+        let myChart = echarts.init(document.getElementById('superviseRegisterSum'));
+        let option = {
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [120, 200, 150, 80, 70, 110, 130],
+                type: 'bar'
+            }]
+        };
+        myChart.setOption(option);
+    }
+    handleDateFour (date, dateString) {
+        this.setState({
+            superviseNumDate: dateString
+        }, () => {
+            this.renderSuperviseDynamicNum();
+        });
+    }
+    renderSuperviseDynamicNum () {
+        let myChart = echarts.init(document.getElementById('superviseDynamicNum'));
+        let option = {
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [120, 200, 150, 80, 70, 110, 130],
+                type: 'bar'
+            }]
+        };
+        myChart.setOption(option);
     }
 }

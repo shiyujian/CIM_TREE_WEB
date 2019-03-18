@@ -18,7 +18,7 @@ const TreeNode = Tree.TreeNode;
 
 export default class SurvivalRateTree extends Component {
     static propTypes = {};
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             // 成活率范围的点击状态，展示是否选中的图片
@@ -77,8 +77,7 @@ export default class SurvivalRateTree extends Component {
         }
     ]
 
-    loop(data = [], loopTime) {
-        const that = this;
+    loop (data = [], loopTime) {
         if (loopTime) {
             loopTime = loopTime + 1;
         } else {
@@ -93,7 +92,7 @@ export default class SurvivalRateTree extends Component {
                 >
                     {data.children &&
                         data.children.map(m => {
-                            return that.loop(m, loopTime);
+                            return this.loop(m, loopTime);
                         })}
                 </TreeNode>
             );
@@ -105,12 +104,30 @@ export default class SurvivalRateTree extends Component {
             map
         } = this.props;
         if (map) {
+            await map.on('click', this.handleSurvivalRateMapClickFunction);
             await this.getTileTreeSurvivalRateBasic();
             await this.getSurvivalRateRateDataDefault();
         }
     }
     componentWillUnmount = async () => {
+        const {
+            map
+        } = this.props;
+        map.off('click', this.handleSurvivalRateMapClickFunction);
         await this.removeTileTreeSurvivalRateLayer();
+    }
+    // 成活率点击事件
+    handleSurvivalRateMapClickFunction = (e) => {
+        try {
+            const {
+                dashboardCompomentMenu
+            } = this.props;
+            if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' && e) {
+                this.getSxmByLocation(e.latlng.lng, e.latlng.lat);
+            }
+        } catch (e) {
+            console.log('initMap', e);
+        }
     }
     // 加载成活率全部瓦片图层
     getTileTreeSurvivalRateBasic = () => {
@@ -134,8 +151,25 @@ export default class SurvivalRateTree extends Component {
             ).addTo(map);
         }
     }
-
-    render() {
+    // 去除成活率全部瓦片图层和成活率筛选图层
+    removeTileTreeSurvivalRateLayer = () => {
+        const {
+            map
+        } = this.props;
+        const {
+            survivalRateMarkerLayerList
+        } = this.state;
+        if (this.tileSurvivalRateLayerFilter) {
+            map.removeLayer(this.tileSurvivalRateLayerFilter);
+        }
+        if (this.tileTreeSurvivalRateLayerBasic) {
+            map.removeLayer(this.tileTreeSurvivalRateLayerBasic);
+        }
+        for (let v in survivalRateMarkerLayerList) {
+            map.removeLayer(survivalRateMarkerLayerList[v]);
+        }
+    }
+    render () {
         const {
             survivalRateTree = [],
             survivalRateTreeLoading,
@@ -151,12 +185,12 @@ export default class SurvivalRateTree extends Component {
         return (
             <div>
                 {
-                    menuTreeVisible ?
-                        (
+                    menuTreeVisible
+                        ? (
                             <div>
-                                <div className='dashboard-menuPanel'>
-                                    <aside className='dashboard-aside' draggable='false'>
-                                        <div className='dashboard-asideTree'>
+                                <div className='SurvivalRateTree-menuPanel'>
+                                    <aside className='SurvivalRateTree-aside' draggable='false'>
+                                        <div className='SurvivalRateTree-asideTree'>
                                             <Spin spinning={survivalRateTreeLoading}>
                                                 <Tree
                                                     showLine
@@ -173,15 +207,15 @@ export default class SurvivalRateTree extends Component {
                                     </aside>
                                 </div>
                                 <div>
-                                    <div className='dashboard-menuSwitchSurvivalRateLayout'>
+                                    <div className='SurvivalRateTree-menuSwitchSurvivalRateLayout'>
                                         {
                                             this.survivalRateOptions.map((option) => {
                                                 return (
                                                     <div style={{ display: 'inlineBlock' }} key={option.id}>
                                                         <img src={option.img}
                                                             title={option.label}
-                                                            className='dashboard-rightMenuSurvivalRateImgLayout' />
-                                                        <a className={this.state[option.id] ? 'dashboard-rightMenuSurvivalRateSelLayout' : 'dashboard-rightMenuSurvivalRateUnSelLayout'}
+                                                            className='SurvivalRateTree-rightMenuSurvivalRateImgLayout' />
+                                                        <a className={this.state[option.id] ? 'SurvivalRateTree-rightMenuSurvivalRateSelLayout' : 'SurvivalRateTree-rightMenuSurvivalRateUnSelLayout'}
                                                             title={option.label}
                                                             key={option.id}
                                                             onClick={this.handleSurvivalRateButton.bind(this, option)} />
@@ -245,7 +279,7 @@ export default class SurvivalRateTree extends Component {
         }
     }
     // 成活率选择成活范围
-    handleSurvivalRateButton(option) {
+    handleSurvivalRateButton (option) {
         try {
             this.setState({
                 [option.id]: !this.state[option.id]
@@ -283,7 +317,6 @@ export default class SurvivalRateTree extends Component {
         });
         return survivalRateRateData;
     }
-
     // 成活率加载图层
     addSurvivalRateLayer = async () => {
         const {
@@ -297,17 +330,6 @@ export default class SurvivalRateTree extends Component {
         try {
             await this.removeTileTreeSurvivalRateLayer();
             let url = '';
-            // 之前任意一种状态存在 都可以进行搜索
-            // if (survivalRateRateData && survivalRateSectionData) {
-            //     url = FOREST_GIS_TREETYPE_API +
-            //     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
-            // } else if (survivalRateRateData && !survivalRateSectionData) {
-            //     url = FOREST_GIS_TREETYPE_API +
-            //     `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
-            // } else if (!survivalRateRateData && survivalRateSectionData) {
-            //      url = FOREST_GIS_TREETYPE_API +
-            //      `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})`;
-            // }
             // 初次进入成活率模块，没有对标段数据进行处理，选择了范围数据直接对图层进行更改
             if (switchSurvivalRateFirst) {
                 url = FOREST_GIS_TREETYPE_API +
@@ -327,24 +349,117 @@ export default class SurvivalRateTree extends Component {
                         transparent: true
                     }
                 ).addTo(map);
-            } else {
-                // await this.getTileTreeSurvivalRateBasic();
             }
         } catch (e) {
             console.log('addSurvivalRateLayer', e);
         }
     }
-
-    // 去除成活率全部瓦片图层和成活率筛选图层
-    removeTileTreeSurvivalRateLayer = () => {
+    // 根据点击的地图坐标与实际树的定位进行对比,根据树节点获取树节点信息
+    getSxmByLocation (x, y) {
         const {
             map
         } = this.props;
-        if (this.tileSurvivalRateLayerFilter) {
-            map.removeLayer(this.tileSurvivalRateLayerFilter);
-        }
-        if (this.tileTreeSurvivalRateLayerBasic) {
-            map.removeLayer(this.tileTreeSurvivalRateLayerBasic);
+        let resolutions = [
+            0.703125,
+            0.3515625,
+            0.17578125,
+            0.087890625,
+            0.0439453125,
+            0.02197265625,
+            0.010986328125,
+            0.0054931640625,
+            0.00274658203125,
+            0.001373291015625,
+            6.866455078125e-4,
+            3.4332275390625e-4,
+            1.71661376953125e-4,
+            8.58306884765625e-5,
+            4.291534423828125e-5,
+            2.1457672119140625e-5,
+            1.0728836059570312e-5,
+            5.364418029785156e-6,
+            2.682209014892578e-6,
+            1.341104507446289e-6,
+            6.705522537231445e-7,
+            3.3527612686157227e-7
+        ];
+        let zoom = map.getZoom();
+        let resolution = resolutions[zoom];
+        let col = (x + 180) / resolution;
+        // 林总说明I和J必须是整数
+        let colp = Math.floor(col % 256);
+        // let colp = col % 256;
+        col = Math.floor(col / 256);
+        let row = (90 - y) / resolution;
+        // 林总说明I和J必须是整数
+        let rowp = Math.floor(row % 256);
+        // let rowp = row % 256;
+        row = Math.floor(row / 256);
+        let url =
+            FOREST_GIS_API +
+            '/geoserver/gwc/service/wmts?VERSION=1.0.0&LAYER=xatree:thinclass&STYLE=&TILEMATRIX=EPSG:4326:' +
+            zoom +
+            '&TILEMATRIXSET=EPSG:4326&SERVICE=WMTS&FORMAT=image/png&SERVICE=WMTS&REQUEST=GetFeatureInfo&INFOFORMAT=application/json&TileCol=' +
+            col +
+            '&TileRow=' +
+            row +
+            '&I=' +
+            colp +
+            '&J=' +
+            rowp;
+        jQuery.getJSON(url, null, async (data) => {
+            if (data.features && data.features.length) {
+                this.getSurvivalRateInfo(data, x, y);
+            }
+        });
+    }
+    // 点击地图上的区域的成活率
+    getSurvivalRateInfo = async (data, x, y) => {
+        const {
+            platform: {
+                tree = {}
+            },
+            map
+        } = this.props;
+        const {
+            survivalRateMarkerLayerList
+        } = this.state;
+        let totalThinClass = tree.totalThinClass || [];
+        try {
+            let bigTreeList = (tree && tree.bigTreeList) || [];
+            if (data && data.features && data.features.length > 0 && data.features[0].properties) {
+                let properties = data.features[0].properties;
+                for (let i in survivalRateMarkerLayerList) {
+                    map.removeLayer(survivalRateMarkerLayerList[i]);
+                }
+                let areaData = getThinClassName(properties.no, properties.Section, totalThinClass, bigTreeList);
+                let iconData = {
+                    geometry: {
+                        coordinates: [y, x],
+                        type: 'Point'
+                    },
+                    key: properties.ID,
+                    properties: {
+                        sectionName: areaData.SectionName ? areaData.SectionName : '',
+                        smallClassName: areaData.SmallName ? areaData.SmallName : '',
+                        thinClassName: areaData.ThinName ? areaData.ThinName : '',
+                        treetype: properties.treetype,
+                        SurvivalRate: properties.SurvivalRate,
+                        type: 'survivalRate'
+                    },
+                    type: 'survivalRate'
+                };
+                let survivalRateLayer = L.popup()
+                    .setLatLng([y, x])
+                    .setContent(genPopUpContent(iconData))
+                    .addTo(map);
+                survivalRateMarkerLayerList[properties.ID] = survivalRateLayer;
+                this.setState({
+                    survivalRateMarkerLayerList
+                });
+            }
+        } catch (e) {
+            console.log('getSurvivalRateInfo', e);
         }
     }
 }

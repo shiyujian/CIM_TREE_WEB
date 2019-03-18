@@ -37,7 +37,6 @@ export default class OnSiteAreaTree extends Component {
             treeData = [],
             areaTreeLoading
         } = this.props;
-        console.log('areaTreeLoading', areaTreeLoading);
         return (
             <div>
                 <Spin spinning={areaTreeLoading}>
