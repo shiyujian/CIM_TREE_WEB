@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Card, Row, Col, DatePicker, Spin, Form, Button, Select } from 'antd';
+import XLSX from 'xlsx';
 import moment from 'moment';
 import echarts from 'echarts';
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
@@ -12,10 +13,19 @@ class PositionProgress extends Component {
             spinningTotal: false, // 加载中
             spinningSection: false, // 加载中
             spinningSmall: false, // 加载中
+            spinningThin: false, // 加载中
             plantSection: '', // 默认标段
-            smallList: [], // 小班列表
-            thinList: [], // 细班列表
-            thinNo: '', // 细班编号
+            smallClassList: [], // 小班列表
+            thinClassList: [], // 细班列表
+            smallNo: '', // 小班编号
+            _headersTotal: [], // 总种植导出表格行头
+            tblDataTotal: [], // 总种植导出表格数据
+            _headersSection: [], // 总种植导出表格行头
+            tblDataSection: [], // 总种植导出表格数据
+            _headersSmall: [], // 总种植导出表格行头
+            tblDataSmall: [], // 总种植导出表格数据
+            _headersThin: [], // 总种植导出表格行头
+            tblDataThin: [], // 总种植导出表格数据
             startDate: moment().subtract(10, 'days').format(dateFormat),
             endDate: moment().format(dateFormat),
             leftkeycode: '' // 项目code
@@ -26,7 +36,10 @@ class PositionProgress extends Component {
         this.handleDate = this.handleDate.bind(this); // 更改时间
         this.handleSmallPlant = this.handleSmallPlant.bind(this); // 小班种植选择标段
         this.handleSmallThin = this.handleSmallThin.bind(this); // 细班种植选择小班
-        this.handlePlantExport = this.handlePlantExport.bind(this); // 种植进度导出
+        this.handleTotalExport = this.handleTotalExport.bind(this); // 总种植进度导出
+        this.handleSectionExport = this.handleSectionExport.bind(this); // 各标段种植进度导出
+        this.handleSmallExport = this.handleSmallExport.bind(this); // 各小班种植进度导出
+        this.handleThinExport = this.handleThinExport.bind(this); // 各细班种植进度导出
     }
     async componentDidMount () {
 
@@ -36,21 +49,21 @@ class PositionProgress extends Component {
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
             this.renderTotal();
-            // this.renderSection();
+            this.renderSection();
             this.setState({
                 plantSection: this.sectionList[0].No,
-                smallList: this.sectionList[0].children,
-                thinNo: this.sectionList[0].children[0].No,
-                thinList: this.sectionList[0].children[0].children
+                smallClassList: this.sectionList[0].children,
+                smallNo: this.sectionList[0].children[0].No,
+                thinClassList: this.sectionList[0].children[0].children
             }, () => {
-                // this.renderSmallClass();
-                // this.renderThin();
+                this.renderSmallClass();
+                this.renderThin();
             });
         }
     }
     render () {
         console.log('sectionList', this.sectionList);
-        const { startDate, endDate, spinningTotal, spinningSection, spinningSmall, plantSection, smallList, thinNo } = this.state;
+        const { startDate, endDate, spinningTotal, spinningSection, spinningSmall, spinningThin, plantSection, smallClassList, smallNo } = this.state;
         return (
             <div>
                 <Form layout='inline'>
@@ -66,7 +79,7 @@ class PositionProgress extends Component {
                 <div style={{ background: '#ECECEC', padding: '30px', height: 1500, marginTop: 20 }}>
                     <Row gutter={16}>
                         <Col span={12}>
-                            <Card title='总种植进度分析' bordered={false} extra={<Button type='primary' onClick={this.handlePlantExport.bind(this)}>导出</Button>}>
+                            <Card title='总种植进度分析' bordered={false} extra={<Button type='primary' onClick={this.handleTotalExport.bind(this)}>导出</Button>}>
                                 <Spin spinning={spinningTotal}>
                                     <div
                                         id='totalPlant'
@@ -76,7 +89,7 @@ class PositionProgress extends Component {
                             </Card>
                         </Col>
                         <Col span={12}>
-                            <Card title='各标段种植进度分析' bordered={false} extra={<Button type='primary'>导出</Button>}>
+                            <Card title='各标段种植进度分析' bordered={false} extra={<Button type='primary' onClick={this.handleSectionExport.bind(this)}>导出</Button>}>
                                 <Spin spinning={spinningSection}>
                                     <div
                                         id='sectionPlant'
@@ -97,7 +110,7 @@ class PositionProgress extends Component {
                                         }
                                     </Select>
                                 </div>
-                            } bordered={false} extra={<Button type='primary'>导出</Button>}>
+                            } bordered={false} extra={<Button type='primary' onClick={this.handleSmallExport.bind(this)}>导出</Button>}>
                                 <Spin spinning={spinningSmall}>
                                     <div
                                         id='smallPlant'
@@ -117,16 +130,16 @@ class PositionProgress extends Component {
                                             })
                                         }
                                     </Select>
-                                    <Select style={{ width: 120 }} value={thinNo} onChange={this.handleSmallThin.bind(this)}>
+                                    <Select style={{ width: 120 }} value={smallNo} onChange={this.handleSmallThin.bind(this)}>
                                         {
-                                            smallList.map(item => {
+                                            smallClassList.map(item => {
                                                 return <Option value={item.No} key={item.No}>{item.Name}</Option>;
                                             })
                                         }
                                     </Select>
                                 </div>
-                            } bordered={false} extra={<Button type='primary'>导出</Button>}>
-                                <Spin spinning={false}>
+                            } bordered={false} extra={<Button type='primary' onClick={this.handleThinExport.bind(this)}>导出</Button>}>
+                                <Spin spinning={spinningThin}>
                                     <div
                                         id='thinPlant'
                                         style={{ width: '100%', height: '350px' }}
@@ -139,11 +152,7 @@ class PositionProgress extends Component {
             </div>
         );
     }
-    handlePlantExport () {
-        const {
-            tblData,
-            _headers
-        } = this.state;
+    handleExport (tblData, _headers, title) {
         if (!(tblData && tblData instanceof Array && tblData.length > 0)) {
             Notification.warning({
                 message: '数据为空，不能导出',
@@ -168,7 +177,23 @@ class PositionProgress extends Component {
                 'mySheet': Object.assign({}, output, { '!ref': ref })
             }
         };
-        XLSX.writeFile(wb, `苗木种植强度分析.xlsx`);
+        XLSX.writeFile(wb, title);
+    }
+    handleTotalExport () {
+        const { tblDataTotal, _headersTotal } = this.state;
+        this.handleExport(tblDataTotal, _headersTotal, '苗木种植强度分析.xlsx');
+    }
+    handleSectionExport () {
+        const { tblDataSection, _headersSection } = this.state;
+        this.handleExport(tblDataSection, _headersSection, '各标段种植进度分析.xlsx');
+    }
+    handleSmallExport () {
+        const { tblDataSmall, _headersSmall } = this.state;
+        this.handleExport(tblDataSmall, _headersSmall, '各小班种植进度分析.xlsx');
+    }
+    handleThinExport () {
+        const { tblDataThin, _headersThin } = this.state;
+        this.handleExport(tblDataThin, _headersThin, '各细班种植进度分析.xlsx');
     }
     onSearch () {
 
@@ -184,8 +209,7 @@ class PositionProgress extends Component {
         const { startDate, endDate } = this.state;
         const { getCount } = this.props.actions;
         let legend = ['总数'];
-        let _headers = ['时间', '总数'];
-        let tblData = [];
+        let _headersTotal = ['时间', '总数'], tblDataTotal = []; // 导出表格数据
         this.sectionList.map(item => {
             legend.push(item.Name);
         });
@@ -212,8 +236,9 @@ class PositionProgress extends Component {
                         Sum += record.Num;
                     }
                 });
-                tblData.push({
-                    '时间': item
+                tblDataTotal.push({
+                    '时间': item,
+                    '总数': Sum
                 });
                 total.push(Sum);
             });
@@ -226,22 +251,24 @@ class PositionProgress extends Component {
             // 各标段数据
             this.sectionList.map(item => {
                 let sectionData = [];
-                times.map(record => {
+                times.map((record, ind) => {
                     let sum = 0;
                     rep.map(row => {
                         if (record === row.Time && row.Section === item.No) {
                             sum += row.Num;
                         }
                     });
+                    tblDataTotal[ind][item.Name] = sum;
                     sectionData.push(sum);
                 });
-                _headers.push(item.Name);
+                _headersTotal.push(item.Name);
                 series.push({
                     name: item.Name,
                     type: 'line',
                     data: sectionData
                 });
             });
+            console.log(series, 'series');
             // 渲染图表
             let myChart = echarts.init(document.getElementById('totalPlant'));
             let options = {
@@ -272,18 +299,17 @@ class PositionProgress extends Component {
                 series: series
             };
             myChart.setOption(options);
-            console.log('tblData', tblData);
-            console.log('_headers', _headers);
             this.setState({
                 spinningTotal: false,
-                tblData,
-                _headers
+                tblDataTotal,
+                _headersTotal
             });
         });
     }
     renderSection () {
         const { startDate, endDate } = this.state;
         const { getCountSection } = this.props.actions;
+        let tblDataSection = [], _headersSection = ['标段', '已种植', '未种植']; // 导出表格数据
         let xAxisData = [];
         this.setState({
             spinningSection: false
@@ -293,7 +319,6 @@ class PositionProgress extends Component {
             stime: startDate,
             etime: endDate
         }).then(rep => {
-            console.log('rep', rep);
             let completeArr = [];
             let unCompleteArr = [];
             this.sectionList.map(item => {
@@ -302,10 +327,15 @@ class PositionProgress extends Component {
                     if (item.No === record.Section) {
                         completeArr.push(record.Complete);
                         unCompleteArr.push(record.UnComplete);
+                        tblDataSection.push({
+                            '标段': item.Name,
+                            '已种植': record.Complete,
+                            '未种植': record.UnComplete
+                        });
                     }
                 });
             });
-            console.log('completeArr', completeArr, unCompleteArr);
+            console.log('completeArr', tblDataSection, _headersSection);
             let myChart = echarts.init(document.getElementById('sectionPlant'));
             let options = {
                 legend: {
@@ -367,40 +397,44 @@ class PositionProgress extends Component {
             };
             myChart.setOption(options);
             this.setState({
+                tblDataSection,
+                _headersSection,
                 spinningSection: false
             });
         });
     }
     handleSmallPlant (value) {
         console.log(value, 'value');
-        let smallList = [];
+        let smallClassList = [];
         this.sectionList.map(item => {
             if (item.No === value) {
-                smallList = item.children;
+                smallClassList = item.children;
             }
         });
         this.setState({
-            smallList,
+            smallClassList,
             plantSection: value
         }, () => {
             this.renderSmallClass();
         });
     }
     renderSmallClass () {
-        const { startDate, endDate, plantSection, smallList } = this.state;
+        const { startDate, endDate, plantSection, smallClassList } = this.state;
+        let tblDataSmall = [], _headersSmall = ['小班', '已种植', '未种植']; // 导出表格数据
         const { getCountSmall } = this.props.actions;
         console.log('plantSection', plantSection);
+        this.setState({
+            spinningSmall: true
+        });
         getCountSmall({}, {
             section: plantSection,
             stime: startDate,
             etime: endDate
         }).then(rep => {
-            console.log(rep, 'rep小班');
-            console.log(smallList, 'rep小班');
             let complete = [];
             let unComplete = [];
             let xAxisData = [];
-            smallList.map(item => {
+            smallClassList.map(item => {
                 rep.map(record => {
                     let recordNo = '';
                     recordNo = record.Section + '-' + record.No.split('-')[2];
@@ -408,6 +442,11 @@ class PositionProgress extends Component {
                         complete.push(record.Complete);
                         unComplete.push(record.UnComplete);
                         xAxisData.push(item.Name);
+                        tblDataSmall.push({
+                            '小班': item.Name,
+                            '已种植': record.Complete,
+                            '未种植': record.UnComplete
+                        });
                     }
                 });
             });
@@ -480,30 +519,37 @@ class PositionProgress extends Component {
                 ]
             };
             myChart.setOption(option);
+            this.setState({
+                tblDataSmall,
+                _headersSmall,
+                spinningSmall: false
+            });
         });
     }
     handleSmallThin (value) {
-        const { smallList } = this.state;
-        let thinList = [];
-        smallList.map(item => {
+        const { smallClassList } = this.state;
+        let thinClassList = [];
+        smallClassList.map(item => {
             if (item.No === value) {
-                thinList = item.children;
+                thinClassList = item.children;
             }
         });
         this.setState({
-            thinList,
-            thinNo: value
+            thinClassList,
+            smallNo: value
         }, () => {
             this.renderThin();
         });
     }
     renderThin () {
-        const { startDate, endDate, plantSection, thinNo, thinList } = this.state;
+        const { startDate, endDate, plantSection, smallNo, thinClassList } = this.state;
+        let tblDataThin = [], _headersThin = []; // 表格数据
         const { getCountThin } = this.props.actions;
-        console.log(thinNo, 'thinNo');
-        console.log(plantSection, 'plantSection');
+        this.setState({
+            spinningThin: true
+        });
         getCountThin({}, {
-            no: thinNo,
+            no: smallNo,
             section: plantSection,
             stime: startDate,
             etime: endDate
@@ -512,7 +558,7 @@ class PositionProgress extends Component {
             let complete = [];
             let unComplete = [];
             let xAxisData = [];
-            thinList.map(item => {
+            thinClassList.map(item => {
                 rep.map(record => {
                     let recordNo = '';
                     let recordArr = record.No.split('-');
@@ -521,6 +567,11 @@ class PositionProgress extends Component {
                         complete.push(record.Complete);
                         unComplete.push(record.UnComplete);
                         xAxisData.push(item.Name);
+                        tblDataThin.push({
+                            '小班': item.Name,
+                            '已种植': record.Complete,
+                            '未种植': record.unComplete
+                        });
                     }
                 });
             });
@@ -583,6 +634,11 @@ class PositionProgress extends Component {
                 ]
             };
             myChart.setOption(options);
+            this.setState({
+                tblDataThin,
+                _headersThin,
+                spinningThin: false
+            });
         });
     }
 }

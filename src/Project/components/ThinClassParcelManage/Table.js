@@ -43,6 +43,7 @@ class Tablelevel extends Component {
         this.treeTypeList = []; // 所有树种类型
         this.dataList = []; // 暂存数据
         this.userSection = ''; // 用户所属标段
+        this.username = ''; // 用户名，给超级管理员更多权限
         this.onSearch = this.onSearch.bind(this); // 查询细班
         this.onEdit = this.onEdit.bind(this); // 编辑
         this.handleSection = this.handleSection.bind(this); // 标段
@@ -90,7 +91,8 @@ class Tablelevel extends Component {
                 title: '操作',
                 dataIndex: 'action',
                 render: (text, record, index) => {
-                    if (this.userSection === record.Section) {
+                    console.log('this.userSection', this.userSection);
+                    if (this.userSection === record.Section || this.username === 'admin') {
                         return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
                     } else {
                         return '';
@@ -101,6 +103,7 @@ class Tablelevel extends Component {
     }
     componentDidMount () {
         let userData = getUser();
+        this.username = userData.username;
         this.userSection = userData.sections.slice(2, -2);
         // 初始化地图
         this.initMap();
