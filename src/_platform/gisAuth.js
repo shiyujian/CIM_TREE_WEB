@@ -242,3 +242,56 @@ export const getSmallThinNameByThinClassData = (thinClass, thinClassTree) => {
         console.log('getSmallThinNameByPlaceData', e);
     }
 };
+// 森林大数据-数字化验收 根据验收类型的ID获取验收类型名称
+export const getYsTypeByID = (ID) => {
+    if (!ID) {
+        return ''
+    }
+    switch (ID) {
+        case 1:
+            return '土地整理'
+        case 2:
+            return '放样点穴'
+        case 3:
+            return '挖穴'
+        case 4:
+            return '苗木质量'
+        case 5:
+            return '土球质量'
+        case 6:
+            return '苗木栽植'
+        case 7:
+            return '苗木支架'
+        case 8:
+            return '苗木浇水'
+        case 9:
+            return '大数据'
+        case 10:
+            return '造林面积'
+        case 11:
+            return '总体'
+        default:
+            return ''
+    }
+};
+
+// 森林大数据-数字化验收 根据验收状态的ID获取验收状态名称
+export const getStatusByID = (ID) => {
+    if (!ID) {
+        return ''
+    }
+    switch (ID) {
+        case 1:
+            return '未申请'
+        case 2:
+            return '待验收'
+        case 3:
+            return '完成'
+        case 4:
+            return '退回'
+        case 5:
+            return '暂存'
+        default:
+            return ''
+    }
+};
