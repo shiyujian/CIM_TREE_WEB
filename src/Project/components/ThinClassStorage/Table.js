@@ -333,11 +333,11 @@ class Tablelevel extends Component {
                         no: item.ThinClass,
                         treetype: item.TreeType,
                         Section: item.Section,
-                        num: item.Num, // 细班计划种植数量
-                        area: item.Area || '', // 面积
+                        num: parseInt(item.Num), // 细班计划种植数量
+                        area: parseFloat(item.Area || item.area), // 面积
                         Level: item.Spec, // 规格
                         coords: item.Geom, // WKT格式item.Geom
-                        TCNo: item.TCNo || '' // 细班唯一顺序属性
+                        TCNo: parseInt(item.TCNo || 0) // 细班唯一顺序属性
                     });
                 }
             });
