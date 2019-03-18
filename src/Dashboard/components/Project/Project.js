@@ -99,13 +99,6 @@ export default class Project extends Component {
             storagetype: 0,
             tiletype: 'arcgis'
         }).addTo(this.map);
-
-        // 航拍影像
-        // L.tileLayer(`${CUS_TILEMAP}/Layers/_alllayers/LE{z}/R{y}/C{x}.png`).addTo(this.map);
-        // document.querySelector('#mapid').addEventListener('animationend', function(){
-        //     this.map.invalidateSize();
-        //     console.log('test');
-        // });
     }
     initMap2 () {
         this.map2 = L.map('mapid2', INITLEAFLET_API);
@@ -141,12 +134,10 @@ export default class Project extends Component {
     // 切换
     toggleTileLayer (e) {
         const index = e.target.value;
-        console.log('index', index);
         this.tileLayer.setUrl(this.tileUrls[index]);
     }
     toggleTileLayer2 (e) {
         const index = e.target.value;
-        console.log('index', index);
         this.tileTreeLayerBasic.setUrl(this.tileUrls[index]);
     }
     /* 显示隐藏地图marker */
@@ -167,9 +158,6 @@ export default class Project extends Component {
         }
     }
     render () {
-        const {
-            dashboardCompomentMenu
-        } = this.props;
         return (
             <div className='project_map-container'>
                 <div

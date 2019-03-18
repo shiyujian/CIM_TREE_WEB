@@ -47,7 +47,7 @@ export default class ViewPositionManage extends Component {
                                                     <Button
                                                         className='ViewPositionManage-rightInitialPositionMenu-areaViewData-button'
                                                         onClick={this.locationToMapCustomPosition.bind(this, view)}
-                                                        type={userMapPositionName === view.name ? 'primary' : ''}>
+                                                        type={userMapPositionName === view.name ? 'primary' : 'default'}>
                                                         {view.name}
                                                     </Button>
                                                 </div>);
@@ -166,7 +166,7 @@ export default class ViewPositionManage extends Component {
             const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
             await getCustomViewByUserID({id: user.id});
         } catch (e) {
-            console.log('e', e);
+            console.log('handleDeleteMapCustomPosition', e);
         }
     }
     handleDeleteMapCustomPositionCancel = async () => {

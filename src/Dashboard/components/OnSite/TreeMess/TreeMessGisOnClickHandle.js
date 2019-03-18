@@ -50,7 +50,6 @@ export default class TreeMessGisOnClickHandle extends Component {
             treeMarkerLayer
         } = this.state;
         map.off('click', this.handleTreeMessGisClickFunction);
-        console.log('是否存在点击事件', map.listens('click'));
         if (treeMarkerLayer) {
             map.removeLayer(treeMarkerLayer);
         }
@@ -63,11 +62,10 @@ export default class TreeMessGisOnClickHandle extends Component {
                 dashboardTreeMess
             } = this.props;
             if (dashboardTreeMess === 'dashboardTreeMess' && e) {
-                console.log('handleTreeMessGisClickFunction', e);
                 this.getSxmByLocation(e.latlng.lng, e.latlng.lat);
             }
         } catch (e) {
-            console.log('initMap', e);
+            console.log('handleTreeMessGisClickFunction', e);
         }
     }
 
@@ -319,7 +317,6 @@ export default class TreeMessGisOnClickHandle extends Component {
             if (treeLocationData && treeLocationData.X && treeLocationData.Y) {
                 location = `${treeLocationData.X},${treeLocationData.Y}`;
             }
-            console.log('location', location);
             queryTreeData.locationCoord = location;
             // let treeAddressData = await handleGetAddressByCoordinate(location, getLocationNameByCoordinate);
             // let queryTreeAddressName = (treeAddressData && treeAddressData.regeocode && treeAddressData.regeocode.formatted_address) || '';

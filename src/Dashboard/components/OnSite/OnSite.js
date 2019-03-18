@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-18 11:18:38
+ * @Last Modified time: 2019-03-18 14:14:29
  */
 import React, { Component } from 'react';
 import {
@@ -115,6 +115,7 @@ class OnSite extends Component {
         } = this.props;
         try {
             let mapInitialization = INITLEAFLET_API;
+            // 根据用户的自定义视图来查看聚焦点
             if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
                 let view = customViewByUserID[0];
                 let center = [view.center[0].lat, view.center[0].lng];
@@ -129,15 +130,18 @@ class OnSite extends Component {
                 maxZoom: 17,
                 storagetype: 0
             }).addTo(this.map);
-            // 巡检路线的代码   地图上边的地点的名称
+            // 地图上边的地点的名称
             L.tileLayer(WMSTILELAYERURL, {
                 subdomains: [1, 2, 3],
                 minZoom: 1,
                 maxZoom: 17,
                 storagetype: 0
             }).addTo(this.map);
+            // 加载苗木图层
             this.getTileLayerTreeBasic();
+            // 加载秋冬季的细班图层
             this.getTileTreeWinterThinClassLayerBasic();
+            // 获取秋冬季的区块范围
             this.getTileTreeWinterProjectLayerBasic();
         } catch (e) {
             console.log('initMap', e);
@@ -437,7 +441,7 @@ class OnSite extends Component {
                                 </div>
                             ) : ''
                     }
-                    { // 右侧菜单当选择区域视图时，展示区域视图页面
+                    { // 视图管理
                         dashboardFocus && dashboardFocus === 'mapFoucs'
                             ? (
                                 <ViewPositionManage
@@ -551,7 +555,7 @@ class OnSite extends Component {
             </div>
         );
     }
-    /* 细班选择处理 */
+    // 细班选择处理
     _handleAreaSelect = async (keys, info) => {
         const {
             areaLayerList,
@@ -560,7 +564,6 @@ class OnSite extends Component {
         const {
             dashboardCompomentMenu
         } = this.props;
-        let me = this;
         // 当前选中的节点
         let areaEventTitle = info.node.props.title;
         this.setState({
@@ -571,7 +574,7 @@ class OnSite extends Component {
             const eventKey = keys[0];
             for (let v in areaLayerList) {
                 areaLayerList[v].map((layer) => {
-                    me.map.removeLayer(layer);
+                    this.map.removeLayer(layer);
                 });
             }
             if (eventKey) {
@@ -582,23 +585,23 @@ class OnSite extends Component {
                     // 如果之前添加过，直接将添加过的再次添加，不用再次请求
                     if (areaLayerList[eventKey]) {
                         areaLayerList[eventKey].map((layer) => {
-                            layer.addTo(me.map);
-                            me.map.fitBounds(layer.getBounds());
+                            layer.addTo(this.map);
+                            this.map.fitBounds(layer.getBounds());
                         });
                     } else {
                     // 如果不是添加过，需要请求数据
-                        await me._addAreaLayer(eventKey);
+                        await this._addAreaLayer(eventKey);
                     }
                 }
                 if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement') {
                     let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
                     let selectSectionNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-                    if (me.tileTreeLayerBasic) {
-                        me.map.removeLayer(me.tileTreeLayerBasic);
+                    if (this.tileTreeLayerBasic) {
+                        this.map.removeLayer(this.tileTreeLayerBasic);
                     }
-                    me.handleRemoveRealThinClassLayer();
+                    this.handleRemoveRealThinClassLayer();
                     if (realThinClassLayerList[eventKey]) {
-                        realThinClassLayerList[eventKey].addTo(me.map);
+                        realThinClassLayerList[eventKey].addTo(this.map);
                     } else {
                         var url = FOREST_GIS_TREETYPE_API +
                         `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27%20and%20Section+LIKE+%27%25${selectSectionNo}%25%27`;
@@ -631,9 +634,7 @@ class OnSite extends Component {
             actions: { getTreearea }
         } = this.props;
         try {
-            console.log('eventKey', eventKey);
             let coords = await handleAreaLayerData(eventKey, getTreearea);
-            console.log('coords2', coords);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
@@ -683,7 +684,7 @@ class OnSite extends Component {
                 return layer;
             }
         } catch (e) {
-            console.log('e', e);
+            console.log('_createMarker', e);
         }
     }
 }

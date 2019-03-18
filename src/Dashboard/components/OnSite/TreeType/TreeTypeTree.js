@@ -228,7 +228,7 @@ export default class TreeTypeTree extends Component {
                 });
             }
         } catch (e) {
-            console.log('e', 'searchTree');
+            console.log('searchTree', e);
         }
     }
 

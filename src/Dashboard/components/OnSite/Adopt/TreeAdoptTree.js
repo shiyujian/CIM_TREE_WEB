@@ -62,7 +62,6 @@ export default class TreeAdoptTree extends Component {
             adoptTreeMarkerLayerList
         } = this.state;
         map.off('click', this.handleAdoptTreeGisClickFunction);
-        console.log('是否存在点击事件', map.listens('click'));
         this.removeTileTreeAdoptLayer();
         for (let t in adoptTreeMarkerLayerList) {
             map.removeLayer(adoptTreeMarkerLayerList[t]);
@@ -75,7 +74,6 @@ export default class TreeAdoptTree extends Component {
                 dashboardCompomentMenu
             } = this.props;
             if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt' && e) {
-                console.log('handleAdoptTreeGisClickFunction', e);
                 this.getSxmByLocation(e.latlng.lng, e.latlng.lat);
             }
         } catch (e) {
@@ -124,7 +122,6 @@ export default class TreeAdoptTree extends Component {
         if (searchValue) {
             contents = searchTree;
         }
-        console.log('contents', contents);
         return (
             <div>
                 <Search
