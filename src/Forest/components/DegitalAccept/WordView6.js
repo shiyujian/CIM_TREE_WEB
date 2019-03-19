@@ -64,11 +64,11 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height="60;" align="center">设计数量</td>
-                                    <td colSpan="1">设计数量</td>
+                                    <td colSpan="1">{detail.DesignNum}</td>
                                     <td>实际数量</td>
-                                    <td colSpan="1">100</td>
+                                    <td colSpan="1">{detail.ActualNum}</td>
                                     <td>抽检数量</td>
-                                    <td >95</td>
+                                    <td >{detail.CheckNum}</td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>

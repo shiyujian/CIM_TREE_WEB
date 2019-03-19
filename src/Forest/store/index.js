@@ -299,6 +299,18 @@ export const getDigitalAcceptUserList = createFetchAction(
     []
 );
 
+// 获取苗木抽检结果列表
+export const getYSResultList = createFetchAction(
+    `${FOREST_API}/tree/qualitytrees`,
+    []
+);
+
+// 根据细班获取树种列表
+export const getTreetypeByThinclass = createFetchAction(
+    `${FOREST_API}/route/thinclassplans`,
+    []
+)
+
 
 
 export const actions = {
@@ -374,7 +386,9 @@ export const actions = {
     getNurseryFromData,
     getDigitalAcceptList,
     getDigitalAcceptUserList,
-    getDigitalAcceptDetail
+    getDigitalAcceptDetail,
+    getYSResultList,
+    getTreetypeByThinclass
 };
 export default handleActions(
     {

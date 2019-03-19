@@ -27,6 +27,27 @@ export default class WordView1 extends Component {
         let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
         let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
         let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
+        let xbsjl = detail.DesignNum; // 细班设计量
+        let xbsjmj = detail.DesignArea; // 细班设计面积
+        let designmd = 1; // 设计密度
+        if (xbsjmj !== 0) {
+            designmd = xbsjl/xbsjmj;
+        }
+        let fdsl = detail.LoftingNum; // 放点数量
+        let ydmj = detail.SampleTapeArea; // 样带面积
+        let truemd = 1; // 实际密度
+        let qulityok = '0%'; // 合格率
+        let cjsl = detail.CheckNum; // 抽检数量
+        let middle = 0;
+        if (ydmj !== 0) {
+            truemd = fdsl/ydmj;
+            middle = cjsl/ydmj;
+        }
+        qulityok = 1 - middle;
+        qulityok = qulityok/designmd
+        qulityok = qulityok * 100
+        qulityok = 100 - qulityok;
+        
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
@@ -39,7 +60,6 @@ export default class WordView1 extends Component {
                     footer={null}
                 >
                     <div className='trrdd'>
-
                         <table style={{ border: 1 }}>
                             <tbody>
                                 <table border="1">
@@ -85,7 +105,7 @@ export default class WordView1 extends Component {
                                         <td className='hei60' colSpan="1" width="118px">设计面积</td>
                                         <td colSpan="2">{detail.DesignArea}</td>
                                         <td colSpan="1" width="118px">设计密度</td>
-                                        <td colSpan="2">95%</td>
+                                        <td colSpan="2">{designmd}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' colSpan="1" width="118px">样带面积</td>
@@ -95,9 +115,9 @@ export default class WordView1 extends Component {
                                     </tr>
                                     <tr>
                                         <td className='hei60' colSpan="1" width="118px">实际密度</td>
-                                        <td colSpan="2">100</td>
+                                        <td colSpan="2">{truemd}</td>
                                         <td colSpan="1" width="118px">合格率</td>
-                                        <td colSpan="2">95%</td>
+                                        <td colSpan="2">{qulityok}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei110' >施工单位质量专检结果</td>

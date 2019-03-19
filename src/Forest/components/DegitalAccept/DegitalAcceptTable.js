@@ -82,6 +82,7 @@ export default class DegitalAcceptTable extends Component {
             visible10: false,
             visible11: false,
             itemDetail: {}, // 数字化验收详情
+            treetypeoption: [], // 根据小班动态获取的树种列表
         };
         this.columns = [
             {
@@ -159,7 +160,6 @@ export default class DegitalAcceptTable extends Component {
         ];
     }
     componentDidMount = async () => {
-        debugger
     }
     render() {
         const { 
@@ -279,7 +279,6 @@ export default class DegitalAcceptTable extends Component {
     }
     treeTable(details) {
         const {
-            treetypeoption,
             sectionoption,
             smallclassoption,
             thinclassoption,
@@ -299,7 +298,8 @@ export default class DegitalAcceptTable extends Component {
             cly,
             jl,
             shigongOptions,
-            jianliOptions
+            jianliOptions,
+            treetypeoption
         } = this.state;
         let header = '';
 
@@ -354,7 +354,7 @@ export default class DegitalAcceptTable extends Component {
                             {ystypeoption}
                         </Select>
                     </div>
-                    <div className='forest-mrg10'>
+                    {/* <div className='forest-mrg10'>
                         <span className='forest-search-span'>类型：</span>
                         <Select
                             allowClear
@@ -365,7 +365,7 @@ export default class DegitalAcceptTable extends Component {
                         >
                             {typeoption}
                         </Select>
-                    </div>
+                    </div> */}
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>树种：</span>
                         <Select
@@ -595,7 +595,34 @@ export default class DegitalAcceptTable extends Component {
     }
 
     onThinClassChange(value) {
-        const { thinClassSelect } = this.props;
+        const {
+            actions: {
+                getTreetypeByThinclass
+            }, 
+            thinClassSelect
+        } = this.props;
+        const { section } = this.state;
+        let array = value.split('-')
+        let array1 = []
+        let treetypeoption = []
+        array.map((item, i) => {
+            if (i !== 2) {
+                array1.push(item)
+            }
+        })
+        getTreetypeByThinclass({},{
+            section: section,
+            thinclass: array1.join('-')
+        }).then(rst => {
+            if (rst && rst.content && rst.content instanceof Array) {
+                rst.content.map(item => {
+                    treetypeoption.push(<Option value={item.TreeType}>{item.TreeTypeObj.TreeTypeName}</Option>)
+                })
+            }
+            this.setState({
+                treetypeoption
+            })
+        })
         try {
             thinClassSelect(value);
             let thinclassData = '';
@@ -612,11 +639,11 @@ export default class DegitalAcceptTable extends Component {
         }
     }
 
-    onTypeChange(value) {
-        const { typeselect } = this.props;
-        typeselect(value || '');
-        this.setState({ curingTypeSelect: value || '', treetype: '', treetypename: '' });
-    }
+    // onTypeChange(value) {
+    //     const { typeselect } = this.props;
+    //     typeselect(value || '');
+    //     this.setState({ curingTypeSelect: value || '', treetype: '', treetypename: '' });
+    // }
 
     onTreeTypeChange(value) {
         this.setState({ treetype: value, treetypename: value });
@@ -665,13 +692,18 @@ export default class DegitalAcceptTable extends Component {
     async viewWord(record) {
         const {
             actions: {
-                getDigitalAcceptDetail
+                getDigitalAcceptDetail,
+                getYSResultList
             }
         } = this.props;
         const {
             stime1 = '',
             etime1 = '',
+            treetypename = '' // 这个等待record返回
         } = this.state;
+        let thinclass = record.ThinClass; // 要通过记录查找，因为可能不选这个条件
+        let section = record.Section;
+        let checktype = record.CheckType;
         const postdata = {
             acceptanceid: record.ID,
             status: record.Status, // 用当前条目的状态去查询
@@ -680,13 +712,22 @@ export default class DegitalAcceptTable extends Component {
         }
         let rst = await getDigitalAcceptDetail({}, postdata);
         if (! rst instanceof Array || rst.length === 0 ) {
-            message.info('查询详情失败'); 
+            message.info('移动端详情尚未提交'); 
             return
+        }
+        // only in these checktype if will have the TreeType field
+        if (checktype === 4 || checktype === 5 || checktype === 6 || checktype === 7 || checktype === 8 || checktype === 9) {
+            const postdata1 = {
+                section: section,
+                thinclass: thinclass,
+                treetype: record.TreeType
+            }
+            let result = await getYSResultList({},postdata1)
         }
         this.setState({
             itemDetail: rst[0]
         })
-        switch (record.CheckType) {
+        switch (checktype) {
             case 1:
                 this.setState({ visible1: true })
                 break;
@@ -768,7 +809,6 @@ export default class DegitalAcceptTable extends Component {
             etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
             // stime2: stime2 && moment(stime2).format('YYYY-MM-DD HH:mm:ss'),
             // etime2: etime2 && moment(etime2).format('YYYY-MM-DD HH:mm:ss'),
-            treetype: treetypename,
             thinclass: array1.join('-'),
             page,
             size: size,
