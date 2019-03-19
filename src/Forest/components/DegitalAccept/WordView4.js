@@ -27,6 +27,11 @@ export default class WordView1 extends Component {
         let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
         let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
         let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
+        let qulityok = 0; // 默认全部不合格
+        let hgl = detail.CheckNum - detail.FailedNum; // 合格量
+        if (detail.CheckNum !== 0) {
+            qulityok = hgl/detail.CheckNum;
+        }
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
@@ -76,17 +81,17 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height="60;" align="center">设计数量</td>
-                                    <td colSpan="1">100</td>
+                                    <td colSpan="1">{detail.DesignNum}</td>
                                     <td>实际数量</td>
-                                    <td colSpan="1">100</td>
+                                    <td colSpan="1">{detail.ActualNum}</td>
                                     <td>抽检数量</td>
-                                    <td >95</td>
+                                    <td >{detail.CheckNum}</td>
                                 </tr>
                                 <tr>
                                     <td height="60;" colSpan="1" width="118px">抽检不合格数量</td>
-                                    <td colSpan="3">100</td>
+                                    <td colSpan="3">{detail.FailedNum}</td>
                                     <td colSpan="1" width="118px">合格率</td>
-                                    <td colSpan="1">95%</td>
+                                    <td colSpan="1">{qulityok}</td>
                                 </tr>
                                 <tr>
                                     <td colSpan="6">不合格苗木记录</td>

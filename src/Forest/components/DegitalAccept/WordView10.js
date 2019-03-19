@@ -60,13 +60,13 @@ export default class WordView1 extends Component {
                                     <td>测量员</td>
                                     <td colSpan="1">100</td>
                                     <td>设计面积</td>
-                                    <td >95</td>
+                                    <td >{detail.DesignArea}</td>
                                 </tr>
                                 <tr>
                                     <td height="60;" align="center">实际面积</td>
-                                    <td>中国交建集团</td>
+                                    <td>{detail.ActualArea}</td>
                                     <td >误差值及备注</td>
-                                    <td colSpan="3">王伟</td>
+                                    <td colSpan="3">/</td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>
@@ -77,7 +77,7 @@ export default class WordView1 extends Component {
                                     <tr>
                                         <td colSpan="5">
                                             测量坐标
-				</td>
+				                        </td>
                                         <tr>
                                             <td colSpan="2">X</td>
                                             <td colSpan="3">Y</td>

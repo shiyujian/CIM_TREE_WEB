@@ -304,20 +304,40 @@ export const getTreeEntrance = forestFetchAction(
 );
 
 // 获取数字化验收列表
-export const getDigitalAcceptList = createFetchAction(
+export const getDigitalAcceptList = forestFetchAction(
     `${FOREST_API}/tree/acceptances`,
     []
 );
 
 // 获取数字化验收详情
-export const getDigitalAcceptDetail = createFetchAction(
+export const getDigitalAcceptDetail = forestFetchAction(
     `${FOREST_API}/tree/acceptancedetails`,
     []
 );
 
 // 获取数字化验收人员列表
-export const getDigitalAcceptUserList = createFetchAction(
+export const getDigitalAcceptUserList = forestFetchAction(
     `${USER_API}/users/?is_active=true`,
+    []
+);
+// 用户分析用户统计
+export const getUserStat = forestFetchAction(
+    `${FOREST_API}/tree/userstat`,
+    []
+);
+// 用户分析新增用户统计
+export const getNewUserStat = forestFetchAction(
+    `${FOREST_API}/tree/newuserstat`,
+    []
+);
+// 用户分析活跃用户统计
+export const getActivityUserStat = forestFetchAction(
+    `${FOREST_API}/tree/activityuserstat`,
+    []
+);
+// 用户分析用户按标段统计
+export const getSectionUserStat = forestFetchAction(
+    `${FOREST_API}/tree/sectionuserstat`,
     []
 );
 
@@ -397,7 +417,13 @@ export const actions = {
     getTreeEntrance,
     getDigitalAcceptList,
     getDigitalAcceptUserList,
-    getDigitalAcceptDetail
+    getDigitalAcceptDetail,
+    getYSResultList,
+    getTreetypeByThinclass
+    getUserStat,
+    getNewUserStat,
+    getActivityUserStat,
+    getSectionUserStat
 };
 export default handleActions({
     [getTreeOK]: (state, {
