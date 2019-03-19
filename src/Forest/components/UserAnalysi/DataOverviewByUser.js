@@ -14,7 +14,9 @@ export default class DataOverviewByUser extends Component {
             etime: moment().subtract(1, 'days').format('YYYY-MM-DD'),
             loading: false,
             dateType: 'week',
-            tabKey: 'NewUser'
+            tabKey: 'NewUser',
+            newUserContent: [],
+            activityUserContent: []
         };
         this.dateTypeList = [
             {
@@ -74,7 +76,7 @@ export default class DataOverviewByUser extends Component {
                 </div>
                 <div style={{margin: 5}}>
                     <Tabs tabBarGutter='10' onChange={this.handleTabChangele.bind(this)}>
-                        <TabPane tab='新增用户' key='NewUser'>
+                        <TabPane tab='新增账号' key='NewUser'>
                             <Spin spinning={loading}>
                                 <div
                                     id='echartsNewUser'
@@ -82,18 +84,10 @@ export default class DataOverviewByUser extends Component {
                                 />
                             </Spin>
                         </TabPane>
-                        <TabPane tab='活跃用户' key='ActiveUser'>
+                        <TabPane tab='活跃账号' key='ActiveUser'>
                             <Spin spinning={loading}>
                                 <div
                                     id='echartsActiveUser'
-                                    style={{ width: '100%', height: '300px' }}
-                                />
-                            </Spin>
-                        </TabPane>
-                        <TabPane tab='启动次数' key='SessionCount'>
-                            <Spin spinning={loading}>
-                                <div
-                                    id='echartsSessionCount'
                                     style={{ width: '100%', height: '300px' }}
                                 />
                             </Spin>
@@ -153,7 +147,7 @@ export default class DataOverviewByUser extends Component {
             this.query();
         }
         if (tabKey && tabKey !== prevState.tabKey) {
-            this.setEcharts();
+            this.query();
         }
     }
     // 搜索数据
@@ -165,31 +159,56 @@ export default class DataOverviewByUser extends Component {
         } = this.state;
         const {
             actions: {
-                getTencentOffLineUser
+                getNewUserStat,
+                getActivityUserStat
             }
         } = this.props;
         try {
             this.setState({
                 loading: true
             });
-            let postData = {
-                startdate: moment(stime).format('YYYY-MM-DD'),
-                enddate: moment(etime).format('YYYY-MM-DD')
-            };
-            let data = await getTencentOffLineUser({}, postData);
-            if (data && data.ret_msg && data.ret_msg === 'success') {
-                let content = data.ret_data;
-                this.setState({
-                    content
-                }, () => {
-                    this.setEcharts();
-                });
-            } else {
-                Notification.error({
-                    message: '查询数据失败',
-                    duration: 3
-                });
-                return;
+            if (tabKey === 'NewUser') {
+                let postData = {
+                    stime: moment(stime).format('YYYY-MM-DD'),
+                    etime: moment(etime).format('YYYY-MM-DD')
+                };
+
+                let newUserContent = await getNewUserStat({}, postData);
+                console.log('newUserContent', newUserContent);
+                if (newUserContent && newUserContent instanceof Array && newUserContent.length > 0) {
+                    this.setState({
+                        newUserContent
+                    }, () => {
+                        this.setEcharts();
+                    });
+                } else {
+                    Notification.error({
+                        message: '查询数据失败',
+                        duration: 3
+                    });
+                    return;
+                }
+            } else if (tabKey === 'ActiveUser') {
+                let postData = {
+                    stime: moment(stime).format('YYYY-MM-DD'),
+                    etime: moment(etime).format('YYYY-MM-DD')
+                };
+
+                let activityUserContent = await getActivityUserStat({}, postData);
+                console.log('activityUserContent', activityUserContent);
+                if (activityUserContent && activityUserContent instanceof Array && activityUserContent.length > 0) {
+                    this.setState({
+                        activityUserContent
+                    }, () => {
+                        this.setEcharts();
+                    });
+                } else {
+                    Notification.error({
+                        message: '查询数据失败',
+                        duration: 3
+                    });
+                    return;
+                }
             }
         } catch (e) {
             console.log('query', e);
@@ -198,22 +217,27 @@ export default class DataOverviewByUser extends Component {
 
     setEcharts = () => {
         const {
-            content,
+            newUserContent,
+            activityUserContent,
             tabKey,
             stime,
             etime
         } = this.state;
-        let start = new Date(stime).getTime();
-        let end = new Date(etime).getTime();
-        let dateList = [];
-        for (;start <= end; start += 86400000) {
-            let tmp = new Date(start);
-            dateList.push(moment(tmp).format('YYYY-MM-DD'));
-        }
         if (tabKey === 'NewUser') {
+            let start = new Date(stime).getTime();
+            let end = new Date(etime).getTime();
+            let dateList = [];
+            for (;start <= end; start += 86400000) {
+                let tmp = new Date(start);
+                dateList.push(moment(tmp).format('YYYY-MM-DD'));
+            }
             let yGrandData = [];
-            for (let i in content) {
-                yGrandData.push(content[i].NewUser);
+            for (let i = 0; i < newUserContent.length; i++) {
+                dateList.map((date) => {
+                    if (moment(date).format('YYYY/MM/DD 23:00:00') === moment(newUserContent[i].Day).format('YYYY/MM/DD HH:mm:ss')) {
+                        yGrandData.push(newUserContent[i].Num);
+                    }
+                });
             }
             const myChart = echarts.init(document.getElementById('echartsNewUser'));
             let optionLine = {
@@ -255,8 +279,10 @@ export default class DataOverviewByUser extends Component {
             });
         } else if (tabKey === 'ActiveUser') {
             let yGrandData = [];
-            for (let i in content) {
-                yGrandData.push(content[i].ActiveUser);
+            let dateList = [];
+            for (let i = 0; i < activityUserContent.length; i++) {
+                dateList.push(activityUserContent[i].Day);
+                yGrandData.push(activityUserContent[i].Num);
             }
             const myChart = echarts.init(document.getElementById('echartsActiveUser'));
             let optionLine = {
@@ -287,49 +313,6 @@ export default class DataOverviewByUser extends Component {
                 series: [
                     {
                         name: '活跃用户',
-                        type: 'line',
-                        data: yGrandData
-                    }
-                ]
-            };
-            myChart.setOption(optionLine);
-            this.setState({
-                loading: false
-            });
-        } else if (tabKey === 'SessionCount') {
-            let yGrandData = [];
-            for (let i in content) {
-                yGrandData.push(content[i].SessionCount);
-            }
-            const myChart = echarts.init(document.getElementById('echartsSessionCount'));
-            let optionLine = {
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        crossStyle: {
-                            color: '#999'
-                        }
-                    }
-                },
-                toolbox: {
-                    feature: {
-                        saveAsImage: { show: true }
-                    }
-                },
-                xAxis: [
-                    {
-                        data: dateList
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value'
-                    }
-                ],
-                series: [
-                    {
-                        name: '启动次数',
                         type: 'line',
                         data: yGrandData
                     }

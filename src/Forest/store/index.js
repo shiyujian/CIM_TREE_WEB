@@ -1,10 +1,26 @@
-import { createAction, handleActions, combineActions } from 'redux-actions';
+import {
+    createAction,
+    handleActions,
+    combineActions
+} from 'redux-actions';
 import createFetchAction from './fetchAction';
-import { createFetchActionWithHeaders as myFetch } from './fetchAction';
-import faithInfoReducer, { actions as faithActions } from './faithInfo';
-import { FOREST_API, TENCENTANALYSIS_API, USER_API } from '_platform/api';
-import {forestFetchAction} from '_platform/store/fetchAction';
-import { actionsMap } from '_platform/store/util';
+import {
+    createFetchActionWithHeaders as myFetch
+} from './fetchAction';
+import faithInfoReducer, {
+    actions as faithActions
+} from './faithInfo';
+import {
+    FOREST_API,
+    TENCENTANALYSIS_API,
+    USER_API
+} from '_platform/api';
+import {
+    forestFetchAction
+} from '_platform/store/fetchAction';
+import {
+    actionsMap
+} from '_platform/store/util';
 const ID = 'forest';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
@@ -280,38 +296,48 @@ export const getNurseryFromData = createFetchAction(
     `${FOREST_API}/tree/nursersourcestat?section={{section}}&regioncode={{regioncode}}&etime={{etime}}`,
     []
 );
+export const getTreeEntrance = forestFetchAction(
+    `${FOREST_API}/tree/nurserystat?`,
+    []
+);
 
 // 获取数字化验收列表
-export const getDigitalAcceptList = createFetchAction(
+export const getDigitalAcceptList = forestFetchAction(
     `${FOREST_API}/tree/acceptances`,
     []
 );
 
 // 获取数字化验收详情
-export const getDigitalAcceptDetail = createFetchAction(
+export const getDigitalAcceptDetail = forestFetchAction(
     `${FOREST_API}/tree/acceptancedetails`,
     []
 );
 
 // 获取数字化验收人员列表
-export const getDigitalAcceptUserList = createFetchAction(
+export const getDigitalAcceptUserList = forestFetchAction(
     `${USER_API}/users/?is_active=true`,
     []
 );
-
-// 获取苗木抽检结果列表
-export const getYSResultList = createFetchAction(
-    `${FOREST_API}/tree/qualitytrees`,
+// 用户分析用户统计
+export const getUserStat = forestFetchAction(
+    `${FOREST_API}/tree/userstat`,
     []
 );
-
-// 根据细班获取树种列表
-export const getTreetypeByThinclass = createFetchAction(
-    `${FOREST_API}/route/thinclassplans`,
+// 用户分析新增用户统计
+export const getNewUserStat = forestFetchAction(
+    `${FOREST_API}/tree/newuserstat`,
     []
-)
-
-
+);
+// 用户分析活跃用户统计
+export const getActivityUserStat = forestFetchAction(
+    `${FOREST_API}/tree/activityuserstat`,
+    []
+);
+// 用户分析用户按标段统计
+export const getSectionUserStat = forestFetchAction(
+    `${FOREST_API}/tree/sectionuserstat`,
+    []
+);
 
 export const actions = {
     getTotalSat,
@@ -384,59 +410,80 @@ export const actions = {
     getTencentOffLineActive,
     getTencentOffLineAusage,
     getNurseryFromData,
+    getTreeEntrance,
     getDigitalAcceptList,
     getDigitalAcceptUserList,
     getDigitalAcceptDetail,
+<<<<<<< HEAD
     getYSResultList,
     getTreetypeByThinclass
+=======
+    getUserStat,
+    getNewUserStat,
+    getActivityUserStat,
+    getSectionUserStat
+>>>>>>> 26d0b67a2b3721fc9888907ef90062366655d1f2
 };
-export default handleActions(
-    {
-        [getTreeOK]: (state, { payload }) => {
-            return {
-                ...state,
-                treeLists: [payload]
-            };
-        },
-        [setkeycode]: (state, { payload }) => {
-            return {
-                ...state,
-                keycode: payload
-            };
-        },
-        [combineActions(...actionsMap(faithActions))]: (
-            state = {},
-            action
-        ) => ({
+export default handleActions({
+    [getTreeOK]: (state, {
+        payload
+    }) => {
+        return {
             ...state,
-            faith: faithInfoReducer(state.faith, action)
-        }),
-        [getForestUsersOK]: (state, { payload: { content } }) => {
-            let users = {};
-            if (content) {
-                content.forEach(user => (users[user.ID] = user));
-            }
-            return {
-                ...state,
-                users
-            };
-        },
-        [getTreeListOK]: (state, { payload }) => ({
-            ...state,
-            treetypes: payload
-        }),
-        [getHonestyNewDetailOk]: (state, { payload }) => ({
-            ...state,
-            honestyList: payload
-        }),
-        [clearList]: (state, { payload }) => ({
-            ...state,
-            honestyList: payload
-        }),
-        [nurseryName]: (state, { payload }) => ({
-            ...state,
-            nurseryName: payload
-        })
+            treeLists: [payload]
+        };
     },
-    {}
-);
+    [setkeycode]: (state, {
+        payload
+    }) => {
+        return {
+            ...state,
+            keycode: payload
+        };
+    },
+    [combineActions(...actionsMap(faithActions))]: (
+        state = {},
+        action
+    ) => ({
+        ...state,
+        faith: faithInfoReducer(state.faith, action)
+    }),
+    [getForestUsersOK]: (state, {
+        payload: {
+            content
+        }
+    }) => {
+        let users = {};
+        if (content) {
+            content.forEach(user => (users[user.ID] = user));
+        }
+        return {
+            ...state,
+            users
+        };
+    },
+    [getTreeListOK]: (state, {
+        payload
+    }) => ({
+        ...state,
+        treetypes: payload
+    }),
+    [getHonestyNewDetailOk]: (state, {
+        payload
+    }) => ({
+        ...state,
+        honestyList: payload
+    }),
+    [clearList]: (state, {
+        payload
+    }) => ({
+        ...state,
+        honestyList: payload
+    }),
+    [nurseryName]: (state, {
+        payload
+    }) => ({
+        ...state,
+        nurseryName: payload
+    })
+}, {});

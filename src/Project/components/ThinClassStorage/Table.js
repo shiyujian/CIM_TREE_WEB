@@ -418,6 +418,7 @@ class Tablelevel extends Component {
                 });
                 this.dataList = rep.features;
                 console.log('最初数据', this.dataList);
+                console.log('this.userSection', this.userSection);
                 let selectKey = [];
                 this.dataList.map(item => {
                     if (item.Section === this.userSection) {

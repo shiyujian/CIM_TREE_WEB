@@ -310,9 +310,10 @@ export default class DataStatis extends Component {
     // 设置树种选项
     setTreeTypeOption (rst) {
         if (rst instanceof Array) {
+            console.log('rst', rst);
             let treetypeoption = rst.map(item => {
                 return (
-                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                    <Option key={item.ID} value={item.ID} title={item.TreeTypeName}>
                         {item.TreeTypeName}
                     </Option>
                 );

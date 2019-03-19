@@ -141,7 +141,7 @@ export default class EntranceRight extends Component {
             leftkeycode,
             treetype,
             platform: { tree = {} },
-            actions: { gettreeEntrance }
+            actions: { getTreeEntrance }
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
         const {
@@ -167,7 +167,7 @@ export default class EntranceRight extends Component {
             loading: true
         });
 
-        let rst = await gettreeEntrance({}, postdata);
+        let rst = await getTreeEntrance({}, postdata);
         let total = [];
         let data = [];
         let gpshtnum = [];

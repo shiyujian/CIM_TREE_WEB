@@ -109,15 +109,11 @@ class PlantStrengthAnalysi extends Component {
                     </Sidebar>
                     <Content>
                         <Tabs type='card' tabBarGutter={10}>
+                            <TabPane tab='树种统计' key='1'>
+                                <PlantStrength {...this.props} {...this.state} typeselect={this.typeselect.bind(this)} />
+                            </TabPane>
                             <TabPane tab='种植进度分析' key='2'>
                                 <PlantProgress {...this.props} {...this.state} />
-                            </TabPane>
-                            <TabPane tab='树种统计' key='1'>
-                                {/* <PlantStrength
-                                    {...this.props}
-                                    {...this.state}
-                                    typeselect={this.typeselect.bind(this)}
-                                /> */}
                             </TabPane>
                             <TabPane tab='定位进度分析' key='3'>
                                 {/* <PositionProgress {...this.props} {...this.state} /> */}
@@ -131,9 +127,9 @@ class PlantStrengthAnalysi extends Component {
     // 设置树种选项
     setTreeTypeOption (rst) {
         console.log('rst树种', rst);
-        let treetypeList = [];
+        let treeTypeList = [];
         rst.map(item => {
-            treetypeList.push({
+            treeTypeList.push({
                 ID: item.ID,
                 TreeTypeName: item.TreeTypeName,
                 TreeTypeNo: item.TreeTypeNo

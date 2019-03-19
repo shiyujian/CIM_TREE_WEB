@@ -33,7 +33,7 @@ const Option = Select.Option;
     })
 )
 export default class DegitalAccept extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             treeLists: [],
@@ -44,7 +44,7 @@ export default class DegitalAccept extends Component {
             resetkey: 0,
             sectionsData: [],
             smallClassesData: [],
-            treetypeoption: [], //树种
+            treetypeoption: [] // 树种
         };
     }
     componentDidMount = async () => {
@@ -68,7 +68,7 @@ export default class DegitalAccept extends Component {
             getForestUsers();
         }
         if (!treetypes) {
-            getTreeList().then(x => this.setTreeTypeOption(x))
+            getTreeList().then(x => this.setTreeTypeOption(x));
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
@@ -80,9 +80,9 @@ export default class DegitalAccept extends Component {
             await getThinClassTree(projectList);
         }
         let defaultProject = await getDefaultProject();
-            if (defaultProject) {
-                this.onSelect([defaultProject]);
-            }
+        if (defaultProject) {
+            this.onSelect([defaultProject]);
+        }
         // 类型
         let typeoption = [
             <Option key={'全部'} value={''} title={'全部'}>
@@ -124,7 +124,7 @@ export default class DegitalAccept extends Component {
             <Option key={'暂存'} value={'4'} title={'暂存'}>
                 暂存
             </Option>
-        ]
+        ];
         // 验收类型
         let ystypeoption = [
             <Option key={'全部'} value={''} title={'全部'}>
@@ -163,18 +163,18 @@ export default class DegitalAccept extends Component {
             <Option key={'总体'} value={'11'} title={'总体'}>
                 总体
             </Option>
-        ]
+        ];
         this.setState({ typeoption, zttypeoption, ystypeoption });
     }
 
-    render() {
+    render () {
         const { keycode } = this.props;
         const {
             leftkeycode,
             sectionoption,
             smallclassoption,
             thinclassoption,
-            resetkey,
+            resetkey
         } = this.state;
         const {
             platform: { tree = {} }
@@ -216,7 +216,7 @@ export default class DegitalAccept extends Component {
         );
     }
     // 树选择, 重新获取: 标段、小班、细班、树种并置空
-    onSelect(keys = [], info) {
+    onSelect (keys = [], info) {
         const {
             platform: { tree = {} }
         } = this.props;
@@ -244,7 +244,7 @@ export default class DegitalAccept extends Component {
         this.setState({
             sectionsData
         });
-        this.typeselect('')
+        this.typeselect('');
 
         // 标段
         let sections = JSON.parse(user.sections);
@@ -261,7 +261,7 @@ export default class DegitalAccept extends Component {
         }
     }
     // 设置标段选项
-    setSectionOption(rst) {
+    setSectionOption (rst) {
         let sectionOptions = [];
         try {
             if (rst instanceof Array) {
@@ -285,7 +285,7 @@ export default class DegitalAccept extends Component {
             console.log('e', e);
         }
     }
-    sectionSelect(value) {
+    sectionSelect (value) {
         const {
             sectionsData
         } = this.state;
@@ -300,7 +300,7 @@ export default class DegitalAccept extends Component {
         });
     }
     // 设置小班选项
-    setSmallClassOption(rst) {
+    setSmallClassOption (rst) {
         if (rst instanceof Array) {
             let smallclassOptions = [];
             rst.map(small => {
@@ -320,7 +320,7 @@ export default class DegitalAccept extends Component {
     }
 
     // 小班选择, 重新获取: 细班
-    smallClassSelect(value) {
+    smallClassSelect (value) {
         const {
             smallClassesData
         } = this.state;
@@ -336,7 +336,7 @@ export default class DegitalAccept extends Component {
     }
 
     // 设置细班选项
-    setThinClassOption(rst) {
+    setThinClassOption (rst) {
         if (rst instanceof Array) {
             let thinclassOptions = [];
             rst.map(thin => {
@@ -356,17 +356,17 @@ export default class DegitalAccept extends Component {
     }
 
     // 细班选择, 重新获取: 树种
-    thinClassSelect(value) {
+    thinClassSelect (value) {
     }
 
     // 重置
-    resetinput(leftkeycode) {
+    resetinput (leftkeycode) {
         this.setState({ resetkey: ++this.state.resetkey }, () => {
             this.onSelect([leftkeycode]);
         });
     }
     // 类型选择, 重新获取: 树种
-    typeselect(value) {
+    typeselect (value) {
         const { treetypes } = this.props;
         this.setState({ bigType: value });
         let selectTreeType = [];
@@ -385,11 +385,11 @@ export default class DegitalAccept extends Component {
         this.setTreeTypeOption(selectTreeType);
     }
     // 设置树种选项
-    setTreeTypeOption(rst) {
+    setTreeTypeOption (rst) {
         if (rst instanceof Array) {
             let treetypeoption = rst.map(item => {
                 return (
-                    <Option key={item.id} value={item.ID} title={item.TreeTypeName}>
+                    <Option key={item.ID} value={item.ID} title={item.TreeTypeName}>
                         {item.TreeTypeName}
                     </Option>
                 );
