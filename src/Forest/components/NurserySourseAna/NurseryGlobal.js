@@ -1,333 +1,551 @@
-import React, { Component } from 'react';
-import echarts from 'echarts';
-import { Select, DatePicker, Spin, Card, Notification } from 'antd';
-import { Cards } from '../../components';
+import React, {Component} from 'react';
+import { Row, Col, Card, DatePicker, Spin } from 'antd';
 import moment from 'moment';
-import XLSX from 'xlsx';
-const Option = Select.Option;
-const { RangePicker } = DatePicker;
+import echarts from 'echarts';
+import './NurseryGlobal.less';
 
-class NurseryGlobal extends Component {
-    static propTypes = {};
+export default class NurseryGlobal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false,
-            stime: moment()
-                .subtract(1, 'days')
-                .format('YYYY/MM/DD 00:00:00'),
-            etime: moment().format('YYYY/MM/DD 23:59:59'),
-            section: '',
-            sectionOption: [],
-            sectionsData: [],
-            queryData: [], // 查找到的数据
-            smallClassList: [] // 根据选择的项目标段获取的小班数据
+            nurseryBaseNum: 0,
+            supplierNum: 0,
+            nurseryBaseUserNum: 0,
+            supplierUserNum: 0,
+            nurseryEnterDate: moment().format('YYYY-MM-DD'), // 苗圃进场日期
+            supplierEnterDate: moment().format('YYYY-MM-DD'), // 供应商进场日期
+            nurseryBackDate: moment().format('YYYY-MM-DD'), // 苗圃退苗日期
+            supplierBackDate: moment().format('YYYY-MM-DD'), // 供应商退苗日期
+            loading1: false,
+            loading2: false,
+            loading3: false,
+            loading4: false
+
         };
     }
 
-    componentDidMount () {
-        var myChart3 = echarts.init(document.getElementById('LocationLeft'));
-        let option3 = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'shadow'
-                }
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    saveAsImage: { show: true }
-                }
-            },
-            xAxis: [
-                {
-                    type: 'category'
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value',
-                    name: '种植数',
-                    axisLabel: {
-                        formatter: '{value} 棵'
-                    }
-                }
-            ],
-            series: []
-        };
-        myChart3.setOption(option3);
-        const { section } = this.state;
-        const { leftkeycode } = this.props;
-        this.getSectionOption();
-        this.query();
-    }
-
-    getSectionOption () {
+    componentDidMount = async () => {
         const {
-            platform: { tree = {} },
+            actions: {
+                getNurseryBaseStat
+            },
             leftkeycode
         } = this.props;
-        let sectionData = (tree && tree.thinClassTree) || [];
-        let sectionOption = [];
-        sectionData.map(project => {
-            // 获取正确的项目
-            if (leftkeycode.indexOf(project.No) > -1) {
-                // 获取项目下的标段
-                let sections = project.children;
-                sections.map((section, index) => {
-                    sectionOption.push(
-                        <Option key={section.No} value={section.No}>
-                            {section.Name}
-                        </Option>
-                    );
-                });
-                this.setState({
-                    section: sections && sections[0] && sections[0].No,
-                    sectionsData: sections
-                });
-            }
-        });
+        let myChart = echarts.init(document.getElementById('nurseryEnter'));
+        let myChart1 = echarts.init(document.getElementById('supplierEnter'));
+        let myChart2 = echarts.init(document.getElementById('nurseryBack'));
+        let myChart3 = echarts.init(document.getElementById('supplierBack'));
+        let option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                    type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: []
+                // axisLabel: {
+                //     interval: 0,
+                //     rotate: 40
+                // }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [],
+                type: 'bar'
+            }]
+        };
+        myChart.setOption(option);
+        myChart1.setOption(option);
+        myChart2.setOption(option);
+        myChart3.setOption(option);
+        let data = await getNurseryBaseStat();
+        let nurseryBaseNum = (data && data.NurseryBaseNum) || 0;
+        let supplierNum = (data && data.SupplierNum) || 0;
+        let nurseryBaseUserNum = (data && data.NurseryBaseUserNum) || 0;
+        let supplierUserNum = (data && data.SupplierUserNum) || 0;
         this.setState({
-            sectionOption
+            nurseryBaseNum,
+            supplierNum,
+            nurseryBaseUserNum,
+            supplierUserNum
         });
+        if (leftkeycode) {
+            this.queryNurseryEnter();
+            this.querySupplierEnter();
+            this.queryNurseryBackDate();
+            this.querySupplierBack();
+        }
     }
 
-    componentDidUpdate (prevProps, prevState) {
-        const { section } = this.state;
-        const { leftkeycode } = this.props;
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode
+        } = this.props;
         if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
-            this.getSectionOption();
-        }
-        if (section && section !== prevState.section) {
-            this.query();
+            this.queryNurseryEnter();
+            this.querySupplierEnter();
+            this.queryNurseryBackDate();
+            this.querySupplierBack();
         }
     }
 
     render () {
-        return (
-            <Spin spinning={this.state.loading}>
-                <Card
-                    title='各小班定位进度分析'
-                    extra={
-                        <div>
-                            <a onClick={this.handleLocationDataExport.bind(this)}>
-                                导出
-                            </a>
-                        </div>
-                    }
-                >
-                    <Cards search={this.search()} title={this.title()}>
-                        <div
-                            id='LocationLeft'
-                            style={{ width: '100%', height: '400px' }}
-                        />
-                    </Cards>
-                </Card>
-            </Spin>
-        );
-    }
-    title () {
-        const { section, sectionOption } = this.state;
+        const {
+            nurseryBaseNum,
+            supplierNum,
+            nurseryBaseUserNum,
+            supplierUserNum
+        } = this.state;
         return (
             <div>
-                <Select
-                    value={section}
-                    onSelect={this.onSectionChange.bind(this)}
-                    style={{ width: '80px' }}
-                >
-                    {sectionOption}
-                </Select>
-                <span>各小班定位进度分析</span>
+                <div>
+                    <h2>实时数据{moment().format('HH:mm:ss')}</h2>
+                </div>
+                <div className='NurseryGlobal-mod_basic'>
+                    <div className='NurseryGlobal-mod-title'>
+                        <h3 className='NurseryGlobal-mod-title-h3'>关键指标</h3>
+                    </div>
+                    <div className='NurseryGlobal-table-content'>
+                        <table className='NurseryGlobal-table-layout'>
+                            <tr>
+                                <td className='NurseryGlobal-table-border'>
+                                    <div className='NurseryGlobal-table-pad'>
+                                        <div className='NurseryGlobal-table-title'>
+                                        苗圃基地账户累计注册数量
+                                        </div>
+                                        <div className='NurseryGlobal-table-num'>
+                                            {nurseryBaseNum}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className='NurseryGlobal-table-border'>
+                                    <div className='NurseryGlobal-table-pad'>
+                                        <div className='NurseryGlobal-table-title'>
+                                        供应商企业账户累计注册数量
+                                        </div>
+                                        <div className='NurseryGlobal-table-num'>
+                                            {supplierNum}
+                                        </div>
+                                    </div>
+                                </td>
+                                {/* <td className='NurseryGlobal-table-border'>
+                                    <div className='NurseryGlobal-table-pad'>
+                                        <div className='NurseryGlobal-table-title'>
+                                        苗圃个人账户累计注册数量
+                                        </div>
+                                        <div className='NurseryGlobal-table-num'>
+                                            {nurseryBaseUserNum}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className='NurseryGlobal-table-border'>
+                                    <div className='NurseryGlobal-table-pad'>
+                                        <div className='NurseryGlobal-table-title'>
+                                        供应商个人账户累计注册数量
+                                        </div>
+                                        <div className='NurseryGlobal-table-num'>
+                                            {supplierUserNum}
+                                        </div>
+                                    </div>
+                                </td> */}
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div style={{marginTop: 15}}>
+                    <h2>进场率排行榜</h2>
+                </div>
+                <div>
+                    <div>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Spin spinning={this.state.loading1} >
+                                    <Card title='苗圃进场率（前五名）'
+                                        extra={
+                                            <span>
+                                            截至日期：
+                                                <DatePicker
+                                                    defaultValue={moment()}
+                                                    onChange={this.handleNurseryEnterDate.bind(this)}
+                                                />
+                                            </span>}>
+                                        <div
+                                            id='nurseryEnter'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Card>
+                                </Spin>
+                            </Col>
+                            <Col span={12}>
+                                <Spin spinning={this.state.loading2} >
+                                    <Card title='供应商进场率（前五名）'
+                                        extra={
+                                            <span>
+                                            截至日期：
+                                                <DatePicker
+                                                    defaultValue={moment()}
+                                                    onChange={this.handleSupplierEnterDate.bind(this)}
+                                                />
+                                            </span>}>
+                                        <div
+                                            id='supplierEnter'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Card>
+                                </Spin>
+                            </Col>
+                        </Row>
+                    </div>
+                </div>
+                <div style={{marginTop: 15}}>
+                    <h2>退苗率排行榜</h2>
+                </div>
+                <div>
+                    <div>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Spin spinning={this.state.loading3} >
+                                    <Card title='苗圃退苗率（前五名）'
+                                        extra={
+                                            <span>
+                                            截至日期：
+                                                <DatePicker
+                                                    defaultValue={moment()}
+                                                    onChange={this.handleNurseryBackDate.bind(this)}
+                                                />
+                                            </span>}>
+                                        <div
+                                            id='nurseryBack'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Card>
+                                </Spin>
+                            </Col>
+                            <Col span={12}>
+                                <Spin spinning={this.state.loading4} >
+                                    <Card title='供应商退苗率（前五名）'
+                                        extra={
+                                            <span>
+                                            截至日期：
+                                                <DatePicker
+                                                    defaultValue={moment()}
+                                                    onChange={this.handleSupplierBackDate.bind(this)}
+                                                />
+                                            </span>}>
+                                        <div
+                                            id='supplierBack'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Card>
+                                </Spin>
+                            </Col>
+                        </Row>
+                    </div>
+                </div>
             </div>
         );
     }
-    onSectionChange (value) {
+    handleNurseryEnterDate (date, dateString) {
         this.setState({
-            section: value
-        });
-    }
-
-    search () {
-        return (
-            <div>
-                <span>定位时间：</span>
-                <RangePicker
-                    style={{ verticalAlign: 'middle' }}
-                    defaultValue={[
-                        moment(this.state.stime, 'YYYY/MM/DD HH:mm:ss'),
-                        moment(this.state.etime, 'YYYY/MM/DD HH:mm:ss')
-                    ]}
-                    showTime={{ format: 'HH:mm:ss' }}
-                    format={'YYYY/MM/DD HH:mm:ss'}
-                    onChange={this.datepick.bind(this)}
-                    onOk={this.datepick.bind(this)}
-                />
-            </div>
-        );
-    }
-
-    datepick (value) {
-        this.setState({
-            stime: value[0]
-                ? moment(value[0]).format('YYYY/MM/DD HH:mm:ss')
-                : '',
-            etime: value[1]
-                ? moment(value[1]).format('YYYY/MM/DD HH:mm:ss')
-                : ''
+            nurseryEnterDate: dateString
         }, () => {
-            this.query();
+            this.queryNurseryEnter();
         });
     }
-
-    async query () {
+    queryNurseryEnter = async () => {
+        const { nurseryEnterDate } = this.state;
         const {
             actions: {
-                getLocationStatBySpecfield
+                getNurseryEnterStat
+            },
+            leftkeycode
+        } = this.props;
+        try {
+            this.setState({
+                loading1: true
+            });
+            let postData = {
+                section: leftkeycode,
+                stime: '',
+                etime: moment(nurseryEnterDate).format('YYYY-MM-DD')
+            };
+            let dataNurseryEnter = await getNurseryEnterStat({}, postData);
+            let xAxisArr = [];
+            let yGrandData = [];
+            let order = 5;
+            if (dataNurseryEnter && dataNurseryEnter instanceof Array && dataNurseryEnter.length > 0) {
+                if (dataNurseryEnter.length <= 5) {
+                    order = dataNurseryEnter.length;
+                }
+                for (let i = 0; i < order; i++) {
+                    if (dataNurseryEnter[i] && dataNurseryEnter[i].Label && dataNurseryEnter[i].Label !== '0') {
+                        xAxisArr.push(dataNurseryEnter[i].Label);
+                        yGrandData.push(dataNurseryEnter[i].Num);
+                    } else {
+                        if (order < dataNurseryEnter.length) {
+                            order++;
+                        }
+                    }
+                }
             }
+            let myChart = echarts.init(document.getElementById('nurseryEnter'));
+            let option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: xAxisArr
+                    // axisLabel: {
+                    //     interval: 0,
+                    //     rotate: 40
+                    // }
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: yGrandData,
+                    type: 'bar',
+                    name: '苗圃进场率'
+                }]
+            };
+            myChart.setOption(option);
+            this.setState({
+                loading1: false
+            });
+        } catch (e) {
+            console.log('queryNurseryBackDate', e);
+        }
+    }
+    handleSupplierEnterDate (date, dateString) {
+        this.setState({
+            supplierEnterDate: dateString
+        }, () => {
+            this.querySupplierEnter();
+        });
+    }
+    querySupplierEnter = async () => {
+        const {
+            actions: {
+                getSupplierEnterStat
+            },
+            leftkeycode
         } = this.props;
         const {
-            stime,
-            etime,
-            section,
-            sectionsData
+            supplierEnterDate
         } = this.state;
-        let param = {
-            stattype: 'smallclass',
-            section: section,
-            stime: stime,
-            etime: etime
-        };
-        this.setState({ loading: true });
-        let smallClassList = [];
-        let queryData = [];
-        sectionsData.map((sectionData) => {
-            if (section === sectionData.No) {
-                smallClassList = sectionData.children;
-            }
-        });
-
-        let rst = await getLocationStatBySpecfield({}, param);
-        let units = [];
-        let complete = [];
-        let label = [];
-
-        if (rst && rst instanceof Array && rst.length > 0) {
-            queryData = rst;
-            smallClassList.map((smallClass) => {
-                rst.map(item => {
-                    let No = smallClass.No;
-                    let NoArr = No.split('-');
-                    if (NoArr.length === 4) {
-                        let smallClassNo = NoArr[0] + '-' + NoArr[1] + '-' + NoArr[3];
-                        if (item.Label === smallClassNo) {
-                            complete.push(item.Num);
-                            label.push(smallClass.Name);
-                        }
-                    };
-                });
+        try {
+            this.setState({
+                loading2: true
             });
-        };
-        this.setState({
-            queryData,
-            smallClassList
-        });
-        let myChart3 = echarts.init(document.getElementById('LocationLeft'));
-        let options3 = {
-            legend: {
-                data: ['已定位']
-            },
-            xAxis: [
-                {
-                    data: label.length > 0 ? label : units
+            let postData = {
+                section: leftkeycode,
+                stime: '',
+                etime: moment(supplierEnterDate).format('YYYY-MM-DD')
+            };
+            let dataSupplierEnter = await getSupplierEnterStat({}, postData);
+            let xAxisArr = [];
+            let yGrandData = [];
+            let order = 5;
+            if (dataSupplierEnter && dataSupplierEnter instanceof Array && dataSupplierEnter.length > 0) {
+                if (dataSupplierEnter.length <= 5) {
+                    order = dataSupplierEnter.length;
                 }
-            ],
-            grid: {
-                bottom: 50
-            },
-            dataZoom: [
-                {
-                    type: 'inside'
-                }, {
-                    type: 'slider'
-                }
-            ],
-            series: [
-                {
-                    name: '已定位',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            offset: ['50', '80'],
-                            show: true,
-                            position: 'inside',
-                            formatter: '{c}',
-                            textStyle: { color: '#FFFFFF' }
+                for (let i = 0; i < order; i++) {
+                    if (dataSupplierEnter[i] && dataSupplierEnter[i].Label && dataSupplierEnter[i].Label !== '0') {
+                        xAxisArr.push(dataSupplierEnter[i].Label);
+                        yGrandData.push(dataSupplierEnter[i].Num);
+                    } else {
+                        if (order < dataSupplierEnter.length) {
+                            order++;
                         }
-                    },
-                    data: complete
-                }
-            ]
-        };
-        myChart3.setOption(options3);
-        this.setState({ loading: false });
-    }
-
-    handleLocationDataExport = () => {
-        const {
-            queryData,
-            smallClassList
-        } = this.state;
-        if (!(queryData && queryData instanceof Array && queryData.length > 0)) {
-            Notification.warning({
-                message: '数据为空，不能导出',
-                duration: 3
-            });
-            return;
-        }
-        let tblData = [];
-        smallClassList.map((smallClass) => {
-            queryData.map((item, index) => {
-                let No = smallClass.No;
-                let NoArr = No.split('-');
-                if (NoArr.length === 4) {
-                    let smallClassNo = NoArr[0] + '-' + NoArr[1] + '-' + NoArr[3];
-                    if (item.Label === smallClassNo) {
-                        let obj = {};
-                        obj['定位数'] = item.Num;
-                        obj['小班'] = smallClass.Name;
-                        tblData.push(obj);
                     }
-                };
-            });
-        });
-        let _headers = ['小班', '定位数'];
-        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
-            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
-            .reduce((prev, next) => prev.concat(next))
-            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
-        let output = Object.assign({}, headers, testttt);
-        // 获取所有单元格的位置
-        let outputPos = Object.keys(output);
-        // 计算出范围
-        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
-        // 构建 workbook 对象
-        let wb = {
-            SheetNames: ['mySheet'],
-            Sheets: {
-                'mySheet': Object.assign({}, output, { '!ref': ref })
+                }
             }
-        };
-        XLSX.writeFile(wb, `各小班定位进度.xlsx`);
+            let myChart = echarts.init(document.getElementById('supplierEnter'));
+            let option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: xAxisArr
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: yGrandData,
+                    type: 'bar',
+                    name: '供应商进场率'
+                }]
+            };
+            myChart.setOption(option);
+            this.setState({
+                loading2: false
+            });
+        } catch (e) {
+            console.log('queryNurseryBackDate', e);
+        }
+    }
+    handleNurseryBackDate (date, dateString) {
+        this.setState({
+            nurseryBackDate: dateString
+        }, () => {
+            this.queryNurseryBackDate();
+        });
+    }
+    queryNurseryBackDate = async () => {
+        const {
+            actions: {
+                getNurseryBackStat
+            },
+            leftkeycode
+        } = this.props;
+        const {
+            nurseryBackDate
+        } = this.state;
+        try {
+            this.setState({
+                loading3: true
+            });
+            let postData = {
+                section: leftkeycode,
+                stime: '',
+                etime: moment(nurseryBackDate).format('YYYY-MM-DD')
+            };
+            let dataNurseryBack = await getNurseryBackStat({}, postData);
+
+            let xAxisArr = [];
+            let yGrandData = [];
+            let order = 5;
+            if (dataNurseryBack && dataNurseryBack instanceof Array && dataNurseryBack.length > 0) {
+                if (dataNurseryBack.length <= 5) {
+                    order = dataNurseryBack.length;
+                }
+                for (let i = 0; i < order; i++) {
+                    if (dataNurseryBack[i] && dataNurseryBack[i].Label && dataNurseryBack[i].Label !== '0') {
+                        xAxisArr.push(dataNurseryBack[i].Label);
+                        yGrandData.push(dataNurseryBack[i].Num);
+                    } else {
+                        if (order < dataNurseryBack.length) {
+                            order++;
+                        }
+                    }
+                }
+            }
+            let myChart = echarts.init(document.getElementById('nurseryBack'));
+            let option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: xAxisArr
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: yGrandData,
+                    type: 'bar',
+                    name: '苗圃退苗率'
+                }]
+            };
+            myChart.setOption(option);
+            this.setState({
+                loading3: false
+            });
+        } catch (e) {
+            console.log('queryNurseryBackDate', e);
+        }
+    }
+    handleSupplierBackDate (date, dateString) {
+        this.setState({
+            supplierBackDate: dateString
+        }, () => {
+            this.querySupplierBack();
+        });
+    }
+    querySupplierBack = async () => {
+        const {
+            actions: {
+                getSupplierBackStat
+            },
+            leftkeycode
+        } = this.props;
+        const {
+            supplierBackDate
+        } = this.state;
+        try {
+            this.setState({
+                loading4: true
+            });
+            let postData = {
+                section: leftkeycode,
+                stime: '',
+                etime: moment(supplierBackDate).format('YYYY-MM-DD')
+            };
+            let dataSupplierBack = await getSupplierBackStat({}, postData);
+            let xAxisArr = [];
+            let yGrandData = [];
+            let order = 5;
+            if (dataSupplierBack && dataSupplierBack instanceof Array && dataSupplierBack.length > 0) {
+                if (dataSupplierBack.length <= 5) {
+                    order = dataSupplierBack.length;
+                }
+                for (let i = 0; i < order; i++) {
+                    if (dataSupplierBack[i] && dataSupplierBack[i].Label && dataSupplierBack[i].Label !== '0') {
+                        xAxisArr.push(dataSupplierBack[i].Label);
+                        yGrandData.push(dataSupplierBack[i].Num);
+                    } else {
+                        if (order < dataSupplierBack.length) {
+                            order++;
+                        }
+                    }
+                }
+            }
+            let myChart = echarts.init(document.getElementById('supplierBack'));
+            let option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: xAxisArr
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: yGrandData,
+                    type: 'bar',
+                    name: '供应商退苗率'
+                }]
+            };
+            myChart.setOption(option);
+            this.setState({
+                loading4: false
+            });
+        } catch (e) {
+            console.log('queryNurseryBackDate', e);
+        }
     }
 }
-
-export default NurseryGlobal;

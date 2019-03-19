@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import { Row, Col, Card, DatePicker } from 'antd';
 import moment from 'moment';
-// import './index.less';
 import echarts from 'echarts';
 import { Sidebar } from '_platform/components/layout';
 import PkCodeTree from '../PkCodeTree';
-import { getAreaTreeData, getDefaultProject } from '_platform/auth';
+import { getDefaultProject } from '_platform/auth';
 
 export default class SectionAlone extends Component {
     constructor (props) {
@@ -32,7 +31,6 @@ export default class SectionAlone extends Component {
                 await getTreeNodeList();
             }
             let defaultProject = await getDefaultProject();
-            console.log('defaultProject', defaultProject);
             if (defaultProject) {
                 await this.onSelect([defaultProject]);
             }
@@ -150,7 +148,6 @@ export default class SectionAlone extends Component {
             platform: { tree = {} }
         } = this.props;
         let treeList = (tree && tree.bigTreeList) || [];
-        console.log('treeList', treeList);
         let leftkeycode = keys[0] || '';
         let sectionObjList = [];
         treeList.map(item => {
@@ -158,7 +155,6 @@ export default class SectionAlone extends Component {
                 sectionObjList = item.children;
             }
         });
-        console.log(leftkeycode, '123');
         await this.setState({
             leftkeycode,
             sectionObjList
@@ -195,7 +191,6 @@ export default class SectionAlone extends Component {
             etime: moment(jobSumDate).format('YYYY-MM-DD')
         };
         let data = await getSectionUserStat({}, postData);
-        console.log('data', data);
         let xAxisArr = [];
         let yGrandData = [];
         sectionObjList.map(item => {
@@ -254,7 +249,6 @@ export default class SectionAlone extends Component {
             etime: moment(jobNumDate).format('YYYY-MM-DD')
         };
         let data = await getSectionUserStat({}, postData);
-        console.log('data', data);
         let xAxisArr = [];
         let yGrandData = [];
         sectionObjList.map(item => {
@@ -313,7 +307,6 @@ export default class SectionAlone extends Component {
             etime: moment(superviseSumDate).format('YYYY-MM-DD')
         };
         let data = await getSectionUserStat({}, postData);
-        console.log('data', data);
         let xAxisArr = [];
         let yGrandData = [];
         sectionObjList.map(item => {
@@ -372,7 +365,6 @@ export default class SectionAlone extends Component {
             etime: moment(superviseNumDate).format('YYYY-MM-DD')
         };
         let data = await getSectionUserStat({}, postData);
-        console.log('data', data);
         let xAxisArr = [];
         let yGrandData = [];
         sectionObjList.map(item => {

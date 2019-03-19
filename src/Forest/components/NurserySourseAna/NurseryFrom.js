@@ -3,24 +3,18 @@ import React, {
 } from 'react';
 import echarts from 'echarts';
 import {
-    Select,
     DatePicker,
     Spin,
     Card,
     Notification
 } from 'antd';
-import {
-    Cards
-} from '../../components';
 import moment from 'moment';
 import XLSX from 'xlsx';
-const Option = Select.Option;
 
 class NurseryFrom extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
-        this.leftkeycode = '';
         this.state = {
             loading1: false,
             loading2: false,
@@ -38,20 +32,50 @@ class NurseryFrom extends Component {
         const {
             leftkeycode
         } = this.props;
+        let myChart = echarts.init(document.getElementById('NurseryCountry'));
+        let myChart1 = echarts.init(document.getElementById('NurseryProvince'));
+        let myChart2 = echarts.init(document.getElementById('NurseryCity'));
+        let option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                    type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: []
+                // axisLabel: {
+                //     interval: 0,
+                //     rotate: 40
+                // }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [],
+                type: 'bar'
+            }]
+        };
+        myChart.setOption(option);
+        myChart1.setOption(option);
+        myChart2.setOption(option);
         if (leftkeycode) {
-            this.leftkeycode = leftkeycode;
-            await this.query1();
-            await this.query2();
-            await this.query3();
+            this.query1();
+            this.query2();
+            this.query3();
         }
     }
 
-    async componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode && this.leftkeycode !== nextProps.leftkeycode) {
-            this.leftkeycode = nextProps.leftkeycode;
-            await this.query1();
-            await this.query2();
-            await this.query3();
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode
+        } = this.props;
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
+            this.query1();
+            this.query2();
+            this.query3();
         }
     }
     render () {
@@ -139,7 +163,6 @@ class NurseryFrom extends Component {
 
     async onDateChange (type, value) {
         if (type === 1) {
-            console.log('value', value);
             this.setState({
                 date1: moment(value._d).format('YYYY-MM-DD')
             }, async () => {
@@ -163,7 +186,8 @@ class NurseryFrom extends Component {
         const {
             actions: {
                 getNurseryFromData
-            }
+            },
+            leftkeycode
         } = this.props;
         const {
             date1
@@ -172,15 +196,17 @@ class NurseryFrom extends Component {
             loading1: true
         });
         let queryCountryData = await getNurseryFromData({
-            section: this.leftkeycode,
+            section: leftkeycode,
             etime: date1
         });
         let aountArray = [];
         let addressArray = [];
         if (queryCountryData instanceof Array) {
             queryCountryData.map(item => {
-                aountArray.push(item.Num);
-                addressArray.push(item.Label);
+                if (item && item.Label) {
+                    aountArray.push(item.Num);
+                    addressArray.push(item.Label);
+                }
             });
         }
         let myChart3 = echarts.init(document.getElementById('NurseryCountry'));
@@ -240,7 +266,8 @@ class NurseryFrom extends Component {
         const {
             actions: {
                 getNurseryFromData
-            }
+            },
+            leftkeycode
         } = this.props;
         this.setState({
             loading2: true
@@ -249,7 +276,7 @@ class NurseryFrom extends Component {
             date2
         } = this.state;
         let queryProvinceData = await getNurseryFromData({
-            section: this.leftkeycode,
+            section: leftkeycode,
             regioncode: '13',
             etime: date2
         });
@@ -257,8 +284,10 @@ class NurseryFrom extends Component {
         let addressArray = [];
         if (queryProvinceData instanceof Array) {
             queryProvinceData.map(item => {
-                aountArray.push(item.Num);
-                addressArray.push(item.Label);
+                if (item && item.Label) {
+                    aountArray.push(item.Num);
+                    addressArray.push(item.Label);
+                }
             });
         }
         let myChart3 = echarts.init(document.getElementById('NurseryProvince'));
@@ -318,7 +347,8 @@ class NurseryFrom extends Component {
         const {
             actions: {
                 getNurseryFromData
-            }
+            },
+            leftkeycode
         } = this.props;
         const {
             date3
@@ -327,7 +357,7 @@ class NurseryFrom extends Component {
             loading3: true
         });
         let queryCityData = await getNurseryFromData({
-            section: this.leftkeycode,
+            section: leftkeycode,
             regioncode: '1306',
             etime: date3
         });
@@ -335,8 +365,15 @@ class NurseryFrom extends Component {
         let addressArray = [];
         if (queryCityData instanceof Array) {
             queryCityData.map(item => {
-                aountArray.push(item.Num);
-                addressArray.push(item.Label);
+                if (item && item.Label) {
+                    if (item.Label === '130600') {
+                        aountArray.push(item.Num);
+                        addressArray.push('保定市');
+                    } else {
+                        aountArray.push(item.Num);
+                        addressArray.push(item.Label);
+                    }
+                }
             });
         }
         let myChart3 = echarts.init(document.getElementById('NurseryCity'));
@@ -406,10 +443,12 @@ class NurseryFrom extends Component {
         }
         let tblData = [];
         queryCountryData.map((item, index) => {
-            let obj = {};
-            obj['省份'] = item.Label;
-            obj['种植数'] = item.Num;
-            tblData.push(obj);
+            if (item && item.Label) {
+                let obj = {};
+                obj['省份'] = item.Label;
+                obj['种植数'] = item.Num;
+                tblData.push(obj);
+            }
         });
         let _headers = ['省份', '种植数'];
         let headers = _headers.map((v, i) => Object.assign({}, {
@@ -460,10 +499,12 @@ class NurseryFrom extends Component {
         }
         let tblData = [];
         queryProvinceData.map((item, index) => {
-            let obj = {};
-            obj['城市'] = item.Label;
-            obj['种植数'] = item.Num;
-            tblData.push(obj);
+            if (item && item.Label) {
+                let obj = {};
+                obj['城市'] = item.Label;
+                obj['种植数'] = item.Num;
+                tblData.push(obj);
+            }
         });
         let _headers = ['城市', '种植数'];
         let headers = _headers.map((v, i) => Object.assign({}, {
@@ -514,10 +555,18 @@ class NurseryFrom extends Component {
         }
         let tblData = [];
         queryCityData.map((item, index) => {
-            let obj = {};
-            obj['县区'] = item.Label;
-            obj['种植数'] = item.Num;
-            tblData.push(obj);
+            if (item && item.Label) {
+                let obj = {};
+                if (item.Label === '130600') {
+                    obj['县区'] = '保定市';
+                    obj['种植数'] = item.Num;
+                    tblData.push(obj);
+                } else {
+                    obj['县区'] = item.Label;
+                    obj['种植数'] = item.Num;
+                    tblData.push(obj);
+                }
+            }
         });
         let _headers = ['县区', '种植数'];
         let headers = _headers.map((v, i) => Object.assign({}, {

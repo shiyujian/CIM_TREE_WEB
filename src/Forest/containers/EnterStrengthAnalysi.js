@@ -32,7 +32,7 @@ export default class EnterStrengthAnalysi extends Component {
         super(props);
         this.state = {
             treeList: [], // 树列表
-            tabPane: '2', // 该次标签
+            tabPane: '1', // 该次标签
             sectionList: [], // 标段列表
             leftkeycode: '' // 项目code
         };

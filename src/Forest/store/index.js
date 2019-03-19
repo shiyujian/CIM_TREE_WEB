@@ -316,7 +316,7 @@ export const getDigitalAcceptDetail = forestFetchAction(
 );
 
 // 获取数字化验收人员列表
-export const getDigitalAcceptUserList = forestFetchAction(
+export const getDigitalAcceptUserList = createFetchAction(
     `${USER_API}/users/?is_active=true`,
     []
 );
@@ -338,6 +338,51 @@ export const getActivityUserStat = forestFetchAction(
 // 用户分析用户按标段统计
 export const getSectionUserStat = forestFetchAction(
     `${FOREST_API}/tree/sectionuserstat`,
+    []
+);
+// 获取苗木质量验收结果列表
+export const getMQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/qualitytrees`,
+    []
+);
+// 获取土球质量验收结果列表
+export const getTQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/samplingnurserys`,
+    []
+);
+// 获取苗木(栽植/支架/浇水)验收结果列表
+export const getZZJQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/patrolevents`,
+    []
+);
+// 根据细班信息获取树种列表
+export const getTreetypeByThinclass = forestFetchAction(
+    `${FOREST_API}/route/thinclassplans`,
+    []
+);
+// 苗木来源地分析苗圃总览 苗圃基地、供应商数据统计
+export const getNurseryBaseStat = forestFetchAction(
+    `${FOREST_API}/tree/nurserybasestat`,
+    []
+);
+// 苗木来源地分析苗圃总览 苗圃基地进场统计
+export const getNurseryEnterStat = forestFetchAction(
+    `${FOREST_API}/tree/nurseryinstatbynurserybase`,
+    []
+);
+// 苗木来源地分析苗圃总览 供应商苗木进场统计
+export const getSupplierEnterStat = forestFetchAction(
+    `${FOREST_API}/tree/nurseryinstatbysupplier`,
+    []
+);
+// 苗木来源地分析苗圃总览 苗圃基地退苗统计
+export const getNurseryBackStat = forestFetchAction(
+    `${FOREST_API}/tree/nurserybackstatbynurserybase`,
+    []
+);
+// 苗木来源地分析苗圃总览 供应商苗木退苗统计
+export const getSupplierBackStat = forestFetchAction(
+    `${FOREST_API}/tree/nurserybackstatbysupplier`,
     []
 );
 
@@ -421,7 +466,14 @@ export const actions = {
     getUserStat,
     getNewUserStat,
     getActivityUserStat,
-    getSectionUserStat
+    getSectionUserStat,
+    getTQulityCheckList,
+    getZZJQulityCheckList,
+    getNurseryBaseStat,
+    getNurseryEnterStat,
+    getSupplierEnterStat,
+    getNurseryBackStat,
+    getSupplierBackStat
 };
 export default handleActions({
     [getTreeOK]: (state, {

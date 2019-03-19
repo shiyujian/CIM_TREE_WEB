@@ -19,7 +19,7 @@ export default class WordView1 extends Component {
     }
 
     render() {
-        const { detail } = this.props;
+        const { detail, unQualifiedList } = this.props;
         let array = ['', '', '', '']
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -31,6 +31,28 @@ export default class WordView1 extends Component {
         let hgl = detail.CheckNum - detail.FailedNum; // 合格量
         if (detail.CheckNum !== 0) {
             qulityok = hgl/detail.CheckNum;
+        }
+        let lalala = []
+        if (unQualifiedList.length > 0) {
+            for (let i = 0; i <= unQualifiedList.length/2; i++) {
+                let a = 2 * i;
+                let b = 2 * i + 1;
+                if (a === unQualifiedList.length) {
+                    lalala.push (<tr>
+                        <td>{unQualifiedList[a].SXM}</td>
+                        <td colSpan="2">{unQualifiedList[a].SupervisorInfo}</td>
+                        <td>{''}</td>
+                        <td colSpan="2">{''}</td>
+                    </tr>)
+                } else {
+                    lalala.push (<tr>
+                        <td>{unQualifiedList[a].SXM}</td>
+                        <td colSpan="2">{unQualifiedList[a].SupervisorInfo}</td>
+                        <td>{unQualifiedList[b]}</td>
+                        <td colSpan="2">{unQualifiedList[b].SupervisorInfo}</td>
+                    </tr>)
+                }
+            }
         }
         return (
             <Spin spinning={this.state.loading}>
@@ -102,6 +124,9 @@ export default class WordView1 extends Component {
                                     <td>二维码号牌</td>
                                     <td colSpan="2">不合格原因</td>
                                 </tr>
+                                {
+                                    lalala.length > 0 ? lalala : null
+                                }
                                 <tr>
                                     <td className='hei110' >施工单位质量专检结果</td>
                                     <td colSpan="5">

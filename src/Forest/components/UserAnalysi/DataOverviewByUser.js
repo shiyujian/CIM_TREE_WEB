@@ -75,7 +75,7 @@ export default class DataOverviewByUser extends Component {
                     }
                 </div>
                 <div style={{margin: 5}}>
-                    <Tabs tabBarGutter='10' onChange={this.handleTabChangele.bind(this)}>
+                    <Tabs tabBarGutter={10} onChange={this.handleTabChangele.bind(this)}>
                         <TabPane tab='新增账号' key='NewUser'>
                             <Spin spinning={loading}>
                                 <div
@@ -174,7 +174,6 @@ export default class DataOverviewByUser extends Component {
                 };
 
                 let newUserContent = await getNewUserStat({}, postData);
-                console.log('newUserContent', newUserContent);
                 if (newUserContent && newUserContent instanceof Array && newUserContent.length > 0) {
                     this.setState({
                         newUserContent
@@ -195,7 +194,6 @@ export default class DataOverviewByUser extends Component {
                 };
 
                 let activityUserContent = await getActivityUserStat({}, postData);
-                console.log('activityUserContent', activityUserContent);
                 if (activityUserContent && activityUserContent instanceof Array && activityUserContent.length > 0) {
                     this.setState({
                         activityUserContent
