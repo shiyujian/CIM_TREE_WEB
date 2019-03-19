@@ -30,10 +30,11 @@ export default class VehicleAnalysi extends Component {
         this.handleDateReturn = this.handleDateReturn.bind(this); // 更改进场截至时间
     }
     componentDidMount = async () => {
-
+        
     }
     componentWillReceiveProps (nextProps) {
-        if (this.props.sectionList !== nextProps.sectionList && this.props.leftkeycode !== nextProps.leftkeycode) {
+        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode) {
+            console.log('渲染车辆包页面');
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
             this.getBasicData();
@@ -87,7 +88,7 @@ export default class VehicleAnalysi extends Component {
                             <Card title='各标段进场车辆统计' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment(enterDate, dateFormat)} format={dateFormat} onChange={this.handleDateEnter.bind(this)} /></span>}>
                                 <Spin spinning={spinningEnter}>
                                     <div
-                                        id='enterStatistics'
+                                        id='enterVehicleStatistics'
                                         style={{ width: '100%', height: '350px' }}
                                     />
                                 </Spin>
@@ -97,7 +98,7 @@ export default class VehicleAnalysi extends Component {
                             <Card title='各标段退苗车辆统计' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment(returnDate, dateFormat)} format={dateFormat} onChange={this.handleDateReturn.bind(this)} /></span>}>
                                 <Spin spinning={spinningReturn}>
                                     <div
-                                        id='returnStatistics'
+                                        id='returnVehicleStatistics'
                                         style={{ width: '100%', height: '350px' }}
                                     />
                                 </Spin>
@@ -109,7 +110,6 @@ export default class VehicleAnalysi extends Component {
         );
     }
     handleDateEnter (date, dateString) {
-        console.log(dateString, 'dateString');
         this.setState({
             enterDate: dateString
         }, () => {
@@ -146,8 +146,8 @@ export default class VehicleAnalysi extends Component {
                 });
                 yAxisArr.push(sectionSum);
             });
-            console.log('yAxisArr', yAxisArr);
-            let myChart = echarts.init(document.getElementById('enterStatistics'));
+            let myChart = echarts.init(document.getElementById('enterVehicleStatistics'));
+            console.log('第一个数据', xAxisArr, yAxisArr);
             let option = {
                 tooltip: {
                     trigger: 'axis',
@@ -186,7 +186,6 @@ export default class VehicleAnalysi extends Component {
             stime: '',
             etime: enterDate
         }).then(rep => {
-            console.log('getCarbackstat', rep);
             this.sectionList.map(item => {
                 xAxisArr.push(item.Name);
                 let SectionSum = 0;
@@ -197,8 +196,7 @@ export default class VehicleAnalysi extends Component {
                 });
                 yAxisArr.push(SectionSum);
             });
-            console.log(yAxisArr);
-            let myChart = echarts.init(document.getElementById('returnStatistics'));
+            let myChart = echarts.init(document.getElementById('returnVehicleStatistics'));
             let option = {
                 tooltip: {
                     trigger: 'axis',

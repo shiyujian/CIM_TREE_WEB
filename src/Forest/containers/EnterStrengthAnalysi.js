@@ -89,11 +89,11 @@ export default class EnterStrengthAnalysi extends Component {
                     </Sidebar>
                     <Content>
                         <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='车辆包分析' key='1'>
-                                <VehicleAnalysi {...this.props} {...this.state} />
-                            </TabPane>
                             <TabPane tab='苗木分析' key='2'>
                                 <NurseryAnalysi {...this.props} {...this.state} />
+                            </TabPane>
+                            <TabPane tab='车辆包分析' key='1'>
+                                <VehicleAnalysi {...this.props} {...this.state} />
                             </TabPane>
                         </Tabs>
                     </Content>

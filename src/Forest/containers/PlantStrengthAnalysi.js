@@ -32,9 +32,10 @@ class PlantStrengthAnalysi extends Component {
         super(props);
         this.state = {
             leftkeycode: '', // 项目
+            tabPane: '', // 该次标签
             sectionList: [], // 标段列表
-            treetypeList: [], // 树种类型
-            treeCategory: [] // 树种大类
+            treeTypeList: [], // 树种类型
+            treeKindList: [] // 树种大类
         };
     }
 
@@ -65,7 +66,7 @@ class PlantStrengthAnalysi extends Component {
             this.onSelect([defaultProject]);
         }
         // 类型
-        const treeCategory = [{
+        const treeKindList = [{
             value: '',
             title: '全部'
         }, {
@@ -84,11 +85,12 @@ class PlantStrengthAnalysi extends Component {
             value: '5',
             title: '地被'
         }];
-        this.setState({ treeCategory });
+        this.setState({ treeKindList });
     }
     componentWillReceiveProps (nextProps) {
         const { tree } = nextProps.platform;
         if (tree) {
+            console.log(2);
             this.setState({
                 treeList: tree.bigTreeList
             });
@@ -108,15 +110,15 @@ class PlantStrengthAnalysi extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='树种统计' key='1'>
-                                <PlantStrength {...this.props} {...this.state} typeselect={this.typeselect.bind(this)} />
+                        <Tabs type='card' defaultActiveKey='3' tabBarGutter={10} onChange={this.handleTabPane.bind(this)}>
+                            {/* <TabPane tab='树种统计' key='1'>
+                                <PlantStrength {...this.props} {...this.state} />
+                            </TabPane> */}
+                            <TabPane tab='定位进度分析' key='3'>
+                                <PositionProgress {...this.props} {...this.state} />
                             </TabPane>
                             <TabPane tab='种植进度分析' key='2'>
                                 <PlantProgress {...this.props} {...this.state} />
-                            </TabPane>
-                            <TabPane tab='定位进度分析' key='3'>
-                                {/* <PositionProgress {...this.props} {...this.state} /> */}
                             </TabPane>
                         </Tabs>
                     </Content>
@@ -124,9 +126,13 @@ class PlantStrengthAnalysi extends Component {
             </Body>
         );
     }
+    handleTabPane (key) {
+        this.setState({
+            tabPane: key
+        });
+    }
     // 设置树种选项
     setTreeTypeOption (rst) {
-        console.log('rst树种', rst);
         let treeTypeList = [];
         rst.map(item => {
             treeTypeList.push({
@@ -135,28 +141,10 @@ class PlantStrengthAnalysi extends Component {
                 TreeTypeNo: item.TreeTypeNo
             });
         });
+        console.log('treeTypeList', treeTypeList);
         this.setState({
-            treetypeList
+            treeTypeList
         });
-    }
-    // 类型选择, 重新获取: 树种
-    typeselect (value) {
-        const { treetypes = [] } = this.props;
-        this.setState({ bigType: value });
-        let selectTreeType = [];
-        treetypes.map(item => {
-            if (item.TreeTypeNo == null) {
-            }
-            if (item.TreeTypeNo) {
-                try {
-                    let code = item.TreeTypeNo.substr(0, 1);
-                    if (code === value) {
-                        selectTreeType.push(item);
-                    }
-                } catch (e) { }
-            }
-        });
-        this.setTreeTypeOption(selectTreeType);
     }
     onSelect (keys) {
         const { tree } = this.props.platform;

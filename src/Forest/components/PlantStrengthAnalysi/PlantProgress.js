@@ -3,6 +3,7 @@ import { Card, Row, Col, DatePicker, Spin, Form, Button, Select } from 'antd';
 import XLSX from 'xlsx';
 import moment from 'moment';
 import echarts from 'echarts';
+
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 const { RangePicker } = DatePicker;
 const Option = Select.Option;
@@ -27,8 +28,7 @@ class PositionProgress extends Component {
             _headersThin: [], // 总种植导出表格行头
             tblDataThin: [], // 总种植导出表格数据
             startDate: moment().subtract(10, 'days').format(dateFormat),
-            endDate: moment().format(dateFormat),
-            leftkeycode: '' // 项目code
+            endDate: moment().format(dateFormat)
         };
         this.sectionList = []; // 标段列表
         this.leftkeycode = ''; // 项目code
@@ -45,24 +45,21 @@ class PositionProgress extends Component {
 
     }
     componentWillReceiveProps (nextProps) {
-        if (this.props.sectionList !== nextProps.sectionList && this.props.leftkeycode !== nextProps.leftkeycode) {
+        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode && nextProps.tabPane === '2') {
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
             this.renderTotal();
             this.renderSection();
             this.setState({
                 plantSection: this.sectionList[0].No,
-                smallClassList: this.sectionList[0].children,
-                smallNo: this.sectionList[0].children[0].No,
-                thinClassList: this.sectionList[0].children[0].children
+                smallClassList: this.sectionList[0].children
             }, () => {
                 this.renderSmallClass();
-                this.renderThin();
+                this.renderThinClass();
             });
         }
     }
     render () {
-        console.log('sectionList', this.sectionList);
         const { startDate, endDate, spinningTotal, spinningSection, spinningSmall, spinningThin, plantSection, smallClassList, smallNo } = this.state;
         return (
             <div>
@@ -196,10 +193,10 @@ class PositionProgress extends Component {
         this.handleExport(tblDataThin, _headersThin, '各细班种植进度分析.xlsx');
     }
     onSearch () {
-
+        this.renderTotal();
+        this.renderSection();
     }
     handleDate (date, dateString) {
-        console.log('dateString', dateString);
         this.setState({
             startDate: dateString[0],
             endDate: dateString[1]
@@ -268,7 +265,7 @@ class PositionProgress extends Component {
                     data: sectionData
                 });
             });
-            console.log(series, 'series');
+            console.log('渲染种植进度的图表');
             // 渲染图表
             let myChart = echarts.init(document.getElementById('totalPlant'));
             let options = {
@@ -319,12 +316,11 @@ class PositionProgress extends Component {
             stime: startDate,
             etime: endDate
         }).then(rep => {
-            let completeArr = [];
-            let unCompleteArr = [];
+            let completeArr = [], unCompleteArr = [];
             this.sectionList.map(item => {
                 xAxisData.push(item.Name);
                 rep.map(record => {
-                    if (item.No === record.Section) {
+                    if (item.No === record.Label) {
                         completeArr.push(record.Complete);
                         unCompleteArr.push(record.UnComplete);
                         tblDataSection.push({
@@ -335,7 +331,6 @@ class PositionProgress extends Component {
                     }
                 });
             });
-            console.log('completeArr', tblDataSection, _headersSection);
             let myChart = echarts.init(document.getElementById('sectionPlant'));
             let options = {
                 legend: {
@@ -404,7 +399,6 @@ class PositionProgress extends Component {
         });
     }
     handleSmallPlant (value) {
-        console.log(value, 'value');
         let smallClassList = [];
         this.sectionList.map(item => {
             if (item.No === value) {
@@ -422,17 +416,15 @@ class PositionProgress extends Component {
         const { startDate, endDate, plantSection, smallClassList } = this.state;
         let tblDataSmall = [], _headersSmall = ['小班', '已种植', '未种植']; // 导出表格数据
         const { getCountSmall } = this.props.actions;
-        console.log('plantSection', plantSection);
         this.setState({
             spinningSmall: true
         });
         getCountSmall({}, {
-            section: plantSection,
+            section: plantSection || this.leftkeycode,
             stime: startDate,
             etime: endDate
         }).then(rep => {
-            let complete = [];
-            let unComplete = [];
+            let complete = [], unComplete = [];
             let xAxisData = [];
             smallClassList.map(item => {
                 rep.map(record => {
@@ -538,26 +530,26 @@ class PositionProgress extends Component {
             thinClassList,
             smallNo: value
         }, () => {
-            this.renderThin();
+            this.renderThinClass();
         });
     }
-    renderThin () {
+    renderThinClass () {
         const { startDate, endDate, plantSection, smallNo, thinClassList } = this.state;
         let tblDataThin = [], _headersThin = []; // 表格数据
         const { getCountThin } = this.props.actions;
         this.setState({
             spinningThin: true
         });
+        let smallNoArr = smallNo.split('-');
+        let no = smallNoArr[0] + '-' + smallNoArr[1] + '-' + smallNoArr[3];
         getCountThin({}, {
-            no: smallNo,
+            no: no,
             section: plantSection,
             stime: startDate,
             etime: endDate
         }).then(rep => {
-            console.log(rep, 'rep');
-            let complete = [];
-            let unComplete = [];
             let xAxisData = [];
+            let complete = [], unComplete = [];
             thinClassList.map(item => {
                 rep.map(record => {
                     let recordNo = '';
