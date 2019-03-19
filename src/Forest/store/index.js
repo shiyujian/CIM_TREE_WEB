@@ -360,9 +360,31 @@ export const getTreetypeByThinclass = forestFetchAction(
     `${FOREST_API}/route/thinclassplans`,
     []
 );
-
-
-
+// 苗木来源地分析苗圃总览 苗圃基地、供应商数据统计
+export const getNurseryBaseStat = forestFetchAction(
+    `${FOREST_API}/tree/nurserybasestat`,
+    []
+);
+// 苗木来源地分析苗圃总览 苗圃基地进场统计
+export const getNurseryEnterStat = forestFetchAction(
+    `${FOREST_API}/tree/nurseryinstatbynurserybase`,
+    []
+);
+// 苗木来源地分析苗圃总览 供应商苗木进场统计
+export const getSupplierEnterStat = forestFetchAction(
+    `${FOREST_API}/tree/nurseryinstatbysupplier`,
+    []
+);
+// 苗木来源地分析苗圃总览 苗圃基地退苗统计
+export const getNurseryBackStat = forestFetchAction(
+    `${FOREST_API}/tree/nurserybackstatbynurserybase`,
+    []
+);
+// 苗木来源地分析苗圃总览 供应商苗木退苗统计
+export const getSupplierBackStat = forestFetchAction(
+    `${FOREST_API}/tree/nurserybackstatbysupplier`,
+    []
+);
 
 export const actions = {
     getTotalSat,
@@ -448,7 +470,12 @@ export const actions = {
     getActivityUserStat,
     getSectionUserStat,
     getTQulityCheckList,
-    getZZJQulityCheckList
+    getZZJQulityCheckList,
+    getNurseryBaseStat,
+    getNurseryEnterStat,
+    getSupplierEnterStat,
+    getNurseryBackStat,
+    getSupplierBackStat
 };
 export default handleActions({
     [getTreeOK]: (state, {

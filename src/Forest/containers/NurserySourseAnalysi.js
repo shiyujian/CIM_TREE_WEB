@@ -75,11 +75,11 @@ export default class NurserySourseAnalysi extends Component {
                     </Sidebar>
                     <Content>
                         <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='苗源地分析' key='2'>
-                                <NurseryFrom {...this.props} {...this.state} />
-                            </TabPane>
                             <TabPane tab='苗圃总览' key='1'>
                                 <NurseryGlobal {...this.props} {...this.state} />
+                            </TabPane>
+                            <TabPane tab='苗源地分析' key='2'>
+                                <NurseryFrom {...this.props} {...this.state} />
                             </TabPane>
                         </Tabs>
                     </Content>

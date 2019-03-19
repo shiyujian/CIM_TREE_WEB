@@ -1,12 +1,7 @@
 import React, {Component} from 'react';
-import { Card, Row, Col } from 'antd';
 import moment from 'moment';
 import './index.less';
 import DataOverviewByUser from './DataOverviewByUser';
-const gridStyle = {
-    width: '25%',
-    textAlign: 'center'
-};
 export default class AccountPandect extends Component {
     constructor (props) {
         super(props);
@@ -24,7 +19,6 @@ export default class AccountPandect extends Component {
             }
         } = this.props;
         let userStat = await getUserStat();
-        console.log('userStat', userStat);
         let NewUser = (userStat && userStat.NewNum) || 0;
         let ActiveUser = (userStat && userStat.ActiveNum) || 0;
         let MaxUserNum = (userStat && userStat.MaxUserNum) || 0;
@@ -55,48 +49,50 @@ export default class AccountPandect extends Component {
                     </div>
                     <div className='UserAnalysis-table-content'>
                         <table className='UserAnalysis-table-layout'>
-                            <tr>
-                                <td className='UserAnalysis-table-border'>
-                                    <div className='UserAnalysis-table-pad'>
-                                        <div className='UserAnalysis-table-title'>
+                            <tbody>
+                                <tr>
+                                    <td className='UserAnalysis-table-border'>
+                                        <div className='UserAnalysis-table-pad'>
+                                            <div className='UserAnalysis-table-title'>
                                         累计注册账户总数
+                                            </div>
+                                            <div className='UserAnalysis-table-num'>
+                                                {UserNum}
+                                            </div>
                                         </div>
-                                        <div className='UserAnalysis-table-num'>
-                                            {UserNum}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className='UserAnalysis-table-border'>
-                                    <div className='UserAnalysis-table-pad'>
-                                        <div className='UserAnalysis-table-title'>
+                                    </td>
+                                    <td className='UserAnalysis-table-border'>
+                                        <div className='UserAnalysis-table-pad'>
+                                            <div className='UserAnalysis-table-title'>
                                         日最高活跃账户数
+                                            </div>
+                                            <div className='UserAnalysis-table-num'>
+                                                {MaxUserNum}
+                                            </div>
                                         </div>
-                                        <div className='UserAnalysis-table-num'>
-                                            {MaxUserNum}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className='UserAnalysis-table-border'>
-                                    <div className='UserAnalysis-table-pad'>
-                                        <div className='UserAnalysis-table-title'>
+                                    </td>
+                                    <td className='UserAnalysis-table-border'>
+                                        <div className='UserAnalysis-table-pad'>
+                                            <div className='UserAnalysis-table-title'>
                                         当前用户活跃度
+                                            </div>
+                                            <div className='UserAnalysis-table-num'>
+                                                {ActiveUser}
+                                            </div>
                                         </div>
-                                        <div className='UserAnalysis-table-num'>
-                                            {ActiveUser}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className='UserAnalysis-table-border'>
-                                    <div className='UserAnalysis-table-pad'>
-                                        <div className='UserAnalysis-table-title'>
+                                    </td>
+                                    <td className='UserAnalysis-table-border'>
+                                        <div className='UserAnalysis-table-pad'>
+                                            <div className='UserAnalysis-table-title'>
                                         今日用户新增度
+                                            </div>
+                                            <div className='UserAnalysis-table-num'>
+                                                {NewUser}
+                                            </div>
                                         </div>
-                                        <div className='UserAnalysis-table-num'>
-                                            {NewUser}
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
