@@ -281,15 +281,15 @@ export const getStatusByID = (ID) => {
         return ''
     }
     switch (ID) {
-        case 1:
+        case 0:
             return '未申请'
-        case 2:
+        case 1:
             return '待验收'
-        case 3:
+        case 2:
             return '完成'
-        case 4:
+        case 3:
             return '退回'
-        case 5:
+        case 4:
             return '暂存'
         default:
             return ''

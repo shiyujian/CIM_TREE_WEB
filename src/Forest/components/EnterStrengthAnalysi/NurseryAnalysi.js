@@ -26,10 +26,11 @@ export default class NurseryAnalysi extends Component {
         this.handleDateReturn = this.handleDateReturn.bind(this); // 更改进场截至时间
     }
     componentDidMount = async () => {
-
+        
     }
     componentWillReceiveProps (nextProps) {
-        if (this.props.sectionList !== nextProps.sectionList && this.props.leftkeycode !== nextProps.leftkeycode) {
+        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode) {
+            console.log('渲染苗木页面');
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
             this.getBasicData();
@@ -39,7 +40,20 @@ export default class NurseryAnalysi extends Component {
     }
     // 获取关键数据
     getBasicData () {
-        
+        const { getNurserytotal } = this.props.actions;
+        // 不分项目出圃，进场数量
+        getNurserytotal({}, {
+            section: this.leftkeycode
+        }).then(rep => {
+            let totalEnter = rep.TotalNum - rep.BackNum;
+            let todayEnter = rep.TodayTotalNum - rep.TodayBackNum;
+            this.setState({
+                totalStage: rep.TotalNum, // 车辆累计出圃数量
+                totalEnter, // 车辆累计进场数量
+                todayStage: rep.TodayTotalNum,
+                todayEnter
+            });
+        });
     }
 
     render () {
@@ -72,7 +86,7 @@ export default class NurseryAnalysi extends Component {
                             <Card title='各标段进场苗木统计' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment(enterDate, dateFormat)} format={dateFormat} onChange={this.handleDateEnter.bind(this)} /></span>}>
                                 <Spin spinning={spinningEnter}>
                                     <div
-                                        id='enterStatistics'
+                                        id='enterNurseryStatistics'
                                         style={{ width: '100%', height: '350px' }}
                                     />
                                 </Spin>
@@ -82,7 +96,7 @@ export default class NurseryAnalysi extends Component {
                             <Card title='各标段进场退苗统计' bordered={false} extra={<span>截至日期：<DatePicker defaultValue={moment(returnDate, dateFormat)} format={dateFormat} onChange={this.handleDateReturn.bind(this)} /></span>}>
                                 <Spin spinning={spinningReturn}>
                                     <div
-                                        id='returnStatistics'
+                                        id='returnNurseryStatistics'
                                         style={{ width: '100%', height: '350px' }}
                                     />
                                 </Spin>
@@ -94,7 +108,6 @@ export default class NurseryAnalysi extends Component {
         );
     }
     handleDateEnter (date, dateString) {
-        console.log(dateString, 'dateString');
         this.setState({
             enterDate: dateString
         }, () => {
@@ -132,7 +145,7 @@ export default class NurseryAnalysi extends Component {
                 yAxisArr.push(sectionSum);
             });
             console.log('yAxisArr', yAxisArr);
-            let myChart = echarts.init(document.getElementById('enterStatistics'));
+            let myChart = echarts.init(document.getElementById('enterNurseryStatistics'));
             let option = {
                 tooltip: {
                     trigger: 'axis',
@@ -144,9 +157,15 @@ export default class NurseryAnalysi extends Component {
                     type: 'category',
                     data: xAxisArr
                 },
-                yAxis: {
-                    type: 'value'
-                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '种植数',
+                        axisLabel: {
+                            formatter: '{value} 棵'
+                        }
+                    }
+                ],
                 series: [{
                     data: yAxisArr,
                     type: 'bar'
@@ -181,8 +200,7 @@ export default class NurseryAnalysi extends Component {
                 });
                 yAxisArr.push(SectionSum);
             });
-            console.log(yAxisArr, 'yAxisArr');
-            let myChart = echarts.init(document.getElementById('returnStatistics'));
+            let myChart = echarts.init(document.getElementById('returnNurseryStatistics'));
             let option = {
                 tooltip: {
                     trigger: 'axis',
@@ -194,9 +212,15 @@ export default class NurseryAnalysi extends Component {
                     type: 'category',
                     data: xAxisArr
                 },
-                yAxis: {
-                    type: 'value'
-                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '种植数',
+                        axisLabel: {
+                            formatter: '{value} 棵'
+                        }
+                    }
+                ],
                 series: [{
                     data: yAxisArr,
                     type: 'bar'

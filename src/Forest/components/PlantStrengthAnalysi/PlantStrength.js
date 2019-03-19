@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import { Card, Row, Col, List, Form, Select, Button } from 'antd';
+import { Card, Row, Col, List, Form, Select, Button, Table } from 'antd';
 import XLSX from 'xlsx';
 import moment from 'moment';
 import echarts from 'echarts';
 
-import '../index.less';
 const gridStyle = {
     width: '25%',
     textAlign: 'center'
@@ -34,7 +33,9 @@ class PlantStrength extends Component {
             thinClassListTree: [], // 树种细班列表
             treeKind: '', // 树的大类code
             treeTypeNo: '', // 树种code
-            treeTypeList: [], // 树种列表
+            treeTypeRanking: [], // 所有栽植树种排名
+            newTreeTypeList: [], // 树种列表
+            treeTypeDisplayTable: false, // 是否表格展示
             plantAmount: 0, // 累计种植数量
             plantToday: 0, // 今日种植总数
             locationToday: 0, // 今日定位数量
@@ -51,6 +52,7 @@ class PlantStrength extends Component {
         this.handleSectionTree = this.handleSectionTree.bind(this); // 树种修改标段
         this.handleSmallClassTree = this.handleSmallClassTree.bind(this); // 树种修改标段
         this.handleThinClassTree = this.handleThinClassTree.bind(this); // 树种修改标段
+        this.onTypeChange = this.onTypeChange.bind(this); // 树种大类选择
     }
     componentDidMount = async () => {
 
@@ -59,10 +61,9 @@ class PlantStrength extends Component {
         const {
             actions: { getTotalSat, getLocationStat, getCount, getLocationStatBySpecfield }
         } = this.props;
-        if (this.props.sectionList !== nextProps.sectionList && this.props.leftkeycode !== nextProps.leftkeycode) {
+        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode && nextProps.tabPane === '1') {
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
-            console.log(this.sectionList, 'this.sectionList');
             // 获取累计种植，定位信息
             let plantAmount = await getTotalSat({}, {
                 statType: 'tree',
@@ -95,22 +96,40 @@ class PlantStrength extends Component {
                 locationToday, // 今日定位数量
                 plantToday, // 今日栽植数量
                 locationAmount: locationStat.split(',')[0], // 累计定位数量
-                plantAmount, // 累计栽植数量
-                leftkeycode: nextProps.leftkeycode, // 项目code
-                sectionList: nextProps.sectionList // 标段列表
+                plantAmount // 累计栽植数量
             });
             this.onSearchPlant();
+            this.onQueryTree();
         }
     }
-
+    column = [
+        {
+            title: '序号',
+            dataIndex: 'index',
+            render: (record, text, index) => {
+                return <span>{index + 1}</span>;
+            },
+            width: '20%'
+        },
+        {
+            title: '树种',
+            dataIndex: 'TreeTypeName',
+            width: '40%'
+        },
+        {
+            title: '数量',
+            dataIndex: 'Num',
+            width: '40%'
+        }
+    ]
     render () {
         const {
             plantAmount, locationAmount, plantToday, locationToday,
             smallClassList, thinClassList, smallClassListTree, thinClassListTree,
-            plantSection, smallClassNo, thinClassNo, nowmessagelist,
-            plantSectionTree, smallClassNoTree, thinClassNoTree, treeKind, treeTypeList, treeTypeNo
+            plantSection, smallClassNo, thinClassNo, nowmessagelist, newTreeTypeList, treeTypeRanking,
+            plantSectionTree, smallClassNoTree, thinClassNoTree, treeKind, treeTypeNo, treeTypeDisplayTable
         } = this.state;
-        const { treeCategory } = this.props;
+        const { treeKindList, treeTypeList } = this.props;
         return (
             <div>
                 <div>
@@ -246,7 +265,7 @@ class PlantStrength extends Component {
                                     onChange={this.onTypeChange.bind(this)}
                                 >
                                     {
-                                        treeCategory.map(item => {
+                                        treeKindList.map(item => {
                                             return <Option value={item.value} key={item.value}>{item.title}</Option>;
                                         })
                                     }
@@ -264,8 +283,10 @@ class PlantStrength extends Component {
                                     onChange={this.onTreeTypeChange.bind(this)}
                                 >
                                     {
-                                        treeTypeList.map(item => {
-                                            return <Option value={item.value} key={item.value}>{item.title}</Option>;
+                                        newTreeTypeList.length > 0 ? newTreeTypeList.map(item => {
+                                            return <Option value={item.ID} key={item.ID}>{item.TreeTypeName}</Option>;
+                                        }) : treeTypeList.map(item => {
+                                            return <Option value={item.ID} key={item.ID}>{item.TreeTypeName}</Option>;
                                         })
                                     }
                                 </Select>
@@ -277,9 +298,14 @@ class PlantStrength extends Component {
                         </Form>
                     </div>
                     <div style={CardStyle}>
-                        {/* <Row gutter={16}>
+                        <Row gutter={16}>
                             <Col span={12}>
-                                <Card title='树种分布'><FB {...this.state} {...this.props} /></Card>
+                                <Card title='树种分布' extra={<Button type='primary' onClick={this.handleDistributionExport.bind(this)}>导出</Button>}>
+                                    <div
+                                        id='TreeTypeCake'
+                                        style={{ width: '100%', height: '350px' }}
+                                    />
+                                </Card>
                             </Col>
                             <Col span={12}>
                                 <Card title='树种排名'
@@ -288,28 +314,166 @@ class PlantStrength extends Component {
                                             <a onClick={this.handleTreeTypeDisplayChange.bind(this)}>
                                                 {treeTypeDisplayTable ? '图形展示' : '表格展示'}
                                             </a>
-                                            <a style={{marginLeft: 10}}
-                                                onClick={this.handleTreeTypeDataExport.bind(this)}>
+                                            <Button style={{marginLeft: 10}} type='primary'
+                                                onClick={this.handleRankingExport.bind(this)}>
                                                 导出
-                                            </a>
+                                            </Button>
                                         </div>
                                     }
                                 >
                                     {
                                         treeTypeDisplayTable
-                                            ? <PM1 {...this.state} {...this.props} />
-                                            : <PM2 {...this.state} {...this.props} />
+                                            ? <div
+                                                id='middleRight'
+                                                style={{ width: '100%', height: '350px' }}
+                                            >
+                                                <Table
+                                                    dataSource={treeTypeRanking}
+                                                    columns={this.column}
+                                                    rowKey='index'
+                                                    bordered
+                                                    pagination={false}
+                                                    scroll={{ y: 291 }}
+                                                    style={{height: '100%'}}
+                                                />
+                                            </div>
+                                            : <div
+                                                id='TreeTypeRanking'
+                                                style={{ width: '100%', height: '350px' }}
+                                            />
                                     }
                                 </Card>
                             </Col>
-                        </Row> */}
+                        </Row>
                     </div>
                 </div>
             </div>
         );
     }
     onQueryTree () {
-
+        const { treeTypeNo, thinClassNoTree, smallClassNoTree, plantSectionTree } = this.state;
+        const { getStatByTreetype } = this.props.actions;
+        getStatByTreetype({}, {
+            no: thinClassNoTree || smallClassNoTree || plantSectionTree || this.leftkeycode,
+            section: plantSectionTree,
+            treetype: treeTypeNo
+        }).then(rep => {
+            // 将获取的数据按照 Num 排序
+            rep.sort(function (a, b) {
+                if (a.Num > b.Num) {
+                    return -1;
+                } else if (a.Num < b.Num) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+            this.setState({
+                treeTypeRanking: rep
+            }, () => {
+                this.renderTreeTypeCake();
+                this.renderTreeTypeRanking();
+            });
+        });
+    }
+    renderTreeTypeRanking () {
+        const { treeTypeRanking } = this.state;
+        let treetypeName = [], treetypeNum = [];
+        treeTypeRanking.map((item, index) => {
+            if (index < 4) {
+                treetypeName.push(item.TreeTypeName);
+                treetypeNum.push(item.Num);
+            }
+        });
+        var myChart = echarts.init(document.getElementById('TreeTypeRanking'));
+        let option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    saveAsImage: { show: true }
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                boundaryGap: [0, 0.01]
+            },
+            yAxis: {
+                type: 'category',
+                data: treetypeName
+            },
+            series: [
+                {
+                    name: '数量',
+                    type: 'bar',
+                    data: treetypeNum
+                }
+            ]
+        };
+        myChart.setOption(option);
+    }
+    renderTreeTypeCake () {
+        const { treeTypeRanking } = this.state;
+        const { treeKindList } = this.props;
+        let cakeData = [];
+        treeKindList.map(item => {
+            if (item.value) {
+                let Sum = 0;
+                treeTypeRanking.map(record => {
+                    if (item.value && item.value === record.TreeTypeNo.slice(0, 1)) {
+                        Sum += record.Num;
+                    }
+                });
+                cakeData.push({
+                    name: item.title,
+                    value: Sum
+                });
+            }
+        });
+        var myChart = echarts.init(document.getElementById('TreeTypeCake'));
+        let option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['常绿乔木', '落叶乔木', '亚乔木', '灌木', '地被']
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    saveAsImage: { show: true }
+                }
+            },
+            series: [{
+                name: '访问来源',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '60%'],
+                data: cakeData,
+                itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(255, 255, 255, 0.3)'
+                    }
+                }
+            }]
+        };
+        myChart.setOption(option);
     }
     handleSectionTree (value) {
         let smallClassListTree = [];
@@ -476,24 +640,83 @@ class PlantStrength extends Component {
         });
     }
     onTypeChange (value) {
-        const { typeselect } = this.props;
-        typeselect(value || '');
+        const { treeTypeList } = this.props;
+        let newTreeTypeList = [];
+        treeTypeList.map(item => {
+            if (item.TreeTypeNo) {
+                let code = item.TreeTypeNo.substr(0, 1);
+                if (code === value) {
+                    newTreeTypeList.push(item);
+                }
+            }
+        });
         this.setState({
-            bigTypeSearch: value || '',
-            treetypeSearch: '',
-            treetypename: ''
+            treeKind: value,
+            newTreeTypeList
         });
     }
     onTreeTypeChange (value) {
-
+        this.setState({
+            treeTypeNo: value
+        });
     }
-
-    handleTreeTypeDataExport = () => {
-    
+    handleRankingExport () {
+        const { treeTypeRanking } = this.state;
+        let tblData = []; // 表格数据
+        treeTypeRanking.map(record => {
+            tblData.push({
+                '树种': record.TreeTypeName,
+                '数量': record.Num
+            });
+        });
+        this.handleExport(tblData, ['树种', '数量'], '树种排名.xlsx');
     }
-
-    handleExport = async () => {
-
+    handleDistributionExport () {
+        const { treeTypeRanking } = this.state;
+        const { treeKindList } = this.props;
+        let tblData = []; // 表格数据
+        treeKindList.map(item => {
+            if (item.value) {
+                let Sum = 0;
+                treeTypeRanking.map(record => {
+                    if (item.value && item.value === record.TreeTypeNo.slice(0, 1)) {
+                        Sum += record.Num;
+                    }
+                });
+                tblData.push({
+                    '树种分类': item.title,
+                    '数量': Sum
+                });
+            }
+        });
+        this.handleExport(tblData, ['树种分类', '数量'], '树种分布.xlsx');
+    }
+    handleExport (tblData, _headers, title) {
+        if (!(tblData && tblData instanceof Array && tblData.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, title);
     }
 }
 
