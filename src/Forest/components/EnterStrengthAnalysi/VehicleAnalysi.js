@@ -30,7 +30,7 @@ export default class VehicleAnalysi extends Component {
         this.handleDateReturn = this.handleDateReturn.bind(this); // 更改进场截至时间
     }
     componentDidMount = async () => {
-        
+
     }
     componentWillReceiveProps (nextProps) {
         console.log('nextProps', nextProps.sectionList.length, nextProps.leftkeycode, nextProps.tabPane === '1');
@@ -182,7 +182,7 @@ export default class VehicleAnalysi extends Component {
     }
     renderReturn () {
         const { getCarbackstat } = this.props.actions;
-        const { enterDate } = this.state;
+        const { returnDate } = this.state;
         let xAxisArr = [];
         let yAxisArr = [];
         this.setState({
@@ -191,7 +191,7 @@ export default class VehicleAnalysi extends Component {
         getCarbackstat({}, {
             section: this.leftkeycode,
             stime: '',
-            etime: enterDate
+            etime: returnDate
         }).then(rep => {
             this.sectionList.map(item => {
                 xAxisArr.push(item.Name);
