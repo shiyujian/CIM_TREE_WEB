@@ -168,7 +168,7 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='标段'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSection.bind(this)} value={plantSection}>
+                                <Select style={{ width: 120 }} onChange={this.handleSection.bind(this)} value={plantSection} allowClear>
                                     {
                                         this.sectionList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -212,7 +212,7 @@ class PlantStrength extends Component {
                                 </Card>
                             </Col>
                             <Col span={12}>
-                                <Card title='定位/未定位'>
+                                <Card title='定位/未定位' extra={<span>仅针对已栽植</span>}>
                                     <div
                                         id='localtionCake'
                                         style={{ width: '100%', height: '300px' }}
@@ -229,7 +229,7 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='标段'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSectionTree.bind(this)} value={plantSectionTree}>
+                                <Select style={{ width: 120 }} onChange={this.handleSectionTree.bind(this)} value={plantSectionTree} allowClear>
                                     {
                                         this.sectionList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -356,9 +356,17 @@ class PlantStrength extends Component {
     onQueryTree () {
         const { treeTypeNo, thinClassNoTree, smallClassNoTree, plantSectionTree } = this.state;
         const { getStatByTreetype } = this.props.actions;
+        let smallNo = '', thinNo = '';
+        if (smallClassNoTree) {
+            let arr = smallClassNoTree.split('-');
+            smallNo = arr[0] + '-' + arr[1] + '-' + arr[3];
+        } else if (thinClassNoTree) {
+            let arr = thinClassNoTree.split('-');
+            thinNo = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
+        }
         getStatByTreetype({}, {
-            no: thinClassNoTree || smallClassNoTree || plantSectionTree || this.leftkeycode,
-            section: plantSectionTree,
+            no: thinNo || smallNo || this.leftkeycode,
+            section: plantSectionTree || '',
             treetype: treeTypeNo
         }).then(rep => {
             // 将获取的数据按照 Num 排序
@@ -478,18 +486,6 @@ class PlantStrength extends Component {
         };
         myChart.setOption(option);
     }
-    handleSectionTree (value) {
-        let smallClassListTree = [];
-        this.sectionList.map(item => {
-            if (item.No === value) {
-                smallClassListTree = item.children;
-            }
-        });
-        this.setState({
-            smallClassListTree,
-            plantSectionTree: value
-        });
-    }
     handleSmallClassTree (value) {
         const { smallClassListTree } = this.state;
         let thinClassListTree = [];
@@ -508,7 +504,37 @@ class PlantStrength extends Component {
             thinClassNoTree: value
         });
     }
+    handleSectionTree (value) {
+        if (value === undefined) {
+            this.setState({
+                smallClassListTree: [],
+                smallClassNoTree: '',
+                plantSectionTree: '',
+                thinClassNoTree: ''
+            });
+            return;
+        }
+        let smallClassListTree = [];
+        this.sectionList.map(item => {
+            if (item.No === value) {
+                smallClassListTree = item.children;
+            }
+        });
+        this.setState({
+            smallClassListTree,
+            plantSectionTree: value
+        });
+    }
     handleSection (value) {
+        if (value === undefined) {
+            this.setState({
+                smallClassList: [],
+                smallClassNo: '',
+                plantSection: '',
+                thinClassNo: ''
+            });
+            return;
+        }
         let smallClassList = [];
         this.sectionList.map(item => {
             if (item.No === value) {
@@ -541,15 +567,24 @@ class PlantStrength extends Component {
     onSearchPlant () {
         const { getTreePlanting, getLocationStat } = this.props.actions;
         const { plantSection, thinClassNo, smallClassNo } = this.state;
+        console.log(smallClassNo);
+        let smallNo = '', thinNo = '';
+        if (smallClassNo) {
+            let arr = smallClassNo.split('-');
+            smallNo = arr[0] + '-' + arr[1] + '-' + arr[3];
+        } else if (thinClassNo) {
+            let arr = thinClassNo.split('-');
+            thinNo = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
+        }
         getTreePlanting({}, {
-            no: thinClassNo || smallClassNo || plantSection || this.leftkeycode,
-            section: plantSection
+            no: thinNo || smallNo || this.leftkeycode,
+            section: plantSection || ''
         }).then(rep => {
             let plantArr = rep.split(',');
             this.renderPlantCake(plantArr[1], plantArr[0]);
         });
         getLocationStat({}, {
-            no: thinClassNo || smallClassNo || plantSection || this.leftkeycode,
+            no: thinNo || smallNo || this.leftkeycode,
             section: plantSection
         }).then(rep => {
             let localtionArr = rep.split(',');
