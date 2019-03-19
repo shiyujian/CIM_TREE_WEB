@@ -314,7 +314,7 @@ export const getDigitalAcceptDetail = forestFetchAction(
 );
 
 // 获取数字化验收人员列表
-export const getDigitalAcceptUserList = forestFetchAction(
+export const getDigitalAcceptUserList = createFetchAction(
     `${USER_API}/users/?is_active=true`,
     []
 );
@@ -338,6 +338,29 @@ export const getSectionUserStat = forestFetchAction(
     `${FOREST_API}/tree/sectionuserstat`,
     []
 );
+// 获取苗木质量验收结果列表
+export const getMQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/qualitytrees`,
+    []
+);
+// 获取土球质量验收结果列表
+export const getTQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/samplingnurserys`,
+    []
+);
+// 获取苗木(栽植/支架/浇水)验收结果列表
+export const getZZJQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/patrolevents`,
+    []
+);
+// 根据细班信息获取树种列表
+export const getTreetypeByThinclass = forestFetchAction(
+    `${FOREST_API}/route/thinclassplans`,
+    []
+);
+
+
+
 
 export const actions = {
     getTotalSat,
@@ -414,12 +437,14 @@ export const actions = {
     getDigitalAcceptList,
     getDigitalAcceptUserList,
     getDigitalAcceptDetail,
-    getYSResultList,
-    getTreetypeByThinclass
+    getMQulityCheckList,
+    getTreetypeByThinclass,
     getUserStat,
     getNewUserStat,
     getActivityUserStat,
-    getSectionUserStat
+    getSectionUserStat,
+    getTQulityCheckList,
+    getZZJQulityCheckList
 };
 export default handleActions({
     [getTreeOK]: (state, {

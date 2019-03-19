@@ -83,6 +83,7 @@ export default class DegitalAcceptTable extends Component {
             visible11: false,
             itemDetail: {}, // 数字化验收详情
             treetypeoption: [], // 根据小班动态获取的树种列表
+            unQualifiedList: [], // 不合格记录列表
         };
         this.columns = [
             {
@@ -176,6 +177,7 @@ export default class DegitalAcceptTable extends Component {
             visible10,
             visible11,
             itemDetail,
+            unQualifiedList,
         } = this.state;
         return (
             <div>
@@ -198,6 +200,7 @@ export default class DegitalAcceptTable extends Component {
                 <WordView4
                     onPressOk = {this.pressOK.bind(this, 4)}
                     visible = {visible4}
+                    unQualifiedList = {unQualifiedList}
                     detail = {itemDetail}
                 />
                 <WordView5
@@ -693,7 +696,9 @@ export default class DegitalAcceptTable extends Component {
         const {
             actions: {
                 getDigitalAcceptDetail,
-                getYSResultList
+                getMQulityCheckList, // 苗木质量不合格列表
+                getTQulityCheckList, // 土球质量不合格列表
+                getZZJQulityCheckList, // 苗木 栽植/支架/浇水 不合格列表
             }
         } = this.props;
         const {
@@ -715,18 +720,10 @@ export default class DegitalAcceptTable extends Component {
             message.info('移动端详情尚未提交'); 
             return
         }
-        // only in these checktype if will have the TreeType field
-        if (checktype === 4 || checktype === 5 || checktype === 6 || checktype === 7 || checktype === 8 || checktype === 9) {
-            const postdata1 = {
-                section: section,
-                thinclass: thinclass,
-                treetype: record.TreeType
-            }
-            let result = await getYSResultList({},postdata1)
-        }
         this.setState({
             itemDetail: rst[0]
         })
+        let unQualifiedList = []
         switch (checktype) {
             case 1:
                 this.setState({ visible1: true })
@@ -738,21 +735,66 @@ export default class DegitalAcceptTable extends Component {
                 this.setState({ visible3: true })
                 break;
             case 4:
-                this.setState({ visible4: true })
+                let postdata1 = {
+                    section: section,
+                    thinclass: thinclass,
+                    treetype: rst[0].TreeType,
+                    status: 0
+                }
+                let result1 = await getMQulityCheckList({},postdata1)
+                if (result1 && result1.content && result1.content instanceof Array) {
+                    unQualifiedList = result1.content;
+                }
+                this.setState({ visible4: true, unQualifiedList })
                 break;
             case 5:
+                let postdata2 = {
+                    section: section,
+                    thinclass: thinclass,
+                    treetype: record.TreeType,
+                    status: 0
+                }
+                let result2 = await getTQulityCheckList({},postdata2)
                 this.setState({ visible5: true })
                 break;
-            case 6:
+            case 6: // 栽植
+                let postdata3 = {
+                    section: section,
+                    thinclass: thinclass,
+                    treetype: record.TreeType,
+                    status: 0,
+                    problemtype: '栽植过深或过浅,栽植未踏实,土球未解除包装物'
+                }
+                let result3 = await getTQulityCheckList({},postdata3)
                 this.setState({ visible6: true })
                 break;
-            case 7:
+            case 7: // 支架
+                let postdata4 = {
+                    section: section,
+                    thinclass: thinclass,
+                    status: 0,
+                    problemtype: '苗木支撑不牢固,苗木支撑不及时,苗木撑杆为非硬木'
+                }
+                let result4 = await getTQulityCheckList({},postdata4)
                 this.setState({ visible7: true })
                 break;
-            case 8:
+            case 8: // 浇水
+                let postdata5 = {
+                    section: section,
+                    thinclass: thinclass,
+                    status: 0,
+                    problemtype: '土堰直径不满足要求,土堰深度不满足要求,首次浇水不及时、未浇透,浇水后未封穴或封穴不密实'
+                }
+                let result5 = await getTQulityCheckList({},postdata5)
                 this.setState({ visible8: true })
                 break;
             case 9:
+                let postdata6 = {
+                    section: section,
+                    thinclass: thinclass,
+                    treetype: record.TreeType
+                }
+                let result6 = await getTQulityCheckList({},postdata6)
                 this.setState({ visible9: true })
                 break;
             case 10:
