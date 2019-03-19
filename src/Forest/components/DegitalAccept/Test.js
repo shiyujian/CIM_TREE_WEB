@@ -14,7 +14,7 @@ import {
     handleCoordinates
 } from 'Dashboard/components/auth';
 
-export default class WordView1 extends Component {
+export default class Test extends Component {
     static propTypes = {};
     constructor(props) {
         super(props);
@@ -27,23 +27,25 @@ export default class WordView1 extends Component {
 
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
+        console.log('i am coming')
         const {
             actions: {
                 getCustomViewByUserID
-            },
-            sscction,
-            tinclass
+            }
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         await getCustomViewByUserID({id: user.id});
         await this.initMap();
-        this._addAreaLayer(tinclass,sscction);
+        this._addAreaLayer('P009-01-002-002','P009-01-01');
     }
 
     componentWillUnmount () {
         this.map = null;
     }
 
+    onOk() {
+        // this.props.onPressOk(1)
+    }
     /* 初始化地图 */
     initMap () {
         const {
@@ -85,7 +87,7 @@ export default class WordView1 extends Component {
     }
 
     // 选中细班，则在地图上加载细班图层
-    _addAreaLayer = async (eventKey) => {
+    _addAreaLayer = async (eventKey,section) => {
         const {
             areaLayerList
         } = this.state;
@@ -94,7 +96,7 @@ export default class WordView1 extends Component {
         } = this.props;
         console.log(eventKey)
         try {
-            let coords = await handleAreaLayerData(eventKey, getTreearea);
+            let coords = await handleAreaLayerData(eventKey, getTreearea, section);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
@@ -141,10 +143,6 @@ export default class WordView1 extends Component {
         }
     }
 
-    onOk() {
-        this.props.onPressOk(3)
-    }
-
     render() {
         const { detail } = this.props;
         let array = ['', '', '', '']
@@ -154,56 +152,57 @@ export default class WordView1 extends Component {
         let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
         let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
         let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
+        let sjmj = detail && detail.DesignArea || ''
+        let shijmj = detail && detail.ActualArea || ''
+        let thinclass = 'P191-01-002-002'
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
                     width={800}
-                    visible={this.props.visible}
-                    title='挖穴质量验收记录'
+                    visible={this.props.visible} 
+                    title='土地整改质量验收记录'
                     onOk={this.onOk.bind(this)}
                     maskClosable={false}
                     onCancel={this.onOk.bind(this)}
                     footer={null}
                 >
                     <div className='trrdd'>
-
+                        
                         <table style={{ border: 1 }}>
                             <tbody>
                                 <tr>
-                                    <td height="60;" colSpan="1" width="118px">单位工程名称</td>
-                                    <td colSpan="3"> {unit}</td>
-                                    <td colSpan="1" width="118px">细班（小班）</td>
-                                    <td colSpan="1">{`${array[2]}(${array[3]})`}</td>
+                                    <td style={{ height: 60, width: 118 }}>单位工程名称</td>
+                                    <td colSpan = '3'>{unit}</td>
+                                    <td style={{ width: 118 }}>细班（小班）</td>
+                                    <td>{`${array[2]}(${array[3]})`}</td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" align="center">施工单位</td>
-                                    <td colSpan="3">中国交建集团</td>
+                                    <td style={{ height: 60, align: 'center' }} >施工单位</td>
+                                    <td colSpan = '3'>中国交建集团</td>
                                     <td >项目经理</td>
                                     <td >王伟</td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" align="center">施工员</td>
-                                    <td colSpan="1">{shigong}</td>
-                                    <td>设计面积</td>
-                                    <td colSpan="1">100</td>
-                                    <td>实际面积</td>
-                                    <td >95</td>
+                                    <td style={{ height: 60, align: 'center' }} colSpan = '1'>施工员</td>
+                                    <td colSpan = '1'>{shigong}</td>
+                                    <td colSpan = '1'>设计面积</td>
+                                    <td colSpan = '1'>{sjmj}</td>
+                                    <td colSpan = '1'>实际面积</td>
+                                    <td colSpan = '1'>{shijmj}</td>
                                 </tr>
                                 <tr>
-                                    <td className='hei60' >施工执行标准名称及编号</td>
-                                    <td colSpan="5"> 《雄安新区造林工作手册》</td>
+                                    <td style={{ height: 60 }} >施工执行标准名称及编号</td>
+                                    <td colSpan = '5'> 《雄安新区造林工作手册》</td>
                                 </tr>
                                 <tr>
-                                    <td colSpan="6" height="200">
-                                    验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。
-                                    ①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；
-                                    ②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。
-                                    挖穴合格率=抽检合格数量/抽检数量。
-
-			                        </td>
+                                    <td style={{ height: 100}} colSpan = '6' >
+                                        验收要点：以细班或小班为单位，对土地整理进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带的微地形处理、垃圾和碎石处理情况进行打分。
+                                        ①微地形按照设计要求精准完成，垃圾碎石清除干净，计90分以上，通过检验；
+                                        ②微地形处理或垃圾碎石处理总体较好，但仍有不足，需整改。
+			                    </td>
                                 </tr>
                                 <tr>
-                                <td style={{ height: 300 }} colSpan = '6'>
+                                    <td style={{ height: 300 }} colSpan = '6'>
                                     <div
                                         id='mapidd'
                                         style={{
@@ -211,33 +210,27 @@ export default class WordView1 extends Component {
                                             borderLeft: '1px solid #ccc'
                                         }}
                                     />
-                                    </td>
+			                    </td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" colSpan="1" width="118px">样带面积</td>
-                                    <td colSpan="3">100</td>
-                                    <td colSpan="1" width="118px">合格率</td>
-                                    <td colSpan="1">95%</td>
-                                </tr>
-                                <tr>
-                                    <td className='hei110' >施工单位质量专检结果</td>
-                                    <td colSpan="5">
+                                    <td style={{ height: 110 }} >施工单位质量专检结果</td>
+                                    <td colSpan = '5'>
                                         <div>
                                             <p>项目专业质量检查员：</p>
-                                            <p className='marL300'>年</p>
-                                            <p className='marL30'>月</p>
-                                            <p className='marL30'>日</p>
+                                            <p style={{ marginLeft: 300 }}>年</p>
+                                            <p style={{ marginLeft: 30 }}>月</p>
+                                            <p style={{ marginLeft: 30 }}>日</p>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td className='hei110' >监理（建设）单位验收记录</td>
-                                    <td colSpan="5">
+                                    <td style={{ height: 110 }} >监理（建设）单位验收记录</td>
+                                    <td colSpan = '5'>
                                         <div>
-                                            <p>监理工程师：</p><p>{jianli}</p>
-                                            <p className='marL300'>年</p>
-                                            <p className='marL30'>月</p>
-                                            <p className='marL30'>日</p>
+                                            <p>监理工程师：</p><p>{jianli}</p><p>{jianli}</p>
+                                            <p style={{ marginLeft: 300 }}>年</p>
+                                            <p style={{ marginLeft: 30 }}>月</p>
+                                            <p style={{ marginLeft: 30 }}>日</p>
                                         </div>
                                     </td>
                                 </tr>

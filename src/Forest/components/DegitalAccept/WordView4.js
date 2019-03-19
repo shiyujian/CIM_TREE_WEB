@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Spin, Modal, Row, Col } from 'antd';
 import './index.less'
-
+/* global $ */
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor(props) {
@@ -12,6 +12,53 @@ export default class WordView1 extends Component {
     }
 
     componentDidMount() {
+        const { unQualifiedList } = this.props;
+        if (unQualifiedList.length > 0) {
+            for (let i = 0; i < unQualifiedList.length/2; i++) {
+                let a = 2 * i;
+                let b = 2 * i + 1;
+                if (a !== unQualifiedList.length) {
+                    $('#trskr').after(
+                        '<tr>'
+                            +'<td>'+unQualifiedList[a].SXM+'</td>'
+                            +'<td colSpan="2">'+unQualifiedList[a].SupervisorInfo+'</td>'
+                            +'<td>'+unQualifiedList[b].SXM+'</td>'
+                            +'<td colSpan="2">'+unQualifiedList[b].SupervisorInfo+'</td>'
+                        +'</tr>'
+                    )
+                } else {
+                    $('#trskr').after(
+                        '<tr>'
+                            +'<td>'+unQualifiedList[a].SXM+'</td>'
+                            +'<td colSpan="2">'+unQualifiedList[a].SupervisorInfo+'</td>'
+                            +'<td>'+''+'</td>'
+                            +'<td colSpan="2">'+''+'</td>'
+                        +'</tr>'
+                    )
+                }
+                // if (a === unQualifiedList.length) {
+                //     let x = document.getElementById('mytable').insertRow(9)
+                //     let y = x.insertCell(0)
+                //     let z = x.insertCell(1)
+                //     let w = x.insertCell(2)
+                //     let v = x.insertCell(3)
+                //     y.innerHTML = unQualifiedList[a].SXM
+                //     z.innerHTML = unQualifiedList[a].SupervisorInfo
+                //     w.innerHTML = unQualifiedList[b].SXM
+                //     v.innerHTML = unQualifiedList[b].SupervisorInfo
+                // } else {
+                //     let x = document.getElementById('mytable').insertRow(9)
+                //     let y = x.insertCell(0)
+                //     let z = x.insertCell(1)
+                //     let w = x.insertCell(2)
+                //     let v = x.insertCell(3)
+                //     y.innerHTML = unQualifiedList[a].SXM
+                //     z.innerHTML = unQualifiedList[a].SupervisorInfo
+                //     w.innerHTML = ''
+                //     v.innerHTML = ''
+                // }
+            }
+        }
     }
 
     onOk() {
@@ -27,32 +74,11 @@ export default class WordView1 extends Component {
         let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
         let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
         let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
+        let treetypename = detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName;
         let qulityok = 0; // 默认全部不合格
         let hgl = detail.CheckNum - detail.FailedNum; // 合格量
         if (detail.CheckNum !== 0) {
             qulityok = hgl/detail.CheckNum;
-        }
-        let lalala = []
-        if (unQualifiedList.length > 0) {
-            for (let i = 0; i <= unQualifiedList.length/2; i++) {
-                let a = 2 * i;
-                let b = 2 * i + 1;
-                if (a === unQualifiedList.length) {
-                    lalala.push (<tr>
-                        <td>{unQualifiedList[a].SXM}</td>
-                        <td colSpan="2">{unQualifiedList[a].SupervisorInfo}</td>
-                        <td>{''}</td>
-                        <td colSpan="2">{''}</td>
-                    </tr>)
-                } else {
-                    lalala.push (<tr>
-                        <td>{unQualifiedList[a].SXM}</td>
-                        <td colSpan="2">{unQualifiedList[a].SupervisorInfo}</td>
-                        <td>{unQualifiedList[b]}</td>
-                        <td colSpan="2">{unQualifiedList[b].SupervisorInfo}</td>
-                    </tr>)
-                }
-            }
         }
         return (
             <Spin spinning={this.state.loading}>
@@ -62,13 +88,13 @@ export default class WordView1 extends Component {
                     title='苗木质量验收记录'
                     onOk={this.onOk.bind(this)}
                     maskClosable={false}
+                    key={this.props.keyy}
                     onCancel={this.onOk.bind(this)}
                     footer={null}
                 >
                     <div className='trrdd'>
-
                         <table style={{ border: 1 }}>
-                            <tbody>
+                            <tbody  id='mytable'>
                                 <tr>
                                     <td height="60;" colSpan="1" width="118px">单位工程名称</td>
                                     <td colSpan="3"> {unit}</td>
@@ -85,7 +111,7 @@ export default class WordView1 extends Component {
                                     <td height="60;" align="center">施工员</td>
                                     <td colSpan="1">{shigong}</td>
                                     <td>苗木品种</td>
-                                    <td colSpan="1">100</td>
+                                    <td colSpan="1">{treetypename}</td>
                                     <td>苗木规格</td>
                                     <td >95</td>
                                 </tr>
@@ -118,15 +144,12 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td colSpan="6">不合格苗木记录</td>
                                 </tr>
-                                <tr>
+                                <tr id='trskr'>
                                     <td>二维码号牌</td>
                                     <td colSpan="2">不合格原因</td>
                                     <td>二维码号牌</td>
                                     <td colSpan="2">不合格原因</td>
                                 </tr>
-                                {
-                                    lalala.length > 0 ? lalala : null
-                                }
                                 <tr>
                                     <td className='hei110' >施工单位质量专检结果</td>
                                     <td colSpan="5">

@@ -25,6 +25,7 @@ import WordView8 from './WordView8';
 import WordView9 from './WordView9';
 import WordView10 from './WordView10';
 import WordView11 from './WordView11';
+import Test from './Test'
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -70,6 +71,7 @@ export default class DegitalAcceptTable extends Component {
             jl: '', // 监理
             shigongOptions: [],
             jianliOptions: [],
+            visible: false,
             visible1: false,
             visible2: false,
             visible3: false,
@@ -84,7 +86,14 @@ export default class DegitalAcceptTable extends Component {
             itemDetail: {}, // 数字化验收详情
             treetypeoption: [], // 根据小班动态获取的树种列表
             unQualifiedList: [], // 不合格记录列表
+            key4: Math.random(),
+            key5: Math.random(),
+            key6: Math.random(),
+            key7: Math.random(),
+            key8: Math.random(),
         };
+        this.sscction = '',
+        this.tinclass = '',
         this.columns = [
             {
                 title: '序号',
@@ -165,6 +174,7 @@ export default class DegitalAcceptTable extends Component {
     render() {
         const { 
             curingTreeData,
+            visible,
             visible1,
             visible2,
             visible3,
@@ -178,70 +188,114 @@ export default class DegitalAcceptTable extends Component {
             visible11,
             itemDetail,
             unQualifiedList,
+            key4,
+            key5,
+            key6,
+            key7,
+            key8
         } = this.state;
         return (
             <div>
                 {this.treeTable(curingTreeData)}
-                <WordView1 
+                {
+                    visible && <Test 
+                    visible={this.state.visible}
+                    onPressOk = {this.pressOK.bind(this, 1)}
+                    {...this.props}/>
+                }
+                {
+                    visible1 && <WordView1 
                     onPressOk = {this.pressOK.bind(this, 1)}
                     visible = {visible1}
+                    sscction = {this.sscction}
+                    tinclass = {this.ThinClass}
                     detail = {itemDetail}
+                    {...this.props}
                 />
-                <WordView2
+                }
+                {
+                    visible2 && <WordView2
                     onPressOk = {this.pressOK.bind(this, 2)}
                     visible = {visible2}
+                    sscction = {this.sscction}
+                    tinclass = {this.ThinClass}
                     detail = {itemDetail}
+                    {...this.props}
                 />
-                <WordView3
+                }
+                {
+                    visible3 && <WordView3
                     onPressOk = {this.pressOK.bind(this, 3)}
                     visible = {visible3}
+                    sscction = {this.sscction}
+                    tinclass = {this.ThinClass}
                     detail = {itemDetail}
+                    {...this.props}
                 />
-                <WordView4
+                }
+                {
+                    visible4 && <WordView4
                     onPressOk = {this.pressOK.bind(this, 4)}
                     visible = {visible4}
+                    keyy={key4}
                     unQualifiedList = {unQualifiedList}
                     detail = {itemDetail}
                 />
-                <WordView5
+                }
+                {
+                    visible5 && <WordView5
                     onPressOk = {this.pressOK.bind(this, 5)}
                     visible = {visible5}
                     detail = {itemDetail}
                 />
-                <WordView6
+                }
+                {
+                    visible6 && <WordView6
                     onPressOk = {this.pressOK.bind(this, 6)}
                     visible = {visible6}
                     detail = {itemDetail}
                 />
-                <WordView7
+                }
+                {
+                    visible7 && <WordView7
                     onPressOk = {this.pressOK.bind(this, 7)}
                     visible = {visible7}
                     detail = {itemDetail}
                 />
-                <WordView8
+                }
+                {
+                    visible8 && <WordView8
                     onPressOk = {this.pressOK.bind(this, 8)}
                     visible = {visible8}
                     detail = {itemDetail}
                 />
-                <WordView9
+                }
+                {
+                    visible9 && <WordView9
                     onPressOk = {this.pressOK.bind(this, 9)}
                     visible = {visible9}
                     detail = {itemDetail}
                 />
-                <WordView10
+                }
+                {
+                    visible10 && <WordView10
                     onPressOk = {this.pressOK.bind(this, 10)}
                     visible = {visible10}
                     detail = {itemDetail}
                 />
-                <WordView11
+                }
+                {
+                    visible11 && <WordView11
                     onPressOk = {this.pressOK.bind(this, 11)}
                     visible = {visible11}
                     detail = {itemDetail}
                 />
+                }
             </div>
         );
     }
     pressOK (which) {
+        this.setState({visible: false})
         switch (which) {
             case 1:
                 this.setState({ visible1: false })
@@ -684,7 +738,7 @@ export default class DegitalAcceptTable extends Component {
     }
 
     exportFile(type, record) {
-        this.setState({visible1: true})
+        this.setState({visible: true})
         if (type === 'single') { // 单个导出
 
         } else if (type === 'mutiple') {
@@ -720,6 +774,8 @@ export default class DegitalAcceptTable extends Component {
             message.info('移动端详情尚未提交'); 
             return
         }
+        this.sscction = rst[0].Section,
+        this.tinclass = rst[0].ThinClass,
         this.setState({
             itemDetail: rst[0]
         })
@@ -745,7 +801,7 @@ export default class DegitalAcceptTable extends Component {
                 if (result1 && result1.content && result1.content instanceof Array) {
                     unQualifiedList = result1.content;
                 }
-                this.setState({ visible4: true, unQualifiedList })
+                this.setState({ visible4: true, unQualifiedList, key4: Math.random() })
                 break;
             case 5:
                 let postdata2 = {
@@ -755,7 +811,7 @@ export default class DegitalAcceptTable extends Component {
                     status: 0
                 }
                 let result2 = await getTQulityCheckList({},postdata2)
-                this.setState({ visible5: true })
+                this.setState({ visible5: true, key5: Math.random() })
                 break;
             case 6: // 栽植
                 let postdata3 = {
@@ -766,7 +822,7 @@ export default class DegitalAcceptTable extends Component {
                     problemtype: '栽植过深或过浅,栽植未踏实,土球未解除包装物'
                 }
                 let result3 = await getTQulityCheckList({},postdata3)
-                this.setState({ visible6: true })
+                this.setState({ visible6: true, key6: Math.random() })
                 break;
             case 7: // 支架
                 let postdata4 = {
@@ -776,7 +832,7 @@ export default class DegitalAcceptTable extends Component {
                     problemtype: '苗木支撑不牢固,苗木支撑不及时,苗木撑杆为非硬木'
                 }
                 let result4 = await getTQulityCheckList({},postdata4)
-                this.setState({ visible7: true })
+                this.setState({ visible7: true, key7: Math.random() })
                 break;
             case 8: // 浇水
                 let postdata5 = {
@@ -786,7 +842,7 @@ export default class DegitalAcceptTable extends Component {
                     problemtype: '土堰直径不满足要求,土堰深度不满足要求,首次浇水不及时、未浇透,浇水后未封穴或封穴不密实'
                 }
                 let result5 = await getTQulityCheckList({},postdata5)
-                this.setState({ visible8: true })
+                this.setState({ visible8: true, key8: Math.random() })
                 break;
             case 9:
                 let postdata6 = {

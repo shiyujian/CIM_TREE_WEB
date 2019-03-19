@@ -561,10 +561,15 @@ export const getThinClassName = (thinClass, section, totalThinClass, bigTreeList
 };
 
 // 点击区域地块处理细班坐标数据
-export const handleAreaLayerData = async (eventKey, getTreearea) => {
+export const handleAreaLayerData = async (eventKey, getTreearea, sectionn) => {
     let handleKey = eventKey.split('-');
     let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
     let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+    if (handleKey.length === 4) {
+        no = eventKey;
+        section = sectionn
+    }
+    
     try {
         let rst = await getTreearea({}, { no: no });
         if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {

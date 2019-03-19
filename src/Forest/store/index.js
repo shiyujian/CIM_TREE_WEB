@@ -361,6 +361,11 @@ export const getTreetypeByThinclass = forestFetchAction(
     []
 );
 
+export const getCustomViewByUserIDOk = createAction(`${ID}根据用户ID获取用户自定义视图`);
+// 根据用户ID获取用户自定义视图
+export const getCustomViewByUserID = createFetchAction(`${USER_API}/user/{{id}}/custom-view/`, [getCustomViewByUserIDOk], 'GET');
+export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET'); // 获取细班详情
+
 
 
 
@@ -448,7 +453,10 @@ export const actions = {
     getActivityUserStat,
     getSectionUserStat,
     getTQulityCheckList,
-    getZZJQulityCheckList
+    getZZJQulityCheckList,
+    getCustomViewByUserIDOk,
+    getCustomViewByUserID,
+    getTreearea
 };
 export default handleActions({
     [getTreeOK]: (state, {
@@ -511,5 +519,11 @@ export default handleActions({
     }) => ({
         ...state,
         nurseryName: payload
-    })
+    }),
+    [getCustomViewByUserIDOk]: (state, { payload }) => {
+        return {
+            ...state,
+            customViewByUserID: payload
+        };
+    },
 }, {});
