@@ -46,6 +46,8 @@ export const getCarinstat = forestFetchAction(`${FOREST_API}/tree/carinstat?`, [
 export const getCarbackstat = forestFetchAction(`${FOREST_API}/tree/carbackstat?`); // 车辆包退苗分析
 export const getNurseryinstat = forestFetchAction(`${FOREST_API}/tree/nurseryinstat?`); // 苗木进场分析
 export const getNurserybackstat = forestFetchAction(`${FOREST_API}/tree/nurserybackstat?`); // 苗木退苗分析
+export const getNurserytotal = forestFetchAction(`${FOREST_API}/tree/nurserytotal?`); // 苗木进场出圃统计
+export const getLocationtotalstat = forestFetchAction(`${FOREST_API}/tree/locationtotalstat?`); // 苗木定位总统计
 
 export const getTreeevery = forestFetchAction(
     `${FOREST_API}/tree/treetypes`,
@@ -374,6 +376,8 @@ export const actions = {
     getNurseryBackstat,
     getNurseryinstat,
     getNurserybackstat,
+    getNurserytotal,
+    getLocationtotalstat,
     getCarpackstat,
     getCarbackstat,
     gettreetype,

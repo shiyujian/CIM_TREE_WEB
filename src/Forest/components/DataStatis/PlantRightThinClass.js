@@ -239,6 +239,7 @@ export default class PlantRightThinClass extends Component {
                 sectionClassName = item.props.children;
             }
         });
+        console.log('sectionClassName', sectionClassName);
         this.setState({
             smallClassSelect: value,
             sectionClassName
