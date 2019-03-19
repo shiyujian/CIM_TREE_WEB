@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import { Row, Col, Card, DatePicker } from 'antd';
 import moment from 'moment';
-// import './index.less';
 import echarts from 'echarts';
 import { Sidebar } from '_platform/components/layout';
 import PkCodeTree from '../PkCodeTree';
-import { getAreaTreeData, getDefaultProject } from '_platform/auth';
+import { getDefaultProject } from '_platform/auth';
 
 export default class SectionAlone extends Component {
     constructor (props) {

@@ -3,18 +3,13 @@ import React, {
 } from 'react';
 import echarts from 'echarts';
 import {
-    Select,
     DatePicker,
     Spin,
     Card,
     Notification
 } from 'antd';
-import {
-    Cards
-} from '../../components';
 import moment from 'moment';
 import XLSX from 'xlsx';
-const Option = Select.Option;
 
 class NurseryFrom extends Component {
     static propTypes = {};
@@ -179,8 +174,10 @@ class NurseryFrom extends Component {
         let addressArray = [];
         if (queryCountryData instanceof Array) {
             queryCountryData.map(item => {
-                aountArray.push(item.Num);
-                addressArray.push(item.Label);
+                if (item && item.Label) {
+                    aountArray.push(item.Num);
+                    addressArray.push(item.Label);
+                }
             });
         }
         let myChart3 = echarts.init(document.getElementById('NurseryCountry'));
@@ -257,8 +254,10 @@ class NurseryFrom extends Component {
         let addressArray = [];
         if (queryProvinceData instanceof Array) {
             queryProvinceData.map(item => {
-                aountArray.push(item.Num);
-                addressArray.push(item.Label);
+                if (item && item.Label) {
+                    aountArray.push(item.Num);
+                    addressArray.push(item.Label);
+                }
             });
         }
         let myChart3 = echarts.init(document.getElementById('NurseryProvince'));
@@ -335,8 +334,15 @@ class NurseryFrom extends Component {
         let addressArray = [];
         if (queryCityData instanceof Array) {
             queryCityData.map(item => {
-                aountArray.push(item.Num);
-                addressArray.push(item.Label);
+                if (item && item.Label) {
+                    if (item.Label === '130600') {
+                        aountArray.push(item.Num);
+                        addressArray.push('保定市');
+                    } else {
+                        aountArray.push(item.Num);
+                        addressArray.push(item.Label);
+                    }
+                }
             });
         }
         let myChart3 = echarts.init(document.getElementById('NurseryCity'));
@@ -406,10 +412,12 @@ class NurseryFrom extends Component {
         }
         let tblData = [];
         queryCountryData.map((item, index) => {
-            let obj = {};
-            obj['省份'] = item.Label;
-            obj['种植数'] = item.Num;
-            tblData.push(obj);
+            if (item && item.Label) {
+                let obj = {};
+                obj['省份'] = item.Label;
+                obj['种植数'] = item.Num;
+                tblData.push(obj);
+            }
         });
         let _headers = ['省份', '种植数'];
         let headers = _headers.map((v, i) => Object.assign({}, {
@@ -460,10 +468,12 @@ class NurseryFrom extends Component {
         }
         let tblData = [];
         queryProvinceData.map((item, index) => {
-            let obj = {};
-            obj['城市'] = item.Label;
-            obj['种植数'] = item.Num;
-            tblData.push(obj);
+            if (item && item.Label) {
+                let obj = {};
+                obj['城市'] = item.Label;
+                obj['种植数'] = item.Num;
+                tblData.push(obj);
+            }
         });
         let _headers = ['城市', '种植数'];
         let headers = _headers.map((v, i) => Object.assign({}, {
@@ -514,10 +524,18 @@ class NurseryFrom extends Component {
         }
         let tblData = [];
         queryCityData.map((item, index) => {
-            let obj = {};
-            obj['县区'] = item.Label;
-            obj['种植数'] = item.Num;
-            tblData.push(obj);
+            if (item && item.Label) {
+                let obj = {};
+                if (item.Label === '130600') {
+                    obj['县区'] = '保定市';
+                    obj['种植数'] = item.Num;
+                    tblData.push(obj);
+                } else {
+                    obj['县区'] = item.Label;
+                    obj['种植数'] = item.Num;
+                    tblData.push(obj);
+                }
+            }
         });
         let _headers = ['县区', '种植数'];
         let headers = _headers.map((v, i) => Object.assign({}, {
