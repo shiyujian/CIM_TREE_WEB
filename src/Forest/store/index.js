@@ -414,15 +414,12 @@ export const actions = {
     getDigitalAcceptList,
     getDigitalAcceptUserList,
     getDigitalAcceptDetail,
-<<<<<<< HEAD
     getYSResultList,
     getTreetypeByThinclass
-=======
     getUserStat,
     getNewUserStat,
     getActivityUserStat,
     getSectionUserStat
->>>>>>> 26d0b67a2b3721fc9888907ef90062366655d1f2
 };
 export default handleActions({
     [getTreeOK]: (state, {
