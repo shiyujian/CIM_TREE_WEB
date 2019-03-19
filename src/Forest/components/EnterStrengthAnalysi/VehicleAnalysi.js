@@ -30,10 +30,11 @@ export default class VehicleAnalysi extends Component {
         this.handleDateReturn = this.handleDateReturn.bind(this); // 更改进场截至时间
     }
     componentDidMount = async () => {
-        
+
     }
     componentWillReceiveProps (nextProps) {
-        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode) {
+        console.log('nextProps', nextProps.sectionList.length, nextProps.leftkeycode, nextProps.tabPane === '1');
+        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode && nextProps.tabPane === '1') {
             console.log('渲染车辆包页面');
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
@@ -159,9 +160,15 @@ export default class VehicleAnalysi extends Component {
                     type: 'category',
                     data: xAxisArr
                 },
-                yAxis: {
-                    type: 'value'
-                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '车辆数',
+                        axisLabel: {
+                            formatter: '{value} 车'
+                        }
+                    }
+                ],
                 series: [{
                     data: yAxisArr,
                     type: 'bar'
@@ -175,7 +182,7 @@ export default class VehicleAnalysi extends Component {
     }
     renderReturn () {
         const { getCarbackstat } = this.props.actions;
-        const { enterDate } = this.state;
+        const { returnDate } = this.state;
         let xAxisArr = [];
         let yAxisArr = [];
         this.setState({
@@ -184,7 +191,7 @@ export default class VehicleAnalysi extends Component {
         getCarbackstat({}, {
             section: this.leftkeycode,
             stime: '',
-            etime: enterDate
+            etime: returnDate
         }).then(rep => {
             this.sectionList.map(item => {
                 xAxisArr.push(item.Name);
@@ -208,9 +215,15 @@ export default class VehicleAnalysi extends Component {
                     type: 'category',
                     data: xAxisArr
                 },
-                yAxis: {
-                    type: 'value'
-                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '车辆数',
+                        axisLabel: {
+                            formatter: '{value} 车'
+                        }
+                    }
+                ],
                 series: [{
                     data: yAxisArr,
                     type: 'bar'

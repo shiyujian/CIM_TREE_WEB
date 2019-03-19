@@ -4,7 +4,6 @@ import { Select, DatePicker, Spin, Card } from 'antd';
 import XLSX from 'xlsx';
 import { Cards } from '../../components';
 import moment from 'moment';
-import { message } from 'antd';
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
@@ -331,7 +330,8 @@ export default class PlantRightThinClass extends Component {
         let myChart4 = echarts.init(document.getElementById('PlantRightThinClass'));
         let options4 = {
             legend: {
-                data: ['未种植', '已种植']
+                // data: ['未种植', '已种植']
+                data: ['已种植']
             },
             xAxis: [
                 {
@@ -347,21 +347,21 @@ export default class PlantRightThinClass extends Component {
                 type: 'slider'
             }],
             series: [
-                {
-                    name: '未种植',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            offset: ['50', '80'],
-                            show: true,
-                            position: 'inside',
-                            formatter: '{c}',
-                            textStyle: { color: '#FFFFFF' }
-                        }
-                    },
-                    data: unComplete
-                },
+                // {
+                //     name: '未种植',
+                //     type: 'bar',
+                //     stack: '总量',
+                //     label: {
+                //         normal: {
+                //             offset: ['50', '80'],
+                //             show: true,
+                //             position: 'inside',
+                //             formatter: '{c}',
+                //             textStyle: { color: '#FFFFFF' }
+                //         }
+                //     },
+                //     data: unComplete
+                // },
                 {
                     name: '已种植',
                     type: 'bar',

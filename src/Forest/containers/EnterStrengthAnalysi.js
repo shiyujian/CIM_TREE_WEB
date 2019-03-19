@@ -12,12 +12,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import {
-    getUser,
-    getAreaTreeData,
-    getDefaultProject,
-    getUserIsManager
-} from '_platform/auth';
+import { getDefaultProject } from '_platform/auth';
 import { NurseryAnalysi, VehicleAnalysi } from '../components/EnterStrengthAnalysi';
 const TabPane = Tabs.TabPane;
 @connect(
@@ -36,7 +31,8 @@ export default class EnterStrengthAnalysi extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            treeList: [], // 树列表数据
+            treeList: [], // 树列表
+            tabPane: '1', // 该次标签
             sectionList: [], // 标段列表
             leftkeycode: '' // 项目code
         };
@@ -45,21 +41,12 @@ export default class EnterStrengthAnalysi extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getTreeNodeList,
-                getTotalThinClass,
-                getThinClassTree,
-                getThinClassList
+                getTreeNodeList
             },
             platform: { tree = {} }
         } = this.props;
-        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
-            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
-            let totalThinClass = data.totalThinClass || [];
-            let projectList = data.projectList || [];
-            // 获取所有的小班数据，用来计算养护任务的位置
-            await getTotalThinClass(totalThinClass);
-            // 区域地块树
-            await getThinClassTree(projectList);
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
         }
         let defaultProject = await getDefaultProject();
         if (defaultProject) {
@@ -75,7 +62,7 @@ export default class EnterStrengthAnalysi extends Component {
         }
     }
     render () {
-        const { leftkeycode, treeList } = this.state;
+        const { leftkeycode, treeList, tabPane } = this.state;
         return (
             <Body>
                 <Main>
@@ -88,18 +75,22 @@ export default class EnterStrengthAnalysi extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='苗木分析' key='2'>
-                                <NurseryAnalysi {...this.props} {...this.state} />
-                            </TabPane>
+                        <Tabs type='card' activeKey={tabPane} tabBarGutter={10} onChange={this.handleTabPane.bind(this)}>
                             <TabPane tab='车辆包分析' key='1'>
                                 <VehicleAnalysi {...this.props} {...this.state} />
+                            </TabPane><TabPane tab='苗木分析' key='2'>
+                                <NurseryAnalysi {...this.props} {...this.state} />
                             </TabPane>
                         </Tabs>
                     </Content>
                 </Main>
             </Body>
         );
+    }
+    handleTabPane (key) {
+        this.setState({
+            tabPane: key
+        });
     }
     // 树选择, 重新获取: 标段、小班、细班、树种并置空
     onSelect (keys) {

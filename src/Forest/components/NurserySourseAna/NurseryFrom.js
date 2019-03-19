@@ -15,7 +15,6 @@ class NurseryFrom extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
-        this.leftkeycode = '';
         this.state = {
             loading1: false,
             loading2: false,
@@ -33,20 +32,50 @@ class NurseryFrom extends Component {
         const {
             leftkeycode
         } = this.props;
+        let myChart = echarts.init(document.getElementById('NurseryCountry'));
+        let myChart1 = echarts.init(document.getElementById('NurseryProvince'));
+        let myChart2 = echarts.init(document.getElementById('NurseryCity'));
+        let option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                    type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: []
+                // axisLabel: {
+                //     interval: 0,
+                //     rotate: 40
+                // }
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [],
+                type: 'bar'
+            }]
+        };
+        myChart.setOption(option);
+        myChart1.setOption(option);
+        myChart2.setOption(option);
         if (leftkeycode) {
-            this.leftkeycode = leftkeycode;
-            await this.query1();
-            await this.query2();
-            await this.query3();
+            this.query1();
+            this.query2();
+            this.query3();
         }
     }
 
-    async componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode && this.leftkeycode !== nextProps.leftkeycode) {
-            this.leftkeycode = nextProps.leftkeycode;
-            await this.query1();
-            await this.query2();
-            await this.query3();
+    componentDidUpdate = async (prevProps, prevState) => {
+        const {
+            leftkeycode
+        } = this.props;
+        if (leftkeycode && leftkeycode !== prevProps.leftkeycode) {
+            this.query1();
+            this.query2();
+            this.query3();
         }
     }
     render () {
@@ -134,7 +163,6 @@ class NurseryFrom extends Component {
 
     async onDateChange (type, value) {
         if (type === 1) {
-            console.log('value', value);
             this.setState({
                 date1: moment(value._d).format('YYYY-MM-DD')
             }, async () => {
@@ -158,7 +186,8 @@ class NurseryFrom extends Component {
         const {
             actions: {
                 getNurseryFromData
-            }
+            },
+            leftkeycode
         } = this.props;
         const {
             date1
@@ -167,7 +196,7 @@ class NurseryFrom extends Component {
             loading1: true
         });
         let queryCountryData = await getNurseryFromData({
-            section: this.leftkeycode,
+            section: leftkeycode,
             etime: date1
         });
         let aountArray = [];
@@ -237,7 +266,8 @@ class NurseryFrom extends Component {
         const {
             actions: {
                 getNurseryFromData
-            }
+            },
+            leftkeycode
         } = this.props;
         this.setState({
             loading2: true
@@ -246,7 +276,7 @@ class NurseryFrom extends Component {
             date2
         } = this.state;
         let queryProvinceData = await getNurseryFromData({
-            section: this.leftkeycode,
+            section: leftkeycode,
             regioncode: '13',
             etime: date2
         });
@@ -317,7 +347,8 @@ class NurseryFrom extends Component {
         const {
             actions: {
                 getNurseryFromData
-            }
+            },
+            leftkeycode
         } = this.props;
         const {
             date3
@@ -326,7 +357,7 @@ class NurseryFrom extends Component {
             loading3: true
         });
         let queryCityData = await getNurseryFromData({
-            section: this.leftkeycode,
+            section: leftkeycode,
             regioncode: '1306',
             etime: date3
         });

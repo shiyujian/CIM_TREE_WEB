@@ -31,8 +31,9 @@ class PlantStrengthAnalysi extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            treeList: [], // 树列表
             leftkeycode: '', // 项目
-            tabPane: '', // 该次标签
+            tabPane: '1', // 该次标签
             sectionList: [], // 标段列表
             treeTypeList: [], // 树种类型
             treeKindList: [] // 树种大类
@@ -97,7 +98,7 @@ class PlantStrengthAnalysi extends Component {
         }
     }
     render () {
-        const { leftkeycode, treeList } = this.state;
+        const { leftkeycode, treeList, tabPane } = this.state;
         return (
             <Body>
                 <Main>
@@ -110,15 +111,15 @@ class PlantStrengthAnalysi extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        <Tabs type='card' defaultActiveKey='3' tabBarGutter={10} onChange={this.handleTabPane.bind(this)}>
-                            {/* <TabPane tab='树种统计' key='1'>
+                        <Tabs type='card' activeKey={tabPane} tabBarGutter={10} onChange={this.handleTabPane.bind(this)}>
+                            <TabPane tab='树种统计' key='1'>
                                 <PlantStrength {...this.props} {...this.state} />
-                            </TabPane> */}
-                            <TabPane tab='定位进度分析' key='3'>
-                                <PositionProgress {...this.props} {...this.state} />
                             </TabPane>
                             <TabPane tab='种植进度分析' key='2'>
                                 <PlantProgress {...this.props} {...this.state} />
+                            </TabPane>
+                            <TabPane tab='定位进度分析' key='3'>
+                                <PositionProgress {...this.props} {...this.state} />
                             </TabPane>
                         </Tabs>
                     </Content>

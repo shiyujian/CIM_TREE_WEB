@@ -174,7 +174,8 @@ export default class PlantRight extends Component {
             let myChart2 = echarts.init(document.getElementById('PlantRight'));
             let options2 = {
                 legend: {
-                    data: ['未种植', '已种植']
+                    // data: ['未种植', '已种植']
+                    data: ['已种植']
                 },
                 xAxis: [
                     {
@@ -182,21 +183,21 @@ export default class PlantRight extends Component {
                     }
                 ],
                 series: [
-                    {
-                        name: '未种植',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                offset: ['50', '80'],
-                                show: true,
-                                position: 'inside',
-                                formatter: '{c}',
-                                textStyle: { color: '#FFFFFF' }
-                            }
-                        },
-                        data: unComplete
-                    },
+                    // {
+                    //     name: '未种植',
+                    //     type: 'bar',
+                    //     stack: '总量',
+                    //     label: {
+                    //         normal: {
+                    //             offset: ['50', '80'],
+                    //             show: true,
+                    //             position: 'inside',
+                    //             formatter: '{c}',
+                    //             textStyle: { color: '#FFFFFF' }
+                    //         }
+                    //     },
+                    //     data: unComplete
+                    // },
                     {
                         name: '已种植',
                         type: 'bar',

@@ -31,7 +31,10 @@ export default class NurserySourseAnalysi extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            leftkeycode: ''
+            treeList: [], // 树列表
+            tabPane: '1', // 该次标签
+            sectionList: [], // 标段列表
+            leftkeycode: '' // 项目code
         };
     }
 
@@ -50,18 +53,17 @@ export default class NurserySourseAnalysi extends Component {
             this.onSelect([defaultProject]);
         }
     }
+    componentWillReceiveProps (nextProps) {
+        const { tree } = nextProps.platform;
+        if (tree) {
+            this.setState({
+                treeList: tree.bigTreeList
+            });
+        }
+    }
 
     render () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        const {
-            leftkeycode
-        } = this.state;
-        let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
-        }
+        const { leftkeycode, treeList, tabPane } = this.state;
         return (
             <Body>
                 <Main>
@@ -74,12 +76,12 @@ export default class NurserySourseAnalysi extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        <Tabs type='card' tabBarGutter={10}>
-                            <TabPane tab='苗源地分析' key='2'>
-                                <NurseryFrom {...this.props} {...this.state} />
-                            </TabPane>
+                        <Tabs type='card' activeKey={tabPane} tabBarGutter={10} onChange={this.handleTabPane.bind(this)}>
                             <TabPane tab='苗圃总览' key='1'>
                                 <NurseryGlobal {...this.props} {...this.state} />
+                            </TabPane>
+                            <TabPane tab='苗源地分析' key='2'>
+                                <NurseryFrom {...this.props} {...this.state} />
                             </TabPane>
                         </Tabs>
                     </Content>
@@ -87,7 +89,11 @@ export default class NurserySourseAnalysi extends Component {
             </Body>
         );
     }
-
+    handleTabPane (key) {
+        this.setState({
+            tabPane: key
+        });
+    }
     onSelect (keys) {
         let keycode = keys[0] || '';
         if (keycode) {

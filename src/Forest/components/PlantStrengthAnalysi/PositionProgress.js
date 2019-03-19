@@ -48,7 +48,6 @@ class PlantProgress extends Component {
         if (nextProps.sectionList.length > 0 && nextProps.leftkeycode && nextProps.tabPane === '3') {
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
-            this.renderTotal();
             this.renderSection();
             this.setState({
                 plantSection: this.sectionList[0].No,
@@ -76,16 +75,6 @@ class PlantProgress extends Component {
                 <div style={{ background: '#ECECEC', padding: '30px', height: 1500, marginTop: 20 }}>
                     <Row gutter={16}>
                         <Col span={12}>
-                            <Card title='总定位进度分析' bordered={false} extra={<Button type='primary' onClick={this.handleTotalExport.bind(this)}>导出</Button>}>
-                                <Spin spinning={spinningTotal}>
-                                    <div
-                                        id='totalLocation'
-                                        style={{ width: '100%', height: '350px' }}
-                                    />
-                                </Spin>
-                            </Card>
-                        </Col>
-                        <Col span={12}>
                             <Card title='各标段定位进度分析' bordered={false} extra={<Button type='primary' onClick={this.handleSectionExport.bind(this)}>导出</Button>}>
                                 <Spin spinning={spinningSection}>
                                     <div
@@ -95,7 +84,7 @@ class PlantProgress extends Component {
                                 </Spin>
                             </Card>
                         </Col>
-                        <Col span={24} style={{marginTop: 20}}>
+                        <Col span={12}>
                             <Card title={
                                 <div>
                                     <span style={{marginRight: 20}}>各小班定位进度分析</span>
@@ -170,73 +159,81 @@ class PlantProgress extends Component {
     onSearch () {
 
     }
-    renderTotal () {
+    renderSection () {
         const { startDate, endDate } = this.state;
         const { getLocationtotalstat } = this.props.actions;
-        let legend = ['总数'];
-        let _headersTotal = ['时间', '总数'], tblDataTotal = []; // 导出表格数据
-        this.sectionList.map(item => {
-            legend.push(item.Name);
-        });
+        // let tblDataSection = [], _headersSection = ['标段', '已种植', '未种植']; // 导出表格数据
+        let xAxisData = [];
         this.setState({
-            spinningTotal: true
+            spinningSection: true
         });
         getLocationtotalstat({}, {
             section: this.leftkeycode,
             stime: startDate,
             etime: endDate
         }).then(rep => {
-            let total = []; // 总数
-            let times = [];
-            rep.map(item => {
-                if (!times.includes(item.Time)) {
-                    times.push(item.Time);
-                }
-            });
-            // 总数
-            times.map(item => {
-                let Sum = 0;
+            console.log('rep各标段定位数据', rep);
+            console.log('rep各标段定位数据', this.sectionList);
+            let yAxisData = [];
+            this.sectionList.map(item => {
+                let sum = 0;
                 rep.map(record => {
-                    if (item === record.Time) {
-                        Sum += record.Num;
+                    if (item.No === record.Label) {
+                        sum += record.Num;
                     }
                 });
-                tblDataTotal.push({
-                    '时间': item,
-                    '总数': Sum
-                });
-                total.push(Sum);
+                xAxisData.push(item.Name);
+                yAxisData.push(sum);
             });
-            let series = []; // 纵坐标数据
-            series.push({
-                name: '总数',
-                type: 'bar',
-                data: total
-            });
-            // 各标段数据
-            this.sectionList.map(item => {
-                let sectionData = [];
-                times.map((record, ind) => {
-                    let sum = 0;
-                    rep.map(row => {
-                        if (record === row.Time && row.Section === item.No) {
-                            sum += row.Num;
+            let myChart = echarts.init(document.getElementById('sectionLocation'));
+            let options = {
+                legend: {
+                    data: ['已定位']
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xAxisData
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '定位数',
+                        axisLabel: {
+                            formatter: '{value} 棵'
                         }
-                    });
-                    tblDataTotal[ind][item.Name] = sum;
-                    sectionData.push(sum);
-                });
-                _headersTotal.push(item.Name);
-                series.push({
-                    name: item.Name,
-                    type: 'line',
-                    data: sectionData
-                });
+                    }
+                ],
+                series: [
+                    {
+                        name: '已定位',
+                        type: 'bar',
+                        stack: '总量',
+                        label: {
+                            normal: {
+                                offset: ['50', '80'],
+                                show: true,
+                                position: 'inside',
+                                formatter: '{c}',
+                                textStyle: { color: '#FFFFFF' }
+                            }
+                        },
+                        data: yAxisData
+                    }
+                ]
+            };
+            myChart.setOption(options);
+            this.setState({
+                spinningSection: false
             });
         });
-    }
-    renderSection () {
-
     }
     handleSmallPlant (value) {
         let smallClassList = [];
