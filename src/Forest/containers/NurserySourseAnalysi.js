@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Tabs } from 'antd';
 import * as actions from '../store';
-import { PkCodeTree } from '../components'
+import { PkCodeTree } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import {
     Main,
@@ -12,9 +12,8 @@ import {
     DynamicTitle,
     Sidebar
 } from '_platform/components/layout';
-import { NurseryPandect, SectionAlone } from '../components/UserAnalysi';
 import { NurseryFrom, NurseryGlobal } from '../components/NurserySourseAna';
-import { getAreaTreeData, getDefaultProject } from '_platform/auth';
+import { getDefaultProject } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 @connect(
     state => {
@@ -32,47 +31,39 @@ export default class NurserySourseAnalysi extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            leftkeycode: '',
-            sectionList: []
+            treeList: [], // 树列表
+            tabPane: '1', // 该次标签
+            sectionList: [], // 标段列表
+            leftkeycode: '' // 项目code
         };
     }
 
     componentDidMount = async () => {
         const {
             actions: {
-                getTreeNodeList,
-                getThinClassList,
-                getTotalThinClass,
-                getThinClassTree
+                getTreeNodeList
             },
             platform: { tree = {} }
         } = this.props;
-        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
-            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
-            let totalThinClass = data.totalThinClass || [];
-            let projectList = data.projectList || [];
-            // 获取所有的小班数据，用来计算养护任务的位置
-            await getTotalThinClass(totalThinClass);
-            // 区域地块树
-            await getThinClassTree(projectList);
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
         }
         let defaultProject = await getDefaultProject();
         if (defaultProject) {
             this.onSelect([defaultProject]);
         }
     }
+    componentWillReceiveProps (nextProps) {
+        const { tree } = nextProps.platform;
+        if (tree) {
+            this.setState({
+                treeList: tree.bigTreeList
+            });
+        }
+    }
 
     render () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        const {
-            leftkeycode
-        } = this.state;
-        let treeList = [];
-        if (tree.bigTreeList) {
-            treeList = tree.bigTreeList;
-        }
+        const { leftkeycode, treeList, tabPane } = this.state;
         return (
             <Body>
                 <Main>
@@ -85,7 +76,7 @@ export default class NurserySourseAnalysi extends Component {
                         />
                     </Sidebar>
                     <Content>
-                        <Tabs type='card' tabBarGutter={10}>
+                        <Tabs type='card' activeKey={tabPane} tabBarGutter={10} onChange={this.handleTabPane.bind(this)}>
                             <TabPane tab='苗源地分析' key='2'>
                                 <NurseryFrom {...this.props} {...this.state} />
                             </TabPane>
@@ -98,7 +89,11 @@ export default class NurserySourseAnalysi extends Component {
             </Body>
         );
     }
-
+    handleTabPane (key) {
+        this.setState({
+            tabPane: key
+        });
+    }
     onSelect (keys) {
         let keycode = keys[0] || '';
         const {

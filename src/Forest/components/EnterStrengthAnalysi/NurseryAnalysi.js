@@ -6,6 +6,10 @@ const gridStyle = {
     width: '25%',
     textAlign: 'center'
 };
+const basicDataStyle = {
+    fontSize: 26,
+    fontWeight: 'bold'
+};
 const dateFormat = 'YYYY-MM-DD';
 export default class NurseryAnalysi extends Component {
     constructor (props) {
@@ -15,10 +19,10 @@ export default class NurseryAnalysi extends Component {
             returnDate: moment().format(dateFormat), // 退苗截至时间
             spinningEnter: false,
             spinningReturn: false,
-            totalStage: 0, // 苗木累计出圃数量
-            totalEnter: 0, // 苗圃累计进场数量
-            todayStage: 0, // 苗木今日出圃数量
-            todayEnter: 0 // 苗木今日进场数量
+            NurseryNum: 0, // 苗木累计出圃数量
+            NurseryInNum: 0, // 苗圃累计进场数量
+            NurseryTodayNum: 0, // 苗木今日出圃数量
+            NurseryTodayInNum: 0 // 苗木今日进场数量
         };
         this.sectionList = []; // 标段列表
         this.leftkeycode = ''; // 项目code
@@ -29,7 +33,7 @@ export default class NurseryAnalysi extends Component {
         
     }
     componentWillReceiveProps (nextProps) {
-        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode) {
+        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode && nextProps.tabPane === '2') {
             console.log('渲染苗木页面');
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
@@ -45,38 +49,37 @@ export default class NurseryAnalysi extends Component {
         getNurserytotal({}, {
             section: this.leftkeycode
         }).then(rep => {
-            let totalEnter = rep.TotalNum - rep.BackNum;
-            let todayEnter = rep.TodayTotalNum - rep.TodayBackNum;
+            console.log(rep, '关键数据');
             this.setState({
-                totalStage: rep.TotalNum, // 车辆累计出圃数量
-                totalEnter, // 车辆累计进场数量
-                todayStage: rep.TodayTotalNum,
-                todayEnter
+                NurseryNum: rep.NurseryNum, // 车辆累计出圃数量
+                NurseryInNum: rep.NurseryInNum, // 车辆累计进场数量
+                NurseryTodayNum: rep.NurseryTodayNum,
+                NurseryTodayInNum: rep.NurseryTodayInNum
             });
         });
     }
 
     render () {
-        const { totalStage, totalEnter, todayStage, todayEnter, enterDate, returnDate, spinningEnter, spinningReturn } = this.state;
+        const { NurseryNum, NurseryInNum, NurseryTodayNum, NurseryTodayInNum, enterDate, returnDate, spinningEnter, spinningReturn } = this.state;
         return (
             <div>
                 <h2>实时数据{moment().format('HH:mm:ss')}</h2>
                 <Card title='关键数据'>
                     <Card.Grid style={gridStyle}>
                         <h3>苗木累计出圃数量</h3>
-                        <div>{totalStage}</div>
+                        <div style={basicDataStyle}>{NurseryNum}</div>
                     </Card.Grid>
                     <Card.Grid style={gridStyle}>
                         <h3>苗圃累计进场数量</h3>
-                        <div>{totalEnter}</div>
+                        <div style={basicDataStyle}>{NurseryInNum}</div>
                     </Card.Grid>
                     <Card.Grid style={gridStyle}>
                         <h3>苗木今日出圃数量</h3>
-                        <div>{todayStage}</div>
+                        <div style={basicDataStyle}>{NurseryTodayNum}</div>
                     </Card.Grid>
                     <Card.Grid style={gridStyle}>
                         <h3>苗木今日进场数量</h3>
-                        <div>{todayEnter}</div>
+                        <div style={basicDataStyle}>{NurseryTodayInNum}</div>
                     </Card.Grid>
                 </Card>
                 <h2>进场及退苗统计</h2>

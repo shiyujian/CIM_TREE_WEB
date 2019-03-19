@@ -418,8 +418,6 @@ export const actions = {
     getDigitalAcceptList,
     getDigitalAcceptUserList,
     getDigitalAcceptDetail,
-    getYSResultList,
-    getTreetypeByThinclass
     getUserStat,
     getNewUserStat,
     getActivityUserStat,

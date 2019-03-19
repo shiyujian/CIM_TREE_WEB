@@ -33,7 +33,8 @@ export default class VehicleAnalysi extends Component {
         
     }
     componentWillReceiveProps (nextProps) {
-        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode) {
+        console.log('nextProps', nextProps.sectionList.length, nextProps.leftkeycode, nextProps.tabPane === '1');
+        if (nextProps.sectionList.length > 0 && nextProps.leftkeycode && nextProps.tabPane === '1') {
             console.log('渲染车辆包页面');
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
@@ -159,9 +160,15 @@ export default class VehicleAnalysi extends Component {
                     type: 'category',
                     data: xAxisArr
                 },
-                yAxis: {
-                    type: 'value'
-                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '车辆数',
+                        axisLabel: {
+                            formatter: '{value} 车'
+                        }
+                    }
+                ],
                 series: [{
                     data: yAxisArr,
                     type: 'bar'
@@ -208,9 +215,15 @@ export default class VehicleAnalysi extends Component {
                     type: 'category',
                     data: xAxisArr
                 },
-                yAxis: {
-                    type: 'value'
-                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '车辆数',
+                        axisLabel: {
+                            formatter: '{value} 车'
+                        }
+                    }
+                ],
                 series: [{
                     data: yAxisArr,
                     type: 'bar'

@@ -28,6 +28,7 @@ export default class UserAnalysi extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            tabPane: '1' // 该次标签
         };
     }
 
@@ -35,12 +36,13 @@ export default class UserAnalysi extends Component {
     }
 
     render () {
+        const { tabPane } = this.state;
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='用户分析' {...this.props} />
                     <Content>
-                        <Tabs type='card' tabBarGutter={10}>
+                        <Tabs type='card' activeKey={tabPane} tabBarGutter={10} onChange={this.handleTabPane.bind(this)}>
                             <TabPane tab='账号总览' key='1'>
                                 <AccountPandect {...this.props} {...this.state} />
                             </TabPane>
@@ -52,5 +54,10 @@ export default class UserAnalysi extends Component {
                 </Main>
             </Body>
         );
+    }
+    handleTabPane (key) {
+        this.setState({
+            tabPane: key
+        });
     }
 }

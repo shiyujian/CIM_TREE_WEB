@@ -309,7 +309,7 @@ class PositionProgress extends Component {
         let tblDataSection = [], _headersSection = ['标段', '已种植', '未种植']; // 导出表格数据
         let xAxisData = [];
         this.setState({
-            spinningSection: false
+            spinningSection: true
         });
         getCountSection({}, {
             section: this.leftkeycode,

@@ -17,6 +17,10 @@ const CardStyle = {
     background: '#ECECEC',
     padding: '30px'
 };
+const basicDataStyle = {
+    fontSize: 26,
+    fontWeight: 'bold'
+};
 class PlantStrength extends Component {
     constructor (props) {
         super(props);
@@ -138,19 +142,19 @@ class PlantStrength extends Component {
                         <Card title='关键数据' style={{float: 'left', width: 800}}>
                             <Card.Grid style={gridStyle}>
                                 <h3>苗木累计种植数量</h3>
-                                <div style={{fontSize: 26}}>{plantAmount}</div>
+                                <div style={basicDataStyle}>{plantAmount}</div>
                             </Card.Grid>
                             <Card.Grid style={gridStyle}>
                                 <h3>苗木累计定位数量</h3>
-                                <div style={{fontSize: 26}}>{locationAmount}</div>
+                                <div style={basicDataStyle}>{locationAmount}</div>
                             </Card.Grid>
                             <Card.Grid style={gridStyle}>
                                 <h3>苗木今日种植数量</h3>
-                                <div style={{fontSize: 26}}>{plantToday}</div>
+                                <div style={basicDataStyle}>{plantToday}</div>
                             </Card.Grid>
                             <Card.Grid style={gridStyle}>
                                 <h3>苗木今日定位数量</h3>
-                                <div style={{fontSize: 26}}>{locationToday}</div>
+                                <div style={basicDataStyle}>{locationToday}</div>
                             </Card.Grid>
                         </Card>
                         <List size='small' style={{marginLeft: 820, height: 180}}
@@ -324,7 +328,6 @@ class PlantStrength extends Component {
                                     {
                                         treeTypeDisplayTable
                                             ? <div
-                                                id='middleRight'
                                                 style={{ width: '100%', height: '350px' }}
                                             >
                                                 <Table
