@@ -27,6 +27,7 @@ export default class WordView1 extends Component {
         let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
         let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
         let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
+        let treetypename = detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName;
         let qulityok = 0; // 默认全部不合格
         let hgl = detail.CheckNum - detail.FailedNum; // 合格量
         if (detail.CheckNum !== 0) {
@@ -56,16 +57,18 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td height="60;" align="center">施工单位</td>
                                     <td colSpan="3">中国交建集团</td>
-                                    <td >项目经理</td>
-                                    <td >王伟</td>
+                                    <td>苗木品种</td>
+                                    <td colSpan="1">{treetypename}</td>
+                                    <td>苗木规格</td>
+                                    <td > / </td>
                                 </tr>
                                 <tr>
                                     <td height="60;" align="center">施工员</td>
                                     <td colSpan="1">{shigong}</td>
                                     <td>苗木品种</td>
-                                    <td colSpan="1">100</td>
+                                    <td colSpan="1">{TreeTypeName}</td>
                                     <td>苗木规格</td>
-                                    <td >95</td>
+                                    <td > / </td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>

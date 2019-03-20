@@ -26,6 +26,7 @@ export default class WordView1 extends Component {
         }
         let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
         let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
+        let treetypename = detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName;
         let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
         return (
             <Spin spinning={this.state.loading}>
@@ -58,7 +59,7 @@ export default class WordView1 extends Component {
                                     <td height="60;" align="center">施工员</td>
                                     <td colSpan="1">{shigong}</td>
                                     <td>苗木品种</td>
-                                    <td colSpan="1">100</td>
+                                    <td colSpan="1">{treetypename}</td>
                                     <td>苗木规格</td>
                                     <td >95</td>
                                 </tr>
