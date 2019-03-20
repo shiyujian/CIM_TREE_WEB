@@ -154,6 +154,44 @@ export default class WordView1 extends Component {
         let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
         let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
         let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
+        let treetypename = detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName;
+        let hgl = detail.CheckNum - detail.FailedNum; // 合格量
+        if (detail.CheckNum !== 0) {
+            qulityok = hgl/detail.CheckNum;
+        }
+        let hege = detail.DigHoleQualifiedNum;
+        let buhege = detail.DigHoleUnQualifiedNum;
+        let currenthege = 0;
+        let currentbuhege = 0;
+        let total = hege + buhege;
+        let rowList = []
+        for (let i = 0; i < total / 17; i++) { // 判断需要展示多少行
+            let colList = []
+            for (let j = 0; j<17;j++) {
+                if (Math.random() > 0.3) {
+                    if (currenthege !== hege) { // 还有合格的选项
+                        colList.push(<Col span={1}><div style={{}}>√</div></Col>)
+                        currenthege++;
+                    } else if(currentbuhege !== buhege) { // 没有合格的选项了，只能添加不合格
+                        colList.push(<Col span={1}><div>×</div></Col>)
+                        currentbuhege++;
+                    }else { // 都没有选项了，添加空项
+                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>)
+                    }
+                } else {
+                    if (currentbuhege !== buhege) {
+                        colList.push(<Col span={1}><div>×</div></Col>)
+                        currentbuhege++;
+                    } else if (currenthege !== hege) {
+                        colList.push(<Col span={1}><div>√</div></Col>)
+                        currenthege++;
+                    } else {
+                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>)
+                    }
+                }
+            }
+            rowList.push(colList)
+        }
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
@@ -214,10 +252,36 @@ export default class WordView1 extends Component {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" colSpan="1" width="118px">样带面积</td>
-                                    <td colSpan="3">100</td>
+                                    <td height="60;"width="118px">挖穴标准</td>
+                                    <td colSpan="1"> / </td>
+                                    <td height="60;"width="118px">设计数量</td>
+                                    <td colSpan="1">{detail.DesignNum}</td>
+                                    <td colSpan="1" width="118px">实际数量</td>
+                                    <td colSpan="1">{detail.ActualNum}</td>
+                                </tr>
+                                <tr>
+                                    <td height="60;"width="118px">抽检数量</td>
+                                    <td colSpan="1">{detail.CheckNum}</td>
+                                    <td height="60;"width="118px">抽检合格数量</td>
+                                    <td colSpan="1">{hgl}</td>
                                     <td colSpan="1" width="118px">合格率</td>
-                                    <td colSpan="1">95%</td>
+                                    <td colSpan="1">{qulityok}</td>
+                                </tr>
+                                <tr>
+                                    <td colSpan='6'>
+                                        <Row>
+                                            <Col span={3} style={{ width: 116 }}>
+                                                <div style={{ width: 116, marginTop: 20 }}>验收记录
+                                                合格(√)
+                                        不合格(×)</div>
+                                            </Col>
+                                            <Col span={21} style={{ width: 630 }}>
+                                                {
+                                                    rowList
+                                                }
+                                            </Col>
+                                        </Row>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td className='hei110' >施工单位质量专检结果</td>
