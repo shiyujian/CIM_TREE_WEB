@@ -16,7 +16,8 @@ class Tablelevel extends Component {
         super(props);
         this.state = {
             leftkeycode: '', // 项目
-            dataList: [],
+            dataList: [], // 表格数据
+            isSuperAdmin: false, // 是否是超级管理员
             selectedRowKeysList: [], // 选中的细班列表
             sectionList: [], // 标段列表
             section: '', // 标段
@@ -29,11 +30,9 @@ class Tablelevel extends Component {
             record: {}, // 历史数据记录
             recordData: {}, // 表格记录
             newRecordData: {}, // 新记录
-            indexBtn: 1,
-            fileList: [],
             page: 1,
             total: 0,
-            number: '',
+            number: '', // 细班编号
             areaLayerList: [], // 区域地块图层list
             spinning: true, // loading
             treetype: '', // 表单树种
@@ -43,7 +42,6 @@ class Tablelevel extends Component {
         this.treeTypeList = []; // 所有树种类型
         this.dataList = []; // 暂存数据
         this.userSection = ''; // 用户所属标段
-        this.username = ''; // 用户名，给超级管理员更多权限
         this.onSearch = this.onSearch.bind(this); // 查询细班
         this.onEdit = this.onEdit.bind(this); // 编辑
         this.handleSection = this.handleSection.bind(this); // 标段
@@ -91,7 +89,7 @@ class Tablelevel extends Component {
                 title: '操作',
                 dataIndex: 'action',
                 render: (text, record, index) => {
-                    if (this.userSection === record.Section || this.username === 'admin') {
+                    if (this.userSection === record.Section || this.state.isSuperAdmin) {
                         return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
                     } else {
                         return '';
@@ -102,8 +100,17 @@ class Tablelevel extends Component {
     }
     componentDidMount () {
         let userData = getUser();
-        this.username = userData.username;
         this.userSection = userData.sections.slice(2, -2);
+        if (userData.username === 'admin') {
+            this.setState({
+                isSuperAdmin: true
+            });
+        } else {
+            this.setState({
+                isSuperAdmin: false,
+                section: this.userSection || ''
+            });
+        }
         // 初始化地图
         this.initMap();
         // 获取历史数据
@@ -114,7 +121,7 @@ class Tablelevel extends Component {
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode) {
             this.setState({
-                section: '',
+                section: this.userSection || '',
                 number: '',
                 leftkeycode: nextProps.leftkeycode,
                 sectionList: nextProps.sectionList
@@ -185,7 +192,7 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan, selectedRowKeysList } = this.state;
+        const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan, selectedRowKeysList, isSuperAdmin } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 this.setState({
@@ -242,9 +249,7 @@ class Tablelevel extends Component {
                 title: '操作',
                 key: '4',
                 render: (text, record, index) => {
-                    console.log(this.userSection, '用户所属');
-                    console.log(record, '行数据');
-                    if (this.userSection === record.Section) {
+                    if (this.userSection === record.Section || this.state.isSuperAdmin) {
                         // 可编辑
                         if (index === 0) {
                             return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
@@ -269,7 +274,7 @@ class Tablelevel extends Component {
                 <div>
                     <Form layout='inline'>
                         <FormItem label='标段'>
-                            <Select style={{ width: 120 }} value={section} onChange={this.handleSection.bind(this)} allowClear>
+                            <Select style={{ width: 120 }} value={section} onChange={this.handleSection.bind(this)} disabled={!isSuperAdmin} allowClear>
                                 {
                                     sectionList.map(item => {
                                         return <Option value={item.No} key={item.No}>{item.Name}</Option>;
