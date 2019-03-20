@@ -45,10 +45,6 @@ class NurseryFrom extends Component {
             xAxis: {
                 type: 'category',
                 data: []
-                // axisLabel: {
-                //     interval: 0,
-                //     rotate: 40
-                // }
             },
             yAxis: {
                 type: 'value'
@@ -58,6 +54,8 @@ class NurseryFrom extends Component {
                 type: 'bar'
             }]
         };
+        let width = (document.body.clientWidth-300);
+        console.log('width', width);
         myChart.setOption(option);
         myChart1.setOption(option);
         myChart2.setOption(option);
