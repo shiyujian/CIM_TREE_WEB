@@ -63,8 +63,21 @@ class PlantStrength extends Component {
     }
     componentWillReceiveProps = async (nextProps) => {
         const {
-            actions: { getTotalSat, getLocationStat, getCount, getLocationStatBySpecfield }
+            actions: { getTotalSat, getLocationStat, getCount, getLocationtotalstat }
         } = this.props;
+        // 切换项目
+        if (nextProps.leftkeycode !== this.props.leftkeycode) {
+            this.setState({
+                plantSection: '',
+                smallClassNo: '',
+                thinClassNo: '',
+                plantSectionTree: '',
+                smallClassNoTree: '',
+                thinClassNoTree: '',
+                treeKind: '',
+                treeTypeNo: ''
+            });
+        }
         if (nextProps.sectionList.length > 0 && nextProps.leftkeycode && nextProps.tabPane === '1') {
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
@@ -84,22 +97,22 @@ class PlantStrength extends Component {
                 etime: moment().format('YYYY/MM/DD 23:59:59'),
                 no: nextProps.leftkeycode
             });
-            let sectionLocationToday = await getLocationStatBySpecfield({}, {
-                stattype: 'smallclass',
+            let sectionLocationToday = await getLocationtotalstat({}, {
                 section: 'P191',
-                stime: '',
-                etime: ''
+                stime: moment().format('YYYY/MM/DD 00:00:00'),
+                etime: moment().format('YYYY/MM/DD 23:59:59')
             });
             sectionPlantArr.map(item => {
                 plantToday += item.Num;
             });
+            console.log('sectionLocationToday', sectionLocationToday);
             sectionLocationToday.map(item => {
                 locationToday += item.Num;
             });
             this.setState({
                 locationToday, // 今日定位数量
                 plantToday, // 今日栽植数量
-                locationAmount: locationStat.split(',')[0], // 累计定位数量
+                locationAmount: locationStat.split(',')[1], // 累计定位数量
                 plantAmount // 累计栽植数量
             });
             this.onSearchPlant();
@@ -567,15 +580,17 @@ class PlantStrength extends Component {
     onSearchPlant () {
         const { getTreePlanting, getLocationStat } = this.props.actions;
         const { plantSection, thinClassNo, smallClassNo } = this.state;
-        console.log(smallClassNo);
+        console.log('thinClassNo', thinClassNo);
         let smallNo = '', thinNo = '';
         if (smallClassNo) {
             let arr = smallClassNo.split('-');
             smallNo = arr[0] + '-' + arr[1] + '-' + arr[3];
-        } else if (thinClassNo) {
+        }
+        if (thinClassNo) {
             let arr = thinClassNo.split('-');
             thinNo = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
         }
+        console.log('thinNo', thinNo, smallNo);
         getTreePlanting({}, {
             no: thinNo || smallNo || this.leftkeycode,
             section: plantSection || ''
@@ -680,6 +695,15 @@ class PlantStrength extends Component {
     onTypeChange (value) {
         const { treeTypeList } = this.props;
         let newTreeTypeList = [];
+        console.log('treeTypeList', treeTypeList);
+        if (!value) {
+            this.setState({
+                treeKind: '',
+                treeTypeNo: '',
+                newTreeTypeList: []
+            });
+            return;
+        }
         treeTypeList.map(item => {
             if (item.TreeTypeNo) {
                 let code = item.TreeTypeNo.substr(0, 1);
@@ -688,6 +712,7 @@ class PlantStrength extends Component {
                 }
             }
         });
+        console.log('newTreeTypeList', newTreeTypeList);
         this.setState({
             treeKind: value,
             newTreeTypeList

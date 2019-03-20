@@ -54,6 +54,8 @@ class PlantStrengthAnalysi extends Component {
         } = this.props;
         if (!treetypes) {
             getTreeList().then(rep => this.setTreeTypeOption(rep));
+        } else {
+            this.setTreeTypeOption(treetypes);
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
@@ -142,7 +144,6 @@ class PlantStrengthAnalysi extends Component {
                 TreeTypeNo: item.TreeTypeNo
             });
         });
-        console.log('treeTypeList', treeTypeList);
         this.setState({
             treeTypeList
         });
