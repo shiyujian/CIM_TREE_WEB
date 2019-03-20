@@ -35,9 +35,9 @@ export default class SectionAlone extends Component {
                 await this.onSelect([defaultProject]);
             }
             let myChart = echarts.init(document.getElementById('jobRegisterSum'));
-            let myChart1 = echarts.init(document.getElementById('jobDynamicNum'));
+            // let myChart1 = echarts.init(document.getElementById('jobDynamicNum'));
             let myChart2 = echarts.init(document.getElementById('superviseRegisterSum'));
-            let myChart3 = echarts.init(document.getElementById('superviseDynamicNum'));
+            // let myChart3 = echarts.init(document.getElementById('superviseDynamicNum'));
         let option = {
             tooltip: {
                 trigger: 'axis',
@@ -58,9 +58,9 @@ export default class SectionAlone extends Component {
             }]
         };
         myChart.setOption(option);
-        myChart1.setOption(option);
+        // myChart1.setOption(option);
         myChart2.setOption(option);
-        myChart3.setOption(option);
+        // myChart3.setOption(option);
         } catch (e) {
             console.log('e', e);
         }
@@ -88,7 +88,7 @@ export default class SectionAlone extends Component {
                         <h2>施工单位</h2>
                         <div style={{ background: '#ECECEC', padding: '30px', height: 550 }}>
                             <Row gutter={16}>
-                                <Col span={12}>
+                                <Col span={24}>
                                     <Card title='账号注册总数'
                                         bordered={false}
                                         extra={
@@ -105,7 +105,7 @@ export default class SectionAlone extends Component {
                                         />
                                     </Card>
                                 </Col>
-                                <Col span={12}>
+                                {/* <Col span={12}>
                                     <Card title='日活跃账号数'
                                         bordered={false}
                                         extra={
@@ -121,7 +121,7 @@ export default class SectionAlone extends Component {
                                             style={{ width: '100%', height: '350px' }}
                                         />
                                     </Card>
-                                </Col>
+                                </Col> */}
                             </Row>
                         </div>
                     </div>
@@ -129,7 +129,7 @@ export default class SectionAlone extends Component {
                         <h2>监理单位</h2>
                         <div style={{ background: '#ECECEC', padding: '30px', height: 550 }}>
                             <Row gutter={16}>
-                                <Col span={12}>
+                                <Col span={24}>
                                     <Card title='账号注册总数'
                                         bordered={false}
                                         extra={
@@ -146,7 +146,7 @@ export default class SectionAlone extends Component {
                                         />
                                     </Card>
                                 </Col>
-                                <Col span={12}>
+                                {/* <Col span={12}>
                                     <Card title='日活跃账号数'
                                         bordered={false}
                                         extra={
@@ -162,7 +162,7 @@ export default class SectionAlone extends Component {
                                             style={{ width: '100%', height: '350px' }}
                                         />
                                     </Card>
-                                </Col>
+                                </Col> */}
                             </Row>
                         </div>
                     </div>
@@ -187,9 +187,9 @@ export default class SectionAlone extends Component {
             sectionObjList
         }, async () => {
             this.renderJobRegisterSum();
-            this.renderJobDynamicNum();
+            // this.renderJobDynamicNum();
             this.renderSuperviseRegisterSum();
-            this.renderSuperviseDynamicNum();
+            // this.renderSuperviseDynamicNum();
         });
     }
     // 切换标签页
