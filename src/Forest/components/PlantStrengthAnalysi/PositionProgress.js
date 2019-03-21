@@ -319,14 +319,62 @@ class PlantProgress extends Component {
                 {
                     name: '已定位',
                     type: 'line',
-                    areaStyle: {},
                     data: yPositionData
+                    // smooth: true,
+                    // symbol: 'circle',
+                    // symbolSize: 5,
+                    // showSymbol: false,
+                    // areaStyle: {
+                    //     normal: {
+                    //         // color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                    //         //     offset: 0,
+                    //         //     color: 'rgba(219, 50, 51, 0.3)'
+                    //         // }, {
+                    //         //     offset: 0.8,
+                    //         //     color: 'rgba(219, 50, 51, 0)'
+                    //         // }], false),
+                    //         shadowColor: 'rgba(0, 0, 0, 0.1)',
+                    //         shadowBlur: 10
+                    //     }
+                    // },
+                    // itemStyle: {
+                    //     normal: {
+                    //         color: 'rgb(137,189,27)',
+                    //         borderColor: 'rgba(137,189,2,0.27)',
+                    //         borderWidth: 12
+
+                    //     }
+                    // }
                 },
                 {
                     name: '已栽植',
                     type: 'line',
-                    areaStyle: {},
                     data: yPlantData
+                    // smooth: true,
+                    // symbol: 'circle',
+                    // symbolSize: 5,
+                    // showSymbol: false,
+                    // areaStyle: {
+                    //     normal: {
+                    //         // color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                    //         //     offset: 0,
+                    //         //     color: 'rgba(219, 50, 51, 0.3)'
+                    //         // }, {
+                    //         //     offset: 0.8,
+                    //         //     color: 'rgba(219, 50, 51, 0)'
+                    //         // }], false),
+                    //         shadowColor: 'rgba(0, 0, 0, 0.1)',
+                    //         shadowBlur: 10
+                    //     }
+                    // },
+                    // itemStyle: {
+                    //     normal: {
+                    //         color: 'rgb(0,136,212)',
+                    //         borderColor: 'rgba(0,136,212,0.2)',
+                    //         borderWidth: 12
+
+                    //     }
+                    // }
                 }
             ]
         };

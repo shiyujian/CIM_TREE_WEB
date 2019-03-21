@@ -356,8 +356,7 @@ export default class LocmeasureTable extends Component {
             smallclassoption,
             thinclassoption,
             typeoption,
-            statusoption,
-            locationoption
+            statusoption
         } = this.props;
         const {
             sxm,

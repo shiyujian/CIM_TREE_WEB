@@ -57,7 +57,7 @@ export default class VehicleAnalysi extends Component {
         getCarpackstat({}, {}).then(rep => {
             console.log(rep, '车辆包数据');
             let totalEnter = rep.TotalNum - rep.BackNum;
-            let todayEnter = rep.TodayTotalNum - rep.TodayBackNum;
+            let todayEnter = rep.TodayInNum;
             this.setState({
                 totalStage: rep.TotalNum, // 车辆累计出圃数量
                 totalEnter, // 车辆累计进场数量
