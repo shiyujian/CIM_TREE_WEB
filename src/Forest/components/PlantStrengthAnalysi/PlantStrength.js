@@ -190,7 +190,17 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='标段'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSection.bind(this)} value={plantSection} allowClear>
+                                <Select
+                                    style={{ width: 120 }}
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    onChange={this.handleSection.bind(this)}
+                                    value={plantSection}
+                                    allowClear>
                                     {
                                         this.sectionList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -201,7 +211,16 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='小班'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSmallClass.bind(this)} value={smallClassNo}>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleSmallClass.bind(this)}
+                                    value={smallClassNo}>
                                     {
                                         smallClassList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -212,7 +231,16 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='细班'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleThinClass.bind(this)} value={thinClassNo}>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleThinClass.bind(this)}
+                                    value={thinClassNo}>
                                     {
                                         thinClassList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -255,7 +283,17 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='标段'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSectionTree.bind(this)} value={plantSectionTree} allowClear>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleSectionTree.bind(this)}
+                                    value={plantSectionTree}
+                                    allowClear>
                                     {
                                         this.sectionList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -266,7 +304,16 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='小班'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSmallClassTree.bind(this)} value={smallClassNoTree}>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleSmallClassTree.bind(this)}
+                                    value={smallClassNoTree}>
                                     {
                                         smallClassListTree.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -277,7 +324,16 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='细班'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleThinClassTree.bind(this)} value={thinClassNoTree}>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleThinClassTree.bind(this)}
+                                    value={thinClassNoTree}>
                                     {
                                         thinClassListTree.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -307,6 +363,11 @@ class PlantStrength extends Component {
                                 <Select
                                     allowClear
                                     showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
                                     style={{width: 150}}
                                     defaultValue='全部'
                                     value={treeTypeNo}

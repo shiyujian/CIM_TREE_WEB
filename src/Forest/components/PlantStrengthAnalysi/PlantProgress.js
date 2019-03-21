@@ -15,8 +15,10 @@ class PositionProgress extends Component {
             spinningSection: false, // 加载中
             spinningSmall: false, // 加载中
             spinningThin: false, // 加载中
-            plantSection: '', // 默认标段
-            smallClassList: [], // 小班列表
+            smallPlantSection: '', // 小班种植进度默认标段
+            thinPlantSection: '', // 细班种植进度默认标段
+            smallPlantSmallClassList: [], // 小班种植进度小班列表
+            thinPlantSmallClassList: [], // 小班种植进度小班列表
             thinClassList: [], // 细班列表
             smallNo: '', // 小班编号
             _headersTotal: [], // 总种植导出表格行头
@@ -34,7 +36,8 @@ class PositionProgress extends Component {
         this.leftkeycode = ''; // 项目code
         this.onSearch = this.onSearch.bind(this); // 查询
         this.handleDate = this.handleDate.bind(this); // 更改时间
-        this.handleSmallPlant = this.handleSmallPlant.bind(this); // 小班种植选择标段
+        this.handleSmallPlantSection = this.handleSmallPlantSection.bind(this); // 小班种植选择标段
+        this.handleThinPlantSection = this.handleThinPlantSection.bind(this); // 小班种植选择标段
         this.handleSmallThin = this.handleSmallThin.bind(this); // 细班种植选择小班
         this.handleTotalExport = this.handleTotalExport.bind(this); // 总种植进度导出
         this.handleSectionExport = this.handleSectionExport.bind(this); // 各标段种植进度导出
@@ -51,8 +54,10 @@ class PositionProgress extends Component {
             this.renderTotal();
             this.renderSection();
             this.setState({
-                plantSection: this.sectionList[0].No,
-                smallClassList: this.sectionList[0].children,
+                smallPlantSection: this.sectionList[0].No,
+                thinPlantSection: this.sectionList[0].No,
+                smallPlantSmallClassList: this.sectionList[0].children,
+                thinPlantSmallClassList: this.sectionList[0].children,
                 smallNo: this.sectionList[0].children[0].No,
                 thinClassList: this.sectionList[0].children[0].children
             }, () => {
@@ -62,7 +67,19 @@ class PositionProgress extends Component {
         }
     }
     render () {
-        const { startDate, endDate, spinningTotal, spinningSection, spinningSmall, spinningThin, plantSection, smallClassList, smallNo } = this.state;
+        const {
+            startDate,
+            endDate,
+            spinningTotal,
+            spinningSection,
+            spinningSmall,
+            spinningThin,
+            smallPlantSection,
+            thinPlantSection,
+            smallPlantSmallClassList,
+            thinPlantSmallClassList,
+            smallNo
+        } = this.state;
         return (
             <div>
                 <Form layout='inline'>
@@ -101,7 +118,16 @@ class PositionProgress extends Component {
                             <Card title={
                                 <div>
                                     <span style={{marginRight: 20}}>各小班种植进度分析</span>
-                                    <Select style={{ width: 120 }} value={plantSection} onChange={this.handleSmallPlant.bind(this)}>
+                                    <Select
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            option.props.children
+                                                .toLowerCase()
+                                                .indexOf(input.toLowerCase()) >= 0
+                                        }
+                                        style={{ width: 120 }}
+                                        value={smallPlantSection}
+                                        onChange={this.handleSmallPlantSection.bind(this)}>
                                         {
                                             this.sectionList.map(item => {
                                                 return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -122,16 +148,34 @@ class PositionProgress extends Component {
                             <Card title={
                                 <div>
                                     <span style={{marginRight: 20}}>各细班种植进度分析</span>
-                                    <Select style={{ width: 120 }} value={plantSection} onChange={this.handleSmallPlant.bind(this)}>
+                                    <Select
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            option.props.children
+                                                .toLowerCase()
+                                                .indexOf(input.toLowerCase()) >= 0
+                                        }
+                                        style={{ width: 120 }}
+                                        value={thinPlantSection}
+                                        onChange={this.handleThinPlantSection.bind(this)}>
                                         {
                                             this.sectionList.map(item => {
                                                 return <Option value={item.No} key={item.No}>{item.Name}</Option>;
                                             })
                                         }
                                     </Select>
-                                    <Select style={{ width: 120 }} value={smallNo} onChange={this.handleSmallThin.bind(this)}>
+                                    <Select
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            option.props.children
+                                                .toLowerCase()
+                                                .indexOf(input.toLowerCase()) >= 0
+                                        }
+                                        style={{ width: 120 }}
+                                        value={smallNo}
+                                        onChange={this.handleSmallThin.bind(this)}>
                                         {
-                                            smallClassList.map(item => {
+                                            thinPlantSmallClassList.map(item => {
                                                 return <Option value={item.No} key={item.No}>{item.Name}</Option>;
                                             })
                                         }
@@ -402,36 +446,48 @@ class PositionProgress extends Component {
             });
         });
     }
-    handleSmallPlant (value) {
-        let smallClassList = [];
+    handleSmallPlantSection (value) {
+        let smallPlantSmallClassList = [];
         this.sectionList.map(item => {
             if (item.No === value) {
-                smallClassList = item.children;
+                smallPlantSmallClassList = item.children;
             }
         });
         this.setState({
-            smallClassList,
-            smallNo: '',
-            plantSection: value
+            smallPlantSmallClassList,
+            smallPlantSection: value
         }, () => {
             this.renderSmallClass();
         });
     }
+    handleThinPlantSection (value) {
+        let thinPlantSmallClassList = [];
+        this.sectionList.map(item => {
+            if (item.No === value) {
+                thinPlantSmallClassList = item.children;
+            }
+        });
+        this.setState({
+            thinPlantSmallClassList,
+            smallNo: '',
+            thinPlantSection: value
+        });
+    }
     renderSmallClass () {
-        const { startDate, endDate, plantSection, smallClassList } = this.state;
+        const { startDate, endDate, smallPlantSection, smallPlantSmallClassList } = this.state;
         let tblDataSmall = [], _headersSmall = ['小班', '已种植', '未种植']; // 导出表格数据
         const { getCountSmall } = this.props.actions;
         this.setState({
             spinningSmall: true
         });
         getCountSmall({}, {
-            section: plantSection || this.leftkeycode,
+            section: smallPlantSection || this.leftkeycode,
             stime: startDate,
             etime: endDate
         }).then(rep => {
             let complete = [], unComplete = [];
             let xAxisData = [];
-            smallClassList.map(item => {
+            smallPlantSmallClassList.map(item => {
                 rep.map(record => {
                     let recordNo = '';
                     recordNo = record.Section + '-' + record.No.split('-')[2];
@@ -524,9 +580,9 @@ class PositionProgress extends Component {
         });
     }
     handleSmallThin (value) {
-        const { smallClassList } = this.state;
+        const { thinPlantSmallClassList } = this.state;
         let thinClassList = [];
-        smallClassList.map(item => {
+        thinPlantSmallClassList.map(item => {
             if (item.No === value) {
                 thinClassList = item.children;
             }
@@ -539,7 +595,7 @@ class PositionProgress extends Component {
         });
     }
     renderThinClass () {
-        const { startDate, endDate, plantSection, smallNo, thinClassList } = this.state;
+        const { startDate, endDate, smallPlantSection, smallNo, thinClassList } = this.state;
         let tblDataThin = [], _headersThin = ['小班', '已种植', '未种植']; // 表格数据
         const { getCountThin } = this.props.actions;
         this.setState({
@@ -549,7 +605,7 @@ class PositionProgress extends Component {
         let no = smallNoArr[0] + '-' + smallNoArr[1] + '-' + smallNoArr[3];
         getCountThin({}, {
             no: no,
-            section: plantSection,
+            section: smallPlantSection,
             stime: startDate,
             etime: endDate
         }).then(rep => {

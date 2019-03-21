@@ -25,7 +25,7 @@ import WordView8 from './WordView8';
 import WordView9 from './WordView9';
 import WordView10 from './WordView10';
 import WordView11 from './WordView11';
-import Test from './Test'
+import Test from './Test';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -39,7 +39,7 @@ import {
 const { RangePicker } = DatePicker;
 
 export default class DegitalAcceptTable extends Component {
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             curingModalvisible: false,
@@ -90,7 +90,7 @@ export default class DegitalAcceptTable extends Component {
             key5: Math.random(),
             key6: Math.random(),
             key7: Math.random(),
-            key8: Math.random(),
+            key8: Math.random()
         };
         this.sscction = '',
         this.tinclass = '',
@@ -119,7 +119,7 @@ export default class DegitalAcceptTable extends Component {
                 title: '树种',
                 dataIndex: 'treetype',
                 render: () => {
-                    return <span>暂无字段</span>
+                    return <span>暂无字段</span>;
                 }
             },
             {
@@ -154,7 +154,7 @@ export default class DegitalAcceptTable extends Component {
                 title: '操作',
                 render: (text, record) => {
                     if (record.status === '未申请') {
-                        return <span>暂无</span>
+                        return <span>暂无</span>;
                     }
                     return (
                         <div>
@@ -171,8 +171,8 @@ export default class DegitalAcceptTable extends Component {
     }
     componentDidMount = async () => {
     }
-    render() {
-        const { 
+    render () {
+        const {
             curingTreeData,
             visible,
             visible1,
@@ -198,143 +198,143 @@ export default class DegitalAcceptTable extends Component {
             <div>
                 {this.treeTable(curingTreeData)}
                 {
-                    visible && <Test 
-                    visible={this.state.visible}
-                    onPressOk = {this.pressOK.bind(this, 1)}
-                    {...this.props}/>
+                    visible && <Test
+                        visible={this.state.visible}
+                        onPressOk ={this.pressOK.bind(this, 1)}
+                        {...this.props} />
                 }
                 {
-                    visible1 && <WordView1 
-                    onPressOk = {this.pressOK.bind(this, 1)}
-                    visible = {visible1}
-                    sscction = {this.sscction}
-                    tinclass = {this.ThinClass}
-                    detail = {itemDetail}
-                    {...this.props}
-                />
+                    visible1 && <WordView1
+                        onPressOk= {this.pressOK.bind(this, 1)}
+                        visible ={visible1}
+                        sscction ={this.sscction}
+                        tinclass= {this.ThinClass}
+                        detail= {itemDetail}
+                        {...this.props}
+                    />
                 }
                 {
                     visible2 && <WordView2
-                    onPressOk = {this.pressOK.bind(this, 2)}
-                    visible = {visible2}
-                    sscction = {this.sscction}
-                    tinclass = {this.ThinClass}
-                    detail = {itemDetail}
-                    {...this.props}
-                />
+                        onPressOk= {this.pressOK.bind(this, 2)}
+                        visible= {visible2}
+                        sscction= {this.sscction}
+                        tinclass ={this.ThinClass}
+                        detail= {itemDetail}
+                        {...this.props}
+                    />
                 }
                 {
                     visible3 && <WordView3
-                    onPressOk = {this.pressOK.bind(this, 3)}
-                    visible = {visible3}
-                    sscction = {this.sscction}
-                    tinclass = {this.ThinClass}
-                    detail = {itemDetail}
-                    {...this.props}
-                />
+                        onPressOk= {this.pressOK.bind(this, 3)}
+                        visible= {visible3}
+                        sscction ={this.sscction}
+                        tinclass= {this.ThinClass}
+                        detail= {itemDetail}
+                        {...this.props}
+                    />
                 }
                 {
                     visible4 && <WordView4
-                    onPressOk = {this.pressOK.bind(this, 4)}
-                    visible = {visible4}
-                    keyy={key4}
-                    unQualifiedList = {unQualifiedList}
-                    detail = {itemDetail}
-                />
+                        onPressOk= {this.pressOK.bind(this, 4)}
+                        visible= {visible4}
+                        keyy={key4}
+                        unQualifiedList ={unQualifiedList}
+                        detail ={itemDetail}
+                    />
                 }
                 {
                     visible5 && <WordView5
-                    onPressOk = {this.pressOK.bind(this, 5)}
-                    visible = {visible5}
-                    detail = {itemDetail}
-                />
+                        onPressOk ={this.pressOK.bind(this, 5)}
+                        visible ={visible5}
+                        detail ={itemDetail}
+                    />
                 }
                 {
                     visible6 && <WordView6
-                    onPressOk = {this.pressOK.bind(this, 6)}
-                    visible = {visible6}
-                    detail = {itemDetail}
-                />
+                        onPressOk= {this.pressOK.bind(this, 6)}
+                        visible ={visible6}
+                        detail= {itemDetail}
+                    />
                 }
                 {
                     visible7 && <WordView7
-                    onPressOk = {this.pressOK.bind(this, 7)}
-                    visible = {visible7}
-                    detail = {itemDetail}
-                />
+                        onPressOk= {this.pressOK.bind(this, 7)}
+                        visible= {visible7}
+                        detail= {itemDetail}
+                    />
                 }
                 {
                     visible8 && <WordView8
-                    onPressOk = {this.pressOK.bind(this, 8)}
-                    visible = {visible8}
-                    detail = {itemDetail}
-                />
+                        onPressOk= {this.pressOK.bind(this, 8)}
+                        visible= {visible8}
+                        detail ={itemDetail}
+                    />
                 }
                 {
                     visible9 && <WordView9
-                    onPressOk = {this.pressOK.bind(this, 9)}
-                    visible = {visible9}
-                    detail = {itemDetail}
-                />
+                        onPressOk= {this.pressOK.bind(this, 9)}
+                        visible ={visible9}
+                        detail= {itemDetail}
+                    />
                 }
                 {
                     visible10 && <WordView10
-                    onPressOk = {this.pressOK.bind(this, 10)}
-                    visible = {visible10}
-                    detail = {itemDetail}
-                />
+                        onPressOk ={this.pressOK.bind(this, 10)}
+                        visible ={visible10}
+                        detail ={itemDetail}
+                    />
                 }
                 {
                     visible11 && <WordView11
-                    onPressOk = {this.pressOK.bind(this, 11)}
-                    visible = {visible11}
-                    detail = {itemDetail}
-                />
+                        onPressOk ={this.pressOK.bind(this, 11)}
+                        visible= {visible11}
+                        detail ={itemDetail}
+                    />
                 }
             </div>
         );
     }
     pressOK (which) {
-        this.setState({visible: false})
+        this.setState({visible: false});
         switch (which) {
             case 1:
-                this.setState({ visible1: false })
+                this.setState({ visible1: false });
                 break;
             case 2:
-                this.setState({ visible2: false })
+                this.setState({ visible2: false });
                 break;
             case 3:
-                this.setState({ visible3: false })
+                this.setState({ visible3: false });
                 break;
             case 4:
-                this.setState({ visible4: false })
+                this.setState({ visible4: false });
                 break;
             case 5:
-                this.setState({ visible5: false })
+                this.setState({ visible5: false });
                 break;
             case 6:
-                this.setState({ visible6: false })
+                this.setState({ visible6: false });
                 break;
             case 7:
-                this.setState({ visible7: false })
+                this.setState({ visible7: false });
                 break;
             case 8:
-                this.setState({ visible8: false })
+                this.setState({ visible8: false });
                 break;
             case 9:
-                this.setState({ visible9: false })
+                this.setState({ visible9: false });
                 break;
             case 10:
-                this.setState({ visible10: false })
+                this.setState({ visible10: false });
                 break;
             case 11:
-                this.setState({ visible11: false })
+                this.setState({ visible11: false });
                 break;
             default:
-                return ''
+                return '';
         }
     }
-    treeTable(details) {
+    treeTable (details) {
         const {
             sectionoption,
             smallclassoption,
@@ -367,6 +367,12 @@ export default class DegitalAcceptTable extends Component {
                         <span className='forest-search-span'>标段：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
@@ -379,6 +385,12 @@ export default class DegitalAcceptTable extends Component {
                         <span className='forest-search-span'>小班：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
@@ -391,6 +403,12 @@ export default class DegitalAcceptTable extends Component {
                         <span className='forest-search-span'>细班：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
@@ -428,6 +446,11 @@ export default class DegitalAcceptTable extends Component {
                         <Select
                             allowClear
                             showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
@@ -580,43 +603,43 @@ export default class DegitalAcceptTable extends Component {
         );
     }
 
-    ysTypeChange(type, value) { // 清空select会调用此函数
+    ysTypeChange (type, value) { // 清空select会调用此函数
         if (type === 'yslx') {
             this.setState({ ystype: value || '' });
         } else if (type === 'zt') {
             this.setState({ zt: value || '' });
         } else if (type === 'sgy') {
-            this.setState({ sgy: value || '' })
+            this.setState({ sgy: value || '' });
         } else if (type === 'cly') {
-            this.setState({ cly: value || '' })
+            this.setState({ cly: value || '' });
         } else if (type === 'jl') {
-            this.setState({ jl: value || '' })
+            this.setState({ jl: value || '' });
         }
     }
 
-    async onSectionChange(value) {
+    async onSectionChange (value) {
         const {
             actions: {
                 getDigitalAcceptUserList
             }
         } = this.props;
         if (!value) {
-            return
+            return;
         }
         // only choose the section, you can search the people
-        let shigong = await getDigitalAcceptUserList({}, { sections: value, grouptype: 1 })
-        let jianli = await getDigitalAcceptUserList({}, { sections: value, grouptype: 2 })
-        let shigongOptions = []
-        let jianliOptions = []
+        let shigong = await getDigitalAcceptUserList({}, { sections: value, grouptype: 1 });
+        let jianli = await getDigitalAcceptUserList({}, { sections: value, grouptype: 2 });
+        let shigongOptions = [];
+        let jianliOptions = [];
         if (shigong instanceof Array) {
             shigong.map(item => {
-                shigongOptions.push(<Option value={item.id}>{item.account.person_name}</Option>)
-            })
+                shigongOptions.push(<Option value={item.id}>{item.account.person_name}</Option>);
+            });
         }
         if (jianli instanceof Array) {
             jianli.map(item => {
-                jianliOptions.push(<Option value={item.id}>{item.account.person_name}</Option>)
-            })
+                jianliOptions.push(<Option value={item.id}>{item.account.person_name}</Option>);
+            });
         }
         const { sectionSelect } = this.props;
         sectionSelect(value || '');
@@ -631,7 +654,7 @@ export default class DegitalAcceptTable extends Component {
         });
     }
 
-    onSmallClassChange(value) {
+    onSmallClassChange (value) {
         const { smallClassSelect } = this.props;
         try {
             smallClassSelect(value);
@@ -651,35 +674,35 @@ export default class DegitalAcceptTable extends Component {
         }
     }
 
-    onThinClassChange(value) {
+    onThinClassChange (value) {
         const {
             actions: {
                 getTreetypeByThinclass
-            }, 
+            },
             thinClassSelect
         } = this.props;
         const { section } = this.state;
-        let array = value.split('-')
-        let array1 = []
-        let treetypeoption = []
+        let array = value.split('-');
+        let array1 = [];
+        let treetypeoption = [];
         array.map((item, i) => {
             if (i !== 2) {
-                array1.push(item)
+                array1.push(item);
             }
-        })
-        getTreetypeByThinclass({},{
+        });
+        getTreetypeByThinclass({}, {
             section: section,
             thinclass: array1.join('-')
         }).then(rst => {
             if (rst && rst.content && rst.content instanceof Array) {
                 rst.content.map(item => {
-                    treetypeoption.push(<Option value={item.TreeType}>{item.TreeTypeObj.TreeTypeName}</Option>)
-                })
+                    treetypeoption.push(<Option value={item.TreeType}>{item.TreeTypeObj.TreeTypeName}</Option>);
+                });
             }
             this.setState({
                 treetypeoption
-            })
-        })
+            });
+        });
         try {
             thinClassSelect(value);
             let thinclassData = '';
@@ -702,11 +725,11 @@ export default class DegitalAcceptTable extends Component {
     //     this.setState({ curingTypeSelect: value || '', treetype: '', treetypename: '' });
     // }
 
-    onTreeTypeChange(value) {
+    onTreeTypeChange (value) {
         this.setState({ treetype: value, treetypename: value });
     }
 
-    datepick(value) {
+    datepick (value) {
         this.setState({
             stime1: value[0]
                 ? moment(value[0]).format('YYYY-MM-DD HH:mm:ss')
@@ -719,7 +742,7 @@ export default class DegitalAcceptTable extends Component {
         });
     }
 
-    handleTableChange(pagination) {
+    handleTableChange (pagination) {
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
         this.setState({
@@ -728,17 +751,17 @@ export default class DegitalAcceptTable extends Component {
         this.query(pagination.current);
     }
 
-    handleCancel() {
+    handleCancel () {
         this.setState({ curingModalvisible: false });
     }
 
-    resetinput() {
+    resetinput () {
         const { resetinput, leftkeycode } = this.props;
         resetinput(leftkeycode);
     }
 
-    exportFile(type, record) {
-        this.setState({visible: true})
+    exportFile (type, record) {
+        this.setState({visible: true});
         if (type === 'single') { // 单个导出
 
         } else if (type === 'mutiple') {
@@ -746,13 +769,13 @@ export default class DegitalAcceptTable extends Component {
         }
     }
 
-    async viewWord(record) {
+    async viewWord (record) {
         const {
             actions: {
                 getDigitalAcceptDetail,
                 getMQulityCheckList, // 苗木质量不合格列表
                 getTQulityCheckList, // 土球质量不合格列表
-                getZZJQulityCheckList, // 苗木 栽植/支架/浇水 不合格列表
+                getZZJQulityCheckList // 苗木 栽植/支架/浇水 不合格列表
             }
         } = this.props;
         const {
@@ -768,27 +791,27 @@ export default class DegitalAcceptTable extends Component {
             status: record.Status, // 用当前条目的状态去查询
             stime: stime1,
             etime: etime1
-        }
+        };
         let rst = await getDigitalAcceptDetail({}, postdata);
-        if (! rst instanceof Array || rst.length === 0 ) {
-            message.info('移动端详情尚未提交'); 
-            return
+        if (!rst instanceof Array || rst.length === 0) {
+            message.info('移动端详情尚未提交');
+            return;
         }
         this.sscction = rst[0].Section,
         this.tinclass = rst[0].ThinClass,
         this.setState({
             itemDetail: rst[0]
-        })
-        let unQualifiedList = []
+        });
+        let unQualifiedList = [];
         switch (checktype) {
             case 1:
-                this.setState({ visible1: true })
+                this.setState({ visible1: true });
                 break;
             case 2:
-                this.setState({ visible2: true })
+                this.setState({ visible2: true });
                 break;
             case 3:
-                this.setState({ visible3: true })
+                this.setState({ visible3: true });
                 break;
             case 4:
                 let postdata1 = {
@@ -796,12 +819,12 @@ export default class DegitalAcceptTable extends Component {
                     thinclass: thinclass,
                     treetype: rst[0].TreeType,
                     status: 0
-                }
-                let result1 = await getMQulityCheckList({},postdata1)
+                };
+                let result1 = await getMQulityCheckList({}, postdata1);
                 if (result1 && result1.content && result1.content instanceof Array) {
                     unQualifiedList = result1.content;
                 }
-                this.setState({ visible4: true, unQualifiedList, key4: Math.random() })
+                this.setState({ visible4: true, unQualifiedList, key4: Math.random() });
                 break;
             case 5:
                 let postdata2 = {
@@ -809,9 +832,9 @@ export default class DegitalAcceptTable extends Component {
                     thinclass: thinclass,
                     treetype: record.TreeType,
                     status: 0
-                }
-                let result2 = await getTQulityCheckList({},postdata2)
-                this.setState({ visible5: true, key5: Math.random() })
+                };
+                let result2 = await getTQulityCheckList({}, postdata2);
+                this.setState({ visible5: true, key5: Math.random() });
                 break;
             case 6: // 栽植
                 let postdata3 = {
@@ -820,9 +843,9 @@ export default class DegitalAcceptTable extends Component {
                     treetype: record.TreeType,
                     status: 0,
                     problemtype: '栽植过深或过浅,栽植未踏实,土球未解除包装物'
-                }
-                let result3 = await getTQulityCheckList({},postdata3)
-                this.setState({ visible6: true, key6: Math.random() })
+                };
+                let result3 = await getTQulityCheckList({}, postdata3);
+                this.setState({ visible6: true, key6: Math.random() });
                 break;
             case 7: // 支架
                 let postdata4 = {
@@ -830,9 +853,9 @@ export default class DegitalAcceptTable extends Component {
                     thinclass: thinclass,
                     status: 0,
                     problemtype: '苗木支撑不牢固,苗木支撑不及时,苗木撑杆为非硬木'
-                }
-                let result4 = await getTQulityCheckList({},postdata4)
-                this.setState({ visible7: true, key7: Math.random() })
+                };
+                let result4 = await getTQulityCheckList({}, postdata4);
+                this.setState({ visible7: true, key7: Math.random() });
                 break;
             case 8: // 浇水
                 let postdata5 = {
@@ -840,27 +863,27 @@ export default class DegitalAcceptTable extends Component {
                     thinclass: thinclass,
                     status: 0,
                     problemtype: '土堰直径不满足要求,土堰深度不满足要求,首次浇水不及时、未浇透,浇水后未封穴或封穴不密实'
-                }
-                let result5 = await getTQulityCheckList({},postdata5)
-                this.setState({ visible8: true, key8: Math.random() })
+                };
+                let result5 = await getTQulityCheckList({}, postdata5);
+                this.setState({ visible8: true, key8: Math.random() });
                 break;
             case 9:
                 let postdata6 = {
                     section: section,
                     thinclass: thinclass,
                     treetype: record.TreeType
-                }
-                let result6 = await getTQulityCheckList({},postdata6)
-                this.setState({ visible9: true })
+                };
+                let result6 = await getTQulityCheckList({}, postdata6);
+                this.setState({ visible9: true });
                 break;
             case 10:
-                this.setState({ visible10: true })
+                this.setState({ visible10: true });
                 break;
             case 11:
-                this.setState({ visible11: true })
+                this.setState({ visible11: true });
                 break;
             default:
-                return ''
+                return '';
         }
     }
 
@@ -893,13 +916,13 @@ export default class DegitalAcceptTable extends Component {
             platform: { tree = {} }
         } = this.props;
         let thinClassTree = tree.thinClassTree;
-        let array = thinclass.split('-')
-        let array1 = []
+        let array = thinclass.split('-');
+        let array1 = [];
         array.map((item, i) => {
             if (i !== 2) {
-                array1.push(item)
+                array1.push(item);
             }
-        })
+        });
         let postdata = {
             section,
             treetype: treetypename,
@@ -925,14 +948,14 @@ export default class DegitalAcceptTable extends Component {
                 let result = [];
                 curingTreeData.map((curingTree, i) => {
                     curingTree.order = (page - 1) * size + i + 1;
-                    curingTree.ystype = getYsTypeByID(curingTree.CheckType)
-                    curingTree.status = getStatusByID(curingTree.Status)
+                    curingTree.ystype = getYsTypeByID(curingTree.CheckType);
+                    curingTree.status = getStatusByID(curingTree.Status);
                     curingTree.sectionName = getSectionNameBySection(curingTree.Section, thinClassTree);
                     curingTree.Project = getProjectNameBySection(curingTree.Section, thinClassTree);
                     curingTree.smallclass = `${smallclassData}号小班`;
                     curingTree.thinclass = `${thinclassData}号细班`;
-                    result.push(curingTree)
-                })
+                    result.push(curingTree);
+                });
                 let totalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
@@ -946,7 +969,7 @@ export default class DegitalAcceptTable extends Component {
                 });
             }
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
     }
 }
