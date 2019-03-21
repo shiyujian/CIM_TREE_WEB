@@ -509,7 +509,8 @@ class PlantStrength extends Component {
         });
         this.setState({
             thinClassListTree,
-            smallClassNoTree: value
+            smallClassNoTree: value,
+            thinClassNoTree: ''
         });
     }
     handleThinClassTree (value) {
@@ -518,15 +519,6 @@ class PlantStrength extends Component {
         });
     }
     handleSectionTree (value) {
-        if (value === undefined) {
-            this.setState({
-                smallClassListTree: [],
-                smallClassNoTree: '',
-                plantSectionTree: '',
-                thinClassNoTree: ''
-            });
-            return;
-        }
         let smallClassListTree = [];
         this.sectionList.map(item => {
             if (item.No === value) {
@@ -535,19 +527,12 @@ class PlantStrength extends Component {
         });
         this.setState({
             smallClassListTree,
-            plantSectionTree: value
+            plantSectionTree: value,
+            smallClassNoTree: '',
+            thinClassNoTree: ''
         });
     }
     handleSection (value) {
-        if (value === undefined) {
-            this.setState({
-                smallClassList: [],
-                smallClassNo: '',
-                plantSection: '',
-                thinClassNo: ''
-            });
-            return;
-        }
         let smallClassList = [];
         this.sectionList.map(item => {
             if (item.No === value) {
@@ -556,7 +541,9 @@ class PlantStrength extends Component {
         });
         this.setState({
             smallClassList,
-            plantSection: value
+            plantSection: value,
+            smallClassNo: '',
+            thinClassNo: ''
         });
     }
     handleSmallClass (value) {
@@ -569,7 +556,8 @@ class PlantStrength extends Component {
         });
         this.setState({
             thinClassList,
-            smallClassNo: value
+            smallClassNo: value,
+            thinClassNo: ''
         });
     }
     handleThinClass (value) {

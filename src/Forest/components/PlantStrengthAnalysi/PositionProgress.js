@@ -11,7 +11,7 @@ class PlantProgress extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            spinningTotal: false, // 加载中
+            spinningPlantPosition: false, // 加载中
             spinningSection: false, // 加载中
             spinningSmall: false, // 加载中
             spinningThin: false, // 加载中
@@ -21,7 +21,7 @@ class PlantProgress extends Component {
             smallNo: '', // 小班编号
             _headersTotal: [], // 总种植导出表格行头
             tblDataTotal: [], // 总种植导出表格数据
-            _headersSection: [], // 总种植导出表格行头
+            _headersSection: [], // 总定位导出表格行头
             tblDataSection: [], // 总种植导出表格数据
             _headersSmall: [], // 总种植导出表格行头
             tblDataSmall: [], // 总种植导出表格数据
@@ -36,8 +36,8 @@ class PlantProgress extends Component {
         this.onSearch = this.onSearch.bind(this); // 查询
         this.handleSmallPlant = this.handleSmallPlant.bind(this); // 小班种植选择标段
         this.handleSmallThin = this.handleSmallThin.bind(this); // 细班种植选择小班
-        this.handleTotalExport = this.handleTotalExport.bind(this); // 总种植进度导出
         this.handleSectionExport = this.handleSectionExport.bind(this); // 各标段种植进度导出
+        this.handlePlantPositionExport = this.handlePlantPositionExport.bind(this); // 总种植总定位进度对比导出
         this.handleSmallExport = this.handleSmallExport.bind(this); // 各小班种植进度导出
         this.handleThinExport = this.handleThinExport.bind(this); // 各细班种植进度导出
     }
@@ -49,9 +49,12 @@ class PlantProgress extends Component {
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
             this.renderSection();
+            this.renderPlantPosition();
             this.setState({
                 plantSection: this.sectionList[0].No,
-                smallClassList: this.sectionList[0].children
+                smallClassList: this.sectionList[0].children,
+                smallNo: this.sectionList[0].children[0].No,
+                thinClassList: this.sectionList[0].children[0].children
             }, () => {
                 this.renderSmallClass();
                 this.renderThinClass();
@@ -59,7 +62,7 @@ class PlantProgress extends Component {
         }
     }
     render () {
-        const { startDate, endDate, spinningTotal, spinningSection, spinningSmall, spinningThin, plantSection, smallClassList, smallNo } = this.state;
+        const { startDate, endDate, spinningSection, spinningPlantPosition, spinningSmall, spinningThin, plantSection, smallClassList, smallNo } = this.state;
         return (
             <div>
                 <Form layout='inline'>
@@ -85,6 +88,16 @@ class PlantProgress extends Component {
                             </Card>
                         </Col>
                         <Col span={12}>
+                            <Card title='各标段栽植定位比例分析' bordered={false} extra={<Button type='primary' onClick={this.handlePlantPositionExport.bind(this)}>导出</Button>}>
+                                <Spin spinning={spinningPlantPosition}>
+                                    <div
+                                        id='plantPosition'
+                                        style={{ width: '100%', height: '350px' }}
+                                    />
+                                </Spin>
+                            </Card>
+                        </Col>
+                        <Col span={24} style={{marginTop: 20}}>
                             <Card title={
                                 <div>
                                     <span style={{marginRight: 20}}>各小班定位进度分析</span>
@@ -138,17 +151,48 @@ class PlantProgress extends Component {
             </div>
         );
     }
-    handleTotalExport () {
-
+    handleExport (tblData, _headers, title) {
+        if (!(tblData && tblData instanceof Array && tblData.length > 0)) {
+            Notification.warning({
+                message: '数据为空，不能导出',
+                duration: 3
+            });
+            return;
+        }
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
+            }
+        };
+        XLSX.writeFile(wb, title);
+    }
+    handlePlantPositionExport () {
+        const { tblDataTotal, _headersTotal } = this.state;
+        this.handleExport(tblDataTotal, _headersTotal, '各标段栽植定位对比分析.xlsx');
     }
     handleSectionExport () {
-
+        const { tblDataSection, _headersSection } = this.state;
+        this.handleExport(tblDataSection, _headersSection, '各标段定位进度分析.xlsx');
     }
     handleSmallExport () {
-        
+        const { tblDataSmall, _headersSmall } = this.state;
+        this.handleExport(tblDataSmall, _headersSmall, '各小班定位进度分析.xlsx');
     }
     handleThinExport () {
-
+        const { tblDataThin, _headersThin } = this.state;
+        this.handleExport(tblDataThin, _headersThin, '各细班定位进度分析.xlsx');
     }
     handleDate (date, dateString) {
         this.setState({
@@ -157,12 +201,102 @@ class PlantProgress extends Component {
         });
     }
     onSearch () {
-
+        this.renderSection();
+        this.renderPlantPosition();
+        this.renderSmallClass();
+        this.renderThinClass();
+    }
+    async renderPlantPosition () {
+        const { startDate, endDate } = this.state;
+        const { getCountSection, getLocationtotalstat } = this.props.actions;
+        let _headersTotal = ['标段', '已栽植', '已定位'], tblDataTotal = []; // 导出表格数据
+        await this.setState({
+            spinningPlantPosition: true
+        });
+        let plantData = await getCountSection({}, {
+            section: this.leftkeycode,
+            stime: startDate,
+            etime: endDate
+        });
+        let locationData = await getLocationtotalstat({}, {
+            section: this.leftkeycode,
+            stime: startDate,
+            etime: endDate
+        });
+        console.log('栽植定位量对比', plantData, locationData);
+        let xAxisData = [], yPlantData = [], yPositionData = [];
+        this.sectionList.map(item => {
+            xAxisData.push(item.Name);
+            let locationSum = 0, plantSum = 0;
+            locationData.map(record => {
+                if (item.No === record.Label) {
+                    locationSum += record.Num;
+                }
+            });
+            plantData.map(record => {
+                if (item.No === record.Label) {
+                    plantSum += record.Complete;
+                }
+            });
+            yPositionData.push(locationSum);
+            yPlantData.push(plantSum);
+            tblDataTotal.push({
+                '标段': item.Name,
+                '已栽植': plantSum,
+                '已定位': locationSum
+            });
+        });
+        console.log('栽植定位量对比', xAxisData, yPlantData, yPositionData);
+        let myChart = echarts.init(document.getElementById('plantPosition'));
+        let options = {
+            legend: {
+                data: ['已栽植', '已定位']
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: xAxisData
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '定位数',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
+                }
+            ],
+            series: [
+                {
+                    name: '已定位',
+                    type: 'line',
+                    areaStyle: {},
+                    data: yPositionData
+                },
+                {
+                    name: '已栽植',
+                    type: 'line',
+                    areaStyle: {},
+                    data: yPlantData
+                }
+            ]
+        };
+        myChart.setOption(options);
+        this.setState({
+            _headersTotal,
+            tblDataTotal,
+            spinningPlantPosition: false
+        });
     }
     renderSection () {
         const { startDate, endDate } = this.state;
         const { getLocationtotalstat } = this.props.actions;
-        // let tblDataSection = [], _headersSection = ['标段', '已种植', '未种植']; // 导出表格数据
+        let tblDataSection = [], _headersSection = ['标段', '已定位']; // 导出表格数据
         let xAxisData = [];
         this.setState({
             spinningSection: true
@@ -184,6 +318,10 @@ class PlantProgress extends Component {
                 });
                 xAxisData.push(item.Name);
                 yAxisData.push(sum);
+                tblDataSection.push({
+                    '标段': item.Name,
+                    '已定位': sum
+                });
             });
             let myChart = echarts.init(document.getElementById('sectionLocation'));
             let options = {
@@ -231,6 +369,8 @@ class PlantProgress extends Component {
             };
             myChart.setOption(options);
             this.setState({
+                tblDataSection,
+                _headersSection,
                 spinningSection: false
             });
         });
@@ -244,6 +384,7 @@ class PlantProgress extends Component {
         });
         this.setState({
             smallClassList,
+            smallNo: '',
             plantSection: value
         }, () => {
             this.renderSmallClass();
@@ -251,7 +392,7 @@ class PlantProgress extends Component {
     }
     renderSmallClass () {
         const { startDate, endDate, plantSection, smallClassList } = this.state;
-        let tblDataSmall = [], _headersSmall = ['小班', '已种植', '未种植']; // 导出表格数据
+        let tblDataSmall = [], _headersSmall = ['小班', '已定位']; // 导出表格数据
         const { getLocationStatBySpecfield } = this.props.actions;
         this.setState({
             spinningSmall: true
@@ -274,7 +415,7 @@ class PlantProgress extends Component {
                         xAxisData.push(item.Name);
                         tblDataSmall.push({
                             '小班': item.Name,
-                            '已种植': record.Num
+                            '已定位': record.Num
                         });
                     }
                 });
@@ -357,7 +498,7 @@ class PlantProgress extends Component {
     }
     renderThinClass () {
         const { startDate, endDate, plantSection, thinClassList } = this.state;
-        let tblDataThin = [], _headersThin = []; // 表格数据
+        let tblDataThin = [], _headersThin = ['小班', '已定位']; // 表格数据
         const { getLocationStatBySpecfield } = this.props.actions;
         this.setState({
             spinningThin: true

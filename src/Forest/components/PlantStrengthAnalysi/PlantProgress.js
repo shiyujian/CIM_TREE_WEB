@@ -52,7 +52,9 @@ class PositionProgress extends Component {
             this.renderSection();
             this.setState({
                 plantSection: this.sectionList[0].No,
-                smallClassList: this.sectionList[0].children
+                smallClassList: this.sectionList[0].children,
+                smallNo: this.sectionList[0].children[0].No,
+                thinClassList: this.sectionList[0].children[0].children
             }, () => {
                 this.renderSmallClass();
                 this.renderThinClass();
@@ -195,6 +197,8 @@ class PositionProgress extends Component {
     onSearch () {
         this.renderTotal();
         this.renderSection();
+        this.renderSmallClass();
+        this.renderThinClass();
     }
     handleDate (date, dateString) {
         this.setState({
@@ -407,6 +411,7 @@ class PositionProgress extends Component {
         });
         this.setState({
             smallClassList,
+            smallNo: '',
             plantSection: value
         }, () => {
             this.renderSmallClass();
@@ -535,7 +540,7 @@ class PositionProgress extends Component {
     }
     renderThinClass () {
         const { startDate, endDate, plantSection, smallNo, thinClassList } = this.state;
-        let tblDataThin = [], _headersThin = []; // 表格数据
+        let tblDataThin = [], _headersThin = ['小班', '已种植', '未种植']; // 表格数据
         const { getCountThin } = this.props.actions;
         this.setState({
             spinningThin: true
