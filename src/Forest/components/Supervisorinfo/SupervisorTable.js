@@ -218,6 +218,12 @@ export default class SupervisorTable extends Component {
                         <span className='forest-search-span'>标段：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
@@ -230,6 +236,12 @@ export default class SupervisorTable extends Component {
                         <span className='forest-search-span'>小班：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
@@ -242,6 +254,12 @@ export default class SupervisorTable extends Component {
                         <span className='forest-search-span'>细班：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
@@ -267,6 +285,11 @@ export default class SupervisorTable extends Component {
                         <Select
                             allowClear
                             showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}

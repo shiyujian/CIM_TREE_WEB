@@ -79,6 +79,12 @@ export default class DataStatisTable extends Component {
                                     <span className='forest-search-span'>标段：</span>
                                     <Select
                                         allowClear
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            option.props.children
+                                                .toLowerCase()
+                                                .indexOf(input.toLowerCase()) >= 0
+                                        }
                                         className='forest-forestcalcw4'
                                         defaultValue='全部'
                                         value={sectionSearch}
@@ -91,6 +97,12 @@ export default class DataStatisTable extends Component {
                                     <span className='forest-search-span'>小班：</span>
                                     <Select
                                         allowClear
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            option.props.children
+                                                .toLowerCase()
+                                                .indexOf(input.toLowerCase()) >= 0
+                                        }
                                         className='forest-forestcalcw4'
                                         defaultValue='全部'
                                         value={smallclassSearch}
@@ -103,6 +115,12 @@ export default class DataStatisTable extends Component {
                                     <span className='forest-search-span'>细班：</span>
                                     <Select
                                         allowClear
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            option.props.children
+                                                .toLowerCase()
+                                                .indexOf(input.toLowerCase()) >= 0
+                                        }
                                         className='forest-forestcalcw4'
                                         defaultValue='全部'
                                         value={thinclassSearch}
@@ -128,6 +146,11 @@ export default class DataStatisTable extends Component {
                                     <Select
                                         allowClear
                                         showSearch
+                                        filterOption={(input, option) =>
+                                            option.props.children
+                                                .toLowerCase()
+                                                .indexOf(input.toLowerCase()) >= 0
+                                        }
                                         className='forest-forestcalcw4'
                                         defaultValue='全部'
                                         value={treetypename}
