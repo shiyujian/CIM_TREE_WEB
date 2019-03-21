@@ -61,7 +61,7 @@ export default class AccountPandect extends Component {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className='UserAnalysis-table-border'>
+                                    {/* <td className='UserAnalysis-table-border'>
                                         <div className='UserAnalysis-table-pad'>
                                             <div className='UserAnalysis-table-title'>
                                         日最高活跃账户数
@@ -70,7 +70,7 @@ export default class AccountPandect extends Component {
                                                 {MaxUserNum}
                                             </div>
                                         </div>
-                                    </td>
+                                    </td> */}
                                     <td className='UserAnalysis-table-border'>
                                         <div className='UserAnalysis-table-pad'>
                                             <div className='UserAnalysis-table-title'>

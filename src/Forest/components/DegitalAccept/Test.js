@@ -34,12 +34,12 @@ export default class Test extends Component {
             }
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        await getCustomViewByUserID({id: user.id});
+        await getCustomViewByUserID({ id: user.id });
         await this.initMap();
-        this._addAreaLayer('P009-01-002-002','P009-01-01');
+        this._addAreaLayer('P009-01-002-002', 'P009-01-01');
     }
 
-    componentWillUnmount () {
+    componentWillUnmount() {
         this.map = null;
     }
 
@@ -47,7 +47,7 @@ export default class Test extends Component {
         // this.props.onPressOk(1)
     }
     /* 初始化地图 */
-    initMap () {
+    initMap() {
         const {
             customViewByUserID = []
         } = this.props;
@@ -87,7 +87,7 @@ export default class Test extends Component {
     }
 
     // 选中细班，则在地图上加载细班图层
-    _addAreaLayer = async (eventKey,section) => {
+    _addAreaLayer = async (eventKey, section) => {
         const {
             areaLayerList
         } = this.state;
@@ -104,7 +104,7 @@ export default class Test extends Component {
                     let message = {
                         key: 3,
                         type: 'Feature',
-                        properties: {name: '', type: 'area'},
+                        properties: { name: '', type: 'area' },
                         geometry: { type: 'Polygon', coordinates: treearea }
                     };
                     let layer = this._createMarker(message);
@@ -127,7 +127,7 @@ export default class Test extends Component {
     }
 
     /* 在地图上添加marker和polygan */
-    _createMarker (geo) {
+    _createMarker(geo) {
         try {
             if (geo.properties.type === 'area') {
                 // 创建区域图形
@@ -155,11 +155,44 @@ export default class Test extends Component {
         let sjmj = detail && detail.DesignArea || ''
         let shijmj = detail && detail.ActualArea || ''
         let thinclass = 'P191-01-002-002'
+        let hege = 70;
+        let buhege = 30;
+        let currenthege = 0;
+        let currentbuhege = 0;
+        let total = hege + buhege;
+        let rowList = []
+        for (let i = 0; i < total / 17; i++) { // 判断需要展示多少行
+            let colList = []
+            for (let j = 0; j<17;j++) {
+                if (Math.random() > 0.3) {
+                    if (currenthege !== hege) { // 还有合格的选项
+                        colList.push(<Col span={1}><div style={{}}>√</div></Col>)
+                        currenthege++;
+                    } else if(currentbuhege !== buhege) { // 没有合格的选项了，只能添加不合格
+                        colList.push(<Col span={1}><div>×</div></Col>)
+                        currentbuhege++;
+                    }else { // 都没有选项了，添加空项
+                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>)
+                    }
+                } else {
+                    if (currentbuhege !== buhege) {
+                        colList.push(<Col span={1}><div>×</div></Col>)
+                        currentbuhege++;
+                    } else if (currenthege !== hege) {
+                        colList.push(<Col span={1}><div>√</div></Col>)
+                        currenthege++;
+                    } else {
+                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>)
+                    }
+                }
+            }
+            rowList.push(colList)
+        }
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
                     width={800}
-                    visible={this.props.visible} 
+                    visible={this.props.visible}
                     title='土地整改质量验收记录'
                     onOk={this.onOk.bind(this)}
                     maskClosable={false}
@@ -167,54 +200,69 @@ export default class Test extends Component {
                     footer={null}
                 >
                     <div className='trrdd'>
-                        
                         <table style={{ border: 1 }}>
                             <tbody>
                                 <tr>
                                     <td style={{ height: 60, width: 118 }}>单位工程名称</td>
-                                    <td colSpan = '3'>{unit}</td>
+                                    <td colSpan='3'>{unit}</td>
                                     <td style={{ width: 118 }}>细班（小班）</td>
                                     <td>{`${array[2]}(${array[3]})`}</td>
                                 </tr>
                                 <tr>
                                     <td style={{ height: 60, align: 'center' }} >施工单位</td>
-                                    <td colSpan = '3'>中国交建集团</td>
+                                    <td colSpan='3'>中国交建集团</td>
                                     <td >项目经理</td>
                                     <td >王伟</td>
                                 </tr>
                                 <tr>
-                                    <td style={{ height: 60, align: 'center' }} colSpan = '1'>施工员</td>
-                                    <td colSpan = '1'>{shigong}</td>
-                                    <td colSpan = '1'>设计面积</td>
-                                    <td colSpan = '1'>{sjmj}</td>
-                                    <td colSpan = '1'>实际面积</td>
-                                    <td colSpan = '1'>{shijmj}</td>
+                                    <td style={{ height: 60, align: 'center' }} colSpan='1'>施工员</td>
+                                    <td colSpan='1'>{shigong}</td>
+                                    <td colSpan='1'>设计面积</td>
+                                    <td colSpan='1'>{sjmj}</td>
+                                    <td colSpan='1'>实际面积</td>
+                                    <td colSpan='1'>{shijmj}</td>
                                 </tr>
                                 <tr>
                                     <td style={{ height: 60 }} >施工执行标准名称及编号</td>
-                                    <td colSpan = '5'> 《雄安新区造林工作手册》</td>
+                                    <td colSpan='5'> 《雄安新区造林工作手册》</td>
                                 </tr>
                                 <tr>
-                                    <td style={{ height: 100}} colSpan = '6' >
+                                    <td style={{ height: 100 }} colSpan='6' >
                                         验收要点：以细班或小班为单位，对土地整理进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带的微地形处理、垃圾和碎石处理情况进行打分。
                                         ①微地形按照设计要求精准完成，垃圾碎石清除干净，计90分以上，通过检验；
                                         ②微地形处理或垃圾碎石处理总体较好，但仍有不足，需整改。
 			                    </td>
                                 </tr>
                                 <tr>
-                                    <td style={{ height: 300 }} colSpan = '6'>
-                                    <div
-                                        id='mapidd'
-                                        style={{
-                                            height: 300,
-                                            borderLeft: '1px solid #ccc'
-                                        }}
-                                    />
-			                    </td>
+                                    <td style={{ height: 300 }} colSpan='6'>
+                                        <div
+                                            id='mapidd'
+                                            style={{
+                                                height: 300,
+                                                borderLeft: '1px solid #ccc'
+                                            }}
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colSpan='6'>
+                                        <Row>
+                                            <Col span={3} style={{ width: 116 }}>
+                                                <div style={{ width: 116, marginTop: 20 }}>验收记录
+                                                合格(√)
+                                        不合格(×)</div>
+                                            </Col>
+                                            <Col span={21} style={{ width: 630 }}>
+                                                {
+                                                    rowList
+                                                }
+                                            </Col>
+                                        </Row>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td style={{ height: 110 }} >施工单位质量专检结果</td>
-                                    <td colSpan = '5'>
+                                    <td colSpan='5'>
                                         <div>
                                             <p>项目专业质量检查员：</p>
                                             <p style={{ marginLeft: 300 }}>年</p>
@@ -225,7 +273,7 @@ export default class Test extends Component {
                                 </tr>
                                 <tr>
                                     <td style={{ height: 110 }} >监理（建设）单位验收记录</td>
-                                    <td colSpan = '5'>
+                                    <td colSpan='5'>
                                         <div>
                                             <p>监理工程师：</p><p>{jianli}</p><p>{jianli}</p>
                                             <p style={{ marginLeft: 300 }}>年</p>
