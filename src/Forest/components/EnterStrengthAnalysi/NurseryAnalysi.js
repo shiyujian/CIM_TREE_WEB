@@ -4,6 +4,7 @@ import moment from 'moment';
 import echarts from 'echarts';
 const gridStyle = {
     width: '25%',
+    height: 120,
     textAlign: 'center'
 };
 const basicDataStyle = {
@@ -19,10 +20,10 @@ export default class NurseryAnalysi extends Component {
             returnDate: moment().format(dateFormat), // 退苗截至时间
             spinningEnter: false,
             spinningReturn: false,
-            NurseryNum: 0, // 苗木累计出圃数量
-            NurseryInNum: 0, // 苗圃累计进场数量
-            NurseryTodayNum: 0, // 苗木今日出圃数量
-            NurseryTodayInNum: 0 // 苗木今日进场数量
+            NurseryNum: '', // 苗木累计出圃数量
+            NurseryInNum: '', // 苗圃累计进场数量
+            NurseryTodayNum: '', // 苗木今日出圃数量
+            NurseryTodayInNum: '' // 苗木今日进场数量
         };
         this.sectionList = []; // 标段列表
         this.leftkeycode = ''; // 项目code
@@ -37,6 +38,12 @@ export default class NurseryAnalysi extends Component {
             console.log('渲染苗木页面');
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
+            this.setState({
+                NurseryNum: '', // 苗木累计出圃数量
+                NurseryInNum: '', // 苗圃累计进场数量
+                NurseryTodayNum: '', // 苗木今日出圃数量
+                NurseryTodayInNum: '' // 苗木今日进场数量
+            });
             this.getBasicData();
             this.renderEnter();
             this.renderReturn();

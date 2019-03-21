@@ -20,7 +20,6 @@ export default class NurseryGlobal extends Component {
             loading2: false,
             loading3: false,
             loading4: false
-
         };
     }
 

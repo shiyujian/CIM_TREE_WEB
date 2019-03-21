@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import { Card, Row, Col, List, Form, Select, Button, Table } from 'antd';
+import { Card, Row, Col, List, Form, Select, Button, Table, Spin } from 'antd';
 import XLSX from 'xlsx';
 import moment from 'moment';
 import echarts from 'echarts';
 
 const gridStyle = {
     width: '25%',
+    height: 120,
     textAlign: 'center'
 };
 const { Option } = Select;
@@ -25,6 +26,8 @@ class PlantStrength extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            spinningPlant: false, // 加载中
+            spinningTree: false, // 加载中
             plantSection: '', // 标段code
             smallClassNo: '', // 小班code
             thinClassNo: '', // 细班code
@@ -40,10 +43,10 @@ class PlantStrength extends Component {
             treeTypeRanking: [], // 所有栽植树种排名
             newTreeTypeList: [], // 树种列表
             treeTypeDisplayTable: false, // 是否表格展示
-            plantAmount: 0, // 累计种植数量
-            plantToday: 0, // 今日种植总数
-            locationToday: 0, // 今日定位数量
-            locationAmount: 0, // 累计定位总数
+            plantAmount: '', // 累计种植数量
+            plantToday: '', // 今日种植总数
+            locationToday: '', // 今日定位数量
+            locationAmount: '', // 累计定位总数
             nowmessagelist: [] // 实时种植数据列表
         };
         this.sectionList = []; // 标段列表
@@ -68,6 +71,12 @@ class PlantStrength extends Component {
         // 切换项目
         if (nextProps.leftkeycode !== this.props.leftkeycode) {
             this.setState({
+                spinningPlant: true, // 加载中
+                spinningTree: true, // 加载中
+                locationToday: '', // 今日定位数量
+                plantToday: '', // 今日栽植数量
+                locationAmount: '', // 累计定位数量
+                plantAmount: '', // 累计栽植数量
                 plantSection: '',
                 smallClassNo: '',
                 thinClassNo: '',
@@ -141,7 +150,7 @@ class PlantStrength extends Component {
     ]
     render () {
         const {
-            plantAmount, locationAmount, plantToday, locationToday,
+            plantAmount, locationAmount, plantToday, locationToday, spinningPlant, spinningTree,
             smallClassList, thinClassList, smallClassListTree, thinClassListTree,
             plantSection, smallClassNo, thinClassNo, nowmessagelist, newTreeTypeList, treeTypeRanking,
             plantSectionTree, smallClassNoTree, thinClassNoTree, treeKind, treeTypeNo, treeTypeDisplayTable
@@ -149,7 +158,7 @@ class PlantStrength extends Component {
         const { treeKindList, treeTypeList } = this.props;
         return (
             <div>
-                <div>
+                <div >
                     <h2>实时数据：{moment().format('HH:mm:ss')}</h2>
                     <div>
                         <Card title='关键数据' style={{float: 'left', width: 800}}>
@@ -218,18 +227,22 @@ class PlantStrength extends Component {
                         <Row gutter={16}>
                             <Col span={12}>
                                 <Card title='栽植/待栽植'>
-                                    <div
-                                        id='plantCake'
-                                        style={{ width: '100%', height: '300px' }}
-                                    />
+                                    <Spin spinning={spinningPlant}>
+                                        <div
+                                            id='plantCake'
+                                            style={{ width: '100%', height: '300px' }}
+                                        />
+                                    </Spin>
                                 </Card>
                             </Col>
                             <Col span={12}>
                                 <Card title='定位/未定位' extra={<span>仅针对已栽植</span>}>
-                                    <div
-                                        id='localtionCake'
-                                        style={{ width: '100%', height: '300px' }}
-                                    />
+                                    <Spin spinning={spinningPlant}>
+                                        <div
+                                            id='localtionCake'
+                                            style={{ width: '100%', height: '300px' }}
+                                        />
+                                    </Spin>
                                 </Card>
                             </Col>
                         </Row>
@@ -318,10 +331,12 @@ class PlantStrength extends Component {
                         <Row gutter={16}>
                             <Col span={12}>
                                 <Card title='树种分布' extra={<Button type='primary' onClick={this.handleDistributionExport.bind(this)}>导出</Button>}>
-                                    <div
-                                        id='TreeTypeCake'
-                                        style={{ width: '100%', height: '350px' }}
-                                    />
+                                    <Spin spinning={spinningTree}>
+                                        <div
+                                            id='TreeTypeCake'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Spin>
                                 </Card>
                             </Col>
                             <Col span={12}>
@@ -353,10 +368,12 @@ class PlantStrength extends Component {
                                                     style={{height: '100%'}}
                                                 />
                                             </div>
-                                            : <div
-                                                id='TreeTypeRanking'
-                                                style={{ width: '100%', height: '350px' }}
-                                            />
+                                            : <Spin spinning={spinningPlant}>
+                                                <div
+                                                    id='TreeTypeRanking'
+                                                    style={{ width: '100%', height: '350px' }}
+                                                />
+                                            </Spin>
                                     }
                                 </Card>
                             </Col>
@@ -369,6 +386,9 @@ class PlantStrength extends Component {
     onQueryTree () {
         const { treeTypeNo, thinClassNoTree, smallClassNoTree, plantSectionTree } = this.state;
         const { getStatByTreetype } = this.props.actions;
+        this.setState({
+            spinningTree: true
+        });
         let smallNo = '', thinNo = '';
         if (smallClassNoTree) {
             let arr = smallClassNoTree.split('-');
@@ -446,6 +466,9 @@ class PlantStrength extends Component {
             ]
         };
         myChart.setOption(option);
+        this.setState({
+            spinningTree: false
+        });
     }
     renderTreeTypeCake () {
         const { treeTypeRanking } = this.state;
@@ -569,6 +592,9 @@ class PlantStrength extends Component {
         const { getTreePlanting, getLocationStat } = this.props.actions;
         const { plantSection, thinClassNo, smallClassNo } = this.state;
         console.log('thinClassNo', thinClassNo);
+        this.setState({
+            spinningPlant: true
+        });
         let smallNo = '', thinNo = '';
         if (smallClassNo) {
             let arr = smallClassNo.split('-');
@@ -632,6 +658,9 @@ class PlantStrength extends Component {
             ]
         };
         myChart.setOption(option);
+        this.setState({
+            spinningPlant: false
+        });
     }
     renderPlantCake (plantNum, unPlantNum) {
         let myChart = echarts.init(document.getElementById('plantCake'));

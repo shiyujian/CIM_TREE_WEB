@@ -4,6 +4,7 @@ import moment from 'moment';
 import echarts from 'echarts';
 const gridStyle = {
     width: '25%',
+    height: 120,
     textAlign: 'center'
 };
 const basicDataStyle = {
@@ -19,10 +20,10 @@ export default class VehicleAnalysi extends Component {
             returnDate: moment().format(dateFormat), // 退苗截至时间
             spinningEnter: false,
             spinningReturn: false,
-            totalStage: 0, // 车辆累计出圃数量
-            totalEnter: 0, // 车辆累计进场数量
-            todayStage: 0, // 车辆今日出圃数量
-            todayEnter: 0 // 车辆今日进场数量
+            totalStage: '', // 车辆累计出圃数量
+            totalEnter: '', // 车辆累计进场数量
+            todayStage: '', // 车辆今日出圃数量
+            todayEnter: '' // 车辆今日进场数量
         };
         this.sectionList = []; // 标段列表
         this.leftkeycode = ''; // 项目code
@@ -36,6 +37,12 @@ export default class VehicleAnalysi extends Component {
         console.log('nextProps', nextProps.sectionList.length, nextProps.leftkeycode, nextProps.tabPane === '1');
         if (nextProps.sectionList.length > 0 && nextProps.leftkeycode && nextProps.tabPane === '1') {
             console.log('渲染车辆包页面');
+            this.setState({
+                totalStage: '', // 车辆累计出圃数量
+                totalEnter: '', // 车辆累计进场数量
+                todayStage: '', // 车辆今日出圃数量
+                todayEnter: '' // 车辆今日进场数量
+            });
             this.sectionList = nextProps.sectionList;
             this.leftkeycode = nextProps.leftkeycode;
             this.getBasicData();
@@ -48,6 +55,7 @@ export default class VehicleAnalysi extends Component {
         const { getCarpackstat } = this.props.actions;
         // 不分项目出圃，进场数量
         getCarpackstat({}, {}).then(rep => {
+            console.log(rep, '车辆包数据');
             let totalEnter = rep.TotalNum - rep.BackNum;
             let todayEnter = rep.TodayTotalNum - rep.TodayBackNum;
             this.setState({
@@ -64,8 +72,8 @@ export default class VehicleAnalysi extends Component {
         return (
             <div>
                 <h2>实时数据{moment().format('HH:mm:ss')}</h2>
-                <Card title='关键数据'>
-                    <Card.Grid style={gridStyle}>
+                <Card title='关键数据' extra={<span>车辆包数据针对所有项目</span>}>
+                    <Card.Grid style={gridStyle} >
                         <h3>车辆累计出圃数量</h3>
                         <div style={basicDataStyle}>{totalStage}</div>
                     </Card.Grid>
