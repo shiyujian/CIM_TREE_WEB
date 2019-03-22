@@ -49,7 +49,8 @@ export default class SupervisorTable extends Component {
             role: '',
             rolename: '',
             percent: 0,
-            totalNum: '',
+            messageTotalNum: '',
+            treeTotalNum: '',
             imgArr: [],
             smallclassData: '',
             thinclassData: ''
@@ -350,10 +351,7 @@ export default class SupervisorTable extends Component {
                         </Button>
                     </Col>
                     <Col span={18} className='forest-quryrstcnt'>
-                        <span>
-                            此次查询共有苗木：
-                            {this.state.totalNum}棵
-                        </span>
+                        <span>{`此次查询共有数据：${this.state.messageTotalNum}条，  共有苗木：${this.state.treeTotalNum}棵`}</span>
                     </Col>
                     <Col span={2}>
                         <Button
@@ -642,14 +640,16 @@ export default class SupervisorTable extends Component {
                     plan.yssj1 = yssj1;
                     plan.yssj2 = yssj2;
                 });
-                let totalNum = rst.total;
+                let treeTotalNum = rst.total;
+                let messageTotalNum = rst.pageinfo.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
                 this.setState({
                     tblData,
                     pagination: pagination,
-                    totalNum: totalNum
+                    messageTotalNum: messageTotalNum,
+                    treeTotalNum
                 });
             }
         });
