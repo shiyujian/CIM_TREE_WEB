@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-15 15:13:20
+ * @Last Modified time: 2019-03-22 14:47:51
  */
 /**
  *
@@ -503,6 +503,22 @@ export const MODULES = [
                 id: 'FOREST.STATIS.NONE',
                 name: '统计图表',
                 children: [
+                    {
+                        id: 'FOREST.USERANALYSI',
+                        name: '用户分析'
+                    },
+                    {
+                        id: 'FOREST.NURSERYSOURSEANALYSI',
+                        name: '苗木来源地分析'
+                    },
+                    {
+                        id: 'FOREST.ENTERSTRENGTHANALYSI',
+                        name: '进场强度分析'
+                    },
+                    {
+                        id: 'FOREST.PLANTSTRENGTHANALYSI',
+                        name: '栽植强度分析'
+                    },
                     {
                         id: 'FOREST.DATASTATIS',
                         name: '数据统计'
