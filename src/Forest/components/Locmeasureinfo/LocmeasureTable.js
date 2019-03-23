@@ -54,7 +54,8 @@ export default class LocmeasureTable extends Component {
             role: 'inputer',
             rolename: '',
             percent: 0,
-            totalNum: '',
+            messageTotalNum: '',
+            treeTotalNum: '',
             imgArr: [],
             smallclassData: '',
             thinclassData: '',
@@ -356,8 +357,7 @@ export default class LocmeasureTable extends Component {
             smallclassoption,
             thinclassoption,
             typeoption,
-            statusoption,
-            locationoption
+            statusoption
         } = this.props;
         const {
             sxm,
@@ -394,6 +394,12 @@ export default class LocmeasureTable extends Component {
                         <span className='forest-search-span'>标段：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={section}
@@ -406,6 +412,12 @@ export default class LocmeasureTable extends Component {
                         <span className='forest-search-span'>小班：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={smallclass}
@@ -418,6 +430,12 @@ export default class LocmeasureTable extends Component {
                         <span className='forest-search-span'>细班：</span>
                         <Select
                             allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={thinclass}
@@ -443,6 +461,11 @@ export default class LocmeasureTable extends Component {
                         <Select
                             allowClear
                             showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
                             className='forest-forestcalcw4'
                             defaultValue='全部'
                             value={treetypename}
@@ -621,7 +644,7 @@ export default class LocmeasureTable extends Component {
                         </Button>
                     </Col>
                     <Col span={18} className='forest-quryrstcnt'>
-                        <span>此次查询共有苗木：{this.state.totalNum}棵</span>
+                        <span>{`此次查询共有数据：${this.state.messageTotalNum}条，  共有苗木：${this.state.treeTotalNum}棵`}</span>
                     </Col>
                     <Col span={2} >
                         <Button
@@ -1149,7 +1172,8 @@ export default class LocmeasureTable extends Component {
                     plan.createtime4 = createtime4;
                 });
 
-                let totalNum = rst.pageinfo.total;
+                let messageTotalNum = rst.pageinfo.total;
+                let treeTotalNum = rst.total;
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
@@ -1494,7 +1518,8 @@ export default class LocmeasureTable extends Component {
                 this.setState({
                     tblData,
                     pagination: pagination,
-                    totalNum: totalNum
+                    messageTotalNum: messageTotalNum,
+                    treeTotalNum
                 });
             }
         });

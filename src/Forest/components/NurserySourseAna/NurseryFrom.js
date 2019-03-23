@@ -54,7 +54,7 @@ class NurseryFrom extends Component {
                 type: 'bar'
             }]
         };
-        let width = (document.body.clientWidth-300);
+        let width = (document.body.clientWidth - 300);
         console.log('width', width);
         myChart.setOption(option);
         myChart1.setOption(option);
@@ -190,75 +190,112 @@ class NurseryFrom extends Component {
         const {
             date1
         } = this.state;
-        this.setState({
-            loading1: true
-        });
-        let queryCountryData = await getNurseryFromData({
-            section: leftkeycode,
-            etime: date1
-        });
-        let aountArray = [];
-        let addressArray = [];
-        if (queryCountryData instanceof Array) {
-            queryCountryData.map(item => {
-                if (item && item.Label) {
-                    aountArray.push(item.Num);
-                    addressArray.push(item.Label);
-                }
+        try {
+            this.setState({
+                loading1: true
             });
-        }
-        let myChart3 = echarts.init(document.getElementById('NurseryCountry'));
-        let options3 = {
-            legend: {
-                data: ['总量']
-            },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: { // 坐标轴指示器，坐标轴触发有效
-                    type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-                }
-            },
-            xAxis: [{
-                data: addressArray
-            }],
-            grid: {
-                bottom: 50
-            },
-            dataZoom: [{
-                type: 'inside'
-            }, {
-                type: 'slider'
-            }],
-            yAxis: [{
-                type: 'value',
-                name: '种植数',
-                axisLabel: {
-                    formatter: '{value} 棵'
-                }
-            }],
-            series: [{
-                name: '苗木总量',
-                type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        offset: ['50', '80'],
-                        show: true,
-                        position: 'inside',
-                        formatter: '{c}',
-                        textStyle: {
-                            color: '#FFFFFF'
+            let queryCountryData = await getNurseryFromData({
+                section: leftkeycode,
+                etime: date1
+            });
+            let aountArray = [];
+            let addressArray = [];
+            if (queryCountryData && queryCountryData instanceof Array && queryCountryData.length > 0) {
+                queryCountryData.sort((a, b) => {
+                    if (a.Num > b.Num) {
+                        return -1;
+                    } else if (a.Num < b.Num) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                queryCountryData.map(item => {
+                    if (item && item.Label) {
+                        aountArray.push(item.Num);
+                        addressArray.push(item.Label);
+                    }
+                });
+            }
+            let myChart3 = echarts.init(document.getElementById('NurseryCountry'));
+            let options3 = {
+                legend: {
+                    data: ['总量']
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                xAxis: {
+                    data: addressArray,
+                    axisLabel: {
+                        interval: 0,
+                        // rotate: 40,
+                        formatter: (value) => {
+                            var ret = '';// 拼接加\n返回的类目项
+                            var maxLength = 4;// 每项显示文字个数
+                            var valLength = value.length;// X轴类目项的文字个数
+                            var rowN = Math.ceil(valLength / maxLength); // 类目项需要换行的行数
+                            if (rowN > 1)// 如果类目项的文字大于3,
+                            {
+                                for (var i = 0; i < rowN; i++) {
+                                    var temp = '';// 每次截取的字符串
+                                    var start = i * maxLength;// 开始截取的位置
+                                    var end = start + maxLength;// 结束截取的位置
+                                    // 这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                                    temp = value.substring(start, end) + '\n';
+                                    ret += temp; // 凭借最终的字符串
+                                }
+                                return ret;
+                            } else {
+                                return value;
+                            }
                         }
                     }
                 },
-                data: aountArray
-            }]
-        };
-        myChart3.setOption(options3);
-        this.setState({
-            loading1: false,
-            queryCountryData
-        });
+                grid: {
+                    bottom: 50
+                },
+                dataZoom: [{
+                    type: 'inside'
+                }, {
+                    type: 'slider'
+                }],
+                yAxis: [{
+                    type: 'value',
+                    name: '种植数',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
+                }],
+                series: [{
+                    name: '苗木总量',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: {
+                                color: '#FFFFFF'
+                            }
+                        }
+                    },
+                    data: aountArray
+                }]
+            };
+            myChart3.setOption(options3);
+            this.setState({
+                loading1: false,
+                queryCountryData
+            });
+        } catch (e) {
+            console.log('query1', e);
+        }
     }
     async query2 () {
         const {
@@ -267,79 +304,116 @@ class NurseryFrom extends Component {
             },
             leftkeycode
         } = this.props;
-        this.setState({
-            loading2: true
-        });
         const {
             date2
         } = this.state;
-        let queryProvinceData = await getNurseryFromData({
-            section: leftkeycode,
-            regioncode: '13',
-            etime: date2
-        });
-        let aountArray = [];
-        let addressArray = [];
-        if (queryProvinceData instanceof Array) {
-            queryProvinceData.map(item => {
-                if (item && item.Label) {
-                    aountArray.push(item.Num);
-                    addressArray.push(item.Label);
-                }
+        try {
+            this.setState({
+                loading2: true
             });
-        }
-        let myChart3 = echarts.init(document.getElementById('NurseryProvince'));
-        let options3 = {
-            legend: {
-                data: ['总量']
-            },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: { // 坐标轴指示器，坐标轴触发有效
-                    type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-                }
-            },
-            xAxis: [{
-                data: addressArray
-            }],
-            grid: {
-                bottom: 50
-            },
-            dataZoom: [{
-                type: 'inside'
-            }, {
-                type: 'slider'
-            }],
-            yAxis: [{
-                type: 'value',
-                name: '种植数',
-                axisLabel: {
-                    formatter: '{value} 棵'
-                }
-            }],
-            series: [{
-                name: '苗木总量',
-                type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        offset: ['50', '80'],
-                        show: true,
-                        position: 'inside',
-                        formatter: '{c}',
-                        textStyle: {
-                            color: '#FFFFFF'
-                        }
+            let queryProvinceData = await getNurseryFromData({
+                section: leftkeycode,
+                regioncode: '13',
+                etime: date2
+            });
+            let aountArray = [];
+            let addressArray = [];
+            if (queryProvinceData && queryProvinceData instanceof Array && queryProvinceData.length > 0) {
+                queryProvinceData.sort((a, b) => {
+                    if (a.Num > b.Num) {
+                        return -1;
+                    } else if (a.Num < b.Num) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                queryProvinceData.map(item => {
+                    if (item && item.Label) {
+                        aountArray.push(item.Num);
+                        addressArray.push(item.Label);
+                    }
+                });
+            }
+            let myChart3 = echarts.init(document.getElementById('NurseryProvince'));
+            let options3 = {
+                legend: {
+                    data: ['总量']
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
                     }
                 },
-                data: aountArray
-            }]
-        };
-        myChart3.setOption(options3);
-        this.setState({
-            loading2: false,
-            queryProvinceData
-        });
+                xAxis: [{
+                    data: addressArray,
+                    axisLabel: {
+                        interval: 0,
+                        // rotate: 40,
+                        formatter: (value) => {
+                            var ret = '';// 拼接加\n返回的类目项
+                            var maxLength = 4;// 每项显示文字个数
+                            var valLength = value.length;// X轴类目项的文字个数
+                            var rowN = Math.ceil(valLength / maxLength); // 类目项需要换行的行数
+                            if (rowN > 1)// 如果类目项的文字大于3,
+                            {
+                                for (var i = 0; i < rowN; i++) {
+                                    var temp = '';// 每次截取的字符串
+                                    var start = i * maxLength;// 开始截取的位置
+                                    var end = start + maxLength;// 结束截取的位置
+                                    // 这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                                    temp = value.substring(start, end) + '\n';
+                                    ret += temp; // 凭借最终的字符串
+                                }
+                                return ret;
+                            } else {
+                                return value;
+                            }
+                        }
+                    }
+                }],
+                grid: {
+                    bottom: 50
+                },
+                dataZoom: [{
+                    type: 'inside'
+                }, {
+                    type: 'slider'
+                }],
+                yAxis: [{
+                    type: 'value',
+                    name: '种植数',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
+                }],
+                series: [{
+                    name: '苗木总量',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: {
+                                color: '#FFFFFF'
+                            }
+                        }
+                    },
+                    data: aountArray
+                }]
+            };
+            myChart3.setOption(options3);
+            this.setState({
+                loading2: false,
+                queryProvinceData
+            });
+        } catch (e) {
+            console.log('query2', e);
+        }
     }
     async query3 () {
         const {
@@ -351,81 +425,118 @@ class NurseryFrom extends Component {
         const {
             date3
         } = this.state;
-        this.setState({
-            loading3: true
-        });
-        let queryCityData = await getNurseryFromData({
-            section: leftkeycode,
-            regioncode: '1306',
-            etime: date3
-        });
-        let aountArray = [];
-        let addressArray = [];
-        if (queryCityData instanceof Array) {
-            queryCityData.map(item => {
-                if (item && item.Label) {
-                    if (item.Label === '130600') {
-                        aountArray.push(item.Num);
-                        addressArray.push('保定市');
-                    } else {
-                        aountArray.push(item.Num);
-                        addressArray.push(item.Label);
-                    }
-                }
+        try {
+            this.setState({
+                loading3: true
             });
-        }
-        let myChart3 = echarts.init(document.getElementById('NurseryCity'));
-        let options3 = {
-            legend: {
-                data: ['总量']
-            },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: { // 坐标轴指示器，坐标轴触发有效
-                    type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-                }
-            },
-            xAxis: [{
-                data: addressArray
-            }],
-            grid: {
-                bottom: 50
-            },
-            dataZoom: [{
-                type: 'inside'
-            }, {
-                type: 'slider'
-            }],
-            yAxis: [{
-                type: 'value',
-                name: '种植数',
-                axisLabel: {
-                    formatter: '{value} 棵'
-                }
-            }],
-            series: [{
-                name: '苗木总量',
-                type: 'bar',
-                stack: '总量',
-                label: {
-                    normal: {
-                        offset: ['50', '80'],
-                        show: true,
-                        position: 'inside',
-                        formatter: '{c}',
-                        textStyle: {
-                            color: '#FFFFFF'
+            let queryCityData = await getNurseryFromData({
+                section: leftkeycode,
+                regioncode: '1306',
+                etime: date3
+            });
+            let aountArray = [];
+            let addressArray = [];
+            if (queryCityData && queryCityData instanceof Array && queryCityData.length > 0) {
+                queryCityData.sort((a, b) => {
+                    if (a.Num > b.Num) {
+                        return -1;
+                    } else if (a.Num < b.Num) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+                queryCityData.map(item => {
+                    if (item && item.Label) {
+                        if (item.Label === '130600') {
+                            aountArray.push(item.Num);
+                            addressArray.push('保定市');
+                        } else {
+                            aountArray.push(item.Num);
+                            addressArray.push(item.Label);
                         }
                     }
+                });
+            }
+            let myChart3 = echarts.init(document.getElementById('NurseryCity'));
+            let options3 = {
+                legend: {
+                    data: ['总量']
                 },
-                data: aountArray
-            }]
-        };
-        myChart3.setOption(options3);
-        this.setState({
-            loading3: false,
-            queryCityData
-        });
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                xAxis: [{
+                    data: addressArray,
+                    axisLabel: {
+                        interval: 0,
+                        // rotate: 40,
+                        formatter: (value) => {
+                            var ret = ''; // 拼接加\n返回的类目项
+                            var maxLength = 4;// 每项显示文字个数
+                            var valLength = value.length;// X轴类目项的文字个数
+                            var rowN = Math.ceil(valLength / maxLength); // 类目项需要换行的行数
+                            if (rowN > 1)// 如果类目项的文字大于3,
+                            {
+                                for (var i = 0; i < rowN; i++) {
+                                    var temp = '';// 每次截取的字符串
+                                    var start = i * maxLength;// 开始截取的位置
+                                    var end = start + maxLength;// 结束截取的位置
+                                    // 这里也可以加一个是否是最后一行的判断，但是不加也没有影响，那就不加吧
+                                    temp = value.substring(start, end) + '\n';
+                                    ret += temp; // 凭借最终的字符串
+                                }
+                                return ret;
+                            } else {
+                                return value;
+                            }
+                        }
+                    }
+                }],
+                grid: {
+                    bottom: 50
+                },
+                dataZoom: [{
+                    type: 'inside'
+                }, {
+                    type: 'slider'
+                }],
+                yAxis: [{
+                    type: 'value',
+                    name: '种植数',
+                    axisLabel: {
+                        formatter: '{value} 棵'
+                    }
+                }],
+                series: [{
+                    name: '苗木总量',
+                    type: 'bar',
+                    stack: '总量',
+                    label: {
+                        normal: {
+                            offset: ['50', '80'],
+                            show: true,
+                            position: 'inside',
+                            formatter: '{c}',
+                            textStyle: {
+                                color: '#FFFFFF'
+                            }
+                        }
+                    },
+                    data: aountArray
+                }]
+            };
+            myChart3.setOption(options3);
+            this.setState({
+                loading3: false,
+                queryCityData
+            });
+        } catch (e) {
+            console.log('query3', e);
+        }
     }
 
     handleCountryDataExport = () => {

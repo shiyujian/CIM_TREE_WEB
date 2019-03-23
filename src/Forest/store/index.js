@@ -48,7 +48,19 @@ export const getNurseryinstat = forestFetchAction(`${FOREST_API}/tree/nurseryins
 export const getNurserybackstat = forestFetchAction(`${FOREST_API}/tree/nurserybackstat?`); // 苗木退苗分析
 export const getNurserytotal = forestFetchAction(`${FOREST_API}/tree/nurserytotal?`); // 苗木进场出圃统计
 export const getLocationtotalstat = forestFetchAction(`${FOREST_API}/tree/locationtotalstat?`); // 苗木定位总统计
+export const getCountSection = forestFetchAction(
+    `${FOREST_API}/tree/treestatbyspecfield?stattype=Section`,
+    []
+); // 获取各标段种植数量
 
+export const getCountSmall = forestFetchAction(
+    `${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`,
+    []
+); // 获取各小班种植数量
+export const getCountThin = forestFetchAction(
+    `${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass`,
+    []
+); // 获取各细班种植数量
 export const getTreeevery = forestFetchAction(
     `${FOREST_API}/tree/treetypes`,
     []
@@ -135,18 +147,6 @@ export const getreturnsupervision = forestFetchAction(
 export const getCount = forestFetchAction(`${FOREST_API}/tree/treestat`, []);
 export const getTreesProgress = forestFetchAction(
     `${FOREST_API}/trees/progress/`,
-    []
-);
-export const getCountSection = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=Section`,
-    []
-);
-export const getCountSmall = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`,
-    []
-);
-export const getCountThin = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass`,
     []
 );
 export const getSmallClassList = forestFetchAction(

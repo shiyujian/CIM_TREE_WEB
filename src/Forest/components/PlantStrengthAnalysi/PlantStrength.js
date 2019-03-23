@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import { Card, Row, Col, List, Form, Select, Button, Table } from 'antd';
+import { Card, Row, Col, List, Form, Select, Button, Table, Spin } from 'antd';
 import XLSX from 'xlsx';
 import moment from 'moment';
 import echarts from 'echarts';
 
 const gridStyle = {
     width: '25%',
+    height: 120,
     textAlign: 'center'
 };
 const { Option } = Select;
@@ -25,6 +26,8 @@ class PlantStrength extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            spinningPlant: false, // 加载中
+            spinningTree: false, // 加载中
             plantSection: '', // 标段code
             smallClassNo: '', // 小班code
             thinClassNo: '', // 细班code
@@ -40,10 +43,10 @@ class PlantStrength extends Component {
             treeTypeRanking: [], // 所有栽植树种排名
             newTreeTypeList: [], // 树种列表
             treeTypeDisplayTable: false, // 是否表格展示
-            plantAmount: 0, // 累计种植数量
-            plantToday: 0, // 今日种植总数
-            locationToday: 0, // 今日定位数量
-            locationAmount: 0, // 累计定位总数
+            plantAmount: '', // 累计种植数量
+            plantToday: '', // 今日种植总数
+            locationToday: '', // 今日定位数量
+            locationAmount: '', // 累计定位总数
             nowmessagelist: [] // 实时种植数据列表
         };
         this.sectionList = []; // 标段列表
@@ -68,6 +71,12 @@ class PlantStrength extends Component {
         // 切换项目
         if (nextProps.leftkeycode !== this.props.leftkeycode) {
             this.setState({
+                spinningPlant: true, // 加载中
+                spinningTree: true, // 加载中
+                locationToday: '', // 今日定位数量
+                plantToday: '', // 今日栽植数量
+                locationAmount: '', // 累计定位数量
+                plantAmount: '', // 累计栽植数量
                 plantSection: '',
                 smallClassNo: '',
                 thinClassNo: '',
@@ -141,7 +150,7 @@ class PlantStrength extends Component {
     ]
     render () {
         const {
-            plantAmount, locationAmount, plantToday, locationToday,
+            plantAmount, locationAmount, plantToday, locationToday, spinningPlant, spinningTree,
             smallClassList, thinClassList, smallClassListTree, thinClassListTree,
             plantSection, smallClassNo, thinClassNo, nowmessagelist, newTreeTypeList, treeTypeRanking,
             plantSectionTree, smallClassNoTree, thinClassNoTree, treeKind, treeTypeNo, treeTypeDisplayTable
@@ -149,7 +158,7 @@ class PlantStrength extends Component {
         const { treeKindList, treeTypeList } = this.props;
         return (
             <div>
-                <div>
+                <div >
                     <h2>实时数据：{moment().format('HH:mm:ss')}</h2>
                     <div>
                         <Card title='关键数据' style={{float: 'left', width: 800}}>
@@ -181,7 +190,17 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='标段'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSection.bind(this)} value={plantSection} allowClear>
+                                <Select
+                                    style={{ width: 120 }}
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    onChange={this.handleSection.bind(this)}
+                                    value={plantSection}
+                                    allowClear>
                                     {
                                         this.sectionList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -192,7 +211,16 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='小班'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSmallClass.bind(this)} value={smallClassNo}>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleSmallClass.bind(this)}
+                                    value={smallClassNo}>
                                     {
                                         smallClassList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -203,7 +231,16 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='细班'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleThinClass.bind(this)} value={thinClassNo}>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleThinClass.bind(this)}
+                                    value={thinClassNo}>
                                     {
                                         thinClassList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -218,18 +255,22 @@ class PlantStrength extends Component {
                         <Row gutter={16}>
                             <Col span={12}>
                                 <Card title='栽植/待栽植'>
-                                    <div
-                                        id='plantCake'
-                                        style={{ width: '100%', height: '300px' }}
-                                    />
+                                    <Spin spinning={spinningPlant}>
+                                        <div
+                                            id='plantCake'
+                                            style={{ width: '100%', height: '300px' }}
+                                        />
+                                    </Spin>
                                 </Card>
                             </Col>
                             <Col span={12}>
                                 <Card title='定位/未定位' extra={<span>仅针对已栽植</span>}>
-                                    <div
-                                        id='localtionCake'
-                                        style={{ width: '100%', height: '300px' }}
-                                    />
+                                    <Spin spinning={spinningPlant}>
+                                        <div
+                                            id='localtionCake'
+                                            style={{ width: '100%', height: '300px' }}
+                                        />
+                                    </Spin>
                                 </Card>
                             </Col>
                         </Row>
@@ -242,7 +283,17 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='标段'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSectionTree.bind(this)} value={plantSectionTree} allowClear>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleSectionTree.bind(this)}
+                                    value={plantSectionTree}
+                                    allowClear>
                                     {
                                         this.sectionList.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -253,7 +304,16 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='小班'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleSmallClassTree.bind(this)} value={smallClassNoTree}>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleSmallClassTree.bind(this)}
+                                    value={smallClassNoTree}>
                                     {
                                         smallClassListTree.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -264,7 +324,16 @@ class PlantStrength extends Component {
                             <Form.Item
                                 label='细班'
                             >
-                                <Select style={{ width: 120 }} onChange={this.handleThinClassTree.bind(this)} value={thinClassNoTree}>
+                                <Select
+                                    showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
+                                    style={{ width: 120 }}
+                                    onChange={this.handleThinClassTree.bind(this)}
+                                    value={thinClassNoTree}>
                                     {
                                         thinClassListTree.map(item => {
                                             return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -294,6 +363,11 @@ class PlantStrength extends Component {
                                 <Select
                                     allowClear
                                     showSearch
+                                    filterOption={(input, option) =>
+                                        option.props.children
+                                            .toLowerCase()
+                                            .indexOf(input.toLowerCase()) >= 0
+                                    }
                                     style={{width: 150}}
                                     defaultValue='全部'
                                     value={treeTypeNo}
@@ -318,10 +392,12 @@ class PlantStrength extends Component {
                         <Row gutter={16}>
                             <Col span={12}>
                                 <Card title='树种分布' extra={<Button type='primary' onClick={this.handleDistributionExport.bind(this)}>导出</Button>}>
-                                    <div
-                                        id='TreeTypeCake'
-                                        style={{ width: '100%', height: '350px' }}
-                                    />
+                                    <Spin spinning={spinningTree}>
+                                        <div
+                                            id='TreeTypeCake'
+                                            style={{ width: '100%', height: '350px' }}
+                                        />
+                                    </Spin>
                                 </Card>
                             </Col>
                             <Col span={12}>
@@ -353,10 +429,12 @@ class PlantStrength extends Component {
                                                     style={{height: '100%'}}
                                                 />
                                             </div>
-                                            : <div
-                                                id='TreeTypeRanking'
-                                                style={{ width: '100%', height: '350px' }}
-                                            />
+                                            : <Spin spinning={spinningPlant}>
+                                                <div
+                                                    id='TreeTypeRanking'
+                                                    style={{ width: '100%', height: '350px' }}
+                                                />
+                                            </Spin>
                                     }
                                 </Card>
                             </Col>
@@ -369,6 +447,9 @@ class PlantStrength extends Component {
     onQueryTree () {
         const { treeTypeNo, thinClassNoTree, smallClassNoTree, plantSectionTree } = this.state;
         const { getStatByTreetype } = this.props.actions;
+        this.setState({
+            spinningTree: true
+        });
         let smallNo = '', thinNo = '';
         if (smallClassNoTree) {
             let arr = smallClassNoTree.split('-');
@@ -446,6 +527,9 @@ class PlantStrength extends Component {
             ]
         };
         myChart.setOption(option);
+        this.setState({
+            spinningTree: false
+        });
     }
     renderTreeTypeCake () {
         const { treeTypeRanking } = this.state;
@@ -509,7 +593,8 @@ class PlantStrength extends Component {
         });
         this.setState({
             thinClassListTree,
-            smallClassNoTree: value
+            smallClassNoTree: value,
+            thinClassNoTree: ''
         });
     }
     handleThinClassTree (value) {
@@ -518,15 +603,6 @@ class PlantStrength extends Component {
         });
     }
     handleSectionTree (value) {
-        if (value === undefined) {
-            this.setState({
-                smallClassListTree: [],
-                smallClassNoTree: '',
-                plantSectionTree: '',
-                thinClassNoTree: ''
-            });
-            return;
-        }
         let smallClassListTree = [];
         this.sectionList.map(item => {
             if (item.No === value) {
@@ -535,19 +611,12 @@ class PlantStrength extends Component {
         });
         this.setState({
             smallClassListTree,
-            plantSectionTree: value
+            plantSectionTree: value,
+            smallClassNoTree: '',
+            thinClassNoTree: ''
         });
     }
     handleSection (value) {
-        if (value === undefined) {
-            this.setState({
-                smallClassList: [],
-                smallClassNo: '',
-                plantSection: '',
-                thinClassNo: ''
-            });
-            return;
-        }
         let smallClassList = [];
         this.sectionList.map(item => {
             if (item.No === value) {
@@ -556,7 +625,9 @@ class PlantStrength extends Component {
         });
         this.setState({
             smallClassList,
-            plantSection: value
+            plantSection: value,
+            smallClassNo: '',
+            thinClassNo: ''
         });
     }
     handleSmallClass (value) {
@@ -569,7 +640,8 @@ class PlantStrength extends Component {
         });
         this.setState({
             thinClassList,
-            smallClassNo: value
+            smallClassNo: value,
+            thinClassNo: ''
         });
     }
     handleThinClass (value) {
@@ -581,6 +653,9 @@ class PlantStrength extends Component {
         const { getTreePlanting, getLocationStat } = this.props.actions;
         const { plantSection, thinClassNo, smallClassNo } = this.state;
         console.log('thinClassNo', thinClassNo);
+        this.setState({
+            spinningPlant: true
+        });
         let smallNo = '', thinNo = '';
         if (smallClassNo) {
             let arr = smallClassNo.split('-');
@@ -644,6 +719,9 @@ class PlantStrength extends Component {
             ]
         };
         myChart.setOption(option);
+        this.setState({
+            spinningPlant: false
+        });
     }
     renderPlantCake (plantNum, unPlantNum) {
         let myChart = echarts.init(document.getElementById('plantCake'));
