@@ -569,7 +569,6 @@ export const handleAreaLayerData = async (eventKey, getTreearea, sectionn) => {
         no = eventKey;
         section = sectionn
     }
-    
     try {
         let rst = await getTreearea({}, { no: no });
         if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {

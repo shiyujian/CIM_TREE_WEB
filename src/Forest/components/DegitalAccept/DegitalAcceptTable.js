@@ -208,7 +208,7 @@ export default class DegitalAcceptTable extends Component {
                     onPressOk = {this.pressOK.bind(this, 1)}
                     visible = {visible1}
                     sscction = {this.sscction}
-                    tinclass = {this.ThinClass}
+                    tinclass = {this.tinclass}
                     detail = {itemDetail}
                     {...this.props}
                 />
@@ -218,7 +218,7 @@ export default class DegitalAcceptTable extends Component {
                     onPressOk = {this.pressOK.bind(this, 2)}
                     visible = {visible2}
                     sscction = {this.sscction}
-                    tinclass = {this.ThinClass}
+                    tinclass = {this.tinclass}
                     detail = {itemDetail}
                     {...this.props}
                 />
@@ -228,7 +228,7 @@ export default class DegitalAcceptTable extends Component {
                     onPressOk = {this.pressOK.bind(this, 3)}
                     visible = {visible3}
                     sscction = {this.sscction}
-                    tinclass = {this.ThinClass}
+                    tinclass = {this.tinclass}
                     detail = {itemDetail}
                     {...this.props}
                 />

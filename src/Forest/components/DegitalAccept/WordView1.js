@@ -14,6 +14,10 @@ import {
     handleCoordinates
 } from 'Dashboard/components/auth';
 
+import {
+    wktToJson
+} from '_platform/gisAuth';
+/ * turf */
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor(props) {
@@ -23,6 +27,7 @@ export default class WordView1 extends Component {
             areaLayerList: [], // 
         };
         this.map = null;
+        
     }
 
     // 初始化地图，获取目录树数据
@@ -32,12 +37,15 @@ export default class WordView1 extends Component {
                 getCustomViewByUserID
             },
             sscction,
-            tinclass
+            tinclass,
+            detail = {}
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         await getCustomViewByUserID({id: user.id});
         await this.initMap();
         this._addAreaLayer(tinclass,sscction);
+        detail.Geom && this.area(wktToJson(detail.Geom));
+        // this.area(wktToJson('LINESTRING(115.5235717559 39.0255521735,115.5235717356 39.0255521642,115.523571649 39.0255521625,115.5235715253 39.025552063599996,115.5235698582 39.0255519424,115.5235653684 39.0255515815,115.5235603148 39.0255489401,115.52355668349999 39.0255446922,115.52355474960001 39.0255395664,115.5235540898 39.0255350754,115.523554986 39.0255305073,115.5235568982 39.0255263123,115.5235607437 39.0255221696,115.5235661617 39.025519481299995,115.5235720818 39.025518586,115.523578376 39.0255188676,115.5235846506 39.0255205539,115.5235903374 39.0255226876,115.523594797 39.0255258128,115.52359686850001 39.0255305992,115.5235992875 39.0255356618,115.5236016121 39.0255405124,115.5236002651 39.0255456245,115.5235952272 39.0255504422,115.52358830700001 39.0255527734,115.5235799397 39.0255537789,115.52357351500001 39.0255533492,115.52357132920001 39.025552038,115.5235711156 39.0255520993,115.5235709159 39.0255523656,115.52357092689999 39.025552350299996)'));
     }
 
     componentWillUnmount () {
@@ -89,7 +97,7 @@ export default class WordView1 extends Component {
     }
 
     // 选中细班，则在地图上加载细班图层
-    _addAreaLayer = async (eventKey) => {
+    _addAreaLayer = async (eventKey,section) => {
         const {
             areaLayerList
         } = this.state;
@@ -98,7 +106,7 @@ export default class WordView1 extends Component {
         } = this.props;
         console.log(eventKey)
         try {
-            let coords = await handleAreaLayerData(eventKey, getTreearea);
+            let coords = await handleAreaLayerData(eventKey, getTreearea,section);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
@@ -144,6 +152,50 @@ export default class WordView1 extends Component {
             console.log('_createMarker', e);
         }
     }
+    area (points) {
+        debugger
+        let lineLayer = new L.featureGroup().addTo(this.map);
+		if (points.length > 1) {
+			var latlngs = [];
+			var lnglats = [];
+
+			for (var i = 0; i < points.length; i++) {
+				latlngs.push([points[i].Y, points[i].X]);
+				lnglats.push([points[i].X, points[i].Y]);
+			}
+			var beginIcon = new L.icon({
+				iconUrl: require('./img/start.png'),
+				iconSize: [26, 28],
+				iconAnchor: [13, 28]
+			});
+			var endIcon = new L.icon({
+				iconUrl: require('./img/end.png'),
+				iconSize: [26, 28],
+				iconAnchor: [13, 28]
+			});
+			var start = new L.marker(latlngs[0], {
+				icon: beginIcon,
+				zIndexOffset: -50
+			}).addTo(lineLayer);
+			var end = new L.marker(latlngs[latlngs.length - 1], {
+				icon: endIcon,
+				zIndexOffset: -50
+			}).addTo(lineLayer);
+			this.map.fitBounds(lineLayer.getBounds());
+
+			var linestring1 = turf.lineString(lnglats, { name: 'line 1' });
+			var buffered = turf.buffer(linestring1, 0.005, { units: 'kilometers' });
+			L.geoJSON(buffered, {
+				style: function (feature) {
+					return {
+						color: 'red'
+					};
+				}
+			}).addTo(lineLayer);
+			// var area = turf.area(buffered.geometry)
+			// return area
+		}
+	}
 
     render() {
         const { detail } = this.props;
@@ -234,7 +286,7 @@ export default class WordView1 extends Component {
                                     <td style={{ height: 110 }} >监理（建设）单位验收记录</td>
                                     <td colSpan = '5'>
                                         <div>
-                                            <p>监理工程师：</p><p>{jianli}</p><p>{jianli}</p>
+                                            <p>监理工程师：</p><p>{jianli}</p>
                                             <p style={{ marginLeft: 300 }}>年</p>
                                             <p style={{ marginLeft: 30 }}>月</p>
                                             <p style={{ marginLeft: 30 }}>日</p>

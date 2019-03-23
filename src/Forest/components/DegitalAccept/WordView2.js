@@ -13,7 +13,10 @@ import {
     handleAreaLayerData,
     handleCoordinates
 } from 'Dashboard/components/auth';
-
+import {
+    wktToJson
+} from '_platform/gisAuth';
+/ * turf */
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor(props) {
@@ -38,6 +41,7 @@ export default class WordView1 extends Component {
         await getCustomViewByUserID({id: user.id});
         await this.initMap();
         this._addAreaLayer(tinclass,sscction);
+        detail.Geom && this.area(wktToJson(detail.Geom));
     }
 
     componentWillUnmount () {
@@ -89,7 +93,7 @@ export default class WordView1 extends Component {
     }
 
     // 选中细班，则在地图上加载细班图层
-    _addAreaLayer = async (eventKey) => {
+    _addAreaLayer = async (eventKey, section) => {
         const {
             areaLayerList
         } = this.state;
@@ -98,7 +102,7 @@ export default class WordView1 extends Component {
         } = this.props;
         console.log(eventKey)
         try {
-            let coords = await handleAreaLayerData(eventKey, getTreearea);
+            let coords = await handleAreaLayerData(eventKey, getTreearea,section);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
@@ -144,6 +148,50 @@ export default class WordView1 extends Component {
             console.log('_createMarker', e);
         }
     }
+
+    area (points) {
+        let lineLayer = new L.featureGroup().addTo(this.map);
+		if (points.length > 1) {
+			var latlngs = [];
+			var lnglats = [];
+
+			for (var i = 0; i < points.length; i++) {
+				latlngs.push([points[i].Y, points[i].X]);
+				lnglats.push([points[i].X, points[i].Y]);
+			}
+			var beginIcon = new L.icon({
+				iconUrl: './img/start.png',
+				iconSize: [26, 28],
+				iconAnchor: [13, 28]
+			});
+			var endIcon = new L.icon({
+				iconUrl: './img/end.png',
+				iconSize: [26, 28],
+				iconAnchor: [13, 28]
+			});
+			var start = new L.marker(latlngs[0], {
+				icon: beginIcon,
+				zIndexOffset: -50
+			}).addTo(lineLayer);
+			var end = new L.marker(latlngs[latlngs.length - 1], {
+				icon: endIcon,
+				zIndexOffset: -50
+			}).addTo(lineLayer);
+			this.map.fitBounds(lineLayer.getBounds());
+
+			var linestring1 = turf.lineString(lnglats, { name: 'line 1' });
+			var buffered = turf.buffer(linestring1, 0.005, { units: 'kilometers' });
+			L.geoJSON(buffered, {
+				style: function (feature) {
+					return {
+						color: 'red'
+					};
+				}
+			}).addTo(lineLayer);
+			// var area = turf.area(buffered.geometry)
+			// return area
+		}
+	}
 
     render() {
         const { detail } = this.props;

@@ -295,3 +295,39 @@ export const getStatusByID = (ID) => {
             return ''
     }
 };
+
+// wkt 转换 json数据
+export const wktToJson = (wkt) => {
+    let coords = []
+    debugger
+    if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+        let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
+        let arr = data.split('),(');
+        arr.map((a, index) => {
+            if (index === 0) {
+                str = a.slice(a.indexOf('(') + 1, a.length - 1);
+            } else if (index === arr.length - 1) {
+                str = a.slice(0, a.indexOf(')'));
+            } else {
+                str = a;
+            }
+            coords.push(str);
+        });
+    } else if (wkt.indexOf('POLYGON') !== -1) {
+        str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+        coords.push(str);
+    } else if (wkt.indexOf('LINESTRING') !== -1) {
+        let wktStr = wkt.split('(')[1].split(')')[0];
+        let middle = wktStr.split(',');
+        middle.map(item => {
+            let obj = {
+                X: parseFloat(item.split(' ')[0]),
+                Y: parseFloat(item.split(' ')[1])
+            }
+            coords.push(obj)
+        })
+    }
+    return coords;
+};
+
+
