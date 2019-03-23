@@ -793,8 +793,11 @@ class Edit extends Component {
                                             ]
                                         })(
                                             <Input
-                                                readOnly
                                                 placeholder='请输入手机号码'
+                                                onChange={changeAdditionField.bind(
+                                                    this,
+                                                    'person_telephone'
+                                                )}
                                             />
                                         )}
                                     </FormItem>
