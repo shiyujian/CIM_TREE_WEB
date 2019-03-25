@@ -183,7 +183,7 @@ export default class TreeMessGisOnClickHandle extends Component {
             if (data && data.features && data.features.length > 0 && data.features[0].properties) {
                 let postdata = {
                     sxm: data.features[0].properties.SXM
-                    // sxm: 'AUT9860'
+                    // sxm: 'CQL7857'
                 };
                 if (treeMarkerLayer) {
                     map.removeLayer(treeMarkerLayer);
@@ -230,7 +230,7 @@ export default class TreeMessGisOnClickHandle extends Component {
         try {
             let postdata = {
                 sxm: data.features[0].properties.SXM
-                // sxm: 'CAF2578'
+                // sxm: 'CQL7857'
             };
             let totalThinClass = tree.totalThinClass || [];
             let bigTreeList = (tree && tree.bigTreeList) || [];

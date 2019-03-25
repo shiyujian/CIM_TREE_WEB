@@ -784,39 +784,25 @@ class TreeMessModal extends Component {
                                     {flowMess.length > 0
                                         ? flowMess.map(flow => {
                                             let flowName = '';
-                                            if (flow.Node) {
-                                                if (
-                                                    flow.Node === '种树'
-                                                ) {
-                                                    flowName = '施工提交';
-                                                } else if (
-                                                    flow.Node === '监理'
-                                                ) {
-                                                    if (
-                                                        flow.Status === 1
-                                                    ) {
-                                                        flowName = '监理审核';
-                                                    } else {
-                                                        flowName = '监理拒绝';
-                                                    }
-                                                } else if (
-                                                    flow.Node === '业主'
-                                                ) {
-                                                    if (
-                                                        flow.Status === 2
-                                                    ) {
-                                                        flowName = '业主抽查通过';
-                                                    } else {
-                                                        flowName = '业主抽查拒绝';
-                                                    }
-                                                } else if (
-                                                    flow.Node === '补种'
-                                                ) {
-                                                    flowName = '施工补录扫码';
-                                                } else if (
-                                                    flow.Node === '结缘入库'
-                                                ) {
+                                            if (flow.Status) {
+                                                if (flow.Status === -1) {
+                                                    flowName = '监理未确认';
+                                                } else if (flow.Status === 0) {
+                                                    flowName = '监理未通过';
+                                                } else if (flow.Status === 1) {
+                                                    flowName = '监理通过';
+                                                } else if (flow.Status === 2) {
+                                                    flowName = '业主抽查通过';
+                                                } else if (flow.Status === 3) {
+                                                    flowName = '业主抽查不通过';
+                                                } else if (flow.Status === 4) {
                                                     flowName = '结缘入库';
+                                                } else if (flow.Status === 5) {
+                                                    flowName = '苗木质量不合格';
+                                                } else if (flow.Status === 6) {
+                                                    flowName = '苗木质量合格';
+                                                } else if (flow.Node === '补种') {
+                                                    flowName = '施工补录扫码';
                                                 }
                                             }
                                             return (
@@ -991,7 +977,8 @@ class TreeMessModal extends Component {
                                                             }
                                                         )
                                                         : ''}
-                                                        <div style={{marginTop: '10px', borderBottom:'1px dashed #8c8383'}}></div>
+                                                    {/* 为每一个养护任务底部添加虚线作为分隔 */}
+                                                    <div style={{marginTop: '10px', borderBottom: '1px dashed #8c8383'}} />
                                                 </div>
                                             );
                                         }) : ''
