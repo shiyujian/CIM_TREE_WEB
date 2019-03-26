@@ -5,8 +5,8 @@ import {
 import './TaskStatis.less';
 import TaskStatisEcharts from './TaskStatisEcharts';
 import PicViewModal from './PicViewModal';
-import { getUser, getForestImgUrl } from '_platform/auth';
-import {getSmallClass, getThinClass, getTaskThinClassName, getTaskStatus} from '../auth';
+import { getUser, getForestImgUrl, getSmallClass, getThinClass } from '_platform/auth';
+import {getTaskThinClassName, getTaskStatus} from '../auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const Option = Select.Option;
