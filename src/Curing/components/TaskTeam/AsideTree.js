@@ -161,20 +161,30 @@ class AsideTree extends Component {
                     >
                     新增班组
                     </Button>
-                    <Popconfirm
-                        onConfirm={this._handleDelDoc.bind(this)}
-                        title='确定要删除该班组么'
-                        okText='确定'
-                        cancelText='取消' >
-                        <Button
-                            // style={{marginBottom: 10, left: 10}}
-                            className='buttonStyle'
-                            type='danger'
-                            disabled={!selected}
-                        >
-                    删除班组
-                        </Button>
-                    </Popconfirm>
+                    {
+                        !selected
+                            ? (
+                                <Button
+                                    className='buttonStyle'
+                                    type='danger'
+                                    disabled={!selected}>
+                                    删除班组
+                                </Button>
+                            ) : (
+                                <Popconfirm
+                                    onConfirm={this._handleDelDoc.bind(this)}
+                                    title='确定要删除该班组么'
+                                    okText='确定'
+                                    disabled={!selected}
+                                    cancelText='取消' >
+                                    <Button
+                                        className='buttonStyle'
+                                        type='danger'>
+                                    删除班组
+                                    </Button>
+                                </Popconfirm>
+                            )
+                    }
                     <div className='aside-main'>
                         <div className='aside'>
                             {teamsTree.length ? (
