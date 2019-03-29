@@ -22,6 +22,7 @@ export default class Tree extends Component {
         const {
             actions: { getSupplierList, getRegionCodes, getNurseryList }
         } = this.props;
+        // 获取行政编码
         getRegionCodes({}, {}).then(rst => {
             let obj = {};
             rst.map(item => {
@@ -29,6 +30,7 @@ export default class Tree extends Component {
             });
             window.sessionStorage.setItem('regionCode_name', JSON.stringify(obj));
         });
+        // 获取供应商列表
         getSupplierList().then(rst => {
             window.sessionStorage.setItem('Supplier_list', JSON.stringify(rst.content));
             let obj = {};
@@ -37,6 +39,7 @@ export default class Tree extends Component {
             });
             window.sessionStorage.setItem('supplier_regionCode', JSON.stringify(obj));
         });
+        // 获取苗圃列表
         getNurseryList().then(rst => {
             let obj = {};
             rst.content.map(item => {
@@ -118,30 +121,42 @@ export default class Tree extends Component {
                 let rst = await getOrgTree({}, {depth: 7});
                 // 对苗圃基地和供应商按照区号进行省份和地区的划分
                 if (rst && rst.children) {
-                    rst.children.map(item => {
+                    orgTreeArrList = rst.children;
+                    let nurseryData = await getOrgTreeByCode({code: ORG_NURSERY_CODE});
+                    let supplierData = await getOrgTreeByCode({code: ORG_SUPPLIER_CODE});
+                    orgTreeArrList.push(nurseryData);
+                    orgTreeArrList.push(supplierData);
+                    orgTreeArrList.map(item => {
                         if (item.name === '供应商') {
                             item.children = addGroup(item.children, '供应商');
                         } else if (item.name === '苗圃基地') {
                             item.children = addGroup(item.children, '苗圃基地');
                         }
                     });
-                    this.getList(rst.children);
-                }
-                const { children: [first] = [] } = rst || {};
-                if (first) {
-                    // 作为选中的节点，将机构的数据上传至redux
-                    await changeSidebarField('node', first);
-                    const codes = Tree.collect(first);
-                    await getTreeCode(codes);
-                    let userList = await getUsers({}, { org_code: codes, page: 1 });
-                    if (userList && userList.count) {
-                        let pagination = {
-                            current: 1,
-                            total: userList.count
-                        };
-                        await getTablePage(pagination);
+                    // rst.children.map(item => {
+                    //     if (item.name === '供应商') {
+                    //         item.children = addGroup(item.children, '供应商');
+                    //     } else if (item.name === '苗圃基地') {
+                    //         item.children = addGroup(item.children, '苗圃基地');
+                    //     }
+                    // });
+                    this.getList(orgTreeArrList);
+                    const first = orgTreeArrList[0];
+                    if (first) {
+                        // 作为选中的节点，将机构的数据上传至redux
+                        await changeSidebarField('node', first);
+                        const codes = Tree.collect(first);
+                        await getTreeCode(codes);
+                        let userList = await getUsers({}, { org_code: codes, page: 1 });
+                        if (userList && userList.count) {
+                            let pagination = {
+                                current: 1,
+                                total: userList.count
+                            };
+                            await getTablePage(pagination);
+                        }
+                        await getTreeModal(false);
                     }
-                    await getTreeModal(false);
                 }
             } else {
                 if (orgTreeData && orgTreeData.pk) {
