@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
-import { Card, Row, Col, List, Form, Select, Button, Table, Spin } from 'antd';
+import { Card, Row, Col, List, Form, Select, Button, Table, Spin, DatePicker } from 'antd';
 import XLSX from 'xlsx';
 import moment from 'moment';
 import echarts from 'echarts';
+const { RangePicker } = DatePicker;
+const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 const gridStyle = {
     width: '25%',
@@ -47,7 +49,9 @@ class PlantStrength extends Component {
             plantToday: '', // 今日种植总数
             locationToday: '', // 今日定位数量
             locationAmount: '', // 累计定位总数
-            nowmessagelist: [] // 实时种植数据列表
+            nowmessagelist: [], // 实时种植数据列表
+            startDate: moment().subtract(10, 'days').format('YYYY-MM-DD 00:00:00'),
+            endDate: moment().format('YYYY-MM-DD 23:59:59')
         };
         this.sectionList = []; // 标段列表
         this.leftkeycode = ''; // 项目code
@@ -150,10 +154,30 @@ class PlantStrength extends Component {
     ]
     render () {
         const {
-            plantAmount, locationAmount, plantToday, locationToday, spinningPlant, spinningTree,
-            smallClassList, thinClassList, smallClassListTree, thinClassListTree,
-            plantSection, smallClassNo, thinClassNo, nowmessagelist, newTreeTypeList, treeTypeRanking,
-            plantSectionTree, smallClassNoTree, thinClassNoTree, treeKind, treeTypeNo, treeTypeDisplayTable
+            plantAmount,
+            locationAmount,
+            plantToday,
+            locationToday,
+            spinningPlant,
+            spinningTree,
+            smallClassList,
+            thinClassList,
+            smallClassListTree,
+            thinClassListTree,
+            plantSection,
+            smallClassNo,
+            thinClassNo,
+            nowmessagelist,
+            newTreeTypeList,
+            treeTypeRanking,
+            plantSectionTree,
+            smallClassNoTree,
+            thinClassNoTree,
+            treeKind,
+            treeTypeNo,
+            treeTypeDisplayTable,
+            startDate,
+            endDate
         } = this.state;
         const { treeKindList, treeTypeList } = this.props;
         return (
@@ -342,6 +366,13 @@ class PlantStrength extends Component {
                                 </Select>
                             </Form.Item>
                             <Form.Item
+                                label='种植时间'>
+                                <RangePicker showTime={{ format: 'HH:mm:ss' }}
+                                    format={dateFormat}
+                                    defaultValue={[moment(startDate, dateFormat), moment(endDate, dateFormat)]}
+                                    onChange={this.handleTreeTypeDate.bind(this)} />
+                            </Form.Item>
+                            <Form.Item
                                 label='类型'
                             >
                                 <Select
@@ -382,9 +413,11 @@ class PlantStrength extends Component {
                                     }
                                 </Select>
                             </Form.Item>
+
                             <Form.Item
+                                style={{float: 'right'}}
                             >
-                                <Button type='primary' onClick={this.onQueryTree.bind(this)}>查询</Button>
+                                <Button style={{float: 'right'}} type='primary' onClick={this.onQueryTree.bind(this)}>查询</Button>
                             </Form.Item>
                         </Form>
                     </div>
@@ -444,8 +477,21 @@ class PlantStrength extends Component {
             </div>
         );
     }
+    handleTreeTypeDate = (date, dateString) => {
+        this.setState({
+            startDate: dateString[0],
+            endDate: dateString[1]
+        });
+    }
     onQueryTree () {
-        const { treeTypeNo, thinClassNoTree, smallClassNoTree, plantSectionTree } = this.state;
+        const {
+            treeTypeNo,
+            thinClassNoTree,
+            smallClassNoTree,
+            plantSectionTree,
+            startDate,
+            endDate
+        } = this.state;
         const { getStatByTreetype } = this.props.actions;
         this.setState({
             spinningTree: true
@@ -461,7 +507,9 @@ class PlantStrength extends Component {
         getStatByTreetype({}, {
             no: thinNo || smallNo || this.leftkeycode,
             section: plantSectionTree || '',
-            treetype: treeTypeNo
+            treetype: treeTypeNo,
+            stime: startDate,
+            etime: endDate
         }).then(rep => {
             // 将获取的数据按照 Num 排序
             rep.sort(function (a, b) {
