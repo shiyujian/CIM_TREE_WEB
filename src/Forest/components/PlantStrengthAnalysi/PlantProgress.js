@@ -29,8 +29,8 @@ class PositionProgress extends Component {
             tblDataSmall: [], // 总种植导出表格数据
             _headersThin: [], // 总种植导出表格行头
             tblDataThin: [], // 总种植导出表格数据
-            startDate: moment().subtract(10, 'days').format(dateFormat),
-            endDate: moment().format(dateFormat)
+            startDate: moment().subtract(10, 'days').format('YYYY-MM-DD 00:00:00'),
+            endDate: moment().format('YYYY-MM-DD 23:59:59')
         };
         this.sectionList = []; // 标段列表
         this.leftkeycode = ''; // 项目code
@@ -80,13 +80,19 @@ class PositionProgress extends Component {
             thinPlantSmallClassList,
             smallNo
         } = this.state;
+        console.log('startDate', endDate)
         return (
             <div>
                 <Form layout='inline'>
                     <Form.Item
                         label='种植时间'>
-                        <RangePicker showTime={{ format: 'HH:mm:ss' }} format={dateFormat}
-                            defaultValue={[moment(startDate, dateFormat), moment(endDate, dateFormat)]} onChange={this.handleDate.bind(this)} />
+                        <RangePicker showTime={{ format: 'HH:mm:ss' }}
+                            format={dateFormat}
+                            defaultValue={
+                                [moment(startDate, dateFormat), 
+                                moment(endDate, dateFormat)]
+                            }
+                            onChange={this.handleDate.bind(this)} />
                     </Form.Item>
                     <Form.Item>
                         <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
