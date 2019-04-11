@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { getUser, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -23,6 +23,7 @@ import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
+import ChangeLocInfoModal from './ChangeLocInfoModal';
 const { RangePicker } = DatePicker;
 const InputGroup = Input.Group;
 
@@ -70,7 +71,11 @@ export default class LocmeasureTable extends Component {
             TQHDFirst: 0,
             TQHDSecond: '',
             TQZJFirst: 0,
-            TQZJSecond: ''
+            TQZJSecond: '',
+            selectedRowKeys: [],
+            dataSourceSelected: [],
+            changeLocInfoVisible: false,
+            selectedAllRowKeys: false
         };
         this.columns = [
             {
@@ -323,7 +328,7 @@ export default class LocmeasureTable extends Component {
         this.sections = JSON.parse(user.sections);
     }
     render () {
-        const { tblData } = this.state;
+        const { tblData, changeLocInfoVisible } = this.state;
         return (
             <div>
                 {this.treeTable(tblData)}
@@ -347,6 +352,16 @@ export default class LocmeasureTable extends Component {
                         </Button>
                     </Row>
                 </Modal>
+                {
+                    changeLocInfoVisible
+                        ? <ChangeLocInfoModal
+                            {...this.props}
+                            {...this.state}
+                            onOk={this.handleChangeLocInfoOK.bind(this)}
+                            onCancel={this.handleChangeLocInfoCancel.bind(this)}
+                        />
+                        : ''
+                }
             </div>
         );
     }
@@ -367,7 +382,9 @@ export default class LocmeasureTable extends Component {
             thinclass,
             bigType,
             treetypename,
-            status
+            status,
+            selectedRowKeys,
+            dataSourceSelected
             // islocation
         } = this.state;
         const suffix1 = sxm ? (
@@ -377,7 +394,7 @@ export default class LocmeasureTable extends Component {
             <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
         let header = '';
-
+        let permission = getUserIsManager();
         header = (
             <div>
                 <Row className='forest-search-layout'>
@@ -643,9 +660,29 @@ export default class LocmeasureTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={18} className='forest-quryrstcnt'>
+                    <Col span={14} className='forest-quryrstcnt'>
                         <span>{`此次查询共有数据：${this.state.messageTotalNum}条，  共有苗木：${this.state.treeTotalNum}棵`}</span>
                     </Col>
+                    {
+                        permission ? (<Col span={2}>
+                            <Button
+                                type='primary'
+                                disabled={!(details && details.length > 0)}
+                                onClick={this.changeLocInfoAll.bind(this)}
+                            >
+                            修改全部
+                            </Button>
+                        </Col>) : <Col span={2} />}
+                    {
+                        permission ? (<Col span={2}>
+                            <Button
+                                type='primary'
+                                disabled={!(dataSourceSelected && dataSourceSelected.length > 0)}
+                                onClick={this.changeLocInfoSome.bind(this)}
+                            >
+                            修改部分
+                            </Button>
+                        </Col>) : <Col span={2} />}
                     <Col span={2} >
                         <Button
                             type='primary'
@@ -666,6 +703,10 @@ export default class LocmeasureTable extends Component {
                 </Row>
             </div>
         );
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onRowSelectChange
+        };
         return (
             <div>
                 <Row>{header}</Row>
@@ -675,6 +716,7 @@ export default class LocmeasureTable extends Component {
                         className='foresttable'
                         columns={this.columns}
                         rowKey='order'
+                        rowSelection={rowSelection}
                         loading={{
                             tip: (
                                 <Progress
@@ -694,6 +736,59 @@ export default class LocmeasureTable extends Component {
                 </Row>
             </div>
         );
+    }
+    onRowSelectChange = (selectedRowKeys, selectedRows) => {
+        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+    };
+    changeLocInfoAll = () => {
+        const {
+            tblData
+        } = this.state;
+        if (tblData && tblData instanceof Array && tblData.length > 0) {
+            this.setState({
+                selectedAllRowKeys: true,
+                changeLocInfoVisible: true
+            });
+        } else {
+            message.warning('请先选择条件，搜索数据！');
+            this.setState({
+                selectedAllRowKeys: false,
+                changeLocInfoVisible: false
+            });
+        }
+    }
+    changeLocInfoSome = () => {
+        const {
+            selectedRowKeys,
+            dataSourceSelected
+        } = this.state;
+        if (dataSourceSelected.length === 0) {
+            message.warning('请先选择数据！');
+        } else {
+            console.log('selectedRowKeys', selectedRowKeys);
+            console.log('dataSourceSelected', dataSourceSelected);
+            this.setState({
+                selectedRowKeys: [],
+                dataSourceSelected: [],
+                changeLocInfoVisible: true
+            });
+        }
+    }
+    handleChangeLocInfoOK = () => {
+        this.setState({
+            selectedRowKeys: [],
+            dataSourceSelected: [],
+            changeLocInfoVisible: false,
+            selectedAllRowKeys: false
+        });
+    }
+    handleChangeLocInfoCancel = () => {
+        this.setState({
+            selectedRowKeys: [],
+            dataSourceSelected: [],
+            changeLocInfoVisible: false,
+            selectedAllRowKeys: false
+        });
     }
 
     emitEmpty1 = () => {

@@ -13,13 +13,14 @@ import {
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API } from '../../../_platform/api';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { FOREST_API } from '_platform/api';
+import { getUser, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import '../index.less';
 import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
+import ChangeNurseryInfoModal from './ChangeNurseryInfoModal';
 const { RangePicker } = DatePicker;
 
 export default class NursmeasureTable extends Component {
@@ -48,7 +49,11 @@ export default class NursmeasureTable extends Component {
             supervisorcheck: '',
             checkstatus: '',
             ispack: '',
-            imgArr: []
+            imgArr: [],
+            selectedRowKeys: [],
+            dataSourceSelected: [],
+            changeInfoVisible: false,
+            selectedAllRowKeys: false
         };
     }
     componentDidMount () {
@@ -56,7 +61,7 @@ export default class NursmeasureTable extends Component {
         this.sections = JSON.parse(user.sections);
     }
     render () {
-        const { tblData } = this.state;
+        const { tblData, changeInfoVisible, imgvisible } = this.state;
         return (
             <div>
                 {this.treeTable(tblData)}
@@ -64,7 +69,7 @@ export default class NursmeasureTable extends Component {
                     width={522}
                     title='详细信息'
                     style={{ textAlign: 'center' }}
-                    visible={this.state.imgvisible}
+                    visible={imgvisible}
                     onOk={this.handleCancel.bind(this)}
                     onCancel={this.handleCancel.bind(this)}
                     footer={null}
@@ -80,6 +85,16 @@ export default class NursmeasureTable extends Component {
                         </Button>
                     </Row>
                 </Modal>
+                {
+                    changeInfoVisible
+                        ? <ChangeNurseryInfoModal
+                            {...this.props}
+                            {...this.state}
+                            onOk={this.handleChangeInfoOk.bind(this)}
+                            onCancel={this.handleChangeInfoCancel.bind(this)}
+                        />
+                        : ''
+                }
             </div>
         );
     }
@@ -103,8 +118,11 @@ export default class NursmeasureTable extends Component {
             bigType,
             treetypename,
             ispack,
-            mmtype = ''
+            mmtype = '',
+            selectedRowKeys,
+            dataSourceSelected
         } = this.state;
+        let permission = getUserIsManager();
         const suffix2 = rolename ? (
             <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
@@ -527,13 +545,13 @@ export default class NursmeasureTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={18} className='forest-quryrstcnt'>
+                    <Col span={16} className='forest-quryrstcnt'>
                         <span>
                             此次查询共有苗木：
                             {this.state.pagination.total}棵
                         </span>
                     </Col>
-                    <Col span={2}>
+                    {/* <Col span={2}>
                         <Button
                             type='primary'
                             style={{ display: 'none' }}
@@ -541,7 +559,27 @@ export default class NursmeasureTable extends Component {
                         >
                             导出
                         </Button>
-                    </Col>
+                    </Col> */}
+                    {
+                        permission ? (<Col span={2}>
+                            <Button
+                                type='primary'
+                                disabled={!(details && details.length > 0)}
+                                onClick={this.changeNurseryInfoAll.bind(this)}
+                            >
+                            修改全部
+                            </Button>
+                        </Col>) : <Col span={2} />}
+                    {
+                        permission ? (<Col span={2}>
+                            <Button
+                                type='primary'
+                                disabled={!(dataSourceSelected && dataSourceSelected.length > 0)}
+                                onClick={this.changeNurseryInfoSome.bind(this)}
+                            >
+                            修改部分
+                            </Button>
+                        </Col>) : <Col span={2} />}
                     <Col span={2}>
                         <Button
                             type='primary'
@@ -553,6 +591,10 @@ export default class NursmeasureTable extends Component {
                 </Row>
             </div>
         );
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onRowSelectChange
+        };
         return (
             <div>
                 <Row>{header}</Row>
@@ -562,6 +604,7 @@ export default class NursmeasureTable extends Component {
                         className='foresttable'
                         columns={columns}
                         rowKey='order'
+                        rowSelection={rowSelection}
                         loading={{
                             tip: (
                                 <Progress
@@ -581,6 +624,62 @@ export default class NursmeasureTable extends Component {
                 </Row>
             </div>
         );
+    }
+    onRowSelectChange = (selectedRowKeys, selectedRows) => {
+        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+    };
+
+    changeNurseryInfoAll = () => {
+        const {
+            tblData
+        } = this.state;
+        if (tblData && tblData instanceof Array && tblData.length > 0) {
+            this.setState({
+                selectedAllRowKeys: true,
+                changeInfoVisible: true
+            });
+        } else {
+            message.warning('请先选择条件，搜索数据！');
+            this.setState({
+                selectedAllRowKeys: false,
+                changeInfoVisible: false
+            });
+        }
+    }
+
+    changeNurseryInfoSome = () => {
+        const {
+            selectedRowKeys,
+            dataSourceSelected
+        } = this.state;
+        if (dataSourceSelected.length === 0) {
+            message.warning('请先选择数据！');
+        } else {
+            console.log('selectedRowKeys', selectedRowKeys);
+            console.log('dataSourceSelected', dataSourceSelected);
+            this.setState({
+                selectedRowKeys: [],
+                dataSourceSelected: [],
+                changeInfoVisible: true
+            });
+        }
+    }
+
+    handleChangeInfoOk = () => {
+        this.setState({
+            selectedRowKeys: [],
+            dataSourceSelected: [],
+            changeInfoVisible: false,
+            selectedAllRowKeys: false
+        });
+    }
+    handleChangeInfoCancel = () => {
+        this.setState({
+            selectedRowKeys: [],
+            dataSourceSelected: [],
+            changeInfoVisible: false,
+            selectedAllRowKeys: false
+        });
     }
 
     emitEmpty2 = () => {
@@ -729,12 +828,10 @@ export default class NursmeasureTable extends Component {
         const {
             actions: { getnurserys },
             keycode = '',
-            platform: { tree = {} },
-            treetypes
+            platform: { tree = {} }
         } = this.props;
         let thinClassTree = tree.thinClassTree;
         let postdata = {
-            // no:keycode,
             sxm,
             bd: section === '' ? keycode : section,
             bigType,
@@ -804,7 +901,7 @@ export default class NursmeasureTable extends Component {
             return;
         }
         const {
-            actions: { getnurserys, getexportNurserys },
+            actions: { getexportNurserys },
             keycode = ''
         } = this.props;
         let postdata = {

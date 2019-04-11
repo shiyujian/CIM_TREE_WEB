@@ -391,7 +391,13 @@ export const getSupplierBackStat = forestFetchAction(
     `${FOREST_API}/tree/nurserybackstatbysupplier`,
     []
 );
+// 获取苗圃列表
+export const getNurseryListOK = createAction(`${ID}_getNurseryList`);
+export const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybases`, [], 'GET', []);
 
+// 获取供应商列表
+export const getSupplierListOK = createAction(`${ID}_getSupplierList`);
+export const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers`, [], 'GET', []);
 export const actions = {
     getTotalSat,
     getTreeLocations,
@@ -482,7 +488,11 @@ export const actions = {
     getNurseryEnterStat,
     getSupplierEnterStat,
     getNurseryBackStat,
-    getSupplierBackStat
+    getSupplierBackStat,
+    getNurseryListOK,
+    getNurseryList,
+    getSupplierListOK,
+    getSupplierList
 };
 export default handleActions({
     [getTreeOK]: (state, {
@@ -550,6 +560,18 @@ export default handleActions({
         return {
             ...state,
             customViewByUserID: payload
+        };
+    },
+    [getNurseryListOK]: (state, { payload }) => {
+        return {
+            ...state,
+            nurseryList: payload
+        };
+    },
+    [getSupplierListOK]: (state, { payload }) => {
+        return {
+            ...state,
+            supplierList: payload
         };
     }
 }, {});

@@ -75,17 +75,23 @@ export default class Nursmeasureinfo extends Component {
                 setkeycode,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree
+                getThinClassTree,
+                getNurseryList,
+                getSupplierList,
+                getNurseryListOK,
+                getSupplierListOK
             },
             users,
             treetypes,
+            nurseryList,
+            supplierList,
             platform: { tree = {} }
         } = this.props;
         // 避免反复获取森林用户数据，提高效率
 
         setkeycode('');
         if (!users) {
-            getForestUsers();
+            await getForestUsers();
         }
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
@@ -99,6 +105,18 @@ export default class Nursmeasureinfo extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+        }
+        if (!nurseryList) {
+            let nurseryData = await getNurseryList();
+            if (nurseryData && nurseryData.content) {
+                await getNurseryListOK(nurseryData.content);
+            }
+        }
+        if (!supplierList) {
+            let supplierData = await getSupplierList();
+            if (supplierData && supplierData.content) {
+                await getSupplierListOK(supplierData.content);
+            }
         }
 
         // 类型
