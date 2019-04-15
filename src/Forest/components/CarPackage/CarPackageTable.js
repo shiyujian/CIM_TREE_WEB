@@ -10,11 +10,12 @@ import {
     Button,
     Input,
     Progress,
-    message
+    message,
+    Divider
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '../../../_platform/api';
-import { getUser } from '_platform/auth';
+import { getUser, getUserIsManager } from '_platform/auth';
 import '../index.less';
 import {
     getSectionNameBySection,
@@ -290,6 +291,8 @@ export default class CarPackageTable extends Component {
         ) : null;
         let columns = [];
         let header = '';
+        // let permission = getUserIsManager();
+        let permission = false;
         columns = [
             {
                 title: '序号',
@@ -429,14 +432,47 @@ export default class CarPackageTable extends Component {
             {
                 title: '操作',
                 render: (text, record) => {
-                    return (
-                        <a
-                            href='javascript:;'
-                            onClick={this.onViewClick.bind(this, record)}
-                        >
-                            详情
-                        </a>
-                    );
+                    if (permission) {
+                        return (
+                            <div>
+                                <a
+                                    href='javascript:;'
+                                    onClick={this.onViewClick.bind(this, record)}
+                                >
+                                详情
+                                </a>
+                                <Divider type='vertical' />
+                                <a
+                                    href='javascript:;'
+                                    onClick={this.handleEditClick.bind(this, record)}
+                                >
+                                编辑
+                                </a>
+                                <Divider type='vertical' />
+                                <a
+                                    href='javascript:;'
+                                    onClick={this.handleDeleteClick.bind(this, record)}
+                                >
+                                删除
+                                </a>
+                                <Divider type='vertical' />
+                                <a
+                                    href='javascript:;'
+                                    onClick={this.handleRemoveClick.bind(this, record)}
+                                >
+                                移动
+                                </a>
+                            </div>);
+                    } else {
+                        return (
+                            <a
+                                href='javascript:;'
+                                onClick={this.onViewClick.bind(this, record)}
+                            >
+                                详情
+                            </a>
+                        );
+                    }
                 }
             }
         ];
@@ -572,6 +608,15 @@ export default class CarPackageTable extends Component {
                 </Row>
             </div>
         );
+    }
+    handleEditClick = async () => {
+
+    }
+    handleDeleteClick = async () => {
+
+    }
+    handleRemoveClick = async () => {
+
     }
     onViewClick = async record => {
         const { pagination1 } = this.state;

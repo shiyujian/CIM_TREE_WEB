@@ -45,27 +45,32 @@ export default class NursOverallTable extends Component {
             {
                 title: '流程',
                 render: (text, record) => {
-                    if (record.Node) {
-                        if (record.Node === '种树') {
-                            return <span>施工提交</span>;
-                        } else if (record.Node === '监理') {
-                            if (record.Status === 1) {
-                                return <span>监理通过</span>;
-                            } else {
-                                return <span>监理拒绝</span>;
-                            }
-                        } else if (record.Node === '业主') {
-                            if (record.Status === 2) {
-                                return <span>业主抽查通过</span>;
-                            } else {
-                                return <span>业主抽查拒绝</span>;
-                            }
-                        } else if (record.Node === '补种') {
-                            return <span>施工补录扫码</span>;
-                        } else if (record.Node === '苗圃提交') {
-                            return <span>苗圃提交</span>;
+                    let flowName = '';
+                    if (record.Status) {
+                        if (record.Status === -1) {
+                            flowName = '施工提交';
+                        } else if (record.Status === 0) {
+                            flowName = '监理大数据未通过';
+                        } else if (record.Status === 1) {
+                            flowName = '监理大数据合格';
+                        } else if (record.Status === 2) {
+                            flowName = '业主合格';
+                        } else if (record.Status === 3) {
+                            flowName = '业主不合格';
+                        } else if (record.Status === 4) {
+                            flowName = '施工结缘入库';
+                        } else if (record.Status === 5) {
+                            flowName = '监理质量不合格';
+                        } else if (record.Status === 6) {
+                            flowName = '监理质量合格';
+                        } else if (record.Status === 100) {
+                            flowName = '苗圃提交';
                         }
                     }
+                    if (record && record.Node && record.Node === '苗圃提交') {
+                        flowName = '苗圃提交';
+                    }
+                    return <span>{flowName}</span>;
                 }
             },
             {

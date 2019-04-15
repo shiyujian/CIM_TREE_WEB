@@ -4,9 +4,6 @@ import {
     Col,
     Input,
     Form,
-    Icon,
-    Button,
-    Table,
     Modal,
     Select,
     Radio
@@ -38,7 +35,12 @@ class ChangeNurseryInfoModal extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        let bigTreeList = tree.bigTreeList;
+        let bigTreeList = tree.bigTreeList || [];
+        console.log('nurseryList', nurseryList);
+        console.log('supplierList', supplierList);
+        console.log('treetypes', treetypes);
+        console.log('bigTreeList', bigTreeList);
+        console.log('sectionsList', sectionsList);
         return (
             <Modal
                 width={850}
@@ -206,13 +208,13 @@ class ChangeNurseryInfoModal extends Component {
                                             ]
                                         }
                                     )(<Select>
-                                        {
+                                        {/* {
                                             sectionsList.map((section) => {
                                                 return <Option key={section.No} value={section.No}>
                                                     {section.Name}
                                                 </Option>;
                                             })
-                                        }
+                                        } */}
                                     </Select>)}
                                 </FormItem>
                             </Col>

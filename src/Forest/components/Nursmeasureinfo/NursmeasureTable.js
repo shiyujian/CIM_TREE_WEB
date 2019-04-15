@@ -85,7 +85,7 @@ export default class NursmeasureTable extends Component {
                         </Button>
                     </Row>
                 </Modal>
-                {
+                {/* {
                     changeInfoVisible
                         ? <ChangeNurseryInfoModal
                             {...this.props}
@@ -94,7 +94,7 @@ export default class NursmeasureTable extends Component {
                             onCancel={this.handleChangeInfoCancel.bind(this)}
                         />
                         : ''
-                }
+                } */}
             </div>
         );
     }
@@ -122,7 +122,8 @@ export default class NursmeasureTable extends Component {
             selectedRowKeys,
             dataSourceSelected
         } = this.state;
-        let permission = getUserIsManager();
+        // let permission = getUserIsManager();
+        let permission = false;
         const suffix2 = rolename ? (
             <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
@@ -626,6 +627,9 @@ export default class NursmeasureTable extends Component {
         );
     }
     onRowSelectChange = (selectedRowKeys, selectedRows) => {
+        console.log('selectedRowKeys', selectedRowKeys);
+        console.log('selectedRows', selectedRows);
+
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     };
 

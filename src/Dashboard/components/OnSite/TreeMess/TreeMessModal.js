@@ -786,21 +786,23 @@ class TreeMessModal extends Component {
                                             let flowName = '';
                                             if (flow.Status) {
                                                 if (flow.Status === -1) {
-                                                    flowName = '监理未确认';
+                                                    flowName = '施工提交';
                                                 } else if (flow.Status === 0) {
-                                                    flowName = '监理未通过';
+                                                    flowName = '监理大数据未通过';
                                                 } else if (flow.Status === 1) {
-                                                    flowName = '监理通过';
+                                                    flowName = '监理大数据合格';
                                                 } else if (flow.Status === 2) {
-                                                    flowName = '业主抽查通过';
+                                                    flowName = '业主合格';
                                                 } else if (flow.Status === 3) {
-                                                    flowName = '业主抽查不通过';
+                                                    flowName = '业主不合格';
                                                 } else if (flow.Status === 4) {
-                                                    flowName = '结缘入库';
+                                                    flowName = '施工结缘入库';
                                                 } else if (flow.Status === 5) {
-                                                    flowName = '苗木质量不合格';
+                                                    flowName = '监理质量不合格';
                                                 } else if (flow.Status === 6) {
-                                                    flowName = '苗木质量合格';
+                                                    flowName = '监理质量合格';
+                                                } else if (flow.Status === 100) {
+                                                    flowName = '苗圃提交';
                                                 } else if (flow.Node === '补种') {
                                                     flowName = '施工补录扫码';
                                                 }

@@ -394,7 +394,8 @@ export default class LocmeasureTable extends Component {
             <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
         let header = '';
-        let permission = getUserIsManager();
+        // let permission = getUserIsManager();
+        let permission = false;
         header = (
             <div>
                 <Row className='forest-search-layout'>
