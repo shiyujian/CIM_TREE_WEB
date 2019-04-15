@@ -40,14 +40,14 @@ export default class Home extends Component {
                         {Datum && <Datum {...props} />}
                     </Col>
                 </Row>
-                <Row gutter={10} style={{margin: '5px 5px 5px 5px'}}>
+                {/* <Row gutter={10} style={{margin: '5px 5px 5px 5px'}}>
                     <Col span={12}>
                         {Schedule && <Schedule {...props} />}
                     </Col>
                     <Col span={12}>
                         {Staff && <Staff {...props} />}
                     </Col>
-                </Row>
+                </Row> */}
                 <Preview />
             </div>
         );
