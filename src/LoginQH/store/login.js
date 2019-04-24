@@ -12,6 +12,8 @@ export const getTasks = createFetchAction(`${WORKFLOW_API}/participant-task/`);
 
 export const loginForest = createFetchAction(`${FOREST_API}/system/login`, [], 'GET');
 
+export const getSecurityCode = createFetchAction(`${FOREST_API}/ValidateHandler.ashx`, [], 'GET');
+
 export default handleActions({
     [loginOK]: (state, action) => {
         return {...state, userData: action.payload};
