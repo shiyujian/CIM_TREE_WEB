@@ -4,7 +4,8 @@ import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Sp
 import { getUser, formItemLayout } from '_platform/auth';
 import {
     fillAreaColor,
-    getCoordsArr
+    getCoordsArr,
+    getPolygonByCoordArr
 } from '../auth';
 import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
 const FormItem = Form.Item;
@@ -16,6 +17,7 @@ class Tablelevel extends Component {
         this.state = {
             dataList: [], // 每页的数据
             newDataList: [], // 查询后每页数据
+            isSuperAdmin: false, // 是否是超级管理员
             showModal: false,
             record: {}, // 行数据
             indexBtn: 1, // 是否为上传细班选项
@@ -88,6 +90,15 @@ class Tablelevel extends Component {
         this.initMap();
         let userData = getUser();
         this.userSection = userData.sections.slice(2, -2);
+        if (userData.username === 'admin') {
+            this.setState({
+                isSuperAdmin: true
+            });
+        } else {
+            this.setState({
+                isSuperAdmin: false
+            });
+        }
     }
     initMap () {
         // 基础设置
@@ -124,7 +135,7 @@ class Tablelevel extends Component {
         ).addTo(this.map);
     }
     render () {
-        const { dataList, newDataList, total, page, confirmLoading, spinning, selectKey } = this.state;
+        const { dataList, newDataList, total, page, confirmLoading, spinning, selectKey, isSuperAdmin } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
                 console.log('定位过去');
@@ -134,7 +145,7 @@ class Tablelevel extends Component {
                 console.log('选择');
                 if (selected) {
                     // 增加
-                    if (record.Section === this.userSection) {
+                    if (isSuperAdmin || record.Section === this.userSection) {
                         selectKey.push(record.key);
                     } else {
                         message.error('勾选失败，当前用户所属标段与该细班所属标段不符');
@@ -383,7 +394,7 @@ class Tablelevel extends Component {
         });
     }
     handleOk () {
-        const { fileList } = this.state;
+        const { fileList, isSuperAdmin } = this.state;
         const formdata = new FormData();
         formdata.append('file', fileList[0]);
         const { shapeUploadHandler } = this.props.actions;
@@ -412,16 +423,21 @@ class Tablelevel extends Component {
                 });
             } else if (rep.features) {
                 message.success('数据导入成功，已默认勾选可以的入库的数据');
+                console.log(rep.features, '最开始');
                 rep.features.map((item, index) => {
                     item.key = index;
-                    item.Geom = item.Geom.replace(/\s{1}0{1}/g, '');
+                    let coordsArr = getCoordsArr(item.Geom);
+                    let newCoordsArr = [];
+                    coordsArr.map(row => {
+                        newCoordsArr.push(row.slice(0, row.lastIndexOf(' ')));
+                    });
+                    item.Geom = getPolygonByCoordArr(newCoordsArr);
                 });
                 this.dataList = rep.features;
                 console.log('最初数据', this.dataList);
-                console.log('this.userSection', this.userSection);
                 let selectKey = [];
                 this.dataList.map(item => {
-                    if (item.Section === this.userSection) {
+                    if (isSuperAdmin || item.Section === this.userSection) {
                         selectKey.push(item.key);
                     }
                 });
