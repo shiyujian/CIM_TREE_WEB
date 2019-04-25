@@ -72,7 +72,7 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                                     window.localStorage.removeItem('FOREST_LOGIN_USER_DATA');
                                     let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
                                     if (!remember) {
-                                        window.localStorage.removeItem('QH_LOGIN_USER');
+                                        window.localStorage.removeItem('LOGIN_USER_PASSDATA');
                                     }
                                     window.location.replace(locationStart + '/login');
                                     return;

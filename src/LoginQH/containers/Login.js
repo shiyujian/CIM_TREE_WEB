@@ -8,7 +8,7 @@ import {
     Button,
     Checkbox,
     message,
-    notification
+    Notification
 } from 'antd';
 import {
     setUser,
@@ -16,7 +16,7 @@ import {
     setPermissions,
     removePermissions,
     getUser
-} from '../../_platform/auth';
+} from '_platform/auth';
 import { FOREST_LOGIN_DATA } from '_platform/api';
 import './Login.less';
 
@@ -36,9 +36,9 @@ class Login extends Component {
         this.state = {
             isPwd: true,
             forgectState: false,
-            token: null,
-            userMessage: null,
-            checked: ''
+            checked: '',
+            getSecurityCodeStatus: false,
+            countDown: 60
         };
         this.account = [];
         this.code = [];
@@ -49,31 +49,33 @@ class Login extends Component {
     }
 
     componentDidMount () {
-        let QH_LOGIN_USER = window.localStorage.getItem('QH_LOGIN_USER');
-        if (QH_LOGIN_USER) {
-            QH_LOGIN_USER = JSON.parse(QH_LOGIN_USER) || {};
-            if (QH_LOGIN_USER.username && QH_LOGIN_USER.password) {
+        let LOGIN_USER_PASSDATA = window.localStorage.getItem('LOGIN_USER_PASSDATA');
+        if (LOGIN_USER_PASSDATA) {
+            LOGIN_USER_PASSDATA = JSON.parse(LOGIN_USER_PASSDATA) || {};
+            if (LOGIN_USER_PASSDATA.username && LOGIN_USER_PASSDATA.password) {
                 const { setFieldsValue } = this.props.form;
                 setFieldsValue({
-                    username: QH_LOGIN_USER.username,
-                    password: QH_LOGIN_USER.password,
-                    remember: QH_LOGIN_USER.remember
+                    username: LOGIN_USER_PASSDATA.username,
+                    password: LOGIN_USER_PASSDATA.password,
+                    remember: LOGIN_USER_PASSDATA.remember
                 });
 
                 document.getElementById('username').value =
-                    QH_LOGIN_USER.username;
+                    LOGIN_USER_PASSDATA.username;
                 document.getElementById('pwdInp').value =
-                    QH_LOGIN_USER.password;
-                this.state.checked = QH_LOGIN_USER.remember;
+                    LOGIN_USER_PASSDATA.password;
+                this.state.checked = LOGIN_USER_PASSDATA.remember;
             }
-            // this.loginFunc(QH_LOGIN_USER, 1);
+            // this.loginFunc(LOGIN_USER_PASSDATA, 1);
         }
     }
 
     render () {
         const { getFieldDecorator } = this.props.form;
         const {
-            forgectState
+            forgectState,
+            getSecurityCodeStatus,
+            countDown
         } = this.state;
         const loginTitle = require('./images/logo1.png');
         const docDescibe = require('./images/doc.png');
@@ -97,7 +99,6 @@ class Login extends Component {
                             <img src={loginTitle} />
                         </a>
                     </div>
-
                     {
                         !forgectState ? (
                             <div className='main-box'>
@@ -122,12 +123,6 @@ class Login extends Component {
                                         >
                                             森林大数据建设管理平台
                                         </p>
-                                        {/* <FormItem style={{ marginTop: '10' }}>
-											<Select placeholder="项目选择">
-												<Option value='二'>二</Option>
-												<Option value='一'>一</Option>
-											</Select>
-										</FormItem> */}
                                         <FormItem
                                             style={{
                                                 marginTop: '20px',
@@ -300,7 +295,70 @@ class Login extends Component {
                                                         id='phoneNumber'
                                                         placeholder='请输入手机号'
                                                     />
+                                                    {
+                                                        getSecurityCodeStatus
+                                                            ? <a
+                                                                className='security-code-status'
+                                                            >{`${countDown}秒后重发`}</a>
+                                                            : <a
+                                                                className='security-code-type'
+                                                                onClick={this.handleGetSecurityCode.bind(
+                                                                    this
+                                                                )}
+                                                            >获取验证码</a>
+                                                    }
+
                                                 </div>
+                                            )}
+                                        </FormItem>
+                                        <FormItem
+                                            style={{
+                                                marginTop: '30px',
+                                                marginLeft: '24px'
+                                            }}
+                                        >
+                                            {getFieldDecorator('securityCode', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请输入验证码'
+                                                    }
+                                                ]
+                                            })(
+                                                <Input
+                                                    id='securityCode'
+                                                    style={{
+                                                        color: '#000000',
+                                                        borderBottom:
+                                                            '1px solid #cccccc'
+                                                    }}
+                                                    placeholder='请输入验证码'
+                                                />
+                                            )}
+                                        </FormItem>
+                                        <FormItem
+                                            style={{
+                                                marginTop: '30px',
+                                                marginLeft: '24px'
+                                            }}
+                                        >
+                                            {getFieldDecorator('newPassWord', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请输入新密码'
+                                                    }
+                                                ]
+                                            })(
+                                                <Input
+                                                    id='newPassWord'
+                                                    style={{
+                                                        color: '#000000',
+                                                        borderBottom:
+                                                            '1px solid #cccccc'
+                                                    }}
+                                                    placeholder='请输入新密码'
+                                                />
                                             )}
                                         </FormItem>
                                         <Button
@@ -350,79 +408,13 @@ class Login extends Component {
     // 忘记密码
     ForgetPassword () {
         this.setState({
-            forgectState: true,
-            token: null,
-            userMessage: null
-        });
-    }
-    //	忘记密码确定
-    sureSubmit (e) {
-        e.preventDefault();
-        const {
-            actions: { forgect }
-        } = this.props;
-        this.props.form.validateFieldsAndScroll((err, values) => {
-            if (!err) {
-                // let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
-                let partn = /^1[0-9]{10}$/;
-                let phonenumber = values.phone;
-                if (!partn.exec(phonenumber)) {
-                    notification.error({
-                        message: '手机号输入错误！',
-                        duration: 2
-                    });
-                } else {
-                    const data = {
-                        username: values.nickname
-                    };
-                    forgect({}, data).then(rst => {
-                        console.log('rst', rst);
-                        if (rst.errornum === '400004') {
-                            notification.error({
-                                message:
-                                    '输入的用户未绑定手机，请联系管理员找回密码！',
-                                duration: 2
-                            });
-                        } else if (rst.errornum === '400002') {
-                            notification.error({
-                                message: '输入的用户不存在！',
-                                duration: 2
-                            });
-                        } else if (rst.errornum === '400003') {
-                            notification.error({
-                                message: '找不到与用户关联的人员！',
-                                duration: 2
-                            });
-                        } else if (rst.errornum === '400005') {
-                            notification.error({
-                                message: '短信发送失败！',
-                                duration: 2
-                            });
-                        } else {
-                            this.setState({
-                                forgectState: false,
-                                token: null,
-                                userMessage: null
-                            });
-                        }
-                    });
-                }
-            }
-        });
-    }
-    cancel () {
-        this.setState({
-            forgectState: false,
-            token: null,
-            userMessage: null
+            forgectState: true
         });
     }
     // 返回登录
     backLogin () {
         this.setState({
-            forgectState: false,
-            token: null,
-            userMessage: null
+            forgectState: false
         });
     }
     handleClick (e) {
@@ -486,7 +478,7 @@ class Login extends Component {
                 }
                 let tasks = [];
                 tasks = await getTasks({}, { task: 'processing', executor: rst.id, pagination: true, page: 1 });
-                notification.open({
+                Notification.open({
                     message: loginType
                         ? '自动登录成功'
                         : '登录成功',
@@ -541,12 +533,12 @@ class Login extends Component {
                 if (loginType === 0) {
                     if (values.remember) {
                         window.localStorage.setItem(
-                            'QH_LOGIN_USER',
+                            'LOGIN_USER_PASSDATA',
                             JSON.stringify(data)
                         );
                     } else {
                         window.localStorage.removeItem(
-                            'QH_LOGIN_USER'
+                            'LOGIN_USER_PASSDATA'
                         );
                     }
                 }
@@ -557,6 +549,148 @@ class Login extends Component {
                 message.error('用户名或密码错误！');
             }
         }
+    }
+
+    // 获取验证码
+    handleGetSecurityCode = async () => {
+        const {
+            actions: {
+                getSecurityCode
+            }
+        } = this.props;
+        try {
+            let phonenumber = this.props.form.getFieldValue('phone');
+            let partn = /^1[0-9]{10}$/;
+            if (!partn.exec(phonenumber)) {
+                Notification.error({
+                    message: '手机号输入错误！',
+                    duration: 2
+                });
+            } else {
+                this.setState({
+                    getSecurityCodeStatus: true
+                });
+                const data = {
+                    action: 'vcode',
+                    phone: phonenumber
+                };
+                let rst = await getSecurityCode({}, data);
+                let status = false;
+                if (rst.indexOf('code') !== -1) {
+                    let handleData = rst.substring(1, rst.length - 1);
+                    let handleDataArr = handleData.split(',');
+                    if (handleDataArr && handleDataArr instanceof Array && handleDataArr.length > 0) {
+                        let codeArr = handleDataArr[0].split(':');
+                        if (codeArr && codeArr instanceof Array && codeArr.length === 2) {
+                            if (codeArr[1] === '1') {
+                                status = true;
+                            }
+                        }
+                    };
+                }
+                if (status) {
+                    Notification.success({
+                        message: '验证码发送成功',
+                        duration: 3
+                    });
+                } else {
+                    Notification.error({
+                        message: '验证码发送失败',
+                        duration: 3
+                    });
+                }
+                this.handleSecurityCodeStatus();
+            }
+        } catch (e) {
+            console.log('handleGetSecurityCode', e);
+        }
+    }
+
+    handleSecurityCodeStatus = () => {
+        const {
+            countDown
+        } = this.state;
+        if (countDown === 1) {
+            this.setState({
+                countDown: 60,
+                getSecurityCodeStatus: false
+            });
+        } else {
+            this.setState({
+                countDown: countDown - 1,
+                getSecurityCodeStatus: true
+            });
+            setTimeout(async () => {
+                await this.handleSecurityCodeStatus();
+            }, 1000);
+        }
+    }
+    //	忘记密码确定
+    sureSubmit (e) {
+        e.preventDefault();
+        const {
+            actions: { getSecurityCode }
+        } = this.props;
+        try {
+            this.props.form.validateFieldsAndScroll(async (err, values) => {
+                if (!err) {
+                    // let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
+                    let partn = /^1[0-9]{10}$/;
+                    let phonenumber = values.phone;
+                    if (!partn.exec(phonenumber)) {
+                        Notification.error({
+                            message: '手机号输入错误！',
+                            duration: 2
+                        });
+                    } else {
+                        const data = {
+                            action: 'modifypwd',
+                            phone: phonenumber,
+                            vcode: values.securityCode,
+                            pwd: values.newPassWord,
+                            username: values.nickname
+                        };
+                        let rst = await getSecurityCode({}, data);
+                        let status = false;
+                        if (rst.indexOf('code') !== -1) {
+                            let handleData = rst.substring(1, rst.length - 1);
+                            let handleDataArr = handleData.split(',');
+                            if (handleDataArr && handleDataArr instanceof Array && handleDataArr.length > 0) {
+                                let codeArr = handleDataArr[0].split(':');
+                                if (codeArr && codeArr instanceof Array && codeArr.length === 2) {
+                                    if (codeArr[1] === '1') {
+                                        status = true;
+                                    }
+                                }
+                            };
+                        }
+                        if (status) {
+                            Notification.success({
+                                message: '密码修改成功',
+                                duration: 3
+                            });
+                        } else {
+                            Notification.error({
+                                message: '密码修改失败',
+                                duration: 3
+                            });
+                        }
+                        this.setState({
+                            forgectState: false,
+                            getSecurityCodeStatus: false,
+                            countDown: 60
+                        });
+                    }
+                }
+            });
+        } catch (e) {
+            console.log('sureSubmit', e);
+        }
+    }
+    cancel () {
+        this.setState({
+            forgectState: false
+        });
     }
 }
 

@@ -157,36 +157,6 @@
   .has-error .ant-input-group-addon {
     background-color: rgba(255, 255, 255, 0) !important;
   }
-
-  .anticon {
-    width: 48px;
-    height: 32px;
-    display: block;
-    background-color: transparent;
-    background-size: 32px 32px;
-    background-position: 1px center;
-    background-repeat: no-repeat;
-  }
-
-  .anticon-user:before {
-    width: 48px;
-    height: 48px;
-    content: '';
-    background: url(./images/icon_01.png) no-repeat;
-  }
-
-  .anticon-lock:before {
-    width: 48px;
-    height: 48px;
-    content: '';
-    background: url(./images/icon_02.png) no-repeat;
-  }
-  .anticon-mobile:before {
-    width: 48px;
-    height: 48px;
-    content: '';
-    background: url(./images/icon_03.png) no-repeat;
-  }
   .ant-input {
     width: 100%;
     height: 32px;
@@ -346,7 +316,36 @@
       max-width: 50%;
       margin: 0 auto;
     }
-  }     
+  }    
+  
+  .security-code-type {
+    width: 70px;
+    text-align: center;
+    height: 15px;
+    display: block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    position: absolute;
+    right: -260px;
+    top: 0%;
+    cursor: pointer;
+    z-index: 5;
+  } 
+  .security-code-status {
+    width: 80px;
+    text-align: center;
+    height: 15px;
+    display: block;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    position: absolute;
+    right: -260px;
+    top: 0%;
+    cursor: auto;
+    z-index: 5;
+  }
   
 }
 
