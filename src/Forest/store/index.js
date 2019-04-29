@@ -242,6 +242,11 @@ export const postForsetPic = myFetch(
     [],
     'POST'
 );
+export const clearTreeData = forestFetchAction(
+    `${FOREST_API}/tree/cleartreedata`,
+    [],
+    'GET'
+);
 
 // 栽植、未栽植数量统计
 export const getTreePlanting = forestFetchAction(
@@ -462,6 +467,7 @@ export const actions = {
     getTreeMess,
     getTreeLocationCoord,
     postForsetPic,
+    clearTreeData,
     getTreePlanting,
     getLocationStat,
     getStatByTreetype,
