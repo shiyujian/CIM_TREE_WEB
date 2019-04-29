@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { Spin, Modal, Row, Col } from 'antd';
-import './index.less'
+import './index.less';
 import {
-    FOREST_GIS_API,
-    FOREST_GIS_TREETYPE_API,
     WMSTILELAYERURL,
     TILEURLS,
     INITLEAFLET_API
@@ -16,14 +14,13 @@ import {
 import {
     wktToJson
 } from '_platform/gisAuth';
-/ * turf */
 export default class WordView1 extends Component {
     static propTypes = {};
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             loading: false,
-            areaLayerList: [], // 
+            areaLayerList: []
         };
         this.map = null;
     }
@@ -35,12 +32,13 @@ export default class WordView1 extends Component {
                 getCustomViewByUserID
             },
             sscction,
-            tinclass
+            tinclass,
+            detail = {}
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         await getCustomViewByUserID({id: user.id});
         await this.initMap();
-        this._addAreaLayer(tinclass,sscction);
+        this._addAreaLayer(tinclass, sscction);
         detail.Geom && this.area(wktToJson(detail.Geom));
     }
 
@@ -96,9 +94,8 @@ export default class WordView1 extends Component {
         const {
             actions: { getTreearea }
         } = this.props;
-        console.log(eventKey)
         try {
-            let coords = await handleAreaLayerData(eventKey, getTreearea,section);
+            let coords = await handleAreaLayerData(eventKey, getTreearea, section);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
@@ -145,65 +142,63 @@ export default class WordView1 extends Component {
         }
     }
 
-    onOk() {
-        this.props.onPressOk(3)
+    onOk () {
+        this.props.onPressOk(3);
     }
 
     area (points) {
         let lineLayer = new L.featureGroup().addTo(this.map);
-		if (points.length > 1) {
-			var latlngs = [];
-			var lnglats = [];
+        if (points.length > 1) {
+            var latlngs = [];
+            var lnglats = [];
 
-			for (var i = 0; i < points.length; i++) {
-				latlngs.push([points[i].Y, points[i].X]);
-				lnglats.push([points[i].X, points[i].Y]);
-			}
-			var beginIcon = new L.icon({
-				iconUrl: './img/start.png',
-				iconSize: [26, 28],
-				iconAnchor: [13, 28]
-			});
-			var endIcon = new L.icon({
-				iconUrl: './img/end.png',
-				iconSize: [26, 28],
-				iconAnchor: [13, 28]
-			});
-			var start = new L.marker(latlngs[0], {
-				icon: beginIcon,
-				zIndexOffset: -50
-			}).addTo(lineLayer);
-			var end = new L.marker(latlngs[latlngs.length - 1], {
-				icon: endIcon,
-				zIndexOffset: -50
-			}).addTo(lineLayer);
-			this.map.fitBounds(lineLayer.getBounds());
+            for (var i = 0; i < points.length; i++) {
+                latlngs.push([points[i].Y, points[i].X]);
+                lnglats.push([points[i].X, points[i].Y]);
+            }
+            var beginIcon = new L.icon({
+                iconUrl: './img/start.png',
+                iconSize: [26, 28],
+                iconAnchor: [13, 28]
+            });
+            var endIcon = new L.icon({
+                iconUrl: './img/end.png',
+                iconSize: [26, 28],
+                iconAnchor: [13, 28]
+            });
+            var start = new L.marker(latlngs[0], {
+                icon: beginIcon,
+                zIndexOffset: -50
+            }).addTo(lineLayer);
+            var end = new L.marker(latlngs[latlngs.length - 1], {
+                icon: endIcon,
+                zIndexOffset: -50
+            }).addTo(lineLayer);
+            this.map.fitBounds(lineLayer.getBounds());
 
-			var linestring1 = turf.lineString(lnglats, { name: 'line 1' });
-			var buffered = turf.buffer(linestring1, 0.005, { units: 'kilometers' });
-			L.geoJSON(buffered, {
-				style: function (feature) {
-					return {
-						color: 'red'
-					};
-				}
-			}).addTo(lineLayer);
-			// var area = turf.area(buffered.geometry)
-			// return area
-		}
-	}
+            var linestring1 = turf.lineString(lnglats, { name: 'line 1' });
+            var buffered = turf.buffer(linestring1, 0.005, { units: 'kilometers' });
+            L.geoJSON(buffered, {
+                style: function (feature) {
+                    return {
+                        color: 'red'
+                    };
+                }
+            }).addTo(lineLayer);
+        }
+    }
 
-    render() {
+    render () {
         const { detail } = this.props;
-        let array = ['', '', '', '']
+        let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
         }
-        let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
-        let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
-        let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
-        let treetypename = detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName;
+        let unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
+        let jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
+        let shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
         let hgl = detail.CheckNum - detail.FailedNum; // 合格量
+        let qulityok = '';
         if (detail.CheckNum !== 0) {
             qulityok = hgl/detail.CheckNum;
         }
@@ -212,29 +207,29 @@ export default class WordView1 extends Component {
         let currenthege = 0;
         let currentbuhege = 0;
         let total = hege + buhege;
-        let rowList = []
+        let rowList = [];
         for (let i = 0; i < total / 17; i++) { // 判断需要展示多少行
-            let colList = []
-            for (let j = 0; j<17;j++) {
+            let colList = [];
+            for (let j = 0; j < 17; j++) {
                 if (Math.random() > 0.3) {
                     if (currenthege !== hege) { // 还有合格的选项
                         colList.push(<Col span={1}><div style={{}}>√</div></Col>)
                         currenthege++;
-                    } else if(currentbuhege !== buhege) { // 没有合格的选项了，只能添加不合格
-                        colList.push(<Col span={1}><div>×</div></Col>)
+                    } else if (currentbuhege !== buhege) { // 没有合格的选项了，只能添加不合格
+                        colList.push(<Col span={1}><div>×</div></Col>);
                         currentbuhege++;
-                    }else { // 都没有选项了，添加空项
-                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>)
+                    } else { // 都没有选项了，添加空项
+                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>);
                     }
                 } else {
                     if (currentbuhege !== buhege) {
-                        colList.push(<Col span={1}><div>×</div></Col>)
+                        colList.push(<Col span={1}><div>×</div></Col>);
                         currentbuhege++;
                     } else if (currenthege !== hege) {
-                        colList.push(<Col span={1}><div>√</div></Col>)
+                        colList.push(<Col span={1}><div>√</div></Col>);
                         currenthege++;
                     } else {
-                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>)
+                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>);
                     }
                 }
             }
@@ -256,64 +251,63 @@ export default class WordView1 extends Component {
                         <table style={{ border: 1 }}>
                             <tbody>
                                 <tr>
-                                    <td height="60;" colSpan="1" width="118px">单位工程名称</td>
-                                    <td colSpan="3"> {unit}</td>
-                                    <td colSpan="1" width="118px">细班（小班）</td>
-                                    <td colSpan="1">{`${array[2]}(${array[3]})`}</td>
+                                    <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
+                                    <td colSpan='3'> {unit}</td>
+                                    <td colSpan='1' width='118px'>细班（小班）</td>
+                                    <td colSpan='1'>{`${array[2]}(${array[3]})`}</td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" align="center">施工单位</td>
-                                    <td colSpan="3">中国交建集团</td>
+                                    <td height='60;' align='center'>施工单位</td>
+                                    <td colSpan='3'>中国交建集团</td>
                                     <td >项目经理</td>
                                     <td >王伟</td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" align="center">施工员</td>
-                                    <td colSpan="1">{shigong}</td>
+                                    <td height='60;' align='center'>施工员</td>
+                                    <td colSpan='1'>{shigong}</td>
                                     <td>设计面积</td>
-                                    <td colSpan="1">100</td>
+                                    <td colSpan='1'>100</td>
                                     <td>实际面积</td>
                                     <td >95</td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>
-                                    <td colSpan="5"> 《雄安新区造林工作手册》</td>
+                                    <td colSpan='5'> 《雄安新区造林工作手册》</td>
                                 </tr>
                                 <tr>
-                                    <td colSpan="6" height="200">
+                                    <td colSpan='6' height='200'>
                                     验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。
                                     ①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；
                                     ②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。
                                     挖穴合格率=抽检合格数量/抽检数量。
-
-			                        </td>
-                                </tr>
-                                <tr>
-                                <td style={{ height: 300 }} colSpan = '6'>
-                                    <div
-                                        id='mapidd'
-                                        style={{
-                                            height: 300,
-                                            borderLeft: '1px solid #ccc'
-                                        }}
-                                    />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td height="60;"width="118px">挖穴标准</td>
-                                    <td colSpan="1"> / </td>
-                                    <td height="60;"width="118px">设计数量</td>
-                                    <td colSpan="1">{detail.DesignNum}</td>
-                                    <td colSpan="1" width="118px">实际数量</td>
-                                    <td colSpan="1">{detail.ActualNum}</td>
+                                    <td style={{ height: 300 }} colSpan='6'>
+                                        <div
+                                            id='mapidd'
+                                            style={{
+                                                height: 300,
+                                                borderLeft: '1px solid #ccc'
+                                            }}
+                                        />
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td height="60;"width="118px">抽检数量</td>
-                                    <td colSpan="1">{detail.CheckNum}</td>
-                                    <td height="60;"width="118px">抽检合格数量</td>
-                                    <td colSpan="1">{hgl}</td>
-                                    <td colSpan="1" width="118px">合格率</td>
-                                    <td colSpan="1">{qulityok}</td>
+                                    <td height='60;'width='118px'>挖穴标准</td>
+                                    <td colSpan='1'> / </td>
+                                    <td height='60;'width='118px'>设计数量</td>
+                                    <td colSpan='1'>{detail.DesignNum}</td>
+                                    <td colSpan='1' width='118px'>实际数量</td>
+                                    <td colSpan='1'>{detail.ActualNum}</td>
+                                </tr>
+                                <tr>
+                                    <td height='60;'width='118px'>抽检数量</td>
+                                    <td colSpan='1'>{detail.CheckNum}</td>
+                                    <td height='60;'width='118px'>抽检合格数量</td>
+                                    <td colSpan='1'>{hgl}</td>
+                                    <td colSpan='1' width='118px'>合格率</td>
+                                    <td colSpan='1'>{qulityok}</td>
                                 </tr>
                                 <tr>
                                     <td colSpan='6'>
@@ -333,7 +327,7 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td className='hei110' >施工单位质量专检结果</td>
-                                    <td colSpan="5">
+                                    <td colSpan='5'>
                                         <div>
                                             <p>项目专业质量检查员：</p>
                                             <p className='marL300'>年</p>
@@ -344,7 +338,7 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td className='hei110' >监理（建设）单位验收记录</td>
-                                    <td colSpan="5">
+                                    <td colSpan='5'>
                                         <div>
                                             <p>监理工程师：</p><p>{jianli}</p>
                                             <p className='marL300'>年</p>

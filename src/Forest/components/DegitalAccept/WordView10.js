@@ -1,32 +1,33 @@
 import React, { Component } from 'react';
-import { Spin, Modal, Row, Col } from 'antd';
-import './index.less'
+import { Spin, Modal } from 'antd';
+import './index.less';
 
 export default class WordView1 extends Component {
     static propTypes = {};
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
-            loading: false,
+            loading: false
         };
     }
 
-    componentDidMount() {
+    componentDidMount () {
+
     }
 
-    onOk() {
-        this.props.onPressOk(10)
+    onOk () {
+        this.props.onPressOk(10);
     }
 
-    render() {
+    render () {
         const { detail } = this.props;
-        let array = ['', '', '', '']
+        let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
         }
-        let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
-        let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
-        let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
+        let unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
+        let jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
+        let shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
@@ -43,50 +44,50 @@ export default class WordView1 extends Component {
                         <table style={{ border: 1 }}>
                             <tbody>
                                 <tr>
-                                    <td height="60;" colSpan="1" width="118px">单位工程名称</td>
-                                    <td colSpan="3"> {unit}</td>
-                                    <td colSpan="1" width="118px">细班（小班）</td>
-                                    <td colSpan="1">{`${array[2]}(${array[3]})`}</td>
+                                    <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
+                                    <td colSpan='3'> {unit}</td>
+                                    <td colSpan='1' width='118px'>细班（小班）</td>
+                                    <td colSpan='1'>{`${array[2]}(${array[3]})`}</td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" align="center">施工单位</td>
-                                    <td colSpan="3">中国交建集团</td>
+                                    <td height='60;' align='center'>施工单位</td>
+                                    <td colSpan='3'>中国交建集团</td>
                                     <td >项目经理</td>
                                     <td >王伟</td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" align="center">施工员</td>
-                                    <td colSpan="1">{shigong}</td>
+                                    <td height='60;' align='center'>施工员</td>
+                                    <td colSpan='1'>{shigong}</td>
                                     <td>测量员</td>
-                                    <td colSpan="1">100</td>
+                                    <td colSpan='1'>100</td>
                                     <td>设计面积</td>
                                     <td >{detail.DesignArea}</td>
                                 </tr>
                                 <tr>
-                                    <td height="60;" align="center">实际面积</td>
+                                    <td height='60;' align='center'>实际面积</td>
                                     <td>{detail.ActualArea}</td>
                                     <td >误差值及备注</td>
-                                    <td colSpan="3">/</td>
+                                    <td colSpan='3'>/</td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>
-                                    <td colSpan="5"> 《雄安新区造林工作手册》</td>
+                                    <td colSpan='5'> 《雄安新区造林工作手册》</td>
                                 </tr>
                                 <tr>
-                                    <td rowspan="3">序号</td>
+                                    <td colSpan='3'>序号</td>
                                     <tr>
-                                        <td colSpan="5">
+                                        <td colSpan='5'>
                                             测量坐标
-				                        </td>
+                                        </td>
                                         <tr>
-                                            <td colSpan="2">X</td>
-                                            <td colSpan="3">Y</td>
+                                            <td colSpan='2'>X</td>
+                                            <td colSpan='3'>Y</td>
                                         </tr>
                                     </tr>
                                 </tr>
                                 <tr>
                                     <td className='hei110' >施工单位质量专检结果</td>
-                                    <td colSpan="5">
+                                    <td colSpan='5'>
                                         <div>
                                             <p>项目专业质量检查员：</p>
                                             <p className='marL300'>年</p>
@@ -97,7 +98,7 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td className='hei110' >监理（建设）单位验收记录</td>
-                                    <td colSpan="5">
+                                    <td colSpan='5'>
                                         <div>
                                             <p>监理工程师：</p><p>{jianli}</p>
                                             <p className='marL300'>年</p>

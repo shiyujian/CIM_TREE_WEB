@@ -245,65 +245,65 @@ export const getSmallThinNameByThinClassData = (thinClass, thinClassTree) => {
 // 森林大数据-数字化验收 根据验收类型的ID获取验收类型名称
 export const getYsTypeByID = (ID) => {
     if (!ID) {
-        return ''
+        return '';
     }
     switch (ID) {
         case 1:
-            return '土地整理'
+            return '土地整理';
         case 2:
-            return '放样点穴'
+            return '放样点穴';
         case 3:
-            return '挖穴'
+            return '挖穴';
         case 4:
-            return '苗木质量'
+            return '苗木质量';
         case 5:
-            return '土球质量'
+            return '土球质量';
         case 6:
-            return '苗木栽植'
+            return '苗木栽植';
         case 7:
-            return '苗木支架'
+            return '苗木支架';
         case 8:
-            return '苗木浇水'
+            return '苗木浇水';
         case 9:
-            return '大数据'
+            return '大数据';
         case 10:
-            return '造林面积'
+            return '造林面积';
         case 11:
-            return '总体'
+            return '总体';
         default:
-            return ''
+            return '';
     }
 };
 
 // 森林大数据-数字化验收 根据验收状态的ID获取验收状态名称
 export const getStatusByID = (ID) => {
     if (!ID) {
-        return ''
+        return '';
     }
     switch (ID) {
         case 0:
-            return '未申请'
+            return '未申请';
         case 1:
-            return '待验收'
+            return '待验收';
         case 2:
-            return '完成'
+            return '完成';
         case 3:
-            return '退回'
+            return '退回';
         case 4:
-            return '暂存'
+            return '暂存';
         default:
-            return ''
+            return '';
     }
 };
 
 // wkt 转换 json数据
 export const wktToJson = (wkt) => {
-    let coords = []
-    debugger
+    let coords = [];
     if (wkt.indexOf('MULTIPOLYGON') !== -1) {
         let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
         let arr = data.split('),(');
         arr.map((a, index) => {
+            let str = '';
             if (index === 0) {
                 str = a.slice(a.indexOf('(') + 1, a.length - 1);
             } else if (index === arr.length - 1) {
@@ -314,7 +314,7 @@ export const wktToJson = (wkt) => {
             coords.push(str);
         });
     } else if (wkt.indexOf('POLYGON') !== -1) {
-        str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+        let str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
         coords.push(str);
     } else if (wkt.indexOf('LINESTRING') !== -1) {
         let wktStr = wkt.split('(')[1].split(')')[0];
@@ -323,11 +323,9 @@ export const wktToJson = (wkt) => {
             let obj = {
                 X: parseFloat(item.split(' ')[0]),
                 Y: parseFloat(item.split(' ')[1])
-            }
-            coords.push(obj)
-        })
+            };
+            coords.push(obj);
+        });
     }
     return coords;
 };
-
-

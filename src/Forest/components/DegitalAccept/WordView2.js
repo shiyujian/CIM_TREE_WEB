@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { Spin, Modal, Row, Col } from 'antd';
-import './index.less'
+import { Spin, Modal } from 'antd';
+import './index.less';
 import {
-    FOREST_GIS_API,
-    FOREST_GIS_TREETYPE_API,
     WMSTILELAYERURL,
     TILEURLS,
     INITLEAFLET_API
@@ -16,14 +14,13 @@ import {
 import {
     wktToJson
 } from '_platform/gisAuth';
-/ * turf */
 export default class WordView1 extends Component {
     static propTypes = {};
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             loading: false,
-            areaLayerList: [], // 
+            areaLayerList: []
         };
         this.map = null;
     }
@@ -35,12 +32,13 @@ export default class WordView1 extends Component {
                 getCustomViewByUserID
             },
             sscction,
-            tinclass
+            tinclass,
+            detail = {}
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         await getCustomViewByUserID({id: user.id});
         await this.initMap();
-        this._addAreaLayer(tinclass,sscction);
+        this._addAreaLayer(tinclass, sscction);
         detail.Geom && this.area(wktToJson(detail.Geom));
     }
 
@@ -48,8 +46,8 @@ export default class WordView1 extends Component {
         this.map = null;
     }
 
-    onOk() {
-        this.props.onPressOk(2)
+    onOk () {
+        this.props.onPressOk(2);
     }
 
     /* 初始化地图 */
@@ -100,7 +98,6 @@ export default class WordView1 extends Component {
         const {
             actions: { getTreearea }
         } = this.props;
-        console.log(eventKey)
         try {
             let coords = await handleAreaLayerData(eventKey, getTreearea,section);
             if (coords && coords instanceof Array && coords.length > 0) {
@@ -151,62 +148,60 @@ export default class WordView1 extends Component {
 
     area (points) {
         let lineLayer = new L.featureGroup().addTo(this.map);
-		if (points.length > 1) {
-			var latlngs = [];
-			var lnglats = [];
+        if (points.length > 1) {
+            var latlngs = [];
+            var lnglats = [];
 
-			for (var i = 0; i < points.length; i++) {
-				latlngs.push([points[i].Y, points[i].X]);
-				lnglats.push([points[i].X, points[i].Y]);
-			}
-			var beginIcon = new L.icon({
-				iconUrl: './img/start.png',
-				iconSize: [26, 28],
-				iconAnchor: [13, 28]
-			});
-			var endIcon = new L.icon({
-				iconUrl: './img/end.png',
-				iconSize: [26, 28],
-				iconAnchor: [13, 28]
-			});
-			var start = new L.marker(latlngs[0], {
-				icon: beginIcon,
-				zIndexOffset: -50
-			}).addTo(lineLayer);
-			var end = new L.marker(latlngs[latlngs.length - 1], {
-				icon: endIcon,
-				zIndexOffset: -50
-			}).addTo(lineLayer);
-			this.map.fitBounds(lineLayer.getBounds());
+            for (var i = 0; i < points.length; i++) {
+                latlngs.push([points[i].Y, points[i].X]);
+                lnglats.push([points[i].X, points[i].Y]);
+            }
+            var beginIcon = new L.icon({
+                iconUrl: './img/start.png',
+                iconSize: [26, 28],
+                iconAnchor: [13, 28]
+            });
+            var endIcon = new L.icon({
+                iconUrl: './img/end.png',
+                iconSize: [26, 28],
+                iconAnchor: [13, 28]
+            });
+            var start = new L.marker(latlngs[0], {
+                icon: beginIcon,
+                zIndexOffset: -50
+            }).addTo(lineLayer);
+            var end = new L.marker(latlngs[latlngs.length - 1], {
+                icon: endIcon,
+                zIndexOffset: -50
+            }).addTo(lineLayer);
+            this.map.fitBounds(lineLayer.getBounds());
 
-			var linestring1 = turf.lineString(lnglats, { name: 'line 1' });
-			var buffered = turf.buffer(linestring1, 0.005, { units: 'kilometers' });
-			L.geoJSON(buffered, {
-				style: function (feature) {
-					return {
-						color: 'red'
-					};
-				}
-			}).addTo(lineLayer);
-			// var area = turf.area(buffered.geometry)
-			// return area
-		}
-	}
+            var linestring1 = turf.lineString(lnglats, { name: 'line 1' });
+            var buffered = turf.buffer(linestring1, 0.005, { units: 'kilometers' });
+            L.geoJSON(buffered, {
+                style: function (feature) {
+                    return {
+                        color: 'red'
+                    };
+                }
+            }).addTo(lineLayer);
+        }
+    }
 
-    render() {
+    render () {
         const { detail } = this.props;
-        let array = ['', '', '', '']
+        let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
         }
-        let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
-        let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
-        let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
+        let unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
+        let jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
+        let shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
         let xbsjl = detail.DesignNum; // 细班设计量
         let xbsjmj = detail.DesignArea; // 细班设计面积
         let designmd = 1; // 设计密度
         if (xbsjmj !== 0) {
-            designmd = xbsjl/xbsjmj;
+            designmd = xbsjl / xbsjmj;
         }
         let fdsl = detail.LoftingNum; // 放点数量
         let ydmj = detail.SampleTapeArea; // 样带面积
@@ -215,14 +210,13 @@ export default class WordView1 extends Component {
         let cjsl = detail.CheckNum; // 抽检数量
         let middle = 0;
         if (ydmj !== 0) {
-            truemd = fdsl/ydmj;
-            middle = cjsl/ydmj;
+            truemd = fdsl / ydmj;
+            middle = cjsl / ydmj;
         }
         qulityok = 1 - middle;
-        qulityok = qulityok/designmd
-        qulityok = qulityok * 100
+        qulityok = qulityok / designmd;
+        qulityok = qulityok * 100;
         qulityok = 100 - qulityok;
-        
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
@@ -237,72 +231,71 @@ export default class WordView1 extends Component {
                     <div className='trrdd'>
                         <table style={{ border: 1 }}>
                             <tbody>
-                                <table border="1">
+                                <table border='1'>
                                     <tr>
-                                        <td className='hei60' colSpan="1" width="118px">单位工程名称</td>
-                                        <td colSpan="3"> {unit}</td>
-                                        <td colSpan="1" width="118px">细班（小班）</td>
-                                        <td colSpan="1">{`${array[2]}(${array[3]})`}</td>
+                                        <td className='hei60' colSpan='1' width='118px'>单位工程名称</td>
+                                        <td colSpan='3'> {unit}</td>
+                                        <td colSpan='1' width='118px'>细班（小班）</td>
+                                        <td colSpan='1'>{`${array[2]}(${array[3]})`}</td>
                                     </tr>
                                     <tr>
-                                        <td className='hei60' align="center">施工单位</td>
-                                        <td colSpan="3">中国交建集团</td>
+                                        <td className='hei60' align='center'>施工单位</td>
+                                        <td colSpan='3'>中国交建集团</td>
                                         <td >项目经理</td>
                                         <td >王伟</td>
                                     </tr>
                                     <tr>
-                                        <td className='hei60' align="center">施工员</td>
-                                        <td colSpan="1">{shigong}</td>
+                                        <td className='hei60' align='center'>施工员</td>
+                                        <td colSpan='1'>{shigong}</td>
                                         <td>设计数量</td>
-                                        <td colSpan="1">{detail.DesignNum}</td>
+                                        <td colSpan='1'>{detail.DesignNum}</td>
                                         <td>实际数量</td>
                                         <td >{detail.ActualNum}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' >施工执行标准名称及编号</td>
-                                        <td colSpan="5"> 《雄安新区造林工作手册》</td>
+                                        <td colSpan='5'> 《雄安新区造林工作手册》</td>
                                     </tr>
                                     <tr>
-                                        <td colSpan="6" height="200">
+                                        <td colSpan='6' height='200'>
                                             验收要点：以细班或小班为单位，对放样点穴进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带内的点穴精准度、密度情况进行打分。
                                             ①放点精准，抽检密度与设计密度的误差在±10%之内，视为合格，计90分以上，通过检验；
                                             ②放点不准，抽检密度与设计密度的误差超出±10%，即为不合格，需整改。
                                             放样点穴合格率=100-|（1-（抽检数量/样带面积）/设计密度）|*100
-    
-			                            </td>
+                                        </td>
                                     </tr>
                                     <tr>
-                                    <td style={{ height: 300 }} colSpan = '6'>
-                                    <div
-                                        id='mapidd'
-                                        style={{
-                                            height: 300,
-                                            borderLeft: '1px solid #ccc'
-                                        }}
-                                    />
-                                    </td>
+                                        <td style={{ height: 300 }} colSpan='6'>
+                                            <div
+                                                id='mapidd'
+                                                style={{
+                                                    height: 300,
+                                                    borderLeft: '1px solid #ccc'
+                                                }}
+                                            />
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <td className='hei60' colSpan="1" width="118px">设计面积</td>
-                                        <td colSpan="2">{detail.DesignArea}</td>
-                                        <td colSpan="1" width="118px">设计密度</td>
-                                        <td colSpan="2">{designmd}</td>
+                                        <td className='hei60' colSpan='1' width='118px'>设计面积</td>
+                                        <td colSpan='2'>{detail.DesignArea}</td>
+                                        <td colSpan='1' width='118px'>设计密度</td>
+                                        <td colSpan='2'>{designmd}</td>
                                     </tr>
                                     <tr>
-                                        <td className='hei60' colSpan="1" width="118px">样带面积</td>
-                                        <td colSpan="2">{detail.SampleTapeArea}</td>
-                                        <td colSpan="1" width="118px">放点数量</td>
-                                        <td colSpan="2">{detail.LoftingNum}</td>
+                                        <td className='hei60' colSpan='1' width='118px'>样带面积</td>
+                                        <td colSpan='2'>{detail.SampleTapeArea}</td>
+                                        <td colSpan='1' width='118px'>放点数量</td>
+                                        <td colSpan='2'>{detail.LoftingNum}</td>
                                     </tr>
                                     <tr>
-                                        <td className='hei60' colSpan="1" width="118px">实际密度</td>
-                                        <td colSpan="2">{truemd}</td>
-                                        <td colSpan="1" width="118px">合格率</td>
-                                        <td colSpan="2">{qulityok}</td>
+                                        <td className='hei60' colSpan='1' width='118px'>实际密度</td>
+                                        <td colSpan='2'>{truemd}</td>
+                                        <td colSpan='1' width='118px'>合格率</td>
+                                        <td colSpan='2'>{qulityok}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei110' >施工单位质量专检结果</td>
-                                        <td colSpan="5">
+                                        <td colSpan='5'>
                                             <div>
                                                 <p>项目专业质量检查员：</p>
                                                 <p className='marL300'>年</p>
@@ -313,7 +306,7 @@ export default class WordView1 extends Component {
                                     </tr>
                                     <tr>
                                         <td className='hei110' >监理（建设）单位验收记录</td>
-                                        <td colSpan="5">
+                                        <td colSpan='5'>
                                             <div>
                                                 <p>监理工程师：</p><p>{jianli}</p>
                                                 <p className='marL300'>年</p>

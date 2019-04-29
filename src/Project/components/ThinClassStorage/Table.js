@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Upload, Input, Icon, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
+import { Upload, Input, Icon, Button, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { getUser, formItemLayout } from '_platform/auth';
 import {
     fillAreaColor,
-    getCoordsArr,
-    getPolygonByCoordArr
+    getNewCoordsArr,
+    getNewPolygonByCoordArr
 } from '../auth';
 import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
 const FormItem = Form.Item;
-const Option = Select.Option;
 window.config = window.config || {};
 class Tablelevel extends Component {
     constructor (props) {
@@ -72,18 +71,6 @@ class Tablelevel extends Component {
                 title: '设计量',
                 dataIndex: 'Num'
             }
-            // {
-            //     key: '6',
-            //     title: '操作',
-            //     dataIndex: 'action',
-            //     render: (text, record, index) => {
-            //         return (
-            //             <div>
-            //                 <a onClick={this.onEdit.bind(this, record)}>编辑</a>
-            //             </div>
-            //         );
-            //     }
-            // }
         ];
     }
     componentDidMount () {
@@ -138,7 +125,7 @@ class Tablelevel extends Component {
         const { dataList, newDataList, total, page, confirmLoading, spinning, selectKey, isSuperAdmin } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
-                console.log('定位过去');
+                console.log('定位过去', selectedRows);
                 this.onLocation(selectedRows);
             },
             onSelect: (record, selected) => {
@@ -226,18 +213,31 @@ class Tablelevel extends Component {
         );
     }
     onLocation (recordArr) {
-        console.log('定位数据', recordArr);
-        const { areaLayerList } = this.state;
+        const { areaLayerList, isSuperAdmin } = this.state;
         areaLayerList.map(item => {
             item.remove();
         });
         let coordinatesArr = []; // 多维数据
+        let selectKey = [];
+        recordArr.map(item => {
+            if (isSuperAdmin || item.Section === this.userSection) {
+                selectKey.push(item.key);
+            }
+        });
+        console.log('选中的', selectKey, recordArr);
+        this.setState({
+            selectKey
+        });
         recordArr.map(item => {
             let treearea = [];
             if (item.Geom) {
-                let coordsArr = getCoordsArr(item.Geom);
-                coordsArr.map(item => {
-                    let arr = item.split(' ');
+                let coordsArr = getNewCoordsArr(item.Geom);
+                let finalCoordsArr = [];
+                coordsArr.map(row => {
+                    finalCoordsArr.push(...row);
+                });
+                finalCoordsArr.map(row => {
+                    let arr = row.split(' ');
                     treearea.push([
                         arr[1],
                         arr[0]
@@ -313,7 +313,6 @@ class Tablelevel extends Component {
         }
     }
     handlePage (page) {
-        console.log('换页', page);
         let index = page - 1;
         if (this.state.number) {
             console.log('新数据');
@@ -423,18 +422,17 @@ class Tablelevel extends Component {
                 });
             } else if (rep.features) {
                 message.success('数据导入成功，已默认勾选可以的入库的数据');
-                console.log(rep.features, '最开始');
+                console.log(rep.features, '处理前的');
                 rep.features.map((item, index) => {
                     item.key = index;
-                    let coordsArr = getCoordsArr(item.Geom);
-                    let newCoordsArr = [];
-                    coordsArr.map(row => {
-                        newCoordsArr.push(row.slice(0, row.lastIndexOf(' ')));
-                    });
-                    item.Geom = getPolygonByCoordArr(newCoordsArr);
+                    console.log('最初的item', item);
+                    let finalCoordsArr = getNewCoordsArr(item.Geom);
+                    console.log('最终的item', finalCoordsArr);
+                    item.Geom = getNewPolygonByCoordArr(finalCoordsArr);
                 });
+                console.log(rep.features, '处理后的');
                 this.dataList = rep.features;
-                console.log('最初数据', this.dataList);
+                // 选中可以上传的
                 let selectKey = [];
                 this.dataList.map(item => {
                     if (isSuperAdmin || item.Section === this.userSection) {

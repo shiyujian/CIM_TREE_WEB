@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { Input, Button, Select, Table, Pagination, Modal, Form, message, List, InputNumber, Spin } from 'antd';
 import {
     fillAreaColor,
-    getCoordsArr,
-    handleCoordinates
+    getNewCoordsArr
 } from '../auth';
 import { formItemLayout, getUser } from '_platform/auth';
 import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
@@ -18,7 +17,7 @@ class Tablelevel extends Component {
             leftkeycode: '', // 项目
             dataList: [], // 表格数据
             isSuperAdmin: false, // 是否是超级管理员
-            selectedRowKeysList: [], // 选中的细班列表
+            selectKey: [], // 选中的细班列表
             sectionList: [], // 标段列表
             section: '', // 标段
             dataListHistory: [], // 历史数据列表
@@ -191,15 +190,12 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, isSuperAdmin, selectedRowKeysList } = this.state;
+        const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, isSuperAdmin, selectKey } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
-                this.setState({
-                    selectedRowKeysList: selectedRowKeys
-                });
                 this.onLocation(selectedRows);
             },
-            selectedRowKeys: selectedRowKeysList
+            selectedRowKeys: selectKey
         };
         return (
             <div className='table-level'>
@@ -523,7 +519,7 @@ class Tablelevel extends Component {
             if (rep.code === 200) {
                 this.setState({
                     dataList: rep.content,
-                    selectedRowKeysList: [],
+                    selectKey: [],
                     total: rep.pageinfo && rep.pageinfo.total,
                     page: rep.pageinfo && rep.pageinfo.page,
                     spinning: false
@@ -561,32 +557,41 @@ class Tablelevel extends Component {
             showModalHistory: false
         });
     }
-    onLocation (selectedRows) {
-        let { areaLayerList } = this.state;
+    onLocation (recordArr) {
+        let { areaLayerList, isSuperAdmin } = this.state;
         areaLayerList.map(item => {
             item.remove();
         });
         let coordinatesArr = []; // 多维数据[[], [], []]
-        let patternArr = []; // 图形数组['135.12 39.80,135.12 39.80', '125.12 39.80,125.12 39.80']
-        selectedRows.map(record => {
-            let temporaryWKT = record.coords;
-            if (temporaryWKT.indexOf('MULTIPOLYGON') !== -1) {
-                temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('(((') + 3, temporaryWKT.indexOf(')))'));
-                patternArr = patternArr.concat(temporaryWKT.split(')),(('));
-            } else {
-                temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('((') + 2, temporaryWKT.indexOf('))'));
-                patternArr.push(temporaryWKT);
+        let selectKey = [];
+        recordArr.map(item => {
+            if (isSuperAdmin || item.Section === this.userSection) {
+                selectKey.push(item.key);
             }
         });
-        patternArr.map(item => {
-            let coordsArr = item.split(',');
+        console.log('选中的', selectKey, recordArr);
+        this.setState({
+            selectKey
+        });
+        recordArr.map(item => {
             let treearea = [];
-            coordsArr.map(record => {
-                let arr = record.split(' ');
-                treearea.push([arr[1], arr[0]]);
-            });
+            if (item.coords) {
+                let coordsArr = getNewCoordsArr(item.coords);
+                let finalCoordsArr = [];
+                coordsArr.map(row => {
+                    finalCoordsArr.push(...row);
+                });
+                finalCoordsArr.map(row => {
+                    let arr = row.split(' ');
+                    treearea.push([
+                        arr[1],
+                        arr[0]
+                    ]);
+                });
+            }
             coordinatesArr.push(treearea);
         });
+        console.log('选中的', coordinatesArr);
         // 如果地块存在，则定位过去
         if (coordinatesArr.length !== 0) {
             let message = {

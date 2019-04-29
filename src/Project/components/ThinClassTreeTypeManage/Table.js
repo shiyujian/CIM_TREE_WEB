@@ -18,7 +18,7 @@ class Tablelevel extends Component {
             leftkeycode: '', // 项目
             dataList: [], // 表格数据
             isSuperAdmin: false, // 是否是超级管理员
-            selectedRowKeysList: [], // 选中的细班列表
+            selectKey: [], // 选中的细班列表
             sectionList: [], // 标段列表
             section: '', // 标段
             dataListHistory: [], // 历史数据列表
@@ -192,17 +192,13 @@ class Tablelevel extends Component {
         });
     }
     render () {
-        const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan, selectedRowKeysList, isSuperAdmin } = this.state;
+        const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan, selectKey, isSuperAdmin } = this.state;
         const rowSelection = {
             onChange: (selectedRowKeys, selectedRows) => {
-                this.setState({
-                    selectedRowKeysList: selectedRowKeys
-                }, () => {
-                    this.onLocation(selectedRows);
-                });
+                this.onLocation(selectedRows);
             },
             type: 'radio',
-            selectedRowKeys: selectedRowKeysList
+            selectedRowKeys: selectKey
         };
         // 子表格
         let expandedRowRender = (record) => {
@@ -591,7 +587,7 @@ class Tablelevel extends Component {
             if (rep.code === 200) {
                 this.setState({
                     dataList: rep.content,
-                    selectedRowKeysList: [],
+                    selectKey: [],
                     total: rep.pageinfo && rep.pageinfo.total,
                     page: rep.pageinfo && rep.pageinfo.page,
                     spinning: false
@@ -630,7 +626,7 @@ class Tablelevel extends Component {
         });
     }
     onLocation (selectedRows) {
-        let { areaLayerList } = this.state;
+        let { areaLayerList, isSuperAdmin } = this.state;
         areaLayerList.map(item => {
             item.remove();
         });
