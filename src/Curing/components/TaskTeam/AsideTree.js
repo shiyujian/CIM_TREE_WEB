@@ -336,9 +336,14 @@ class AsideTree extends Component {
                         teamVisible: false
                     });
                     this._docList(this.section);
+                } else if (curinggroup && curinggroup.msg && curinggroup.msg === '同一个标段中存在相同名称的班组!') {
+                    Notification.error({
+                        message: '同一个标段中存在相同名称的班组,请修改名称重新创建',
+                        dutation: 3
+                    });
                 } else {
                     Notification.error({
-                        message: '新增班组失败',
+                        message: '创建班组失败',
                         dutation: 3
                     });
                 }

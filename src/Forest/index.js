@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-25 10:51:59
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-04 15:55:57
+ * @Last Modified time: 2019-04-29 14:52:04
  */
 /**
  *
@@ -67,6 +67,7 @@ export default class ForestContainer extends Component {
             EnterStrengthAnalysi = null,
             PlantStrengthAnalysi = null,
             DegitalAccept = null,
+            TreeDataClear = null
         } = this.state || {};
         return (
             <Body>
@@ -219,111 +220,16 @@ export default class ForestContainer extends Component {
                             component={DegitalAccept}
                         />
                     )}
+                    {TreeDataClear && (
+                        <Route
+                            path='/forest/treedataclear'
+                            component={TreeDataClear}
+                        />
+                    )}
                 </Main>
             </Body>
         );
     }
-
-    // static menus = [
-    //     {
-    //         key: 'info',
-    //         id: 'FOREST.INFO',
-    //         name: '苗木大数据',
-    //         children: [
-    //             {
-    //                 key: 'nursoverallinfo',
-    //                 id: 'FOREST.NURSOVERALLINFO',
-    //                 path: '/forest/nursoverallinfo',
-    //                 name: '苗木综合信息'
-    //             },
-    //             {
-    //                 key: 'nursmeasureinfo',
-    //                 id: 'FOREST.NURSMEASUREINFO',
-    //                 path: '/forest/nursmeasureinfo',
-    //                 name: '苗圃测量信息'
-    //             },
-    //             {
-    //                 key: 'carpackage',
-    //                 id: 'FOREST.CARPACKAGE',
-    //                 path: '/forest/carpackage',
-    //                 name: '车辆打包信息'
-    //             },
-    //             {
-    //                 key: 'locmeasureinfo',
-    //                 id: 'FOREST.LOCMEASUREINFO',
-    //                 path: '/forest/locmeasureinfo',
-    //                 name: '现场测量信息'
-    //             },
-    //             {
-    //                 key: 'supervisorinfo',
-    //                 id: 'FOREST.SUPERVISORINFO',
-    //                 path: '/forest/supervisorinfo',
-    //                 name: '监理抽查信息'
-    //             },
-    //             {
-    //                 key: 'ownerinfo',
-    //                 id: 'FOREST.OWNERINFO',
-    //                 path: '/forest/checkerinfo',
-    //                 name: '业主抽查信息'
-    //             },
-    //             // {
-    //             //     key: 'contrastinfo',
-    //             //     id: 'FOREST.CONTRASTINFO',
-    //             //     path: '/forest/contrastinfo',
-    //             //     name: '苗木对比信息'
-    //             // },
-    //             {
-    //                 key: 'faithinfo',
-    //                 id: 'FOREST.FAITHINFO',
-    //                 path: '/forest/faithinfo',
-    //                 name: '供应商诚信信息'
-    //             },
-    //             {
-    //                 key: 'seedlingschange',
-    //                 id: 'FOREST.SEEDLINGSCHANGE',
-    //                 path: '/forest/seedlingschange',
-    //                 name: '苗木信息修改'
-    //             },
-    //             {
-    //                 key: 'curinginfo',
-    //                 id: 'FOREST.CURINGINFO',
-    //                 path: '/forest/curinginfo',
-    //                 name: '养护信息'
-    //             },
-    //             {
-    //                 key: 'treeadoptinfo',
-    //                 id: 'FOREST.TREEADOPTINFO',
-    //                 path: '/forest/treeadoptinfo',
-    //                 name: '苗木状态信息'
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         key: 'import',
-    //         id: 'FOREST.IMPORT',
-    //         name: '定位数据信息',
-    //         children: [
-    //             {
-    //                 key: 'dataimport',
-    //                 id: 'FOREST.DATAIMPORT',
-    //                 path: '/forest/dataimport',
-    //                 name: '定位数据导入'
-    //             },
-    //             {
-    //                 key: 'dataexport',
-    //                 id: 'FOREST.DATAEXPORT',
-    //                 path: '/forest/dataexport',
-    //                 name: '定位数据导出'
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         key: 'datastatis',
-    //         id: 'FOREST.DATASTATIS',
-    //         path: '/forest/datastatis',
-    //         name: '数据统计'
-    //     }
-    // ];
 
     static menus = [
         {
@@ -443,6 +349,12 @@ export default class ForestContainer extends Component {
                     name: '苗木信息修改'
                 },
                 {
+                    key: 'treedataclear',
+                    id: 'FOREST.TREEDATACLEAR',
+                    path: '/forest/treedataclear',
+                    name: '苗木信息删除'
+                },
+                {
                     key: 'dataimport',
                     id: 'FOREST.DATAIMPORT',
                     path: '/forest/dataimport',
@@ -463,5 +375,5 @@ export default class ForestContainer extends Component {
             name: '数字化验收'
         }
     ];
-    static defaultOpenKeys = ['statis'];
+    static defaultOpenKeys = [''];
 }
