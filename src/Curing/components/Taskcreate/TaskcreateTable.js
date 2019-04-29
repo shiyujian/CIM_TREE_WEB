@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     Button, Collapse, Notification, Spin, Checkbox
 } from 'antd';
-import {FOREST_GIS_API, TILEURLS, INITLEAFLET_API} from '_platform/api';
+import {FOREST_GIS_API, TILEURLS, INITLEAFLET_API, WMSTILELAYERURL} from '_platform/api';
 import AreaTreeCreate from '../AreaTreeCreate';
 import TaskCheckTree from '../TaskCheckTree';
 import {
@@ -171,6 +171,13 @@ export default class TaskCreateTable extends Component {
         L.control.zoom({ position: 'bottomright' }).addTo(this.map);
         // 加载基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {
+            subdomains: [1, 2, 3],
+            minZoom: 1,
+            maxZoom: 17,
+            storagetype: 0
+        }).addTo(this.map);
+        // 地图上边的地点的名称
+        L.tileLayer(WMSTILELAYERURL, {
             subdomains: [1, 2, 3],
             minZoom: 1,
             maxZoom: 17,
