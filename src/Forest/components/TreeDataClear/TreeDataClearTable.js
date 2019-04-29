@@ -1229,29 +1229,37 @@ export default class TreeDataClearTable extends Component {
             sxm
         } = this.state;
         try {
-            this.setState({
-                loading: true
-            });
-            // 清除类型 0:清除苗木  1：清除现场测量  2：清除苗木、现场测量  3：清除苗木、现场测量、位置
-            let postData = {
-                sxm: sxm,
-                cleartype: 3
-            };
-            console.log('postData', postData);
-            let data = await clearTreeData({}, postData);
-            console.log('data', data);
-            this.setState({
-                loading: true
-            });
-            if (data && data.code && data.code === 1) {
-                Notification.success({
-                    message: '删除信息成功',
-                    duration: 3
+            let user = getUser();
+            if (user && user.username === 'admin') {
+                this.setState({
+                    loading: true
                 });
-                await this.resetinput();
+                // 清除类型 0:清除苗木  1：清除现场测量  2：清除苗木、现场测量  3：清除苗木、现场测量、位置
+                let postData = {
+                    sxm: sxm,
+                    cleartype: 3
+                };
+                console.log('postData', postData);
+                let data = await clearTreeData({}, postData);
+                console.log('data', data);
+                this.setState({
+                    loading: true
+                });
+                if (data && data.code && data.code === 1) {
+                    Notification.success({
+                        message: '删除信息成功',
+                        duration: 3
+                    });
+                    await this.resetinput();
+                } else {
+                    Notification.error({
+                        message: '删除信息失败',
+                        duration: 3
+                    });
+                }
             } else {
                 Notification.error({
-                    message: '删除信息失败',
+                    message: '非管理员不得删除',
                     duration: 3
                 });
             }
