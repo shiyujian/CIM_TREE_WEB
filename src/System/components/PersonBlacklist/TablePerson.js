@@ -704,8 +704,9 @@ class TablePerson extends Component {
             this.setState({ loading: true });
             let blackPostData = {
                 id: record.children[0].id,
-                is_black: false,
-                black_remark: ''
+                is_black: 0,
+                black_remark: '',
+                change_all: true
             };
             let rst = await postForestUserBlackList({}, blackPostData);
             console.log('rst111111111111', rst);

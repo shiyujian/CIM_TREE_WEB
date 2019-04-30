@@ -127,19 +127,20 @@ class Users extends Component {
             title: '状态',
             key: '9',
             dataIndex: 'is_active',
-            render: text => {
-                return text ? '已审核' : '未审核';
+            render: (text, record) => {
+                if (record.is_active) {
+                    return '已审核';
+                } else if (record.account.is_black === 0) {
+                    return '已审核';
+                } else {
+                    return '未审核';
+                }
             }
         },
         {
             title: '操作',
             key: '10',
             render: (text, record) => {
-                const {
-                    sidebar: {
-                        node = {}
-                    } = {}
-                } = this.props;
                 const userc = JSON.parse(
                     window.localStorage.getItem('QH_USER_DATA')
                 );
@@ -156,97 +157,78 @@ class Users extends Component {
                         userIsProjectDocument = true;
                     }
                 });
-
-                let editVisible = true;
-                if (userc && userc.username !== 'admin' && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
-                    editVisible = false;
-                }
-                let arr = [
-                    <a
-                        onClick={this.edit.bind(this, record)}
-                        key={1}
-                        style={{ marginRight: '.5em' }}
-                    >
-                        编辑
-                    </a>,
-                    <Popconfirm
-                        title='是否真的要删除用户?'
-                        key={2}
-                        onConfirm={this.del.bind(this, record)}
-                        okText='是'
-                        cancelText='否'
-                    >
-                        <a>删除</a>
-                    </Popconfirm>
-                ];
-                if (userc.is_superuser === true) {
-                    if (record.is_active === true) {
-                        arr.push(<a
-                            key={3}
-                            style={{marginLeft: '.5em'}}
-                            onClick={this.disable.bind(this, record)}
-                        >
-                            禁用
-                        </a>);
+                let arr = [];
+                if (userc && userc.username && userc.username === 'admin') {
+                    if (record.is_active) {
+                        if (record.account.is_black === 0) {
+                            arr.push(<a
+                                key={3}
+                                style={{marginRight: '.5em'}}
+                                onClick={this.handleUserDisabled.bind(this, record)}
+                            >
+                                禁用
+                            </a>);
+                        }
                     } else {
-                        arr.push(<a
-                            key={3}
-                            style={{ marginLeft: '.5em', color: 'red' }}
-                            onClick={this.disable.bind(this, record)}
+                        if (record.account.is_black === 0) {
+                            arr.push(<a
+                                key={4}
+                                style={{marginRight: '.5em'}}
+                                onClick={this.toAudit.bind(this, record)}
+                            >
+                                审核
+                            </a>);
+                        } else if (record.account.is_black === 2) {
+                            arr.push(<a
+                                key={3}
+                                style={{ marginRight: '.5em', color: 'red' }}
+                                onClick={this.handleUserDisabled.bind(this, record)}
+                            >
+                                启用
+                            </a>);
+                        }
+                    };
+                    arr.push(
+                        <a
+                            onClick={this.edit.bind(this, record)}
+                            key={1}
+                            style={{ marginRight: '.5em' }}
                         >
-                            启用
-                        </a>, <a
+                            编辑
+                        </a>
+                    );
+                    arr.push(
+                        <Popconfirm
+                            title='是否真的要删除用户?'
+                            key={2}
+                            onConfirm={this.del.bind(this, record)}
+                            okText='是'
+                            cancelText='否'
+                        >
+                            <a>删除</a>
+                        </Popconfirm>
+                    );
+                } else if (userIsProjectDocument && userIsSupplierDocument) {
+                    if (!record.is_active && record.account.is_black === 0) {
+                        arr.push(<a
                             key={4}
-                            style={{marginLeft: '.5em'}}
+                            style={{marginRight: '.5em'}}
                             onClick={this.toAudit.bind(this, record)}
                         >
                             审核
                         </a>);
                     }
+                    arr.push(
+                        <a
+                            onClick={this.edit.bind(this, record)}
+                            key={1}
+                            style={{ marginRight: '.5em' }}
+                        >
+                            编辑
+                        </a>
+                    );
                 } else {
-                    if (editVisible) {
-                        arr = [
-                            <a
-                                onClick={this.edit.bind(this, record)}
-                                key={4}
-                                style={{ marginRight: '.5em' }}
-                            >
-                                编辑
-                            </a>
-                        ];
-                    } else {
-                        arr = ['/'];
-                    }
-                }
-                // 供应商文书权限 // 项目相关文书，施工，监理，业主文书权限
-                if (userIsSupplierDocument || userIsProjectDocument) {
-                    if (record.is_active) {
-                        arr = [
-                            <a
-                                onClick={this.edit.bind(this, record)}
-                                key={1}
-                                style={{ marginRight: '.5em' }}
-                            >
-                                编辑
-                            </a>
-                        ];
-                    } else {
-                        arr = [
-                            <a
-                                onClick={this.edit.bind(this, record)}
-                                key={1}
-                                style={{ marginRight: '.5em' }}
-                            >
-                                编辑
-                            </a>, <a
-                                key={2}
-                                style={{marginLeft: '.5em'}}
-                                onClick={this.toAudit.bind(this, record)}
-                            >
-                                审核
-                            </a>
-                        ];
-                    }
+                    arr.push('/');
                 }
                 return arr;
             }
@@ -373,6 +355,7 @@ class Users extends Component {
                 sm: { span: 14 }
             }
         };
+        console.log('dataList', dataList);
         return permissionStatus ? (
             <div>
                 <Spin
@@ -791,41 +774,46 @@ class Users extends Component {
         });
     }
     // 禁用或启用
-    disable = async (user, event) => {
+    handleUserDisabled = async (user, event) => {
         const {
-            sidebar: { node } = {},
-            actions: { postUserForbidden }
+            actions: {
+                postForestUserBlackDisabled
+            },
+            getTablePages
         } = this.props;
-        let actives;
-        if (user.is_black !== 1) {
-            if (user.is_active === true) {
-                user.is_active = false;
-                actives = false;
-            } else {
-                user.is_active = true;
-                actives = true;
+        try {
+            let isBlack = 0;
+            let changeName = '';
+            if (user.account.is_black === 1) {
+                message.warn('用户已加入黑名单,不可启用');
+                return;
+            } else if (user.account.is_black === 2) {
+                // 当前为禁用状态，改为启用
+                isBlack = 0;
+                changeName = '启用';
+            } else if (user.account.is_black === 0) {
+                // 当前为启用状态，改为禁用
+                isBlack = 2;
+                changeName = '禁用';
             }
-        } else {
-            message.warn('用户已加入黑名单,不可启用');
-            return;
+            let postData = {
+                id: user.id,
+                is_black: isBlack,
+                black_remark: '',
+                change_all: false
+            };
+            let data = await postForestUserBlackDisabled({}, postData);
+            if (data && data.code && data.code === 1) {
+                message.success(`用户${changeName}成功`);
+                const pager = { ...getTablePages };
+                await this.search(pager.current || 1);
+            } else {
+                message.error(`用户${changeName}失败`);
+            }
+            console.log('data', data);
+        } catch (e) {
+            console.log('handleUserDisabled', e);
         }
-        let groupe = [];
-        for (let j = 0; j < user.groups.length; j++) {
-            const element = user.groups[j];
-            groupe.push(element.id);
-        }
-        let postData = {
-            id: user.id,
-            is_active: actives
-        };
-        let data = await postUserForbidden({}, postData);
-        if (data && data.code && data.code === 1) {
-            message.success('用户禁用成功');
-        } else {
-            message.error('用户禁用失败');
-        }
-        console.log('data', data);
-        await this.forceUpdate();
     }
     // 用户编辑按钮
     edit (user, event) {

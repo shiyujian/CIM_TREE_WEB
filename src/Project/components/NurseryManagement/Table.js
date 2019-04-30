@@ -572,8 +572,9 @@ class Tablelevel extends Component {
                         if (user && user.account && user.account.id_num && !user.account.is_black && userIDNumList.indexOf(user.account.id_num) === -1) {
                             let blackPostData = {
                                 id: user.id,
-                                is_black: true,
-                                black_remark: `苗圃基地${nursery.NurseryName}: ${values.BlackInfo}`
+                                is_black: 1,
+                                black_remark: `苗圃基地${nursery.NurseryName}: ${values.BlackInfo}`,
+                                change_all: true
                             };
                             blackPostRequestList.push(postForestUserBlackList({}, blackPostData));
                             userIDNumList.push(user.account.id_num);

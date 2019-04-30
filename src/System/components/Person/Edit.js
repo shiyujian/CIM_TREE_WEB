@@ -1147,8 +1147,9 @@ class Edit extends Component {
                         // await putUserBlackList({ userID: addition.id }, blackPostData);
                         let blackPostData = {
                             id: addition.id,
-                            is_black: true,
-                            black_remark: addition.black_remark
+                            is_black: 1,
+                            black_remark: addition.black_remark,
+                            change_all: true
                         };
                         let blackData = await postForestUserBlackList({}, blackPostData);
                         if (blackData && blackData.code && blackData.code === 1) {
