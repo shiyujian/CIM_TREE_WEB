@@ -208,7 +208,7 @@ class Users extends Component {
                             <a>删除</a>
                         </Popconfirm>
                     );
-                } else if (userIsProjectDocument && userIsSupplierDocument) {
+                } else if (userIsProjectDocument || userIsSupplierDocument) {
                     if (!record.is_active && record.account.is_black === 0) {
                         arr.push(<a
                             key={4}
