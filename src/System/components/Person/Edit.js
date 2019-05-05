@@ -1139,12 +1139,6 @@ class Edit extends Component {
                 if (!err) {
                     // 拉黑处理
                     if (isBlackChecked) {
-                        // let blackPostData = {
-                        //     is_black: isBlackChecked,
-                        //     change_all: true,
-                        //     black_remark: addition.black_remark
-                        // };
-                        // await putUserBlackList({ userID: addition.id }, blackPostData);
                         let blackPostData = {
                             id: addition.id,
                             is_black: 1,
