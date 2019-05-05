@@ -131,9 +131,9 @@ class Users extends Component {
                 if (record.is_active) {
                     return '已审核';
                 } else if (record.account.is_black === 0) {
-                    return '已审核';
-                } else {
                     return '未审核';
+                } else {
+                    return '已审核';
                 }
             }
         },
