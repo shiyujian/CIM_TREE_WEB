@@ -313,7 +313,7 @@ class Users extends Component {
     }
     // 设置拉入黑名单的背景颜色
     setBlackListColor (record, i) {
-        if (record && record.account && (record.account.is_black === 1 || record.is_black === true)) {
+        if (record && record.account && (record.account.is_black === 1)) {
             return 'background';
         } else {
             return '';
@@ -817,7 +817,7 @@ class Users extends Component {
     }
     // 用户编辑按钮
     edit (user, event) {
-        if (user.is_black === 1 || user.is_black === true) {
+        if (user.account.is_black === 1) {
             message.warn('用户已加入黑名单,不可编辑');
             return;
         }

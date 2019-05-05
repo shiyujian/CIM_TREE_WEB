@@ -383,8 +383,11 @@ class TablePerson extends Component {
                 key: 'Edit',
                 render: record => {
                     if (record.id) {
+                        // return (
+                        //     <a onClick={this.edits.bind(this, record)}>查看</a>
+                        // );
                         return (
-                            <a onClick={this.edits.bind(this, record)}>查看</a>
+                            '/'
                         );
                     } else {
                         return (
@@ -478,12 +481,12 @@ class TablePerson extends Component {
             </div>
         );
     }
-    edits (record) {
+    edits = async (record) => {
         const {
             actions: { ModifyVisible, setModifyPer }
         } = this.props;
-        ModifyVisible(true);
-        setModifyPer(record);
+        await setModifyPer(record);
+        await ModifyVisible(true);
     }
     async changePage (obj) {
         const {
