@@ -777,7 +777,8 @@ class Users extends Component {
     handleUserDisabled = async (user, event) => {
         const {
             actions: {
-                postForestUserBlackDisabled
+                postForestUserBlackDisabled,
+                putUserBlackList
             },
             getTablePages
         } = this.props;
@@ -796,21 +797,34 @@ class Users extends Component {
                 isBlack = 2;
                 changeName = '禁用';
             }
+            // let postData = {
+            //     id: user.id,
+            //     is_black: isBlack,
+            //     black_remark: '',
+            //     change_all: false
+            // };
             let postData = {
-                id: user.id,
                 is_black: isBlack,
-                black_remark: '',
-                change_all: false
+                black_remark: ''
             };
-            let data = await postForestUserBlackDisabled({}, postData);
-            if (data && data.code && data.code === 1) {
+            let data = await putUserBlackList({userID: user.id}, postData);
+            if (data && data.id) {
                 message.success(`用户${changeName}成功`);
                 const pager = { ...getTablePages };
                 await this.search(pager.current || 1);
             } else {
                 message.error(`用户${changeName}失败`);
             }
-            console.log('data', data);
+            // // let data = await postForestUserBlackDisabled({}, postData);
+            // if (data && data.code && data.code === 1) {
+            //     message.success(`用户${changeName}成功`);
+            //     const pager = { ...getTablePages };
+            //     setTimeout(async () => {
+            //         await this.search(pager.current || 1);
+            //     }, 1000);
+            // } else {
+            //     message.error(`用户${changeName}失败`);
+            // }
         } catch (e) {
             console.log('handleUserDisabled', e);
         }

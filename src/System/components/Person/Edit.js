@@ -383,7 +383,8 @@ class Edit extends Component {
             sidebar,
             editUserVisible,
             isSection,
-            actions: { changeAdditionField }
+            actions: { changeAdditionField },
+            addition
         } = this.props;
         if (
             editUserVisible &&
@@ -399,6 +400,17 @@ class Edit extends Component {
             changeAdditionField('org_code', code);
             changeAdditionField('organizationName', name);
             changeAdditionField('organizationPk', pk);
+            if (addition && addition.account && addition.account.is_black === 1) {
+                this.setState({
+                    isBlackChecked: true
+                });
+                changeAdditionField('is_black', 1);
+            } else {
+                this.setState({
+                    isBlackChecked: false
+                });
+                changeAdditionField('is_black', addition.account.is_black);
+            }
         }
         if (isSection && isSection instanceof Array && isSection.length > 0 && isSection !== prevProps.isSection) {
             this.setState({
