@@ -569,11 +569,12 @@ class Tablelevel extends Component {
 
                     userAllResults.map((user) => {
                         // 之前没有对该身份证进行拉黑，则push进入拉黑请求数组中
-                        if (user && user.account && user.account.id_num && !user.account.is_black && userIDNumList.indexOf(user.account.id_num) === -1) {
+                        if (user && user.account && user.account.id_num && !(user.account.is_black === 1) && userIDNumList.indexOf(user.account.id_num) === -1) {
                             let blackPostData = {
                                 id: user.id,
-                                is_black: true,
-                                black_remark: `苗圃基地${nursery.NurseryName}: ${values.BlackInfo}`
+                                is_black: 1,
+                                black_remark: `苗圃基地${nursery.NurseryName}: ${values.BlackInfo}`,
+                                change_all: true
                             };
                             blackPostRequestList.push(postForestUserBlackList({}, blackPostData));
                             userIDNumList.push(user.account.id_num);

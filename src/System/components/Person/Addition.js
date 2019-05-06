@@ -408,7 +408,6 @@ class Addition extends Component {
             isSection,
             actions: { changeAdditionField }
         } = this.props;
-        console.log('prevProps.addition', prevProps.addition);
         if (
             addition &&
             addition.visible &&

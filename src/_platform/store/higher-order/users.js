@@ -36,6 +36,11 @@ export default (ID, service = '') => {
         [],
         'POST'
     );
+    const postForestUserBlackDisabled = forestFetchAction(
+        `${FOREST_API}/system/blacksuser`,
+        [],
+        'POST'
+    );
     const usersReducer = handleActions(
         {
             [getUsersOK]: (state, { payload }) => {
@@ -71,6 +76,7 @@ export default (ID, service = '') => {
     usersReducer[`put${SERVICE}User`] = putUser;
     usersReducer[`put${SERVICE}UserBlackList`] = putUserBlackList;
     usersReducer[`post${SERVICE}ForestUserBlackList`] = postForestUserBlackList;
+    usersReducer[`post${SERVICE}ForestUserBlackDisabled`] = postForestUserBlackDisabled;
 
     usersReducer[`delete${SERVICE}User`] = deleteUser;
     return usersReducer;

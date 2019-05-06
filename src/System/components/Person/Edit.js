@@ -912,8 +912,8 @@ class Edit extends Component {
                                                     <Switch
                                                         checked={
                                                             addition.id
-                                                                ? addition.is_black !==
-                                                                  0
+                                                                ? addition.is_black ===
+                                                                  1
                                                                 : false
                                                         }
                                                         onChange={this.changeblack.bind(
@@ -1086,7 +1086,7 @@ class Edit extends Component {
             isBlackChecked: checked
         });
         // 如果拉黑为true的话，则is_active就为false
-        changeAdditionField('is_black', checked);
+        changeAdditionField('is_black', 1);
     }
     changeBlack_remark (value) {
         const {
@@ -1139,16 +1139,11 @@ class Edit extends Component {
                 if (!err) {
                     // 拉黑处理
                     if (isBlackChecked) {
-                        // let blackPostData = {
-                        //     is_black: isBlackChecked,
-                        //     change_all: true,
-                        //     black_remark: addition.black_remark
-                        // };
-                        // await putUserBlackList({ userID: addition.id }, blackPostData);
                         let blackPostData = {
                             id: addition.id,
-                            is_black: true,
-                            black_remark: addition.black_remark
+                            is_black: 1,
+                            black_remark: addition.black_remark,
+                            change_all: true
                         };
                         let blackData = await postForestUserBlackList({}, blackPostData);
                         if (blackData && blackData.code && blackData.code === 1) {
@@ -1181,9 +1176,8 @@ class Edit extends Component {
                         groups: roles.map(role => +role),
                         // black_remark: addition.black_remark,
                         // change_all:addition.change_all,
-                        is_active: addition.is_active,
+                        is_active: isBlackChecked ? false : addition.is_active,
                         id_num: addition.id_num,
-                        // is_black: blacksa,
                         // 取消身份证照片限制
                         // id_image: [UploadFilesNums, UploadNegatives],
                         id_image: [],
