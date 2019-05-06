@@ -321,6 +321,7 @@ class Tablelevel extends Component {
         postThinclass({}, {
             Section: recordData.Section,
             no: recordData.no,
+            TCNo: recordData.TCNo,
             treetype: treetype || recordData.treetype,
             area: area || recordData.area,
             num: parseInt(num) || recordData.num,
