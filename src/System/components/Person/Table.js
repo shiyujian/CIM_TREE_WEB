@@ -777,8 +777,8 @@ class Users extends Component {
     handleUserDisabled = async (user, event) => {
         const {
             actions: {
-                postForestUserBlackDisabled,
-                putUserBlackList
+                postForestUserBlackDisabled
+                // putUserBlackList
             },
             getTablePages
         } = this.props;
@@ -797,31 +797,31 @@ class Users extends Component {
                 isBlack = 2;
                 changeName = '禁用';
             }
-            // let postData = {
-            //     id: user.id,
-            //     is_black: isBlack,
-            //     black_remark: '',
-            //     change_all: false
-            // };
             let postData = {
+                id: user.id,
                 is_black: isBlack,
-                black_remark: ''
+                black_remark: '',
+                change_all: false
             };
-            let data = await putUserBlackList({userID: user.id}, postData);
-            if (data && data.id) {
+            let data = await postForestUserBlackDisabled({}, postData);
+            if (data && data.code && data.code === 1) {
                 message.success(`用户${changeName}成功`);
                 const pager = { ...getTablePages };
-                await this.search(pager.current || 1);
+                setTimeout(async () => {
+                    await this.search(pager.current || 1);
+                }, 1000);
             } else {
                 message.error(`用户${changeName}失败`);
             }
-            // // let data = await postForestUserBlackDisabled({}, postData);
-            // if (data && data.code && data.code === 1) {
+            // let postData = {
+            //     is_black: isBlack,
+            //     black_remark: ''
+            // };
+            // let data = await putUserBlackList({userID: user.id}, postData);
+            // if (data && data.id) {
             //     message.success(`用户${changeName}成功`);
             //     const pager = { ...getTablePages };
-            //     setTimeout(async () => {
-            //         await this.search(pager.current || 1);
-            //     }, 1000);
+            //     await this.search(pager.current || 1);
             // } else {
             //     message.error(`用户${changeName}失败`);
             // }

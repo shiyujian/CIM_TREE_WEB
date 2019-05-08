@@ -1125,7 +1125,6 @@ class Edit extends Component {
                 postUploadFilesNum,
                 getSwitch,
                 postUploadAutograph,
-                // putUserBlackList,
                 postForestUserBlackList,
                 changeEditUserVisible
             }
