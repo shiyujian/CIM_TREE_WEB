@@ -231,6 +231,7 @@ class TaskCreateModal extends Component {
                 groupid: value
             };
             let teamPerson = await getCuringGroupMans(postGetData);
+            console.log('teamPerson', teamPerson);
             setFieldsValue({
                 taskTeam: value
             });
@@ -270,6 +271,13 @@ class TaskCreateModal extends Component {
         if (!(signUser && signUser.ID)) {
             Notification.error({
                 message: '当前登录用户无法下发任务',
+                duration: 2
+            });
+            return;
+        }
+        if (!(teamPerson && teamPerson instanceof Array && teamPerson.length > 0)) {
+            Notification.error({
+                message: '当前班组无养护人员，请重新选择班组或为班组添加人员',
                 duration: 2
             });
             return;
