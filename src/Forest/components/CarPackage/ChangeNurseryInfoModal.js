@@ -20,6 +20,41 @@ class ChangeNurseryInfoModal extends Component {
             sectionsList: []
         };
     }
+    handleChangeNurseryInfoOk = () => {
+        const {
+            form: {
+                validateFields
+            }
+        } = this.props;
+        validateFields(async (err, values) => {
+            console.log('values', values);
+            console.log('err', err);
+            if (!err) {
+                this.props.changeNurseryInfoOk();
+            }
+        });
+    }
+    handleChangeNurseryInfoCancel = () => {
+        this.props.changeNurseryInfoCancel();
+    }
+    projectSelect = (value) => {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        console.log('value', value);
+        let treeList = tree.bigTreeList;
+        let sectionsList = [];
+        if (value) {
+            treeList.map((treeData) => {
+                if (value === treeData.No) {
+                    sectionsList = treeData.children;
+                }
+            });
+        }
+        this.setState({
+            sectionsList
+        });
+    }
     render () {
         const {
             form: { getFieldDecorator },
@@ -36,18 +71,14 @@ class ChangeNurseryInfoModal extends Component {
             wrapperCol: { span: 16 }
         };
         let bigTreeList = tree.bigTreeList || [];
-        console.log('nurseryList', nurseryList);
-        console.log('supplierList', supplierList);
-        console.log('treetypes', treetypes);
-        console.log('bigTreeList', bigTreeList);
-        console.log('sectionsList', sectionsList);
         return (
             <Modal
                 width={850}
                 title='修改信息'
                 visible
-                onOk={this.handleChangeInfoOk.bind(this)}
-                onCancel={this.handleChangeInfoCancel.bind(this)}
+                maskClosable={false}
+                onOk={this.handleChangeNurseryInfoOk.bind(this)}
+                onCancel={this.handleChangeNurseryInfoCancel.bind(this)}
             >
                 <Form>
                     <Row>
@@ -208,13 +239,13 @@ class ChangeNurseryInfoModal extends Component {
                                             ]
                                         }
                                     )(<Select>
-                                        {/* {
+                                        {
                                             sectionsList.map((section) => {
                                                 return <Option key={section.No} value={section.No}>
                                                     {section.Name}
                                                 </Option>;
                                             })
-                                        } */}
+                                        }
                                     </Select>)}
                                 </FormItem>
                             </Col>
@@ -236,7 +267,7 @@ class ChangeNurseryInfoModal extends Component {
                                     )(<Select>
                                         <Option key={'未打包'} value={'0'} title={'未打包'}>
                                             未打包
-                                        </Option>,
+                                        </Option>
                                         <Option key={'已打包'} value={'1'} title={'已打包'}>
                                             已打包
                                         </Option>
@@ -260,7 +291,7 @@ class ChangeNurseryInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -283,7 +314,7 @@ class ChangeNurseryInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -306,7 +337,7 @@ class ChangeNurseryInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -329,7 +360,7 @@ class ChangeNurseryInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -352,7 +383,7 @@ class ChangeNurseryInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -375,7 +406,7 @@ class ChangeNurseryInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -386,31 +417,6 @@ class ChangeNurseryInfoModal extends Component {
                 </Form>
             </Modal>
         );
-    }
-
-    handleChangeInfoOk = () => {
-        this.props.onOk();
-    }
-    handleChangeInfoCancel = () => {
-        this.props.onCancel();
-    }
-    projectSelect = (value) => {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        console.log('value', value);
-        let treeList = tree.bigTreeList;
-        let sectionsList = [];
-        if (value) {
-            treeList.map((treeData) => {
-                if (value === treeData.No) {
-                    sectionsList = treeData.children;
-                }
-            });
-        }
-        this.setState({
-            sectionsList
-        });
     }
 }
 

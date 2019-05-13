@@ -14,13 +14,12 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getForestImgUrl, getUserIsManager } from '_platform/auth';
+import { getUser, getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
-import ChangeNurseryInfoModal from './ChangeNurseryInfoModal';
 const { RangePicker } = DatePicker;
 
 export default class NursmeasureTable extends Component {
@@ -49,11 +48,7 @@ export default class NursmeasureTable extends Component {
             supervisorcheck: '',
             checkstatus: '',
             ispack: '',
-            imgArr: [],
-            selectedRowKeys: [],
-            dataSourceSelected: [],
-            changeInfoVisible: false,
-            selectedAllRowKeys: false
+            imgArr: []
         };
     }
     componentDidMount () {
@@ -61,7 +56,7 @@ export default class NursmeasureTable extends Component {
         this.sections = JSON.parse(user.sections);
     }
     render () {
-        const { tblData, changeInfoVisible, imgvisible } = this.state;
+        const { tblData, imgvisible } = this.state;
         return (
             <div>
                 {this.treeTable(tblData)}
@@ -85,16 +80,6 @@ export default class NursmeasureTable extends Component {
                         </Button>
                     </Row>
                 </Modal>
-                {/* {
-                    changeInfoVisible
-                        ? <ChangeNurseryInfoModal
-                            {...this.props}
-                            {...this.state}
-                            onOk={this.handleChangeInfoOk.bind(this)}
-                            onCancel={this.handleChangeInfoCancel.bind(this)}
-                        />
-                        : ''
-                } */}
             </div>
         );
     }
@@ -118,12 +103,8 @@ export default class NursmeasureTable extends Component {
             bigType,
             treetypename,
             ispack,
-            mmtype = '',
-            selectedRowKeys,
-            dataSourceSelected
+            mmtype = ''
         } = this.state;
-        // let permission = getUserIsManager();
-        let permission = false;
         const suffix2 = rolename ? (
             <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
@@ -546,7 +527,7 @@ export default class NursmeasureTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={16} className='forest-quryrstcnt'>
+                    <Col span={20} className='forest-quryrstcnt'>
                         <span>
                             此次查询共有苗木：
                             {this.state.pagination.total}棵
@@ -561,26 +542,6 @@ export default class NursmeasureTable extends Component {
                             导出
                         </Button>
                     </Col> */}
-                    {
-                        permission ? (<Col span={2}>
-                            <Button
-                                type='primary'
-                                disabled={!(details && details.length > 0)}
-                                onClick={this.changeNurseryInfoAll.bind(this)}
-                            >
-                            修改全部
-                            </Button>
-                        </Col>) : <Col span={2} />}
-                    {
-                        permission ? (<Col span={2}>
-                            <Button
-                                type='primary'
-                                disabled={!(dataSourceSelected && dataSourceSelected.length > 0)}
-                                onClick={this.changeNurseryInfoSome.bind(this)}
-                            >
-                            修改部分
-                            </Button>
-                        </Col>) : <Col span={2} />}
                     <Col span={2}>
                         <Button
                             type='primary'
@@ -592,10 +553,6 @@ export default class NursmeasureTable extends Component {
                 </Row>
             </div>
         );
-        const rowSelection = {
-            selectedRowKeys,
-            onChange: this.onRowSelectChange
-        };
         return (
             <div>
                 <Row>{header}</Row>
@@ -605,7 +562,6 @@ export default class NursmeasureTable extends Component {
                         className='foresttable'
                         columns={columns}
                         rowKey='order'
-                        rowSelection={rowSelection}
                         loading={{
                             tip: (
                                 <Progress
@@ -625,65 +581,6 @@ export default class NursmeasureTable extends Component {
                 </Row>
             </div>
         );
-    }
-    onRowSelectChange = (selectedRowKeys, selectedRows) => {
-        console.log('selectedRowKeys', selectedRowKeys);
-        console.log('selectedRows', selectedRows);
-
-        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
-    };
-
-    changeNurseryInfoAll = () => {
-        const {
-            tblData
-        } = this.state;
-        if (tblData && tblData instanceof Array && tblData.length > 0) {
-            this.setState({
-                selectedAllRowKeys: true,
-                changeInfoVisible: true
-            });
-        } else {
-            message.warning('请先选择条件，搜索数据！');
-            this.setState({
-                selectedAllRowKeys: false,
-                changeInfoVisible: false
-            });
-        }
-    }
-
-    changeNurseryInfoSome = () => {
-        const {
-            selectedRowKeys,
-            dataSourceSelected
-        } = this.state;
-        if (dataSourceSelected.length === 0) {
-            message.warning('请先选择数据！');
-        } else {
-            console.log('selectedRowKeys', selectedRowKeys);
-            console.log('dataSourceSelected', dataSourceSelected);
-            this.setState({
-                selectedRowKeys: [],
-                dataSourceSelected: [],
-                changeInfoVisible: true
-            });
-        }
-    }
-
-    handleChangeInfoOk = () => {
-        this.setState({
-            selectedRowKeys: [],
-            dataSourceSelected: [],
-            changeInfoVisible: false,
-            selectedAllRowKeys: false
-        });
-    }
-    handleChangeInfoCancel = () => {
-        this.setState({
-            selectedRowKeys: [],
-            dataSourceSelected: [],
-            changeInfoVisible: false,
-            selectedAllRowKeys: false
-        });
     }
 
     emitEmpty2 = () => {

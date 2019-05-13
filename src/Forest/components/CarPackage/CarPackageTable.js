@@ -14,8 +14,12 @@ import {
     Divider
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API } from '../../../_platform/api';
+import { FOREST_API } from '_platform/api';
 import { getUser, getUserIsManager } from '_platform/auth';
+import CarPackDetailModal from './CarPackDetailModal'; // 查看车内苗木信息
+import HandleNurseryInCar from './HandleNurseryInCar'; // 移动或修改车内苗木
+import ChangeCarInfoModal from './ChangeCarInfoModal'; // 修改车辆信息
+import MergeCarPackModal from './MergeCarPackModal'; // 合并两车
 import '../index.less';
 import {
     getSectionNameBySection,
@@ -24,17 +28,12 @@ import {
 const { RangePicker } = DatePicker;
 
 export default class CarPackageTable extends Component {
-    currentCarID = '';
     constructor (props) {
         super(props);
         this.state = {
-            imgvisible: false,
             tblData: [],
-            tblData1: [],
             pagination: {},
-            pagination1: {},
             loading: false,
-            loading1: false,
             size: 10,
             exportsize: 100,
             leftkeycode: '',
@@ -51,12 +50,194 @@ export default class CarPackageTable extends Component {
             role: 'inputer',
             rolename: '',
             percent: 0,
-            percent1: 0,
             supervisorcheck: '',
             checkstatus: '',
-            status: ''
+            status: '',
+            currentCarID: '',
+            detailVisible: false,
+            editCarInfoVisible: false,
+            mergeCarPackVisible: false,
+            handleNurseryInCarVisible: false
         };
     }
+    columns = [
+        {
+            title: '序号',
+            dataIndex: 'order'
+        },
+        {
+            title: '车牌号',
+            dataIndex: 'LicensePlate'
+        },
+        {
+            title: '项目',
+            dataIndex: 'Project'
+        },
+        {
+            title: '标段',
+            dataIndex: 'sectionName'
+        },
+        {
+            title: '苗木类型',
+            dataIndex: 'IsShrub',
+            render: (text, record) => {
+                if (text === 0) {
+                    return <p>乔灌</p>;
+                } else {
+                    return <p>地被</p>;
+                }
+            }
+        },
+        {
+            title: '苗木规格',
+            dataIndex: 'Standard',
+            render: text => {
+                if (text === '') {
+                    return <p> / </p>;
+                } else {
+                    return <p>{text}</p>;
+                }
+            }
+        },
+        {
+            title: '创建时间',
+            render: (text, record) => {
+                const { liftertime1 = '', liftertime2 = '' } = record;
+                return (
+                    <div>
+                        <div>{liftertime1}</div>
+                        <div>{liftertime2}</div>
+                    </div>
+                );
+            }
+        },
+        {
+            title: '总数',
+            dataIndex: 'NurseryNum'
+        },
+        {
+            title: '进场抽检退苗量',
+            dataIndex: 'UnQualifiedNum'
+        },
+        {
+            title: '状态',
+            dataIndex: 'Status',
+            render: (text, record) => {
+                if (text === -1) {
+                    return <p>打包</p>;
+                } else if (text === 0) {
+                    return <p>施工提交</p>;
+                } else if (text === 1) {
+                    return <p>监理合格</p>;
+                } else if (text === 2) {
+                    return <p>监理退苗</p>;
+                } else if (text === 3) {
+                    return <p>监理合格施工同意</p>;
+                } else if (text === 4) {
+                    return <p>监理合格施工不同意</p>;
+                } else if (text === 5) {
+                    return <p>监理退苗施工同意</p>;
+                } else if (text === 6) {
+                    return <p>监理退苗施工不同意</p>;
+                } else if (text === 7) {
+                    return <p>业主合格</p>;
+                } else if (text === 8) {
+                    return <p>业主退苗</p>;
+                } else {
+                    return <p> / </p>;
+                }
+            }
+        },
+        {
+            title: '抽检人',
+            dataIndex: 'ConstructionerName',
+            render: (text, record) => {
+                if (record.ConstructionerUserName && record.ConstructionerName) {
+                    return <p>{record.ConstructionerName + '(' + record.ConstructionerUserName + ')'}</p>;
+                } else if (record.ConstructionerName && !record.ConstructionerUserName) {
+                    return <p>{record.ConstructionerName}</p>;
+                } else {
+                    return <p> / </p>;
+                }
+            }
+        },
+        {
+            title: '监理人',
+            dataIndex: 'SupervisorName',
+            render: (text, record) => {
+                if (record.SupervisorUserName && record.SupervisorName) {
+                    return <p>{record.SupervisorName + '(' + record.SupervisorUserName + ')'}</p>;
+                } else if (record.SupervisorName && !record.SupervisorUserName) {
+                    return <p>{record.SupervisorName}</p>;
+                } else {
+                    return <p> / </p>;
+                }
+            }
+        },
+        {
+            title: '司机姓名',
+            dataIndex: 'Driver',
+            render: (text, record) => {
+                if (text) {
+                    return <p>{text}</p>;
+                } else {
+                    return <p> / </p>;
+                }
+            }
+        },
+        {
+            title: '司机电话',
+            dataIndex: 'DriverPhone',
+            render: (text, record) => {
+                if (text) {
+                    return <p>{text}</p>;
+                } else {
+                    return <p> / </p>;
+                }
+            }
+        },
+        {
+            title: '操作',
+            render: (text, record) => {
+                // let permission = getUserIsManager();
+                let permission = false;
+                if (permission) {
+                    return (
+                        <div>
+                            <a
+                                href='javascript:;'
+                                onClick={this.handleChangeNurseryInCar.bind(this, record)}
+                            >
+                                修改苗木
+                            </a>
+                            <Divider type='vertical' />
+                            <a
+                                href='javascript:;'
+                                onClick={this.handleEditCarInfoClick.bind(this, record)}
+                            >
+                                编辑车辆
+                            </a>
+                            <Divider type='vertical' />
+                            <a
+                                href='javascript:;'
+                                onClick={this.handlMergeCarClick.bind(this, record)}
+                            >
+                                合并车辆
+                            </a>
+                        </div>);
+                } else {
+                    return (
+                        <a
+                            href='javascript:;'
+                            onClick={this.handleDetailClick.bind(this, record)}
+                        >
+                            详情
+                        </a>
+                    );
+                }
+            }
+        }
+    ];
     componentDidMount () {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
@@ -73,598 +254,88 @@ export default class CarPackageTable extends Component {
             );
         }
     }
-    render () {
-        const { tblData, tblData1 } = this.state;
-        return (
-            <div>
-                {this.treeTable(tblData)}
-                <Modal
-                    width={1080}
-                    title='详情'
-                    visible={this.state.imgvisible}
-                    onOk={this.handleCancel.bind(this)}
-                    onCancel={this.handleCancel.bind(this)}
-                    footer={null}
-                >
-                    <div>{this.treeTable1(tblData1)}</div>
-                </Modal>
-            </div>
-        );
-    }
-    treeTable1 (details) {
-        const { users } = this.props;
-        let columns = [
-            {
-                title: '序号',
-                dataIndex: 'order'
-            },
-            {
-                title: '顺序码',
-                dataIndex: 'ZZBM'
-            },
-            {
-                title: '树种',
-                dataIndex: 'TreeTypeObj.TreeTypeName'
-            },
-            {
-                title: '苗龄',
-                dataIndex: 'Age',
-                render: (text, record) => {
-                    if (record.BD.indexOf('P010') !== -1) {
-                        return <p>{text}</p>;
-                    } else {
-                        return <p> / </p>;
-                    }
-                }
-            },
-            {
-                title: '产地',
-                dataIndex: 'TreePlace'
-            },
-            {
-                title: '供应商',
-                dataIndex: 'Factory'
-            },
-            {
-                title: '苗圃名称',
-                dataIndex: 'NurseryName'
-            },
-            {
-                title: '填报人',
-                dataIndex: 'Inputer',
-                render: (text, record) => {
-                    return (
-                        <span>
-                            {users && users[text] ? users[text].Full_Name : ''}
-                        </span>
-                    );
-                }
-            },
-            {
-                title: '创建时间',
-                render: (text, record) => {
-                    const { liftertime1 = '', liftertime2 = '' } = record;
-                    return (
-                        <div>
-                            <div>{liftertime1}</div>
-                            <div>{liftertime2}</div>
-                        </div>
-                    );
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>高度</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.GD != 0) return <span>{record.GD}</span>;
-                    else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>冠幅</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.GF != 0) return <span>{record.GF}</span>;
-                    else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>胸径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.XJ != 0) return <span>{record.XJ}</span>;
-                    else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>地径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                render: (text, record) => {
-                    if (record.DJ != 0) return <span>{record.DJ}</span>;
-                    else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>土球厚度</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                dataIndex: 'tqhd',
-                render: (text, record) => {
-                    if (record.TQHD != 0) return <span>{record.TQHD}</span>;
-                    else {
-                        return <span>/</span>;
-                    }
-                }
-            },
-            {
-                title: (
-                    <div>
-                        <div>土球直径</div>
-                        <div>(cm)</div>
-                    </div>
-                ),
-                dataIndex: 'tqzj',
-                render: (text, record) => {
-                    if (record.TQZJ != 0) return <span>{record.TQZJ}</span>;
-                    else {
-                        return <span>/</span>;
-                    }
-                }
-            }
-        ];
-        return (
-            <div>
-                <Table
-                    bordered
-                    className='foresttable'
-                    columns={columns}
-                    rowKey='order'
-                    loading={{
-                        tip: (
-                            <Progress
-                                style={{ width: 200 }}
-                                percent={this.state.percent1}
-                                status='active'
-                                strokeWidth={5}
-                            />
-                        ),
-                        spinning: this.state.loading1
-                    }}
-                    locale={{ emptyText: '当天无苗圃测量信息' }}
-                    dataSource={details}
-                    onChange={this.handleTableChange1.bind(this)}
-                    pagination={this.state.pagination1}
-                />
-                <Row style={{ marginTop: 10 }}>
-                    <Button
-                        onClick={this.handleCancel.bind(this)}
-                        style={{ float: 'right' }}
-                        type='primary'
-                    >
-                        关闭
-                    </Button>
-                </Row>
-            </div>
-        );
-    }
-    treeTable (details) {
-        const {
-            sectionoption,
-            mmtypeoption,
-            statusoption
-        } = this.props;
-        const {
-            licenseplate,
-            section,
-            status,
-            mmtype
-        } = this.state;
-        const suffix1 = licenseplate ? (
-            <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
-        let columns = [];
-        let header = '';
-        // let permission = getUserIsManager();
-        let permission = false;
-        columns = [
-            {
-                title: '序号',
-                dataIndex: 'order'
-            },
-            {
-                title: '车牌号',
-                dataIndex: 'LicensePlate'
-            },
-            {
-                title: '项目',
-                dataIndex: 'Project'
-            },
-            {
-                title: '标段',
-                dataIndex: 'sectionName'
-            },
-            {
-                title: '苗木类型',
-                dataIndex: 'IsShrub',
-                render: (text, record) => {
-                    if (text === 0) {
-                        return <p>乔灌</p>;
-                    } else {
-                        return <p>地被</p>;
-                    }
-                }
-            },
-            {
-                title: '苗木规格',
-                dataIndex: 'Standard',
-                render: text => {
-                    if (text === '') {
-                        return <p> / </p>;
-                    } else {
-                        return <p>{text}</p>;
-                    }
-                }
-            },
-            {
-                title: '创建时间',
-                render: (text, record) => {
-                    const { liftertime1 = '', liftertime2 = '' } = record;
-                    return (
-                        <div>
-                            <div>{liftertime1}</div>
-                            <div>{liftertime2}</div>
-                        </div>
-                    );
-                }
-            },
-            {
-                title: '总数',
-                dataIndex: 'NurseryNum'
-            },
-            {
-                title: '进场抽检退苗量',
-                dataIndex: 'UnQualifiedNum'
-            },
-            {
-                title: '状态',
-                dataIndex: 'Status',
-                render: (text, record) => {
-                    if (text === -1) {
-                        return <p>打包</p>;
-                    } else if (text === 0) {
-                        return <p>施工提交</p>;
-                    } else if (text === 1) {
-                        return <p>监理合格</p>;
-                    } else if (text === 2) {
-                        return <p>监理退苗</p>;
-                    } else if (text === 3) {
-                        return <p>监理合格施工同意</p>;
-                    } else if (text === 4) {
-                        return <p>监理合格施工不同意</p>;
-                    } else if (text === 5) {
-                        return <p>监理退苗施工同意</p>;
-                    } else if (text === 6) {
-                        return <p>监理退苗施工不同意</p>;
-                    } else if (text === 7) {
-                        return <p>业主合格</p>;
-                    } else if (text === 8) {
-                        return <p>业主退苗</p>;
-                    } else {
-                        return <p> / </p>;
-                    }
-                }
-            },
-            {
-                title: '抽检人',
-                dataIndex: 'ConstructionerName',
-                render: (text, record) => {
-                    if (record.ConstructionerUserName && record.ConstructionerName) {
-                        return <p>{record.ConstructionerName + '(' + record.ConstructionerUserName + ')'}</p>;
-                    } else if (record.ConstructionerName && !record.ConstructionerUserName) {
-                        return <p>{record.ConstructionerName}</p>;
-                    } else {
-                        return <p> / </p>;
-                    }
-                }
-            },
-            {
-                title: '监理人',
-                dataIndex: 'SupervisorName',
-                render: (text, record) => {
-                    if (record.SupervisorUserName && record.SupervisorName) {
-                        return <p>{record.SupervisorName + '(' + record.SupervisorUserName + ')'}</p>;
-                    } else if (record.SupervisorName && !record.SupervisorUserName) {
-                        return <p>{record.SupervisorName}</p>;
-                    } else {
-                        return <p> / </p>;
-                    }
-                }
-            },
-            {
-                title: '司机姓名',
-                dataIndex: 'Driver',
-                render: (text, record) => {
-                    if (text) {
-                        return <p>{text}</p>;
-                    } else {
-                        return <p> / </p>;
-                    }
-                }
-            },
-            {
-                title: '司机电话',
-                dataIndex: 'DriverPhone',
-                render: (text, record) => {
-                    if (text) {
-                        return <p>{text}</p>;
-                    } else {
-                        return <p> / </p>;
-                    }
-                }
-            },
-            {
-                title: '操作',
-                render: (text, record) => {
-                    if (permission) {
-                        return (
-                            <div>
-                                <a
-                                    href='javascript:;'
-                                    onClick={this.onViewClick.bind(this, record)}
-                                >
-                                详情
-                                </a>
-                                <Divider type='vertical' />
-                                <a
-                                    href='javascript:;'
-                                    onClick={this.handleEditClick.bind(this, record)}
-                                >
-                                编辑
-                                </a>
-                                <Divider type='vertical' />
-                                <a
-                                    href='javascript:;'
-                                    onClick={this.handleDeleteClick.bind(this, record)}
-                                >
-                                删除
-                                </a>
-                                <Divider type='vertical' />
-                                <a
-                                    href='javascript:;'
-                                    onClick={this.handleRemoveClick.bind(this, record)}
-                                >
-                                移动
-                                </a>
-                            </div>);
-                    } else {
-                        return (
-                            <a
-                                href='javascript:;'
-                                onClick={this.onViewClick.bind(this, record)}
-                            >
-                                详情
-                            </a>
-                        );
-                    }
-                }
-            }
-        ];
-        header = (
-            <div>
-                <Row className='forest-search-layout'>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>车牌号：</span>
-                        <Input
-                            suffix={suffix1}
-                            value={licenseplate}
-                            className='forest-forestcalcw4'
-                            onChange={this.licenseplateChange.bind(this)}
-                        />
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>标段：</span>
-                        <Select
-                            allowClear
-                            showSearch
-                            filterOption={(input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                            }
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={section}
-                            onChange={this.onSectionChange.bind(this)}
-                        >
-                            {sectionoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>苗木类型：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={mmtype}
-                            onChange={this.onmmtypechange.bind(this)}
-                        >
-                            {mmtypeoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>状态：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={status}
-                            onChange={this.onStatusChange.bind(this)}
-                        >
-                            {statusoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>创建时间：</span>
-                        <RangePicker
-                            style={{ verticalAlign: 'middle' }}
-                            defaultValue={[
-                                moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),
-                                moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')
-                            ]}
-                            className='forest-forestcalcw4'
-                            showTime={{ format: 'HH:mm:ss' }}
-                            format={'YYYY/MM/DD HH:mm:ss'}
-                            onChange={this.datepick.bind(this)}
-                            onOk={this.datepick.bind(this)}
-                        />
-                    </div>
-                </Row>
-                <Row>
-                    <Col span={2}>
-                        <Button
-                            type='primary'
-                            onClick={this.handleTableChange.bind(this, {
-                                current: 1
-                            })}
-                        >
-                            查询
-                        </Button>
-                    </Col>
-                    <Col span={18} className='forest-quryrstcnt'>
-                        <span>
-                            此次查询共有车辆：
-                            {this.state.pagination.total}辆
-                        </span>
-                    </Col>
-                    <Col span={2}>
-                        <Button type='primary' onClick={this.exportexcel.bind(this)}>
-								导出
-                        </Button>
-                    </Col>
-                    <Col span={2}>
-                        <Button
-                            type='primary'
-                            onClick={this.resetinput.bind(this)}
-                        >
-                            重置
-                        </Button>
-                    </Col>
-
-                </Row>
-            </div>
-        );
-        return (
-            <div>
-                <Row>{header}</Row>
-                <Row>
-                    <Table
-                        bordered
-                        className='foresttable'
-                        columns={columns}
-                        rowKey='order'
-                        loading={{
-                            tip: (
-                                <Progress
-                                    style={{ width: 200 }}
-                                    percent={this.state.percent}
-                                    status='active'
-                                    strokeWidth={5}
-                                />
-                            ),
-                            spinning: this.state.loading
-                        }}
-                        locale={{ emptyText: '当天无苗圃测量信息' }}
-                        dataSource={details}
-                        onChange={this.handleTableChange.bind(this)}
-                        pagination={this.state.pagination}
-                    />
-                </Row>
-            </div>
-        );
-    }
-    handleEditClick = async () => {
-
-    }
-    handleDeleteClick = async () => {
-
-    }
-    handleRemoveClick = async () => {
-
-    }
-    onViewClick = async record => {
-        const { pagination1 } = this.state;
+    // 查看车辆包详情
+    handleDetailClick = async (record) => {
         if (
             record &&
             record.Status &&
-            (record.Status == '5' || record.Status == '8')
+            (record.Status === '5' || record.Status === '8')
         ) {
             message.info('本车苗木均已退回');
             return;
         }
-        this.currentCarID = record.ID;
-        await this.query(1);
-
-        pagination1.current = 1;
-        this.setState({ imgvisible: true, pagination1: pagination1 });
+        this.setState({
+            detailVisible: true,
+            currentCarID: record.ID
+        });
     };
-
-    query (page) {
-        const {
-            actions: { getNurserysByPack }
-        } = this.props;
-        const { size } = this.state;
-        let postData = {
-            packid: this.currentCarID,
-            page,
-            size
-        };
-        this.setState({ loading1: true, percent1: 0 });
-        getNurserysByPack({}, postData).then(rst => {
-            this.setState({ loading1: false, percent1: 100 });
-            if (!rst) return;
-            let tblData1 = rst.content;
-            if (tblData1 instanceof Array) {
-                tblData1.forEach((plan, i) => {
-                    plan.order = (page - 1) * size + i + 1;
-                    plan.liftertime1 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('YYYY-MM-DD')
-                        : '/';
-                    plan.liftertime2 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('HH:mm:ss')
-                        : '/';
-                });
-                const pagination1 = { ...this.state.pagination1 };
-                pagination1.total = rst.pageinfo.total;
-                pagination1.pageSize = size;
-                this.setState({ tblData1, pagination1 });
-            }
+    // 关闭详情弹窗
+    handleDetailModalCancel = async () => {
+        this.setState({
+            detailVisible: false,
+            currentCarID: ''
+        });
+    }
+    // 修改车辆内的苗木信息
+    handleChangeNurseryInCar = async (record) => {
+        if (
+            record &&
+            record.Status &&
+            (record.Status === '5' || record.Status === '8')
+        ) {
+            message.info('本车苗木均已退回');
+            return;
+        }
+        this.setState({
+            handleNurseryInCarVisible: true,
+            currentCarID: record.ID
+        });
+    }
+    // 关闭修改车辆信息弹窗
+    handleChangeNurseryInCarModalCancel = async () => {
+        this.setState({
+            handleNurseryInCarVisible: false,
+            currentCarID: ''
+        });
+    }
+    // 修改车辆信息
+    handleEditCarInfoClick = async (record) => {
+        if (
+            record &&
+            record.Status &&
+            (record.Status === '5' || record.Status === '8')
+        ) {
+            message.info('本车苗木均已退回');
+            return;
+        }
+        this.setState({
+            editCarInfoVisible: true
+        });
+    }
+    // 关闭修改车辆信息弹窗
+    handleEditCarInfoModalCancel = async () => {
+        this.setState({
+            editCarInfoVisible: false
+        });
+    }
+    // 合并车辆包
+    handlMergeCarClick = async (record) => {
+        if (
+            record &&
+            record.Status &&
+            (record.Status === '5' || record.Status === '8')
+        ) {
+            message.info('本车苗木均已退回');
+            return;
+        }
+        this.setState({
+            mergeCarPackVisible: true
+        });
+    }
+    // 关闭合并车辆包弹窗
+    handleMergeCarPackModalCancel = async () => {
+        this.setState({
+            mergeCarPackVisible: false
         });
     }
 
@@ -715,18 +386,6 @@ export default class CarPackageTable extends Component {
             pagination: pager
         });
         this.qury(pagination.current);
-    }
-    handleTableChange1 (pagination) {
-        const pager = { ...this.state.pagination1 };
-        pager.current = pagination.current;
-        this.setState({
-            pagination1: pager
-        });
-        this.query(pagination.current);
-    }
-
-    handleCancel () {
-        this.setState({ imgvisible: false });
     }
 
     resetinput () {
@@ -851,5 +510,201 @@ export default class CarPackageTable extends Component {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+
+    treeTable (details) {
+        const {
+            sectionoption,
+            mmtypeoption,
+            statusoption
+        } = this.props;
+        const {
+            licenseplate,
+            section,
+            status,
+            mmtype
+        } = this.state;
+        const suffix1 = licenseplate ? (
+            <Icon type='close-circle' onClick={this.emitEmpty1} />
+        ) : null;
+        let header = '';
+        header = (
+            <div>
+                <Row className='forest-search-layout'>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>车牌号：</span>
+                        <Input
+                            suffix={suffix1}
+                            value={licenseplate}
+                            className='forest-forestcalcw4'
+                            onChange={this.licenseplateChange.bind(this)}
+                        />
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>标段：</span>
+                        <Select
+                            allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={section}
+                            onChange={this.onSectionChange.bind(this)}
+                        >
+                            {sectionoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>苗木类型：</span>
+                        <Select
+                            allowClear
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={mmtype}
+                            onChange={this.onmmtypechange.bind(this)}
+                        >
+                            {mmtypeoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>状态：</span>
+                        <Select
+                            allowClear
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={status}
+                            onChange={this.onStatusChange.bind(this)}
+                        >
+                            {statusoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg-datePicker'>
+                        <span className='forest-search-span'>创建时间：</span>
+                        <RangePicker
+                            style={{ verticalAlign: 'middle' }}
+                            defaultValue={[
+                                moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),
+                                moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')
+                            ]}
+                            className='forest-forestcalcw4'
+                            showTime={{ format: 'HH:mm:ss' }}
+                            format={'YYYY/MM/DD HH:mm:ss'}
+                            onChange={this.datepick.bind(this)}
+                            onOk={this.datepick.bind(this)}
+                        />
+                    </div>
+                </Row>
+                <Row>
+                    <Col span={2}>
+                        <Button
+                            type='primary'
+                            onClick={this.handleTableChange.bind(this, {
+                                current: 1
+                            })}
+                        >
+                            查询
+                        </Button>
+                    </Col>
+                    <Col span={18} className='forest-quryrstcnt'>
+                        <span>
+                            此次查询共有车辆：
+                            {this.state.pagination.total}辆
+                        </span>
+                    </Col>
+                    <Col span={2}>
+                        <Button type='primary' onClick={this.exportexcel.bind(this)}>
+								导出
+                        </Button>
+                    </Col>
+                    <Col span={2}>
+                        <Button
+                            type='primary'
+                            onClick={this.resetinput.bind(this)}
+                        >
+                            重置
+                        </Button>
+                    </Col>
+
+                </Row>
+            </div>
+        );
+        return (
+            <div>
+                <Row>{header}</Row>
+                <Row>
+                    <Table
+                        bordered
+                        className='foresttable'
+                        columns={this.columns}
+                        rowKey='order'
+                        loading={{
+                            tip: (
+                                <Progress
+                                    style={{ width: 200 }}
+                                    percent={this.state.percent}
+                                    status='active'
+                                    strokeWidth={5}
+                                />
+                            ),
+                            spinning: this.state.loading
+                        }}
+                        locale={{ emptyText: '当天无苗圃测量信息' }}
+                        dataSource={details}
+                        onChange={this.handleTableChange.bind(this)}
+                        pagination={this.state.pagination}
+                    />
+                </Row>
+            </div>
+        );
+    }
+    render () {
+        const {
+            tblData,
+            detailVisible,
+            editCarInfoVisible,
+            mergeCarPackVisible,
+            handleNurseryInCarVisible
+        } = this.state;
+        return (
+            <div>
+                {this.treeTable(tblData)}
+                {
+                    detailVisible
+                        ? <CarPackDetailModal
+                            {...this.props}
+                            {...this.state}
+                            onDetailModalCancel={this.handleDetailModalCancel.bind(this)}
+                        /> : ''
+                }
+                {
+                    handleNurseryInCarVisible
+                        ? <HandleNurseryInCar
+                            {...this.props}
+                            {...this.state}
+                            onChangeNurseryInCarModalCancel={this.handleChangeNurseryInCarModalCancel.bind(this)}
+                        /> : ''
+                }
+                {
+                    editCarInfoVisible
+                        ? <ChangeCarInfoModal
+                            {...this.props}
+                            {...this.state}
+                            onEditCarModalCancel={this.handleEditCarInfoModalCancel.bind(this)}
+                        /> : ''
+                }
+                {
+                    mergeCarPackVisible
+                        ? <MergeCarPackModal
+                            {...this.props}
+                            {...this.state}
+                            onMergeCarPackModalCancel={this.handleMergeCarPackModalCancel.bind(this)}
+                        /> : ''
+                }
+            </div>
+        );
     }
 }

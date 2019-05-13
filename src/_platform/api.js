@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-22 14:47:51
+ * @Last Modified time: 2019-05-10 14:34:47
  */
 /**
  *
@@ -204,7 +204,7 @@ export const TREETYPENO = [
     },
     {
         id: '5',
-        name: '草本'
+        name: '地被'
     }
 ];
 // 苗木市场  需求发布

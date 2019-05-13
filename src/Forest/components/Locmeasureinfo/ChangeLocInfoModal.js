@@ -46,6 +46,7 @@ class ChangeLocInfoModal extends Component {
                 width={850}
                 title='修改信息'
                 visible
+                maskClosable={false}
                 onOk={this.handleChangeInfoOk.bind(this)}
                 onCancel={this.handleChangeInfoCancel.bind(this)}
             >
@@ -223,7 +224,7 @@ class ChangeLocInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -246,7 +247,7 @@ class ChangeLocInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -269,7 +270,7 @@ class ChangeLocInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -292,7 +293,7 @@ class ChangeLocInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -315,7 +316,7 @@ class ChangeLocInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}
@@ -338,7 +339,7 @@ class ChangeLocInfoModal extends Component {
                                         }
                                     )(<RadioGroup>
                                         <Radio value={'x10'}>x10</Radio>
-                                        <Radio value={'100'}>100</Radio>
+                                        <Radio value={'x100'}>x100</Radio>
                                         <Radio value={'/10'}>/10</Radio>
                                         <Radio value={'/100'}>/100</Radio>
                                     </RadioGroup>)}

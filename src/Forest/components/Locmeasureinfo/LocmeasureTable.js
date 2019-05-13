@@ -504,18 +504,6 @@ export default class LocmeasureTable extends Component {
                             {statusoption}
                         </Select>
                     </div>
-                    {/* <div className='forest-mrg10'>
-                        <span className='forest-search-span'>定位：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={islocation}
-                            onChange={this.onLocationChange.bind(this)}
-                        >
-                            {locationoption}
-                        </Select>
-                    </div> */}
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>测量人：</span>
                         <Input
@@ -541,17 +529,6 @@ export default class LocmeasureTable extends Component {
                             onOk={this.datepick.bind(this)}
                         />
                     </div>
-                    {/* <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>定位时间：</span>
-                        <RangePicker
-                            className='forest-forestcalcw4'
-                            style={{ verticalAlign: 'middle' }}
-                            showTime={{ format: 'HH:mm:ss' }}
-                            format={'YYYY/MM/DD HH:mm:ss'}
-                            onChange={this.datepick1.bind(this)}
-                            onOk={this.datepick1.bind(this)}
-                        />
-                    </div> */}
                     <div className='forest-mrg-standard2'>
                         <span className='forest-search-span'>胸径：</span>
                         <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
@@ -766,8 +743,6 @@ export default class LocmeasureTable extends Component {
         if (dataSourceSelected.length === 0) {
             message.warning('请先选择数据！');
         } else {
-            console.log('selectedRowKeys', selectedRowKeys);
-            console.log('dataSourceSelected', dataSourceSelected);
             this.setState({
                 selectedRowKeys: [],
                 dataSourceSelected: [],

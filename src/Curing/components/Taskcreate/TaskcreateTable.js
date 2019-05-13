@@ -537,6 +537,7 @@ export default class TaskCreateTable extends Component {
                             createBtnVisible: true
                         });
                     } else {
+                        console.log('_addAreaLayer_addAreaLayer');
                         // 如果不是添加过，需要请求数据
                         me._addAreaLayer(eventKey);
                     }
@@ -565,6 +566,7 @@ export default class TaskCreateTable extends Component {
         } = this.props;
         try {
             let coords = await handleAreaLayerData(eventKey, getTreearea);
+            console.log('coords', coords);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];

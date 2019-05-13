@@ -455,7 +455,8 @@ export default class LocmeasureTable extends Component {
             smallclass = '',
             positiontype,
             smallclassData = '',
-            thinclassData = ''
+            thinclassData = '',
+            bigType = ''
         } = this.state;
         if (thinclass === '' && sxm === '') {
             message.info('请选择项目，标段，小班及细班信息或输入顺序码');
@@ -469,6 +470,7 @@ export default class LocmeasureTable extends Component {
         let postdata = {
             sxm,
             section,
+            bigType,
             treetype,
             stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),

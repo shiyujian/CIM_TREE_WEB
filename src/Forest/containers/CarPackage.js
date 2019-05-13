@@ -56,16 +56,22 @@ export default class CarPackage extends Component {
                 setkeycode,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree
+                getThinClassTree,
+                getTreeList
             },
             users,
-            platform: { tree = {} }
+            platform: { tree = {} },
+            treetypes
         } = this.props;
 
         setkeycode('');
         // 避免反复获取森林用户数据，提高效率
         if (!users) {
             getForestUsers();
+        }
+        // 避免反复获取森林树种列表，提高效率
+        if (!treetypes) {
+            getTreeList().then(x => this.setTreeTypeOption(x));
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
