@@ -3,7 +3,7 @@ import { Modal, Form, Input, Row, Col, Button, message, Select, Upload, Icon } f
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '../../../_platform/auth';
-import { UPLOAD_API, STATIC_DOWNLOAD_API, SOURCE_API, FILE_API } from '../../../_platform/api';
+import { UPLOAD_API, STATIC_DOWNLOAD_API, SOURCE_API, FILE_API, STATIC_PREVIEW_API } from '../../../_platform/api';
 import E from 'wangeditor';
 import { DEPARTMENT } from '_platform/api';
 
@@ -12,7 +12,7 @@ moment.locale('zh-cn');
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class RichModal extends Component {
+class NewsModal extends Component {
     array = [];
     constructor (props) {
         super(props);
@@ -81,6 +81,9 @@ class RichModal extends Component {
             if (toggleData.editData.cover) {
                 attachment[0].uid = '1';
                 attachment[0].status = 'done';
+                if (toggleData.editData.cover && toggleData.editData.cover.a_file) {
+                    attachment[0].url = STATIC_PREVIEW_API + toggleData.editData.cover.a_file;
+                }
             }
             let atta = toggleData.editData.attachment && toggleData.editData.attachment.fileList ? toggleData.editData.attachment.fileList : [];
             if (atta.length > 0) {
@@ -493,4 +496,4 @@ class RichModal extends Component {
     }
 }
 
-export default Form.create()(RichModal);
+export default Form.create()(NewsModal);

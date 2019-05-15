@@ -13,7 +13,7 @@ import {
     DatePicker,
     Select
 } from 'antd';
-import RichModal from './RichModal';
+import NewsModal from './NewsModal';
 import { DEPARTMENT } from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -204,10 +204,10 @@ class NewsTable extends Component {
 
     query1 () {
         const {
-            actions: { getDraftNewsList },
-            filter = {}
+            actions: { getDraftNewsList }
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
+            console.log('err', err);
             let conditions = {
                 org: values.workunits || '',
                 title: values.title1 || ''
@@ -245,12 +245,11 @@ class NewsTable extends Component {
         return (
             <Row>
                 {
-                    <div style={{ marginBottom: '10px' }}>
-                        {toggleData.visible &&
-                            toggleData.type === 'NEWS' && (
-                            <RichModal {...this.props} />
-                        )}
-                    </div>
+                    toggleData.visible &&
+                            toggleData.type === 'NEWS' &&
+                            (
+                                <NewsModal {...this.props} />
+                            )
                 }
                 <Col span={22} offset={1}>
                     <Tabs
@@ -264,10 +263,6 @@ class NewsTable extends Component {
                                 >
                                     新闻发布
                                 </Button>
-                                {toggleData.visible &&
-                                    toggleData.type === 'NEWS' && (
-                                    <RichModal {...this.props} />
-                                )}
                             </div>
                         }
                     >

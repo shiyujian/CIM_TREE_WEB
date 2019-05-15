@@ -12,7 +12,7 @@ moment.locale('zh-cn');
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class Modals extends Component {
+class NoticeModal extends Component {
     array = [];
     constructor (props) {
         super(props);
@@ -415,5 +415,5 @@ class Modals extends Component {
     }
 }
 
-export default Form.create()(Modals)
+export default Form.create()(NoticeModal)
 ;

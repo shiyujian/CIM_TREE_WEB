@@ -14,8 +14,7 @@ import {
     Icon,
     Select
 } from 'antd';
-import SimpleText from './SimpleText';
-import Modals from './SimpModal';
+import NoticeModal from './NoticeModal';
 import { DEPARTMENT } from '_platform/api';
 import moment from 'moment';
 import { getUser } from '../../../_platform/auth';
@@ -27,7 +26,7 @@ const Option = Select.Option;
 const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
 
-class TipsTable extends Component {
+class NoticeTable extends Component {
     array = [];
     constructor (props) {
         super(props);
@@ -283,11 +282,10 @@ class TipsTable extends Component {
         return (
             <Row>
                 {
-                    <div style={{ marginBottom: '10px' }}>
-                        {toggleData.visible && toggleData.type === 'TIPS' && (
-                            <Modals {...this.props} />
-                        )}
-                    </div>
+                    toggleData.visible && toggleData.type === 'TIPS' &&
+                     (
+                         <NoticeModal {...this.props} />
+                     )
                 }
                 <Col span={22} offset={1}>
                     <Tabs
@@ -301,10 +299,6 @@ class TipsTable extends Component {
                                 >
                                     通知发布
                                 </Button>
-                                {toggleData.visible &&
-                                    toggleData.type === 'TIPS' && (
-                                    <Modals {...this.props} />
-                                )}
                             </div>
                         }
                     >
@@ -538,9 +532,6 @@ class TipsTable extends Component {
                                 rowKey='id'
                             />
                         </TabPane>
-                        {/* <TabPane tab="通知发布" key="3">
-							<SimpleText {...this.props} />
-						</TabPane> */}
                     </Tabs>
                 </Col>
             </Row>
@@ -718,4 +709,4 @@ class TipsTable extends Component {
     ];
 }
 
-export default Form.create()(TipsTable);
+export default Form.create()(NoticeTable);

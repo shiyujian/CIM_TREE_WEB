@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Tabs } from 'antd';
 import NewsTable from '../components/News/NewsTable';
-import TipsTable from '../components/News/TipsTable';
+import NoticeTable from '../components/News/NoticeTable';
 
 const TabPane = Tabs.TabPane;
 
@@ -74,7 +74,7 @@ export default class News extends Component {
                         <NewsTable {...this.props} array={this.array} />
                     </TabPane>
                     <TabPane tab='通知管理' key='2'>
-                        <TipsTable {...this.props} array={this.array} />
+                        <NoticeTable {...this.props} array={this.array} />
                     </TabPane>
                 </Tabs>
             </div>
