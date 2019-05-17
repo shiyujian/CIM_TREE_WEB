@@ -373,6 +373,8 @@ export default class Member extends Component {
                     // groups: [7],
                     groups: setGroups,
                     is_active: true,
+                    id_num: user.account.id_num,
+                    id_image: [],
                     basic_params: {
                         info: {
                             电话: user.account.person_telephone || '',
@@ -441,6 +443,8 @@ export default class Member extends Component {
                     // groups: [7],
                     groups: groupsa,
                     is_active: true,
+                    id_num: user.account.id_num,
+                    id_image: [],
                     basic_params: {
                         info: {
                             电话: user.account.person_telephone || '',

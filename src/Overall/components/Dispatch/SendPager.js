@@ -13,7 +13,6 @@ import {
     Form,
     DatePicker
 } from 'antd';
-// import SimpleText from './SimpleText';
 import { getUser } from '../../../_platform/auth';
 import moment from 'moment';
 import ToggleModal from './ToggleModal';
