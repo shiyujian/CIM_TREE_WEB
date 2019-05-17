@@ -409,7 +409,10 @@ class Tablelevel extends Component {
                     confirmLoading: false
                 });
             }
-            rep = JSON.parse(rep);
+            // 清除不规范字符
+            rep = rep.replace(/\\/g, ' ');
+            rep = typeof rep === 'string' ? JSON.parse(rep) : rep;
+
             // 解析文件失败
             if (rep.errorinfo) {
                 message.error(rep.errorinfo);
