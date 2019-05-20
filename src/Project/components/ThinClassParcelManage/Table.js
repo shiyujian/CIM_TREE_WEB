@@ -179,8 +179,8 @@ class Tablelevel extends Component {
             datatype: 'thinclass',
             stime: '',
             etime: '',
-            page: 1,
-            size: 10
+            page: '',
+            size: ''
         }).then(rep => {
             if (rep.code === 200) {
                 this.setState({
