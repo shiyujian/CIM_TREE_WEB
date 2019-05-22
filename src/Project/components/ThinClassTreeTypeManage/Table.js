@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Input, Button, Select, Table, Pagination, Modal, Form, message, List, InputNumber, Spin } from 'antd';
 import {
     fillAreaColor,
-    getCoordsArr
+    getNewCoordsArrByMULTIPOLYGON,
+    getNewCoordsArrByPOLYGON
 } from '../auth';
 import { formItemLayout, getUser } from '_platform/auth';
 import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
@@ -197,8 +198,8 @@ class Tablelevel extends Component {
             onChange: (selectedRowKeys, selectedRows) => {
                 this.onLocation(selectedRows);
             },
-            type: 'radio',
-            selectedRowKeys: selectKey
+            selectedRowKeys: selectKey,
+            type: 'radio'
         };
         // 子表格
         let expandedRowRender = (record) => {
@@ -630,8 +631,17 @@ class Tablelevel extends Component {
         areaLayerList.map(item => {
             item.remove();
         });
-        let coordinatesArr = []; // 多维数据
-        let patternArr = []; // 图形数组
+        let coordinatesArr = []; // 二维数据[[[y,x],[y,x]], [[y,x],[y,x]]]
+        let selectKey = [];
+        selectedRows.map(item => {
+            if (isSuperAdmin || item.Section === this.userSection) {
+                selectKey.push(item.key);
+            }
+        });
+        console.log('选中的', selectKey, selectedRows);
+        this.setState({
+            selectKey
+        });
         if (!selectedRows[0].no) {
             return;
         }
@@ -643,28 +653,44 @@ class Tablelevel extends Component {
             page: '',
             size: ''
         }).then(rep => {
-            console.log('表格数据', rep.content);
             rep.content.map(record => {
-                let temporaryWKT = record.coords;
-                if (temporaryWKT.indexOf('MULTIPOLYGON') !== -1) {
-                    temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('(((') + 3, temporaryWKT.indexOf(')))'));
-                    patternArr = patternArr.concat(temporaryWKT.split(')),(('));
-                } else {
-                    temporaryWKT = temporaryWKT.slice(temporaryWKT.indexOf('((') + 2, temporaryWKT.indexOf('))'));
-                    patternArr.push(temporaryWKT);
+                if (record.coords && record.coords.indexOf('MULTIPOLYGON') !== -1) {
+                    let temporaryWKT = record.coords.slice(record.coords.indexOf('(((') + 3, record.coords.indexOf(')))'));
+                    let coordsArr = getNewCoordsArrByMULTIPOLYGON(temporaryWKT); // [闭合圈数组, [闭合圈数组，闭合圈数组]]
+                    console.log('分解后的数组', coordsArr);
+                    coordsArr.map(row => {
+                        let treearea = []; // 闭合圈 [[y,x],[y,x]]
+                        let finalCoordsArr = []; // 多圈数据组合
+                        row.map(record => {
+                            finalCoordsArr.push(...record);
+                        });
+                        finalCoordsArr.map(record => {
+                            let arr = record.split(' ');
+                            treearea.push([
+                                arr[1],
+                                arr[0]
+                            ]);
+                        });
+                        coordinatesArr.push(treearea);
+                    });
+                } else if (record.coords && record.coords.indexOf('POLYGON') !== -1) {
+                    let treearea = []; // 闭合圈 [[y,x],[y,x]]
+                    let temporaryWKT = record.coords.slice(record.coords.indexOf('((') + 2, record.coords.indexOf('))'));
+                    let coordsArr = getNewCoordsArrByPOLYGON(temporaryWKT); // 二维数组[闭合圈数组,闭合圈数组]
+                    let finalCoordsArr = []; // 多圈数据组合
+                    coordsArr.map(row => {
+                        finalCoordsArr.push(...row);
+                    });
+                    finalCoordsArr.map(row => {
+                        let arr = row.split(' ');
+                        treearea.push([
+                            arr[1],
+                            arr[0]
+                        ]);
+                    });
+                    coordinatesArr.push(treearea);
                 }
             });
-            console.log('patternArr', patternArr);
-            patternArr.map(item => {
-                let coordsArr = item.split(',');
-                let treearea = [];
-                coordsArr.map(record => {
-                    let arr = record.split(' ');
-                    treearea.push([arr[1], arr[0]]);
-                });
-                coordinatesArr.push(treearea);
-            });
-            console.log('coordinatesArr', coordinatesArr);
             // 如果地块存在，则定位过去
             if (coordinatesArr.length !== 0) {
                 let message = {

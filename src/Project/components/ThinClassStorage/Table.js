@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import moment from 'moment';
 import { Upload, Input, Icon, Button, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import { getUser, formItemLayout } from '_platform/auth';
 import {
     fillAreaColor,
-    getNewCoordsArr,
+    getNewCoordsArrByMULTIPOLYGON,
+    getNewCoordsArrByPOLYGON,
+    getNewMultiPolygonByCoordArr,
     getNewPolygonByCoordArr
 } from '../auth';
 import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
@@ -39,7 +40,7 @@ class Tablelevel extends Component {
         this.onAdd = this.onAdd.bind(this); // 暂存细班
         this.onEdit = this.onEdit.bind(this);
         this.onPutStorage = this.onPutStorage.bind(this); // 细班入库
-        this.handlePage = this.handlePage.bind(this);
+        this.handlePage = this.handlePage.bind(this); // 换页
         this.columns = [
             {
                 key: '1',
@@ -212,27 +213,47 @@ class Tablelevel extends Component {
             </div>
         );
     }
-    onLocation (recordArr) {
+    onLocation (selectedRows) {
         const { areaLayerList, isSuperAdmin } = this.state;
         areaLayerList.map(item => {
             item.remove();
         });
-        let coordinatesArr = []; // 多维数据
+        let coordinatesArr = []; // 二维数据[[[y,x],[y,x]], [[y,x],[y,x]]]
         let selectKey = [];
-        recordArr.map(item => {
+        selectedRows.map(item => {
             if (isSuperAdmin || item.Section === this.userSection) {
                 selectKey.push(item.key);
             }
         });
-        console.log('选中的', selectKey, recordArr);
+        console.log('选中的', selectKey, selectedRows);
         this.setState({
             selectKey
         });
-        recordArr.map(item => {
-            let treearea = [];
-            if (item.Geom) {
-                let coordsArr = getNewCoordsArr(item.Geom);
-                let finalCoordsArr = [];
+        selectedRows.map(item => {
+            if (item.Geom && item.Geom.indexOf('MULTIPOLYGON') !== -1) {
+                let temporaryWKT = item.Geom.slice(item.Geom.indexOf('(((') + 3, item.Geom.indexOf(')))'));
+                let coordsArr = getNewCoordsArrByMULTIPOLYGON(temporaryWKT); // [闭合圈数组, [闭合圈数组，闭合圈数组]]
+                console.log('分解后的数组', coordsArr);
+                coordsArr.map(row => {
+                    let treearea = []; // 闭合圈 [[y,x],[y,x]]
+                    let finalCoordsArr = []; // 多圈数据组合
+                    row.map(record => {
+                        finalCoordsArr.push(...record);
+                    });
+                    finalCoordsArr.map(record => {
+                        let arr = record.split(' ');
+                        treearea.push([
+                            arr[1],
+                            arr[0]
+                        ]);
+                    });
+                    coordinatesArr.push(treearea);
+                });
+            } else if (item.Geom && item.Geom.indexOf('POLYGON') !== -1) {
+                let treearea = []; // 闭合圈 [[y,x],[y,x]]
+                let temporaryWKT = item.Geom.slice(item.Geom.indexOf('((') + 2, item.Geom.indexOf('))'));
+                let coordsArr = getNewCoordsArrByPOLYGON(temporaryWKT); // 二维数组[闭合圈数组,闭合圈数组]
+                let finalCoordsArr = []; // 多圈数据组合
                 coordsArr.map(row => {
                     finalCoordsArr.push(...row);
                 });
@@ -243,8 +264,8 @@ class Tablelevel extends Component {
                         arr[0]
                     ]);
                 });
+                coordinatesArr.push(treearea);
             }
-            coordinatesArr.push(treearea);
         });
         // 如果地块存在，则定位过去
         if (coordinatesArr.length !== 0) {
@@ -426,12 +447,19 @@ class Tablelevel extends Component {
             } else if (rep.features) {
                 message.success('数据导入成功，已默认勾选可以的入库的数据');
                 console.log(rep.features, '处理前的');
+                // debugger
                 rep.features.map((item, index) => {
                     item.key = index;
-                    console.log('最初的item', item);
-                    let finalCoordsArr = getNewCoordsArr(item.Geom);
-                    console.log('最终的item', finalCoordsArr);
-                    item.Geom = getNewPolygonByCoordArr(finalCoordsArr);
+                    if (item.Geom.indexOf('MULTIPOLYGON') !== -1) {
+                        let geomStr = item.Geom.slice(item.Geom.indexOf('(((') + 3, item.Geom.indexOf(')))'));
+                        let finalCoordsArr = getNewCoordsArrByMULTIPOLYGON(geomStr);
+                        item.Geom = getNewMultiPolygonByCoordArr(finalCoordsArr);
+                        // debugger
+                    } else if (item.Geom.indexOf('POLYGON') !== -1) {
+                        let geomStr = item.Geom.slice(item.Geom.indexOf('((') + 2, item.Geom.indexOf('))'));
+                        let finalCoordsArr = getNewCoordsArrByPOLYGON(geomStr);
+                        item.Geom = getNewPolygonByCoordArr(finalCoordsArr);
+                    }
                 });
                 console.log(rep.features, '处理后的');
                 this.dataList = rep.features;
