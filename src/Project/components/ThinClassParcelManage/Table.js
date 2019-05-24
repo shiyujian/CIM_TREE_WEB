@@ -579,14 +579,22 @@ class Tablelevel extends Component {
             if (item.coords && item.coords.indexOf('MULTIPOLYGON') !== -1) {
                 let temporaryWKT = item.coords.slice(item.coords.indexOf('(((') + 3, item.coords.indexOf(')))'));
                 let coordsArr = getNewCoordsArrByMULTIPOLYGON(temporaryWKT); // [闭合圈数组, [闭合圈数组，闭合圈数组]]
-                console.log('分解后的数组', coordsArr);
+                console.log(coordsArr, '多个闭合圈数组');
+                debugger
+                let newCoordsArr = [];
                 coordsArr.map(row => {
-                    let treearea = []; // 闭合圈 [[y,x],[y,x]]
-                    let finalCoordsArr = []; // 多圈数据组合
                     row.map(record => {
-                        finalCoordsArr.push(...record);
+                        if (Array.isArray(record)) {
+                            newCoordsArr.push(record);
+                        } else {
+                            newCoordsArr.push(row);
+                        }
                     });
-                    finalCoordsArr.map(record => {
+                });
+                console.log(newCoordsArr, '新多个闭合圈数组'); // [闭合圈数组，闭合圈数组，闭合圈数组]
+                newCoordsArr.map(row => {
+                    let treearea = []; // 闭合圈 [[y,x],[y,x]]
+                    row.map(record => {
                         let arr = record.split(' ');
                         treearea.push([
                             arr[1],
@@ -596,21 +604,21 @@ class Tablelevel extends Component {
                     coordinatesArr.push(treearea);
                 });
             } else if (item.coords && item.coords.indexOf('POLYGON') !== -1) {
-                let treearea = []; // 闭合圈 [[y,x],[y,x]]
                 let temporaryWKT = item.coords.slice(item.coords.indexOf('((') + 2, item.coords.indexOf('))'));
                 let coordsArr = getNewCoordsArrByPOLYGON(temporaryWKT); // 二维数组[闭合圈数组,闭合圈数组]
-                let finalCoordsArr = []; // 多圈数据组合
+                console.log(coordsArr, '多个闭合圈数组');
                 coordsArr.map(row => {
-                    finalCoordsArr.push(...row);
+                    let treearea = []; // 闭合圈 [[y,x],[y,x]]
+                    row.map(record => {
+                        let arr = record.split(' ');
+                        treearea.push([
+                            arr[1],
+                            arr[0]
+                        ]);
+                    });
+                    coordinatesArr.push(treearea);
                 });
-                finalCoordsArr.map(row => {
-                    let arr = row.split(' ');
-                    treearea.push([
-                        arr[1],
-                        arr[0]
-                    ]);
-                });
-                coordinatesArr.push(treearea);
+                console.log(coordinatesArr, '最终数据');
             }
         });
         // 如果地块存在，则定位过去
