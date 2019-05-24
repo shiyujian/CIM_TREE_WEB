@@ -403,6 +403,18 @@ export const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybas
 // 获取供应商列表
 export const getSupplierListOK = createAction(`${ID}_getSupplierList`);
 export const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers`, [], 'GET', []);
+// 数据维护
+// 修改苗圃信息
+export const putChangeNurseryInfoInCar = forestFetchAction(`${FOREST_API}/tree/batchnursery`, [], 'PUT', []);
+// 修改车辆信息
+export const putChangCarPackInfo = forestFetchAction(`${FOREST_API}/tree/carpack`, [], 'PUT', []);
+// 车辆包合并
+export const putMergeCarPack = forestFetchAction(`${FOREST_API}/tree/packmerge`, [], 'PUT', []);
+// 车辆包内苗木移动车辆包内苗木移动
+export const putMoveTreeInCar = forestFetchAction(`${FOREST_API}/tree/packnurserymove`, [], 'PUT', []);
+// 修改现场测量信息
+export const putChangeLocInfo = forestFetchAction(`${FOREST_API}/tree/batchtree`, [], 'PUT', []);
+
 export const actions = {
     getTotalSat,
     getTreeLocations,
@@ -498,7 +510,12 @@ export const actions = {
     getNurseryListOK,
     getNurseryList,
     getSupplierListOK,
-    getSupplierList
+    getSupplierList,
+    putChangeNurseryInfoInCar,
+    putChangCarPackInfo,
+    putMergeCarPack,
+    putMoveTreeInCar,
+    putChangeLocInfo
 };
 export default handleActions({
     [getTreeOK]: (state, {

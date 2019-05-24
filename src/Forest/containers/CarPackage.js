@@ -57,11 +57,17 @@ export default class CarPackage extends Component {
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree,
-                getTreeList
+                getTreeList,
+                getNurseryList,
+                getSupplierList,
+                getNurseryListOK,
+                getSupplierListOK
             },
             users,
             platform: { tree = {} },
-            treetypes
+            treetypes,
+            nurseryList,
+            supplierList
         } = this.props;
 
         setkeycode('');
@@ -69,9 +75,21 @@ export default class CarPackage extends Component {
         if (!users) {
             getForestUsers();
         }
+        if (!nurseryList) {
+            let nurseryData = await getNurseryList();
+            if (nurseryData && nurseryData.content) {
+                await getNurseryListOK(nurseryData.content);
+            }
+        }
+        if (!supplierList) {
+            let supplierData = await getSupplierList();
+            if (supplierData && supplierData.content) {
+                await getSupplierListOK(supplierData.content);
+            }
+        }
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
-            getTreeList().then(x => this.setTreeTypeOption(x));
+            getTreeList();
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);

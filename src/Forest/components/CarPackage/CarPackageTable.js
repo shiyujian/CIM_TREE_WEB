@@ -17,7 +17,7 @@ import moment from 'moment';
 import { FOREST_API } from '_platform/api';
 import { getUser, getUserIsManager } from '_platform/auth';
 import CarPackDetailModal from './CarPackDetailModal'; // 查看车内苗木信息
-import HandleNurseryInCar from './HandleNurseryInCar'; // 移动或修改车内苗木
+import HandleChangeDetailModal from './HandleChangeDetailModal'; // 移动或修改车内苗木
 import ChangeCarInfoModal from './ChangeCarInfoModal'; // 修改车辆信息
 import MergeCarPackModal from './MergeCarPackModal'; // 合并两车
 import '../index.less';
@@ -54,10 +54,11 @@ export default class CarPackageTable extends Component {
             checkstatus: '',
             status: '',
             currentCarID: '',
+            currentRecord: '',
             detailVisible: false,
             editCarInfoVisible: false,
             mergeCarPackVisible: false,
-            handleNurseryInCarVisible: false
+            handleChangeDetailVisible: false
         };
     }
     columns = [
@@ -199,16 +200,16 @@ export default class CarPackageTable extends Component {
         {
             title: '操作',
             render: (text, record) => {
-                // let permission = getUserIsManager();
-                let permission = false;
+                let permission = getUserIsManager();
+                // let permission = false;
                 if (permission) {
                     return (
                         <div>
                             <a
                                 href='javascript:;'
-                                onClick={this.handleChangeNurseryInCar.bind(this, record)}
+                                onClick={this.handleChangeDetail.bind(this, record)}
                             >
-                                修改苗木
+                                详情
                             </a>
                             <Divider type='vertical' />
                             <a
@@ -249,7 +250,7 @@ export default class CarPackageTable extends Component {
                     leftkeycode: nextProps.leftkeycode
                 },
                 () => {
-                    this.qury(1);
+                    this.query(1);
                 }
             );
         }
@@ -277,7 +278,7 @@ export default class CarPackageTable extends Component {
         });
     }
     // 修改车辆内的苗木信息
-    handleChangeNurseryInCar = async (record) => {
+    handleChangeDetail = async (record) => {
         if (
             record &&
             record.Status &&
@@ -287,15 +288,15 @@ export default class CarPackageTable extends Component {
             return;
         }
         this.setState({
-            handleNurseryInCarVisible: true,
-            currentCarID: record.ID
+            handleChangeDetailVisible: true,
+            currentRecord: record
         });
     }
     // 关闭修改车辆信息弹窗
-    handleChangeNurseryInCarModalCancel = async () => {
+    handleChangeDetailModalCancel = async () => {
         this.setState({
-            handleNurseryInCarVisible: false,
-            currentCarID: ''
+            handleChangeDetailVisible: false,
+            currentRecord: ''
         });
     }
     // 修改车辆信息
@@ -309,13 +310,24 @@ export default class CarPackageTable extends Component {
             return;
         }
         this.setState({
-            editCarInfoVisible: true
+            editCarInfoVisible: true,
+            currentRecord: record
         });
     }
-    // 关闭修改车辆信息弹窗
+    // 修改信息成功，关闭修改车辆信息弹窗，重新获取信息
+    handleEditCarInfoModalOk = async () => {
+        const pager = { ...this.state.pagination };
+        this.setState({
+            editCarInfoVisible: false,
+            currentRecord: ''
+        });
+        await this.query(pager.current);
+    }
+    // 取消修改信息，关闭修改车辆信息弹窗
     handleEditCarInfoModalCancel = async () => {
         this.setState({
-            editCarInfoVisible: false
+            editCarInfoVisible: false,
+            currentRecord: ''
         });
     }
     // 合并车辆包
@@ -329,13 +341,24 @@ export default class CarPackageTable extends Component {
             return;
         }
         this.setState({
-            mergeCarPackVisible: true
+            mergeCarPackVisible: true,
+            currentRecord: record
         });
     }
-    // 关闭合并车辆包弹窗
+    // 合并车辆包成功,关闭合并车辆包弹窗，重新获取信息
+    handleMergeCarPackModalOk = async () => {
+        const pager = { ...this.state.pagination };
+        this.setState({
+            mergeCarPackVisible: false,
+            currentRecord: ''
+        });
+        await this.query(pager.current);
+    }
+    // 取消合并车辆包,关闭合并车辆包弹窗
     handleMergeCarPackModalCancel = async () => {
         this.setState({
-            mergeCarPackVisible: false
+            mergeCarPackVisible: false,
+            currentRecord: ''
         });
     }
 
@@ -385,7 +408,7 @@ export default class CarPackageTable extends Component {
         this.setState({
             pagination: pager
         });
-        this.qury(pagination.current);
+        this.query(pagination.current);
     }
 
     resetinput () {
@@ -393,7 +416,7 @@ export default class CarPackageTable extends Component {
         resetinput(leftkeycode);
     }
 
-    qury = async (page) => {
+    query = async (page) => {
         const {
             licenseplate = '',
             section = '',
@@ -461,7 +484,7 @@ export default class CarPackageTable extends Component {
                 this.setState({ tblData, pagination });
             }
         } catch (e) {
-            console.log('qury', e);
+            console.log('query', e);
         }
     }
 
@@ -667,7 +690,7 @@ export default class CarPackageTable extends Component {
             detailVisible,
             editCarInfoVisible,
             mergeCarPackVisible,
-            handleNurseryInCarVisible
+            handleChangeDetailVisible
         } = this.state;
         return (
             <div>
@@ -681,11 +704,11 @@ export default class CarPackageTable extends Component {
                         /> : ''
                 }
                 {
-                    handleNurseryInCarVisible
-                        ? <HandleNurseryInCar
+                    handleChangeDetailVisible
+                        ? <HandleChangeDetailModal
                             {...this.props}
                             {...this.state}
-                            onChangeNurseryInCarModalCancel={this.handleChangeNurseryInCarModalCancel.bind(this)}
+                            onChangeDetailModalCancel={this.handleChangeDetailModalCancel.bind(this)}
                         /> : ''
                 }
                 {
@@ -693,6 +716,7 @@ export default class CarPackageTable extends Component {
                         ? <ChangeCarInfoModal
                             {...this.props}
                             {...this.state}
+                            onEditCarModalOk={this.handleEditCarInfoModalOk.bind(this)}
                             onEditCarModalCancel={this.handleEditCarInfoModalCancel.bind(this)}
                         /> : ''
                 }
@@ -701,6 +725,7 @@ export default class CarPackageTable extends Component {
                         ? <MergeCarPackModal
                             {...this.props}
                             {...this.state}
+                            onMergeCarPackModalOk={this.handleMergeCarPackModalOk.bind(this)}
                             onMergeCarPackModalCancel={this.handleMergeCarPackModalCancel.bind(this)}
                         /> : ''
                 }
