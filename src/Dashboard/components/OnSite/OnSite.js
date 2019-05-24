@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-18 14:14:29
+ * @Last Modified time: 2019-05-24 11:12:52
  */
 import React, { Component } from 'react';
 import {
@@ -635,6 +635,7 @@ class OnSite extends Component {
         } = this.props;
         try {
             let coords = await handleAreaLayerData(eventKey, getTreearea);
+            console.log('coords', coords);
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];

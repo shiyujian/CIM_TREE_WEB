@@ -14,16 +14,10 @@ export const handleAreaDesignLayerData = async (eventKey, treeNodeName, getTreea
         let data = contents.find(content => content.Section === section);
         let wkt = data.coords;
         if (wkt.indexOf('MULTIPOLYGON') !== -1) {
-            let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
-            let arr = data.split('),(');
+            let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
+            let arr = datas.split('),(');
             arr.map((a, index) => {
-                if (index === 0) {
-                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
-                } else if (index === arr.length - 1) {
-                    str = a.slice(0, a.indexOf(')'));
-                } else {
-                    str = a;
-                }
+                str = a.slice(a.indexOf('(') + 1, a.length - 1);
                 coords.push(str);
             });
         } else if (wkt.indexOf('POLYGON') !== -1) {
@@ -55,16 +49,10 @@ export const handleAreaRealLayerData = async (eventKey, treeNodeName, getTreeare
             wkt = data.actualcoords;
         }
         if (wkt.indexOf('MULTIPOLYGON') !== -1) {
-            let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
-            let arr = data.split('),(');
+            let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
+            let arr = datas.split('),(');
             arr.map((a, index) => {
-                if (index === 0) {
-                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
-                } else if (index === arr.length - 1) {
-                    str = a.slice(0, a.indexOf(')'));
-                } else {
-                    str = a;
-                }
+                str = a.slice(a.indexOf('(') + 1, a.length - 1);
                 coords.push(str);
             });
         } else if (wkt.indexOf('POLYGON') !== -1) {
@@ -300,17 +288,10 @@ export const getStatusByID = (ID) => {
 export const wktToJson = (wkt) => {
     let coords = [];
     if (wkt.indexOf('MULTIPOLYGON') !== -1) {
-        let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
-        let arr = data.split('),(');
+        let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
+        let arr = datas.split('),(');
         arr.map((a, index) => {
-            let str = '';
-            if (index === 0) {
-                str = a.slice(a.indexOf('(') + 1, a.length - 1);
-            } else if (index === arr.length - 1) {
-                str = a.slice(0, a.indexOf(')'));
-            } else {
-                str = a;
-            }
+            str = a.slice(a.indexOf('(') + 1, a.length - 1);
             coords.push(str);
         });
     } else if (wkt.indexOf('POLYGON') !== -1) {

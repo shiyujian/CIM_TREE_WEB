@@ -334,7 +334,8 @@ export default class TreeMessGisOnClickHandle extends Component {
                     });
                     let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
                     let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                    let companyName = parent.name;
+                    console.log('parent', parent);
+                    let companyName = (parent && parent.name) || '';
                     treeflowData[i].companyName = companyName;
                     treeflowData[i].orgData = parent;
                 }
