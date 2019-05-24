@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Input, Button, Select, Table, Pagination, Modal, Form, message, List, InputNumber, Spin } from 'antd';
 import {
     fillAreaColor,
-    getNewCoordsArr
+    getNewCoordsArrByMULTIPOLYGON,
+    getNewCoordsArrByPOLYGON
 } from '../auth';
 import { formItemLayout, getUser } from '_platform/auth';
 import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
@@ -179,8 +180,8 @@ class Tablelevel extends Component {
             datatype: 'thinclass',
             stime: '',
             etime: '',
-            page: 1,
-            size: 10
+            page: '',
+            size: ''
         }).then(rep => {
             if (rep.code === 200) {
                 this.setState({
@@ -224,8 +225,8 @@ class Tablelevel extends Component {
                 <div style={{marginTop: 20}}>
                     <div style={{width: 720, minHeight: 640, float: 'left'}}>
                         <Spin spinning={spinning}>
-                            <Table rowSelection={rowSelection}
-                                columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
+                            <Table rowSelection={rowSelection} columns={this.columns}
+                                dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
                                 onExpand={this.handleExpanded.bind(this)} />
                         </Spin>
                         <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
@@ -558,27 +559,47 @@ class Tablelevel extends Component {
             showModalHistory: false
         });
     }
-    onLocation (recordArr) {
+    onLocation (selectedRows) {
         let { areaLayerList, isSuperAdmin } = this.state;
         areaLayerList.map(item => {
             item.remove();
         });
-        let coordinatesArr = []; // 多维数据[[], [], []]
+        let coordinatesArr = []; // 二维数据[[[y,x],[y,x]], [[y,x],[y,x]]]
         let selectKey = [];
-        recordArr.map(item => {
+        selectedRows.map(item => {
             if (isSuperAdmin || item.Section === this.userSection) {
                 selectKey.push(item.key);
             }
         });
-        console.log('选中的', selectKey, recordArr);
+        console.log('选中的', selectKey, selectedRows);
         this.setState({
             selectKey
         });
-        recordArr.map(item => {
-            let treearea = [];
-            if (item.coords) {
-                let coordsArr = getNewCoordsArr(item.coords);
-                let finalCoordsArr = [];
+        selectedRows.map(item => {
+            if (item.coords && item.coords.indexOf('MULTIPOLYGON') !== -1) {
+                let temporaryWKT = item.coords.slice(item.coords.indexOf('(((') + 3, item.coords.indexOf(')))'));
+                let coordsArr = getNewCoordsArrByMULTIPOLYGON(temporaryWKT); // [闭合圈数组, [闭合圈数组，闭合圈数组]]
+                console.log('分解后的数组', coordsArr);
+                coordsArr.map(row => {
+                    let treearea = []; // 闭合圈 [[y,x],[y,x]]
+                    let finalCoordsArr = []; // 多圈数据组合
+                    row.map(record => {
+                        finalCoordsArr.push(...record);
+                    });
+                    finalCoordsArr.map(record => {
+                        let arr = record.split(' ');
+                        treearea.push([
+                            arr[1],
+                            arr[0]
+                        ]);
+                    });
+                    coordinatesArr.push(treearea);
+                });
+            } else if (item.coords && item.coords.indexOf('POLYGON') !== -1) {
+                let treearea = []; // 闭合圈 [[y,x],[y,x]]
+                let temporaryWKT = item.coords.slice(item.coords.indexOf('((') + 2, item.coords.indexOf('))'));
+                let coordsArr = getNewCoordsArrByPOLYGON(temporaryWKT); // 二维数组[闭合圈数组,闭合圈数组]
+                let finalCoordsArr = []; // 多圈数据组合
                 coordsArr.map(row => {
                     finalCoordsArr.push(...row);
                 });
@@ -589,10 +610,9 @@ class Tablelevel extends Component {
                         arr[0]
                     ]);
                 });
+                coordinatesArr.push(treearea);
             }
-            coordinatesArr.push(treearea);
         });
-        console.log('选中的', coordinatesArr);
         // 如果地块存在，则定位过去
         if (coordinatesArr.length !== 0) {
             let message = {
