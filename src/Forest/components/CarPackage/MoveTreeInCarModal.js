@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react';
+import React, { Component } from 'react';
 import {
     Button,
     Row,
@@ -23,7 +23,7 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
-class MergeCarPackModal extends Component {
+class MoveTreeInCarModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -128,48 +128,50 @@ class MergeCarPackModal extends Component {
             }
         }
     }
-    handleMergeCarPackOk = async () => {
+    handleMoveTreeInCarOk = async () => {
         const {
             dataChecked
         } = this.state;
         const {
             actions: {
-                putMergeCarPack
+                putMoveTreeInCar
             },
-            currentRecord
+            currentRecord,
+            selectedRowSXM
         } = this.props;
         try {
             if (dataChecked && currentRecord && currentRecord.ID) {
                 let postData = {
-                    'CorrectPackId': dataChecked,
-                    'ErrorPackId': currentRecord.ID
+                    'PackID': dataChecked,
+                    'OldPackID': currentRecord.ID,
+                    'SXMs': selectedRowSXM
                 };
-                let data = await putMergeCarPack({}, postData);
+                let data = await putMoveTreeInCar({}, postData);
                 console.log('data', data);
                 if (data && data.code === 1) {
                     Notification.success({
-                        message: '车辆包合并成功',
+                        message: '苗木移动成功',
                         duration: 3
                     });
-                    await this.props.onMergeCarPackModalOk();
+                    await this.props.onMoveTreeInCarModalOk();
                 } else {
                     Notification.error({
-                        message: '车辆包合并失败',
+                        message: '苗木移动失败',
                         duration: 3
                     });
                 }
             } else {
                 Notification.error({
-                    message: '未选中车辆包，不能进行合并',
+                    message: '未选中车辆包，不能进行移动',
                     duration: 3
                 });
             }
         } catch (e) {
-            console.log('handleMergeCarPackOk', e);
+            console.log('handleMoveTreeInCarOk', e);
         }
     }
-    handleMergeCarPackCancel = () => {
-        this.props.onMergeCarPackModalCancel();
+    handleMoveTreeInCarCancel = () => {
+        this.props.onMoveTreeInCarModalCancel();
     }
     projectSelect = (value) => {
         const {
@@ -294,7 +296,8 @@ class MergeCarPackModal extends Component {
         const {
             form: { getFieldDecorator },
             platform: { tree = {} },
-            currentRecord
+            currentRecord,
+            selectedRowSXM = []
         } = this.props;
         const {
             sectionsList = [],
@@ -306,11 +309,11 @@ class MergeCarPackModal extends Component {
         return (
             <Modal
                 width={1000}
-                title='车辆包合并'
+                title='选择车辆'
                 visible
                 maskClosable={false}
                 footer={null}
-                onCancel={this.handleMergeCarPackCancel.bind(this)}
+                onCancel={this.handleMoveTreeInCarCancel.bind(this)}
             >
                 <div>
                     <Form>
@@ -437,7 +440,7 @@ class MergeCarPackModal extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={6}>
-                                <FormItem {...MergeCarPackModal.FormItemLayout1} >
+                                <FormItem {...MoveTreeInCarModal.FormItemLayout1} >
                                     {getFieldDecorator('button', {
                                     })(
                                         <div>
@@ -470,22 +473,20 @@ class MergeCarPackModal extends Component {
                             <Button
                                 type='primary'
                                 style={{marginLeft: 30}}
-                                onClick={this.handleMergeCarPackCancel.bind(this)}
+                                onClick={this.handleMoveTreeInCarCancel.bind(this)}
                             >
                             取消
                             </Button>
                             {
                                 dataChecked && currentRecord && currentRecord.LicensePlate
                                     ? <Popconfirm
-                                        style={{wordWrap: 'break-word'}}
                                         title={
                                             <div>
-                                                <p>{`确定将 ${currentRecord.LicensePlate}(${currentRecord.Section}) 中的 ${selectRecort.NurseryNum} 棵`}</p>
-                                                <p>{`苗木移动至 ${selectRecort.LicensePlate}(${selectRecort.Section}) 中,`}</p>
-                                                <p>{`同时清除 ${currentRecord.LicensePlate} 么`}</p>
+                                                <p>{`确定将 ${currentRecord.LicensePlate}(${currentRecord.Section}) 中的 ${selectedRowSXM.length} 棵`}</p>
+                                                <p>{`苗木移动至 ${selectRecort.LicensePlate}(${selectRecort.Section}) 中么`}</p>
                                             </div>
                                         }
-                                        onConfirm={this.handleMergeCarPackOk.bind(this)}
+                                        onConfirm={this.handleMoveTreeInCarOk.bind(this)}
                                         okText='确认'
                                         cancelText='取消'
                                     >
@@ -512,4 +513,4 @@ class MergeCarPackModal extends Component {
     }
 }
 
-export default Form.create()(MergeCarPackModal);
+export default Form.create()(MoveTreeInCarModal);

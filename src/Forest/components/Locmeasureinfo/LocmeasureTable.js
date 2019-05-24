@@ -13,7 +13,7 @@ import {
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API } from '../../../_platform/api';
+import { FOREST_API } from '_platform/api';
 import { getUser, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import '../index.less';
 import {
@@ -73,9 +73,12 @@ export default class LocmeasureTable extends Component {
             TQZJFirst: 0,
             TQZJSecond: '',
             selectedRowKeys: [],
-            dataSourceSelected: [],
+            selectedRows: [],
+            selectedRowSXM: [],
             changeLocInfoVisible: false,
-            selectedAllRowKeys: false
+            changeLocInfoAllStatus: false,
+            example: '',
+            postData: ''
         };
         this.columns = [
             {
@@ -327,443 +330,96 @@ export default class LocmeasureTable extends Component {
         let user = getUser();
         this.sections = JSON.parse(user.sections);
     }
-    render () {
-        const { tblData, changeLocInfoVisible } = this.state;
-        return (
-            <div>
-                {this.treeTable(tblData)}
-                <Modal
-                    width={522}
-                    title='详细信息'
-                    style={{ textAlign: 'center' }}
-                    visible={this.state.imgvisible}
-                    onOk={this.handleCancel.bind(this)}
-                    onCancel={this.handleCancel.bind(this)}
-                    footer={null}
-                >
-                    {this.state.imgArr}
-                    <Row style={{ marginTop: 10 }}>
-                        <Button
-                            onClick={this.handleCancel.bind(this)}
-                            style={{ float: 'right' }}
-                            type='primary'
-                        >
-                            关闭
-                        </Button>
-                    </Row>
-                </Modal>
-                {
-                    changeLocInfoVisible
-                        ? <ChangeLocInfoModal
-                            {...this.props}
-                            {...this.state}
-                            onOk={this.handleChangeLocInfoOK.bind(this)}
-                            onCancel={this.handleChangeLocInfoCancel.bind(this)}
-                        />
-                        : ''
-                }
-            </div>
-        );
-    }
-    treeTable (details) {
-        const {
-            treetypeoption,
-            sectionoption,
-            smallclassoption,
-            thinclassoption,
-            typeoption,
-            statusoption
-        } = this.props;
-        const {
-            sxm,
-            rolename,
-            section,
-            smallclass,
-            thinclass,
-            bigType,
-            treetypename,
-            status,
-            selectedRowKeys,
-            dataSourceSelected
-            // islocation
-        } = this.state;
-        const suffix1 = sxm ? (
-            <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
-        const suffix2 = rolename ? (
-            <Icon type='close-circle' onClick={this.emitEmpty2} />
-        ) : null;
-        let header = '';
-        // let permission = getUserIsManager();
-        let permission = false;
-        header = (
-            <div>
-                <Row className='forest-search-layout'>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>顺序码：</span>
-                        <Input
-                            suffix={suffix1}
-                            value={sxm}
-                            className='forest-forestcalcw4'
-                            onChange={this.sxmChange.bind(this)}
-                        />
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>标段：</span>
-                        <Select
-                            allowClear
-                            showSearch
-                            filterOption={(input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                            }
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={section}
-                            onChange={this.onSectionChange.bind(this)}
-                        >
-                            {sectionoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>小班：</span>
-                        <Select
-                            allowClear
-                            showSearch
-                            filterOption={(input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                            }
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={smallclass}
-                            onChange={this.onSmallClassChange.bind(this)}
-                        >
-                            {smallclassoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>细班：</span>
-                        <Select
-                            allowClear
-                            showSearch
-                            filterOption={(input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                            }
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={thinclass}
-                            onChange={this.onThinClassChange.bind(this)}
-                        >
-                            {thinclassoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>类型：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={bigType}
-                            onChange={this.onTypeChange.bind(this)}
-                        >
-                            {typeoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>树种：</span>
-                        <Select
-                            allowClear
-                            showSearch
-                            filterOption={(input, option) =>
-                                option.props.children
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                            }
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={treetypename}
-                            onChange={this.onTreeTypeChange.bind(this)}
-                        >
-                            {treetypeoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>状态：</span>
-                        <Select
-                            allowClear
-                            className='forest-forestcalcw4'
-                            defaultValue='全部'
-                            value={status}
-                            onChange={this.onStatusChange.bind(this)}
-                        >
-                            {statusoption}
-                        </Select>
-                    </div>
-                    <div className='forest-mrg10'>
-                        <span className='forest-search-span'>测量人：</span>
-                        <Input
-                            suffix={suffix2}
-                            value={rolename}
-                            placeholder='请输入用户名'
-                            className='forest-forestcalcw4'
-                            onChange={this.onRoleNameChange.bind(this)}
-                        />
-                    </div>
-                    <div className='forest-mrg-datePicker'>
-                        <span className='forest-search-span'>测量时间：</span>
-                        <RangePicker
-                            style={{ verticalAlign: 'middle' }}
-                            defaultValue={[
-                                moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),
-                                moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')
-                            ]}
-                            className='forest-forestcalcw4'
-                            showTime={{ format: 'HH:mm:ss' }}
-                            format={'YYYY/MM/DD HH:mm:ss'}
-                            onChange={this.datepick.bind(this)}
-                            onOk={this.datepick.bind(this)}
-                        />
-                    </div>
-                    <div className='forest-mrg-standard2'>
-                        <span className='forest-search-span'>胸径：</span>
-                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.XJFirst}
-                                    onChange={this.handleXJChangeFirst.bind(this)} />
-                            </Col>
-                            <span style={{width: 20, textAlign: 'center'}} >~</span>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.XJSecond}
-                                    onChange={this.handleXJChangeSecond.bind(this)} />
-                            </Col>
-                        </InputGroup>
-                    </div>
-                    <div className='forest-mrg-standard2'>
-                        <span className='forest-search-span'>地径：</span>
-                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.DJFirst}
-                                    onChange={this.handleDJChangeFirst.bind(this)} />
-                            </Col>
-                            <span style={{width: 20, textAlign: 'center'}} >~</span>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.DJSecond}
-                                    onChange={this.handleDJChangeSecond.bind(this)} />
-                            </Col>
-                        </InputGroup>
-                    </div>
-                    <div className='forest-mrg-standard2'>
-                        <span className='forest-search-span'>高度：</span>
-                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.GDFirst}
-                                    onChange={this.handleGDChangeFirst.bind(this)} />
-                            </Col>
-                            <span style={{width: 20, textAlign: 'center'}} >~</span>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.GDSecond}
-                                    onChange={this.handleGDChangeSecond.bind(this)} />
-                            </Col>
-                        </InputGroup>
-                    </div>
-                    <div className='forest-mrg-standard2'>
-                        <span className='forest-search-span'>冠幅：</span>
-                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.GFFirst}
-                                    onChange={this.handleGFChangeFirst.bind(this)} />
-                            </Col>
-                            <span style={{width: 20, textAlign: 'center'}} >~</span>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.GFSecond}
-                                    onChange={this.handleGFChangeSecond.bind(this)} />
-                            </Col>
-                        </InputGroup>
-                    </div>
-                    <div className='forest-mrg-standard4'>
-                        <span className='forest-search-span'>土球厚度：</span>
-                        <InputGroup compact className='forest-forestcalcw4' style={{display: 'inlineBlock'}}>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.TQHDFirst}
-                                    onChange={this.handleTQHDChangeFirst.bind(this)} />
-                            </Col>
-                            <span style={{width: 20, textAlign: 'center'}} >~</span>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.TQHDSecond}
-                                    onChange={this.handleTQHDChangeSecond.bind(this)} />
-                            </Col>
-                        </InputGroup>
-                    </div>
-                    <div className='forest-mrg-standard4'>
-                        <span className='forest-search-span'>土球直径：</span>
-                        <InputGroup compact className='forest-forestcalcw4' style={{display: 'inlineBlock'}}>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.TQZJFirst}
-                                    onChange={this.handleTQZJChangeFirst.bind(this)} />
-                            </Col>
-                            <span style={{width: 20, textAlign: 'center'}} >~</span>
-                            <Col>
-                                <Input addonAfter={'cm'} style={{width: 100}}
-                                    value={this.state.TQZJSecond}
-                                    onChange={this.handleTQZJChangeSecond.bind(this)} />
-                            </Col>
-                        </InputGroup>
-                    </div>
-
-                </Row>
-                <Row style={{marginTop: 10, marginBottom: 10}}>
-                    <Col span={2} >
-                        <Button
-                            type='primary'
-                            onClick={this.handleTableChange.bind(this, {
-                                current: 1
-                            })}
-                        >
-                            查询
-                        </Button>
-                    </Col>
-                    <Col span={14} className='forest-quryrstcnt'>
-                        <span>{`此次查询共有数据：${this.state.messageTotalNum}条，  共有苗木：${this.state.treeTotalNum}棵`}</span>
-                    </Col>
-                    {
-                        permission ? (<Col span={2}>
-                            <Button
-                                type='primary'
-                                disabled={!(details && details.length > 0)}
-                                onClick={this.changeLocInfoAll.bind(this)}
-                            >
-                            修改全部
-                            </Button>
-                        </Col>) : <Col span={2} />}
-                    {
-                        permission ? (<Col span={2}>
-                            <Button
-                                type='primary'
-                                disabled={!(dataSourceSelected && dataSourceSelected.length > 0)}
-                                onClick={this.changeLocInfoSome.bind(this)}
-                            >
-                            修改部分
-                            </Button>
-                        </Col>) : <Col span={2} />}
-                    <Col span={2} >
-                        <Button
-                            type='primary'
-                            onClick={this.exportexcel.bind(this)}
-                            style={{display: 'block'}}
-                        >
-                            导出
-                        </Button>
-                    </Col>
-                    <Col span={2} >
-                        <Button
-                            type='primary'
-                            onClick={this.resetinput.bind(this)}
-                        >
-                            重置
-                        </Button>
-                    </Col>
-                </Row>
-            </div>
-        );
-        const rowSelection = {
-            selectedRowKeys,
-            onChange: this.onRowSelectChange
-        };
-        return (
-            <div>
-                <Row>{header}</Row>
-                <Row>
-                    <Table
-                        bordered
-                        className='foresttable'
-                        columns={this.columns}
-                        rowKey='order'
-                        rowSelection={rowSelection}
-                        loading={{
-                            tip: (
-                                <Progress
-                                    style={{ width: 200 }}
-                                    percent={this.state.percent}
-                                    status='active'
-                                    strokeWidth={5}
-                                />
-                            ),
-                            spinning: this.state.loading
-                        }}
-                        locale={{ emptyText: '当天无现场测量信息' }}
-                        dataSource={details}
-                        onChange={this.handleTableChange.bind(this)}
-                        pagination={this.state.pagination}
-                    />
-                </Row>
-            </div>
-        );
-    }
+    // 表格的多选设置
     onRowSelectChange = (selectedRowKeys, selectedRows) => {
-        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
+        let selectedRowSXM = [];
+        for (let i = 0; i < selectedRows.length; i++) {
+            selectedRowSXM.push(selectedRows[i].ZZBM);
+        }
+        this.setState({
+            selectedRowKeys,
+            selectedRows,
+            selectedRowSXM
+        });
     };
+    // 全选修改
     changeLocInfoAll = () => {
         const {
-            tblData
+            tblData,
+            pagination
         } = this.state;
         if (tblData && tblData instanceof Array && tblData.length > 0) {
-            this.setState({
-                selectedAllRowKeys: true,
-                changeLocInfoVisible: true
-            });
+            if (pagination && pagination.total <= 500) {
+                let example = tblData[0];
+                this.setState({
+                    example,
+                    changeLocInfoVisible: true,
+                    changeLocInfoAllStatus: true
+                });
+            } else {
+                message.warning('一次修改最多500条，请重新选择条件搜索');
+                this.setState({
+                    example: '',
+                    changeLocInfoVisible: false,
+                    changeLocInfoAllStatus: false
+                });
+            }
         } else {
             message.warning('请先选择条件，搜索数据！');
             this.setState({
-                selectedAllRowKeys: false,
-                changeLocInfoVisible: false
+                example: '',
+                changeLocInfoVisible: false,
+                changeLocInfoAllStatus: false
             });
         }
     }
+    // 部分修改
     changeLocInfoSome = () => {
         const {
-            selectedRowKeys,
-            dataSourceSelected
+            selectedRows
         } = this.state;
-        if (dataSourceSelected.length === 0) {
-            message.warning('请先选择数据！');
+        if (selectedRows && selectedRows instanceof Array && selectedRows.length > 0) {
+            if (selectedRows.length <= 500) {
+                let example = selectedRows[0];
+                this.setState({
+                    example,
+                    changeLocInfoVisible: true,
+                    changeLocInfoAllStatus: false
+                });
+            } else {
+                message.warning(`一次修改最多500条，当前已选择${selectedRows.length}条，请重新选择数据`);
+                this.setState({
+                    example: '',
+                    changeLocInfoVisible: false,
+                    changeLocInfoAllStatus: false
+                });
+            }
         } else {
+            message.warning('请先选择条件，搜索数据！');
             this.setState({
-                selectedRowKeys: [],
-                dataSourceSelected: [],
-                changeLocInfoVisible: true
+                example: '',
+                changeLocInfoVisible: false,
+                changeLocInfoAllStatus: false
             });
         }
     }
-    handleChangeLocInfoOK = () => {
+    handleChangeLocInfoOK = async () => {
         this.setState({
+            example: '',
             selectedRowKeys: [],
-            dataSourceSelected: [],
+            selectedRows: [],
+            selectedRowSXM: [],
             changeLocInfoVisible: false,
-            selectedAllRowKeys: false
+            changeLocInfoAllStatus: false
         });
+        const pager = { ...this.state.pagination };
+        await this.query(pager.current);
     }
     handleChangeLocInfoCancel = () => {
         this.setState({
-            selectedRowKeys: [],
-            dataSourceSelected: [],
+            example: '',
             changeLocInfoVisible: false,
-            selectedAllRowKeys: false
+            changeLocInfoAllStatus: false
         });
     }
 
@@ -1014,16 +670,6 @@ export default class LocmeasureTable extends Component {
             });
         }
     }
-
-    handleTableChange (pagination) {
-        const pager = { ...this.state.pagination };
-        pager.current = pagination.current;
-        this.setState({
-            pagination: pager
-        });
-        this.query(pagination.current);
-    }
-
     onImgClick (data) {
         let srcs = [];
         try {
@@ -1048,16 +694,186 @@ export default class LocmeasureTable extends Component {
             imgArr: imgArr
         });
     }
-
     handleCancel () {
         this.setState({ imgvisible: false });
     }
-
     resetinput () {
         const { resetinput, leftkeycode } = this.props;
         resetinput(leftkeycode);
     }
-
+    exportexcel () {
+        const {
+            sxm = '',
+            section = '',
+            bigType = '',
+            treetype = '',
+            locationstatus = '',
+            role = '',
+            rolename = '',
+            stime = '',
+            lstime = '',
+            etime = '',
+            letime = '',
+            exportsize,
+            thinclass = '',
+            status = '',
+            smallclassData = '',
+            thinclassData = '',
+            XJFirst = 0,
+            XJSecond = '',
+            DJFirst = 0,
+            DJSecond = '',
+            GDFirst = 0,
+            GDSecond = '',
+            GFFirst = 0,
+            GFSecond = '',
+            TQHDFirst = 0,
+            TQHDSecond = '',
+            TQZJFirst = 0,
+            TQZJSecond = ''
+        } = this.state;
+        if (thinclass === '' && sxm === '') {
+            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+            return;
+        }
+        const {
+            actions: { getexportTree },
+            keycode = ''
+        } = this.props;
+        // 胸径
+        let xj = '';
+        if (XJFirst >= 0 && XJSecond) {
+            if (XJSecond > XJFirst) {
+                xj = XJFirst + '-' + XJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入胸径');
+                return;
+            }
+        } else if (XJFirst >= 0 && !XJSecond) {
+            xj = XJFirst;
+        }
+        // 地径
+        let dj = '';
+        if (DJFirst >= 0 && DJSecond) {
+            if (DJSecond > DJFirst) {
+                dj = DJFirst + '-' + DJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入地径');
+                return;
+            }
+        } else if (DJFirst >= 0 && !DJSecond) {
+            dj = DJFirst;
+        }
+        // 高度
+        let gd = '';
+        if (GDFirst >= 0 && GDSecond) {
+            if (GDSecond > GDFirst) {
+                gd = GDFirst + '-' + GDSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入高度');
+                return;
+            }
+        } else if (GDFirst >= 0 && !GDSecond) {
+            gd = GDFirst;
+        }
+        // 冠幅
+        let gf = '';
+        if (GFFirst >= 0 && GFSecond) {
+            if (GFSecond > GFFirst) {
+                gf = GFFirst + '-' + GFSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入冠幅');
+                return;
+            }
+        } else if (GFFirst >= 0 && !GFSecond) {
+            gf = GFFirst;
+        }
+        // 土球厚度
+        let tqhd = '';
+        if (TQHDFirst >= 0 && TQHDSecond) {
+            if (TQHDSecond > TQHDFirst) {
+                tqhd = TQHDFirst + '-' + TQHDSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入土球厚度');
+                return;
+            }
+        } else if (TQHDFirst >= 0 && !TQHDSecond) {
+            tqhd = TQHDFirst;
+        }
+        // 土球直径
+        let tqzj = '';
+        if (TQZJFirst >= 0 && TQZJSecond) {
+            if (TQZJSecond > TQZJFirst) {
+                tqzj = TQZJFirst + '-' + TQZJSecond;
+            } else {
+                message.error('请按从小到大的范围重新输入土球直径');
+                return;
+            }
+        } else if (TQZJFirst >= 0 && !TQZJSecond) {
+            tqzj = TQZJFirst;
+        }
+        let searchStatus = '';
+        let searchSamplingStatus = '';
+        if (status === '未抽查') {
+            searchSamplingStatus = -1;
+        } else if (status === '不合格') {
+            searchSamplingStatus = 2;
+        } else {
+            searchStatus = status;
+        }
+        let postData = {
+            no: keycode,
+            sxm,
+            section,
+            treetype,
+            status: searchStatus,
+            samplingStatus: searchSamplingStatus,
+            // locationstatus,
+            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+            lstime: lstime && moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+            letime: letime && moment(letime).format('YYYY-MM-DD HH:mm:ss'),
+            page: 1,
+            size: exportsize,
+            smallclass: smallclassData, // 小班
+            thinclass: thinclassData,
+            xj: xj,
+            dj: dj,
+            gd: gd,
+            gf: gf,
+            tqhd: tqhd,
+            tqzj: tqzj
+        };
+        if (role) postData[role] = rolename;
+        this.setState({ loading: true, percent: 0 });
+        getexportTree({}, postData).then(rst3 => {
+            if (rst3 === '') {
+                message.info('没有符合条件的信息');
+            } else {
+                window.open(`${FOREST_API}/${rst3}`);
+                // this.createLink(this,`${FOREST_API}/${rst3}`)
+            }
+            this.setState({ loading: false });
+        });
+    }
+    createLink (name, url) {
+        let link = document.createElement('a');
+        // link.download = name;
+        link.href = url;
+        link.setAttribute('download', name);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    handleTableChange (pagination) {
+        const pager = { ...this.state.pagination };
+        pager.current = pagination.current;
+        this.setState({
+            pagination: pager
+        });
+        this.query(pagination.current);
+    }
     query (page) {
         const { users } = this.props;
         const {
@@ -1181,7 +997,7 @@ export default class LocmeasureTable extends Component {
         } else {
             searchStatus = status;
         }
-        let postdata = {
+        let postData = {
             no: keycode,
             sxm,
             section,
@@ -1205,10 +1021,10 @@ export default class LocmeasureTable extends Component {
             tqhd: tqhd,
             tqzj: tqzj
         };
-        if (role) postdata[role] = rolename;
+        if (role) postData[role] = rolename;
 
         this.setState({ loading: true, percent: 0 });
-        getqueryTree({}, postdata).then(rst => {
+        getqueryTree({}, postData).then(rst => {
             this.setState({ loading: false, percent: 100 });
             if (!rst) return;
             let tblData = rst.content;
@@ -1590,176 +1406,403 @@ export default class LocmeasureTable extends Component {
                     tblData,
                     pagination: pagination,
                     messageTotalNum: messageTotalNum,
-                    treeTotalNum
+                    treeTotalNum,
+                    postData
                 });
             }
         });
     }
 
-    exportexcel () {
+    treeTable (details) {
         const {
-            sxm = '',
-            section = '',
-            bigType = '',
-            treetype = '',
-            locationstatus = '',
-            role = '',
-            rolename = '',
-            stime = '',
-            lstime = '',
-            etime = '',
-            letime = '',
-            exportsize,
-            thinclass = '',
-            status = '',
-            smallclassData = '',
-            thinclassData = '',
-            XJFirst = 0,
-            XJSecond = '',
-            DJFirst = 0,
-            DJSecond = '',
-            GDFirst = 0,
-            GDSecond = '',
-            GFFirst = 0,
-            GFSecond = '',
-            TQHDFirst = 0,
-            TQHDSecond = '',
-            TQZJFirst = 0,
-            TQZJSecond = ''
-        } = this.state;
-        if (thinclass === '' && sxm === '') {
-            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
-            return;
-        }
-        const {
-            actions: { getexportTree },
-            keycode = ''
+            treetypeoption,
+            sectionoption,
+            smallclassoption,
+            thinclassoption,
+            typeoption,
+            statusoption,
+            platform: {
+                tree = {}
+            }
         } = this.props;
-        // 胸径
-        let xj = '';
-        if (XJFirst >= 0 && XJSecond) {
-            if (XJSecond > XJFirst) {
-                xj = XJFirst + '-' + XJSecond;
-            } else {
-                message.error('请按从小到大的范围重新输入胸径');
-                return;
-            }
-        } else if (XJFirst >= 0 && !XJSecond) {
-            xj = XJFirst;
-        }
-        // 地径
-        let dj = '';
-        if (DJFirst >= 0 && DJSecond) {
-            if (DJSecond > DJFirst) {
-                dj = DJFirst + '-' + DJSecond;
-            } else {
-                message.error('请按从小到大的范围重新输入地径');
-                return;
-            }
-        } else if (DJFirst >= 0 && !DJSecond) {
-            dj = DJFirst;
-        }
-        // 高度
-        let gd = '';
-        if (GDFirst >= 0 && GDSecond) {
-            if (GDSecond > GDFirst) {
-                gd = GDFirst + '-' + GDSecond;
-            } else {
-                message.error('请按从小到大的范围重新输入高度');
-                return;
-            }
-        } else if (GDFirst >= 0 && !GDSecond) {
-            gd = GDFirst;
-        }
-        // 冠幅
-        let gf = '';
-        if (GFFirst >= 0 && GFSecond) {
-            if (GFSecond > GFFirst) {
-                gf = GFFirst + '-' + GFSecond;
-            } else {
-                message.error('请按从小到大的范围重新输入冠幅');
-                return;
-            }
-        } else if (GFFirst >= 0 && !GFSecond) {
-            gf = GFFirst;
-        }
-        // 土球厚度
-        let tqhd = '';
-        if (TQHDFirst >= 0 && TQHDSecond) {
-            if (TQHDSecond > TQHDFirst) {
-                tqhd = TQHDFirst + '-' + TQHDSecond;
-            } else {
-                message.error('请按从小到大的范围重新输入土球厚度');
-                return;
-            }
-        } else if (TQHDFirst >= 0 && !TQHDSecond) {
-            tqhd = TQHDFirst;
-        }
-        // 土球直径
-        let tqzj = '';
-        if (TQZJFirst >= 0 && TQZJSecond) {
-            if (TQZJSecond > TQZJFirst) {
-                tqzj = TQZJFirst + '-' + TQZJSecond;
-            } else {
-                message.error('请按从小到大的范围重新输入土球直径');
-                return;
-            }
-        } else if (TQZJFirst >= 0 && !TQZJSecond) {
-            tqzj = TQZJFirst;
-        }
-        let searchStatus = '';
-        let searchSamplingStatus = '';
-        if (status === '未抽查') {
-            searchSamplingStatus = -1;
-        } else if (status === '不合格') {
-            searchSamplingStatus = 2;
-        } else {
-            searchStatus = status;
-        }
-        let postdata = {
-            no: keycode,
+        const {
             sxm,
+            rolename,
             section,
-            treetype,
-            status: searchStatus,
-            samplingStatus: searchSamplingStatus,
-            // locationstatus,
-            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            lstime: lstime && moment(lstime).format('YYYY-MM-DD HH:mm:ss'),
-            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            letime: letime && moment(letime).format('YYYY-MM-DD HH:mm:ss'),
-            page: 1,
-            size: exportsize,
-            smallclass: smallclassData, // 小班
-            thinclass: thinclassData,
-            xj: xj,
-            dj: dj,
-            gd: gd,
-            gf: gf,
-            tqhd: tqhd,
-            tqzj: tqzj
-        };
-        if (role) postdata[role] = rolename;
-        this.setState({ loading: true, percent: 0 });
-        getexportTree({}, postdata).then(rst3 => {
-            if (rst3 === '') {
-                message.info('没有符合条件的信息');
-            } else {
-                window.open(`${FOREST_API}/${rst3}`);
-                // this.createLink(this,`${FOREST_API}/${rst3}`)
-            }
-            this.setState({ loading: false });
-        });
-    }
+            smallclass,
+            thinclass,
+            bigType,
+            treetypename,
+            status,
+            selectedRowKeys = []
+            // islocation
+        } = this.state;
+        const suffix1 = sxm ? (
+            <Icon type='close-circle' onClick={this.emitEmpty1} />
+        ) : null;
+        const suffix2 = rolename ? (
+            <Icon type='close-circle' onClick={this.emitEmpty2} />
+        ) : null;
+        let header = '';
+        let permission = getUserIsManager();
+        // let permission = false;
+        header = (
+            <div>
+                <Row className='forest-search-layout'>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>顺序码：</span>
+                        <Input
+                            suffix={suffix1}
+                            value={sxm}
+                            className='forest-forestcalcw4'
+                            onChange={this.sxmChange.bind(this)}
+                        />
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>标段：</span>
+                        <Select
+                            allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={section}
+                            onChange={this.onSectionChange.bind(this)}
+                        >
+                            {sectionoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>小班：</span>
+                        <Select
+                            allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={smallclass}
+                            onChange={this.onSmallClassChange.bind(this)}
+                        >
+                            {smallclassoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>细班：</span>
+                        <Select
+                            allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={thinclass}
+                            onChange={this.onThinClassChange.bind(this)}
+                        >
+                            {thinclassoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>类型：</span>
+                        <Select
+                            allowClear
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={bigType}
+                            onChange={this.onTypeChange.bind(this)}
+                        >
+                            {typeoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>树种：</span>
+                        <Select
+                            allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={treetypename}
+                            onChange={this.onTreeTypeChange.bind(this)}
+                        >
+                            {treetypeoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>状态：</span>
+                        <Select
+                            allowClear
+                            className='forest-forestcalcw4'
+                            defaultValue='全部'
+                            value={status}
+                            onChange={this.onStatusChange.bind(this)}
+                        >
+                            {statusoption}
+                        </Select>
+                    </div>
+                    <div className='forest-mrg10'>
+                        <span className='forest-search-span'>测量人：</span>
+                        <Input
+                            suffix={suffix2}
+                            value={rolename}
+                            placeholder='请输入用户名'
+                            className='forest-forestcalcw4'
+                            onChange={this.onRoleNameChange.bind(this)}
+                        />
+                    </div>
+                    <div className='forest-mrg-datePicker'>
+                        <span className='forest-search-span'>测量时间：</span>
+                        <RangePicker
+                            style={{ verticalAlign: 'middle' }}
+                            defaultValue={[
+                                moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'),
+                                moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')
+                            ]}
+                            className='forest-forestcalcw4'
+                            showTime={{ format: 'HH:mm:ss' }}
+                            format={'YYYY/MM/DD HH:mm:ss'}
+                            onChange={this.datepick.bind(this)}
+                            onOk={this.datepick.bind(this)}
+                        />
+                    </div>
+                    <div className='forest-mrg-standard2'>
+                        <span className='forest-search-span'>胸径：</span>
+                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.XJFirst}
+                                    onChange={this.handleXJChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.XJSecond}
+                                    onChange={this.handleXJChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard2'>
+                        <span className='forest-search-span'>地径：</span>
+                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.DJFirst}
+                                    onChange={this.handleDJChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.DJSecond}
+                                    onChange={this.handleDJChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard2'>
+                        <span className='forest-search-span'>高度：</span>
+                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.GDFirst}
+                                    onChange={this.handleGDChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.GDSecond}
+                                    onChange={this.handleGDChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard2'>
+                        <span className='forest-search-span'>冠幅：</span>
+                        <InputGroup compact className='forest-forestcalcw2' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.GFFirst}
+                                    onChange={this.handleGFChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.GFSecond}
+                                    onChange={this.handleGFChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard4'>
+                        <span className='forest-search-span'>土球厚度：</span>
+                        <InputGroup compact className='forest-forestcalcw4' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.TQHDFirst}
+                                    onChange={this.handleTQHDChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.TQHDSecond}
+                                    onChange={this.handleTQHDChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
+                    <div className='forest-mrg-standard4'>
+                        <span className='forest-search-span'>土球直径：</span>
+                        <InputGroup compact className='forest-forestcalcw4' style={{display: 'inlineBlock'}}>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.TQZJFirst}
+                                    onChange={this.handleTQZJChangeFirst.bind(this)} />
+                            </Col>
+                            <span style={{width: 20, textAlign: 'center'}} >~</span>
+                            <Col>
+                                <Input addonAfter={'cm'} style={{width: 100}}
+                                    value={this.state.TQZJSecond}
+                                    onChange={this.handleTQZJChangeSecond.bind(this)} />
+                            </Col>
+                        </InputGroup>
+                    </div>
 
-    createLink (name, url) {
-        let link = document.createElement('a');
-        // link.download = name;
-        link.href = url;
-        link.setAttribute('download', name);
-        link.setAttribute('target', '_blank');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+                </Row>
+                <Row style={{marginTop: 10, marginBottom: 10}}>
+                    <Col span={2} >
+                        <Button
+                            type='primary'
+                            onClick={this.handleTableChange.bind(this, {
+                                current: 1
+                            })}
+                        >
+                            查询
+                        </Button>
+                    </Col>
+                    <Col span={14} className='forest-quryrstcnt'>
+                        <span>{`此次查询共有数据：${this.state.messageTotalNum}条，  共有苗木：${this.state.treeTotalNum}棵`}</span>
+                    </Col>
+                    {
+                        permission ? (<Col span={2}>
+                            <Button
+                                type='primary'
+                                disabled={!(details && details.length > 0)}
+                                onClick={this.changeLocInfoAll.bind(this)}
+                            >
+                            修改全部
+                            </Button>
+                        </Col>) : <Col span={2} />
+                    }
+                    {
+                        permission ? (<Col span={2}>
+                            <Button
+                                type='primary'
+                                disabled={!selectedRowKeys.length > 0}
+                                onClick={this.changeLocInfoSome.bind(this)}
+                            >
+                            修改部分
+                            </Button>
+                        </Col>) : <Col span={2} />
+                    }
+                    <Col span={2} >
+                        <Button
+                            type='primary'
+                            onClick={this.exportexcel.bind(this)}
+                            style={{display: 'block'}}
+                        >
+                            导出
+                        </Button>
+                    </Col>
+                    <Col span={2} >
+                        <Button
+                            type='primary'
+                            onClick={this.resetinput.bind(this)}
+                        >
+                            重置
+                        </Button>
+                    </Col>
+                </Row>
+            </div>
+        );
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onRowSelectChange
+        };
+        return (
+            <div>
+                <Row>{header}</Row>
+                <Row>
+                    <Table
+                        bordered
+                        className='foresttable'
+                        columns={this.columns}
+                        rowKey='order'
+                        rowSelection={rowSelection}
+                        loading={{
+                            tip: (
+                                <Progress
+                                    style={{ width: 200 }}
+                                    percent={this.state.percent}
+                                    status='active'
+                                    strokeWidth={5}
+                                />
+                            ),
+                            spinning: this.state.loading
+                        }}
+                        locale={{ emptyText: '当天无现场测量信息' }}
+                        dataSource={details}
+                        onChange={this.handleTableChange.bind(this)}
+                        pagination={this.state.pagination}
+                    />
+                </Row>
+            </div>
+        );
+    }
+    render () {
+        const { tblData, changeLocInfoVisible } = this.state;
+        return (
+            <div>
+                {this.treeTable(tblData)}
+                <Modal
+                    width={522}
+                    title='详细信息'
+                    style={{ textAlign: 'center' }}
+                    visible={this.state.imgvisible}
+                    onOk={this.handleCancel.bind(this)}
+                    onCancel={this.handleCancel.bind(this)}
+                    footer={null}
+                >
+                    {this.state.imgArr}
+                    <Row style={{ marginTop: 10 }}>
+                        <Button
+                            onClick={this.handleCancel.bind(this)}
+                            style={{ float: 'right' }}
+                            type='primary'
+                        >
+                            关闭
+                        </Button>
+                    </Row>
+                </Modal>
+                {
+                    changeLocInfoVisible
+                        ? <ChangeLocInfoModal
+                            {...this.props}
+                            {...this.state}
+                            onChangeLocInfoOk={this.handleChangeLocInfoOK.bind(this)}
+                            onChangeLocInfoCancel={this.handleChangeLocInfoCancel.bind(this)}
+                        />
+                        : ''
+                }
+            </div>
+        );
     }
 }
