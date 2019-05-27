@@ -1097,8 +1097,11 @@ class Edit extends Component {
         this.setState({
             isBlackChecked: checked
         });
-        // 如果拉黑为true的话，则is_active就为false
-        changeAdditionField('is_black', 1);
+        if (checked) {
+            changeAdditionField('is_black', 1);
+        } else {
+            changeAdditionField('is_black', 0);
+        }
     }
     changeBlack_remark (value) {
         const {
