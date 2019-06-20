@@ -12,12 +12,15 @@ const additionReducer = fieldFactory(ID, 'addition');
 export const getListStore = createAction(`${ID}getListStore`);
 export const changeOrgTreeDataStatus = createAction(`${ID}changeOrgTreeDataStatus`);
 const addDir = createFetchAction(`${SERVICE_API}/directories/`, 'POST');
+// 编辑人员Visible
+export const changeEditOrgVisible = createAction(`${ID}编辑组织机构Visible`);
 export const actions = {
     ...sidebarReducer,
     ...additionReducer,
     getListStore,
     changeOrgTreeDataStatus,
-    addDir
+    addDir,
+    changeEditOrgVisible
 };
 
 export default handleActions({
@@ -36,5 +39,9 @@ export default handleActions({
     [changeOrgTreeDataStatus]: (state, {payload}) => ({
         ...state,
         orgTreeDataChangeStatus: payload
+    }),
+    [changeEditOrgVisible]: (state, {payload}) => ({
+        ...state,
+        editOrgVisible: payload
     })
 }, {});

@@ -11,7 +11,7 @@ import { actions as platformActions } from '_platform/store/global';
 import { actions } from '../store/org';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Tree, Info, Participant, Addition } from '../components/Org';
+import { Tree, Info, Edit, Addition } from '../components/Org';
 
 @connect(
     state => {
@@ -31,6 +31,7 @@ export default class Org extends Component {
 
     render () {
         const {
+            editOrgVisible,
             addition
         } = this.props;
         return (
@@ -43,6 +44,7 @@ export default class Org extends Component {
                     <Info {...this.props} />
                 </Content>
                 {(addition && addition.visible) ? <Addition {...this.props} /> : ''}
+                {editOrgVisible ? <Edit {...this.props} /> : ''}
             </div>
         );
     }

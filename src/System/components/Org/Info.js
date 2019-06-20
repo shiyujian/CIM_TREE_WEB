@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { Form, Input, Button, Select } from 'antd';
-import { CUS_TILEMAP } from '_platform/api';
+import { Form, Input, Button } from 'antd';
 
 const FormItem = Form.Item;
-const { Option, OptGroup } = Select;
 
 export default class Info extends Component {
     constructor (props) {
@@ -15,19 +13,25 @@ export default class Info extends Component {
     static propTypes = {};
     render () {
         const {
-            sidebar: { node = {} } = {},
-            addition = {},
-            actions: { changeAdditionField },
-            listStore
+            sidebar: { node = {} } = {}
         } = this.props;
-        const { type, extra_params: extra = {}, obj_type } = node || {};
-        const title = Info.getTitle(type);
+        const { extra_params: extra = {} } = node || {};
+        const { extra_params } = node || {};
+        let companyVisible = false;
+        // 新建项目时，默认显示
+        if (extra_params && extra_params.companyStatus) {
+            companyVisible = true;
+        }
+        let disabled = true;
+        if (node && node.code) {
+            disabled = false;
+        }
         return (
             <div style={{ marginBottom: 20 }}>
                 <div
                     style={{
                         borderBottom: '1px solid #e9e9e9',
-                        paddingBottom: 5,
+                        paddingBottom: 15,
                         marginBottom: 20
                     }}
                 >
@@ -37,62 +41,34 @@ export default class Info extends Component {
                             fontWeight: 'bold',
                             paddingRight: '1em'
                         }}
-                    >{`${title}管理`}</span>
-                    {type === 'project' && (
-                        <Button
-                            type='primary'
-                            ghost
-                            onClick={this.addProject.bind(this)}
-                        >
-                            新建子项目
-                        </Button>
-                    )}
-                    {type === 'subProject' && (
-                        <Button
-                            type='primary'
-                            ghost
-                            onClick={this.addSubProject.bind(this)}
-                        >
-                            新建组织机构
-                        </Button>
-                    )}
-                    {type === 'org' && (
-                        <Button
-                            type='primary'
-                            ghost
-                            onClick={this.addCompany.bind(this)}
-                        >
-                            新建单位
-                        </Button>
-                    )}
-                    {type === 'company' && (
-                        <Button
-                            type='primary'
-                            ghost
-                            onClick={this.addDepartment.bind(this)}
-                        >
-                            新建部门
-                        </Button>
-                    )}
+                    >{`信息管理`}</span>
                     <Button
                         onClick={this.edit.bind(this)}
                         style={{ float: 'right' }}
                         type='primary'
                         ghost
+                        disabled={disabled}
                     >
                         编辑
                     </Button>
                 </div>
-                <FormItem {...Info.layout} label={`${title}名称`}>
+                <FormItem {...Info.layout} label={`名称`}>
                     <Input readOnly value={node.name} />
                 </FormItem>
-                <FormItem {...Info.layout} label={`${title}编码`}>
+                <FormItem {...Info.layout} label={`编码`}>
                     <Input readOnly value={node.code} />
                 </FormItem>
-                <FormItem {...Info.layout} label={`${title}标段`}>
+                <FormItem {...Info.layout} label={`标段`}>
                     <Input readOnly value={extra.sections} />
                 </FormItem>
-                <FormItem {...Info.layout} label={`${title}简介`}>
+                {
+                    companyVisible
+                        ? <FormItem {...Info.layout} label={`公司类型`}>
+                            <Input readOnly value={extra.companyStatus || ''} />
+                        </FormItem>
+                        : ''
+                }
+                <FormItem {...Info.layout} label={`简介`}>
                     <Input
                         type='textarea'
                         rows={4}
@@ -104,80 +80,28 @@ export default class Info extends Component {
         );
     }
 
-    addSubProject () {
-        const {
-            sidebar: { node = {} } = {},
-            actions: { changeAdditionField, changeSidebarField }
-        } = this.props;
-        changeSidebarField('parent', node);
-        changeAdditionField('visible', true);
-    }
-
-    addProject () {
-        const {
-            sidebar: { node = {} } = {},
-            actions: { changeAdditionField, changeSidebarField }
-        } = this.props;
-        changeSidebarField('parent', node);
-        changeAdditionField('visible', true);
-    }
-
-    addCompany () {
-        const {
-            sidebar: { node = {} } = {},
-            actions: { changeAdditionField, changeSidebarField }
-        } = this.props;
-        changeSidebarField('parent', node);
-        changeAdditionField('visible', true);
-    }
-
-    addDepartment () {
-        const {
-            sidebar: { node = {} } = {},
-            actions: { changeAdditionField, changeSidebarField }
-        } = this.props;
-        changeSidebarField('parent', node);
-        changeAdditionField('visible', true);
-    }
-
-    edit () {
+    edit = async () => {
         const {
             sidebar: { node } = {},
-            actions: { changeSidebarField, resetAdditionField }
+            actions: { changeSidebarField, resetAdditionField, changeEditOrgVisible }
         } = this.props;
         if (typeof node.extra_params.sections === 'string') {
             node.extra_params.sections = node.extra_params.sections
                 ? node.extra_params.sections.split(',')
                 : [];
             node.extra_params.sections =
-                node.extra_params.sections == ''
+                node.extra_params.sections === ''
                     ? []
                     : node.extra_params.sections;
         }
 
-        changeSidebarField('parent', undefined);
-        resetAdditionField({
-            visible: true,
+        await changeSidebarField('parent', undefined);
+        await resetAdditionField({
+            visible: false,
             ...node,
             ...node.extra_params
         });
-    }
-
-    static getTitle (type) {
-        switch (type) {
-            case 'project':
-                return '项目';
-            case 'subProject':
-                return '子项目';
-            case 'org':
-                return '机构类型';
-            case 'company':
-                return '单位';
-            case 'department':
-                return '部门';
-            default:
-                return '';
-        }
+        await changeEditOrgVisible(true);
     }
 
     static layout = {

@@ -23,8 +23,18 @@ class Addition extends Component {
     }
     componentDidMount = () => {
         const {
+            form: {
+                setFieldsValue
+            },
+            addition,
             sidebar: { node = {}, parent } = {}
         } = this.props;
+        setFieldsValue({
+            name: (addition && addition.name) || undefined,
+            code: (addition && addition.code) || undefined,
+            sections: (addition && addition.extra_params && addition.extra_params.sections) || undefined,
+            introduction: (addition && addition.extra_params && addition.extra_params.introduction) || undefined
+        });
         const { extra_params } = node || {};
         let companyVisible = false;
         // 新建项目时，默认显示
@@ -60,14 +70,10 @@ class Addition extends Component {
     getUnits = () => {
         try {
             const {
-                sidebar: { node = {}, parent } = {},
+                sidebar: { node = {} } = {},
                 listStore = [],
                 platform: { tree = {} }
             } = this.props;
-            // 新建项目时，默认显示
-            if (parent && parent.code && parent.code === 'ORG_ROOT') {
-                return [];
-            }
             let bigTreeList = tree.bigTreeList || [];
             let projectName = '';
             listStore.map((item, index) => {
@@ -144,17 +150,29 @@ class Addition extends Component {
         });
         changeAdditionField('companyStatus', value);
     }
+    changeIntroduction = (value) => {
+        const {
+            actions: { changeAdditionField },
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        setFieldsValue({
+            introduction: value
+        });
+        changeAdditionField('introduction', value);
+    }
 
     save = async () => {
         const {
-            sidebar: { parent } = {},
             addition = {},
             actions: {
-                postOrg,
+                putOrg,
                 getOrgTree,
                 changeSidebarField,
                 clearAdditionField,
-                changeOrgTreeDataStatus
+                changeOrgTreeDataStatus,
+                changeEditOrgVisible
             }
         } = this.props;
         const {
@@ -162,60 +180,57 @@ class Addition extends Component {
         } = this.state;
         const sections = addition.sections ? addition.sections.join() : [];
         this.props.form.validateFields(async (err, values) => {
-            console.log('err', err);
             if (!err) {
-                if (parent) {
-                    this.setState({
-                        loading: true
-                    });
-                    let postData = {
-                        name: addition.name,
-                        code: addition.code,
-                        obj_type: 'C_ORG',
-                        status: 'A',
-                        extra_params: {
-                            introduction: addition.introduction,
-                            sections: sections,
-                            companyStatus: companyVisible ? values.companyStatus : ''
-                        },
-                        parent: {
-                            pk: parent.pk,
-                            code: parent.code,
-                            obj_type: 'C_ORG'
-                        }
-                    };
-                    let rst = await postOrg({}, postData);
-                    console.log('rst', rst);
-                    if (rst.pk) {
-                        setTimeout(async () => {
-                            await getOrgTree({}, { depth: 7 });
-                            await changeOrgTreeDataStatus(true);
-                            this.setState({
-                                loading: false
-                            });
-                            await clearAdditionField();
-                            await changeSidebarField('addition', false);
-                            await changeSidebarField('parent', null);
-                        }, 1000);
-                    } else if (rst === 'Create Data failed: this code has already exits .') {
-                        Notification.error({
-                            message: '此编码已存在',
-                            duration: 3
-                        });
+                this.setState({
+                    loading: true
+                });
+                let postData = {
+                    obj_type: 'C_ORG',
+                    status: 'A',
+                    name: addition.name,
+                    extra_params: {
+                        introduction: addition.introduction,
+                        sections: sections,
+                        companyStatus: companyVisible ? values.companyStatus : ''
+                    }
+                };
+                let rst = await putOrg({ code: addition.code }, postData);
+                console.log('rst', rst);
+                if (rst.pk) {
+                    await changeSidebarField('parent', null);
+                    await clearAdditionField();
+                    setTimeout(async () => {
+                        await getOrgTree({}, { depth: 7 });
+                        await changeOrgTreeDataStatus(true);
                         this.setState({
                             loading: false
                         });
-                    }
+                        await changeEditOrgVisible(false);
+                    }, 1000);
+                } else {
+                    Notification.error({
+                        message: '修改组织机构信息失败',
+                        duration: 3
+                    });
+                    this.setState({
+                        loading: false
+                    });
                 }
             }
         });
     }
 
-    cancel () {
+    cancel = async () => {
         const {
-            actions: { clearAdditionField }
+            actions: {
+                clearAdditionField,
+                changeSidebarField,
+                changeEditOrgVisible
+            }
         } = this.props;
-        clearAdditionField();
+        await changeSidebarField('parent', null);
+        await clearAdditionField();
+        await changeEditOrgVisible(false);
     }
 
     static layout = {
@@ -226,9 +241,9 @@ class Addition extends Component {
     render () {
         const {
             form: { getFieldDecorator },
-            sidebar: { parent } = {},
-            addition = {},
-            actions: { changeAdditionField }
+            sidebar: { node = {}, parent } = {},
+            editOrgVisible,
+            addition
         } = this.props;
         const {
             companyVisible,
@@ -238,13 +253,13 @@ class Addition extends Component {
 
         return (
             <Modal
-                title={`新建组织机构 | ${parent.name}`}
+                title={`编辑 | ${node.name}`}
                 maskClosable={false}
-                visible={addition.visible}
+                visible={editOrgVisible}
                 footer={null}
                 closable={false}
                 // onOk={this.save.bind(this)}
-                // onCancel={this.cancel.bind(this)}
+                onCancel={this.cancel.bind(this)}
             >
                 <Spin spinning={loading}>
                     <div>
@@ -313,6 +328,10 @@ class Addition extends Component {
                                 ? (
                                     <FormItem {...Addition.layout} label={'公司类型'}>
                                         {getFieldDecorator('companyStatus', {
+                                            initialValue: `${
+                                                (addition && addition.companyStatus)
+                                                    ? addition.companyStatus : ''
+                                            }`,
                                             rules: [
                                                 {
                                                     required: companyVisible,
@@ -328,17 +347,14 @@ class Addition extends Component {
                                                 <Option key={'非公司'} value={'非公司'}>
                                                     非公司
                                                 </Option>
+                                                <Option key={'业主单位'} value={'业主单位'}>
+                                                    业主单位
+                                                </Option>
                                                 <Option key={'施工单位'} value={'施工单位'}>
                                                     施工单位
                                                 </Option>
                                                 <Option key={'监理单位'} value={'监理单位'}>
                                                     监理单位
-                                                </Option>
-                                                <Option key={'业主单位'} value={'业主单位'}>
-                                                    业主单位
-                                                </Option>
-                                                <Option key={'养护单位'} value={'养护单位'}>
-                                                    养护单位
                                                 </Option>
                                             </Select>
                                         )}
@@ -348,13 +364,9 @@ class Addition extends Component {
                         <FormItem {...Addition.layout} label={`简介`}>
                             <Input
                                 placeholder='请输入简介'
-                                value={(addition && addition.introduction) || undefined}
                                 type='textarea'
                                 rows={4}
-                                onChange={changeAdditionField.bind(
-                                    this,
-                                    'introduction'
-                                )}
+                                onChange={this.changeIntroduction.bind(this)}
                             />
                         </FormItem>
                         <Row style={{ marginTop: 10 }}>

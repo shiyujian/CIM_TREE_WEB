@@ -361,10 +361,10 @@ export const loopOrgCompany = (orgData) => {
     try {
         let extra_params = orgData && orgData.extra_params;
         let companyStatus = extra_params && extra_params.companyStatus;
-        if (companyStatus && companyStatus === '公司') {
+        if (companyStatus && (companyStatus === '公司' || companyStatus.indexOf('单位') !== -1)) {
             return orgData;
         } else if (orgData && orgData.children && orgData.children.length > 0 &&
-            companyStatus && companyStatus === '项目') {
+            companyStatus && (companyStatus === '项目' || companyStatus === '非公司')) {
             return orgData.children.map((child) => {
                 return loopOrgCompany(child);
             });

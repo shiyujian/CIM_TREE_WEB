@@ -109,13 +109,13 @@ class CountFilter extends Component {
     // 查找所有的公司的List
     getCompanyList = async (data) => {
         if (data && data.extra_params && data.extra_params.companyStatus) {
-            if (data.extra_params.companyStatus === '项目') {
+            if (data.extra_params.companyStatus === '项目' || data.extra_params.companyStatus === '非公司') {
                 if (data && data.children && data.children.length > 0) {
                     await data.children.map((child) => {
                         return this.getCompanyList(child);
                     });
                 }
-            } else if (data.extra_params.companyStatus === '公司') {
+            } else if (data.extra_params.companyStatus === '公司' || data.extra_params.companyStatus.indexOf('单位') !== -1) {
                 await this.companyList.push(data);
             }
         }

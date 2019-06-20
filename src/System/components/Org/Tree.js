@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import SimpleTree from '_platform/components/panels/SimpleTree';
-import { Button, Popconfirm } from 'antd';
+import { Button, Popconfirm, Notification, Spin } from 'antd';
 
 export default class Tree extends Component {
     static propTypes = {};
@@ -9,13 +9,16 @@ export default class Tree extends Component {
         this.state = {
             childList: [],
             list: [],
-            listVisible: true
+            listVisible: true,
+            loading: false
         };
     }
     componentDidMount = async () => {
         const {
             actions: { getOrgTree },
-            platform: { org: { children = [] } = {} }
+            platform: {
+                org: { children = [] } = {}
+            }
         } = this.props;
         if (!(children && children instanceof Array && children.length > 0)) {
             await getOrgTree({}, { depth: 7 });
@@ -50,46 +53,51 @@ export default class Tree extends Component {
     }
 
     render () {
-        const { dataList } = this.state;
+        const {
+            dataList,
+            loading
+        } = this.state;
         const {
             sidebar: { node = {} } = {}
         } = this.props;
         const { code } = node || {};
         return (
             <div>
-                <div
-                    style={{
-                        height: 35,
-                        paddingBottom: 5,
-                        borderBottom: '1px solid #dddddd',
-                        textAlign: 'center',
-                        marginBottom: 10
-                    }}
-                >
-                    <Button
-                        style={{ float: 'left' }}
-                        type='primary'
-                        ghost
-                        onClick={this.addOrg.bind(this)}
+                <Spin spinning={loading}>
+                    <div
+                        style={{
+                            height: 35,
+                            paddingBottom: 5,
+                            borderBottom: '1px solid #dddddd',
+                            textAlign: 'center',
+                            marginBottom: 10
+                        }}
                     >
-                        新建项目
-                    </Button>
-                    <Popconfirm
-                        title='是否真的要删除选中项目?'
-                        onConfirm={this.remove.bind(this)}
-                        okText='是'
-                        cancelText='否'
-                    >
-                        <Button style={{ float: 'right' }} type='danger' ghost>
-                            删除
+                        <Button
+                            style={{ float: 'left' }}
+                            type='primary'
+                            ghost
+                            onClick={this.addOrg.bind(this)}
+                        >
+                        新建组织机构
                         </Button>
-                    </Popconfirm>
-                </div>
-                <SimpleTree
-                    dataSource={dataList}
-                    selectedKey={code}
-                    onSelect={this.select.bind(this)}
-                />
+                        <Popconfirm
+                            title='是否真的要删除选中项目?'
+                            onConfirm={this.remove.bind(this)}
+                            okText='是'
+                            cancelText='否'
+                        >
+                            <Button style={{ float: 'right' }} type='danger' ghost>
+                            删除
+                            </Button>
+                        </Popconfirm>
+                    </div>
+                    <SimpleTree
+                        dataSource={dataList}
+                        selectedKey={code}
+                        onSelect={this.select.bind(this)}
+                    />
+                </Spin>
             </div>
         );
     }
@@ -194,13 +202,20 @@ export default class Tree extends Component {
         return false;
     }
 
-    addOrg () {
+    addOrg = async () => {
         const {
             platform: { org = {} },
+            sidebar: { node = {} } = {},
             actions: { changeAdditionField, changeSidebarField }
         } = this.props;
-        changeSidebarField('parent', org);
-        changeAdditionField('visible', true);
+        console.log('node', node);
+        if (node && node.code) {
+            await changeSidebarField('parent', node);
+        } else {
+            await changeSidebarField('parent', org);
+        }
+        ;
+        await changeAdditionField('visible', true);
     }
 
     select (s, node) {
@@ -209,8 +224,12 @@ export default class Tree extends Component {
             platform: { org: { children = [] } = {} },
             actions: { changeSidebarField }
         } = this.props;
-        const org = Tree.loop(children, eventKey);
-        changeSidebarField('node', org);
+        if (node && node.selected) {
+            const org = Tree.loop(children, eventKey);
+            changeSidebarField('node', org);
+        } else {
+            changeSidebarField('node', '');
+        }
     }
 
     remove = async () => {
@@ -219,9 +238,43 @@ export default class Tree extends Component {
             actions: { deleteOrg, getOrgTree, changeOrgTreeDataStatus }
         } = this.props;
         try {
-            await deleteOrg({ code: node.code });
-            await getOrgTree({}, { depth: 7 });
-            await changeOrgTreeDataStatus(true);
+            this.setState({
+                loading: true
+            });
+            let deleteData = await deleteOrg({ code: node.code });
+            if (!deleteData) {
+                setTimeout(async () => {
+                    Notification.success({
+                        message: '删除成功',
+                        duration: 3
+                    });
+                    await getOrgTree({}, { depth: 7 });
+                    await changeOrgTreeDataStatus(true);
+                    this.setState({
+                        loading: false
+                    });
+                }, 1000);
+            } else {
+                if (deleteData === 'Error:This Org has Person Members, DELETE NOT ALLOWED') {
+                    Notification.error({
+                        message: '当前部门下存在人员，不能进行删除',
+                        duration: 3
+                    });
+                } else if (deleteData === 'Error:This Org has children, DELETE NOT ALLOWED') {
+                    Notification.error({
+                        message: '当前部门下存在子节点，不能进行删除',
+                        duration: 3
+                    });
+                } else {
+                    Notification.error({
+                        message: '删除失败',
+                        duration: 3
+                    });
+                }
+                this.setState({
+                    loading: false
+                });
+            }
         } catch (e) {
             console.log('remove', e);
         }
@@ -233,23 +286,6 @@ export default class Tree extends Component {
             const { code: value, children = [] } = item;
             if (value === code) {
                 let type = '';
-                switch (deep) {
-                    case 0:
-                        type = 'project';
-                        break;
-                    case 1:
-                        type = 'subProject';
-                        break;
-                    case 2:
-                        type = 'org';
-                        break;
-                    case 3:
-                        type = 'company';
-                        break;
-                    default:
-                        type = 'department';
-                        break;
-                }
                 rst = { ...item, type };
             } else {
                 const tmp = Tree.loop(children, code, deep + 1);
