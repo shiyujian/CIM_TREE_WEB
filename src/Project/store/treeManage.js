@@ -16,6 +16,8 @@ export const postForsetPic = myFetch(
     [],
     'POST'
 );
+// 是否新增或者修改树种状态
+export const handleChangeTreeTypeStatus = createAction(`${ID}_changeTreeTypeStatus`);
 
 export const actions = {
     getTreeTypeListOK,
@@ -25,7 +27,8 @@ export const actions = {
     deleteTreeType,
     changeEditVisible,
     changeViewVisible,
-    postForsetPic
+    postForsetPic,
+    handleChangeTreeTypeStatus
 };
 
 export default handleActions({
@@ -40,5 +43,9 @@ export default handleActions({
     [changeViewVisible]: (state, {payload}) => ({
         ...state,
         viewVisible: payload
+    }),
+    [handleChangeTreeTypeStatus]: (state, {payload}) => ({
+        ...state,
+        changeTreeTypeStatus: payload
     })
 }, {});

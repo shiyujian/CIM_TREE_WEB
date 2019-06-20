@@ -10,10 +10,9 @@ import {
     Modal,
     Upload,
     Icon,
-    message,
     Select,
     Radio,
-    notification
+    Notification
 } from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -152,6 +151,7 @@ class Edite extends Component {
                     title='修改树种信息'
                     width={920}
                     visible={editVisible}
+                    maskClosable={false}
                     onOk={this.save.bind(this)}
                     onCancel={this.cancel.bind(this)}
                 >
@@ -324,7 +324,7 @@ class Edite extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请选择抽检测量项'
+                                                        message: '请选择是否需要挂牌'
                                                     }
                                                 ]
                                             })(
@@ -463,7 +463,7 @@ class Edite extends Component {
                             status: 'done',
                             url: src
                         }];
-                        // notification.success({
+                        // Notification.success({
                         // 	message:'文件上传成功',
                         // 	duration:3
                         // })
@@ -486,7 +486,10 @@ class Edite extends Component {
                     }
                 });
             } else {
-                message.error('请上传jpg,jpeg,png 文件');
+                Notification.error({
+                    message: '请上传jpg,jpeg,png 文件',
+                    duration: 3
+                });
                 this.setState({
                     loading: false
                 });
@@ -543,7 +546,12 @@ class Edite extends Component {
 
     save = () => {
         const {
-            actions: { putTreeType, getTreeTypeList, changeEditVisible },
+            actions: {
+                putTreeType,
+                getTreeTypeList,
+                changeEditVisible,
+                handleChangeTreeTypeStatus
+            },
             form: { setFieldsValue },
             record,
             treeTypeList
@@ -605,7 +613,7 @@ class Edite extends Component {
                     postData.HaveQRCode === record.HaveQRCode &&
                     postData.ID === record.ID
                 ) {
-                    notification.info({
+                    Notification.info({
                         message: '请进行修改后再进行提交',
                         duration: 3
                     });
@@ -633,18 +641,19 @@ class Edite extends Component {
                             samplingParam: [],
                             loading: false
                         });
-                        notification.success({
+                        Notification.success({
                             message: '修改树种成功',
                             duration: 3
                         });
                         await changeEditVisible(false);
                     } else {
-                        notification.error({
+                        Notification.error({
                             message: '新增树种失败',
                             duration: 3
                         });
                     }
                     await getTreeTypeList();
+                    await handleChangeTreeTypeStatus(true);
                 }
             }
         });

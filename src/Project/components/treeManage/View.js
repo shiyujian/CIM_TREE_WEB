@@ -10,10 +10,9 @@ import {
     Modal,
     Upload,
     Icon,
-    message,
     Select,
     Radio,
-    notification
+    Notification
 } from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -443,10 +442,6 @@ class View extends Component {
                             status: 'done',
                             url: src
                         }];
-                        // notification.success({
-                        // 	message:'文件上传成功',
-                        // 	duration:3
-                        // })
                         this.setState({
                             fileList: fileList,
                             picsSrc: rst,
@@ -466,7 +461,10 @@ class View extends Component {
                     }
                 });
             } else {
-                message.error('请上传jpg,jpeg,png 文件');
+                Notification.error({
+                    message: '请上传jpg,jpeg,png 文件',
+                    duration: 3
+                });
                 this.setState({
                     loading: false
                 });

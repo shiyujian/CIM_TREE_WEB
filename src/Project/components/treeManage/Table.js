@@ -7,14 +7,14 @@ import {
     Modal,
     Avatar,
     Table,
-    notification,
+    Notification,
     Popconfirm,
     Divider
 } from 'antd';
-import { getForestImgUrl } from '_platform/auth';
-import { TREETYPENO } from '../../../_platform/api';
+import { getForestImgUrl, getUser } from '_platform/auth';
+import { TREETYPENO } from '_platform/api';
 import Addition from './Addition';
-import Edite from './Edite';
+import Edit from './Edit';
 import View from './View';
 import './index.less';
 
@@ -54,9 +54,17 @@ export default class Tablelevel extends Component {
         }
     }
 
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.treeTypeList !== this.props.treeTypeList) {
-            this.search();
+    componentWillReceiveProps = async (nextProps) => {
+        const {
+            changeTreeTypeStatus = false,
+            actions: {
+                handleChangeTreeTypeStatus
+            }
+        } = this.props;
+        console.log('nextProps.changeTreeTypeStatus', nextProps.changeTreeTypeStatus);
+        if (nextProps.changeTreeTypeStatus && nextProps.changeTreeTypeStatus !== changeTreeTypeStatus) {
+            await handleChangeTreeTypeStatus(false);
+            await this.search();
         }
     }
 
@@ -73,10 +81,10 @@ export default class Tablelevel extends Component {
             dataSource = treeTypeList;
         }
 
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = getUser();
         let permission = false;
         let superUser = false;
-        if (user.username === 'admin') {
+        if (user && user.username && user.username === 'admin') {
             superUser = true;
         }
         let groups = user.groups || [];
@@ -139,7 +147,7 @@ export default class Tablelevel extends Component {
                                 pagination={this.state.pagination}
                                 onChange={this.handleTableChange.bind(this)}
                             />
-                            {editVisible ? <Edite {...this.props} {...this.state} /> : ''}
+                            {editVisible ? <Edit {...this.props} {...this.state} /> : ''}
                             {viewVisible ? <View {...this.props} {...this.state} /> : ''}
                         </Col>
                     </Row>
@@ -197,6 +205,25 @@ export default class Tablelevel extends Component {
                 pagination,
                 searchList
             });
+        } else {
+            let current = pagination.current;
+            if (treeTypeList && treeTypeList instanceof Array) {
+                // 删除最后一页数据，需要重新设置页数
+                if (treeTypeList.length > 0) {
+                    if (Math.ceil(treeTypeList.length / 10) >= current) {
+                        pagination.current = current;
+                    } else {
+                        pagination.current = current - 1;
+                    }
+                } else {
+                    pagination.current = 0;
+                }
+                pagination.total = treeTypeList && treeTypeList.length;
+                pagination.pageSize = 10;
+                this.setState({
+                    pagination
+                });
+            }
         }
     }
 
@@ -250,12 +277,12 @@ export default class Tablelevel extends Component {
         };
         let rst = await deleteTreeType(deleteID);
         if (rst && rst.code && rst.code === 1) {
-            notification.success({
+            Notification.success({
                 message: '树种删除成功',
                 duration: 3
             });
         } else {
-            notification.error({
+            Notification.error({
                 message: '树种删除失败',
                 duration: 3
             });
