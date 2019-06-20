@@ -1123,7 +1123,7 @@ class Edit extends Component {
                 getUsers,
                 postUploadFilesImg,
                 postUploadNegative,
-                putUser,
+                putForestUser,
                 getTablePage,
                 postUploadFilesNum,
                 getSwitch,
@@ -1208,7 +1208,7 @@ class Edit extends Component {
                         extra_params: {},
                         title: addition.title || ''
                     };
-                    let userData = await putUser({}, putUserPostData);
+                    let userData = await putForestUser({}, putUserPostData);
                     if (userData.code === 1) {
                         message.info('修改人员成功');
                         await getSwitch();

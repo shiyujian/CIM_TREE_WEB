@@ -1,234 +1,185 @@
 import React, { Component } from 'react';
-import { Modal, Table, Checkbox, Spin, Input, Row, Col } from 'antd';
-
+import { Modal, Table, Checkbox, Spin, Input, Row, Col, Button } from 'antd';
+const Search = Input.Search;
 export default class Member extends Component {
     constructor (props) {
         super(props);
         this.state = {
             loading: false,
-            orgSet: null,
-            searchList: [],
-            search: false,
-            searchUser: [],
-            objIndex: {},
-            personIndex: {},
-            checkeds: ''
+            relationMember: [],
+            relationMemberIDList: [],
+            allUserData: {},
+            pagination: {},
+            searchRelationList: [],
+            searchRelationStatus: false,
+            searchAllUser: [],
+            searchAllUserStatus: false,
+            searchAllUserPostData: {}
         };
     }
-    search (value) {
-        let searchList = [];
-        const users = this.props.getUserList || [];
-        users.map(item => {
+    componentDidMount = async () => {
+        const {
+            member: { role = {} } = {},
+            actions: {
+                getMembers,
+                getUsersPage
+            }
+        } = this.props;
+        try {
+            this.setState({ loading: true });
+            let data = await getMembers({ id: role.id });
+            let relationMember = (data && data.members) || [];
+            let relationMemberIDList = relationMember.map(member => member.id);
+
+            let allUserData = await getUsersPage({ page: 1 });
+            let pagination = {
+                current: 1,
+                total: (allUserData && allUserData.count) || 0,
+                pageSize: 10
+            };
+            this.setState({
+                relationMember,
+                relationMemberIDList,
+                pagination,
+                allUserData,
+                loading: false
+            });
+        } catch (e) {
+            console.log('componentDidMount', e);
+        }
+    }
+    // 已关联用户搜索
+    searchRelationUser (value) {
+        let searchRelationList = [];
+        const {
+            relationMember = []
+        } = this.state;
+        let array = [];
+        relationMember.map(item => {
             if (item.username) {
                 if (value && item.username.indexOf(value) > -1) {
-                    searchList.push(item);
+                    searchRelationList.push(item);
+                    array.push(item.id);
                 }
             }
         });
+        relationMember.map(item => {
+            if (item.account && item.account.person_name) {
+                // 符合搜索条件的名字
+                if (value && item.account.person_name.indexOf(value) > -1) {
+                    // 之前没有加入数组
+                    if (array.indexOf(item.id) === -1) {
+                        searchRelationList.push(item);
+                    }
+                }
+            }
+        });
+        console.log('searchRelationList', searchRelationList);
         if (value) {
             this.setState({
-                searchList: searchList,
-                search: true
+                searchRelationList: searchRelationList,
+                searchRelationStatus: true
             });
         } else {
             this.setState({
-                searchList: users,
-                search: false
+                searchRelationList: [],
+                searchRelationStatus: false
             });
         }
     }
-    render () {
-        const Search = Input.Search;
-        const { searchList } = this.state;
-        const {
-            member: { visible, role = {} } = {}
-        } = this.props;
-        const title = `关联用户 | ${role ? role.name : ''}`;
-        let { platform: { users = [] } = {} } = this.props;
-        const infoList = this.props.getUserFristDatas || {};
-
-        const results = infoList.results || [];
-        let users2 = results.map(ele => {
-            return { ...ele };
-        });
-        const getUserList = this.props.getUserList || [];
-        // console.log("111111111",getUserList)
-        let users1 = getUserList.map((ele, i) => {
-            ele.index = i + 1;
-            return { ...ele };
-        });
-        let dataSource = [];
-        if (this.state.search === true) {
-            dataSource = searchList;
-        } else {
-            dataSource = users1;
-        }
-        console.log('this.state.searchUser', this.state.searchUser);
-        console.log('users2', users2);
-
-        this.state.orgSet &&
-            users2.forEach(ele => {
-                if (this.state.orgSet[ele.person_id]) {
-                    ele.organization = this.state.orgSet[ele.person_id];
-                }
-            });
-        return (
-            <Modal
-                title={title}
-                style={{ top: 0 }}
-                visible={visible}
-                width='90%'
-                onOk={this.ok.bind(this)}
-                onCancel={this.cancel.bind(this)}
-            >
-                <Spin spinning={this.props.getUserLoadings}>
-                    {/* <div style={{ overflow: "scroll", height: "600px" }}> */}
-                    <Row style={{ marginBottom: '10px' }}>
-                        <Col span={6}>
-                            <h2 style={{ marginLeft: '10px' }}>
-                                已经关联的用户
-                            </h2>
-                        </Col>
-                        <Col span={6}>
-                            <Search
-                                placeholder='请输入搜索的用户名'
-                                style={{
-                                    width: '200px',
-                                    margin: '0 0 0 5px'
-                                }}
-                                onSearch={value => {
-                                    this.search.bind(this, value)();
-                                }}
-                            />
-                        </Col>
-                    </Row>
-                    <Table
-                        bordered
-                        rowKey='id'
-                        size='small'
-                        columns={this.columns1}
-                        dataSource={dataSource}
-                    />
-
-                    <Row style={{ marginBottom: '10px' }}>
-                        <Col span={6}>
-                            <h2 style={{ marginLeft: '10px' }}>所有用户</h2>
-                        </Col>
-                        <Col span={6}>
-                            <Search
-                                placeholder='请输入搜索的用户名'
-                                style={{
-                                    width: '200px',
-                                    margin: '0 0 0 5px'
-                                }}
-                                onSearch={value => {
-                                    this.searchByName.bind(this, value)();
-                                }}
-                            />
-                        </Col>
-                    </Row>
-                    <Table
-                        bordered
-                        rowKey='id'
-                        size='small'
-                        columns={this.columns}
-                        dataSource={
-                            this.state.searchUser
-                                ? this.state.searchUser.length > 0
-                                    ? this.state.searchUser
-                                    : users2
-                                : users2
-                        }
-                        onChange={this.changePage.bind(this)}
-                        pagination={
-                            this.state.searchUser
-                                ? this.state.searchUser.length > 0
-                                    ? { current: 1, total: 1 }
-                                    : this.props.getUserFristPages
-                                : this.props.getUserFristPages
-                        }
-                    />
-                    {/* </div> */}
-                </Spin>
-            </Modal>
-        );
-    }
-    searchByName (value) {
+    // 全部用户搜索
+    searchAllUer = async (value) => {
         const {
             actions: { getUsers }
         } = this.props;
+        const {
+            pagination,
+            allUserData = {}
+        } = this.state;
+        pagination.current = 1;
+        pagination.pageSize = 10;
         if (value) {
-            getUsers({}, { username: value }).then(item => {
-                if (item.length > 0) {
-                    if (value === item[0].username) {
-                        this.setState({ searchUser: item, objIndex: '' });
-                    }
-                }
+            this.setState({ loading: true });
+            let searchAllUserPostData = {
+                page: 1,
+                keyword: value,
+                is_active: true,
+                is_black: 0
+            };
+            let searchAllUser = await getUsers({}, searchAllUserPostData);
+            pagination.total = (searchAllUser && searchAllUser.count) || 0;
+            this.setState({
+                searchAllUserPostData,
+                searchAllUser,
+                pagination,
+                searchAllUserStatus: true,
+                loading: false
             });
         } else {
+            pagination.total = (allUserData && allUserData.count) || 0;
             this.setState({
-                searchUser: this.props.getUserFristDatas,
-                objIndex: this.state.personIndex
+                searchAllUserPostData: {},
+                searchAllUser: {},
+                pagination,
+                searchAllUserStatus: false
             });
         }
     }
-    ok () {
+    // 所有用户翻页
+    changePage = async (pagina) => {
         const {
-            actions: { changeMemberField },
-            member: { members = [], role = {} } = {}
+            actions: {
+                getUsersPage,
+                getUsers
+            }
         } = this.props;
-
-        changeMemberField('visible', false);
+        const {
+            searchAllUserStatus,
+            searchAllUserPostData,
+            pagination
+        } = this.state;
+        let page = pagina.current;
+        pagination.current = page;
+        pagination.pageSize = 10;
+        this.setState({ loading: true });
+        if (searchAllUserStatus) {
+            searchAllUserPostData.page = page;
+            let searchAllUser = await getUsers({}, searchAllUserPostData);
+            pagination.total = (searchAllUser && searchAllUser.count) || 0;
+            this.setState({
+                searchAllUserPostData,
+                searchAllUser,
+                pagination,
+                loading: false
+            });
+        } else {
+            let allUserData = await getUsersPage({ page: pagina.current });
+            pagination.total = (allUserData && allUserData.count) || 0;
+            this.setState({
+                pagination,
+                allUserData,
+                loading: false
+            });
+        }
     }
-    // cancelRelation() {
-
-    // }
-    cancel () {
+    // 关闭弹窗
+    handleModalCancel () {
         const {
             actions: {
                 changeMemberField
             }
         } = this.props;
-        changeMemberField('members', undefined);
-        this.searchByName('');
-        this.search('');
-        this.setState({ objIndex: '', personIndex: '', search: false });
         changeMemberField('visible', false);
-    }
-    async changePage (obj) {
-        const {
-            actions: { getUsersPage, getUserFristPage, getUserFristData }
-        } = this.props;
-
-        getUsersPage({ page: obj.current }).then(rst2 => {
-            let pagination = {
-                current: obj.current,
-                total: rst2.count
-            };
-            getUserFristPage(pagination);
-            getUserFristData(rst2);
-            this.setState({ objIndex: obj, personIndex: obj });
-        });
-    }
-    componentDidMount () {
-        const {
-            member: { role: { id } = {} } = {},
-            actions: { getMembers },
-            platform: { users = [] } = {}
-        } = this.props;
-        this.setState({ loading: true });
-        id && getMembers({ id });
-    }
-    componentWillUnmount () {
-        this.setState({ orgSet: null });
     }
     columns = [
         {
             title: '序号',
-            // dataIndex: 'index',
             render: (text, record, index) => {
-                const current = this.state.objIndex.current;
-                const pageSize = this.state.objIndex.pageSize;
+                const {
+                    pagination
+                } = this.state;
+                const current = pagination.current;
+                const pageSize = pagination.pageSize;
                 if (current !== undefined && pageSize !== undefined) {
                     return index + 1 + (current - 1) * pageSize;
                 } else {
@@ -259,9 +210,10 @@ export default class Member extends Component {
         {
             title: '关联',
             render: user => {
-                const { member = {} } = this.props;
-                const members = member.members || [];
-                const checked = members.some(member => member === user.id);
+                const {
+                    relationMemberIDList
+                } = this.state;
+                const checked = relationMemberIDList.some(member => member === user.id);
 
                 return (
                     <Checkbox
@@ -276,9 +228,6 @@ export default class Member extends Component {
         {
             title: '序号',
             dataIndex: 'index'
-            // render: (text,record,index) => {
-            // 	return index + 1;
-            // }
         },
         {
             title: '名称',
@@ -303,9 +252,10 @@ export default class Member extends Component {
         {
             title: '关联',
             render: user => {
-                const { member = {} } = this.props;
-                const members = member.members || [];
-                const checked = members.some(member => member === user.id);
+                const {
+                    relationMemberIDList
+                } = this.state;
+                const checked = relationMemberIDList.some(member => member === user.id);
                 return (
                     <Checkbox
                         checked={checked}
@@ -317,148 +267,238 @@ export default class Member extends Component {
     ];
     // user是关联用户里面的其中一行记录
 
-    check (user) {
-        console.log('22222222', user);
+    check = async (user) => {
         const {
-            actions: { changeMemberField },
-            member: { role = [], members = [] }
+            actions: {
+                putForestUser,
+                getOrgName
+            },
+            member: { role = [] }
         } = this.props;
-        const has = members.some(member => member === user.id);
+        const {
+            relationMemberIDList
+        } = this.state;
+        const has = relationMemberIDList.some(member => member === user.id);
         let rst = [];
         let groupsa = [];
-        for (let i = 0; i < user.groups.length; i++) {
-            const element = user.groups[i];
-            if (has) {
-                rst = members.filter(member => member !== user.id);
-                if (element.id === role.id) {
-                } else {
-                    groupsa.push(element.id);
-                }
-            } else {
-                rst = [...members, user.id];
-                groupsa.push(role.id);
-                groupsa.push(element.id);
-            }
-            changeMemberField('members', rst);
+        if (has) {
+            rst = relationMemberIDList.filter(member => member !== user.id);
+        } else {
+            rst = [...relationMemberIDList, user.id];
+            groupsa.push(role.id);
         }
-        console.log('groupsa', groupsa);
-        let setGroups = Array.from(new Set(groupsa));
-        console.log('7777777777', setGroups);
-        const {
-            actions: { putUser, getOrgName }
-        } = this.props;
-        // return
-        getOrgName({ code: user.account.org_code }).then(items => {
-            putUser(
-                {},
-                {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    // password: addition.password, // 密码不能变？信息中没有密码
-                    account: {
-                        person_name: user.person_name,
-                        person_type: 'C_PER',
-                        person_avatar_url: '',
-                        organization: {
-                            pk: items.pk,
-                            code: user.account.org_code,
-                            obj_type: 'C_ORG',
-                            rel_type: 'member',
-                            name: user.account.organization
-                        }
-                    },
-                    tags: user.account.tags,
-                    sections: user.account.sections,
-                    // groups: [7],
-                    groups: setGroups,
-                    is_active: true,
-                    id_num: user.account.id_num,
-                    id_image: [],
-                    basic_params: {
-                        info: {
-                            电话: user.account.person_telephone || '',
-                            性别: user.account.gender || '',
-                            技术职称: user.account.title || '',
-                            phone: user.account.person_telephone || '',
-                            sex: user.account.gender || '',
-                            duty: ''
-                        }
-                    },
-                    extra_params: {},
-                    title: user.account.title || ''
-                }
-            ).then(rst => {});
+        this.setState({
+            relationMemberIDList: rst
         });
+        let items = await getOrgName({ code: user.account.org_code });
+        await putForestUser(
+            {},
+            {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                // password: addition.password, // 密码不能变？信息中没有密码
+                account: {
+                    person_name: user.person_name,
+                    person_type: 'C_PER',
+                    person_avatar_url: '',
+                    person_signature_url: '',
+                    organization: {
+                        pk: items.pk,
+                        code: user.account.org_code,
+                        obj_type: 'C_ORG',
+                        rel_type: 'member',
+                        name: user.account.organization
+                    }
+                },
+                tags: user.account.tags,
+                sections: user.account.sections,
+                groups: groupsa,
+                is_active: true,
+                id_num: user.account.id_num,
+                id_image: [],
+                basic_params: {
+                    info: {
+                        电话: user.account.person_telephone || '',
+                        性别: user.account.gender || '',
+                        技术职称: user.account.title || '',
+                        phone: user.account.person_telephone || '',
+                        sex: user.account.gender || '',
+                        duty: ''
+                    }
+                },
+                extra_params: {},
+                title: user.account.title || ''
+            }
+        );
     }
-    cancelRelation (user) {
+    cancelRelation = async (user) => {
         const {
-            actions: { changeMemberField },
-            member: { role = [], members = [] }
+            actions: {
+                putForestUser,
+                getOrgName
+            },
+            member: { role = [] }
         } = this.props;
-        const has = members.some(member => member === user.id);
+        const {
+            relationMemberIDList
+        } = this.state;
+        const has = relationMemberIDList.some(member => member === user.id);
         let rst = [];
         let groupsa = [];
-        for (let i = 0; i < user.groups.length; i++) {
-            const element = user.groups[i];
-            if (has) {
-                rst = members.filter(member => member !== user.id);
-                if (element.id === role.id) {
-                } else {
-                    groupsa.push(element.id);
-                }
-            } else {
-                rst = [...members, user.id];
-                groupsa.push(element.id);
-            }
-            changeMemberField('members', rst);
+        if (has) {
+            rst = relationMemberIDList.filter(member => member !== user.id);
+        } else {
+            rst = [...relationMemberIDList, user.id];
+            groupsa.push(role.id);
         }
-        console.log('groupsa', groupsa);
-        const {
-            actions: { putUser, getOrgName }
-        } = this.props;
-        // return
-        getOrgName({ code: user.account.org_code }).then(items => {
-            putUser(
-                {},
-                {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    // password: addition.password, // 密码不能变？信息中没有密码
-                    account: {
-                        person_name: user.person_name,
-                        person_type: 'C_PER',
-                        person_avatar_url: '',
-                        organization: {
-                            pk: items.pk,
-                            code: user.account.org_code,
-                            obj_type: 'C_ORG',
-                            rel_type: 'member',
-                            name: user.account.organization
-                        }
-                    },
-                    tags: user.account.tags,
-                    sections: user.account.sections,
-                    // groups: [7],
-                    groups: groupsa,
-                    is_active: true,
-                    id_num: user.account.id_num,
-                    id_image: [],
-                    basic_params: {
-                        info: {
-                            电话: user.account.person_telephone || '',
-                            性别: user.account.gender || '',
-                            技术职称: user.account.title || '',
-                            phone: user.account.person_telephone || '',
-                            sex: user.account.gender || '',
-                            duty: ''
-                        }
-                    },
-                    extra_params: {},
-                    title: user.account.title || ''
-                }
-            ).then(rst => {});
+        this.setState({
+            relationMemberIDList: rst
         });
+        let items = await getOrgName({ code: user.account.org_code });
+        await putForestUser(
+            {},
+            {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                // password: addition.password, // 密码不能变？信息中没有密码
+                account: {
+                    person_name: user.person_name,
+                    person_type: 'C_PER',
+                    person_avatar_url: '',
+                    person_signature_url: '',
+                    organization: {
+                        pk: items.pk,
+                        code: user.account.org_code,
+                        obj_type: 'C_ORG',
+                        rel_type: 'member',
+                        name: user.account.organization
+                    }
+                },
+                tags: user.account.tags,
+                sections: user.account.sections,
+                // groups: [7],
+                groups: groupsa,
+                is_active: true,
+                id_num: user.account.id_num,
+                id_image: [],
+                basic_params: {
+                    info: {
+                        电话: user.account.person_telephone || '',
+                        性别: user.account.gender || '',
+                        技术职称: user.account.title || '',
+                        phone: user.account.person_telephone || '',
+                        sex: user.account.gender || '',
+                        duty: ''
+                    }
+                },
+                extra_params: {},
+                title: user.account.title || ''
+            }
+        );
+    }
+
+    render () {
+        const {
+            loading,
+            searchRelationList,
+            searchRelationStatus,
+            relationMember = [],
+            searchAllUserStatus,
+            allUserData,
+            searchAllUser
+        } = this.state;
+        const {
+            member: { visible, role = {} } = {}
+        } = this.props;
+        const title = `关联用户 | ${role ? role.name : ''}`;
+        let allUserDataSource = [];
+        if (searchAllUserStatus) {
+            allUserDataSource = (searchAllUser && searchAllUser.results) || [];
+        } else {
+            allUserDataSource = (allUserData && allUserData.results) || [];
+        }
+        let relationDataSource = [];
+        if (searchRelationStatus) {
+            relationDataSource = searchRelationList || [];
+        } else {
+            relationDataSource = relationMember || [];
+        }
+        relationDataSource.map((ele, i) => {
+            ele.index = i + 1;
+            return { ...ele };
+        });
+        return (
+            <Modal
+                title={title}
+                style={{ top: 0 }}
+                visible={visible}
+                width='90%'
+                footer={null}
+                onCancel={this.handleModalCancel.bind(this)}
+            >
+                <Spin spinning={loading}>
+                    <Row style={{ marginBottom: '10px' }}>
+                        <Col span={6}>
+                            <h2 style={{ marginLeft: '10px' }}>
+                                已经关联的用户
+                            </h2>
+                        </Col>
+                        <Col span={6}>
+                            <Search
+                                placeholder='请输入用户名'
+                                style={{
+                                    width: '200px',
+                                    margin: '0 0 0 5px'
+                                }}
+                                onSearch={this.searchRelationUser.bind(this)}
+                            />
+                        </Col>
+                    </Row>
+                    <Table
+                        bordered
+                        rowKey='id'
+                        size='small'
+                        columns={this.columns1}
+                        dataSource={relationDataSource}
+                    />
+
+                    <Row style={{ marginBottom: '10px' }}>
+                        <Col span={6}>
+                            <h2 style={{ marginLeft: '10px' }}>所有用户</h2>
+                        </Col>
+                        <Col span={6}>
+                            <Search
+                                placeholder='请输入用户名或名称'
+                                style={{
+                                    width: '200px',
+                                    margin: '0 0 0 5px'
+                                }}
+                                onSearch={this.searchAllUer.bind(this)}
+                            />
+                        </Col>
+                    </Row>
+                    <Table
+                        bordered
+                        rowKey='id'
+                        size='small'
+                        columns={this.columns}
+                        dataSource={allUserDataSource}
+                        onChange={this.changePage.bind(this)}
+                        pagination={this.state.pagination}
+                    />
+                    <Row style={{ marginTop: 10 }}>
+                        <Button
+                            onClick={this.handleModalCancel.bind(this)}
+                            style={{ float: 'right' }}
+                            type='primary'
+                        >
+                            关闭
+                        </Button>
+                    </Row>
+                </Spin>
+            </Modal>
+        );
     }
 }

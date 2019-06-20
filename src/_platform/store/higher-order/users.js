@@ -8,29 +8,18 @@ export default (ID, service = '') => {
     const suffix = service.toUpperCase();
     const SERVICE = capitalize(service);
     const getUsersOK = createAction(`${ID}_GET_USERS_OK_${suffix}`);
-    const updateUsers = createAction(`${ID}_UPDATE_USERS_OK_${suffix}`);
     const getUsers = createFetchAction(`${USER_API}/users/`, [getUsersOK]);
     const getUsersPage = createFetchAction(
         `${USER_API}/users/?page={{page}}`,
         'GET'
     );
-    const postUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'POST');
-    const postUsers = createFetchAction(
-        `${SUSER_API}/system/susers`,
-        [],
-        'POST'
-    );
-    const deleteUser = createFetchAction(
+    const postForestUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'POST');
+    const deleteForestUser = createFetchAction(
         `${SUSER_API}/system/user/{{userID}}`,
         [],
         'DELETE'
     );
-    const putUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'PUT');
-    const putUserBlackList = createFetchAction(
-        `${USER_API}/user/{{userID}}/black/`,
-        [],
-        'PUT'
-    );
+    const putForestUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'PUT');
     const postForestUserBlackList = forestFetchAction(
         `${FOREST_API}/system/blacksuser`,
         [],
@@ -59,9 +48,6 @@ export default (ID, service = '') => {
                         }));
                     }
                 }
-            },
-            [updateUsers]: state => {
-                return state;
             }
         },
         []
@@ -70,14 +56,11 @@ export default (ID, service = '') => {
     usersReducer[`get${SERVICE}Users`] = getUsers;
     usersReducer[`get${SERVICE}UsersPage`] = getUsersPage;
     usersReducer[`get${SERVICE}UsersOK`] = getUsersOK;
-    usersReducer[`update${SERVICE}Users`] = updateUsers;
-    usersReducer[`post${SERVICE}User`] = postUser;
-    usersReducer[`post${SERVICE}Users`] = postUsers;
-    usersReducer[`put${SERVICE}User`] = putUser;
-    usersReducer[`put${SERVICE}UserBlackList`] = putUserBlackList;
+    usersReducer[`post${SERVICE}ForestUser`] = postForestUser;
+    usersReducer[`put${SERVICE}ForestUser`] = putForestUser;
     usersReducer[`post${SERVICE}ForestUserBlackList`] = postForestUserBlackList;
     usersReducer[`post${SERVICE}ForestUserBlackDisabled`] = postForestUserBlackDisabled;
 
-    usersReducer[`delete${SERVICE}User`] = deleteUser;
+    usersReducer[`delete${SERVICE}ForestUser`] = deleteForestUser;
     return usersReducer;
 };

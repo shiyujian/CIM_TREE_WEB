@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, message } from 'antd';
+import { Modal, Form, Input, Notification } from 'antd';
 
 const FormItem = Form.Item;
 
@@ -43,7 +43,10 @@ export default class Info extends Component {
             actions: { getRoles, postRole, clearAdditionField, putRole }
         } = this.props;
         if (!addition.name) {
-            message.warn('请输入角色名称');
+            Notification.error({
+                message: '请输入角色名称',
+                duration: 2
+            });
         } else {
             if (addition.id) {
                 putRole(
@@ -56,8 +59,17 @@ export default class Info extends Component {
                     }
                 ).then(rst => {
                     if (rst.id) {
+                        Notification.success({
+                            message: '角色创建成功',
+                            duration: 3
+                        });
                         clearAdditionField();
                         getRoles();
+                    } else if (rst && rst.name && rst.name[0] === 'group with this name already exists.') {
+                        Notification.error({
+                            message: '角色名称已存在',
+                            duration: 3
+                        });
                     }
                 });
             } else {
@@ -70,9 +82,19 @@ export default class Info extends Component {
                         description: addition.description
                     }
                 ).then(rst => {
+                    console.log('rst', rst);
                     if (rst.id) {
+                        Notification.success({
+                            message: '角色创建成功',
+                            duration: 3
+                        });
                         clearAdditionField();
                         getRoles();
+                    } else if (rst && rst.name && rst.name[0] === 'group with this name already exists.') {
+                        Notification.error({
+                            message: '角色名称已存在',
+                            duration: 3
+                        });
                     }
                 });
             }

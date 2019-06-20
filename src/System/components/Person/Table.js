@@ -701,12 +701,12 @@ class Users extends Component {
         } else {
             this.setState({ loading: true });
             const {
-                actions: { deleteUser },
+                actions: { deleteForestUser },
                 getTablePages
             } = this.props;
             let actionArr = [];
             this.selectedCodes.map(userId => {
-                actionArr.push(deleteUser({ userID: userId }));
+                actionArr.push(deleteForestUser({ userID: userId }));
             });
             let rst = await Promise.all(actionArr);
             let code = 1;
@@ -778,7 +778,6 @@ class Users extends Component {
         const {
             actions: {
                 postForestUserBlackDisabled
-                // putUserBlackList
             },
             getTablePages
         } = this.props;
@@ -813,18 +812,6 @@ class Users extends Component {
             } else {
                 message.error(`用户${changeName}失败`);
             }
-            // let postData = {
-            //     is_black: isBlack,
-            //     black_remark: ''
-            // };
-            // let data = await putUserBlackList({userID: user.id}, postData);
-            // if (data && data.id) {
-            //     message.success(`用户${changeName}成功`);
-            //     const pager = { ...getTablePages };
-            //     await this.search(pager.current || 1);
-            // } else {
-            //     message.error(`用户${changeName}失败`);
-            // }
         } catch (e) {
             console.log('handleUserDisabled', e);
         }
@@ -868,7 +855,7 @@ class Users extends Component {
     // 单个用户的删除功能
     del = async (user) => {
         const {
-            actions: { deleteUser },
+            actions: { deleteForestUser },
             getTablePages
         } = this.props;
         const pager = { ...getTablePages };
@@ -876,7 +863,7 @@ class Users extends Component {
             this.setState({
                 loading: true
             });
-            let rep = await deleteUser({ userID: user.id });
+            let rep = await deleteForestUser({ userID: user.id });
             if (rep && rep.code && rep.code === 1) {
                 message.success('删除用户成功');
                 // 更新表格

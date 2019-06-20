@@ -1027,7 +1027,7 @@ class Addition extends Component {
             addition = {},
             sidebar: { node } = {},
             actions: {
-                postUser,
+                postForestUser,
                 clearAdditionField,
                 getUsers,
                 postUploadFilesImg,
@@ -1111,7 +1111,7 @@ class Addition extends Component {
                     // 先进行实名认证再注册用户
                     let realNameData = await RealName(addition);
                     console.log('realNameData', realNameData);
-                    let userData = await postUser({}, postUserPostData);
+                    let userData = await postForestUser({}, postUserPostData);
                     if (userData.code === 1) {
                         const msgs = JSON.parse(userData.msg);
                         if (
