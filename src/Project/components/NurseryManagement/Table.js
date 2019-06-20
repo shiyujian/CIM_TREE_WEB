@@ -41,75 +41,6 @@ class Tablelevel extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 隐藏弹框
         this.handlePage = this.handlePage.bind(this); // 换页
     }
-    componentDidMount () {
-        const { getRegionCodes, getSupplierList } = this.props.actions;
-        // 获取当前组织机构的权限
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        if (user.groups && user.groups.length > 0) {
-            this.groupId = user.groups[0].id;
-        }
-        let permission = getUserIsManager();
-        console.log('permission', permission);
-        this.setState({
-            permission
-        });
-        // 获取行政区划编码
-        const RegionCodeList = JSON.parse(window.localStorage.getItem('RegionCodeList'));
-        if (RegionCodeList) {
-            this.setState({
-                RegionCodeList
-            });
-        } else {
-            getRegionCodes().then(rep => {
-                let RegionCodeList = [];
-                rep.map(item => {
-                    if (item.LevelType === '1') {
-                        RegionCodeList.push({
-                            value: item.ID,
-                            label: item.Name
-                        });
-                    }
-                });
-                RegionCodeList.map(item => {
-                    let arrCity = [];
-                    rep.map(row => {
-                        if (row.LevelType === '2' && item.value === row.ParentId) {
-                            arrCity.push({
-                                value: row.ID,
-                                label: row.Name
-                            });
-                        }
-                    });
-                    arrCity.map(row => {
-                        let arrCounty = [];
-                        rep.map(record => {
-                            if (record.LevelType === '3' && row.value === record.ParentId) {
-                                arrCounty.push({
-                                    value: record.ID,
-                                    label: record.Name
-                                });
-                            }
-                        });
-                        row.children = arrCounty;
-                    });
-                    item.children = arrCity;
-                });
-                window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
-                this.setState({
-                    RegionCodeList
-                });
-            });
-        }
-        // 获取所有供应商
-        getSupplierList({}, {
-            status: 1
-        }).then(rep => {
-            this.setState({
-                optionList: rep.content
-            });
-        });
-        this.onSearch();
-    }
     columns = [
         {
             title: '苗圃名称',
@@ -229,161 +160,74 @@ class Tablelevel extends Component {
             }
         }
     ];
-    render () {
-        const {
-            status,
-            nurseryList,
-            page, total,
-            visible,
-            visibleTitle,
-            seeVisible,
-            auditVisible,
-            optionList,
-            fileList,
-            fileListBack,
-            imageUrl,
-            record,
-            RegionCodeList,
-            nurseryname,
-            Leader,
-            textCord,
-            blackVisible
-        } = this.state;
-        const { getFieldDecorator } = this.props.form;
-        let img = getForestImgUrl(imageUrl);
-        return (
-            <div className='table-level'>
-                <Row>
-                    <Col span={6}>
-                        <h3>苗圃列表</h3>
-                    </Col>
-                    <Col span={12}>
-                        <label
-                            style={{marginRight: 10}}
-                        >
-                            苗圃名称:
-                        </label>
-                        <Input className='search_input' value={nurseryname} onChange={this.handleName} />
-                        <Button
-                            type='primary'
-                            onClick={this.onSearch}
-                            style={{minWidth: 30, marginRight: 20}}
-                        >
-                            查询
-                        </Button>
-                        <Button
-                            onClick={this.onClear}
-                            style={{minWidth: 30}}
-                        >
-                            清空
-                        </Button>
-                    </Col>
-                    <Col span={6}>
-                        <Button
-                            type='primary'
-                            style={{ float: 'right' }}
-                            onClick={this.toAdd}
-                        >
-                            新增苗圃
-                        </Button>
-                    </Col>
-                </Row>
-                <Row style={{ marginTop: 5 }}>
-                    <Col span={6}>
-                        <label
-                            style={{marginRight: 10}}
-                        >
-                            状态:
-                        </label>
-                        <Select defaultValue={status} allowClear style={{width: 150}} onChange={this.handleStatus}>
-                            <Option value={0}>未审核</Option>
-                            <Option value={1}>审核通过</Option>
-                            <Option value={2}>审核不通过</Option>
-                            <Option value={''}>全部</Option>
-                        </Select>
-                    </Col>
-                </Row>
-                <Row style={{ marginTop: 10 }}>
-                    <Col span={24}>
-                        <Spin tip='Loading...' spinning={this.state.loading}>
-                            <Table
-                                columns={this.columns}
-                                bordered
-                                rowClassName={this.setBlackListColor.bind(this)}
-                                dataSource={nurseryList}
-                                pagination={false} rowKey='ID' />
-                            <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
-                                showQuickJumper page='1' onChange={this.handlePage} />
-                        </Spin>
-                    </Col>
-                </Row>
-                <Modal title='查看' visible={seeVisible}
-                    onCancel={this.handleCancel}
-                    style={{textAlign: 'center'}}
-                    footer={null}
-                >
-                    <p style={{fontSize: 20}}>{Leader}&nbsp;&nbsp;{textCord}</p>
-                    <img src={img} width='100%' height='100%' alt='图片找不到了' />
-                </Modal>
-                {
-                    auditVisible ? <Modal title='审核' visible
-                        onOk={this.handleAudit} onCancel={this.handleCancel}
-                    >
-                        <Form>
-                            <FormItem
-                                {...formItemLayout}
-                                label='审核结果'
-                            >
-                                {getFieldDecorator('CheckStatus', {
-                                    rules: [{required: true, message: '必填项'}]
-                                })(
-                                    <Select style={{ width: 150 }} allowClear>
-                                        <Option value={1}>审核通过</Option>
-                                        <Option value={2}>审核不通过</Option>
-                                    </Select>
-                                )}
-                            </FormItem>
-                            <FormItem
-                                {...formItemLayout}
-                                label='审核备注'
-                            >
-                                {getFieldDecorator('CheckInfo', {
-                                })(
-                                    <TextArea rows={4} />
-                                )}
-                            </FormItem>
-                        </Form>
-                    </Modal> : null
-                }
-                {
-                    visible ? <AddEdit fileList={fileList} {...this.props}
-                        fileListBack={fileListBack}
-                        record={record}
-                        RegionCodeList={RegionCodeList}
-                        visibleTitle={visibleTitle}
-                        optionList={optionList}
-                        handleCancel={this.handleCancel}
-                        onSearch={this.onSearch}
-                    /> : null
-                }
-                <Modal title='拉黑' visible={blackVisible}
-                    onCancel={this.handleBlackCancel.bind(this)}
-                    onOk={this.handleBlackOk.bind(this)}
-                >
-                    <Form>
-                        <FormItem
-                            {...formItemLayout}
-                            label='拉黑备注'
-                        >
-                            {getFieldDecorator('BlackInfo', {
-                            })(
-                                <TextArea rows={4} />
-                            )}
-                        </FormItem>
-                    </Form>
-                </Modal>
-            </div>
-        );
+    componentDidMount () {
+        const { getRegionCodes, getSupplierList } = this.props.actions;
+        // 获取当前组织机构的权限
+        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        if (user.groups && user.groups.length > 0) {
+            this.groupId = user.groups[0].id;
+        }
+        let permission = getUserIsManager();
+        console.log('permission', permission);
+        this.setState({
+            permission
+        });
+        // 获取行政区划编码
+        const RegionCodeList = JSON.parse(window.localStorage.getItem('RegionCodeList'));
+        if (RegionCodeList) {
+            this.setState({
+                RegionCodeList
+            });
+        } else {
+            getRegionCodes().then(rep => {
+                let RegionCodeList = [];
+                rep.map(item => {
+                    if (item.LevelType === '1') {
+                        RegionCodeList.push({
+                            value: item.ID,
+                            label: item.Name
+                        });
+                    }
+                });
+                RegionCodeList.map(item => {
+                    let arrCity = [];
+                    rep.map(row => {
+                        if (row.LevelType === '2' && item.value === row.ParentId) {
+                            arrCity.push({
+                                value: row.ID,
+                                label: row.Name
+                            });
+                        }
+                    });
+                    arrCity.map(row => {
+                        let arrCounty = [];
+                        rep.map(record => {
+                            if (record.LevelType === '3' && row.value === record.ParentId) {
+                                arrCounty.push({
+                                    value: record.ID,
+                                    label: record.Name
+                                });
+                            }
+                        });
+                        row.children = arrCounty;
+                    });
+                    item.children = arrCity;
+                });
+                window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
+                this.setState({
+                    RegionCodeList
+                });
+            });
+        }
+        // 获取所有供应商
+        getSupplierList({}, {
+            status: 1
+        }).then(rep => {
+            this.setState({
+                optionList: rep.content
+            });
+        });
+        this.onSearch();
     }
     handlePage (page) {
         this.setState({
@@ -624,6 +468,162 @@ class Tablelevel extends Component {
             auditVisible: false,
             record: null
         });
+    }
+    render () {
+        const {
+            status,
+            nurseryList,
+            page, total,
+            visible,
+            visibleTitle,
+            seeVisible,
+            auditVisible,
+            optionList,
+            fileList,
+            fileListBack,
+            imageUrl,
+            record,
+            RegionCodeList,
+            nurseryname,
+            Leader,
+            textCord,
+            blackVisible
+        } = this.state;
+        const { getFieldDecorator } = this.props.form;
+        let img = getForestImgUrl(imageUrl);
+        return (
+            <div className='table-level'>
+                <Row>
+                    <Col span={6}>
+                        <h3>苗圃列表</h3>
+                    </Col>
+                    <Col span={12}>
+                        <label
+                            style={{marginRight: 10}}
+                        >
+                            苗圃名称:
+                        </label>
+                        <Input className='search_input' value={nurseryname} onChange={this.handleName} />
+                        <Button
+                            type='primary'
+                            onClick={this.onSearch}
+                            style={{minWidth: 30, marginRight: 20}}
+                        >
+                            查询
+                        </Button>
+                        <Button
+                            onClick={this.onClear}
+                            style={{minWidth: 30}}
+                        >
+                            清空
+                        </Button>
+                    </Col>
+                    <Col span={6}>
+                        <Button
+                            type='primary'
+                            style={{ float: 'right' }}
+                            onClick={this.toAdd}
+                        >
+                            新增苗圃
+                        </Button>
+                    </Col>
+                </Row>
+                <Row style={{ marginTop: 5 }}>
+                    <Col span={6}>
+                        <label
+                            style={{marginRight: 10}}
+                        >
+                            状态:
+                        </label>
+                        <Select defaultValue={status} allowClear style={{width: 150}} onChange={this.handleStatus}>
+                            <Option value={0}>未审核</Option>
+                            <Option value={1}>审核通过</Option>
+                            <Option value={2}>审核不通过</Option>
+                            <Option value={''}>全部</Option>
+                        </Select>
+                    </Col>
+                </Row>
+                <Row style={{ marginTop: 10 }}>
+                    <Col span={24}>
+                        <Spin tip='Loading...' spinning={this.state.loading}>
+                            <Table
+                                columns={this.columns}
+                                bordered
+                                rowClassName={this.setBlackListColor.bind(this)}
+                                dataSource={nurseryList}
+                                pagination={false} rowKey='ID' />
+                            <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
+                                showQuickJumper page='1' onChange={this.handlePage} />
+                        </Spin>
+                    </Col>
+                </Row>
+                <Modal title='查看' visible={seeVisible}
+                    onCancel={this.handleCancel}
+                    style={{textAlign: 'center'}}
+                    footer={null}
+                >
+                    <p style={{fontSize: 20}}>{Leader}&nbsp;&nbsp;{textCord}</p>
+                    <img src={img} width='100%' height='100%' alt='图片找不到了' />
+                </Modal>
+                {
+                    auditVisible ? <Modal title='审核' visible
+                        onOk={this.handleAudit} onCancel={this.handleCancel}
+                    >
+                        <Form>
+                            <FormItem
+                                {...formItemLayout}
+                                label='审核结果'
+                            >
+                                {getFieldDecorator('CheckStatus', {
+                                    rules: [{required: true, message: '必填项'}]
+                                })(
+                                    <Select style={{ width: 150 }} allowClear>
+                                        <Option value={1}>审核通过</Option>
+                                        <Option value={2}>审核不通过</Option>
+                                    </Select>
+                                )}
+                            </FormItem>
+                            <FormItem
+                                {...formItemLayout}
+                                label='审核备注'
+                            >
+                                {getFieldDecorator('CheckInfo', {
+                                })(
+                                    <TextArea rows={4} />
+                                )}
+                            </FormItem>
+                        </Form>
+                    </Modal> : null
+                }
+                {
+                    visible ? <AddEdit fileList={fileList} {...this.props}
+                        fileListBack={fileListBack}
+                        record={record}
+                        RegionCodeList={RegionCodeList}
+                        visibleTitle={visibleTitle}
+                        optionList={optionList}
+                        handleCancel={this.handleCancel}
+                        onSearch={this.onSearch}
+                    /> : null
+                }
+                <Modal title='拉黑' visible={blackVisible}
+                    onCancel={this.handleBlackCancel.bind(this)}
+                    onOk={this.handleBlackOk.bind(this)}
+                >
+                    <Form>
+                        <FormItem
+                            {...formItemLayout}
+                            label='拉黑备注'
+                        >
+                            {getFieldDecorator('BlackInfo', {
+                            })(
+                                <TextArea rows={4} />
+                            )}
+                        </FormItem>
+                    </Form>
+                </Modal>
+            </div>
+        );
     }
 }
 
