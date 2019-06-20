@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
-import AddEdit from './AddEdit';
+import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, Notification } from 'antd';
+import Edit from './Edit';
+import Addition from './Addition';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import './Table.less';
 const confirm = Modal.confirm;
@@ -30,7 +31,9 @@ class Tablelevel extends Component {
             optionList: [],
             permission: false, // 是否为业主或管理员
             blackVisible: false, // 拉黑modal
-            blackRecord: '' // 拉黑的信息
+            blackRecord: '', // 拉黑的信息
+            addVisible: false,
+            editVisible: false
         };
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
@@ -104,28 +107,33 @@ class Tablelevel extends Component {
                 const {
                     permission
                 } = this.state;
-                const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+                const user = getUser();
                 if (user && user.username === 'admin') {
                     return (
                         <span>
                             {
                                 record && record.IsBlack
-                                    ? ''
-                                    : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                    ? <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                                    : [
+                                        <a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
                                         <span key='2' className='ant-divider' />,
-                                        <a onClick={this.toDelete.bind(this, record)}>删除</a>]
+                                        <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                                    ]
                             }
                             {
-                                record.CheckStatus === 0 ? [<span key='4' className='ant-divider' />,
-                                    <a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>
-                                ] : []
+                                record && !record.IsBlack && record.CheckStatus === 0
+                                    ? [
+                                        <span key='4' className='ant-divider' />,
+                                        <a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>
+                                    ]
+                                    : []
                             }
                             {
-                                record && record.IsBlack
-                                    ? '' : ([
+                                record && !record.IsBlack && record.CheckStatus === 1
+                                    ? ([
                                         <span key='4' className='ant-divider' />,
                                         <a onClick={this.toBlack.bind(this, record)}>拉黑</a>
-                                    ])
+                                    ]) : ''
                             }
                         </span>
                     );
@@ -134,25 +142,33 @@ class Tablelevel extends Component {
                         <span>
                             {
                                 record && record.IsBlack
-                                    ? ''
-                                    : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
-                                        <span key='2' className='ant-divider' />]
+                                    ? <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                                    : [
+                                        <a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                        <span key='2' className='ant-divider' />,
+                                        <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                                    ]
                             }
                             {
-                                record.CheckStatus === 0 ? [<a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>,
-                                    <span key='4' className='ant-divider' />] : []
+                                record && !record.IsBlack && record.CheckStatus === 0
+                                    ? [
+                                        <span key='4' className='ant-divider' />,
+                                        <a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>
+                                    ]
+                                    : []
                             }
-                            <a onClick={this.toDelete.bind(this, record)}>删除</a>
                         </span>
                     );
                 } else {
                     return (
                         <span>
                             {
-                                record.CheckStatus === 1 ? '' : <span>
-                                    <a onClick={this.toEdit.bind(this, record)}>修改</a>
-                                    <span className='ant-divider' />
-                                </span>
+                                record.CheckStatus === 1
+                                    ? ''
+                                    : <span>
+                                        <a onClick={this.toEdit.bind(this, record)}>修改</a>
+                                        <span className='ant-divider' />
+                                    </span>
                             }
                         </span>
                     );
@@ -168,7 +184,6 @@ class Tablelevel extends Component {
             this.groupId = user.groups[0].id;
         }
         let permission = getUserIsManager();
-        console.log('permission', permission);
         this.setState({
             permission
         });
@@ -239,6 +254,8 @@ class Tablelevel extends Component {
     onClear () {
         this.setState({
             nurseryname: ''
+        }, () => {
+            this.onSearch();
         });
     }
     seeModal (record, str) {
@@ -288,7 +305,10 @@ class Tablelevel extends Component {
             };
             checkNursery({}, param).then((rep) => {
                 if (rep.code === 1) {
-                    message.success('审核成功');
+                    Notification.success({
+                        message: '审核成功',
+                        duration: 2
+                    });
                     this.onSearch();
                     this.handleCancel();
                 }
@@ -297,14 +317,14 @@ class Tablelevel extends Component {
     }
     toAdd () {
         this.setState({
-            visible: true,
+            addVisible: true,
             visibleTitle: '新增苗圃'
         });
     }
     toEdit (record, e) {
         e.preventDefault();
         this.setState({
-            visible: true,
+            editVisible: true,
             visibleTitle: '编辑苗圃',
             record
         });
@@ -327,10 +347,16 @@ class Tablelevel extends Component {
             onOk () {
                 deleteNursery({ID: record.ID}).then((rep) => {
                     if (rep.code === 1) {
-                        message.warning('如未删除成功，请确认该组织机构下无用户');
+                        Notification.warning({
+                            message: '如未删除成功，请确认该组织机构下无用户',
+                            duration: 2
+                        });
                         self.onSearch();
                     } else {
-                        message.warning('如未删除成功，请确认本机构下无用户');
+                        Notification.warning({
+                            message: '如未删除成功，请确认本机构下无用户',
+                            duration: 2
+                        });
                         self.onSearch();
                     }
                 });
@@ -427,7 +453,10 @@ class Tablelevel extends Component {
                     let blackData = await Promise.all(blackPostRequestList);
                     console.log('blackData', blackData);
                     if (blackData && blackData.length > 0) {
-                        message.success('苗圃人员拉黑成功');
+                        Notification.success({
+                            message: '苗圃人员拉黑成功',
+                            duration: 2
+                        });
                     }
                     let nurseryPostData = {
                         ID: nursery.ID,
@@ -436,9 +465,15 @@ class Tablelevel extends Component {
                     let nurseryBlackData = await postNurseryBlack({}, nurseryPostData);
                     console.log('nurseryBlackData', nurseryBlackData);
                     if (nurseryBlackData && nurseryBlackData.code && nurseryBlackData.code === 1) {
-                        message.success('苗圃拉黑成功');
+                        Notification.success({
+                            message: '苗圃拉黑成功',
+                            duration: 2
+                        });
                     } else {
-                        message.error('苗圃拉黑失败');
+                        Notification.error({
+                            message: '苗圃拉黑失败',
+                            duration: 2
+                        });
                     }
                 }
                 await this.onSearch();
@@ -454,6 +489,8 @@ class Tablelevel extends Component {
     handleStatus (value) {
         this.setState({
             status: value
+        }, () => {
+            this.onSearch();
         });
     }
     handleName (e) {
@@ -463,7 +500,8 @@ class Tablelevel extends Component {
     }
     handleCancel () {
         this.setState({
-            visible: false,
+            addVisible: false,
+            editVisible: false,
             seeVisible: false,
             auditVisible: false,
             record: null
@@ -473,17 +511,14 @@ class Tablelevel extends Component {
         const {
             status,
             nurseryList,
-            page, total,
-            visible,
-            visibleTitle,
+            page,
+            total,
+            editVisible,
+            addVisible,
             seeVisible,
             auditVisible,
-            optionList,
-            fileList,
             fileListBack,
             imageUrl,
-            record,
-            RegionCodeList,
             nurseryname,
             Leader,
             textCord,
@@ -535,10 +570,14 @@ class Tablelevel extends Component {
                         >
                             状态:
                         </label>
-                        <Select defaultValue={status} allowClear style={{width: 150}} onChange={this.handleStatus}>
+                        <Select
+                            defaultValue={status}
+                            allowClear
+                            style={{width: 150}}
+                            onChange={this.handleStatus}>
                             <Option value={0}>未审核</Option>
                             <Option value={1}>审核通过</Option>
-                            <Option value={2}>审核不通过</Option>
+                            {/* <Option value={2}>审核不通过</Option> */}
                             <Option value={''}>全部</Option>
                         </Select>
                     </Col>
@@ -557,7 +596,9 @@ class Tablelevel extends Component {
                         </Spin>
                     </Col>
                 </Row>
-                <Modal title='查看' visible={seeVisible}
+                <Modal
+                    title='查看'
+                    visible={seeVisible}
                     onCancel={this.handleCancel}
                     style={{textAlign: 'center'}}
                     footer={null}
@@ -565,47 +606,6 @@ class Tablelevel extends Component {
                     <p style={{fontSize: 20}}>{Leader}&nbsp;&nbsp;{textCord}</p>
                     <img src={img} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
-                {
-                    auditVisible ? <Modal title='审核' visible
-                        onOk={this.handleAudit} onCancel={this.handleCancel}
-                    >
-                        <Form>
-                            <FormItem
-                                {...formItemLayout}
-                                label='审核结果'
-                            >
-                                {getFieldDecorator('CheckStatus', {
-                                    rules: [{required: true, message: '必填项'}]
-                                })(
-                                    <Select style={{ width: 150 }} allowClear>
-                                        <Option value={1}>审核通过</Option>
-                                        <Option value={2}>审核不通过</Option>
-                                    </Select>
-                                )}
-                            </FormItem>
-                            <FormItem
-                                {...formItemLayout}
-                                label='审核备注'
-                            >
-                                {getFieldDecorator('CheckInfo', {
-                                })(
-                                    <TextArea rows={4} />
-                                )}
-                            </FormItem>
-                        </Form>
-                    </Modal> : null
-                }
-                {
-                    visible ? <AddEdit fileList={fileList} {...this.props}
-                        fileListBack={fileListBack}
-                        record={record}
-                        RegionCodeList={RegionCodeList}
-                        visibleTitle={visibleTitle}
-                        optionList={optionList}
-                        handleCancel={this.handleCancel}
-                        onSearch={this.onSearch}
-                    /> : null
-                }
                 <Modal title='拉黑' visible={blackVisible}
                     onCancel={this.handleBlackCancel.bind(this)}
                     onOk={this.handleBlackOk.bind(this)}
@@ -622,6 +622,59 @@ class Tablelevel extends Component {
                         </FormItem>
                     </Form>
                 </Modal>
+                {
+                    auditVisible
+                        ? <Modal title='审核' visible
+                            onOk={this.handleAudit} onCancel={this.handleCancel}
+                        >
+                            <Form>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label='审核结果'
+                                >
+                                    {getFieldDecorator('CheckStatus', {
+                                        rules: [{required: true, message: '必填项'}]
+                                    })(
+                                        <Select style={{ width: 150 }} allowClear>
+                                            <Option value={1}>审核通过</Option>
+                                            <Option value={2}>审核不通过</Option>
+                                        </Select>
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label='审核备注'
+                                >
+                                    {getFieldDecorator('CheckInfo', {
+                                    })(
+                                        <TextArea rows={4} />
+                                    )}
+                                </FormItem>
+                            </Form>
+                        </Modal>
+                        : null
+                }
+                {
+                    editVisible
+                        ? <Edit
+                            {...this.props}
+                            {...this.state}
+                            fileListBack={fileListBack}
+                            handleCancel={this.handleCancel}
+                            onSearch={this.onSearch}
+                        />
+                        : null
+                }
+                {
+                    addVisible
+                        ? <Addition
+                            {...this.props}
+                            {...this.state}
+                            handleCancel={this.handleCancel}
+                            onSearch={this.onSearch}
+                        />
+                        : null
+                }
             </div>
         );
     }
