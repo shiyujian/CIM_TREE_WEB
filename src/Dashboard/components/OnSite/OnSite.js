@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-05-24 11:12:52
+ * @Last Modified time: 2019-06-20 11:05:48
  */
 import React, { Component } from 'react';
 import {
@@ -156,6 +156,9 @@ class OnSite extends Component {
                 tabs = {}
             }
         } = this.props;
+        if (!dashboardCompomentMenu && prevProps.dashboardCompomentMenu) {
+            await this.getTileLayerTreeBasic();
+        }
         // 在各个菜单之间切换时需要处理的图层
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             // 去除各个模块切换的图层，其他模块的图层在退出模块时自动去除，辅助管理的图层在主文件中

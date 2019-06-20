@@ -70,7 +70,7 @@ class ChangeNurseryInfoModal extends Component {
                     nurseryName: (example && example.NurseryName) || '',
                     supplierName: (example && example.Factory) || '',
                     place: (example && example.TreePlace) || '',
-                    treeType: (example && example.TreeType) || '',
+                    treeTypeNursery: (example && example.TreeType) || '',
                     project: project,
                     section: section,
                     isPack: isPack,
@@ -115,7 +115,7 @@ class ChangeNurseryInfoModal extends Component {
                     'DJ': values.DJ,
                     'TQZJ': values.TQZJ,
                     'TQHD': values.TQHD,
-                    'TreeType': values.treeType,
+                    'TreeType': values.treeTypeNursery,
                     'NurseryName': values.nurseryName,
                     'Factory': values.supplierName,
                     'TreePlace': values.place,
@@ -313,7 +313,7 @@ class ChangeNurseryInfoModal extends Component {
                                         label='树种'
                                     >
                                         {getFieldDecorator(
-                                            'treeType',
+                                            'treeTypeNursery',
                                             {
                                                 rules: [
                                                     {

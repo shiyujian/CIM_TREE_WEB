@@ -742,7 +742,6 @@ export default class TreePipePage extends Component {
                     }
                 }
             });
-
             this.setState({
                 treePipeMaterialData
             }, () => {
@@ -756,7 +755,7 @@ export default class TreePipePage extends Component {
     handleQueryTreePipe = async () => {
         const {
             actions: {
-                postTreePipeQuery
+                getQueryTreePipe
             }
         } = this.props;
         const {
@@ -792,7 +791,7 @@ export default class TreePipePage extends Component {
                     Layers: layers,
                     Sql: sqlData
                 };
-                let queryTreePipeData = await postTreePipeQuery({}, postData);
+                let queryTreePipeData = await getQueryTreePipe({}, postData);
                 if (treePipe) {
                     contents = queryTreePipeData && queryTreePipeData.Pipes;
                 } else if (treePipeNode) {
@@ -812,7 +811,7 @@ export default class TreePipePage extends Component {
         const {
             map,
             actions: {
-                postTreePipeQuery
+                getQueryTreePipe
             }
         } = this.props;
         const {
@@ -841,7 +840,7 @@ export default class TreePipePage extends Component {
                 Bbox: wkt,
                 Layers: layers
             };
-            let queryTreePipeData = await postTreePipeQuery({}, postData);
+            let queryTreePipeData = await getQueryTreePipe({}, postData);
             let contents = [];
             if (treePipe) {
                 contents = queryTreePipeData && queryTreePipeData.Pipes;

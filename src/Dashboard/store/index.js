@@ -43,6 +43,8 @@ export const getTreeLocation = forestFetchAction(`${FOREST_API}/tree/treelocatio
 export const getAdoptTrees = forestFetchAction(`${FOREST_API}/adopt/adopttrees`, [], 'GET');
 // 根据坐标获取地址信息
 export const getLocationNameByCoordinate = createFetchAction(`${LBSAMAP_API}/v3/geocode/regeo`, [], 'GET');
+// 灌溉官网查询数据
+export const getQueryTreePipe = createFetchAction(`${TREEPIPE_API}/pipe/query`, [], 'POST');
 export const getCustomViewByUserIDOk = createAction(`${ID}根据用户ID获取用户自定义视图`);
 // 根据用户ID获取用户自定义视图
 export const getCustomViewByUserID = createFetchAction(`${USER_API}/user/{{id}}/custom-view/`, [getCustomViewByUserIDOk], 'GET');
@@ -50,7 +52,6 @@ export const getCustomViewByUserID = createFetchAction(`${USER_API}/user/{{id}}/
 export const postUserCustomView = createFetchAction(`${USER_API}/custom-view/`, [], 'POST');
 // 用户删除自定义视图
 export const deleteUserCustomView = createFetchAction(`${USER_API}/custom-view/{{id}}/`, [], 'DELETE');
-export const postTreePipeQuery = createFetchAction(`${TREEPIPE_API}/pipe/query`, [], 'POST');
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -104,7 +105,7 @@ export const actions = {
     getCustomViewByUserID,
     postUserCustomView,
     deleteUserCustomView,
-    postTreePipeQuery,
+    getQueryTreePipe,
 
     switchDashboardCompoment,
     getAreaTree,
