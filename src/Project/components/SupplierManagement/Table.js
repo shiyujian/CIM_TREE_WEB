@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, message } from 'antd';
+import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, Notification } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import AddEdit from './AddEdit';
+import Addition from './Addition';
+import Edit from './Edit';
 import './Table.less';
 const confirm = Modal.confirm;
 const Option = Select.Option;
@@ -32,7 +34,9 @@ class Tablelevel extends Component {
             optionList: [],
             permission: false, // 是否为业主或管理员
             blackRecord: '',
-            blackVisible: false
+            blackVisible: false,
+            addVisible: false,
+            editVisible: false
         };
         this.Checker = '';
         this.groupId = ''; // 用户分组ID
@@ -132,28 +136,33 @@ class Tablelevel extends Component {
                 const {
                     permission
                 } = this.state;
-                const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+                const user = getUser();
                 if (user && user.username === 'admin') {
                     return (
                         <span>
                             {
                                 record && record.IsBlack
-                                    ? ''
-                                    : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                    ? <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                                    : [
+                                        <a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
                                         <span key='2' className='ant-divider' />,
-                                        <a onClick={this.toDelete.bind(this, record)}>删除</a>]
+                                        <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                                    ]
                             }
                             {
-                                record.CheckStatus === 0 ? [<span key='4' className='ant-divider' />,
-                                    <a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>
-                                ] : []
+                                record && !record.IsBlack && record.CheckStatus === 0
+                                    ? [
+                                        <span key='4' className='ant-divider' />,
+                                        <a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>
+                                    ]
+                                    : []
                             }
                             {
-                                record && record.IsBlack
-                                    ? '' : ([
+                                record && !record.IsBlack && record.CheckStatus === 1
+                                    ? ([
                                         <span key='4' className='ant-divider' />,
                                         <a onClick={this.toBlack.bind(this, record)}>拉黑</a>
-                                    ])
+                                    ]) : ''
                             }
                         </span>
                     );
@@ -162,22 +171,29 @@ class Tablelevel extends Component {
                         <span>
                             {
                                 record && record.IsBlack
-                                    ? ''
-                                    : [<a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
-                                        <span key='2' className='ant-divider' />]
+                                    ? <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                                    : [
+                                        <a key='1' onClick={this.toEdit.bind(this, record)}>修改</a>,
+                                        <span key='2' className='ant-divider' />,
+                                        <a onClick={this.toDelete.bind(this, record)}>删除</a>
+                                    ]
                             }
                             {
-                                record.CheckStatus === 0 ? [<a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>,
-                                    <span key='4' className='ant-divider' />] : []
+                                record && !record.IsBlack && record.CheckStatus === 0
+                                    ? [
+                                        <span key='4' className='ant-divider' />,
+                                        <a key='3' onClick={this.toAudit.bind(this, record)}>审核</a>
+                                    ] : []
                             }
-                            <a onClick={this.toDelete.bind(this, record)}>删除</a>
                         </span>
                     );
                 } else {
                     return (
                         <span>
                             {
-                                record.CheckStatus === 1 ? '' : <a onClick={this.toEdit.bind(this, record)}>修改</a>
+                                record.CheckStatus === 1
+                                    ? ''
+                                    : <a onClick={this.toEdit.bind(this, record)}>修改</a>
                             }
                         </span>
                     );
@@ -277,7 +293,10 @@ class Tablelevel extends Component {
             };
             checkSupplier({}, param).then((rep) => {
                 if (rep.code === 1) {
-                    message.success('审核成功');
+                    Notification.success({
+                        message: '审核成功',
+                        duration: 2
+                    });
                     this.onSearch();
                     this.handleCancel();
                 }
@@ -287,6 +306,8 @@ class Tablelevel extends Component {
     onClear () {
         this.setState({
             suppliername: ''
+        }, () => {
+            this.onSearch();
         });
     }
     seeModal (record, str, textCord) {
@@ -304,14 +325,14 @@ class Tablelevel extends Component {
     }
     toAdd () {
         this.setState({
-            visible: true,
+            addVisible: true,
             visibleTitle: '新增供应商'
         });
     }
     toEdit (record, e) {
         e.preventDefault();
         this.setState({
-            visible: true,
+            editVisible: true,
             visibleTitle: '编辑供应商',
             record
         });
@@ -334,10 +355,16 @@ class Tablelevel extends Component {
             onOk () {
                 deleteSupplier({ID: record.ID}).then((rep) => {
                     if (rep.code === 1) {
-                        message.warning('如未删除成功，请确认该组织机构下无用户');
+                        Notification.warning({
+                            message: '如未删除成功，请确认该组织机构下无用户',
+                            duration: 2
+                        });
                         self.onSearch();
                     } else {
-                        message.warning('如未删除成功，请确认该组织机构下无用户');
+                        Notification.warning({
+                            message: '如未删除成功，请确认该组织机构下无用户',
+                            duration: 2
+                        });
                         self.onSearch();
                     }
                 });
@@ -433,7 +460,10 @@ class Tablelevel extends Component {
                     let blackData = await Promise.all(blackPostRequestList);
                     console.log('blackData', blackData);
                     if (blackData && blackData.length > 0) {
-                        message.success('供应商人员拉黑成功');
+                        Notification.success({
+                            message: '供应商人员拉黑成功',
+                            duration: 2
+                        });
                     }
                     let nurseryPostData = {
                         ID: supplier.ID,
@@ -442,9 +472,15 @@ class Tablelevel extends Component {
                     let supplierBlackData = await postSupplierBlack({}, nurseryPostData);
                     console.log('supplierBlackData', supplierBlackData);
                     if (supplierBlackData && supplierBlackData.code && supplierBlackData.code === 1) {
-                        message.success('供应商拉黑成功');
+                        Notification.success({
+                            message: '供应商拉黑成功',
+                            duration: 2
+                        });
                     } else {
-                        message.error('供应商拉黑失败');
+                        Notification.error({
+                            message: '供应商拉黑失败',
+                            duration: 2
+                        });
                     }
                 }
                 await this.onSearch();
@@ -483,11 +519,14 @@ class Tablelevel extends Component {
     handleStatus (value) {
         this.setState({
             status: value
+        }, () => {
+            this.onSearch();
         });
     }
     handleCancel () {
         this.setState({
-            visible: false,
+            addVisible: false,
+            editVisible: false,
             seeVisible: false,
             auditVisible: false,
             record: null
@@ -500,15 +539,11 @@ class Tablelevel extends Component {
             page,
             total,
             visible,
-            visibleTitle,
+            addVisible,
+            editVisible,
             seeVisible,
             auditVisible,
-            optionList,
-            fileList,
-            fileListBack,
             imageUrl,
-            record,
-            RegionCodeList,
             suppliername,
             status,
             textCord,
@@ -561,10 +596,14 @@ class Tablelevel extends Component {
                         >
                             状态:
                         </label>
-                        <Select defaultValue={status} allowClear style={{width: 150}} onChange={this.handleStatus}>
+                        <Select
+                            defaultValue={status}
+                            allowClear
+                            style={{width: 150}}
+                            onChange={this.handleStatus}>
                             <Option value={0}>未审核</Option>
                             <Option value={1}>审核通过</Option>
-                            <Option value={2}>审核不通过</Option>
+                            {/* <Option value={2}>审核不通过</Option> */}
                             <Option value={''}>全部</Option>
                         </Select>
                     </Col>
@@ -593,45 +632,38 @@ class Tablelevel extends Component {
                     <img src={img} width='100%' height='100%' alt='图片找不到了' />
                 </Modal>
                 {
-                    auditVisible ? <Modal title='审核' visible
-                        onOk={this.handleAudit} onCancel={this.handleCancel}
-                    >
-                        <Form>
-                            <FormItem
-                                {...formItemLayout}
-                                label='审核结果'
+                    auditVisible
+                        ? (
+                            <Modal title='审核' visible
+                                onOk={this.handleAudit} onCancel={this.handleCancel}
                             >
-                                {getFieldDecorator('CheckStatus', {
-                                    rules: [{required: true, message: '必填项'}]
-                                })(
-                                    <Select style={{ width: 150 }} allowClear>
-                                        <Option value={1}>审核通过</Option>
-                                        <Option value={2}>审核不通过</Option>
-                                    </Select>
-                                )}
-                            </FormItem>
-                            <FormItem
-                                {...formItemLayout}
-                                label='审核备注'
-                            >
-                                {getFieldDecorator('CheckInfo', {
-                                })(
-                                    <TextArea rows={4} />
-                                )}
-                            </FormItem>
-                        </Form>
-                    </Modal> : null
-                }
-                {
-                    visible ? <AddEdit fileList={fileList} {...this.props}
-                        fileListBack={fileListBack}
-                        record={record}
-                        RegionCodeList={RegionCodeList}
-                        visibleTitle={visibleTitle}
-                        optionList={optionList}
-                        handleCancel={this.handleCancel}
-                        onSearch={this.onSearch}
-                    /> : null
+                                <Form>
+                                    <FormItem
+                                        {...formItemLayout}
+                                        label='审核结果'
+                                    >
+                                        {getFieldDecorator('CheckStatus', {
+                                            rules: [{required: true, message: '必填项'}]
+                                        })(
+                                            <Select style={{ width: 150 }} allowClear>
+                                                <Option value={1}>审核通过</Option>
+                                                <Option value={2}>审核不通过</Option>
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                    <FormItem
+                                        {...formItemLayout}
+                                        label='审核备注'
+                                    >
+                                        {getFieldDecorator('CheckInfo', {
+                                        })(
+                                            <TextArea rows={4} />
+                                        )}
+                                    </FormItem>
+                                </Form>
+                            </Modal>
+                        )
+                        : null
                 }
                 <Modal title='拉黑' visible={blackVisible}
                     onCancel={this.handleBlackCancel.bind(this)}
@@ -649,6 +681,33 @@ class Tablelevel extends Component {
                         </FormItem>
                     </Form>
                 </Modal>
+                {
+                    visible
+                        ? <AddEdit
+                            {...this.props}
+                            {...this.state}
+                            handleCancel={this.handleCancel}
+                            onSearch={this.onSearch}
+                        /> : null
+                }
+                {
+                    addVisible
+                        ? <Addition
+                            {...this.props}
+                            {...this.state}
+                            handleCancel={this.handleCancel}
+                            onSearch={this.onSearch}
+                        /> : null
+                }
+                {
+                    editVisible
+                        ? <Edit
+                            {...this.props}
+                            {...this.state}
+                            handleCancel={this.handleCancel}
+                            onSearch={this.onSearch}
+                        /> : null
+                }
             </div>
         );
     }
