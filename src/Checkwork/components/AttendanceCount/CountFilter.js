@@ -8,7 +8,7 @@ import {
     DatePicker,
     Select
 } from 'antd';
-import { getUserIsManager, getCompanyDataByOrgCode } from '../../../_platform/auth';
+import { getUserIsManager, getCompanyDataByOrgCode } from '_platform/auth';
 import { handleFilterData } from '../auth';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;

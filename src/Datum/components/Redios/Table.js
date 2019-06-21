@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Modal } from 'antd';
-import { STATIC_DOWNLOAD_API, SOURCE_API } from '../../../_platform/api';
+import { STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import moment from 'moment';
 import '../Datum/index.less';
 export default class GeneralTable extends Component {

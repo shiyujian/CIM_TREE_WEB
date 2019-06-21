@@ -5,7 +5,7 @@ import moment from 'moment';
 import { Link } from 'react-router-dom';
 
 import styles from './styles.less';
-import { getUser } from '../../_platform/auth';
+import { getUser } from '_platform/auth';
 
 const TabPane = Tabs.TabPane;
 

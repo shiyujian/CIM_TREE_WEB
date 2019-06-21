@@ -18,9 +18,9 @@ import {
 } from 'antd';
 import moment from 'moment';
 import ToggleModal from './ToggleModal';
-import { getUser } from '../../../_platform/auth';
-import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
-import '../../../Datum/components/Datum/index.less';
+import { getUser } from '_platform/auth';
+import { STATIC_DOWNLOAD_API } from '_platform/api';
+import 'Datum/components/Datum/index.less';
 const { TextArea } = Input;
 
 const Option = Select.Option;

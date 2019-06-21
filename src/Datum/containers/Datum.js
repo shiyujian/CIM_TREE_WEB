@@ -19,7 +19,7 @@ import {
 } from '../components/Datum';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import { getUser } from '../../_platform/auth';
+import { getUser } from '_platform/auth';
 export const Datumcode = window.DeathCode.DATUM_DATUM;
 
 @connect(

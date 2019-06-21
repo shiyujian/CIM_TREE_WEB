@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
 import {
     Form,
     Input,

@@ -12,7 +12,6 @@ import {
 import { Filter, Table, Addition, Updatemodal } from '../components/Video';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import { getUser } from '../../_platform/auth';
 export const Datumcode = window.DeathCode.DATUM_VIDEO;
 
 @connect(

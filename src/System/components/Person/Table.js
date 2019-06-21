@@ -286,27 +286,52 @@ class Users extends Component {
     }
     // 添加和删除用户的按钮
     confirms () {
+        const {
+            sidebar: { node } = {}
+        } = this.props;
+        const {
+            selectedRowKeys
+        } = this.state;
+        console.log('node', node);
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         if (user.is_superuser === true) {
             return (<div>
                 <Col span={3}>
-                    <Button onClick={this.append.bind(this)}>添加用户</Button>
+                    <Button
+                        type='primary'
+                        disabled={!node}
+                        onClick={this.append.bind(this)}>
+                            添加用户
+                    </Button>
                 </Col>,
                 <Col span={3}>
-                    <Popconfirm
-                        title='是否真的要删除选中用户?'
-                        onConfirm={this.remove.bind(this)}
-                        okText='是'
-                        cancelText='否'
-                    >
-                        <Button>批量删除</Button>
-                    </Popconfirm>
+                    {
+                        selectedRowKeys.length > 0
+                            ? <Popconfirm
+                                title='是否真的要删除选中用户?'
+                                onConfirm={this.remove.bind(this)}
+                                okText='是'
+                                cancelText='否'
+                            >
+                                <Button type='danger'>
+                                    批量删除
+                                </Button>
+                            </Popconfirm>
+                            : <Button type='danger' disabled>
+                                批量删除
+                            </Button>
+                    }
                 </Col>
             </div>);
         } else {
             return (
                 <Col span={3}>
-                    <Button onClick={this.append.bind(this)}>添加用户</Button>
+                    <Button
+                        onClick={this.append.bind(this)}
+                        disabled={!node}
+                    >
+                        添加用户
+                    </Button>
                 </Col>
             );
         }
@@ -840,7 +865,12 @@ class Users extends Component {
         event.preventDefault();
         const groups = user.groups || [];
         const {
-            actions: { resetAdditionField, getIsActive, getSwitch, changeEditUserVisible }
+            actions: {
+                resetAdditionField,
+                getIsActive,
+                getSwitch,
+                changeEditUserVisible
+            }
         } = this.props;
         getIsActive(user.is_active);
 

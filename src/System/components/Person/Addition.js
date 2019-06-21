@@ -6,18 +6,11 @@ import {
     Form,
     Input,
     Select,
-    message,
-    Upload,
-    Icon,
-    Button
+    message
 } from 'antd';
-import { getUserIsDocument } from '../../../_platform/auth';
+import { getUserIsDocument } from '_platform/auth';
 import {getSectionNameBySection} from '_platform/gisAuth';
-import { UPLOAD_API, STATIC_DOWNLOAD_API, STATIC_UPLOAD_API, STATIC_PREVIEW_API } from '../../../_platform/api';
 import { Promise } from 'es6-promise';
-let fileTypes =
-    'application/jpeg,application/gif,application/png,image/jpeg,image/gif,image/png,image/jpg';
-
 window.config = window.config || {};
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -283,118 +276,6 @@ class Addition extends Component {
         });
         return objs;
     }
-    // 上传用户头像
-    uploadChange (file) {
-        const status = file.file.status;
-        const {
-            actions: { postUploadFilesImg, getImgBtn }
-        } = this.props;
-        if (status === 'done') {
-            let newFileList = file.file.response.download_url.split(
-                '/media'
-            )[1];
-            getImgBtn(true);
-            postUploadFilesImg(newFileList);
-        }
-        if (status === 'removed') {
-            getImgBtn(false);
-            postUploadFilesImg();
-        }
-        if (event) {
-            let { percent } = event;
-            if (percent !== undefined) {
-            }
-        }
-    }
-    // 上传用户签名
-    uploadChangew (file) {
-        const status = file.file.status;
-        const {
-            actions: { postUploadAutograph, getAutographBtn }
-        } = this.props;
-        if (status === 'done') {
-            let newFileList = file.file.response.download_url.split(
-                '/media'
-            )[1];
-            // postUploadVideo(newFileList)
-            getAutographBtn(true);
-            postUploadAutograph(newFileList);
-        }
-        if (status === 'removed') {
-            getAutographBtn(false);
-            postUploadAutograph();
-        }
-        if (event) {
-            let { percent } = event;
-            if (percent !== undefined) {
-            }
-            // this.setState({ progress: parseFloat(percent.toFixed(1)) });
-        }
-    }
-    // 上传身份证正面照片
-    uploadChanges (file) {
-        const status = file.file.status;
-        const {
-            actions: { postUploadFilesNum, getImgNumBtn }
-            // postUploadFilesNums = []
-        } = this.props;
-        if (status === 'done') {
-            // let newFileList = postUploadFilesNums;
-            let newFile = {
-                name: file.file.name,
-                filepath:
-                    STATIC_DOWNLOAD_API +
-                    '/media' +
-                    file.file.response.download_url.split('/media')[1]
-            };
-            getImgNumBtn(true);
-            this.setState({ idImgZ: true });
-            postUploadFilesNum(newFile);
-        }
-        if (status === 'removed') {
-            getImgNumBtn(false);
-            postUploadFilesNum();
-            this.setState({ idImgZ: false });
-        }
-        if (event) {
-            let { percent } = event;
-            if (percent !== undefined) {
-            }
-        }
-    }
-    // 上传身份证反面照片
-    uploadChangea (file) {
-        const status = file.file.status;
-        const {
-            actions: { postUploadNegative, getImgNegative }
-            // postUploadNegatives = []
-        } = this.props;
-        if (status === 'done') {
-            // let newFileList = postUploadNegatives;
-            let newFile = {
-                name: file.file.name,
-                filepath:
-                    STATIC_DOWNLOAD_API +
-                    '/media' +
-                    file.file.response.download_url.split('/media')[1]
-            };
-            this.setState({ idImgF: true });
-
-            getImgNegative(true);
-            postUploadNegative(newFile);
-        }
-        if (status === 'removed') {
-            getImgNegative(false);
-            postUploadNegative();
-            this.setState({ idImgF: false });
-        }
-        if (event) {
-            let { percent } = event;
-            if (percent !== undefined) {
-            }
-        }
-    }
-
     componentDidMount () {
         const {
             actions: { getRoles }
@@ -445,105 +326,6 @@ class Addition extends Component {
         // 用户是否为文书
         let userIsDocument = getUserIsDocument();
         let units = this.getUnits(isSection);
-        let avatar_url = '';
-        let avatar_urlName;
-        // 上传用户头像
-        let fileList = [];
-        if (
-            addition.person_avatar_url &&
-            addition.person_avatar_url !== STATIC_UPLOAD_API
-        ) {
-            avatar_urlName = addition.person_avatar_url.split('/').pop();
-            avatar_url =
-                STATIC_PREVIEW_API +
-                '/media' +
-                addition.person_avatar_url;
-            fileList = [
-                {
-                    uid: -1,
-                    name: avatar_urlName,
-                    status: 'done',
-                    url: avatar_url,
-                    thumbUrl: avatar_url
-                }
-            ];
-        }
-        // 上传用户签名
-        let autographList = [];
-        if (
-            addition.relative_signature_url &&
-            addition.relative_signature_url !== STATIC_UPLOAD_API
-        ) {
-            const avatar_urlName3 = addition.relative_signature_url
-                .split('/')
-                .pop();
-            const avatar_url3 =
-                STATIC_PREVIEW_API +
-                '/media' +
-                addition.relative_signature_url;
-            autographList = [
-                {
-                    uid: -1,
-                    name: avatar_urlName3,
-                    status: 'done',
-                    url: avatar_url3,
-                    thumbUrl: avatar_url3
-                }
-            ];
-        }
-        // 上传身份证正面
-        let fileList1 = [];
-        let id_image_url = '';
-        let id_image_urlName;
-        if (addition.id_image && addition.id_image[0]) {
-            if (addition.id_image[0].name && addition.id_image[0].filepath) {
-                id_image_urlName = addition.id_image[0].name;
-                const id_img = addition.id_image[0].filepath.split('/media')[1];
-                const id_imgs =
-                    STATIC_PREVIEW_API +
-                    '/media' +
-                    id_img;
-                id_image_url = id_imgs || addition.id_image[0].thumbUrl;
-                fileList1 = [
-                    {
-                        uid: 1,
-                        name: id_image_urlName,
-                        status: 'done',
-                        url: id_image_url,
-                        thumbUrl: id_image_url
-                    }
-                ];
-            }
-        }
-
-        // 上传身份证发面
-        let fileList2 = [];
-        let id_image_url1 = '';
-        let id_image_urlName1;
-        if (addition.id_image && addition.id_image[1]) {
-            if (addition.id_image[1].name && addition.id_image[1].filepath) {
-                const id_img = addition.id_image[1].filepath.split('/media')[1];
-                const id_imgs =
-                    STATIC_PREVIEW_API +
-                    '/media' +
-                    id_img;
-                id_image_urlName1 = addition.id_image[1].name;
-                id_image_url1 = id_imgs || addition.id_image[1].thumbUrl;
-                fileList2 = [
-                    {
-                        uid: 2,
-                        name: id_image_urlName1,
-                        status: 'done',
-                        url: id_image_url1,
-                        thumbUrl: id_image_url1
-                    }
-                ];
-            }
-        }
-        let marginTops = '';
-        if (!user.is_superuser) {
-            marginTops = '55px';
-        }
         return (
             <div>
                 {addition.visible && (
@@ -714,82 +496,6 @@ class Addition extends Component {
                                                 : ''}
                                         </Select>
                                     </FormItem>
-                                    <div style={{ marginLeft: '25%' }}>
-                                        <Upload
-                                            name='file'
-                                            multiple
-                                            accept={fileTypes}
-                                            // showUploadList: false,
-                                            action={UPLOAD_API}
-                                            listType='picture'
-                                            data={file => ({
-                                                name: file.fileName,
-                                                a_file: file
-                                            })}
-                                            onChange={this.uploadChange.bind(
-                                                this
-                                            )}
-                                            defaultFileList={fileList}
-                                            disabled={
-                                                fileList && fileList.length
-                                                    ? this.props.getImgBtns ===
-                                                      true
-                                                        ? this.props.getImgBtns
-                                                        : this.props
-                                                            .getImgBtns !==
-                                                          false
-                                                    : this.props.getImgBtns
-                                            }
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />
-                                                <span>上传用户头像</span>
-                                            </Button>
-                                        </Upload>
-                                    </div>
-
-                                    <div
-                                        style={{
-                                            marginLeft: '25%',
-                                            marginTop: '30px'
-                                        }}
-                                    >
-                                        <Upload
-                                            name='file'
-                                            multiple
-                                            accept={fileTypes}
-                                            // showUploadList: false,
-                                            action={UPLOAD_API}
-                                            listType='picture'
-                                            data={file => ({
-                                                name: file.fileName,
-                                                a_file: file
-                                            })}
-                                            onChange={this.uploadChangew.bind(
-                                                this
-                                            )}
-                                            defaultFileList={autographList}
-                                            disabled={
-                                                autographList &&
-                                                autographList.length
-                                                    ? this.props
-                                                        .getAutographBtns ===
-                                                      true
-                                                        ? this.props
-                                                            .getAutographBtns
-                                                        : this.props
-                                                            .getAutographBtns !==
-                                                          false
-                                                    : this.props
-                                                        .getAutographBtns
-                                            }
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />
-                                                <span>上传用户签名</span>
-                                            </Button>
-                                        </Upload>
-                                    </div>
                                 </Col>
                                 <Col span={12}>
                                     <FormItem {...Addition.layout} label='邮箱'>
@@ -893,85 +599,6 @@ class Addition extends Component {
                                     ) : (
                                         ''
                                     )}
-                                    <div
-                                        style={{
-                                            marginLeft: '25%',
-                                            marginTop: marginTops
-                                        }}
-                                    >
-                                        <Upload
-                                            name='file'
-                                            multiple
-                                            accept={fileTypes}
-                                            action={UPLOAD_API}
-                                            listType='picture'
-                                            data={file => ({
-                                                name: file.fileName,
-                                                a_file: file
-                                            })}
-                                            onChange={this.uploadChanges.bind(
-                                                this
-                                            )}
-                                            defaultFileList={fileList1}
-                                            disabled={
-                                                fileList1 && fileList1.length
-                                                    ? this.props
-                                                        .getImgNumBtns === true
-                                                        ? this.props
-                                                            .getImgNumBtns
-                                                        : this.props
-                                                            .getImgNumBtns !==
-                                                          false
-                                                    : this.props.getImgNumBtns
-                                            }
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />
-                                                <span>上传身份证正面照片</span>
-                                            </Button>
-                                        </Upload>
-                                    </div>
-                                    <div
-                                        style={{
-                                            marginLeft: '25%',
-                                            marginTop: '30px'
-                                        }}
-                                    >
-                                        <Upload
-                                            name='file'
-                                            multiple
-                                            accept={fileTypes}
-                                            // className='form-item-required'
-                                            // showUploadList: false,
-                                            action={UPLOAD_API}
-                                            listType='picture'
-                                            data={file => ({
-                                                name: file.fileName,
-                                                a_file: file
-                                            })}
-                                            onChange={this.uploadChangea.bind(
-                                                this
-                                            )}
-                                            defaultFileList={fileList2}
-                                            disabled={
-                                                fileList2 && fileList2.length
-                                                    ? this.props
-                                                        .getImgNegatives ===
-                                                      true
-                                                        ? this.props
-                                                            .getImgNegatives
-                                                        : this.props
-                                                            .getImgNegatives !==
-                                                          false
-                                                    : this.props.getImgNegatives
-                                            }
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />
-                                                <span>上传身份证反面照片</span>
-                                            </Button>
-                                        </Upload>
-                                    </div>
                                 </Col>
                             </Row>
                         </Form>
@@ -1045,18 +672,6 @@ class Addition extends Component {
             section
         } = this.state;
         const roles = addition.roles || [];
-        if (this.props.fileList) {
-            addition.person_avatar_url = this.props.fileList;
-        } else {
-            addition.person_avatar_url = addition.person_avatar_url;
-        }
-        if (this.props.postUploadAutographs) {
-            addition.relative_signature_url = this.props.postUploadAutographs;
-        } else {
-            addition.relative_signature_url = addition.relative_signature_url;
-        }
-        // addition.id_image = [UploadFilesNums, UploadNegatives];
-        addition.id_image = [];
         if (!/^[\w@\.\+\-_]+$/.test(addition.username)) {
             message.warn('请输入英文字符、数字');
         } else {
@@ -1071,10 +686,8 @@ class Addition extends Component {
                             person_code: addition.code,
                             person_name: addition.person_name,
                             person_type: 'C_PER',
-                            person_avatar_url:
-                                this.props.fileList || '',
-                            person_signature_url:
-                                this.props.postUploadAutographs || '',
+                            person_avatar_url: '',
+                            person_signature_url: '',
                             organization: {
                                 pk: node.pk,
                                 code: node.code,
@@ -1089,11 +702,7 @@ class Addition extends Component {
                             : [section],
                         groups: roles.map(role => +role),
                         is_active: true,
-                        // black_remark: addition.black_remark,
                         id_num: addition.id_num,
-                        // is_black: 0,
-                        // 取消身份证照片限制
-                        // id_image: [UploadFilesNums, UploadNegatives],
                         id_image: [],
                         basic_params: {
                             info: {
@@ -1165,7 +774,7 @@ class Addition extends Component {
                             if (userData.msg === '账户注册的苗圃基地已被拉黑！') {
                                 message.warn('账户注册的苗圃基地已被拉黑！');
                             } else {
-                                message.warn('服务器端报错！');
+                                message.warn('新增人员失败');
                             }
                         }
                     }

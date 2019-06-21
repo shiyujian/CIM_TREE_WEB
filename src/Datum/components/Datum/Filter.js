@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
+import { STATIC_DOWNLOAD_API } from '_platform/api';
 import { Form, Input, Button, Row, Col, message, Popconfirm } from 'antd';
 const FormItem = Form.Item;
 const Search = Input.Search;

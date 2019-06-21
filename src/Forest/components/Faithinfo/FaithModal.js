@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Modal, Row, Col, Button, Progress } from 'antd';
-import { FOREST_API } from '../../../_platform/api';
+import { FOREST_API } from '_platform/api';
 import '../index.less';
 
 export default class FaithModal extends Component {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FOREST_API } from '../../../_platform/api';
+import { FOREST_API } from '_platform/api';
 import {
     Form,
     Row,

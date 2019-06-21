@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FILE_API } from '../../../_platform/api';
+import { FILE_API } from '_platform/api';
 import {
     Form,
     Input,
@@ -15,8 +15,7 @@ import {
     Spin
 } from 'antd';
 import moment from 'moment';
-import { DeleteIpPort } from '../../../_platform/components/singleton/DeleteIpPort';
-// import {fileTypes} from '../../../_platform/store/global/file';
+import { DeleteIpPort } from '_platform/components/singleton/DeleteIpPort';
 const Dragger = Upload.Dragger;
 let fileTypes = 'image/jpeg,image/tiff,image/png,image/bmp,image/jpg';
 

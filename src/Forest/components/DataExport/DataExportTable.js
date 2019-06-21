@@ -12,7 +12,7 @@ import {
     message
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API } from '../../../_platform/api';
+import { FOREST_API } from '_platform/api';
 import { getUser } from '_platform/auth';
 import '../index.less';
 import {

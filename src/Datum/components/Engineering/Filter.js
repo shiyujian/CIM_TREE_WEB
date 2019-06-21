@@ -11,7 +11,7 @@ import {
     Select
 } from 'antd';
 import moment from 'moment';
-import { getUser } from '../../../_platform/auth';
+import { getUser } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;

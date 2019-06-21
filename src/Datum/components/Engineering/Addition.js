@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FILE_API } from '../../../_platform/api';
+import { FILE_API } from '_platform/api';
 import {
     Form,
     Input,
@@ -15,7 +15,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { getUser } from '_platform/auth';
-import { DeleteIpPort } from '../../../_platform/components/singleton/DeleteIpPort';
+import { DeleteIpPort } from '_platform/components/singleton/DeleteIpPort';
 const fileTypes =
     'application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword';
 const Dragger = Upload.Dragger;

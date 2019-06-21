@@ -15,10 +15,10 @@ import {
     Spin
 } from 'antd';
 import moment from 'moment';
-import PerSearch from '../../../_platform/components/panels/PerSearch';
-import { getUser } from '../../../_platform/auth';
-import { getNextStates } from '../../../_platform/components/Progress/util';
-import { UPLOAD_API } from '../../../_platform/api';
+import PerSearch from '_platform/components/panels/PerSearch';
+import { getUser } from '_platform/auth';
+import { getNextStates } from '_platform/components/Progress/util';
+import { UPLOAD_API } from '_platform/api';
 const Dragger = Upload.Dragger;
 const FormItem = Form.Item;
 const fileTypes =

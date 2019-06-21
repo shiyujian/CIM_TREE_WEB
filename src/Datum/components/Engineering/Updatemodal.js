@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FILE_API } from '../../../_platform/api';
+import { FILE_API } from '_platform/api';
 import {
     Form,
     Input,

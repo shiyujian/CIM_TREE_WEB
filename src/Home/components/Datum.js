@@ -4,7 +4,7 @@ import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import './styles.less';
-import { getUser } from '../../_platform/auth';
+import { getUser } from '_platform/auth';
 import 'moment/locale/zh-cn';
 moment.locale('zh-cn');
 

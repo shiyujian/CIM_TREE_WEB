@@ -10,7 +10,7 @@ import {
     Progress,
     message
 } from 'antd';
-import { FOREST_API } from '../../../_platform/api';
+import { FOREST_API } from '_platform/api';
 import '../index.less';
 
 export default class FaithinfoTable extends Component {

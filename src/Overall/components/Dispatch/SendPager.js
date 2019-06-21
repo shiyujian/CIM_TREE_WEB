@@ -13,11 +13,11 @@ import {
     Form,
     DatePicker
 } from 'antd';
-import { getUser } from '../../../_platform/auth';
+import { getUser } from '_platform/auth';
 import moment from 'moment';
 import ToggleModal from './ToggleModal';
-import { STATIC_DOWNLOAD_API } from '../../../_platform/api';
-import '../../../Datum/components/Datum/index.less';
+import { STATIC_DOWNLOAD_API } from '_platform/api';
+import 'Datum/components/Datum/index.less';
 
 const Option = Select.Option;
 const FormItem = Form.Item;

@@ -21,7 +21,7 @@ import {
 
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import { getUser, getCompanyDataByOrgCode } from '../../_platform/auth';
+import { getUser, getCompanyDataByOrgCode } from '_platform/auth';
 export const Datumcode = window.DeathCode.DATUM_GCYX;
 
 @connect(

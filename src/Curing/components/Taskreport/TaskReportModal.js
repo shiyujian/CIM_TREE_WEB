@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button, Modal, Form, Row, Input, Notification, Spin, Upload, Icon } from 'antd';
-import { FOREST_API } from '../../../_platform/api';
+import { FOREST_API } from '_platform/api';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
 
