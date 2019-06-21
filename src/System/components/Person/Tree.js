@@ -55,7 +55,8 @@ export default class Tree extends Component {
                 changeSidebarField,
                 getOrgTreeSelect,
                 getOrgTreeByCode,
-                getOrgTreeDataArr
+                getOrgTreeDataArr,
+                getTablePage
             }
         } = this.props;
         try {
@@ -146,7 +147,13 @@ export default class Tree extends Component {
                         orgTreeArrList
                     });
                 }
+                // 进入模块将选中点，表格都清空
                 await changeSidebarField('node', '');
+                let pagination = {
+                    current: 1,
+                    total: 0
+                };
+                await getTablePage(pagination);
             } else {
                 if (orgTreeData && orgTreeData.pk) {
                     // 作为选中的节点，将机构的数据上传至redux

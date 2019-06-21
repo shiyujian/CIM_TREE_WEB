@@ -292,7 +292,6 @@ class Users extends Component {
         const {
             selectedRowKeys
         } = this.state;
-        console.log('node', node);
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         if (user.is_superuser === true) {
             return (<div>
@@ -392,13 +391,11 @@ class Users extends Component {
                 >
                     <div>
                         <Row className='system-person-search-layout'>
-                            <div className='system-person-mrg10'>
-                                <label className='system-person-search-span'>
-                                    用户名:
-                                </label>
+                            <div className='system-person-mrg20'>
                                 <Input
                                     id='NurseryData'
-                                    className='system-person-forestcalcw4'
+                                    placeholder='请输入关键字'
+                                    style={{ width: '100%' }}
                                     value={searchKeyword}
                                     onChange={this.handleChangeKeyword.bind(this)}
                                 />
@@ -487,9 +484,7 @@ class Users extends Component {
                                     </div>)
                                     : ''
                             }
-                        </Row>
-                        <Row style={{marginBottom: 10}}>
-                            <Col span={2} >
+                            <div style={{display: 'inlineBlock'}}>
                                 <Button
                                     type='primary'
                                     onClick={this.handleTableChange.bind(this, {current: 1})}
@@ -501,21 +496,18 @@ class Users extends Component {
                                 >
                                     查询
                                 </Button>
-                            </Col>
-                            <Col span={20} />
-                            <Col span={2} >
                                 <Button
                                     type='primary'
                                     onClick={this.clear.bind(this)}
                                     style={{
                                         minWidth: 30,
                                         display: 'inline-block',
-                                        marginRight: 20
+                                        marginLeft: 20
                                     }}
                                 >
                                     清空
                                 </Button>
-                            </Col>
+                            </div>
                         </Row>
                         <Row style={{ marginBottom: '20px' }}>
                             {this.confirms()}
@@ -527,7 +519,7 @@ class Users extends Component {
                         bordered
                         rowSelection={this.rowSelection}
                         columns={this.columns}
-                        dataSource={dataList}
+                        dataSource={node ? dataList : []}
                         rowClassName={this.setBlackListColor.bind(this)}
                         pagination={this.props.getTablePages}
                         onChange={this.handleTableChange.bind(this)}
