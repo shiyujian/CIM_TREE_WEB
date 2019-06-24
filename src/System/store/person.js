@@ -21,27 +21,6 @@ const getOrgTreeDataArr = createAction(`${ID}获取登录用户所在公司的�
 // 设置上传的文件列表
 export const postUploadFilesImg = createAction(`${ID}xhy设置上传的文件列表`);
 
-// 设置上传的用户签名
-export const postUploadAutograph = createAction(`${ID}设置上传的用户签名`);
-
-// 控制只能上传一张用户照片签名
-export const getAutographBtn = createAction(`${ID}控制只能上传一张用户照片签名`);
-
-// 设置上传的身份证正面照片
-export const postUploadFilesNum = createAction(`${ID}设置上传的身份证照片`);
-// 设置上传的身份证反面照片
-export const postUploadNegative = createAction(`${ID}设置上传的身份证反面照片`);
-
-// 控制只能上传一张用户照片
-export const getImgBtn = createAction(`${ID}控制只能上传一张用户照片`);
-// 控制只能上传一张身份证正面照片
-export const getImgNumBtn = createAction(`${ID}控制只能上传一张身份证正面照片`);
-
-// 控制只能上传一张身份证反面照片
-export const getImgNegative = createAction(`${ID}控制只能上传一张身份证反面照片`);
-
-// 编辑时如果有照片就显示照片
-export const getImgArr = createAction(`${ID}编辑时如果有照片就显示照片`);
 // 黑名单控制开关
 export const getSwitch = createAction(`${ID}黑名单控制开关`);
 // 编辑人员Visible
@@ -77,16 +56,8 @@ export const actions = {
     getIsBtn,
     getIsActive,
     postUploadFilesImg,
-    getImgBtn,
-    getImgArr,
-    postUploadFilesNum,
-    getImgNumBtn,
     getSwitch,
     changeEditUserVisible,
-    postUploadAutograph,
-    getAutographBtn,
-    postUploadNegative,
-    getImgNegative,
     getOrgTreeSelect,
     getOrgTreeDataArr,
     getSupplierList,
@@ -149,22 +120,6 @@ export default handleActions({
         ...state,
         fileList: payload
     }),
-    [getImgBtn]: (state, {payload}) => ({
-        ...state,
-        getImgBtns: payload
-    }),
-    [getImgArr]: (state, {payload}) => ({
-        ...state,
-        getImgArrs: payload
-    }),
-    [postUploadFilesNum]: (state, {payload}) => ({
-        ...state,
-        postUploadFilesNums: payload
-    }),
-    [getImgNumBtn]: (state, {payload}) => ({
-        ...state,
-        getImgNumBtns: payload
-    }),
     [getSwitch]: (state, {payload}) => ({
         ...state,
         getSwitchBtn: payload
@@ -172,22 +127,6 @@ export default handleActions({
     [changeEditUserVisible]: (state, {payload}) => ({
         ...state,
         editUserVisible: payload
-    }),
-    [postUploadAutograph]: (state, {payload}) => ({
-        ...state,
-        postUploadAutographs: payload
-    }),
-    [getAutographBtn]: (state, {payload}) => ({
-        ...state,
-        getAutographBtns: payload
-    }),
-    [postUploadNegative]: (state, {payload}) => ({
-        ...state,
-        postUploadNegatives: payload
-    }),
-    [getImgNegative]: (state, {payload}) => ({
-        ...state,
-        getImgNegatives: payload
     }),
     [getOrgTreeSelect]: (state, {payload}) => ({
         ...state,

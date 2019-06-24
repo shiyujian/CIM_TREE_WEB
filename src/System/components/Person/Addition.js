@@ -658,13 +658,6 @@ class Addition extends Component {
                 clearAdditionField,
                 getUsers,
                 postUploadFilesImg,
-                getImgBtn,
-                postUploadNegative,
-                getImgNegative,
-                getAutographBtn,
-                postUploadFilesNum,
-                getImgNumBtn,
-                postUploadAutograph,
                 getTablePage
             }
         } = this.props;
@@ -734,13 +727,6 @@ class Addition extends Component {
                         }
                         await clearAdditionField();
                         await postUploadFilesImg();
-                        await postUploadFilesNum();
-                        await postUploadNegative();
-                        await postUploadAutograph();
-                        await getAutographBtn();
-                        await getImgBtn();
-                        await getImgNumBtn();
-                        await getImgNegative();
                         const codes = Addition.collect(node);
                         let paget = '';
                         const totals = this.props.getTablePages.total;
@@ -787,17 +773,9 @@ class Addition extends Component {
         const {
             actions: {
                 clearAdditionField,
-                getImgBtn,
-                getImgNumBtn,
-                getSwitch,
-                getImgNegative,
-                getAutographBtn
+                getSwitch
             }
         } = this.props;
-        getImgBtn();
-        getImgNumBtn();
-        getImgNegative();
-        getAutographBtn();
         getSwitch();
         this.setState({
             newKey: Math.random(),

@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import { Table, Button, Switch } from 'antd';
+import { Table, Button, Switch, Spin } from 'antd';
 import { MODULES } from '_platform/api';
 import Card from '_platform/components/panels/Card';
 import './index.css';
+
 export default class PermissionTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            permissionData: []
+            permissionData: [],
+            editing: false,
+            loading: false
         };
     }
     columns = [
@@ -21,8 +24,11 @@ export default class PermissionTable extends Component {
             width: '25%',
             render: item => {
                 const {
-                    table: { editing, permissions = [] } = {}
+                    table: { permissions = [] } = {}
                 } = this.props;
+                const {
+                    editing
+                } = this.state;
 
                 const key = `appmeta.${item.id}.READ`;
                 // permissions里面是当前用户拥有的所有的权限
@@ -150,17 +156,21 @@ export default class PermissionTable extends Component {
         }
         changeTableField('permissions', permissions);
     }
-    save () {
+    save = async () => {
         const {
             table: { role = {}, permissions = [] } = {},
             actions: { changeTableField, putRole, getRoles }
         } = this.props;
-        changeTableField('editing', false);
-        putRole(
-            { id: role.id },
-            { name: role.name, grouptype: role.grouptype, permissions }
-        ).then(rst => {
-            getRoles().then((roles = []) => {
+        try {
+            this.setState({
+                loading: true
+            });
+            await putRole(
+                { id: role.id },
+                { name: role.name, grouptype: role.grouptype, permissions }
+            );
+            let roles = await getRoles();
+            if (roles && roles instanceof Array) {
                 let myrole = roles.find(theRole => {
                     return theRole.id === role.id;
                 });
@@ -168,7 +178,19 @@ export default class PermissionTable extends Component {
                 myrole &&
                     myrole.permissions &&
                     changeTableField('permissions', myrole.permissions);
+            };
+            this.setState({
+                editing: false,
+                loading: false
             });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+
+    handleChangeEditStatus = async () => {
+        this.setState({
+            editing: true
         });
     }
 
@@ -177,8 +199,11 @@ export default class PermissionTable extends Component {
             return { ...ele };
         });
         const {
-            table: { editing, role = {} } = {},
-            actions: { changeTableField }
+            loading,
+            editing
+        } = this.state;
+        const {
+            table: { role = {} } = {}
         } = this.props;
         let disabled = true;
         if (role && role.id) {
@@ -186,46 +211,44 @@ export default class PermissionTable extends Component {
         }
         return (
             <div>
-                <Card
-                    title='权限详情'
-                    extra={
-                        <div>
-                            {editing || (
-                                <Button
-                                    type='primary'
-                                    ghost
-                                    disabled={disabled}
-                                    onClick={changeTableField.bind(
-                                        this,
-                                        'editing',
-                                        true
-                                    )}
-                                >
+                <Spin spinning={loading}>
+                    <Card
+                        title='权限详情'
+                        extra={
+                            <div>
+                                {editing || (
+                                    <Button
+                                        type='primary'
+                                        ghost
+                                        disabled={disabled}
+                                        onClick={this.handleChangeEditStatus.bind(this)}
+                                    >
                                     编辑
-                                </Button>
-                            )}
-                            {editing && (
-                                <Button
-                                    disabled={disabled}
-                                    type='primary'
-                                    onClick={this.save.bind(this)}
-                                >
+                                    </Button>
+                                )}
+                                {editing && (
+                                    <Button
+                                        disabled={disabled}
+                                        type='primary'
+                                        onClick={this.save.bind(this)}
+                                    >
                                     保存
-                                </Button>
-                            )}
-                        </div>
-                    }
-                >
-                    <Table
-                        showLine
-                        columns={this.columns}
-                        dataSource={userPermi}
-                        bordered
-                        pagination={false}
-                        rowKey='id'
-                        className='tableLevel2'
-                    />
-                </Card>
+                                    </Button>
+                                )}
+                            </div>
+                        }
+                    >
+                        <Table
+                            showLine
+                            columns={this.columns}
+                            dataSource={userPermi}
+                            bordered
+                            pagination={false}
+                            rowKey='id'
+                            className='tableLevel2'
+                        />
+                    </Card>
+                </Spin>
             </div>
         );
     }

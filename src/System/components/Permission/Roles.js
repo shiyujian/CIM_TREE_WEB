@@ -67,8 +67,8 @@ export default class Roles extends Component {
             actions: { changeTableField }
         } = this.props;
         await getRoles();
-        changeTableField('role', '');
-        changeTableField('permissions', []);
+        await changeTableField('role', '');
+        await changeTableField('permissions', []);
     }
 
     select (s, node) {

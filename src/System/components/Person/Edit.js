@@ -758,12 +758,9 @@ class Edit extends Component {
                 clearAdditionField,
                 getUsers,
                 postUploadFilesImg,
-                postUploadNegative,
                 putForestUser,
                 getTablePage,
-                postUploadFilesNum,
                 getSwitch,
-                postUploadAutograph,
                 postForestUserBlackList,
                 changeEditUserVisible
             }
@@ -832,9 +829,6 @@ class Edit extends Component {
                         message.info('修改人员成功');
                         await getSwitch();
                         await postUploadFilesImg();
-                        await postUploadFilesNum();
-                        await postUploadNegative();
-                        await postUploadAutograph();
                         await clearAdditionField();
                         await changeEditUserVisible(false);
                         // 之前不修改人员的部门   所以不需要重新获取人员列表 但是现在要修改部门   所以要重新获取人员列表
@@ -862,18 +856,10 @@ class Edit extends Component {
         const {
             actions: {
                 clearAdditionField,
-                getImgBtn,
-                getImgNumBtn,
                 getSwitch,
-                getImgNegative,
-                getAutographBtn,
                 changeEditUserVisible
             }
         } = this.props;
-        getImgBtn();
-        getImgNumBtn();
-        getImgNegative();
-        getAutographBtn();
         getSwitch();
         changeEditUserVisible(false);
         this.setState({
