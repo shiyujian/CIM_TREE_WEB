@@ -17,7 +17,7 @@ import NewsAddModal from './NewsAddModal';
 import NewsEditModal from './NewsEditModal';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { getUser } from '_platform/auth';
+import { STATIC_PREVIEW_API, STATIC_DOWNLOAD_API } from '_platform/api';
 import './index.less';
 moment.locale('zh-cn');
 
@@ -30,12 +30,15 @@ class NewsTable extends Component {
         super(props);
         this.state = {
             content: '',
-            visible: false,
+            detailVisible: false,
+            detailTitle: '',
             container: null,
             newsTabValue: 'publish',
             editNewsVisible: false,
             addNewsVisible: false,
-            newsDetail: ''
+            newsDetail: '',
+            viewCoverVisible: false,
+            coverArr: []
         };
     }
     columns = [
@@ -49,7 +52,7 @@ class NewsTable extends Component {
             title: '名称',
             dataIndex: 'title',
             key: 'title',
-            width: '50%'
+            width: '40%'
         },
         {
             title: '发布单位',
@@ -58,12 +61,12 @@ class NewsTable extends Component {
             width: '10%',
             render: (text, record) => {
                 if (record.abstract) {
-                    return <p>{record.abstract}</p>;
+                    return record.abstract;
                 } else {
                     if (record.pub_unit && record.pub_unit.name) {
-                        return <p>{record.pub_unit.name}</p>;
+                        return record.pub_unit.name;
                     } else {
-                        return <p> / </p>;
+                        return '/';
                     }
                 }
             }
@@ -83,6 +86,19 @@ class NewsTable extends Component {
             }
         },
         {
+            title: '封面',
+            dataIndex: 'cover',
+            key: 'cover',
+            width: '10%',
+            render: (text, record, index) => {
+                return (<a
+                    onClick={this.handleViewCover.bind(this, text)}
+                >
+                    查看
+                </a>);
+            }
+        },
+        {
             title: '操作',
             width: '15%',
             render: record => {
@@ -92,10 +108,10 @@ class NewsTable extends Component {
                             查看
                         </a>
                         <Divider type='vertical' />
-                        <a onClick={this.handleNewsEdit.bind(this, record)}>
+                        {/* <a onClick={this.handleNewsEdit.bind(this, record)}>
                             修改
                         </a>
-                        <Divider type='vertical' />
+                        <Divider type='vertical' /> */}
                         <Popconfirm
                             title='确定删除吗?'
                             onConfirm={this.handleNewsDelete.bind(this, record)}
@@ -120,7 +136,7 @@ class NewsTable extends Component {
             title: '名称',
             dataIndex: 'title',
             key: 'title',
-            width: '50%'
+            width: '40%'
         },
         {
             title: '发布单位',
@@ -129,12 +145,12 @@ class NewsTable extends Component {
             width: '10%',
             render: (text, record) => {
                 if (record.abstract) {
-                    return <p>{record.abstract}</p>;
+                    return record.abstract;
                 } else {
                     if (record.pub_unit && record.pub_unit.name) {
-                        return <p>{record.pub_unit.name}</p>;
+                        return record.pub_unit.name;
                     } else {
-                        return <p> / </p>;
+                        return '/';
                     }
                 }
             }
@@ -149,19 +165,32 @@ class NewsTable extends Component {
             }
         },
         {
+            title: '封面',
+            dataIndex: 'cover',
+            key: 'cover',
+            width: '10%',
+            render: (text, record, index) => {
+                return (<a
+                    onClick={this.handleViewCover.bind(this, text)}
+                >
+                    查看
+                </a>);
+            }
+        },
+        {
             title: '操作',
             width: '15%',
             render: record => {
                 return (
                     <span>
+                        <a onClick={this.handleNewsView.bind(this, record)}>
+                            查看
+                        </a>
+                        <Divider type='vertical' />
                         <a
                             onClick={this.handleNewsPublish.bind(this, record)}
                         >
                             发布
-                        </a>
-                        <Divider type='vertical' />
-                        <a onClick={this.handleNewsView.bind(this, record)}>
-                            查看
                         </a>
                         <Divider type='vertical' />
                         <a onClick={this.handleNewsEdit.bind(this, record)}>
@@ -197,13 +226,43 @@ class NewsTable extends Component {
             is_draft: true
         });
     }
+    // 查看封面
+    handleViewCover = async (cover) => {
+        let coverArr = [];
+        if (cover && cover.a_file) {
+            coverArr.push(
+                <img style={{ width: '490px' }} src={STATIC_PREVIEW_API + cover.a_file} alt='图片' />
+            );
+        }
+        this.setState({
+            viewCoverVisible: true,
+            coverArr
+        });
+    }
+    handleViewCoverCancel = async () => {
+        this.setState({
+            viewCoverVisible: false,
+            coverArr: []
+        });
+    }
     // 查看新闻
     handleNewsView = async (record) => {
         this.setState({
-            visible: true,
+            detailVisible: true,
             container: record.raw,
-            title: record.title,
-            source: record.source ? record.source.name : '无'
+            detailTitle: record.title,
+            source: record.source,
+            newsDetail: record
+        });
+    }
+    // 关闭新闻预览弹窗
+    handleCancel () {
+        this.setState({
+            detailVisible: false,
+            container: null,
+            detailTitle: '',
+            source: '',
+            newsDetail: ''
         });
     }
     // 编辑新闻
@@ -291,13 +350,6 @@ class NewsTable extends Component {
             });
         }
     }
-    // 关闭新闻预览弹窗
-    handleCancel () {
-        this.setState({
-            visible: false,
-            container: null
-        });
-    }
     // 新闻列表和暂存的新闻列表切换
     subTabChange (newsTabValue) {
         this.setState({
@@ -310,14 +362,15 @@ class NewsTable extends Component {
             actions: { getNewsList }
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
+            console.log('values', values);
             console.log('err', err);
             await getNewsList({}, {
                 tag: '新闻',
                 is_draft: false,
-                pub_time_begin: values.worktime
+                pub_time_begin: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
                     ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktime
-                    ? moment(values.worktime[1]).format('YYYY-MM-DD') : '',
+                pub_time_end: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
+                    ? moment(values.worktime[1]).add(1, 'days').format('YYYY-MM-DD') : '',
                 title: values.theme || ''
             });
         });
@@ -336,12 +389,15 @@ class NewsTable extends Component {
             actions: { getDraftNewsList }
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
+            console.log('values', values);
             console.log('err', err);
             await getDraftNewsList({}, {
                 tag: '新闻',
                 is_draft: true,
-                pub_time_begin: values.worktimes ? moment(values.worktimes[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktimes ? moment(values.worktimes[1]).format('YYYY-MM-DD') : '',
+                pub_time_begin: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
+                    ? moment(values.worktimes[0]).format('YYYY-MM-DD') : '',
+                pub_time_end: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
+                    ? moment(values.worktimes[1]).add(1, 'days').format('YYYY-MM-DD') : '',
                 title: values.title1 || ''
             });
         });
@@ -374,12 +430,25 @@ class NewsTable extends Component {
         const {
             newsTabValue,
             editNewsVisible,
-            addNewsVisible
+            addNewsVisible,
+            source,
+            detailVisible,
+            container,
+            detailTitle,
+            viewCoverVisible,
+            coverArr,
+            newsDetail
         } = this.state;
         const formItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
+        let annexFileList = [];
+        if (newsDetail.attachment && newsDetail.attachment.fileList &&
+            newsDetail.attachment.fileList instanceof Array &&
+            newsDetail.attachment.fileList.length > 0) {
+            annexFileList = newsDetail.attachment.fileList;
+        }
         return (
             <Row>
                 {
@@ -399,23 +468,72 @@ class NewsTable extends Component {
                         /> : ''
                 }
                 <Modal
-                    title='新闻预览'
+                    title={detailTitle}
                     width='800px'
-                    visible={this.state.visible}
+                    visible={detailVisible}
                     onCancel={this.handleCancel.bind(this)}
                     footer={null}
                 >
                     <div>
-                        {this.state.source === '无' ? null : (
-                            <p>{`来源 ：${this.state.source}`}</p>
-                        )}
+                        <h1 style={{ textAlign: 'center' }}>{detailTitle}</h1>
+                        {
+                            source && source.name
+                                ? <p>{`来源 ：${source.name}`}</p> : (
+                                    <p>{`来源 ：暂无`}</p>
+                                )
+                        }
+                        {
+                            newsDetail && newsDetail.cover && newsDetail.cover.a_file
+                                ? (
+                                    <p>
+                                        封面 ：<a href={STATIC_PREVIEW_API + newsDetail.cover.a_file}
+                                            target='_blank'>
+                                            {newsDetail.cover.name}
+                                        </a>
+                                    </p>
+                                ) : <p>{`封面 ：暂无`}</p>
+                        }
+                        {
+                            annexFileList.map((file) => {
+                                if (file && file.response && file.response.download_url) {
+                                    return (
+                                        <p>
+                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
+                                                {file.name}
+                                            </a>
+                                        </p>
+                                    );
+                                } else {
+                                    return (<p>{`附件 ：暂无`}</p>);
+                                }
+                            })
+                        }
                         <div
                             style={{ maxHeight: '800px', overflow: 'auto' }}
                             dangerouslySetInnerHTML={{
-                                __html: this.state.container
+                                __html: container
                             }}
                         />
                     </div>
+                </Modal>
+                <Modal
+                    width={522}
+                    title='封面'
+                    style={{ textAlign: 'center' }}
+                    visible={viewCoverVisible}
+                    onCancel={this.handleViewCoverCancel.bind(this)}
+                    footer={null}
+                >
+                    {coverArr}
+                    <Row style={{ marginTop: 10 }}>
+                        <Button
+                            onClick={this.handleViewCoverCancel.bind(this)}
+                            style={{ float: 'right' }}
+                            type='primary'
+                        >
+                            关闭
+                        </Button>
+                    </Row>
                 </Modal>
                 <Col span={22} offset={1}>
                     <Tabs
@@ -485,20 +603,32 @@ class NewsTable extends Component {
                                     <Row />
                                 </Col>
                                 <Col span={2} offset={1}>
-                                    <Button
-                                        icon='search'
-                                        onClick={this.queryPublish.bind(this)}
-                                    >
-                                        查找
-                                    </Button>
+                                    <FormItem>
+                                        {getFieldDecorator('search', {
+                                            rules: [{ required: false, message: '请选择查询条件' }]
+                                        })(
+                                            <Button
+                                                icon='search'
+                                                onClick={this.queryPublish.bind(this)}
+                                            >
+                                                查询
+                                            </Button>
+                                        )}
+                                    </FormItem>
                                 </Col>
                                 <Col span={2}>
-                                    <Button
-                                        icon='reload'
-                                        onClick={this.clearPublish.bind(this)}
-                                    >
-                                        清空
-                                    </Button>
+                                    <FormItem>
+                                        {getFieldDecorator('reload', {
+                                            rules: [{ required: false, message: '请选择查询条件' }]
+                                        })(
+                                            <Button
+                                                icon='reload'
+                                                onClick={this.clearPublish.bind(this)}
+                                            >
+                                            清除
+                                            </Button>
+                                        )}
+                                    </FormItem>
                                 </Col>
                             </Row>
                             <Table
@@ -564,20 +694,32 @@ class NewsTable extends Component {
                                     </Row>
                                 </Col>
                                 <Col span={2} offset={1}>
-                                    <Button
-                                        icon='search'
-                                        onClick={this.queryTemporary.bind(this)}
-                                    >
-                                        查找
-                                    </Button>
+                                    <FormItem>
+                                        {getFieldDecorator('search', {
+                                            rules: [{ required: false, message: '请选择查询条件' }]
+                                        })(
+                                            <Button
+                                                icon='search'
+                                                onClick={this.queryTemporary.bind(this)}
+                                            >
+                                                查询
+                                            </Button>
+                                        )}
+                                    </FormItem>
                                 </Col>
                                 <Col span={2}>
-                                    <Button
-                                        icon='reload'
-                                        onClick={this.clearTemporary.bind(this)}
-                                    >
-                                        清空
-                                    </Button>
+                                    <FormItem>
+                                        {getFieldDecorator('reload', {
+                                            rules: [{ required: false, message: '请选择查询条件' }]
+                                        })(
+                                            <Button
+                                                icon='reload'
+                                                onClick={this.clearTemporary.bind(this)}
+                                            >
+                                            清除
+                                            </Button>
+                                        )}
+                                    </FormItem>
                                 </Col>
                             </Row>
                             <Table

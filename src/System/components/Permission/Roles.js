@@ -18,7 +18,6 @@ export default class Roles extends Component {
         const departmentRoles = roles.filter(role => role.grouptype === 3);
         const curingRoles = roles.filter(role => role.grouptype === 4);
         const supplierRoles = roles.filter(role => role.grouptype === 6);
-        console.log(roles, '-----');
         return (
             <div>
                 <Tree
@@ -62,26 +61,14 @@ export default class Roles extends Component {
         );
     }
 
-    componentDidMount () {
-        // const permissions2 = [
-        // 	{ id: 'HOME', value: "1" },
-        // 	{ id: 'DISPLAY', value: "0" },
-        // 	{ id: 'MANAGE', value: "1" },
-        // 	{ id: 'DATUM', value: "1" },
-        //  { id: 'SAFETY', value: "0" },
-        // ]
+    componentDidMount = async () => {
         const {
             actions: { getRoles },
             actions: { changeTableField }
         } = this.props;
-        getRoles().then((roles = []) => {
-            const [role = {}] = roles || []; // 默认第一个
-            role && changeTableField('role', role);
-            role &&
-                role.permissions &&
-                changeTableField('permissions', role.permissions);
-            // role && role.permissions && changeTableField('permissions', permissions2);
-        });
+        await getRoles();
+        changeTableField('role', '');
+        changeTableField('permissions', []);
     }
 
     select (s, node) {
@@ -95,6 +82,5 @@ export default class Roles extends Component {
         role &&
             role.permissions &&
             changeTableField('permissions', role.permissions);
-        // role && role.permissions && changeTableField('permissions', permissions2);
     }
 }
