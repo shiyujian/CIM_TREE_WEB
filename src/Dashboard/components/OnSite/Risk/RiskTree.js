@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox, Modal, Row } from 'antd';
+import L from 'leaflet';
 import './RiskTree.less';
 import moment from 'moment';
 import RiskDetail from './RiskDetail';

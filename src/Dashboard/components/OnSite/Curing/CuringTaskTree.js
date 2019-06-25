@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
+import L from 'leaflet';
 import './CuringTaskTree.less';
 import moment from 'moment';
 import {

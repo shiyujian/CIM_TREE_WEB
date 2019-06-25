@@ -2,7 +2,13 @@ import React, { Component } from 'react';
 import {
     Button
 } from 'antd';
-import {FOREST_GIS_API, TILEURLS, INITLEAFLET_API} from '_platform/api';
+import L from 'leaflet';
+import {
+    FOREST_GIS_API,
+    TILEURLS,
+    INITLEAFLET_API,
+    WMSTILELAYERURL
+} from '_platform/api';
 import {genPopUpContent, getIconType, getTaskStatus} from '../auth';
 import '../Curing.less';
 window.config = window.config || {};
@@ -43,15 +49,22 @@ export default class TaskStatisGis extends Component {
     }
     /* 初始化地图 */
     _initMap () {
-        this.map = L.map('mapid', INITLEAFLET_API);
-        // 放大缩小地图的按钮
-        L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+        let mapInitialization = INITLEAFLET_API;
+        mapInitialization.crs = L.CRS.EPSG4326;
+        this.map = L.map('mapid', mapInitialization);
         // 加载基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
+            subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+            minZoom: 10,
             maxZoom: 17,
-            storagetype: 0
+            zoomOffset: 1
+        }).addTo(this.map);
+        // 地图上边的地点的名称
+        L.tileLayer(WMSTILELAYERURL, {
+            subdomains: [1, 2, 3],
+            minZoom: 10,
+            maxZoom: 17,
+            zoomOffset: 1
         }).addTo(this.map);
         // 加载树图层
         this.getTileLayer2();
@@ -78,7 +91,7 @@ export default class TaskStatisGis extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 11,
+                    minZoom: 10,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'

@@ -1,6 +1,5 @@
-import React, {
-    Component
-} from 'react';
+import React, { Component } from 'react';
+import L from 'leaflet';
 import {
     FOREST_GIS_API
 } from '_platform/api';

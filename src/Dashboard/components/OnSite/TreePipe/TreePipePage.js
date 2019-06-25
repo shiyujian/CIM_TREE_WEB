@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import moment from 'moment';
+import L from 'leaflet';
 import {
     Row,
     Col,
@@ -177,7 +177,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 11,
+                    minZoom: 10,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -199,7 +199,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 11,
+                    minZoom: 10,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -221,7 +221,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 11,
+                    minZoom: 10,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'
@@ -243,7 +243,7 @@ export default class TreePipePage extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 11,
+                    minZoom: 10,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'

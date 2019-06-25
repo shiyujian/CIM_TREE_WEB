@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-06-24 10:39:58
+ * @Last Modified time: 2019-06-25 09:48:42
  */
 /**
  *
@@ -95,7 +95,7 @@ export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
 // 智慧森林
 export const SUSER_API = `${SDOMAIN}`;
 export const FOREST_API = `${SDOMAIN}`;
-export const SEEDLING_API = `${SDOMAIN}:808`;
+export const SEEDLING_API = `${window.config.SEEDLING}`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const FOREST_GIS_TREETYPE_API = `${window.config.DASHBOARD_TREETYPE}`;

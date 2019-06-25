@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
 import { Input, Button, Select, Table, Pagination, Modal, Form, message, List, InputNumber, Spin } from 'antd';
+import L from 'leaflet';
 import {
     fillAreaColor,
     getNewCoordsArrByMULTIPOLYGON,
     getNewCoordsArrByPOLYGON
 } from '../auth';
 import { formItemLayout, getUser } from '_platform/auth';
-import { FOREST_GIS_API, WMSTILELAYERURL, TILEURLS } from '_platform/api';
+import {
+    FOREST_GIS_API,
+    WMSTILELAYERURL,
+    TILEURLS,
+    INITLEAFLET_API
+} from '_platform/api';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -143,32 +149,29 @@ class Tablelevel extends Component {
     }
     initMap () {
         // 基础设置
-        this.map = L.map('mapid', {
-            zoom: 14,
-            center: [39.04882729053497, 115.90790748596191],
-            crs: L.CRS.EPSG4326,
-            zoomControl: false
-        });
+        let mapInitialization = INITLEAFLET_API;
+        mapInitialization.crs = L.CRS.EPSG4326;
+        this.map = L.map('mapid', mapInitialization);
         // 基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
+            subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+            minZoom: 10,
             maxZoom: 17,
-            storagetype: 0
+            zoomOffset: 1
         }).addTo(this.map);
         // 道路图层
         L.tileLayer(WMSTILELAYERURL, {
             subdomains: [1, 2, 3],
-            minZoom: 1,
+            minZoom: 10,
             maxZoom: 17,
-            storagetype: 0
+            zoomOffset: 1
         }).addTo(this.map);
         // 树木瓦片图层
         L.tileLayer(
             FOREST_GIS_API + '/geoserver/gwc/service/wmts?layer=xatree%3Atreelocation&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}', {
                 opacity: 1.0,
                 subdomains: [1, 2, 3],
-                minZoom: 11,
+                minZoom: 10,
                 maxZoom: 21,
                 storagetype: 0,
                 tiletype: 'wtms'

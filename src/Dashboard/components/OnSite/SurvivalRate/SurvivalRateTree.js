@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Spin } from 'antd';
+import L from 'leaflet';
 import { FOREST_GIS_TREETYPE_API, FOREST_GIS_API } from '_platform/api';
 import './SurvivalRateTree.less';
 // 存活率图片
@@ -143,7 +144,7 @@ export default class SurvivalRateTree extends Component {
                 {
                     opacity: 1.0,
                     subdomains: [1, 2, 3],
-                    minZoom: 11,
+                    minZoom: 10,
                     maxZoom: 21,
                     storagetype: 0,
                     tiletype: 'wtms'

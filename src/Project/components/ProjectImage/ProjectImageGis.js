@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Radio } from 'antd';
+import L from 'leaflet';
 import { WMSTILELAYERURL, TILEURLS, INITLEAFLET_API } from '_platform/api';
 import './ProjectImageGis.less';
 const RadioButton = Radio.Button;
@@ -61,52 +62,56 @@ export default class ProjectImageGis extends Component {
     }
     /* 初始化地图 */
     initMap () {
-        this.map = L.map('mapid', INITLEAFLET_API);
+        let mapInitialization = INITLEAFLET_API;
+        mapInitialization.crs = L.CRS.EPSG4326;
+        this.map = L.map('mapid', mapInitialization);
 
         this.imgTileLayer = L.tileLayer(TILEURLS[1], {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 20,
-            storagetype: 0
+            subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+            minZoom: 10,
+            maxZoom: 17,
+            zoomOffset: 1
         }).addTo(this.map);
 
         this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
             subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 20,
-            storagetype: 0
+            minZoom: 10,
+            maxZoom: 17,
+            zoomOffset: 1
         }).addTo(this.map);
 
         this.tileLayer = L.tileLayer(this.tileUrls[1], {
             opacity: 1.0,
             subdomains: [1, 2, 3],
-            minZoom: 12,
+            minZoom: 10,
             maxZoom: 20,
             storagetype: 0,
             tiletype: 'arcgis'
         }).addTo(this.map);
     }
     initMap2 () {
-        this.map2 = L.map('mapid2', INITLEAFLET_API);
+        let mapInitialization = INITLEAFLET_API;
+        mapInitialization.crs = L.CRS.EPSG4326;
+        this.map = L.map('mapid2', mapInitialization);
 
         this.imgTileLayer = L.tileLayer(TILEURLS[1], {
-            subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 20,
-            storagetype: 0
+            subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+            minZoom: 10,
+            maxZoom: 17,
+            zoomOffset: 1
         }).addTo(this.map2);
 
         this.cvaTileLayer = L.tileLayer(`${WMSTILELAYERURL}`, {
             subdomains: [1, 2, 3],
-            minZoom: 1,
-            maxZoom: 20,
-            storagetype: 0
+            minZoom: 10,
+            maxZoom: 17,
+            zoomOffset: 1
         }).addTo(this.map2);
 
         this.tileTreeLayerBasic = L.tileLayer(this.tileUrls[1], {
             opacity: 1.0,
             subdomains: [1, 2, 3],
-            minZoom: 12,
+            minZoom: 10,
             maxZoom: 20,
             storagetype: 0,
             tiletype: 'arcgis'

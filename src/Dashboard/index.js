@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-07-04 14:32:29
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-08-18 17:04:14
+ * @Last Modified time: 2019-06-25 10:08:45
  */
 /**
  *
@@ -49,9 +49,6 @@
 
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
-import { Route, Switch } from 'react-router-dom';
-import { Aside, Main } from '_platform/components/layout';
-import Submenu from '_platform/components/panels/Submenu';
 import { Icon } from 'react-fa';
 
 export default class Dashboard extends Component {
@@ -64,40 +61,6 @@ export default class Dashboard extends Component {
         });
     }
 
-    // render () {
-    //     const { OnSite, Project, Plan, Danger } = this.state || {};
-    //     return (
-    //         <div style={{ display: 'flex' }}>
-    //             <Aside style={{ overflow: 'hidden' }}>
-    //                 <Submenu
-    //                     {...this.props}
-    //                     menus={Dashboard.menus}
-    //                     defaultOpenKeys={Dashboard.defaultOpenKeys}
-    //                 />
-    //             </Aside>
-    //             <Main>
-    //                 <Switch>
-    //                     {OnSite && (
-    //                         <Route exact path='/dashboard' component={OnSite} />
-    //                     )}
-    //                     {OnSite && (
-    //                         <Route
-    //                             path='/dashboard/onsite'
-    //                             component={OnSite}
-    //                         />
-    //                     )}
-    //                     {Project && (
-    //                         <Route
-    //                             path='/dashboard/project'
-    //                             component={Project}
-    //                         />
-    //                     )}
-    //                 </Switch>
-    //             </Main>
-    //         </div>
-    //     );
-    // }
-
     render () {
         const {OnSite = null} = this.state || {};
         return (OnSite && <OnSite {...this.props} />);
@@ -109,13 +72,6 @@ export default class Dashboard extends Component {
             path: '/dashboard/onsite',
             name: '二维展示',
             icon: <Icon name='map-o' />
-        },
-        {
-            key: 'PROJECT',
-            id: 'DASHBOARD.PROJECT',
-            path: '/dashboard/project',
-            name: '工程影像',
-            icon: <Icon name='caret-square-o-up' />
         }
     ];
     static defaultOpenKeys = ['ONSITE'];

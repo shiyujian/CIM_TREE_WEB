@@ -27,11 +27,9 @@ export default class App extends Component {
         const { default: Curing } = await import('../../Curing');
         const { default: Overall } = await import('../../Overall');
         const { default: Datum } = await import('../../Datum');
-        const { default: Quality } = await import('../../Quality');
         const { default: Schedule } = await import('../../Schedule');
         const { default: System } = await import('../../System');
         const { default: Selfcare } = await import('../../Selfcare');
-        const { default: Safety } = await import('../../Safety');
         const { default: Project } = await import('../../Project');
         const { default: Market } = await import('../../Market');
         const { default: Checkwork } = await import('../../Checkwork');
@@ -45,11 +43,9 @@ export default class App extends Component {
             Curing,
             Overall,
             Datum,
-            Quality,
             Schedule,
             Selfcare,
             System,
-            Safety,
             Project,
             Market,
             Checkwork,
@@ -66,11 +62,9 @@ export default class App extends Component {
             Curing,
             Overall,
             Datum,
-            Quality,
             Schedule,
             Selfcare,
             System,
-            Safety,
             Project,
             Market,
             Checkwork,
@@ -97,9 +91,6 @@ export default class App extends Component {
                         {Datum && (
                             <Route path='/datum/:category?' component={Datum} />
                         )}
-                        {Quality && (
-                            <Route path='/quality' component={Quality} />
-                        )}
                         {Schedule && (
                             <Route path='/schedule' component={Schedule} />
                         )}
@@ -107,7 +98,6 @@ export default class App extends Component {
                             <Route path='/selfcare' component={Selfcare} />
                         )}
                         {System && <Route path='/system' component={System} />}
-                        {Safety && <Route path='/safety' component={Safety} />}
                         {Project && (
                             <Route path='/project' component={Project} />
                         )}

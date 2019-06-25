@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Spin } from 'antd';
+import L from 'leaflet';
 import {FOREST_GIS_TREETYPE_API} from '_platfoem/api';
 import {
     fillAreaColor,

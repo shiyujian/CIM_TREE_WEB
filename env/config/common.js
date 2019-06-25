@@ -187,7 +187,7 @@ module.exports = {
             { from: '../static/sources.list' },
             { from: '../static/supervisord.conf' },
 
-            { from: '../static/leaflet', to: 'leaflet/' },
+            // { from: '../static/leaflet', to: 'leaflet/' },
             { from: '../static/fonts', to: 'fonts/' },
             { from: '../static/gooflow', to: 'gooflow/' },
             { from: '../static/oajs', to: 'oajs/' },
@@ -199,7 +199,6 @@ module.exports = {
                 from: `../static/DeathCode_${process.env.proj}.js`,
                 to: 'DeathCode.js'
             },
-            { from: `../static/treemapdemo`, to: 'treemapdemo/' },
             { from: `../static/dippingdemo`, to: 'dippingdemo/' },
 
             {

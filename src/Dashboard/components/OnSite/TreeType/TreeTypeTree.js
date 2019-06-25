@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Input, Spin } from 'antd';
+import L from 'leaflet';
 import {
     getIconType
 } from '../../auth';

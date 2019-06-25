@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button } from 'antd';
+import L from 'leaflet';
 import './AreaDistanceMeasure.less';
 import distanceMeasureUnSelImg from '../../MeasureImg/distanceUnSel.png';
 import distanceMeasureSelImg from '../../MeasureImg/distanceSel.png';

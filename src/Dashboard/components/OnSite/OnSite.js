@@ -9,13 +9,14 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-06-20 11:05:48
+ * @Last Modified time: 2019-06-25 10:12:20
  */
 import React, { Component } from 'react';
 import {
     Button,
     Form
 } from 'antd';
+import L from 'leaflet';
 import './OnSite.less';
 import RiskTree from './Risk/RiskTree';
 import TrackTree from './Track/TrackTree';
@@ -123,19 +124,20 @@ class OnSite extends Component {
                 mapInitialization.center = center;
                 mapInitialization.zoom = zoom;
             };
+            mapInitialization.crs = L.CRS.EPSG4326;
             this.map = L.map('mapid', mapInitialization);
             this.tileLayer = L.tileLayer(TILEURLS[1], {
-                subdomains: [1, 2, 3],
-                minZoom: 1,
+                subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+                minZoom: 10,
                 maxZoom: 17,
-                storagetype: 0
+                zoomOffset: 1
             }).addTo(this.map);
             // 地图上边的地点的名称
             L.tileLayer(WMSTILELAYERURL, {
                 subdomains: [1, 2, 3],
-                minZoom: 1,
+                minZoom: 10,
                 maxZoom: 17,
-                storagetype: 0
+                zoomOffset: 1
             }).addTo(this.map);
             // 加载苗木图层
             this.getTileLayerTreeBasic();
@@ -252,7 +254,7 @@ class OnSite extends Component {
                     {
                         opacity: 1.0,
                         subdomains: [1, 2, 3],
-                        minZoom: 11,
+                        minZoom: 10,
                         maxZoom: 21,
                         storagetype: 0,
                         tiletype: 'wtms'
@@ -279,7 +281,7 @@ class OnSite extends Component {
                     {
                         opacity: 1.0,
                         subdomains: [1, 2, 3],
-                        minZoom: 11,
+                        minZoom: 10,
                         maxZoom: 21,
                         storagetype: 0,
                         tiletype: 'wtms'
@@ -302,7 +304,7 @@ class OnSite extends Component {
                     {
                         opacity: 1.0,
                         subdomains: [1, 2, 3],
-                        minZoom: 11,
+                        minZoom: 10,
                         maxZoom: 21,
                         storagetype: 0,
                         tiletype: 'wtms'

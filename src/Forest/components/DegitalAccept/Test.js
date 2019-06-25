@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Spin, Modal, Row, Col } from 'antd';
-import './index.less'
+import L from 'leaflet';
+import './index.less';
 import {
     FOREST_GIS_API,
     FOREST_GIS_TREETYPE_API,
@@ -16,64 +17,46 @@ import {
 
 export default class Test extends Component {
     static propTypes = {};
-    constructor(props) {
+    constructor (props) {
         super(props);
         this.state = {
             loading: false,
-            areaLayerList: [], // 
+            areaLayerList: [] //
         };
         this.map = null;
     }
 
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
-        console.log('i am coming')
-        const {
-            actions: {
-                getCustomViewByUserID
-            }
-        } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        await getCustomViewByUserID({ id: user.id });
         await this.initMap();
         this._addAreaLayer('P009-01-002-002', 'P009-01-01');
     }
 
-    componentWillUnmount() {
+    componentWillUnmount () {
         this.map = null;
     }
 
-    onOk() {
+    onOk () {
         // this.props.onPressOk(1)
     }
     /* 初始化地图 */
-    initMap() {
-        const {
-            customViewByUserID = []
-        } = this.props;
+    initMap () {
         try {
             let mapInitialization = INITLEAFLET_API;
-            // 根据用户的自定义视图来查看聚焦点
-            if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
-                let view = customViewByUserID[0];
-                let center = [view.center[0].lat, view.center[0].lng];
-                let zoom = view.zoom;
-                mapInitialization.center = center;
-                mapInitialization.zoom = zoom;
-            };
-            this.map = L.map('mapidd', mapInitialization);
+            mapInitialization.crs = L.CRS.EPSG4326;
+            this.map = L.map('mapid', mapInitialization);
             this.tileLayer = L.tileLayer(TILEURLS[1], {
-                subdomains: [1, 2, 3],
-                minZoom: 1,
+                subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+                minZoom: 10,
                 maxZoom: 17,
-                storagetype: 0
+                zoomOffset: 1
             }).addTo(this.map);
             // 地图上边的地点的名称
             L.tileLayer(WMSTILELAYERURL, {
                 subdomains: [1, 2, 3],
-                minZoom: 1,
+                minZoom: 10,
                 maxZoom: 17,
-                storagetype: 0
+                zoomOffset: 1
             }).addTo(this.map);
             // 加载苗木图层
             // this.getTileLayerTreeBasic();
@@ -94,7 +77,7 @@ export default class Test extends Component {
         const {
             actions: { getTreearea }
         } = this.props;
-        console.log(eventKey)
+        console.log(eventKey);
         try {
             let coords = await handleAreaLayerData(eventKey, getTreearea, section);
             if (coords && coords instanceof Array && coords.length > 0) {
@@ -127,7 +110,7 @@ export default class Test extends Component {
     }
 
     /* 在地图上添加marker和polygan */
-    _createMarker(geo) {
+    _createMarker (geo) {
         try {
             if (geo.properties.type === 'area') {
                 // 创建区域图形
@@ -143,50 +126,50 @@ export default class Test extends Component {
         }
     }
 
-    render() {
+    render () {
         const { detail } = this.props;
-        let array = ['', '', '', '']
+        let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
         }
-        let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || ''
-        let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || ''
-        let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || ''
-        let sjmj = detail && detail.DesignArea || ''
-        let shijmj = detail && detail.ActualArea || ''
-        let thinclass = 'P191-01-002-002'
+        let unit = detail && detail.AcceptanceObj && detail.AcceptanceObj.Land || '';
+        let jianli = detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name || '';
+        let shigong = detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name || '';
+        let sjmj = detail && detail.DesignArea || '';
+        let shijmj = detail && detail.ActualArea || '';
+        let thinclass = 'P191-01-002-002';
         let hege = 70;
         let buhege = 30;
         let currenthege = 0;
         let currentbuhege = 0;
         let total = hege + buhege;
-        let rowList = []
+        let rowList = [];
         for (let i = 0; i < total / 17; i++) { // 判断需要展示多少行
-            let colList = []
-            for (let j = 0; j<17;j++) {
+            let colList = [];
+            for (let j = 0; j < 17; j++) {
                 if (Math.random() > 0.3) {
                     if (currenthege !== hege) { // 还有合格的选项
-                        colList.push(<Col span={1}><div style={{}}>√</div></Col>)
+                        colList.push(<Col span={1}><div style={{}}>√</div></Col>);
                         currenthege++;
-                    } else if(currentbuhege !== buhege) { // 没有合格的选项了，只能添加不合格
-                        colList.push(<Col span={1}><div>×</div></Col>)
+                    } else if (currentbuhege !== buhege) { // 没有合格的选项了，只能添加不合格
+                        colList.push(<Col span={1}><div>×</div></Col>);
                         currentbuhege++;
-                    }else { // 都没有选项了，添加空项
-                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>)
+                    } else { // 都没有选项了，添加空项
+                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>);
                     }
                 } else {
                     if (currentbuhege !== buhege) {
-                        colList.push(<Col span={1}><div>×</div></Col>)
+                        colList.push(<Col span={1}><div>×</div></Col>);
                         currentbuhege++;
                     } else if (currenthege !== hege) {
-                        colList.push(<Col span={1}><div>√</div></Col>)
+                        colList.push(<Col span={1}><div>√</div></Col>);
                         currenthege++;
                     } else {
-                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>)
+                        colList.push(<Col span={1}><div style={{height: 21}}>{ }</div></Col>);
                     }
                 }
             }
-            rowList.push(colList)
+            rowList.push(colList);
         }
         return (
             <Spin spinning={this.state.loading}>
@@ -231,7 +214,7 @@ export default class Test extends Component {
                                         验收要点：以细班或小班为单位，对土地整理进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带的微地形处理、垃圾和碎石处理情况进行打分。
                                         ①微地形按照设计要求精准完成，垃圾碎石清除干净，计90分以上，通过检验；
                                         ②微地形处理或垃圾碎石处理总体较好，但仍有不足，需整改。
-			                    </td>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td style={{ height: 300 }} colSpan='6'>

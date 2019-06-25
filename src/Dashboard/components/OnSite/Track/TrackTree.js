@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Input } from 'antd';
+import L from 'leaflet';
 import moment from 'moment';
 import {handleTrackData, getSectionName, getIconType, genPopUpContent} from '../../auth';
 import './TrackTree.less';

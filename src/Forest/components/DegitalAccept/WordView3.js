@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Spin, Modal, Row, Col } from 'antd';
+import L from 'leaflet';
 import './index.less';
 import {
     WMSTILELAYERURL,
@@ -28,15 +29,10 @@ export default class WordView1 extends Component {
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
-            actions: {
-                getCustomViewByUserID
-            },
             sscction,
             tinclass,
             detail = {}
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        await getCustomViewByUserID({id: user.id});
         await this.initMap();
         this._addAreaLayer(tinclass, sscction);
         detail.Geom && this.area(wktToJson(detail.Geom));
@@ -48,32 +44,22 @@ export default class WordView1 extends Component {
 
     /* 初始化地图 */
     initMap () {
-        const {
-            customViewByUserID = []
-        } = this.props;
         try {
             let mapInitialization = INITLEAFLET_API;
-            // 根据用户的自定义视图来查看聚焦点
-            if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
-                let view = customViewByUserID[0];
-                let center = [view.center[0].lat, view.center[0].lng];
-                let zoom = view.zoom;
-                mapInitialization.center = center;
-                mapInitialization.zoom = zoom;
-            };
-            this.map = L.map('mapidd', mapInitialization);
+            mapInitialization.crs = L.CRS.EPSG4326;
+            this.map = L.map('mapid', mapInitialization);
             this.tileLayer = L.tileLayer(TILEURLS[1], {
-                subdomains: [1, 2, 3],
-                minZoom: 1,
+                subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+                minZoom: 10,
                 maxZoom: 17,
-                storagetype: 0
+                zoomOffset: 1
             }).addTo(this.map);
             // 地图上边的地点的名称
             L.tileLayer(WMSTILELAYERURL, {
                 subdomains: [1, 2, 3],
-                minZoom: 1,
+                minZoom: 10,
                 maxZoom: 17,
-                storagetype: 0
+                zoomOffset: 1
             }).addTo(this.map);
             // 加载苗木图层
             // this.getTileLayerTreeBasic();
@@ -200,7 +186,7 @@ export default class WordView1 extends Component {
         let hgl = detail.CheckNum - detail.FailedNum; // 合格量
         let qulityok = '';
         if (detail.CheckNum !== 0) {
-            qulityok = hgl/detail.CheckNum;
+            qulityok = hgl / detail.CheckNum;
         }
         let hege = detail.DigHoleQualifiedNum;
         let buhege = detail.DigHoleUnQualifiedNum;
@@ -213,7 +199,7 @@ export default class WordView1 extends Component {
             for (let j = 0; j < 17; j++) {
                 if (Math.random() > 0.3) {
                     if (currenthege !== hege) { // 还有合格的选项
-                        colList.push(<Col span={1}><div style={{}}>√</div></Col>)
+                        colList.push(<Col span={1}><div style={{}}>√</div></Col>);
                         currenthege++;
                     } else if (currentbuhege !== buhege) { // 没有合格的选项了，只能添加不合格
                         colList.push(<Col span={1}><div>×</div></Col>);
@@ -233,7 +219,7 @@ export default class WordView1 extends Component {
                     }
                 }
             }
-            rowList.push(colList)
+            rowList.push(colList);
         }
         return (
             <Spin spinning={this.state.loading}>
@@ -285,7 +271,7 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td style={{ height: 300 }} colSpan='6'>
                                         <div
-                                            id='mapidd'
+                                            id='mapid'
                                             style={{
                                                 height: 300,
                                                 borderLeft: '1px solid #ccc'

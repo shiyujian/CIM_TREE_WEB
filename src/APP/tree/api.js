@@ -46,25 +46,11 @@ export const tree_menus = [
         icon: <Icon name='book' />
     },
     {
-        key: 'quality',
-        id: 'QUALITY',
-        title: '质量管理',
-        path: '/quality/score/search',
-        icon: <Icon name='list-alt' />
-    },
-    {
         key: 'schedule',
         id: 'SCHEDULE',
         title: '进度管理',
         path: '/schedule/stagereport',
         icon: <Icon name='random' />
-    },
-    {
-        key: 'safety',
-        title: '安环管理',
-        id: 'SAFETY',
-        path: '/safety/trend',
-        icon: <Icon name='shield' />
     },
     {
         key: 'forest',
