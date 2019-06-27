@@ -132,19 +132,33 @@ export default class PermissionTable extends Component {
         } = this.state;
         let currentKey = key.slice(key.indexOf('appmeta.') + 8, key.indexOf('.READ'));
         if (checked) {
-            let datas = this.findParent(permissionData, currentKey);
-            if (datas && datas.length > 0) {
-                datas.map((data) => {
+            let parentDatas = this.findParent(permissionData, currentKey);
+            console.log('parentDatas', parentDatas);
+            if (parentDatas && parentDatas.length > 0) {
+                parentDatas.map((data) => {
                     let id = `appmeta.${data.id}.READ`;
                     if (permissions.indexOf(id) === -1) {
                         permissions.push(id);
                     }
                 });
             }
+            let childDatas = this.findChildren(permissionData, currentKey);
+            console.log('childDatas', childDatas);
+
+            if (childDatas && childDatas.length > 0) {
+                childDatas.map((data) => {
+                    if (data) {
+                        let id = `appmeta.${data}.READ`;
+                        if (permissions.indexOf(id) === -1) {
+                            permissions.push(id);
+                        }
+                    }
+                });
+            }
         } else {
-            let datas = this.findChildren(permissionData, currentKey);
-            if (datas && datas.length > 0) {
-                datas.map((data) => {
+            let childDatas = this.findChildren(permissionData, currentKey);
+            if (childDatas && childDatas.length > 0) {
+                childDatas.map((data) => {
                     if (data) {
                         let id = `appmeta.${data}.READ`;
                         if (permissions.indexOf(id) !== -1) {
@@ -152,6 +166,37 @@ export default class PermissionTable extends Component {
                         }
                     }
                 });
+            }
+            let parentDatas = this.findParent(permissionData, currentKey);
+            console.log('parentDatas', parentDatas);
+            if (parentDatas && parentDatas.length > 0) {
+                for (let i = parentDatas.length - 1; i >= 0; i--) {
+                    let data = parentDatas[i];
+                    if (i === parentDatas.length) {
+                        let id = `appmeta.${data.id}.READ`;
+                        if (permissions.indexOf(id) !== -1) {
+                            permissions.splice(permissions.indexOf(id), 1);
+                        }
+                    } else {
+                        if (data && data.children && data.children.length > 0) {
+                            let children = data.children;
+                            let isEmpty = true;
+                            for (let s = 0; s < children.length; s++) {
+                                let child = children[s];
+                                let id = `appmeta.${child.id}.READ`;
+                                if (permissions.indexOf(id) !== -1) {
+                                    isEmpty = false;
+                                }
+                            }
+                            if (isEmpty) {
+                                let id = `appmeta.${data.id}.READ`;
+                                if (permissions.indexOf(id) !== -1) {
+                                    permissions.splice(permissions.indexOf(id), 1);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         changeTableField('permissions', permissions);
