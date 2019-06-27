@@ -44,7 +44,8 @@ class Tablelevel extends Component {
             spinning: true, // loading
             treetype: '', // 表单树种
             num: '', // 表单栽植量
-            area: '' // 栽植面积
+            area: '', // 栽植面积
+            permissionOperate: false
         };
         this.treeTypeList = []; // 所有树种类型
         this.dataList = []; // 暂存数据
@@ -63,52 +64,248 @@ class Tablelevel extends Component {
         this.handleNumberForm = this.handleNumberForm.bind(this); // 栽植量修改
         this.handleAreaForm = this.handleAreaForm.bind(this); // 栽植面积修改
         this.handleExpanded = this.handleExpanded.bind(this); // 展开子表格
-        this.columns = [
-            {
-                key: '1',
-                width: 120,
-                title: '所属标段',
-                dataIndex: 'Section'
-            },
-            {
-                key: '2',
-                title: '细班编号',
-                dataIndex: 'no'
-            },
-            {
-                key: '3',
-                width: 150,
-                title: '树种',
-                dataIndex: 'treetype'
-            },
-            {
-                key: '4',
-                title: '设计量',
-                dataIndex: 'num'
-            },
-            {
-                key: '5',
-                title: '设计面积',
-                dataIndex: 'area'
-            },
-            {
-                key: '6',
-                title: '操作',
-                dataIndex: 'action',
-                render: (text, record, index) => {
-                    if (this.userSection === record.Section || this.state.isSuperAdmin) {
-                        return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
-                    } else {
-                        return '';
-                    }
+    }
+    // 有操作权限的表格
+    permissionColumns = [
+        {
+            key: '1',
+            width: 120,
+            title: '所属标段',
+            dataIndex: 'Section'
+        },
+        {
+            key: '2',
+            title: '细班编号',
+            dataIndex: 'no'
+        },
+        {
+            key: '3',
+            width: 150,
+            title: '树种',
+            dataIndex: 'treetype'
+        },
+        {
+            key: '4',
+            title: '设计量',
+            dataIndex: 'num'
+        },
+        {
+            key: '5',
+            title: '设计面积',
+            dataIndex: 'area'
+        },
+        {
+            key: '6',
+            title: '操作',
+            dataIndex: 'action',
+            render: (text, record, index) => {
+                if (this.userSection === record.Section || this.state.isSuperAdmin) {
+                    return <a onClick={this.onEdit.bind(this, record)}>编辑</a>;
+                } else {
+                    return '';
                 }
             }
-        ];
-    }
+        }
+    ];
+    // 没有操作权限的表格
+    noPermissionColumns = [
+        {
+            key: '1',
+            width: 120,
+            title: '所属标段',
+            dataIndex: 'Section'
+        },
+        {
+            key: '2',
+            title: '细班编号',
+            dataIndex: 'no'
+        },
+        {
+            key: '3',
+            width: 150,
+            title: '树种',
+            dataIndex: 'treetype'
+        },
+        {
+            key: '4',
+            title: '设计量',
+            dataIndex: 'num'
+        },
+        {
+            key: '5',
+            title: '设计面积',
+            dataIndex: 'area'
+        }
+    ];
+    // 有操作权限的子表格
+    permissionExpandedRowRender = (record) => {
+        const {
+            treeTypeList,
+            dataListPlan
+        } = this.state;
+        console.log('record', record);
+        console.log('dataListPlan', dataListPlan);
+        let childPermissionColumns = [{
+            title: '树种',
+            key: '1',
+            dataIndex: 'treeType',
+            render: (text, rec, index) => {
+                let disabled = true;
+                if (index === 0) {
+                    disabled = false;
+                }
+                return (
+                    <Select
+                        showSearch
+                        filterOption={false}
+                        style={{width: 150}}
+                        value={text}
+                        disabled={disabled}
+                        placeholder='请输入树木类型名称'
+                        onChange={this.handleTreeType.bind(this, index)}
+                        onSearch={this.handleSearch.bind(this)}>
+                        {
+                            treeTypeList.length > 0
+                                ? treeTypeList.map(item => {
+                                    return <Option
+                                        value={item.ID}
+                                        key={item.ID}>
+                                        {item.TreeTypeName}
+                                    </Option>;
+                                }) : []
+                        }
+                    </Select>
+                );
+            }
+        }, {
+            title: '设计量',
+            key: '2',
+            dataIndex: 'Num',
+            render: (text, rec, index) => {
+                return (
+                    <InputNumber
+                        min={1}
+                        max={record.num}
+                        value={text}
+                        onChange={this.handleNum.bind(this, index)} />
+                );
+            }
+        }, {
+            title: '设计面积',
+            key: '3',
+            dataIndex: 'Area',
+            render: (text, rec, index) => {
+                return (
+                    <InputNumber
+                        min={1}
+                        max={record.Area}
+                        value={text}
+                        onChange={this.handleArea.bind(this, index)} />
+                );
+            }
+        }, {
+            title: '操作',
+            key: '4',
+            render: (text, record, index) => {
+                if (this.userSection === record.Section || this.state.isSuperAdmin) {
+                    // 可编辑
+                    if (index === 0) {
+                        return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
+                    } else {
+                        return <span>
+                            <a onClick={this.onUpdatePlan.bind(this, record)}>更新</a>
+                            <a onClick={this.onDeletePlan.bind(this, record)} style={{marginLeft: 10}}>删除</a>
+                        </span>;
+                    }
+                } else {
+                    // 不可编辑
+                    return '';
+                }
+            }
+        }];
+        return (
+            <Table
+                columns={childPermissionColumns}
+                dataSource={dataListPlan}
+                pagination={false}
+                rowKey='ID' />
+        );
+    };
+    // 没有操作权限的子表格
+    noPermissionExpandedRowRender = (record) => {
+        const {
+            treeTypeList,
+            dataListPlan
+        } = this.state;
+        console.log('record', record);
+        console.log('dataListPlan', dataListPlan);
+        let childPermissionColumns = [{
+            title: '树种',
+            key: '1',
+            dataIndex: 'treeType',
+            render: (text, rec, index) => {
+                return (
+                    <Select
+                        showSearch
+                        filterOption={false}
+                        style={{width: 150}}
+                        value={text}
+                        disabled
+                        placeholder='请输入树木类型名称'
+                    >
+                        {
+                            treeTypeList.length > 0
+                                ? treeTypeList.map(item => {
+                                    return <Option
+                                        value={item.ID}
+                                        key={item.ID}>
+                                        {item.TreeTypeName}
+                                    </Option>;
+                                }) : []
+                        }
+                    </Select>
+                );
+            }
+        }, {
+            title: '设计量',
+            key: '2',
+            dataIndex: 'Num',
+            render: (text, rec, index) => {
+                return (
+                    <Input
+                        value={text}
+                        readOnly
+                    />
+                );
+            }
+        }, {
+            title: '设计面积',
+            key: '3',
+            dataIndex: 'Area',
+            render: (text, rec, index) => {
+                return (
+                    <Input
+                        value={text}
+                        readOnly
+                    />
+                );
+            }
+        }];
+        return (
+            <Table
+                columns={childPermissionColumns}
+                dataSource={dataListPlan}
+                pagination={false}
+                rowKey='ID' />
+        );
+    };
     componentDidMount () {
         let userData = getUser();
+        // 业主和管理员
+        let permissionOperate = false;
         this.userSection = userData.sections.slice(2, -2);
         if (userData.username === 'admin') {
+            permissionOperate = true;
             this.setState({
                 isSuperAdmin: true
             });
@@ -118,6 +315,17 @@ class Tablelevel extends Component {
                 section: this.userSection || ''
             });
         }
+        let userMess = window.localStorage.getItem('QH_USER_DATA');
+        userMess = JSON.parse(userMess);
+        let groups = userMess.groups || [];
+        groups.map((group) => {
+            if (group.name.indexOf('施工设计') !== -1) {
+                permissionOperate = true;
+            }
+        });
+        this.setState({
+            permissionOperate
+        });
         // 初始化地图
         this.initMap();
         // 获取历史数据
@@ -195,167 +403,6 @@ class Tablelevel extends Component {
             }
         });
     }
-    render () {
-        const { dataList, section, number, dataListHistory, total, page, expandedRowKeys, spinning, sectionList, recordData, treeTypeList, treetype, num, area, dataListPlan, selectKey, isSuperAdmin } = this.state;
-        const rowSelection = {
-            onChange: (selectedRowKeys, selectedRows) => {
-                this.onLocation(selectedRows);
-            },
-            selectedRowKeys: selectKey,
-            type: 'radio'
-        };
-        // 子表格
-        let expandedRowRender = (record) => {
-            let columns = [{
-                title: '树种',
-                key: '1',
-                dataIndex: 'treeType',
-                render: (text, rec, index) => {
-                    let disabled = true;
-                    if (index === 0) {
-                        disabled = false;
-                    }
-                    return (
-                        <Select showSearch filterOption={false} style={{width: 150}} value={text} disabled={disabled}
-                            placeholder='请输入树木类型名称' onChange={this.handleTreeType.bind(this, index)}
-                            onSearch={this.handleSearch.bind(this)}>
-                            {
-                                treeTypeList.length > 0 ? treeTypeList.map(item => {
-                                    return <Option value={item.ID} key={item.ID}>{item.TreeTypeName}</Option>;
-                                }) : []
-                            }
-                        </Select>
-                    );
-                }
-            }, {
-                title: '设计量',
-                key: '2',
-                dataIndex: 'Num',
-                render: (text, rec, index) => {
-                    return (
-                        <InputNumber min={1} max={record.num} value={text} onChange={this.handleNum.bind(this, index)} />
-                    );
-                }
-            }, {
-                title: '设计面积',
-                key: '3',
-                dataIndex: 'Area',
-                render: (text, rec, index) => {
-                    return (
-                        <InputNumber min={1} max={record.Area} value={text} onChange={this.handleArea.bind(this, index)} />
-                    );
-                }
-            }, {
-                title: '操作',
-                key: '4',
-                render: (text, record, index) => {
-                    if (this.userSection === record.Section || this.state.isSuperAdmin) {
-                        // 可编辑
-                        if (index === 0) {
-                            return <a onClick={this.onSavePlan.bind(this, record)}>保存</a>;
-                        } else {
-                            return <span>
-                                <a onClick={this.onUpdatePlan.bind(this, record)}>更新</a>
-                                <a onClick={this.onDeletePlan.bind(this, record)} style={{marginLeft: 10}}>删除</a>
-                            </span>;
-                        }
-                    } else {
-                        // 不可编辑
-                        return '';
-                    }
-                }
-            }];
-            return (
-                <Table columns={columns} dataSource={dataListPlan} pagination={false} rowKey='ID' />
-            );
-        };
-        return (
-            <div className='table-level'>
-                <div>
-                    <Form layout='inline'>
-                        <FormItem label='标段'>
-                            <Select style={{ width: 120 }} value={section} onChange={this.handleSection.bind(this)} disabled={!isSuperAdmin} allowClear>
-                                {
-                                    sectionList.map(item => {
-                                        return <Option value={item.No} key={item.No}>{item.Name}</Option>;
-                                    })
-                                }
-                            </Select>
-                        </FormItem>
-                        <FormItem label='细班编号'>
-                            <Input style={{width: 200}} value={number} onChange={this.handleNumber.bind(this)} />
-                        </FormItem>
-                        <FormItem>
-                            <Button type='primary' onClick={this.onSearch.bind(this, 1)}>查询</Button>
-                        </FormItem>
-                        <FormItem>
-                            <Button type='primary' onClick={this.onHistory.bind(this)} style={{marginLeft: 50}}>历史导入列表</Button>
-                        </FormItem>
-                    </Form>
-                </div>
-                <div style={{marginTop: 20}}>
-                    <div style={{width: 720, minHeight: 640, float: 'left'}}>
-                        <Spin spinning={spinning}>
-                            <Table expandedRowRender={expandedRowRender} rowSelection={rowSelection}
-                                columns={this.columns} dataSource={dataList} pagination={false} expandedRowKeys={expandedRowKeys}
-                                onExpand={this.handleExpanded.bind(this)} />
-                        </Spin>
-                        <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
-                    </div>
-                    {/* 地图 */}
-                    <div style={{marginLeft: 740, height: 640, overflow: 'hidden', border: '3px solid #ccc'}}>
-                        <div id='mapid' style={{height: 640, width: '100%'}} />
-                    </div>
-                </div>
-                <Modal
-                    title='历史导入列表'
-                    visible={this.state.showModalHistory}
-                    onOk={this.handleOkHistory}
-                    onCancel={this.handleCancel}
-                >
-                    <List
-                        header={<div>
-                            <div style={{float: 'left', width: 150}}>标段</div>
-                            <div style={{float: 'left', width: 220}}>入库时间</div>
-                            <div>操作</div>
-                        </div>}
-                        bordered
-                        dataSource={dataListHistory}
-                        renderItem={this.getItemList.bind(this)}
-                    />
-                </Modal>
-                <Modal
-                    title='编辑'
-                    visible={this.state.showModal}
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
-                >
-                    <Form>
-                        <FormItem label='细班编号' {...formItemLayout}>
-                            <Input style={{width: 200}} value={recordData.no} disabled />
-                        </FormItem>
-                        <FormItem label='树木类型' {...formItemLayout}>
-                            <Select showSearch filterOption={false} style={{width: 200}} value={treetype}
-                                placeholder='请输入树木类型名称' onChange={this.handleTreeTypeForm.bind(this)}
-                                onSearch={this.handleSearch.bind(this)}>
-                                {
-                                    treeTypeList.length > 0 ? treeTypeList.map(item => {
-                                        return <Option value={item.ID} key={item.ID}>{item.TreeTypeName}</Option>;
-                                    }) : []
-                                }
-                            </Select>
-                        </FormItem>
-                        <FormItem label='种植量' {...formItemLayout}>
-                            <Input style={{width: 200}} value={num} onChange={this.handleNumberForm.bind(this)} />
-                        </FormItem>
-                        <FormItem label='细班面积' {...formItemLayout}>
-                            <Input style={{width: 200}} defaultValue={area} onChange={this.handleAreaForm.bind(this)} />
-                        </FormItem>
-                    </Form>
-                </Modal>
-            </div>
-        );
-    }
     handleTreeTypeForm (value) {
         let treetype = '';
         this.state.treeTypeList.map(item => {
@@ -425,7 +472,15 @@ class Tablelevel extends Component {
             </List.Item>
         );
     }
-    handleExpanded (expanded, record) {
+    handleExpanded = async (expanded, record) => {
+        const {
+            permissionOperate
+        } = this.state;
+        const {
+            actions: {
+                getThinClassPlans
+            }
+        } = this.props;
         if (!expanded) {
             this.setState({
                 dataListPlan: [],
@@ -435,40 +490,40 @@ class Tablelevel extends Component {
         }
         let dataListPlan = [];
         let expandedRowKeys = [];
-        dataListPlan.push({
-            ID: record.key + '1',
-            Num: '',
-            Section: record.Section,
-            no: record.no,
-            treeType: '',
-            Area: ''
-        });
-        const { getThinClassPlans } = this.props.actions;
-        getThinClassPlans({}, {
+        if (permissionOperate) {
+            dataListPlan.push({
+                ID: record.key + '1',
+                Num: '',
+                Section: record.Section,
+                no: record.no,
+                treeType: '',
+                Area: ''
+            });
+        }
+        let rep = await getThinClassPlans({}, {
             section: record.Section,
             thinclass: record.no,
             treetype: '',
             page: '',
             size: ''
-        }).then(rep => {
-            if (rep.code === 200) {
-                rep.content.map(item => {
-                    dataListPlan.push({
-                        ID: item.ID,
-                        Num: item.Num,
-                        Section: item.Section,
-                        no: item.ThinClass,
-                        treeType: item.TreeType,
-                        Area: item.Area
-                    });
-                });
-                expandedRowKeys.push(record.key);
-                this.setState({
-                    dataListPlan,
-                    expandedRowKeys
-                });
-            }
         });
+        if (rep.code === 200) {
+            rep.content.map(item => {
+                dataListPlan.push({
+                    ID: item.ID,
+                    Num: item.Num,
+                    Section: item.Section,
+                    no: item.ThinClass,
+                    treeType: item.TreeType,
+                    Area: item.Area
+                });
+            });
+            expandedRowKeys.push(record.key);
+            this.setState({
+                dataListPlan,
+                expandedRowKeys
+            });
+        }
     }
     onSavePlan (rec) {
         const { postThinClassPlans } = this.props.actions;
@@ -739,6 +794,181 @@ class Tablelevel extends Component {
     }
     handlePage (page, pageSize = 10) {
         this.onSearch(page);
+    }
+
+    render () {
+        const {
+            dataList,
+            section,
+            number,
+            dataListHistory,
+            total,
+            page,
+            expandedRowKeys,
+            spinning,
+            sectionList,
+            recordData,
+            treeTypeList,
+            treetype,
+            num,
+            area,
+            selectKey,
+            isSuperAdmin,
+            permissionOperate
+        } = this.state;
+        const rowSelection = {
+            onChange: (selectedRowKeys, selectedRows) => {
+                this.onLocation(selectedRows);
+            },
+            selectedRowKeys: selectKey,
+            type: 'radio'
+        };
+        return (
+            <div className='table-level'>
+                <div>
+                    <Form layout='inline'>
+                        <FormItem label='标段'>
+                            <Select
+                                style={{ width: 120 }}
+                                value={section}
+                                onChange={this.handleSection.bind(this)}
+                                disabled={!isSuperAdmin}
+                                allowClear>
+                                {
+                                    sectionList.map(item => {
+                                        return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                    })
+                                }
+                            </Select>
+                        </FormItem>
+                        <FormItem label='细班编号'>
+                            <Input
+                                style={{width: 200}}
+                                value={number}
+                                onChange={this.handleNumber.bind(this)} />
+                        </FormItem>
+                        <FormItem>
+                            <Button
+                                type='primary'
+                                onClick={this.onSearch.bind(this, 1)}>
+                                    查询
+                            </Button>
+                        </FormItem>
+                        <FormItem>
+                            <Button
+                                type='primary'
+                                onClick={this.onHistory.bind(this)}
+                                style={{marginLeft: 50}}>
+                                历史导入列表
+                            </Button>
+                        </FormItem>
+                    </Form>
+                </div>
+                <div style={{marginTop: 20}}>
+                    <div style={{width: 720, minHeight: 640, float: 'left'}}>
+                        <Spin spinning={spinning}>
+                            <Table
+                                // expandedRowRender={
+                                //     permissionOperate
+                                //         ? this.permissionExpandedRowRender
+                                //         : this.noPermissionExpandedRowRender
+                                // }
+                                expandedRowRender={this.noPermissionExpandedRowRender}
+                                rowSelection={rowSelection}
+                                // columns={permissionOperate
+                                //     ? this.permissionColumns
+                                //     : this.noPermissionColumns
+                                // }
+                                columns={this.noPermissionColumns}
+                                dataSource={dataList}
+                                pagination={false}
+                                expandedRowKeys={expandedRowKeys}
+                                onExpand={this.handleExpanded.bind(this)} />
+                        </Spin>
+                        <Pagination
+                            style={{float: 'right', marginTop: 10}}
+                            current={page}
+                            total={total}
+                            onChange={this.handlePage.bind(this)}
+                            showQuickJumper />
+                    </div>
+                    {/* 地图 */}
+                    <div
+                        style={{
+                            marginLeft: 740,
+                            height: 640,
+                            overflow: 'hidden',
+                            border: '3px solid #ccc'
+                        }}
+                    >
+                        <div
+                            id='mapid'
+                            style={{height: 640, width: '100%'}} />
+                    </div>
+                </div>
+                <Modal
+                    title='历史导入列表'
+                    visible={this.state.showModalHistory}
+                    onOk={this.handleOkHistory}
+                    onCancel={this.handleCancel}
+                >
+                    <List
+                        header={<div>
+                            <div style={{float: 'left', width: 150}}>标段</div>
+                            <div style={{float: 'left', width: 220}}>入库时间</div>
+                            <div>操作</div>
+                        </div>}
+                        bordered
+                        dataSource={dataListHistory}
+                        renderItem={this.getItemList.bind(this)}
+                    />
+                </Modal>
+                <Modal
+                    title='编辑'
+                    visible={this.state.showModal}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                >
+                    <Form>
+                        <FormItem label='细班编号' {...formItemLayout}>
+                            <Input
+                                style={{width: 200}}
+                                value={recordData.no}
+                                disabled />
+                        </FormItem>
+                        <FormItem label='树木类型' {...formItemLayout}>
+                            <Select
+                                showSearch
+                                filterOption={false}
+                                style={{width: 200}}
+                                value={treetype}
+                                placeholder='请输入树木类型名称'
+                                onChange={this.handleTreeTypeForm.bind(this)}
+                                onSearch={this.handleSearch.bind(this)}>
+                                {
+                                    treeTypeList.length > 0
+                                        ? treeTypeList.map(item => {
+                                            return <Option value={item.ID} key={item.ID}>{item.TreeTypeName}</Option>;
+                                        }) : []
+                                }
+                            </Select>
+                        </FormItem>
+                        <FormItem label='种植量' {...formItemLayout}>
+                            <Input
+                                style={{width: 200}}
+                                value={num}
+                                onChange={this.handleNumberForm.bind(this)} />
+                        </FormItem>
+                        <FormItem label='细班面积' {...formItemLayout}>
+                            <Input
+                                style={{width: 200}}
+                                defaultValue={area}
+                                onChange={this.handleAreaForm.bind(this)} />
+                        </FormItem>
+                    </Form>
+                </Modal>
+            </div>
+        );
     }
 }
 
