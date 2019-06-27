@@ -868,18 +868,16 @@ class Tablelevel extends Component {
                     <div style={{width: 720, minHeight: 640, float: 'left'}}>
                         <Spin spinning={spinning}>
                             <Table
-                                // expandedRowRender={
-                                //     permissionOperate
-                                //         ? this.permissionExpandedRowRender
-                                //         : this.noPermissionExpandedRowRender
-                                // }
-                                expandedRowRender={this.noPermissionExpandedRowRender}
+                                expandedRowRender={
+                                    permissionOperate
+                                        ? this.permissionExpandedRowRender
+                                        : this.noPermissionExpandedRowRender
+                                }
                                 rowSelection={rowSelection}
-                                // columns={permissionOperate
-                                //     ? this.permissionColumns
-                                //     : this.noPermissionColumns
-                                // }
-                                columns={this.noPermissionColumns}
+                                columns={permissionOperate
+                                    ? this.permissionColumns
+                                    : this.noPermissionColumns
+                                }
                                 dataSource={dataList}
                                 pagination={false}
                                 expandedRowKeys={expandedRowKeys}

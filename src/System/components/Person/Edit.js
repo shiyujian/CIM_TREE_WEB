@@ -16,6 +16,25 @@ window.config = window.config || {};
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 
+const RealName = (addition) => {
+    return new Promise((resolve) => {
+        fetch(`http://idcert.market.alicloudapi.com/idcard?idCard=${addition.id_num}&name=${addition.person_name}`, {
+            headers: {
+                'Authorization': 'APPCODE ' + 'c091fa7360bc48ff87a3471f028d5645'
+            }
+        }).then(rep => {
+            return rep.json();
+        }).then(rst => {
+            if (rst.status === '01') {
+                message.success('实名认证通过');
+                resolve();
+            } else {
+                message.warning('实名认证失败，请确认信息是否正确');
+            }
+        });
+    });
+};
+
 class Edit extends Component {
     static propTypes = {};
     constructor (props) {
@@ -787,6 +806,9 @@ class Edit extends Component {
                             message.error('人员拉黑失败');
                         }
                     }
+                    // 先进行实名认证再注册用户
+                    let realNameData = await RealName(addition);
+                    console.log('realNameData', realNameData);
                     // 修改人员信息
                     let putUserPostData = {
                         id: addition.id,
