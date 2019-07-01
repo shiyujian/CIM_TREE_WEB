@@ -190,6 +190,7 @@ export default class WordView1 extends Component {
             <Spin spinning={this.state.loading}>
                 <Modal
                     width={800}
+                    // visible
                     visible={this.props.visible}
                     title='土地整改质量验收记录'
                     onOk={this.onOk.bind(this)}

@@ -43,8 +43,7 @@ export default class DegitalAccept extends Component {
             leftkeycode: '',
             resetkey: 0,
             sectionsData: [],
-            smallClassesData: [],
-            treetypeoption: [] // 树种
+            smallClassesData: []
         };
     }
     componentDidMount = async () => {
@@ -52,23 +51,16 @@ export default class DegitalAccept extends Component {
             actions: {
                 getForestUsers,
                 getTreeNodeList,
-                setkeycode,
-                getDigitalAcceptList,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree,
-                getTreeList
+                getThinClassTree
             },
             users,
-            treetypes,
             platform: { tree = {} }
         } = this.props;
         // 避免反复获取森林用户数据，提高效率
         if (!users) {
             getForestUsers();
-        }
-        if (!treetypes) {
-            getTreeList().then(x => this.setTreeTypeOption(x));
         }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
@@ -207,7 +199,6 @@ export default class DegitalAccept extends Component {
                             thinClassSelect={this.thinClassSelect.bind(this)}
                             leftkeycode={leftkeycode}
                             keycode={keycode}
-                            typeselect={this.typeselect.bind(this)}
                             resetinput={this.resetinput.bind(this)}
                         />
                     </Content>
@@ -244,7 +235,6 @@ export default class DegitalAccept extends Component {
         this.setState({
             sectionsData
         });
-        this.typeselect('');
 
         // 标段
         let sections = JSON.parse(user.sections);
@@ -364,42 +354,5 @@ export default class DegitalAccept extends Component {
         this.setState({ resetkey: ++this.state.resetkey }, () => {
             this.onSelect([leftkeycode]);
         });
-    }
-    // 类型选择, 重新获取: 树种
-    typeselect (value) {
-        const { treetypes } = this.props;
-        this.setState({ bigType: value });
-        let selectTreeType = [];
-        treetypes.map(item => {
-            if (item.TreeTypeNo == null) {
-            }
-            if (item.TreeTypeNo) {
-                try {
-                    let code = item.TreeTypeNo.substr(0, 1);
-                    if (code === value) {
-                        selectTreeType.push(item);
-                    }
-                } catch (e) { }
-            }
-        });
-        this.setTreeTypeOption(selectTreeType);
-    }
-    // 设置树种选项
-    setTreeTypeOption (rst) {
-        if (rst instanceof Array) {
-            let treetypeoption = rst.map(item => {
-                return (
-                    <Option key={item.ID} value={item.ID} title={item.TreeTypeName}>
-                        {item.TreeTypeName}
-                    </Option>
-                );
-            });
-            treetypeoption.unshift(
-                <Option key={'全部'} value={''} title={'全部'}>
-                    全部
-                </Option>
-            );
-            this.setState({ treetypeoption, treetypelist: rst });
-        }
     }
 }

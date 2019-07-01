@@ -27,11 +27,7 @@ import WordView8 from './WordView8';
 import WordView9 from './WordView9';
 import WordView10 from './WordView10';
 import WordView11 from './WordView11';
-import Test from './Test';
 import '../index.less';
-import {
-    getSmallThinNameByPlaceData
-} from '../auth';
 import {
     getSectionNameBySection,
     getProjectNameBySection,
@@ -199,169 +195,107 @@ export default class DegitalAcceptTable extends Component {
             key7,
             key8
         } = this.state;
-        return (<div > {
-            this.treeTable(curingTreeData)
-        } {
-            visible1 && <WordView1
-                onPressOk={
-                    this.pressOK.bind(this, 1)
+        return (
+            <div>
+                {
+                    this.treeTable(curingTreeData)
                 }
-                visible={
-                    visible1
+                {
+                    visible1 && <WordView1
+                        onPressOk={this.pressOK.bind(this, 1)}
+                        visible={visible1}
+                        sscction={this.sscction}
+                        tinclass={this.tinclass}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                sscction={
-                    this.sscction
+                {
+                    visible2 && <WordView2
+                        onPressOk={this.pressOK.bind(this, 2)}
+                        visible={visible2}
+                        sscction={this.sscction}
+                        tinclass={this.tinclass}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                tinclass={
-                    this.tinclass
+                {
+                    visible3 && <WordView3
+                        onPressOk={this.pressOK.bind(this, 3)}
+                        visible={visible3}
+                        sscction={this.sscction}
+                        tinclass={this.tinclass}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                detail={
-                    itemDetail
-                } {...this.props}
-            />
-        } {
-            visible2 && <WordView2
-                onPressOk={
-                    this.pressOK.bind(this, 2)
+                {
+                    visible4 && <WordView4
+                        onPressOk={this.pressOK.bind(this, 4)}
+                        visible={visible4}
+                        keyy={key4}
+                        unQualifiedList={unQualifiedList}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                visible={
-                    visible2
+                {
+                    visible5 && <WordView5
+                        onPressOk={this.pressOK.bind(this, 5)}
+                        visible={visible5}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                sscction={
-                    this.sscction
+                {
+                    visible6 && <WordView6
+                        onPressOk={this.pressOK.bind(this, 6)}
+                        visible={visible6}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                tinclass={
-                    this.tinclass
+                {
+                    visible7 && <WordView7
+                        onPressOk={this.pressOK.bind(this, 7)}
+                        visible={visible7}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                detail={
-                    itemDetail
-                } {
-                ...this.props
+                {
+                    visible8 && <WordView8
+                        onPressOk={this.pressOK.bind(this, 8)}
+                        visible={visible8}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-            />
-        } {
-            visible3 && <WordView3
-                onPressOk={
-                    this.pressOK.bind(this, 3)
+                {
+                    visible9 && <WordView9
+                        onPressOk={this.pressOK.bind(this, 9)}
+                        visible={visible9}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                visible={
-                    visible3
+                {
+                    visible10 && <WordView10
+                        onPressOk={this.pressOK.bind(this, 10)}
+                        visible={visible10}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
                 }
-                sscction={
-                    this.sscction
-                }
-                tinclass={
-                    this.tinclass
-                }
-                detail={
-                    itemDetail
-                } {
-                ...this.props
-                }
-            />
-        } {
-            visible4 && <WordView4
-                onPressOk={
-                    this.pressOK.bind(this, 4)
-                }
-                visible={
-                    visible4
-                }
-                keyy={
-                    key4
-                }
-                unQualifiedList={
-                    unQualifiedList
-                }
-                detail={
-                    itemDetail
-                }
-            />
-        } {
-            visible5 && <WordView5
-                onPressOk={
-                    this.pressOK.bind(this, 5)
-                }
-                visible={
-                    visible5
-                }
-                detail={
-                    itemDetail
-                }
-            />
-        } {
-            visible6 && <WordView6
-                onPressOk={
-                    this.pressOK.bind(this, 6)
-                }
-                visible={
-                    visible6
-                }
-                detail={
-                    itemDetail
-                }
-            />
-        } {
-            visible7 && <WordView7
-                onPressOk={
-                    this.pressOK.bind(this, 7)
-                }
-                visible={
-                    visible7
-                }
-                detail={
-                    itemDetail
-                }
-            />
-        } {
-            visible8 && <WordView8
-                onPressOk={
-                    this.pressOK.bind(this, 8)
-                }
-                visible={
-                    visible8
-                }
-                detail={
-                    itemDetail
-                }
-            />
-        } {
-            visible9 && <WordView9
-                onPressOk={
-                    this.pressOK.bind(this, 9)
-                }
-                visible={
-                    visible9
-                }
-                detail={
-                    itemDetail
-                }
-            />
-        } {
-            visible10 && <WordView10
-                onPressOk={
-                    this.pressOK.bind(this, 10)
-                }
-                visible={
-                    visible10
-                }
-                detail={
-                    itemDetail
-                }
-            />
-        } {
-            visible11 && <WordView11
-                onPressOk={
-                    this.pressOK.bind(this, 11)
-                }
-                visible={
-                    visible11
-                }
-                detail={
-                    itemDetail
-                }
-            />
-        } </div>
+                {
+                    visible11 && <WordView11
+                        onPressOk={this.pressOK.bind(this, 11)}
+                        visible={visible11}
+                        detail={itemDetail}
+                        {...this.props}
+                    />
+                } </div>
         );
     }
     pressOK (which) {
@@ -520,20 +454,8 @@ export default class DegitalAcceptTable extends Component {
                         onChange={this.ysTypeChange.bind(this, 'yslx')} >
                         {ystypeoption}
                     </Select>
-                </div> {
-                /* <div className='forest-mrg10'>
-                                        <span className='forest-search-span'>类型：</span>
-                                        <Select
-                                            allowClear
-                                            className='forest-forestcalcw4'
-                                            defaultValue='全部'
-                                            value={curingTypeSelect}
-                                            onChange={this.onTypeChange.bind(this)}
-                                        >
-                                            {typeoption}
-                                        </Select>
-                                    </div> */
-                } <div className='forest-mrg10' >
+                </div>
+                <div className='forest-mrg10' >
                     <span className='forest-search-span' > 树种： </span>
                     <Select allowClear showSearch
                         filterOption={
@@ -624,7 +546,7 @@ export default class DegitalAcceptTable extends Component {
                         查询
                     </Button>
                 </Col>
-                <Col span={16} className='forest-quryrstcnt' >
+                <Col span={18} className='forest-quryrstcnt' >
                     <span > 此次查询共有苗木： {this.state.totalNum}棵 </span>
                 </Col>
                 <Col span={2} >
@@ -646,13 +568,12 @@ export default class DegitalAcceptTable extends Component {
         </div>
         );
         return (<div >
-            <Row > {
-                header
-            } </Row> <Row >
+            <Row>
+                {header}
+            </Row>
+            <Row>
                 <Table bordered className='foresttable'
-                    columns={
-                        this.columns
-                    }
+                    columns={this.columns}
                     rowKey='order'
                     loading={
                         {
@@ -665,21 +586,13 @@ export default class DegitalAcceptTable extends Component {
                             spinning: this.state.loading
                         }
                     }
-                    locale={
-                        {
-                            emptyText: '暂无验收消息'
-                        }
-                    }
-                    dataSource={
-                        details
-                    }
-                    onChange={
-                        this.handleTableChange.bind(this)
-                    }
-                    pagination={
-                        this.state.pagination
-                    }
-                /> </Row> </div>
+                    locale={{emptyText: '暂无验收消息'}}
+                    dataSource={details}
+                    onChange={this.handleTableChange.bind(this)}
+                    pagination={this.state.pagination}
+                />
+            </Row>
+        </div>
         );
     }
 
@@ -832,12 +745,6 @@ export default class DegitalAcceptTable extends Component {
             console.log('onThinClassChange', e);
         }
     }
-
-    // onTypeChange(value) {
-    //     const { typeselect } = this.props;
-    //     typeselect(value || '');
-    //     this.setState({ curingTypeSelect: value || '', treetype: '', treetypename: '' });
-    // }
 
     onTreeTypeChange (value) {
         this.setState({
