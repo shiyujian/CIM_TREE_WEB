@@ -30,10 +30,12 @@ import WordView11 from './WordView11';
 import '../index.less';
 import {
     getSectionNameBySection,
-    getProjectNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
+import {
     getYsTypeByID,
     getStatusByID
-} from '_platform/gisAuth';
+} from './auth';
 const {
     RangePicker
 } = DatePicker;

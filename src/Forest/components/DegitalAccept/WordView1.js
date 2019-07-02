@@ -10,12 +10,10 @@ import {
 import {
     fillAreaColor,
     handleAreaLayerData,
-    handleCoordinates
-} from 'Dashboard/components/auth';
-
-import {
+    handleCoordinates,
     wktToJson
-} from '_platform/gisAuth';
+} from './auth';
+import { lineString, buffer } from "@turf/turf";
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor (props) {
@@ -35,8 +33,9 @@ export default class WordView1 extends Component {
             detail = {}
         } = this.props;
         await this.initMap();
-        this._addAreaLayer(tinclass, sscction);
-        detail.Geom && this.area(wktToJson(detail.Geom));
+        await this._addAreaLayer(tinclass, sscction);
+        console.log('detail', detail);
+        detail.Geom && await this.area(wktToJson(detail.Geom));
     }
 
     componentWillUnmount () {
@@ -69,10 +68,6 @@ export default class WordView1 extends Component {
             }).addTo(this.map);
             // 加载苗木图层
             // this.getTileLayerTreeBasic();
-            // 加载秋冬季的细班图层
-            // this.getTileTreeWinterThinClassLayerBasic();
-            // 获取秋冬季的区块范围
-            // this.getTileTreeWinterProjectLayerBasic();
         } catch (e) {
             console.log('initMap', e);
         }
@@ -134,44 +129,43 @@ export default class WordView1 extends Component {
         }
     }
     area (points) {
-        let lineLayer = new L.FeatureGroup().addTo(this.map);
-        if (points.length > 1) {
-            var latlngs = [];
-            var lnglats = [];
-
-            for (var i = 0; i < points.length; i++) {
+        if (points && points instanceof Array && points.length > 1) {
+            let latlngs = [];
+            let lnglats = [];
+            for (let i = 0; i < points.length; i++) {
                 latlngs.push([points[i].Y, points[i].X]);
                 lnglats.push([points[i].X, points[i].Y]);
             }
-            var beginIcon = new L.Icon({
+            let beginIcon = L.icon({
                 iconUrl: require('./img/start.png'),
                 iconSize: [26, 28],
                 iconAnchor: [13, 28]
             });
-            var endIcon = new L.Icon({
+            let endIcon = L.icon({
                 iconUrl: require('./img/end.png'),
                 iconSize: [26, 28],
                 iconAnchor: [13, 28]
             });
-            var start = new L.Marker(latlngs[0], {
+            let start = L.marker(latlngs[0], {
                 icon: beginIcon,
                 zIndexOffset: -50
-            }).addTo(lineLayer);
-            var end = new L.Marker(latlngs[latlngs.length - 1], {
+            }).addTo(this.map);
+            let end = L.marker(latlngs[latlngs.length - 1], {
                 icon: endIcon,
                 zIndexOffset: -50
-            }).addTo(lineLayer);
-            this.map.fitBounds(lineLayer.getBounds());
+            }).addTo(this.map);
 
-            var linestring1 = turf.lineString(lnglats, { name: 'line 1' });
-            var buffered = turf.buffer(linestring1, 0.005, { units: 'kilometers' });
+            let linestring1 = lineString(lnglats, { name: 'line 1' });
+            let buffered = buffer(linestring1, 0.005, { units: 'kilometers' });
             L.geoJSON(buffered, {
                 style: function (feature) {
                     return {
                         color: 'red'
                     };
                 }
-            }).addTo(lineLayer);
+            }).addTo(this.map);
+            console.log('points', points);
+            this.map.panTo(latlngs[0]);
         }
     }
 

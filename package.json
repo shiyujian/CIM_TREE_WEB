@@ -93,6 +93,7 @@
     "history": "^4.6.3",
     "js-base64": "^2.1.9",
     "js-cookie": "^2.2.0",
+    "leaflet": "^1.2.0",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "normalize.css": "^5.0.0",
@@ -117,12 +118,12 @@
     "redux-thunk": "^2.2.0",
     "shortid": "^2.2.8",
     "superagent": "^3.5.2",
+    "@turf/turf": "^5.1.6",
     "uuid": "^3.1.0",
     "victory": "^0.21.3",
     "wangeditor": "^3.0.12",
     "whatwg-fetch": "^2.0.2",
     "wolfy87-eventemitter": "^5.2.1",
-    "xlsx": "^0.14.1",
-    "leaflet": "^1.2.0"
+    "xlsx": "^0.14.1"
   }
 }
