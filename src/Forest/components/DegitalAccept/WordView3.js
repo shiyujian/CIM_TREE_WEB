@@ -14,7 +14,7 @@ import {
     wktToJson
 } from './auth';
 import { lineString, buffer } from '@turf/turf';
-
+import moment from 'moment';
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor (props) {
@@ -174,20 +174,25 @@ export default class WordView1 extends Component {
         }
     }
 
-    render () {
-        const { detail } = this.props;
-        let array = ['', '', '', ''];
-        if (detail && detail.ThinClass) {
-            array = detail.ThinClass.split('-');
-        }
-        let unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
-        let jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
-        let shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
-        let hgl = detail.CheckNum - detail.FailedNum; // 合格量
-        let qulityok = '';
-        if (detail.CheckNum !== 0) {
-            qulityok = hgl / detail.CheckNum;
-        }
+    handleDetailData = (detail) => {
+        let handleDetail = {};
+        handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
+        handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
+        handleDetail.shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ConstructerObj.Full_Name) || '';
+        handleDetail.checker = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
+        handleDetail.designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || '';
+        handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
+        handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
+        handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
+        handleDetail.designNum = (detail && detail.DesignNum) || 0;
+        handleDetail.actualNum = (detail && detail.ActualNum) || 0;
+        handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
+        handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
+        handleDetail.checkNum = (detail && detail.CheckNum) || 0;
+        handleDetail.failedNum = (detail && detail.FailedNum) || 0;
+
+        let hgl = handleDetail.checkNum - handleDetail.failedNum; // 合格量
+        handleDetail.hgl = hgl;
         let hege = detail.DigHoleQualifiedNum;
         let buhege = detail.DigHoleUnQualifiedNum;
         let currenthege = 0;
@@ -221,6 +226,18 @@ export default class WordView1 extends Component {
             }
             rowList.push(colList);
         }
+        handleDetail.rowList = rowList;
+        return handleDetail;
+    }
+
+    render () {
+        const { detail } = this.props;
+        let array = ['', '', '', ''];
+        if (detail && detail.ThinClass) {
+            array = detail.ThinClass.split('-');
+        }
+        let handleDetail = this.handleDetailData(detail);
+        console.log('handleDetail', handleDetail);
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
@@ -238,9 +255,9 @@ export default class WordView1 extends Component {
                             <tbody>
                                 <tr>
                                     <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
-                                    <td colSpan='3'> {unit}</td>
+                                    <td colSpan='3'> {handleDetail.unit}</td>
                                     <td colSpan='1' width='118px'>细班（小班）</td>
-                                    <td colSpan='1'>{`${array[2]}(${array[3]})`}</td>
+                                    <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工单位</td>
@@ -250,22 +267,24 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工员</td>
-                                    <td colSpan='1'>{shigong}</td>
+                                    <td colSpan='1'>{handleDetail.shigong}</td>
                                     <td>设计面积</td>
-                                    <td colSpan='1'>100</td>
+                                    <td colSpan='1'>{handleDetail.designArea}</td>
                                     <td>实际面积</td>
-                                    <td >95</td>
+                                    <td >{handleDetail.actualArea}</td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>
                                     <td colSpan='5'> 《雄安新区造林工作手册》</td>
                                 </tr>
                                 <tr>
-                                    <td colSpan='6' height='200'>
-                                    验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。
-                                    ①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；
-                                    ②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。
-                                    挖穴合格率=抽检合格数量/抽检数量。
+                                    <td colSpan='6' style={{height: 200}}>
+                                        <div style={{textAlign: 'left'}}>
+                                            <p>验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。</p>
+                                            <p>①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；</p>
+                                            <p>②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。</p>
+                                            <p>挖穴合格率=抽检合格数量/抽检数量。</p>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -283,17 +302,17 @@ export default class WordView1 extends Component {
                                     <td height='60;'width='118px'>挖穴标准</td>
                                     <td colSpan='1'> / </td>
                                     <td height='60;'width='118px'>设计数量</td>
-                                    <td colSpan='1'>{detail.DesignNum}</td>
+                                    <td colSpan='1'>{handleDetail.designNum}</td>
                                     <td colSpan='1' width='118px'>实际数量</td>
-                                    <td colSpan='1'>{detail.ActualNum}</td>
+                                    <td colSpan='1'>{handleDetail.actualNum}</td>
                                 </tr>
                                 <tr>
                                     <td height='60;'width='118px'>抽检数量</td>
-                                    <td colSpan='1'>{detail.CheckNum}</td>
+                                    <td colSpan='1'>{handleDetail.checkNum}</td>
                                     <td height='60;'width='118px'>抽检合格数量</td>
-                                    <td colSpan='1'>{hgl}</td>
+                                    <td colSpan='1'>{handleDetail.hgl}</td>
                                     <td colSpan='1' width='118px'>合格率</td>
-                                    <td colSpan='1'>{qulityok}</td>
+                                    <td colSpan='1'>{`${handleDetail.score}%`}</td>
                                 </tr>
                                 <tr>
                                     <td colSpan='6'>
@@ -305,7 +324,7 @@ export default class WordView1 extends Component {
                                             </Col>
                                             <Col span={21} style={{ width: 630 }}>
                                                 {
-                                                    rowList
+                                                    handleDetail.rowList
                                                 }
                                             </Col>
                                         </Row>
@@ -315,10 +334,8 @@ export default class WordView1 extends Component {
                                     <td className='hei110' >施工单位质量专检结果</td>
                                     <td colSpan='5'>
                                         <div>
-                                            <p>项目专业质量检查员：</p>
-                                            <p className='marL300'>年</p>
-                                            <p className='marL30'>月</p>
-                                            <p className='marL30'>日</p>
+                                            <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                            <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -326,7 +343,7 @@ export default class WordView1 extends Component {
                                     <td className='hei110' >监理（建设）单位验收记录</td>
                                     <td colSpan='5'>
                                         <div>
-                                            <p>监理工程师：</p><p>{jianli}</p>
+                                            <p>监理工程师：</p><p>{handleDetail.jianli}</p>
                                             <p className='marL300'>年</p>
                                             <p className='marL30'>月</p>
                                             <p className='marL30'>日</p>

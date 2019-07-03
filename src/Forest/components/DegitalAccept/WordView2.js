@@ -14,6 +14,7 @@ import {
     wktToJson
 } from './auth';
 import { lineString, buffer } from '@turf/turf';
+import moment from 'moment';
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor (props) {
@@ -174,35 +175,48 @@ export default class WordView1 extends Component {
         }
     }
 
+    handleDetailData = (detail) => {
+        let handleDetail = {};
+        handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
+        handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
+        handleDetail.shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ConstructerObj.Full_Name) || '';
+        handleDetail.checker = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
+        handleDetail.designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || '';
+        handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
+        handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
+        handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
+        handleDetail.designNum = (detail && detail.DesignNum) || 0;
+        handleDetail.actualNum = (detail && detail.ActualNum) || 0;
+        handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
+        handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
+
+        // 设计密度
+        let designNum = (detail && detail.DesignNum) || 0; // 细班设计量
+        let designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || 0; // 细班设计面积
+        let designDensity = 1;
+        if (designArea && designNum && designArea !== 0) {
+            designDensity = (designNum / designArea).toFixed(2);
+        }
+
+        let loftingNum = (detail && detail.LoftingNum) || 0; // 放点数量
+        let sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || ''; // 样带面积
+        let truemd = 1; // 实际密度
+        if (sampleTapeArea && sampleTapeArea !== 0) {
+            truemd = (loftingNum / sampleTapeArea).toFixed(2);
+        }
+        handleDetail.truemd = truemd;
+        handleDetail.designDensity = designDensity;
+        return handleDetail;
+    }
+
     render () {
         const { detail } = this.props;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
         }
-        let unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
-        let jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
-        let shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
-        let xbsjl = detail.DesignNum; // 细班设计量
-        let xbsjmj = detail.DesignArea; // 细班设计面积
-        let designmd = 1; // 设计密度
-        if (xbsjmj !== 0) {
-            designmd = xbsjl / xbsjmj;
-        }
-        let fdsl = detail.LoftingNum; // 放点数量
-        let ydmj = detail.SampleTapeArea; // 样带面积
-        let truemd = 1; // 实际密度
-        let qulityok = '0%'; // 合格率
-        let cjsl = detail.CheckNum; // 抽检数量
-        let middle = 0;
-        if (ydmj !== 0) {
-            truemd = fdsl / ydmj;
-            middle = cjsl / ydmj;
-        }
-        qulityok = 1 - middle;
-        qulityok = qulityok / designmd;
-        qulityok = qulityok * 100;
-        qulityok = 100 - qulityok;
+        let handleDetail = this.handleDetailData(detail);
+        console.log('handleDetail', handleDetail);
         return (
             <Spin spinning={this.state.loading}>
                 <Modal
@@ -220,9 +234,9 @@ export default class WordView1 extends Component {
                                 <table border='1'>
                                     <tr>
                                         <td className='hei60' colSpan='1' width='118px'>单位工程名称</td>
-                                        <td colSpan='3'> {unit}</td>
+                                        <td colSpan='3'> {handleDetail.unit}</td>
                                         <td colSpan='1' width='118px'>细班（小班）</td>
-                                        <td colSpan='1'>{`${array[2]}(${array[3]})`}</td>
+                                        <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' align='center'>施工单位</td>
@@ -232,22 +246,25 @@ export default class WordView1 extends Component {
                                     </tr>
                                     <tr>
                                         <td className='hei60' align='center'>施工员</td>
-                                        <td colSpan='1'>{shigong}</td>
+                                        <td colSpan='1'>{handleDetail.shigong}</td>
                                         <td>设计数量</td>
-                                        <td colSpan='1'>{detail.DesignNum}</td>
+                                        <td colSpan='1'>{handleDetail.designNum}</td>
                                         <td>实际数量</td>
-                                        <td >{detail.ActualNum}</td>
+                                        <td >{handleDetail.actualNum}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' >施工执行标准名称及编号</td>
                                         <td colSpan='5'> 《雄安新区造林工作手册》</td>
                                     </tr>
                                     <tr>
-                                        <td colSpan='6' height='200'>
-                                            验收要点：以细班或小班为单位，对放样点穴进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带内的点穴精准度、密度情况进行打分。
-                                            ①放点精准，抽检密度与设计密度的误差在±10%之内，视为合格，计90分以上，通过检验；
-                                            ②放点不准，抽检密度与设计密度的误差超出±10%，即为不合格，需整改。
-                                            放样点穴合格率=100-|（1-（抽检数量/样带面积）/设计密度）|*100
+                                        <td colSpan='6' style={{height: 200}}>
+                                            <div style={{textAlign: 'left'}}>
+                                                <p>验收要点：以细班或小班为单位，对放样点穴进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带内的点穴精准度、密度情况进行打分。</p>
+                                                <p>①放点精准，抽检密度与设计密度的误差在±10%之内，视为合格，计90分以上，通过检验；</p>
+                                                <p>②放点不准，抽检密度与设计密度的误差超出±10%，即为不合格，需整改。</p>
+                                                <p> 放样点穴合格率=100-|（1-（抽检数量/样带面积）/设计密度）|*100</p>
+                                            </div>
+
                                         </td>
                                     </tr>
                                     <tr>
@@ -263,30 +280,28 @@ export default class WordView1 extends Component {
                                     </tr>
                                     <tr>
                                         <td className='hei60' colSpan='1' width='118px'>设计面积</td>
-                                        <td colSpan='2'>{detail.DesignArea}</td>
+                                        <td colSpan='2'>{handleDetail.designArea}</td>
                                         <td colSpan='1' width='118px'>设计密度</td>
-                                        <td colSpan='2'>{designmd}</td>
+                                        <td colSpan='2'>{handleDetail.designDensity}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' colSpan='1' width='118px'>样带面积</td>
-                                        <td colSpan='2'>{detail.SampleTapeArea}</td>
+                                        <td colSpan='2'>{handleDetail.sampleTapeArea}</td>
                                         <td colSpan='1' width='118px'>放点数量</td>
-                                        <td colSpan='2'>{detail.LoftingNum}</td>
+                                        <td colSpan='2'>{handleDetail.loftingNum}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' colSpan='1' width='118px'>实际密度</td>
-                                        <td colSpan='2'>{truemd}</td>
+                                        <td colSpan='2'>{handleDetail.truemd}</td>
                                         <td colSpan='1' width='118px'>合格率</td>
-                                        <td colSpan='2'>{qulityok}</td>
+                                        <td colSpan='2'>{`${handleDetail.score}%`}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei110' >施工单位质量专检结果</td>
                                         <td colSpan='5'>
                                             <div>
-                                                <p>项目专业质量检查员：</p>
-                                                <p className='marL300'>年</p>
-                                                <p className='marL30'>月</p>
-                                                <p className='marL30'>日</p>
+                                                <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -294,7 +309,7 @@ export default class WordView1 extends Component {
                                         <td className='hei110' >监理（建设）单位验收记录</td>
                                         <td colSpan='5'>
                                             <div>
-                                                <p>监理工程师：</p><p>{jianli}</p>
+                                                <p>监理工程师：</p><p>{handleDetail.jianli}</p>
                                                 <p className='marL300'>年</p>
                                                 <p className='marL30'>月</p>
                                                 <p className='marL30'>日</p>
