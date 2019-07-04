@@ -179,8 +179,8 @@ export default class WordView1 extends Component {
                             </tbody>
                         </table>
                         <div>
-                            <p>注：附验收过程照片及说明</p>
-                            <p>2、本表解释权归XXXXXXXX。咨询电话：XXXXXXXX</p>
+                            <p>注：1.细班（小班）造林合格率得分=∑(单项验收得分×单项得分权重)/（100-零分项分值）×100。
+                                2.附细班（小班）各项过程质量验收记录。</p>
                         </div>
                     </div>
                 </Modal>

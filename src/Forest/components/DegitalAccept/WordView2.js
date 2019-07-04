@@ -320,8 +320,7 @@ export default class WordView1 extends Component {
                             </tbody>
                         </table>
                         <div>
-                            <p>注：附验收过程照片及说明</p>
-                            <p>2、本表解释权归XXXXXXXX。咨询电话：XXXXXXXX</p>
+                            <p>注：附验收过程照片及说明。 </p>
                         </div>
                     </div>
                 </Modal>

@@ -112,7 +112,7 @@ export default class WordView1 extends Component {
                                     <td>苗木品种</td>
                                     <td colSpan='1'>{handleDetail.treetypename}</td>
                                     <td>苗木规格</td>
-                                    <td >95</td>
+                                    <td > / </td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>
@@ -174,8 +174,7 @@ export default class WordView1 extends Component {
                             </tbody>
                         </table>
                         <div>
-                            <p>注：附验收过程照片及说明</p>
-                            <p>2、本表解释权归XXXXXXXX。咨询电话：XXXXXXXX</p>
+                            <p>注：1.苗木质量不合格记录可另附表。2.附验收过程照片及说明。</p>
                         </div>
                     </div>
                 </Modal>

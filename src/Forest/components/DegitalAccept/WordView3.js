@@ -190,7 +190,7 @@ export default class WordView1 extends Component {
         handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
         handleDetail.checkNum = (detail && detail.CheckNum) || 0;
         handleDetail.failedNum = (detail && detail.FailedNum) || 0;
-
+        handleDetail.treetypename = (detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName) || '';
         let hgl = handleDetail.checkNum - handleDetail.failedNum; // 合格量
         handleDetail.hgl = hgl;
         let hege = detail.DigHoleQualifiedNum;
@@ -268,10 +268,10 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td height='60;' align='center'>施工员</td>
                                     <td colSpan='1'>{handleDetail.shigong}</td>
-                                    <td>设计面积</td>
-                                    <td colSpan='1'>{handleDetail.designArea}</td>
-                                    <td>实际面积</td>
-                                    <td >{handleDetail.actualArea}</td>
+                                    <td>苗木品种及规格</td>
+                                    <td colSpan='1'>{handleDetail.treetypename}</td>
+                                    <td>土球规格</td>
+                                    <td > / </td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>
@@ -353,8 +353,7 @@ export default class WordView1 extends Component {
                             </tbody>
                         </table>
                         <div>
-                            <p>注：附验收过程照片及说明</p>
-                            <p>2、本表解释权归XXXXXXXX。咨询电话：XXXXXXXX</p>
+                            <p>注：1.挖穴验收记录可另附表。2.附验收过程照片及说明。 </p>
                         </div>
                     </div>
                 </Modal>
