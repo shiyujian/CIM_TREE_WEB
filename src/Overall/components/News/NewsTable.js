@@ -72,7 +72,7 @@ class NewsTable extends Component {
             }
         },
         {
-            title: '发布日期',
+            title: '创建时间',
             key: 'pub_time',
             width: '15%',
             render: (text, record) => {
@@ -156,7 +156,7 @@ class NewsTable extends Component {
             }
         },
         {
-            title: '修改日期',
+            title: '创建时间',
             dataIndex: 'pub_time',
             key: 'pub_time',
             width: '15%',

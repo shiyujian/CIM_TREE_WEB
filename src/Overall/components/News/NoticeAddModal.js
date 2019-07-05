@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Notification, Select } from 'antd';
+import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Notification, Select, Spin } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '_platform/auth';
@@ -16,7 +16,8 @@ class NoticeAddModal extends Component {
         super(props);
         this.state = {
             content: '',
-            progress: 0
+            progress: 0,
+            loading: false
         };
     }
 
@@ -74,60 +75,32 @@ class NoticeAddModal extends Component {
         editor.create();
     }
 
-    uploadProps = {
-        name: 'a_file',
-        multiple: true,
-        showUploadList: true,
-        action: UPLOAD_API,
-        beforeUpload: () => {
-            this.setState({ progress: 0 });
-        },
-        onChange: ({ file, event }) => {
-            const status = file.status;
-            if (status === 'done') {
-                const { actions: { postUploadFiles }, fileList = [] } = this.props;
-                let newFileList = fileList;
-                let newFile = {
-                    name: file.name,
-                    down_file: STATIC_DOWNLOAD_API + '/media' + file.response.download_url.split('/media')[1]
-                };
-                newFileList = newFileList.concat(newFile);
-                postUploadFiles(newFileList);
-                Notification.info({
-                    message: '上传附件成功',
-                    duration: 3
-                });
-            }
-            if (event) {
-                let { percent } = event;
-                if (percent !== undefined) { this.setState({ progress: parseFloat(percent.toFixed(1)) }); }
-            }
-        }
-    };
-
     // modal显示与影藏
     modalClick () {
-        const { actions: { postUploadFiles } } = this.props;
-        postUploadFiles([]);
         this.props.handlePublishNoticeModalCancel();
     }
 
     // 发布通知
-    postData () {
+    postData = async () => {
         const {
-            actions: { postData, getTipsList, postUploadFiles },
-            form: { validateFields },
-            fileList = []
+            actions: { postData, getTipsList },
+            form: { validateFields }
         } = this.props;
-        validateFields((err, values) => {
+        validateFields(async (err, values) => {
+            console.log('values', values);
             if (!err) {
-                // 判断是发布通知还是更新通知
+                let fileList = [];
+                if (values && values.annexFile && values.annexFile.fileList &&
+                    values.annexFile.fileList instanceof Array &&
+                    values.annexFile.fileList.length > 0) {
+                    fileList = values.annexFile.fileList;
+                }
                 let newData = {
                     'title': values['title'] || '',
                     'raw': this.state.content,
                     'degree': values['mergency'],
                     'attachment': {
-                        'fileList': fileList || []
+                        'fileList': fileList
                     },
                     'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
                     'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
@@ -136,22 +109,24 @@ class NoticeAddModal extends Component {
                     'publisher': getUser().id,
                     'is_draft': false
                 };
-                postData({}, newData)
-                    .then(rst => {
-                        if (rst.id) {
-                            this.modalClick();
-                            Notification.success({
-                                message: '发布通知成功',
-                                duration: 3
-                            });
-                            // 更新通知列表数据
-                            getTipsList({}, {
-                                tag: '公告',
-                                is_draft: false
-                            });
-                            postUploadFiles([]);
-                        }
+                let rst = await postData({}, newData);
+                if (rst && rst.id) {
+                    // 更新通知列表数据
+                    await getTipsList({}, {
+                        tag: '公告',
+                        is_draft: false
                     });
+                    await this.modalClick();
+                    Notification.success({
+                        message: '发布通知成功',
+                        duration: 3
+                    });
+                } else {
+                    Notification.error({
+                        message: '发布通知失败',
+                        duration: 3
+                    });
+                }
             }
         });
     }
@@ -159,18 +134,24 @@ class NoticeAddModal extends Component {
     // 暂存通知
     draftDataFunc () {
         const {
-            actions: { postData, getDraftTipsList, postUploadFiles },
-            form: { validateFields },
-            fileList = []
+            actions: { postData, getDraftTipsList },
+            form: { validateFields }
         } = this.props;
-        validateFields((err, values) => {
+        validateFields(async (err, values) => {
+            console.log('values', values);
             if (!err) {
+                let fileList = [];
+                if (values && values.annexFile && values.annexFile.fileList &&
+                    values.annexFile.fileList instanceof Array &&
+                    values.annexFile.fileList.length > 0) {
+                    fileList = values.annexFile.fileList;
+                }
                 let newData = {
                     'title': values['title'] || '',
                     'raw': this.state.content,
                     'degree': values['mergency'],
                     'attachment': {
-                        'fileList': fileList || []
+                        'fileList': fileList
                     },
                     'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
                     'tags': [2],
@@ -178,48 +159,90 @@ class NoticeAddModal extends Component {
                     'publisher': getUser().id,
                     'is_draft': true
                 };
-                postData({}, newData)
-                    .then(rst => {
-                        if (rst.id) {
-                            this.modalClick();
-                            Notification.success({
-                                message: '暂存成功！',
-                                duration: 3
-                            });
-                            // 更新暂存的通知列表数据
-                            getDraftTipsList({}, {
-                                tag: '公告',
-                                is_draft: true
-                            });
-                            postUploadFiles([]);
-                        }
+                let rst = await postData({}, newData);
+                if (rst && rst.id) {
+                    // 更新暂存的通知列表数据
+                    await getDraftTipsList({}, {
+                        tag: '公告',
+                        is_draft: true
                     });
+                    await this.modalClick();
+                    Notification.success({
+                        message: '暂存通知成功！',
+                        duration: 3
+                    });
+                } else {
+                    Notification.error({
+                        message: '暂存通知失败',
+                        duration: 3
+                    });
+                }
             }
         });
     }
-    coverPicFile = (e) => {
-        if (Array.isArray(e)) {
-            return e;
+    uploadPropsFile = {
+        name: 'a_file',
+        showUploadList: true,
+        action: UPLOAD_API,
+        beforeUpload: () => {
+            this.setState({
+                progress: 0,
+                loading: true
+            });
+        },
+        onChange: async ({file, fileList}) => {
+            try {
+                console.log('file', file);
+                console.log('fileList', fileList);
+                const status = file.status;
+                if (status === 'done') {
+                    file.url = file && file.response && file.response.a_file;
+                    fileList.map((fileData) => {
+                        if (fileData && fileData.response && fileData.response.a_file) {
+                            fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                        }
+                    });
+                    this.setState({
+                        progress: 1,
+                        loading: false
+                    });
+                    Notification.info({
+                        message: '上传附件成功',
+                        duration: 3
+                    });
+                } else if (status === 'error') {
+                    Notification.error({
+                        message: '上传附件失败',
+                        duration: 3
+                    });
+                    this.setState({
+                        progress: 1,
+                        loading: false
+                    });
+                }
+            } catch (e) {
+                console.log('uploadPropsFile', e);
+            }
         }
-        if (e.file.status === 'removed') {
-            return [];
+    };
+    checkTitle = async (rule, value, callback) => {
+        if (value) {
+            if (value.length <= 40) {
+                callback();
+            } else {
+                callback(`名称须少于40个字，请重新输入`);
+            };
+        } else {
+            callback();
         }
-        if (e.file.status === 'done' && !e.file.response.a_file) {
-            return [];
-        }
-        let array = [];
-        let length = e.fileList.length - 1;
-        if (e.file.status === 'done' && e.file.response.a_file) {
-            e.fileList[length].response.name = e.file.name;
-        }
-        array.push(e.fileList[length]);
-        return e && array;
     }
-
     render () {
         const {
             form: { getFieldDecorator }
         } = this.props;
+        const {
+            loading
+        } = this.state;
         const formItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -232,13 +255,21 @@ class NoticeAddModal extends Component {
                 footer={null}
                 width='80%'
             >
-                <div>
+                <Spin spinning={loading}>
                     <Form>
                         <Row span={22}>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='名称'>
                                     {getFieldDecorator('title', {
-                                        rules: [{ required: true, message: '请输入通知名称' }],
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请输入通知名称'
+                                            },
+                                            {
+                                                validator: this.checkTitle
+                                            }
+                                        ],
                                         initialValue: ''
                                     })(
                                         <Input type='text' />
@@ -260,11 +291,9 @@ class NoticeAddModal extends Component {
                             </Col>
                             <Col span={5} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
-                                    {getFieldDecorator('attachment1', {
-                                        valuePropName: 'fileList',
-                                        getValueFromEvent: this.coverPicFile
+                                    {getFieldDecorator('annexFile', {
                                     })(
-                                        <Upload {...this.uploadProps}
+                                        <Upload {...this.uploadPropsFile}
                                         >
                                             <Button>
                                                 <Icon type='upload' />上传附件
@@ -287,7 +316,7 @@ class NoticeAddModal extends Component {
                             </Col>
                         </Row>
                     </Form>
-                </div>
+                </Spin>
             </Modal>
 
         );

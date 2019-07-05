@@ -18,6 +18,7 @@ import NoticeAddModal from './NoticeAddModal';
 import NoticeEditModal from './NoticeEditModal';
 import moment from 'moment';
 import { getUser } from '_platform/auth';
+import { STATIC_DOWNLOAD_API } from '_platform/api';
 import './index.less';
 
 const TabPane = Tabs.TabPane;
@@ -32,7 +33,10 @@ class NoticeTable extends Component {
             tipsTabValue: 'publish',
             editNoticeVisible: false,
             addNoticeVisible: false,
-            noticeDetail: ''
+            noticeDetail: '',
+            record: '',
+            detailVisible: false,
+            detailDegree: ''
         };
     }
 
@@ -53,48 +57,54 @@ class NoticeTable extends Component {
         {
             title: '通知查询ID',
             dataIndex: 'id',
-            key: 'id'
+            key: 'id',
+            width: '10%'
         },
         {
             title: '名称',
             dataIndex: 'title',
-            key: 'title'
+            key: 'title',
+            width: '40%'
         },
         {
             title: '发布单位',
+            width: '10%',
             render: (text, record) => {
                 if (record.pub_unit) {
-                    return <p>{record.pub_unit.name}</p>;
+                    return record.pub_unit.name;
                 } else {
-                    return <p> / </p>;
+                    return '/';
                 }
-            }
-        },
-        {
-            title: '发布时间',
-            key: 'pub_time',
-            render: (text, record) => {
-                return moment(record.pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
             }
         },
         {
             title: '紧急程度',
             dataIndex: 'degree',
             key: 'degree',
+            width: '10%',
             render: text => {
                 if (text === 0) {
-                    return <p>平件</p>;
+                    return '平件';
                 } else if (text === 1) {
-                    return <p>加急</p>;
+                    return '加急';
                 } else if (text === 2) {
-                    return <p>特急</p>;
+                    return '特急';
                 } else {
-                    return <p> / </p>;
+                    return '/';
                 }
             }
         },
         {
+            title: '创建时间',
+            key: 'pub_time',
+            width: '15%',
+            render: (text, record) => {
+                return moment(record.pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
+            }
+        },
+        {
             title: '操作',
+            width: '15%',
             render: record => {
                 return (
                     <span>
@@ -102,10 +112,10 @@ class NoticeTable extends Component {
                             查看
                         </a>
                         <Divider type='vertical' />
-                        <a onClick={this.handleNoticeEdit.bind(this, record)}>
+                        {/* <a onClick={this.handleNoticeEdit.bind(this, record)}>
                             修改
                         </a>
-                        <Divider type='vertical' />
+                        <Divider type='vertical' /> */}
                         <Popconfirm
                             title='确定删除吗?'
                             onConfirm={this.handleNoticeDelete.bind(this, record)}
@@ -123,20 +133,23 @@ class NoticeTable extends Component {
         {
             title: '暂存通知ID',
             dataIndex: 'id',
-            key: 'id'
+            key: 'id',
+            width: '10%'
         },
         {
-            title: '主题',
+            title: '名称',
             dataIndex: 'title',
-            key: 'title'
+            key: 'title',
+            width: '25%'
         },
         {
             title: '发布单位',
+            width: '10%',
             render: (text, record) => {
                 if (record.pub_unit) {
-                    return <p>{record.pub_unit.name}</p>;
+                    return record.pub_unit.name;
                 } else {
-                    return <p> / </p>;
+                    return '/';
                 }
             }
         },
@@ -144,22 +157,24 @@ class NoticeTable extends Component {
             title: '紧急程度',
             dataIndex: 'degree',
             key: 'degree',
+            width: '10%',
             render: text => {
                 if (text === 0) {
-                    return <p>平件</p>;
+                    return '平件';
                 } else if (text === 1) {
-                    return <p>加急</p>;
+                    return '加急';
                 } else if (text === 2) {
-                    return <p>特急</p>;
+                    return '特急';
                 } else {
-                    return <p> / </p>;
+                    return '/';
                 }
             }
         },
         {
-            title: '修改时间',
+            title: '创建时间',
             dataIndex: 'pub_time',
             key: 'pub_time',
+            width: '15%',
             render: pub_time => {
                 return moment(pub_time)
                     .utc()
@@ -168,6 +183,7 @@ class NoticeTable extends Component {
         },
         {
             title: '操作',
+            width: '20%',
             render: record => {
                 return (
                     <span>
@@ -199,48 +215,28 @@ class NoticeTable extends Component {
         }
     ];
     handleNoticeView = async (record) => {
-        Modal.info({
-            title: <h1 style={{ marginLeft: 42 }}>{record.title}</h1>,
-            okText: '知道了',
-            width: '800px',
-            iconType: 'none',
-            content: (
-                <div>
-                    {record.source && record.source.name && (
-                        <p>{`来源 ：${record.source.name}`}</p>
-                    )}
-                    <div
-                        // style={{ maxHeight: '600px', overflow: 'auto', border: '1px solid #ccc',marginBottom:10,marginTop:10}}
-                        style={{
-                            maxHeight: '800px',
-                            overflow: 'auto',
-                            marginTop: '5px'
-                        }}
-                        dangerouslySetInnerHTML={{ __html: record.raw }}
-                    />
-                    <h4>
-                        通知附件：
-                        {record.attachment.fileList.length > 0
-                            ? record.attachment.fileList.map(
-                                (file, index) => {
-                                    return (
-                                        <div key={index}>
-                                            <a
-                                                target='_bank'
-                                                href={file.down_file}
-                                            >
-                                                  附件{index + 1}、
-                                                {file.name}
-                                            </a>
-                                        </div>
-                                    );
-                                }
-                            )
-                            : '暂无附件'}
-                    </h4>
-                </div>
-            ),
-            onOk () {}
+        let detailDegree = '';
+        if (record && record.degree) {
+            if (record.degree === 1) {
+                detailDegree = '加急';
+            } else if (record.degree === 2) {
+                detailDegree = '特急';
+            }
+        } else if (record.degree === 0) {
+            detailDegree = '平件';
+        }
+        console.log('detailDegree', detailDegree);
+        this.setState({
+            noticeDetail: record,
+            detailVisible: true,
+            detailDegree
+        });
+    }
+    handleCancel = async () => {
+        this.setState({
+            noticeDetail: '',
+            detailVisible: false,
+            detailDegree: ''
         });
     }
     // 编辑通知
@@ -323,7 +319,7 @@ class NoticeTable extends Component {
             });
         }
     }
-    // 查找
+    // 查询
     queryPublish () {
         const {
             actions: { getTipsList }
@@ -333,8 +329,10 @@ class NoticeTable extends Component {
             await getTipsList({}, {
                 tag: '公告',
                 is_draft: false,
-                pub_time_begin: values.worktime ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktime ? moment(values.worktime[1]).format('YYYY-MM-DD') : '',
+                pub_time_begin: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
+                    ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
+                pub_time_end: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
+                    ? moment(values.worktime[1]).add(1, 'days').format('YYYY-MM-DD') : '',
                 title: values.theme || '',
                 degree: values.degree || ''
             });
@@ -354,27 +352,15 @@ class NoticeTable extends Component {
         const {
             actions: { getDraftTipsList }
         } = this.props;
-        const user = getUser();
         this.props.form.validateFields(async (err, values) => {
             console.log('err', err);
-            let conditions = {
-                executor: user.id,
-                title: values.titles || '',
-                degree: values.degrees || ''
-            };
-            if (values && values.worktimes) {
-                conditions.begin = moment(values.worktimes[0]).format(
-                    'YYYY-MM-DD'
-                );
-                conditions.end = moment(values.worktimes[1]).format(
-                    'YYYY-MM-DD'
-                );
-            }
             await getDraftTipsList({}, {
                 tag: '公告',
                 is_draft: true,
-                pub_time_begin: values.worktimes ? moment(values.worktimes[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktimes ? moment(values.worktimes[1]).format('YYYY-MM-DD') : '',
+                pub_time_begin: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
+                    ? moment(values.worktimes[0]).format('YYYY-MM-DD') : '',
+                pub_time_end: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
+                    ? moment(values.worktimes[1]).add(1, 'days').format('YYYY-MM-DD') : '',
                 title: values.titles || '',
                 degree: values.degrees || ''
             });
@@ -416,13 +402,21 @@ class NoticeTable extends Component {
         const {
             tipsTabValue,
             editNoticeVisible,
-            addNoticeVisible
+            addNoticeVisible,
+            noticeDetail,
+            detailDegree
         } = this.state;
 
         const formItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
+        let annexFileList = [];
+        if (noticeDetail.attachment && noticeDetail.attachment.fileList &&
+            noticeDetail.attachment.fileList instanceof Array &&
+            noticeDetail.attachment.fileList.length > 0) {
+            annexFileList = noticeDetail.attachment.fileList;
+        }
         return (
             <Row>
                 {
@@ -441,6 +435,46 @@ class NoticeTable extends Component {
                             handlePublishNoticeModalCancel={this.handlePublishNoticeModalCancel.bind(this)}
                         /> : ''
                 }
+                <Modal
+                    title='通知预览'
+                    width='800px'
+                    visible={this.state.detailVisible}
+                    onCancel={this.handleCancel.bind(this)}
+                    footer={null}
+                >
+                    <div>
+                        <h1 style={{ textAlign: 'center' }}>{noticeDetail && noticeDetail.title}</h1>
+                        <div>
+                            {detailDegree ? (
+                                <p>{`紧急程度 ：${detailDegree}`}</p>)
+                                : (<p>{`紧急程度 ：暂无`}</p>)
+                            }
+                            {
+                                annexFileList.map((file) => {
+                                    if (file && file.response && file.response.download_url) {
+                                        return (
+                                            <p>
+                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
+                                                    {file.name}
+                                                </a>
+                                            </p>
+                                        );
+                                    } else {
+                                        return (<p>{`附件 ：暂无`}</p>);
+                                    }
+                                })
+                            }
+                            <div
+                                style={{
+                                    maxHeight: '800px',
+                                    overflow: 'auto',
+                                    marginTop: '5px'
+                                }}
+                                dangerouslySetInnerHTML={{ __html: noticeDetail && noticeDetail.raw }}
+                            />
+                        </div>
+                    </div>
+                </Modal>
                 <Col span={22} offset={1}>
                     <Tabs
                         activeKey={tipsTabValue}
@@ -464,10 +498,10 @@ class NoticeTable extends Component {
                                             rules: [
                                                 {
                                                     required: false,
-                                                    message: '请输入主题'
+                                                    message: '请输入名称'
                                                 }
                                             ]
-                                        })(<Input placeholder='请输入主题' />)}
+                                        })(<Input placeholder='请输入名称' />)}
                                     </FormItem>
                                 </Col>
                                 <Col span={10}>
@@ -510,6 +544,7 @@ class NoticeTable extends Component {
                                         })(
                                             <Select
                                                 allowClear
+                                                placeholder='请选择紧急程度'
                                                 style={{ width: '100%' }}
                                             >
                                                 <Option value='0'>平件</Option>
@@ -520,22 +555,29 @@ class NoticeTable extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={10}>
-                                    <div style={{float: 'right'}}>
-                                        <Button
-                                            icon='search'
-                                            style={{marginLeft: 30}}
-                                            onClick={this.queryPublish.bind(this)}
-                                        >
-                                            查找
-                                        </Button>
-                                        <Button
-                                            icon='reload'
-                                            style={{marginLeft: 30}}
-                                            onClick={this.clearPublish.bind(this)}
-                                        >
-                                            清除
-                                        </Button>
-                                    </div>
+                                    <FormItem>
+                                        {getFieldDecorator('search', {
+                                            rules: [{ required: false, message: '请选择查询条件' }]
+                                        })(
+                                            <div style={{float: 'right'}}>
+                                                <Button
+                                                    icon='search'
+                                                    style={{marginLeft: 30}}
+                                                    onClick={this.queryPublish.bind(this)}
+                                                >
+                                                查询
+                                                </Button>
+                                                <Button
+                                                    icon='reload'
+                                                    style={{marginLeft: 30}}
+                                                    onClick={this.clearPublish.bind(this)}
+                                                >
+                                                清除
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </FormItem>
+
                                 </Col>
                             </Row>
 
@@ -555,10 +597,10 @@ class NoticeTable extends Component {
                                             rules: [
                                                 {
                                                     required: false,
-                                                    message: '请输入主题'
+                                                    message: '请输入名称'
                                                 }
                                             ]
-                                        })(<Input placeholder='请输入主题' />)}
+                                        })(<Input placeholder='请输入名称' />)}
                                     </FormItem>
                                 </Col>
                                 <Col span={10}>
@@ -599,7 +641,9 @@ class NoticeTable extends Component {
                                                 }
                                             ]
                                         })(
-                                            <Select style={{ width: '100%' }}>
+                                            <Select
+                                                placeholder='请选择紧急程度'
+                                                style={{ width: '100%' }}>
                                                 <Option value='0'>平件</Option>
                                                 <Option value='1'>加急</Option>
                                                 <Option value='2'>特急</Option>
@@ -608,22 +652,28 @@ class NoticeTable extends Component {
                                     </FormItem>
                                 </Col>
                                 <Col span={10}>
-                                    <div style={{float: 'right'}}>
-                                        <Button
-                                            icon='search'
-                                            style={{marginLeft: 30}}
-                                            onClick={this.queryTemporary.bind(this)}
-                                        >
-                                            查找
-                                        </Button>
-                                        <Button
-                                            icon='reload'
-                                            style={{marginLeft: 30}}
-                                            onClick={this.clearTemporary.bind(this)}
-                                        >
+                                    <FormItem>
+                                        {getFieldDecorator('search', {
+                                            rules: [{ required: false, message: '请选择查询条件' }]
+                                        })(
+                                            <div style={{float: 'right'}}>
+                                                <Button
+                                                    icon='search'
+                                                    style={{marginLeft: 30}}
+                                                    onClick={this.queryTemporary.bind(this)}
+                                                >
+                                            查询
+                                                </Button>
+                                                <Button
+                                                    icon='reload'
+                                                    style={{marginLeft: 30}}
+                                                    onClick={this.clearTemporary.bind(this)}
+                                                >
                                             清除
-                                        </Button>
-                                    </div>
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </FormItem>
                                 </Col>
                             </Row>
                             <Table

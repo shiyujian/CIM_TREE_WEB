@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Row, Col, Button, Notification, Select, Upload, Icon } from 'antd';
+import { Modal, Form, Input, Row, Col, Button, Notification, Spin, Upload, Icon } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '_platform/auth';
@@ -21,7 +21,10 @@ class NewsEditModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            content: ''
+            content: '',
+            progress: 0,
+            loading: false,
+            annexFileList: []
         };
     }
 
@@ -99,50 +102,58 @@ class NewsEditModal extends Component {
                 attachment[0].url = STATIC_PREVIEW_API + newsDetail.cover.a_file;
             }
         }
-        let atta = newsDetail.attachment && newsDetail.attachment.fileList ? newsDetail.attachment.fileList : [];
-        if (atta.length > 0) {
-            atta.map((item, index) => {
-                item.uid = index;
-                item.status = 'done';
-            });
-        }
+        let annexFile = newsDetail.attachment && newsDetail.attachment.fileList
+            ? newsDetail.attachment.fileList : [];
+        console.log('annexFile', annexFile);
         setFieldsValue({
             'title': newsDetail.title || '',
             'attachment': attachment,
-            'attachment1': atta,
+            'annexFile': annexFile,
             'source': newsDetail.source && newsDetail.source.name ? newsDetail.source.name : ''
+        });
+        this.setState({
+            annexFileList: annexFile
         });
     }
 
     // 发布新闻
     postData () {
         const {
-            actions: { getNewsList, patchData, getDraftNewsList, postUploadFiles },
+            actions: { getNewsList, patchData, getDraftNewsList },
             form: { validateFields },
-            newsDetail,
-            fileList = []
+            newsDetail
         } = this.props;
         validateFields(async (err, values) => {
+            console.log('values', values);
             if (!err) {
-                let resp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
-                let newFileList = fileList.length !== 0 ? fileList : values.attachment1;
+                let coverResp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
+                let fileList = [];
+                if (values && values.annexFile) {
+                    if (values.annexFile.fileList &&
+                        values.annexFile.fileList instanceof Array &&
+                        values.annexFile.fileList.length > 0) {
+                        fileList = values.annexFile.fileList;
+                    } else {
+                        fileList = values.annexFile;
+                    }
+                }
                 let newData = {
                     'title': values['title'] || '',
                     'raw': this.state.content,
                     'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
                     'categories': [],
                     'attachment': {
-                        'fileList': newFileList
+                        'fileList': fileList
                     },
                     'is_draft': false,
                     'cover': {
-                        // "uid": resp.id,
-                        'misc': resp.misc,
-                        'download_url': resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'a_file': resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'create_time': resp.create_time,
-                        'mime_type': resp.mime_type,
-                        'name': resp.name
+                        'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        'create_time': coverResp.create_time,
+                        'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        'id': coverResp.id,
+                        'mime_type': coverResp.mime_type,
+                        'misc': coverResp.misc,
+                        'name': coverResp.name
                     },
                     'source': {
                         'name': values.source
@@ -164,7 +175,6 @@ class NewsEditModal extends Component {
                         tag: '新闻',
                         is_draft: true
                     });
-                    postUploadFiles([]);
                 } else {
                     Notification.error({
                         message: '编辑新闻失败',
@@ -178,68 +188,182 @@ class NewsEditModal extends Component {
     // 暂存新闻
     draftDataFunc () {
         const {
-            actions: { patchData, getNewsList, getDraftNewsList, postUploadFiles },
+            actions: { patchData, getNewsList, getDraftNewsList },
             form: { validateFields },
-            newsDetail,
-            fileList = []
+            newsDetail
         } = this.props;
         validateFields(async (err, values) => {
+            console.log('values', values);
             console.log('err', err);
-            let resp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
-            let newFileList = fileList.length !== 0 ? fileList : values.attachment1;
-            let newData = {
-                'title': values['title'] || '',
-                'raw': this.state.content,
-                'categories': [],
-                'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                'is_draft': true,
-                'attachment': {
-                    'fileList': newFileList
-                },
-                'cover': {
-                    // "uid": resp.id,
-                    'misc': resp.misc,
-                    'download_url': resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                    'a_file': resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                    'create_time': resp.create_time,
-                    'mime_type': resp.mime_type,
-                    'name': resp.name
-                },
-                'source': {
-                    'name': values.source
+            if (!err) {
+                let coverResp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
+                let fileList = [];
+                if (values && values.annexFile) {
+                    if (values.annexFile.fileList &&
+                        values.annexFile.fileList instanceof Array &&
+                        values.annexFile.fileList.length > 0) {
+                        fileList = values.annexFile.fileList;
+                    } else {
+                        fileList = values.annexFile;
+                    }
                 }
-            };
-            let rst = await patchData({ pk: newsDetail.id }, newData);
-            if (rst.id) {
-                this.modalClick();
-                Notification.success({
-                    message: '暂存成功',
-                    duration: 3
-                });
-                // 更新暂存的新闻列表数据
-                getNewsList({}, {
-                    tag: '新闻',
-                    is_draft: false
-                });
-                getDraftNewsList({}, {
-                    tag: '新闻',
-                    is_draft: true
-                });
-                postUploadFiles([]);
-            } else {
-                Notification.error({
-                    message: '暂存失败',
-                    duration: 3
-                });
+                let newData = {
+                    'title': values['title'] || '',
+                    'raw': this.state.content,
+                    'categories': [],
+                    'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
+                    'is_draft': true,
+                    'attachment': {
+                        'fileList': fileList
+                    },
+                    'cover': {
+                        'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        'create_time': coverResp.create_time,
+                        'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        'id': coverResp.id,
+                        'mime_type': coverResp.mime_type,
+                        'misc': coverResp.misc,
+                        'name': coverResp.name
+                    },
+                    'source': {
+                        'name': values.source
+                    }
+                };
+                let rst = await patchData({ pk: newsDetail.id }, newData);
+                if (rst.id) {
+                    this.modalClick();
+                    Notification.success({
+                        message: '暂存成功',
+                        duration: 3
+                    });
+                    // 更新暂存的新闻列表数据
+                    getNewsList({}, {
+                        tag: '新闻',
+                        is_draft: false
+                    });
+                    getDraftNewsList({}, {
+                        tag: '新闻',
+                        is_draft: true
+                    });
+                } else {
+                    Notification.error({
+                        message: '暂存失败',
+                        duration: 3
+                    });
+                }
             }
         });
     }
 
     modalClick () {
-        const { actions: { postUploadFiles } } = this.props;
-        postUploadFiles([]);
         this.props.handleNewsEditModalCancel();
     }
+    uploadPropsFile = {
+        name: 'a_file',
+        showUploadList: true,
+        action: UPLOAD_API,
+        beforeUpload: () => {
+            this.setState({
+                progress: 0,
+                loading: true
+            });
+        },
+        onChange: ({ file, fileList }) => {
+            try {
+                console.log('file', file);
+                console.log('fileList', fileList);
+                this.setState({
+                    annexFileList: fileList
+                });
+                const status = file.status;
+                if (status === 'done') {
+                    file.url = file && file.response && file.response.a_file;
+                    fileList.map((fileData) => {
+                        if (fileData && fileData.response && fileData.response.a_file) {
+                            fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                        }
+                    });
+                    this.setState({
+                        progress: 1,
+                        loading: false
+                    });
+                    Notification.info({
+                        message: '上传附件成功',
+                        duration: 3
+                    });
+                } else if (status === 'error') {
+                    Notification.error({
+                        message: '上传附件失败',
+                        duration: 3
+                    });
+                    this.setState({
+                        progress: 1,
+                        loading: false
+                    });
+                }
+            } catch (e) {
+                console.log('uploadPropsFile', e);
+            }
+        }
+    };
+
+    uploadPropsCover = {
+        name: 'file',
+        action: `${FILE_API}/api/user/files/`,
+        showUploadList: true,
+        data: (file) => {
+            return {
+                name: file.fileName,
+                a_file: file
+            };
+        },
+        beforeUpload: (file) => {
+            let type = file.name.toString().split('.');
+            let len = type.length;
+            if (
+                type[len - 1] === 'jpg' ||
+            type[len - 1] === 'jpeg' ||
+            type[len - 1] === 'png' ||
+            type[len - 1] === 'JPG' ||
+            type[len - 1] === 'JPEG' ||
+            type[len - 1] === 'PNG'
+            ) {
+                this.setState({
+                    progress: 0,
+                    loading: true
+                });
+                return true;
+            } else {
+                Notification.error({
+                    message: '请上传jpg,jpeg,png 文件',
+                    duration: 3
+                });
+                return false;
+            }
+        },
+        onChange: ({ file }) => {
+            const status = file.status;
+            if (status === 'done') {
+                Notification.info({
+                    message: '上传封面成功',
+                    duration: 3
+                });
+                this.setState({
+                    progress: 1,
+                    loading: false
+                });
+            } else if (status === 'error') {
+                Notification.info({
+                    message: '上传封面失败',
+                    duration: 3
+                });
+                this.setState({
+                    progress: 1,
+                    loading: false
+                });
+            }
+        }
+    };
     coverPicFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -254,6 +378,7 @@ class NewsEditModal extends Component {
         let length = e.fileList.length - 1;
         if (e.file.status === 'done' && e.file.response.a_file) {
             e.fileList[length].response.name = e.file.name;
+            e.fileList[length].url = STATIC_PREVIEW_API + e.file.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         }
         array.push(e.fileList[length]);
         if (e.file.status) {
@@ -262,64 +387,24 @@ class NewsEditModal extends Component {
             return [];
         }
     }
-    uploadProps1 = {
-        name: 'a_file',
-        multiple: true,
-        showUploadList: true,
-        action: UPLOAD_API,
-        beforeUpload: () => {
-            this.setState({ progress: 0 });
-        },
-        onChange: ({ file, event }) => {
-            const status = file.status;
-            if (status === 'done') {
-                const { actions: { postUploadFiles }, fileList = [] } = this.props;
-                let newFileList = fileList;
-                let newFile = {
-                    name: file.name,
-                    down_file: STATIC_DOWNLOAD_API + '/media' + file.response.download_url.split('/media')[1]
-                };
-                newFileList = newFileList.concat(newFile);
-                postUploadFiles(newFileList);
-                Notification.info({
-                    message: '上传附件成功',
-                    duration: 3
-                });
-            }
-            if (event) {
-                let { percent } = event;
-                if (percent !== undefined) { this.setState({ progress: parseFloat(percent.toFixed(1)) }); }
-            }
-        }
-    };
-
-    uploadProps = {
-        name: 'file',
-        action: `${FILE_API}/api/user/files/`,
-        showUploadList: true,
-        data (file) {
-            return {
-                name: file.fileName,
-                a_file: file
+    checkTitle = async (rule, value, callback) => {
+        if (value) {
+            if (value.length <= 40) {
+                callback();
+            } else {
+                callback(`名称须少于40个字，请重新输入`);
             };
-        },
-        beforeUpload (file) {
-            const valid = file.name.indexOf('png') === -1 && file.name.indexOf('jpg') === -1;
-            if (valid) {
-                Notification.error({
-                    message: '只能上传 jpg或者png 文件！',
-                    duration: 3
-                });
-            }
-            return !valid;
+        } else {
+            callback();
         }
-    };
-
+    }
     render () {
         const {
             form: { getFieldDecorator }
         } = this.props;
-
+        const {
+            loading
+        } = this.state;
         const formItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -333,23 +418,32 @@ class NewsEditModal extends Component {
                 footer={null}
                 width='80%'
             >
-                <div>
+                <Spin spinning={loading}>
                     <Form>
                         <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='名称'>
-                                    {getFieldDecorator('title', {})(
+                                    {getFieldDecorator('title', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请填写新闻名称！'
+                                            },
+                                            {
+                                                validator: this.checkTitle
+                                            }
+                                        ]
+                                    })(
                                         <Input type='text' placeholder='新闻名称' />
                                     )}
                                 </FormItem>
                             </Col>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
-                                    {getFieldDecorator('attachment1', {
-                                        valuePropName: 'fileList',
-                                        getValueFromEvent: this.coverPicFile
+                                    {getFieldDecorator('annexFile', {
                                     })(
-                                        <Upload {...this.uploadProps1}
+                                        <Upload {...this.uploadPropsFile}
+                                            fileList={this.state.annexFileList}
                                         >
                                             <Button>
                                                 <Icon type='upload' />上传附件
@@ -372,7 +466,7 @@ class NewsEditModal extends Component {
                                             }
                                         ]
                                     })(
-                                        <Upload {...this.uploadProps}
+                                        <Upload {...this.uploadPropsCover}
                                         >
                                             <Button>
                                                 <Icon type='upload' />添加文件
@@ -408,7 +502,7 @@ class NewsEditModal extends Component {
                             <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
                         </Col>
                     </Row>
-                </div>
+                </Spin>
             </Modal>
 
         );

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Row, Col, Button, Notification, Select, Upload, Icon } from 'antd';
+import { Modal, Form, Input, Row, Col, Button, Notification, Spin, Upload, Icon } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '_platform/auth';
 import {
     UPLOAD_API,
     STATIC_DOWNLOAD_API,
+    STATIC_PREVIEW_API,
     SOURCE_API,
     FILE_API
 } from '_platform/api';
@@ -20,7 +21,9 @@ class NewsAddModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            content: ''
+            content: '',
+            loading: false,
+            progress: 0
         };
     }
 
@@ -85,13 +88,19 @@ class NewsAddModal extends Component {
     // 发布新闻
     postData () {
         const {
-            actions: { postData, getNewsList, postUploadFiles },
-            form: { validateFields },
-            fileList = []
+            actions: { postData, getNewsList },
+            form: { validateFields }
         } = this.props;
         validateFields(async (err, values) => {
+            console.log('values', values);
             if (!err) {
-                let resp = values.attachment[0].response;
+                let coverResp = values.attachment[0].response;
+                let fileList = [];
+                if (values && values.annexFile && values.annexFile.fileList &&
+                    values.annexFile.fileList instanceof Array &&
+                    values.annexFile.fileList.length > 0) {
+                    fileList = values.annexFile.fileList;
+                }
                 let newData = {
                     'title': values['title'] || '',
                     'raw': this.state.content,
@@ -101,17 +110,18 @@ class NewsAddModal extends Component {
                     'tags': [1],
                     'categories': [],
                     'attachment': {
-                        'fileList': fileList || []
+                        'fileList': fileList
                     },
                     'publisher': getUser().id,
                     'is_draft': false,
                     'cover': {
-                        'misc': resp.misc,
-                        'download_url': resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'a_file': resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'create_time': resp.create_time,
-                        'mime_type': resp.mime_type,
-                        'name': resp.name
+                        'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        'create_time': coverResp.create_time,
+                        'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        'id': coverResp.id,
+                        'mime_type': coverResp.mime_type,
+                        'misc': coverResp.misc,
+                        'name': coverResp.name
                     },
                     'source': {
                         'name': values.source
@@ -129,7 +139,6 @@ class NewsAddModal extends Component {
                         tag: '新闻',
                         is_draft: false
                     });
-                    postUploadFiles([]);
                 } else {
                     Notification.success({
                         message: '发布新闻失败！',
@@ -143,141 +152,170 @@ class NewsAddModal extends Component {
     // 暂存新闻
     draftDataFunc () {
         const {
-            actions: { postData, getDraftNewsList, postUploadFiles },
-            form: { validateFields },
-            fileList = []
+            actions: { postData, getDraftNewsList },
+            form: { validateFields }
         } = this.props;
         validateFields(async (err, values) => {
-            console.log('err', err);
             console.log('values', values);
-            let resp = values.attachment[0].response;
-            let newData = {
-                'title': values['title'] || '',
-                'raw': this.state.content || '',
-                'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                'tags': [1],
-                'categories': [],
-                'attachment': {
-                    'fileList': fileList || []
-                },
-                'publisher': getUser().id,
-                'is_draft': true,
-                'cover': {
-                    // "uid": resp.id,
-                    'misc': resp.misc,
-                    'download_url': resp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                    'a_file': resp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                    'create_time': resp.create_time,
-                    'mime_type': resp.mime_type,
-                    'name': resp.name
-                },
-                'source': {
-                    'name': values.source
+            if (!err) {
+                let coverResp = values.attachment[0].response;
+                let fileList = [];
+                if (values && values.annexFile && values.annexFile.fileList &&
+                    values.annexFile.fileList instanceof Array &&
+                    values.annexFile.fileList.length > 0) {
+                    fileList = values.annexFile.fileList;
                 }
-            };
-            let rst = await postData({}, newData);
-            if (rst.id) {
-                this.modalClick();
-                Notification.success({
-                    message: '暂存成功！',
-                    duration: 3
-                });
-                // 更新暂存的新闻列表数据
-                getDraftNewsList({}, {
-                    tag: '新闻',
-                    is_draft: true
-                });
-                postUploadFiles([]);
-            } else {
-                Notification.success({
-                    message: '暂存失败！',
-                    duration: 3
-                });
+                let newData = {
+                    'title': values['title'] || '',
+                    'raw': this.state.content || '',
+                    'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
+                    'tags': [1],
+                    'categories': [],
+                    'attachment': {
+                        'fileList': fileList
+                    },
+                    'publisher': getUser().id,
+                    'is_draft': true,
+                    'cover': {
+                        'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        'create_time': coverResp.create_time,
+                        'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+                        'id': coverResp.id,
+                        'mime_type': coverResp.mime_type,
+                        'misc': coverResp.misc,
+                        'name': coverResp.name
+                    },
+                    'source': {
+                        'name': values.source
+                    }
+                };
+                let rst = await postData({}, newData);
+                if (rst.id) {
+                    this.modalClick();
+                    Notification.success({
+                        message: '暂存成功！',
+                        duration: 3
+                    });
+                    // 更新暂存的新闻列表数据
+                    getDraftNewsList({}, {
+                        tag: '新闻',
+                        is_draft: true
+                    });
+                } else {
+                    Notification.success({
+                        message: '暂存失败！',
+                        duration: 3
+                    });
+                }
             }
         });
     }
     // modal显示与影藏
     modalClick () {
-        const {
-            actions: {
-                postUploadFiles
-            }
-        } = this.props;
-        postUploadFiles([]);
         this.props.handlePublishNewsModalCancel();
     }
     uploadPropsFile = {
         name: 'a_file',
-        multiple: true,
         showUploadList: true,
         action: UPLOAD_API,
         beforeUpload: () => {
-            this.setState({ progress: 0 });
+            this.setState({
+                progress: 0,
+                loading: true
+            });
         },
-        onChange: ({ file, event }) => {
-            const status = file.status;
-            if (status === 'done') {
-                const { actions: { postUploadFiles }, fileList = [] } = this.props;
-                let newFileList = fileList;
-                let newFile = {
-                    name: file.name,
-                    down_file: STATIC_DOWNLOAD_API + '/media' + file.response.download_url.split('/media')[1]
-                };
-                newFileList = newFileList.concat(newFile);
-                postUploadFiles(newFileList);
-                Notification.info({
-                    message: '上传附件成功',
-                    duration: 3
-                });
-            }
-            if (event) {
-                let { percent } = event;
-                if (percent !== undefined) { this.setState({ progress: parseFloat(percent.toFixed(1)) }); }
+        onChange: async ({file, fileList}) => {
+            try {
+                console.log('file', file);
+                console.log('fileList', fileList);
+                const status = file.status;
+                if (status === 'done') {
+                    file.url = file && file.response && file.response.a_file;
+                    fileList.map((fileData) => {
+                        if (fileData && fileData.response && fileData.response.a_file) {
+                            fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                        }
+                    });
+                    this.setState({
+                        progress: 1,
+                        loading: false
+                    });
+                    Notification.info({
+                        message: '上传附件成功',
+                        duration: 3
+                    });
+                } else if (status === 'error') {
+                    Notification.error({
+                        message: '上传附件失败',
+                        duration: 3
+                    });
+                    this.setState({
+                        progress: 1,
+                        loading: false
+                    });
+                }
+            } catch (e) {
+                console.log('uploadPropsFile', e);
             }
         }
     };
-    uploadFile = (e) => {
-        console.log('e', e);
-        if (Array.isArray(e)) {
-            return e;
-        }
-        if (e.file.status === 'removed') {
-            return [];
-        }
-        if (e.file.status === 'done' && !e.file.response.a_file) {
-            return [];
-        }
-        let array = [];
-        let length = e.fileList.length - 1;
-        if (e.file.status === 'done' && e.file.response.a_file) {
-            e.fileList[length].response.name = e.file.name;
-        }
-        array.push(e.fileList[length]);
-        if (e.file.status) {
-            return e && array;
-        } else {
-            return [];
-        }
-    }
     uploadPropsCover = {
         name: 'file',
         action: `${FILE_API}/api/user/files/`,
         showUploadList: true,
-        data (file) {
+        data: (file) => {
             return {
                 name: file.fileName,
                 a_file: file
             };
         },
-        beforeUpload (file) {
-            const valid = file.name.indexOf('png') === -1 && file.name.indexOf('jpg') === -1;
-            if (valid) {
+        beforeUpload: (file) => {
+            let type = file.name.toString().split('.');
+            let len = type.length;
+            if (
+                type[len - 1] === 'jpg' ||
+            type[len - 1] === 'jpeg' ||
+            type[len - 1] === 'png' ||
+            type[len - 1] === 'JPG' ||
+            type[len - 1] === 'JPEG' ||
+            type[len - 1] === 'PNG'
+            ) {
+                this.setState({
+                    progress: 0,
+                    loading: true
+                });
+                return true;
+            } else {
                 Notification.error({
-                    message: '只能上传 jpg或者png 文件！',
+                    message: '请上传jpg,jpeg,png 文件',
                     duration: 3
                 });
+                return false;
             }
-            return !valid;
+        },
+        onChange: ({ file }) => {
+            console.log('file', file);
+
+            const status = file.status;
+            if (status === 'done') {
+                Notification.info({
+                    message: '上传封面成功',
+                    duration: 3
+                });
+                this.setState({
+                    progress: 1,
+                    loading: false
+                });
+            } else if (status === 'error') {
+                Notification.info({
+                    message: '上传封面失败',
+                    duration: 3
+                });
+                this.setState({
+                    progress: 1,
+                    loading: false
+                });
+            }
         }
     };
     coverPicFile = (e) => {
@@ -295,6 +333,7 @@ class NewsAddModal extends Component {
         let length = e.fileList.length - 1;
         if (e.file.status === 'done' && e.file.response.a_file) {
             e.fileList[length].response.name = e.file.name;
+            e.fileList[length].url = STATIC_PREVIEW_API + e.file.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
         }
         array.push(e.fileList[length]);
         if (e.file.status) {
@@ -303,11 +342,25 @@ class NewsAddModal extends Component {
             return [];
         }
     }
+    checkTitle = async (rule, value, callback) => {
+        if (value) {
+            if (value.length <= 40) {
+                callback();
+            } else {
+                callback(`名称须少于40个字，请重新输入`);
+            };
+        } else {
+            callback();
+        }
+    }
 
     render () {
         const {
             form: { getFieldDecorator }
         } = this.props;
+        const {
+            loading
+        } = this.state;
 
         const formItemLayout = {
             labelCol: { span: 8 },
@@ -322,21 +375,29 @@ class NewsAddModal extends Component {
                 footer={null}
                 width='80%'
             >
-                <div>
+                <Spin spinning={loading}>
                     <Form>
                         <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='名称'>
-                                    {getFieldDecorator('title', {})(
+                                    {getFieldDecorator('title', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请填写新闻名称！'
+                                            },
+                                            {
+                                                validator: this.checkTitle
+                                            }
+                                        ]
+                                    })(
                                         <Input type='text' placeholder='新闻名称' />
                                     )}
                                 </FormItem>
                             </Col>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
-                                    {getFieldDecorator('attachment1', {
-                                        valuePropName: 'fileList',
-                                        getValueFromEvent: this.uploadFile
+                                    {getFieldDecorator('annexFile', {
                                     })(
                                         <Upload {...this.uploadPropsFile}
                                         >
@@ -397,7 +458,7 @@ class NewsAddModal extends Component {
                             <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
                         </Col>
                     </Row>
-                </div>
+                </Spin>
             </Modal>
 
         );

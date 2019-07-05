@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { Table, Row, Col, Modal, Tabs } from 'antd';
-import Blade from '_platform/components/panels/Blade';
 import moment from 'moment';
-import { Link } from 'react-router-dom';
+import { STATIC_PREVIEW_API, STATIC_DOWNLOAD_API } from '_platform/api';
 
-import styles from './styles.less';
-import { getUser } from '_platform/auth';
+import './styles.less';
 
 const TabPane = Tabs.TabPane;
 
@@ -13,46 +11,18 @@ export default class News extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            visible: false,
-            container: null,
-            title: '',
-            source: '',
-            attachment: []
+            newsVisible: false,
+            newsContainer: null,
+            newsTitle: '',
+            newsSource: '',
+            newsDetail: '',
+            // 通知
+            noticeDetailVisible: false,
+            noticeDetail: '',
+            noticeTitle: '',
+            noticeDetailDegree: ''
         };
     }
-
-    static propTypes = {};
-
-    componentDidMount () {
-        const {
-            actions: { getNewsList, getTipsList }
-        } = this.props;
-        const user = getUser();
-        let user_id = user.id;
-        getNewsList({}, { tag: '新闻', is_draft: false });
-        getTipsList({}, { tag: '公告', is_draft: false });
-    }
-
-    clickNews (record, type) {
-        if (type === 'VIEW') {
-            this.setState({
-                visible: true,
-                container: record.raw,
-                title: record.title,
-                source: record.source ? record.source.name : '无',
-                attachment: record.attachment
-            });
-        }
-    }
-
-    // 新闻和通知的列表切换
-    subTabChange (tabValue) {
-        const {
-            actions: { setTabActive }
-        } = this.props;
-        setTabActive(tabValue);
-    }
-
     columns = [
         {
             title: '新闻标题',
@@ -85,7 +55,7 @@ export default class News extends Component {
             render: record => {
                 return (
                     <span>
-                        <a onClick={this.clickNews.bind(this, record, 'VIEW')}>
+                        <a onClick={this.handleNewsView.bind(this, record)}>
                             查看
                         </a>
                     </span>
@@ -126,7 +96,7 @@ export default class News extends Component {
             render: record => {
                 return (
                     <span>
-                        <a onClick={this.clickNews.bind(this, record, 'VIEW')}>
+                        <a onClick={this.handleNoticeView.bind(this, record)}>
                             查看
                         </a>
                     </span>
@@ -134,35 +104,100 @@ export default class News extends Component {
             }
         }
     ];
-
-    handleCancel () {
+    componentDidMount () {
+        const {
+            actions: { getNewsList, getTipsList }
+        } = this.props;
+        getNewsList();
+        getTipsList();
+    }
+    // 查看新闻
+    handleNewsView (record) {
+        console.log('');
         this.setState({
-            visible: false,
-            container: null
+            newsVisible: true,
+            newsContainer: record.raw,
+            newsTitle: record.title,
+            newsSource: record.source,
+            newsDetail: record
+        });
+    }
+    // 查看通知
+    handleNoticeView = async (record) => {
+        let noticeDetailDegree = '';
+        if (record && record.degree) {
+            if (record.degree === 1) {
+                noticeDetailDegree = '加急';
+            } else if (record.degree === 2) {
+                noticeDetailDegree = '特急';
+            }
+        } else if (record.degree === 0) {
+            noticeDetailDegree = '平件';
+        }
+        console.log('noticeDetailDegree', noticeDetailDegree);
+        this.setState({
+            noticeDetail: record,
+            noticeDetailVisible: true,
+            noticeDetailDegree,
+            noticeTitle: record.title
+        });
+    }
+    // 新闻和通知的列表切换
+    subTabChange (tabValue) {
+        const {
+            actions: { setTabActive }
+        } = this.props;
+        setTabActive(tabValue);
+    }
+
+    handleNewsCancel () {
+        this.setState({
+            newsVisible: false,
+            newsContainer: '',
+            newsTitle: '',
+            newsSource: '',
+            newsDetail: ''
+        });
+    }
+    handleNoticeCancel () {
+        this.setState({
+            noticeDetail: '',
+            noticeDetailVisible: false,
+            noticeDetailDegree: '',
+            noticeTitle: ''
         });
     }
 
     render () {
         const { newsList = [], tipsList = [] } = this.props;
+        const {
+            newsTitle,
+            newsVisible,
+            newsDetail,
+            newsSource,
+            newsContainer,
 
+            noticeDetailVisible,
+            noticeDetail,
+            noticeDetailDegree,
+            noticeTitle
+        } = this.state;
+        let newsFileList = [];
+        if (newsDetail.attachment && newsDetail.attachment.fileList &&
+            newsDetail.attachment.fileList instanceof Array &&
+            newsDetail.attachment.fileList.length > 0) {
+            newsFileList = newsDetail.attachment.fileList;
+        }
+
+        let noticeFileList = [];
+        if (noticeDetail.attachment && noticeDetail.attachment.fileList &&
+            noticeDetail.attachment.fileList instanceof Array &&
+            noticeDetail.attachment.fileList.length > 0) {
+            noticeFileList = noticeDetail.attachment.fileList;
+        }
         return (
-            // <Blade title="新闻">
-            // 		<div className="tableContainer">
-            // 			<Table bordered={false} dataSource={newsList} columns={this.columns}
-            // 			       rowKey="id" size="small" pagination={{pageSize: 8}}/>
-            // 		</div>
-            // 		<Modal title="新闻预览" width={800} visible={this.state.visible}
-            // 			onOk={this.handleCancel.bind(this)} onCancel={this.handleCancel.bind(this)} footer={null}>
-            // 			<div style={{maxHeight: '800px', overflow: 'auto'}}
-            // 			     dangerouslySetInnerHTML={{__html: this.state.container}}/>
-            // 		</Modal>
-            // </Blade>
-
             <Row>
                 <Col style={{ position: 'relative' }} span={22} offset={1}>
-                    {/* <Link  to='/overall/news'>
-						<span style={{position:'absolute', top: "10px",right:'0',zIndex:'200' }} >MORE</span>
-					</Link> */}
                     <Tabs
                         className='tabless'
                         onChange={this.subTabChange.bind(this)}
@@ -194,49 +229,92 @@ export default class News extends Component {
                     </Tabs>
                 </Col>
                 <Modal
-                    title={<p style={{ fontSize: 16 }}>{this.state.title}</p>}
-                    width={800}
-                    visible={this.state.visible}
-                    onOk={this.handleCancel.bind(this)}
-                    onCancel={this.handleCancel.bind(this)}
+                    title={newsTitle}
+                    width='800px'
+                    visible={newsVisible}
+                    onCancel={this.handleNewsCancel.bind(this)}
                     footer={null}
                 >
                     <div>
-                        {this.state.source === '无' ? null : (
-                            <p>{`来源 ：${this.state.source}`}</p>
-                        )}
+                        <h1 style={{ textAlign: 'center' }}>{newsTitle}</h1>
+                        {
+                            newsSource && newsSource.name
+                                ? <p>{`来源 ：${newsSource.name}`}</p> : (
+                                    <p>{`来源 ：暂无`}</p>
+                                )
+                        }
+                        {
+                            newsDetail && newsDetail.cover && newsDetail.cover.a_file
+                                ? (
+                                    <p>
+                                        封面 ：<a href={STATIC_PREVIEW_API + newsDetail.cover.a_file}
+                                            target='_blank'>
+                                            {newsDetail.cover.name}
+                                        </a>
+                                    </p>
+                                ) : <p>{`封面 ：暂无`}</p>
+                        }
+                        {
+                            newsFileList.map((file) => {
+                                if (file && file.response && file.response.download_url) {
+                                    return (
+                                        <p>
+                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
+                                                {file.name}
+                                            </a>
+                                        </p>
+                                    );
+                                } else {
+                                    return (<p>{`附件 ：暂无`}</p>);
+                                }
+                            })
+                        }
                         <div
-                            style={{
-                                maxHeight: '800px',
-                                overflow: 'auto',
-                                marginTop: '5px'
-                            }}
+                            style={{ maxHeight: '800px', overflow: 'auto' }}
                             dangerouslySetInnerHTML={{
-                                __html: this.state.container
+                                __html: newsContainer
                             }}
                         />
-                        <h4>
-                            通知附件：{this.state.attachment &&
-                            this.state.attachment.fileList &&
-                            this.state.attachment.fileList.length > 0
-                                ? this.state.attachment.fileList.map(
-                                    (file, index) => {
+                    </div>
+                </Modal>
+                <Modal
+                    title={noticeTitle}
+                    width='800px'
+                    visible={noticeDetailVisible}
+                    onCancel={this.handleNoticeCancel.bind(this)}
+                    footer={null}
+                >
+                    <div>
+                        <h1 style={{ textAlign: 'center' }}>{noticeTitle}</h1>
+                        <div>
+                            {noticeDetailDegree ? (
+                                <p>{`紧急程度 ：${noticeDetailDegree}`}</p>)
+                                : (<p>{`紧急程度 ：暂无`}</p>)
+                            }
+                            {
+                                noticeFileList.map((file) => {
+                                    if (file && file.response && file.response.download_url) {
                                         return (
-                                            <div key={index}>
-                                                <a
-                                                    target='_bank'
-                                                    href={file.down_file}
-                                                >
-                                                      附件{index + 1}、{
-                                                        file.name
-                                                    }
-                                                </a>
-                                            </div>
+                                            <p>
+                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
+                                                {file.name}
+                                            </a>
+                                            </p>
                                         );
+                                    } else {
+                                        return (<p>{`附件 ：暂无`}</p>);
                                     }
-                                )
-                                : '暂无附件'}
-                        </h4>
+                                })
+                            }
+                            <div
+                                style={{
+                                    maxHeight: '800px',
+                                    overflow: 'auto',
+                                    marginTop: '5px'
+                                }}
+                                dangerouslySetInnerHTML={{ __html: noticeDetail && noticeDetail.raw }}
+                            />
+                        </div>
                     </div>
                 </Modal>
             </Row>
