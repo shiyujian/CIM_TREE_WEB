@@ -414,6 +414,8 @@ export const putMergeCarPack = forestFetchAction(`${FOREST_API}/tree/packmerge`,
 export const putMoveTreeInCar = forestFetchAction(`${FOREST_API}/tree/packnurserymove`, [], 'PUT', []);
 // 修改现场测量信息
 export const putChangeLocInfo = forestFetchAction(`${FOREST_API}/tree/batchtree`, [], 'PUT', []);
+// 获取标段对应的公司名称和项目经理
+export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sections`, [], 'GET', []);
 
 export const actions = {
     getTotalSat,
@@ -515,7 +517,8 @@ export const actions = {
     putChangCarPackInfo,
     putMergeCarPack,
     putMoveTreeInCar,
-    putChangeLocInfo
+    putChangeLocInfo,
+    getUnitMessageBySection
 };
 export default handleActions({
     [getTreeOK]: (state, {

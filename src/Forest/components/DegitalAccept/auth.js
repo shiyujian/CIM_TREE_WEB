@@ -1,8 +1,5 @@
 // 森林大数据-数字化验收 根据验收状态的ID获取验收状态名称
 export const getStatusByID = (ID) => {
-    if (!ID) {
-        return '';
-    }
     switch (ID) {
         case 0:
             return '未申请';

@@ -21,7 +21,9 @@ export default class WordView1 extends Component {
         super(props);
         this.state = {
             loading: false,
-            areaLayerList: []
+            areaLayerList: [],
+            leader: '',
+            unitName: ''
         };
         this.map = null;
     }
@@ -29,23 +31,22 @@ export default class WordView1 extends Component {
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
-            sscction,
-            tinclass,
             detail = {}
         } = this.props;
         await this.initMap();
-        this._addAreaLayer(tinclass, sscction);
+        console.log('detail', detail);
+        if (detail && detail.Section && detail.ThinClass) {
+            await this._addAreaLayer(detail.ThinClass, detail.Section);
+        }
         detail.Geom && this.area(wktToJson(detail.Geom));
+        await this.getUnitMessage();
     }
-
     componentWillUnmount () {
         this.map = null;
     }
-
     onOk () {
         this.props.onPressOk(2);
     }
-
     /* 初始化地图 */
     initMap () {
         try {
@@ -76,7 +77,6 @@ export default class WordView1 extends Component {
             console.log('initMap', e);
         }
     }
-
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey, section) => {
         const {
@@ -115,7 +115,6 @@ export default class WordView1 extends Component {
             console.log('加载细班图层', e);
         }
     }
-
     /* 在地图上添加marker和polygan */
     _createMarker (geo) {
         try {
@@ -132,7 +131,6 @@ export default class WordView1 extends Component {
             console.log('_createMarker', e);
         }
     }
-
     area (points) {
         if (points && points instanceof Array && points.length > 1) {
             let latlngs = [];
@@ -174,7 +172,26 @@ export default class WordView1 extends Component {
             this.map.panTo(latlngs[0]);
         }
     }
-
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
+    }
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
@@ -211,6 +228,11 @@ export default class WordView1 extends Component {
 
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -218,7 +240,7 @@ export default class WordView1 extends Component {
         let handleDetail = this.handleDetailData(detail);
         console.log('handleDetail', handleDetail);
         return (
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
                 <Modal
                     width={800}
                     visible={this.props.visible}
@@ -240,9 +262,9 @@ export default class WordView1 extends Component {
                                     </tr>
                                     <tr>
                                         <td className='hei60' align='center'>施工单位</td>
-                                        <td colSpan='3'>中国交建集团</td>
+                                        <td colSpan='3'>{unitName}</td>
                                         <td >项目经理</td>
-                                        <td >王伟</td>
+                                        <td >{leader}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' align='center'>施工员</td>
@@ -259,10 +281,10 @@ export default class WordView1 extends Component {
                                     <tr>
                                         <td colSpan='6' style={{height: 200}}>
                                             <div style={{textAlign: 'left'}}>
-                                                <p>验收要点：以细班或小班为单位，对放样点穴进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带内的点穴精准度、密度情况进行打分。</p>
-                                                <p>①放点精准，抽检密度与设计密度的误差在±10%之内，视为合格，计90分以上，通过检验；</p>
-                                                <p>②放点不准，抽检密度与设计密度的误差超出±10%，即为不合格，需整改。</p>
-                                                <p> 放样点穴合格率=100-|（1-（抽检数量/样带面积）/设计密度）|*100</p>
+                                                <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对放样点穴进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带内的点穴精准度、密度情况进行打分。</span>
+                                                <span style={{display: 'block'}}>①放点精准，抽检密度与设计密度的误差在±10%之内，视为合格，计90分以上，通过检验；</span>
+                                                <span style={{display: 'block'}}>②放点不准，抽检密度与设计密度的误差超出±10%，即为不合格，需整改。</span>
+                                                <span style={{display: 'block'}}> 放样点穴合格率=100-|（1-（抽检数量/样带面积）/设计密度）|*100</span>
                                             </div>
 
                                         </td>

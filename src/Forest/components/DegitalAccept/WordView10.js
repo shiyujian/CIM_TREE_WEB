@@ -7,16 +7,38 @@ export default class WordView1 extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            leader: '',
+            unitName: ''
         };
     }
 
-    componentDidMount () {
-
+    componentDidMount = async () => {
+        await this.getUnitMessage();
     }
 
     onOk () {
         this.props.onPressOk(10);
+    }
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
     }
     handleDetailData = (detail) => {
         let handleDetail = {};
@@ -46,6 +68,11 @@ export default class WordView1 extends Component {
     }
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -53,7 +80,7 @@ export default class WordView1 extends Component {
         let handleDetail = this.handleDetailData(detail);
         console.log('handleDetail', handleDetail);
         return (
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
                 <Modal
                     width={800}
                     visible={this.props.visible}
@@ -75,9 +102,9 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工单位</td>
-                                    <td colSpan='3'>中国交建集团</td>
+                                    <td colSpan='3'>{unitName}</td>
                                     <td >项目经理</td>
-                                    <td >王伟</td>
+                                    <td >{leader}</td>
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工员</td>

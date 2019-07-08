@@ -7,17 +7,39 @@ export default class WordView1 extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            leader: '',
+            unitName: ''
         };
     }
 
-    componentDidMount () {
+    componentDidMount = async () => {
+        await this.getUnitMessage();
     }
 
     onOk () {
         this.props.onPressOk(6);
     }
-
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
+    }
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
@@ -47,6 +69,11 @@ export default class WordView1 extends Component {
 
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -54,7 +81,7 @@ export default class WordView1 extends Component {
         let handleDetail = this.handleDetailData(detail);
         console.log('handleDetail', handleDetail);
         return (
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
                 <Modal
                     width={800}
                     visible={this.props.visible}
@@ -75,9 +102,9 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工单位</td>
-                                    <td colSpan='3'>中国交建集团</td>
+                                    <td colSpan='3'>{unitName}</td>
                                     <td >项目经理</td>
-                                    <td >王伟</td>
+                                    <td >{leader}</td>
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工员</td>
@@ -108,10 +135,10 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td colSpan='6' style={{height: 200}}>
                                         <div style={{textAlign: 'left'}}>
-                                            <p>验收要点：以细班或小班为单位，对苗木栽植进行验收。按照不低于设计数量的5%进行抽检，对苗木栽植情况进行打分。要求轻吊轻放，不损伤土球；栽植深度适宜，超过土球3～5厘米；苗木保持直立，栽紧踏实，不松动；不可降解的包装材料全部解除。</p>
-                                            <p>①按照上述要求植苗，达到标准，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</p>
-                                            <p>②以上标准中，有一项不符合要求，即为不合格，须整改。</p>
-                                            <p>苗木栽植合格率=抽检合格数量/抽检数量。</p>
+                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对苗木栽植进行验收。按照不低于设计数量的5%进行抽检，对苗木栽植情况进行打分。要求轻吊轻放，不损伤土球；栽植深度适宜，超过土球3～5厘米；苗木保持直立，栽紧踏实，不松动；不可降解的包装材料全部解除。</span>
+                                            <span style={{display: 'block'}}>①按照上述要求植苗，达到标准，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</span>
+                                            <span style={{display: 'block'}}>②以上标准中，有一项不符合要求，即为不合格，须整改。</span>
+                                            <span style={{display: 'block'}}>苗木栽植合格率=抽检合格数量/抽检数量。</span>
                                         </div>
                                     </td>
                                 </tr>

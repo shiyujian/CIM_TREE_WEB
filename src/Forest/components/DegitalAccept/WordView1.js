@@ -13,7 +13,7 @@ import {
     handleCoordinates,
     wktToJson
 } from './auth';
-import { lineString, buffer } from "@turf/turf";
+import { lineString, buffer } from '@turf/turf';
 import moment from 'moment';
 export default class WordView1 extends Component {
     static propTypes = {};
@@ -21,7 +21,9 @@ export default class WordView1 extends Component {
         super(props);
         this.state = {
             loading: false,
-            areaLayerList: []
+            areaLayerList: [],
+            leader: '',
+            unitName: ''
         };
         this.map = null;
     }
@@ -29,14 +31,15 @@ export default class WordView1 extends Component {
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
-            sscction,
-            tinclass,
             detail = {}
         } = this.props;
         await this.initMap();
-        await this._addAreaLayer(tinclass, sscction);
         console.log('detail', detail);
+        if (detail && detail.Section && detail.ThinClass) {
+            await this._addAreaLayer(detail.ThinClass, detail.Section);
+        }
         detail.Geom && await this.area(wktToJson(detail.Geom));
+        await this.getUnitMessage();
     }
 
     componentWillUnmount () {
@@ -46,7 +49,6 @@ export default class WordView1 extends Component {
     onOk () {
         this.props.onPressOk(1);
     }
-
     /* 初始化地图 */
     initMap () {
         try {
@@ -73,7 +75,6 @@ export default class WordView1 extends Component {
             console.log('initMap', e);
         }
     }
-
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey, section) => {
         const {
@@ -112,7 +113,6 @@ export default class WordView1 extends Component {
             console.log('加载细班图层', e);
         }
     }
-
     /* 在地图上添加marker和polygan */
     _createMarker (geo) {
         try {
@@ -168,7 +168,26 @@ export default class WordView1 extends Component {
             this.map.panTo(latlngs[0]);
         }
     }
-
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
+    }
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
@@ -184,6 +203,11 @@ export default class WordView1 extends Component {
     }
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -191,7 +215,7 @@ export default class WordView1 extends Component {
         let handleDetail = this.handleDetailData(detail);
         console.log('handleDetail', handleDetail);
         return (
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
                 <Modal
                     width={800}
                     // visible
@@ -213,9 +237,9 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td style={{ height: 60, align: 'center' }} >施工单位</td>
-                                    <td colSpan='3'>中国交建集团</td>
+                                    <td colSpan='3'>{unitName}</td>
                                     <td >项目经理</td>
-                                    <td >王伟</td>
+                                    <td >{leader}</td>
                                 </tr>
                                 <tr>
                                     <td style={{ height: 60, align: 'center' }} colSpan='1'>施工员</td>
@@ -230,11 +254,11 @@ export default class WordView1 extends Component {
                                     <td colSpan='5'> 《雄安新区造林工作手册》</td>
                                 </tr>
                                 <tr>
-                                    <td style={{height: 100}} colSpan='6' >
+                                    <td style={{height: 150}} colSpan='6' >
                                         <div style={{textAlign: 'left'}}>
-                                            <p>验收要点：以细班或小班为单位，对土地整理进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带的微地形处理、垃圾和碎石处理情况进行打分。</p>
-                                            <p>①微地形按照设计要求精准完成，垃圾碎石清除干净，计90分以上，通过检验；</p>
-                                            <p>②微地形处理或垃圾碎石处理总体较好，但仍有不足，需整改。</p>
+                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对土地整理进行验收。按照不低于5%的设计面积随机布设5m宽样带，对样带的微地形处理、垃圾和碎石处理情况进行打分。</span>
+                                            <span style={{display: 'block'}}>①微地形按照设计要求精准完成，垃圾碎石清除干净，计90分以上，通过检验；</span>
+                                            <span style={{display: 'block'}}>②微地形处理或垃圾碎石处理总体较好，但仍有不足，需整改。</span>
                                         </div>
                                     </td>
                                 </tr>

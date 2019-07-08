@@ -53,8 +53,6 @@ export default class DegitalAcceptTable extends Component {
             exportsize: 100,
             stime1: moment().format('YYYY-MM-DD 00:00:00'),
             etime1: moment().format('YYYY-MM-DD 23:59:59'),
-            stime2: moment().format('YYYY-MM-DD 00:00:00'),
-            etime2: moment().format('YYYY-MM-DD 23:59:59'),
             ystype: '', // 验收类型
             zt: '', // 状态
             treetypename: '',
@@ -74,7 +72,6 @@ export default class DegitalAcceptTable extends Component {
             jl: '', // 监理
             shigongOptions: [],
             jianliOptions: [],
-            visible: false,
             visible1: false,
             visible2: false,
             visible3: false,
@@ -89,14 +86,8 @@ export default class DegitalAcceptTable extends Component {
             itemDetail: {}, // 数字化验收详情
             treetypeoption: [], // 根据小班动态获取的树种列表
             unQualifiedList: [], // 不合格记录列表
-            key4: Math.random(),
-            key5: Math.random(),
-            key6: Math.random(),
-            key7: Math.random(),
-            key8: Math.random()
+            unitMessage: []
         };
-        this.sscction = '';
-        this.tinclass = '';
         this.columns = [{
             title: '序号',
             dataIndex: 'order'
@@ -134,26 +125,11 @@ export default class DegitalAcceptTable extends Component {
                 const {
                     ApplyTime = ''
                 } = record;
-                return (<div >
-                    <div > {
-                        ApplyTime
-                    } </div> {
-                        /* <div>{createtime2}</div> */ } </div>
+                return (
+                    <div > {ApplyTime} </div>
                 );
             }
         },
-            // {
-            //     title: '定位时间',
-            //     render: (text, record) => {
-            //         const { createtime3 = '', createtime4 = '' } = record;
-            //         return (
-            //             <div>
-            //                 <div>{createtime3}</div>
-            //                 <div>{createtime4}</div>
-            //             </div>
-            //         );
-            //     }
-            // },
         {
             title: '操作',
             render: (text, record) => {
@@ -173,11 +149,21 @@ export default class DegitalAcceptTable extends Component {
         }
         ];
     }
-    componentDidMount = async () => {}
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getUnitMessageBySection
+            }
+        } = this.props;
+        let unitMessage = await getUnitMessageBySection();
+        console.log('unitMessage', unitMessage);
+        this.setState({
+            unitMessage
+        });
+    }
     render () {
         const {
             curingTreeData,
-            visible,
             visible1,
             visible2,
             visible3,
@@ -190,12 +176,7 @@ export default class DegitalAcceptTable extends Component {
             visible10,
             visible11,
             itemDetail,
-            unQualifiedList,
-            key4,
-            key5,
-            key6,
-            key7,
-            key8
+            unQualifiedList
         } = this.state;
         return (
             <div>
@@ -206,40 +187,37 @@ export default class DegitalAcceptTable extends Component {
                     visible1 && <WordView1
                         onPressOk={this.pressOK.bind(this, 1)}
                         visible={visible1}
-                        sscction={this.sscction}
-                        tinclass={this.tinclass}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
                     visible2 && <WordView2
                         onPressOk={this.pressOK.bind(this, 2)}
                         visible={visible2}
-                        sscction={this.sscction}
-                        tinclass={this.tinclass}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
                     visible3 && <WordView3
                         onPressOk={this.pressOK.bind(this, 3)}
                         visible={visible3}
-                        sscction={this.sscction}
-                        tinclass={this.tinclass}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
                     visible4 && <WordView4
                         onPressOk={this.pressOK.bind(this, 4)}
                         visible={visible4}
-                        keyy={key4}
                         unQualifiedList={unQualifiedList}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
@@ -248,6 +226,7 @@ export default class DegitalAcceptTable extends Component {
                         visible={visible5}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
@@ -256,6 +235,7 @@ export default class DegitalAcceptTable extends Component {
                         visible={visible6}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
@@ -264,6 +244,7 @@ export default class DegitalAcceptTable extends Component {
                         visible={visible7}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
@@ -272,6 +253,7 @@ export default class DegitalAcceptTable extends Component {
                         visible={visible8}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
@@ -280,6 +262,7 @@ export default class DegitalAcceptTable extends Component {
                         visible={visible9}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
@@ -288,6 +271,7 @@ export default class DegitalAcceptTable extends Component {
                         visible={visible10}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 }
                 {
@@ -296,14 +280,12 @@ export default class DegitalAcceptTable extends Component {
                         visible={visible11}
                         detail={itemDetail}
                         {...this.props}
+                        {...this.state}
                     />
                 } </div>
         );
     }
     pressOK (which) {
-        this.setState({
-            visible: false
-        });
         switch (which) {
             case 1:
                 this.setState({
@@ -369,7 +351,6 @@ export default class DegitalAcceptTable extends Component {
             sectionoption,
             smallclassoption,
             thinclassoption,
-            typeoption,
             zttypeoption,
             ystypeoption
         } = this.props;
@@ -379,7 +360,6 @@ export default class DegitalAcceptTable extends Component {
             thinclass,
             ystype,
             zt,
-            curingTypeSelect,
             treetypename,
             sgy,
             cly,
@@ -523,23 +503,6 @@ export default class DegitalAcceptTable extends Component {
                         onOk={this.datepick.bind(this)}
                     />
                 </div>
-                {
-                /* <div className='forest-mrg20'>
-                                        <span className='forest-search-span6'>验收完成时间：</span>
-                                        <RangePicker
-                                            style={{ verticalAlign: 'middle' }}
-                                            defaultValue={[
-                                                moment(this.state.stime2, 'YYYY-MM-DD HH:mm:ss'),
-                                                moment(this.state.etime2, 'YYYY-MM-DD HH:mm:ss')
-                                            ]}
-                                            className='forest-forestcalcw6'
-                                            showTime={{ format: 'HH:mm:ss' }}
-                                            format={'YYYY/MM/DD HH:mm:ss'}
-                                            onChange={this.datepick.bind(this)}
-                                            onOk={this.datepick.bind(this)}
-                                        />
-                                    </div> */
-                }
             </Row>
             <Row style={{marginTop: 10, marginBottom: 10}} >
                 <Col span={2} >
@@ -794,9 +757,6 @@ export default class DegitalAcceptTable extends Component {
     }
 
     exportFile (type, record) {
-        this.setState({
-            visible: true
-        });
         if (type === 'single') { // 单个导出
 
         } else if (type === 'mutiple') {
@@ -832,8 +792,6 @@ export default class DegitalAcceptTable extends Component {
             message.info('移动端详情尚未提交');
             return;
         }
-        this.sscction = rst[0].Section,
-        this.tinclass = rst[0].ThinClass,
         this.setState({
             itemDetail: rst[0]
         });
@@ -867,8 +825,7 @@ export default class DegitalAcceptTable extends Component {
                 }
                 this.setState({
                     visible4: true,
-                    unQualifiedList,
-                    key4: Math.random()
+                    unQualifiedList
                 });
                 break;
             case 5:
@@ -880,8 +837,7 @@ export default class DegitalAcceptTable extends Component {
                 };
                 let result2 = await getTQulityCheckList({}, postdata2);
                 this.setState({
-                    visible5: true,
-                    key5: Math.random()
+                    visible5: true
                 });
                 break;
             case 6: // 栽植
@@ -892,10 +848,9 @@ export default class DegitalAcceptTable extends Component {
                     status: 0,
                     problemtype: '栽植过深或过浅,栽植未踏实,土球未解除包装物'
                 };
-                let result3 = await getTQulityCheckList({}, postdata3);
+                let result3 = await getZZJQulityCheckList({}, postdata3);
                 this.setState({
-                    visible6: true,
-                    key6: Math.random()
+                    visible6: true
                 });
                 break;
             case 7: // 支架
@@ -905,10 +860,9 @@ export default class DegitalAcceptTable extends Component {
                     status: 0,
                     problemtype: '苗木支撑不牢固,苗木支撑不及时,苗木撑杆为非硬木'
                 };
-                let result4 = await getTQulityCheckList({}, postdata4);
+                let result4 = await getZZJQulityCheckList({}, postdata4);
                 this.setState({
-                    visible7: true,
-                    key7: Math.random()
+                    visible7: true
                 });
                 break;
             case 8: // 浇水
@@ -918,10 +872,9 @@ export default class DegitalAcceptTable extends Component {
                     status: 0,
                     problemtype: '土堰直径不满足要求,土堰深度不满足要求,首次浇水不及时、未浇透,浇水后未封穴或封穴不密实'
                 };
-                let result5 = await getTQulityCheckList({}, postdata5);
+                let result5 = await getZZJQulityCheckList({}, postdata5);
                 this.setState({
-                    visible8: true,
-                    key8: Math.random()
+                    visible8: true
                 });
                 break;
             case 9:
@@ -930,7 +883,7 @@ export default class DegitalAcceptTable extends Component {
                     thinclass: thinclass,
                     treetype: record.TreeType
                 };
-                let result6 = await getTQulityCheckList({}, postdata6);
+                let result6 = await getZZJQulityCheckList({}, postdata6);
                 this.setState({
                     visible9: true
                 });
@@ -950,102 +903,97 @@ export default class DegitalAcceptTable extends Component {
         }
     }
 
-                    query = async (page) => {
-                        const {
-                            section = '',
-                            stime1 = '',
-                            etime1 = '',
-                            stime2 = '',
-                            etime2 = '',
-                            size,
-                            sgy = '',
-                            cly = '',
-                            jl = '',
-                            thinclass = '',
-                            curingTypeSelect = '',
-                            thinclassData = '',
-                            smallclassData = '',
-                            zt = '',
-                            ystype = '',
-                            treetypename = ''
-                        } = this.state;
-                        if (thinclass === '') {
-                            message.info('请选择项目，标段，小班及细班信息');
-                            return;
-                        }
+    query = async (page) => {
+        const {
+            section = '',
+            stime1 = '',
+            etime1 = '',
+            size,
+            sgy = '',
+            cly = '',
+            jl = '',
+            thinclass = '',
+            thinclassData = '',
+            smallclassData = '',
+            zt = '',
+            ystype = '',
+            treetypename = ''
+        } = this.state;
+        if (thinclass === '') {
+            message.info('请选择项目，标段，小班及细班信息');
+            return;
+        }
 
-                        const {
-                            actions: {
-                                getDigitalAcceptList,
-                                getqueryTree
-                            },
-                            platform: {
-                                tree = {}
-                            }
-                        } = this.props;
-                        let thinClassTree = tree.thinClassTree;
-                        let array = thinclass.split('-');
-                        let array1 = [];
-                        array.map((item, i) => {
-                            if (i !== 2) {
-                                array1.push(item);
-                            }
-                        });
-                        let postdata = {
-                            section,
-                            treetype: treetypename,
-                            stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
-                            etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
-                            // stime2: stime2 && moment(stime2).format('YYYY-MM-DD HH:mm:ss'),
-                            // etime2: etime2 && moment(etime2).format('YYYY-MM-DD HH:mm:ss'),
-                            thinclass: array1.join('-'),
-                            page,
-                            size: size,
-                            status: zt,
-                            checktype: ystype
-                        };
-                        this.setState({
-                            loading: true,
-                            percent: 0
-                        });
-                        try {
-                            let rst = await getDigitalAcceptList({}, postdata);
-                            if (!rst) {
-                                this.setState({
-                                    loading: false,
-                                    percent: 100
-                                });
-                                return;
-                            };
-                            let curingTreeData = rst && rst.content;
-                            if (curingTreeData instanceof Array) {
-                                let result = [];
-                                curingTreeData.map((curingTree, i) => {
-                                    curingTree.order = (page - 1) * size + i + 1;
-                                    curingTree.ystype = getYsTypeByID(curingTree.CheckType);
-                                    curingTree.status = getStatusByID(curingTree.Status);
-                                    curingTree.sectionName = getSectionNameBySection(curingTree.Section, thinClassTree);
-                                    curingTree.Project = getProjectNameBySection(curingTree.Section, thinClassTree);
-                                    curingTree.smallclass = `${smallclassData}号小班`;
-                                    curingTree.thinclass = `${thinclassData}号细班`;
-                                    result.push(curingTree);
-                                });
-                                let totalNum = rst.pageinfo.total;
-                                const pagination = {
-                                    ...this.state.pagination
-                                };
-                                pagination.total = rst.pageinfo.total;
-                                pagination.pageSize = size;
-                                this.setState({
-                                    loading: false,
-                                    percent: 100,
-                                    curingTreeData: result,
-                                    pagination: pagination,
-                                    totalNum: totalNum
-                                });
-                            }
-                        } catch (e) {
-                            console.log(e);
-                        }
-                    }
+        const {
+            actions: {
+                getDigitalAcceptList
+            },
+            platform: {
+                tree = {}
+            }
+        } = this.props;
+        let thinClassTree = tree.thinClassTree;
+        let array = thinclass.split('-');
+        let array1 = [];
+        array.map((item, i) => {
+            if (i !== 2) {
+                array1.push(item);
+            }
+        });
+        let postdata = {
+            section,
+            treetype: treetypename,
+            stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
+            thinclass: array1.join('-'),
+            page,
+            size: size,
+            status: zt,
+            checktype: ystype,
+            supervisor: jl
+        };
+        this.setState({
+            loading: true,
+            percent: 0
+        });
+        try {
+            let rst = await getDigitalAcceptList({}, postdata);
+            if (!rst) {
+                this.setState({
+                    loading: false,
+                    percent: 100
+                });
+                return;
+            };
+            let curingTreeData = rst && rst.content;
+            if (curingTreeData instanceof Array) {
+                let result = [];
+                curingTreeData.map((curingTree, i) => {
+                    curingTree.order = (page - 1) * size + i + 1;
+                    curingTree.ystype = getYsTypeByID(curingTree.CheckType);
+                    curingTree.status = getStatusByID(curingTree.Status);
+                    curingTree.sectionName = getSectionNameBySection(curingTree.Section, thinClassTree);
+                    curingTree.Project = getProjectNameBySection(curingTree.Section, thinClassTree);
+                    curingTree.smallclass = `${smallclassData}号小班`;
+                    curingTree.thinclass = `${thinclassData}号细班`;
+                    result.push(curingTree);
+                });
+                let totalNum = rst.pageinfo.total;
+                const pagination = {
+                    ...this.state.pagination
+                };
+                pagination.total = rst.pageinfo.total;
+                pagination.pageSize = size;
+                this.setState({
+                    loading: false,
+                    percent: 100,
+                    curingTreeData: result,
+                    pagination: pagination,
+                    totalNum: totalNum
+                });
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
 }

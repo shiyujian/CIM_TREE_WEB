@@ -7,15 +7,38 @@ export default class WordView1 extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            leader: '',
+            unitName: ''
         };
     }
 
-    componentDidMount () {
+    componentDidMount = async () => {
+        await this.getUnitMessage();
     }
 
     onOk () {
         this.props.onPressOk(9);
+    }
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
     }
     handleDetailData = (detail) => {
         let handleDetail = {};
@@ -45,6 +68,11 @@ export default class WordView1 extends Component {
     }
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -52,7 +80,7 @@ export default class WordView1 extends Component {
         let handleDetail = this.handleDetailData(detail);
         console.log('handleDetail', handleDetail);
         return (
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
                 <Modal
                     width={800}
                     visible={this.props.visible}
@@ -74,9 +102,9 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工单位</td>
-                                    <td colSpan='3'>中国交建集团</td>
+                                    <td colSpan='3'>{unitName}</td>
                                     <td >项目经理</td>
-                                    <td >王伟</td>
+                                    <td >{leader}</td>
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工员</td>
@@ -93,10 +121,10 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td colSpan='6' style={{height: 200}}>
                                         <div style={{textAlign: 'left'}}>
-                                            <p>验收要点：以细班或小班为单位，对大数据进行验收。按照不低于设计数量的20%进行抽检，对大数据情况进行打分。要求二维码牌绑扎在北侧，落叶乔木距离树干1.5米，其他植物距离树干1～1.3米，绑扎需要给苗木留足生长空间；大数据测量项数值准确、照片清晰、定位准确。</p>
-                                            <p>①二维码牌绑扎正确，大数据测量项数值准确、照片清晰、定位准确，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</p>
-                                            <p>②二维码牌绑扎不正确，大数据测量项数值不准确或照片不清晰或定位不准确，即为不合格，须整改。</p>
-                                            <p>大数据合格率=抽检合格数量/抽检数量。</p>
+                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对大数据进行验收。按照不低于设计数量的20%进行抽检，对大数据情况进行打分。要求二维码牌绑扎在北侧，落叶乔木距离树干1.5米，其他植物距离树干1～1.3米，绑扎需要给苗木留足生长空间；大数据测量项数值准确、照片清晰、定位准确。</span>
+                                            <span style={{display: 'block'}}>①二维码牌绑扎正确，大数据测量项数值准确、照片清晰、定位准确，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</span>
+                                            <span style={{display: 'block'}}>②二维码牌绑扎不正确，大数据测量项数值不准确或照片不清晰或定位不准确，即为不合格，须整改。</span>
+                                            <span style={{display: 'block'}}>大数据合格率=抽检合格数量/抽检数量。</span>
                                         </div>
                                     </td>
                                 </tr>

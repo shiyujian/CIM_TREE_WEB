@@ -7,17 +7,39 @@ export default class WordView1 extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            leader: '',
+            unitName: ''
         };
     }
 
-    componentDidMount () {
+    componentDidMount = async () => {
+        await this.getUnitMessage();
     }
 
     onOk () {
         this.props.onPressOk(11);
     }
-
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
+    }
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
@@ -47,6 +69,11 @@ export default class WordView1 extends Component {
 
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');

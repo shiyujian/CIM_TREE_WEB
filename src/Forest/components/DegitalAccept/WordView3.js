@@ -21,7 +21,9 @@ export default class WordView1 extends Component {
         super(props);
         this.state = {
             loading: false,
-            areaLayerList: []
+            areaLayerList: [],
+            leader: '',
+            unitName: ''
         };
         this.map = null;
     }
@@ -29,19 +31,19 @@ export default class WordView1 extends Component {
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
-            sscction,
-            tinclass,
             detail = {}
         } = this.props;
         await this.initMap();
-        this._addAreaLayer(tinclass, sscction);
+        console.log('detail', detail);
+        if (detail && detail.Section && detail.ThinClass) {
+            await this._addAreaLayer(detail.ThinClass, detail.Section);
+        }
         detail.Geom && this.area(wktToJson(detail.Geom));
+        await this.getUnitMessage();
     }
-
     componentWillUnmount () {
         this.map = null;
     }
-
     /* 初始化地图 */
     initMap () {
         try {
@@ -71,7 +73,6 @@ export default class WordView1 extends Component {
             console.log('initMap', e);
         }
     }
-
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey, section) => {
         const {
@@ -110,7 +111,6 @@ export default class WordView1 extends Component {
             console.log('加载细班图层', e);
         }
     }
-
     /* 在地图上添加marker和polygan */
     _createMarker (geo) {
         try {
@@ -127,11 +127,9 @@ export default class WordView1 extends Component {
             console.log('_createMarker', e);
         }
     }
-
     onOk () {
         this.props.onPressOk(3);
     }
-
     area (points) {
         if (points && points instanceof Array && points.length > 1) {
             let latlngs = [];
@@ -173,7 +171,26 @@ export default class WordView1 extends Component {
             this.map.panTo(latlngs[0]);
         }
     }
-
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
+    }
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
@@ -229,9 +246,13 @@ export default class WordView1 extends Component {
         handleDetail.rowList = rowList;
         return handleDetail;
     }
-
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -239,7 +260,7 @@ export default class WordView1 extends Component {
         let handleDetail = this.handleDetailData(detail);
         console.log('handleDetail', handleDetail);
         return (
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
                 <Modal
                     width={800}
                     visible={this.props.visible}
@@ -261,9 +282,9 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工单位</td>
-                                    <td colSpan='3'>中国交建集团</td>
+                                    <td colSpan='3'>{unitName}</td>
                                     <td >项目经理</td>
-                                    <td >王伟</td>
+                                    <td >{leader}</td>
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工员</td>
@@ -280,10 +301,10 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td colSpan='6' style={{height: 200}}>
                                         <div style={{textAlign: 'left'}}>
-                                            <p>验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。</p>
-                                            <p>①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；</p>
-                                            <p>②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。</p>
-                                            <p>挖穴合格率=抽检合格数量/抽检数量。</p>
+                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。</span>
+                                            <span style={{display: 'block'}}>①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；</span>
+                                            <span style={{display: 'block'}}>②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。</span>
+                                            <span style={{display: 'block'}}>挖穴合格率=抽检合格数量/抽检数量。</span>
                                         </div>
                                     </td>
                                 </tr>

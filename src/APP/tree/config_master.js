@@ -61,7 +61,6 @@ window.config = {
     // 腾讯移动分析
     TENCENTANALYSIS: 'http://39.97.163.176',
     // 地图瓦片地址
-    cus_tilemap: 'http://10.215.160.39:6580',
     WMSTileLayerUrl:
         // 'http://t{s}.tianditu.gov.cn/cva_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cva&tileMatrixSet=c&TileMatrix={z}&TileRow={y}&TileCol={x}&style=default&format=tiles&tk=87c942f4f4a2b17270f52f797df4537c',
         'http://t{s}.tianditu.com/cia_c/wmts?layer=cia&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}&tk=87c942f4f4a2b17270f52f797df4537c',

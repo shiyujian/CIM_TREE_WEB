@@ -7,11 +7,12 @@ export default class WordView1 extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            leader: '',
+            unitName: ''
         };
     }
-
-    componentDidMount () {
+    componentDidMount = async () => {
         const { unQualifiedList = [] } = this.props;
         if (unQualifiedList.length > 0) {
             for (let i = 0; i < unQualifiedList.length / 2; i++) {
@@ -38,10 +39,30 @@ export default class WordView1 extends Component {
                 }
             }
         }
+        await this.getUnitMessage();
     }
-
     onOk () {
         this.props.onPressOk(5);
+    }
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
     }
     handleDetailData = (detail) => {
         let handleDetail = {};
@@ -71,6 +92,11 @@ export default class WordView1 extends Component {
 
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -78,7 +104,7 @@ export default class WordView1 extends Component {
         let handleDetail = this.handleDetailData(detail);
         console.log('handleDetail', handleDetail);
         return (
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
                 <Modal
                     width={800}
                     visible={this.props.visible}
@@ -100,9 +126,9 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工单位</td>
-                                    <td colSpan='3'>中国交建集团</td>
+                                    <td colSpan='3'>{unitName}</td>
                                     <td >项目经理</td>
-                                    <td >王伟</td>
+                                    <td >{leader}</td>
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工员</td>
@@ -133,10 +159,10 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td colSpan='6' style={{height: 200}}>
                                         <div style={{textAlign: 'left'}}>
-                                            <p>验收要点：以细班或小班为单位，对土球质量进行验收。按照不低于设计数量的10%进行抽检，对苗木土球质量情况进行打分。要求土球完整，落叶乔木土球直径达到胸径的8-10倍，常绿乔木土球直径达到地径的7倍以上，亚乔木、独干灌木土球直径达到地径的8倍以上，丛生灌木土球直径达到丛围3倍以上。</p>
-                                            <p>①达到以上质量要求即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</p>
-                                            <p>②土球散坨；落叶乔木土球直径低于胸径的8倍；常绿乔木土球直径低于地径的7倍；亚乔木、独干灌木土球直径低于7倍；丛生灌木土球直径小于丛围3倍，视为不合格，不予使用。</p>
-                                            <p>土球质量合格率=抽检合格数量/抽检数量。</p>
+                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对土球质量进行验收。按照不低于设计数量的10%进行抽检，对苗木土球质量情况进行打分。要求土球完整，落叶乔木土球直径达到胸径的8-10倍，常绿乔木土球直径达到地径的7倍以上，亚乔木、独干灌木土球直径达到地径的8倍以上，丛生灌木土球直径达到丛围3倍以上。</span>
+                                            <span style={{display: 'block'}}>①达到以上质量要求即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</span>
+                                            <span style={{display: 'block'}}>②土球散坨；落叶乔木土球直径低于胸径的8倍；常绿乔木土球直径低于地径的7倍；亚乔木、独干灌木土球直径低于7倍；丛生灌木土球直径小于丛围3倍，视为不合格，不予使用。</span>
+                                            <span style={{display: 'block'}}>土球质量合格率=抽检合格数量/抽检数量。</span>
                                         </div>
                                     </td>
                                 </tr>

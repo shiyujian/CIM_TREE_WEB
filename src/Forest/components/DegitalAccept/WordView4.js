@@ -7,11 +7,13 @@ export default class WordView1 extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            loading: false
+            loading: false,
+            leader: '',
+            unitName: ''
         };
     }
 
-    componentDidMount () {
+    componentDidMount = async () => {
         const { unQualifiedList } = this.props;
         if (unQualifiedList.length > 0) {
             for (let i = 0; i < unQualifiedList.length / 2; i++) {
@@ -38,10 +40,30 @@ export default class WordView1 extends Component {
                 }
             }
         }
+        await this.getUnitMessage();
     }
-
     onOk () {
         this.props.onPressOk(4);
+    }
+    getUnitMessage = () => {
+        const {
+            detail = {},
+            unitMessage = []
+        } = this.props;
+        let leader = '';
+        let unitName = '';
+        if (detail && detail.Section) {
+            unitMessage.map((unit) => {
+                if (unit && unit.Section && unit.Section === detail.Section) {
+                    leader = unit.Leader;
+                    unitName = unit.Unit;
+                }
+            });
+        }
+        this.setState({
+            leader,
+            unitName
+        });
     }
     handleDetailData = (detail) => {
         let handleDetail = {};
@@ -69,9 +91,13 @@ export default class WordView1 extends Component {
         handleDetail.qulityok = qulityok;
         return handleDetail;
     }
-
     render () {
         const { detail } = this.props;
+        const {
+            leader,
+            unitName,
+            loading
+        } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -80,14 +106,13 @@ export default class WordView1 extends Component {
         console.log('handleDetail', handleDetail);
 
         return (
-            <Spin spinning={this.state.loading}>
+            <Spin spinning={loading}>
                 <Modal
                     width={800}
                     visible={this.props.visible}
                     title='苗木质量验收记录'
                     onOk={this.onOk.bind(this)}
                     maskClosable={false}
-                    key={this.props.keyy}
                     onCancel={this.onOk.bind(this)}
                     footer={null}
                 >
@@ -102,9 +127,9 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工单位</td>
-                                    <td colSpan='3'>中国交建集团</td>
+                                    <td colSpan='3'>{unitName}</td>
                                     <td >项目经理</td>
-                                    <td >王伟</td>
+                                    <td >{leader}</td>
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>施工员</td>
@@ -121,10 +146,10 @@ export default class WordView1 extends Component {
                                 <tr>
                                     <td colSpan='6' style={{height: 200}}>
                                         <div style={{textAlign: 'left'}}>
-                                            <p>验收要点：以细班或小班为单位，对苗木质量进行验收。按照不低于设计数量的30%进行抽检，对苗木品种、规格、质量情况进行打分。</p>
-                                            <p>①苗木品种符合设计要求，规格符合设计要求，质量符合用苗要求即为合格，抽检合格率达到95%以上，计95分以上，通过检验；</p>
-                                            <p>②苗木品种不符合设计要求；苗木规格低于设计要求；苗木主干弯曲；常绿苗木无顶芽；落叶乔木无中央领导枝；树冠严重偏冠；严重的机械损伤；检疫性或蛀干性病虫害，视为不合格，不予使用。</p>
-                                            <p>苗木质量合格率=抽检合格数量/抽检数量。</p>
+                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对苗木质量进行验收。按照不低于设计数量的30%进行抽检，对苗木品种、规格、质量情况进行打分。</span>
+                                            <span style={{display: 'block'}}>①苗木品种符合设计要求，规格符合设计要求，质量符合用苗要求即为合格，抽检合格率达到95%以上，计95分以上，通过检验；</span>
+                                            <span style={{display: 'block'}}>②苗木品种不符合设计要求；苗木规格低于设计要求；苗木主干弯曲；常绿苗木无顶芽；落叶乔木无中央领导枝；树冠严重偏冠；严重的机械损伤；检疫性或蛀干性病虫害，视为不合格，不予使用。</span>
+                                            <span style={{display: 'block'}}>苗木质量合格率=抽检合格数量/抽检数量。</span>
                                         </div>
                                     </td>
                                 </tr>

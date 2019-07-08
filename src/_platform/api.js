@@ -65,7 +65,6 @@ export const SERVICE_API = `${base}/service/construction/api`;
 export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
 export const MAIN_API = `${base}/main/api`;
-export const CUS_TILEMAP = window.config.cus_tilemap;
 export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
 // 高德地图逆坐标查询
