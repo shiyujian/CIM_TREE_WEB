@@ -203,6 +203,7 @@ export default class WordView1 extends Component {
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
         handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
+        handleDetail.checkTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.CheckTime && moment(detail.AcceptanceObj.CheckTime).format('YYYY年MM月DD日')) || '';
         handleDetail.designNum = (detail && detail.DesignNum) || 0;
         handleDetail.actualNum = (detail && detail.ActualNum) || 0;
         handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
@@ -323,8 +324,10 @@ export default class WordView1 extends Component {
                                         <td className='hei110' >施工单位质量专检结果</td>
                                         <td colSpan='5'>
                                             <div>
-                                                <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
-                                                <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
+                                                <div style={{ float: 'left', marginLeft: 10 }}>
+                                                    <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                </div>
+                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -332,10 +335,10 @@ export default class WordView1 extends Component {
                                         <td className='hei110' >监理（建设）单位验收记录</td>
                                         <td colSpan='5'>
                                             <div>
-                                                <p>监理工程师：</p><p>{handleDetail.jianli}</p>
-                                                <p className='marL300'>年</p>
-                                                <p className='marL30'>月</p>
-                                                <p className='marL30'>日</p>
+                                                <div style={{ float: 'left', marginLeft: 10 }}>
+                                                    <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                                </div>
+                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.checkTime}</p>
                                             </div>
                                         </td>
                                     </tr>

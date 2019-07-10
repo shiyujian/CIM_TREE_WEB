@@ -418,6 +418,11 @@ export const getZZJQulityCheckList = forestFetchAction(
     `${FOREST_API}/tree/patrolevents`,
     []
 );
+// 大数据验收结果列表
+export const getBigDataCheckList = forestFetchAction(
+    `${FOREST_API}/tree/trees`,
+    []
+);
 // 数字化验收导出
 export const getExportAcceptList = forestFetchAction(`${FOREST_API}/tree/exportacceptances`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
@@ -525,7 +530,8 @@ export const actions = {
     putMoveTreeInCar,
     putChangeLocInfo,
     getUnitMessageBySection,
-    getExportAcceptList
+    getExportAcceptList,
+    getBigDataCheckList
 };
 export default handleActions({
     [getTreeOK]: (state, {

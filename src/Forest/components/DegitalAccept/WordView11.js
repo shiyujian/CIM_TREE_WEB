@@ -200,8 +200,10 @@ export default class WordView1 extends Component {
                                     <td className='hei110' >施工单位质量专检结果</td>
                                     <td colSpan='5'>
                                         <div>
-                                            <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
-                                            <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
+                                            <div style={{ float: 'left', marginLeft: 10 }}>
+                                                <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                            </div>
+                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -209,10 +211,10 @@ export default class WordView1 extends Component {
                                     <td className='hei110' >监理（建设）单位验收记录</td>
                                     <td colSpan='5'>
                                         <div>
-                                            <p>监理工程师：</p><p>{handleDetail.jianli}</p>
-                                            <p className='marL300'>年</p>
-                                            <p className='marL30'>月</p>
-                                            <p className='marL30'>日</p>
+                                            <div style={{ float: 'left', marginLeft: 10 }}>
+                                                <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                            </div>
+                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.checkTime}</p>
                                         </div>
                                     </td>
                                 </tr>

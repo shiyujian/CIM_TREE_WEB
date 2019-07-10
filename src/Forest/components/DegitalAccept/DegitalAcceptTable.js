@@ -136,6 +136,8 @@ export default class DegitalAcceptTable extends Component {
             render: (text, record) => {
                 if (record.status === '未申请') {
                     return <span > 暂无 </span>;
+                } else if (record.status === '待验收') {
+                    return <span > 暂无 </span>;
                 }
                 return (<div >
                     <a onClick={
@@ -175,9 +177,7 @@ export default class DegitalAcceptTable extends Component {
             visible8,
             visible9,
             visible10,
-            visible11,
-            itemDetailList,
-            unQualifiedList
+            visible11
         } = this.state;
         return (
             <div>
@@ -212,7 +212,6 @@ export default class DegitalAcceptTable extends Component {
                     visible4 && <WordView4
                         onPressOk={this.pressOK.bind(this, 4)}
                         visible={visible4}
-                        unQualifiedList={unQualifiedList}
                         {...this.props}
                         {...this.state}
                     />
@@ -840,15 +839,13 @@ export default class DegitalAcceptTable extends Component {
         const {
             actions: {
                 getDigitalAcceptDetail,
-                getMQulityCheckList, // 苗木质量不合格列表
                 getTQulityCheckList, // 土球质量不合格列表
                 getZZJQulityCheckList // 苗木 栽植/支架/浇水 不合格列表
             }
         } = this.props;
         const {
             stime1 = '',
-            etime1 = '',
-            treetypename = '' // 这个等待record返回
+            etime1 = ''
         } = this.state;
         let thinclass = record.ThinClass; // 要通过记录查找，因为可能不选这个条件
         let section = record.Section;
@@ -885,70 +882,26 @@ export default class DegitalAcceptTable extends Component {
                 });
                 break;
             case 4:
-                let postdata1 = {
-                    section: section,
-                    thinclass: thinclass,
-                    treetype: rst[0].TreeType,
-                    status: 0
-                };
-                let result1 = await getMQulityCheckList({}, postdata1);
-                if (result1 && result1.content && result1.content instanceof Array) {
-                    unQualifiedList = result1.content;
-                }
                 this.setState({
-                    visible4: true,
-                    unQualifiedList
+                    visible4: true
                 });
                 break;
             case 5:
-                let postdata2 = {
-                    section: section,
-                    thinclass: thinclass,
-                    treetype: record.TreeType,
-                    status: 0
-                };
-                let result2 = await getTQulityCheckList({}, postdata2);
-                console.log('result2', result2);
                 this.setState({
                     visible5: true
                 });
                 break;
             case 6: // 栽植
-                let postdata3 = {
-                    section: section,
-                    thinclass: thinclass,
-                    treetype: record.TreeType,
-                    status: 0,
-                    problemtype: '栽植过深或过浅,栽植未踏实,土球未解除包装物'
-                };
-                let result3 = await getZZJQulityCheckList({}, postdata3);
-                console.log('result3', result3);
                 this.setState({
                     visible6: true
                 });
                 break;
             case 7: // 支架
-                let postdata4 = {
-                    section: section,
-                    thinclass: thinclass,
-                    status: 0,
-                    problemtype: '苗木支撑不牢固,苗木支撑不及时,苗木撑杆为非硬木'
-                };
-                let result4 = await getZZJQulityCheckList({}, postdata4);
-                console.log('result4', result4);
                 this.setState({
                     visible7: true
                 });
                 break;
             case 8: // 浇水
-                let postdata5 = {
-                    section: section,
-                    thinclass: thinclass,
-                    status: 0,
-                    problemtype: '土堰直径不满足要求,土堰深度不满足要求,首次浇水不及时、未浇透,浇水后未封穴或封穴不密实'
-                };
-                let result5 = await getZZJQulityCheckList({}, postdata5);
-                console.log('result5', result5);
                 this.setState({
                     visible8: true
                 });

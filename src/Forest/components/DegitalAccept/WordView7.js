@@ -10,22 +10,84 @@ export default class WordView1 extends Component {
             loading: false,
             leader: '',
             unitName: '',
-            detail: ''
+            detail: '',
+            unQualifiedList: []
         };
     }
 
     componentDidMount = async () => {
         const {
-            itemDetailList = [],
-            unQualifiedList = []
+            itemDetailList = []
         } = this.props;
         if (itemDetailList.length > 0) {
             let detail = itemDetailList[0];
+            await this.getUnqualifiedList(detail);
             await this.getUnitMessage(detail);
             this.setState({
                 detail
             });
         }
+    }
+    getUnqualifiedList = async (detail) => {
+        const {
+            actions: {
+                getZZJQulityCheckList
+            }
+        } = this.props;
+        this.setState({
+            loading: true
+        });
+        let unQualifiedList = [];
+        let postdata = {
+            section: detail.Section,
+            no: detail.ThinClass,
+            treetype: detail.TreeType,
+            eventtype: 0,
+            status: '0,1,2',
+            problemtype: '苗木支撑不牢固,苗木支撑不及时,苗木撑杆为非硬木'
+        };
+        let result1 = await getZZJQulityCheckList({}, postdata);
+        if (result1 && result1.content && result1.content instanceof Array) {
+            unQualifiedList = result1.content;
+        }
+        console.log('result1', result1);
+        this.setState({
+            loading: false,
+            unQualifiedList
+        });
+    }
+    setTableData = () => {
+        const {
+            unQualifiedList = []
+        } = this.state;
+        let tableData = [];
+        console.log('unQualifiedList', unQualifiedList);
+        if (unQualifiedList.length > 0) {
+            for (let i = 0; i < unQualifiedList.length; i = i + 2) {
+                let a = i;
+                let b = i + 1;
+                if (a !== unQualifiedList.length - 1) {
+                    tableData.push(
+                        <tr>
+                            <td>{unQualifiedList[a].SXM || ''}</td>
+                            <td colSpan='2'>{unQualifiedList[a].SupervisorInfo || ''}</td>
+                            <td>{unQualifiedList[b].SXM || ''}</td>
+                            <td colSpan='2'>{unQualifiedList[b].SupervisorInfo || ''}</td>
+                        </tr>
+                    );
+                } else {
+                    tableData.push(
+                        <tr>
+                            <td>{unQualifiedList[a].SXM || ''}</td>
+                            <td colSpan='2'>{unQualifiedList[a].SupervisorInfo || ''}</td>
+                            <td />
+                            <td colSpan='2' />
+                        </tr>
+                    );
+                }
+            }
+        }
+        return tableData;
     }
 
     onOk () {
@@ -60,6 +122,7 @@ export default class WordView1 extends Component {
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
         handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
+        handleDetail.checkTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.CheckTime && moment(detail.AcceptanceObj.CheckTime).format('YYYY年MM月DD日')) || '';
         handleDetail.designNum = (detail && detail.DesignNum) || 0;
         handleDetail.actualNum = (detail && detail.ActualNum) || 0;
         handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
@@ -92,16 +155,17 @@ export default class WordView1 extends Component {
         console.log('handleDetail', handleDetail);
 
         return (
-            <Spin spinning={loading}>
-                <Modal
-                    width={800}
-                    visible={this.props.visible}
-                    title='苗木支架质量验收记录'
-                    onOk={this.onOk.bind(this)}
-                    maskClosable={false}
-                    onCancel={this.onOk.bind(this)}
-                    footer={null}
-                >
+
+            <Modal
+                width={800}
+                visible={this.props.visible}
+                title='苗木支架质量验收记录'
+                onOk={this.onOk.bind(this)}
+                maskClosable={false}
+                onCancel={this.onOk.bind(this)}
+                footer={null}
+            >
+                <Spin spinning={loading}>
                     <div className='trrdd'>
                         <table style={{ border: 1 }}>
                             <tbody>
@@ -154,12 +218,17 @@ export default class WordView1 extends Component {
                                     <td>二维码号牌</td>
                                     <td colSpan='2'>不合格原因</td>
                                 </tr>
+                                {
+                                    this.setTableData()
+                                }
                                 <tr>
                                     <td className='hei110' >施工单位质量专检结果</td>
                                     <td colSpan='5'>
                                         <div>
-                                            <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
-                                            <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
+                                            <div style={{ float: 'left', marginLeft: 10 }}>
+                                                <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                            </div>
+                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -167,10 +236,10 @@ export default class WordView1 extends Component {
                                     <td className='hei110' >监理（建设）单位验收记录</td>
                                     <td colSpan='5'>
                                         <div>
-                                            <p>监理工程师：</p><p>{handleDetail.jianli}</p>
-                                            <p className='marL300'>年</p>
-                                            <p className='marL30'>月</p>
-                                            <p className='marL30'>日</p>
+                                            <div style={{ float: 'left', marginLeft: 10 }}>
+                                                <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                            </div>
+                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.checkTime}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -180,8 +249,8 @@ export default class WordView1 extends Component {
                             <p>注：1.苗木支架验收不合格记录可另附表。2.附验收过程照片及说明。 </p>
                         </div>
                     </div>
-                </Modal>
-            </Spin>
+                </Spin>
+            </Modal>
         );
     }
 }
