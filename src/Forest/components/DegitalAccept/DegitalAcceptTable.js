@@ -16,6 +16,7 @@ import {
     Divider
 } from 'antd';
 import moment from 'moment';
+import {FOREST_API} from '_platform/api';
 import WordView1 from './WordView1';
 import WordView2 from './WordView2';
 import WordView3 from './WordView3';
@@ -83,7 +84,7 @@ export default class DegitalAcceptTable extends Component {
             visible9: false,
             visible10: false,
             visible11: false,
-            itemDetail: {}, // 数字化验收详情
+            itemDetailList: {}, // 数字化验收详情
             treetypeoption: [], // 根据小班动态获取的树种列表
             unQualifiedList: [], // 不合格记录列表
             unitMessage: []
@@ -175,7 +176,7 @@ export default class DegitalAcceptTable extends Component {
             visible9,
             visible10,
             visible11,
-            itemDetail,
+            itemDetailList,
             unQualifiedList
         } = this.state;
         return (
@@ -187,7 +188,6 @@ export default class DegitalAcceptTable extends Component {
                     visible1 && <WordView1
                         onPressOk={this.pressOK.bind(this, 1)}
                         visible={visible1}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -196,7 +196,6 @@ export default class DegitalAcceptTable extends Component {
                     visible2 && <WordView2
                         onPressOk={this.pressOK.bind(this, 2)}
                         visible={visible2}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -205,7 +204,6 @@ export default class DegitalAcceptTable extends Component {
                     visible3 && <WordView3
                         onPressOk={this.pressOK.bind(this, 3)}
                         visible={visible3}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -215,7 +213,6 @@ export default class DegitalAcceptTable extends Component {
                         onPressOk={this.pressOK.bind(this, 4)}
                         visible={visible4}
                         unQualifiedList={unQualifiedList}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -224,7 +221,6 @@ export default class DegitalAcceptTable extends Component {
                     visible5 && <WordView5
                         onPressOk={this.pressOK.bind(this, 5)}
                         visible={visible5}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -233,7 +229,6 @@ export default class DegitalAcceptTable extends Component {
                     visible6 && <WordView6
                         onPressOk={this.pressOK.bind(this, 6)}
                         visible={visible6}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -242,7 +237,6 @@ export default class DegitalAcceptTable extends Component {
                     visible7 && <WordView7
                         onPressOk={this.pressOK.bind(this, 7)}
                         visible={visible7}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -251,7 +245,6 @@ export default class DegitalAcceptTable extends Component {
                     visible8 && <WordView8
                         onPressOk={this.pressOK.bind(this, 8)}
                         visible={visible8}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -260,7 +253,6 @@ export default class DegitalAcceptTable extends Component {
                     visible9 && <WordView9
                         onPressOk={this.pressOK.bind(this, 9)}
                         visible={visible9}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -269,7 +261,6 @@ export default class DegitalAcceptTable extends Component {
                     visible10 && <WordView10
                         onPressOk={this.pressOK.bind(this, 10)}
                         visible={visible10}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -278,7 +269,6 @@ export default class DegitalAcceptTable extends Component {
                     visible11 && <WordView11
                         onPressOk={this.pressOK.bind(this, 11)}
                         visible={visible11}
-                        detail={itemDetail}
                         {...this.props}
                         {...this.state}
                     />
@@ -464,8 +454,17 @@ export default class DegitalAcceptTable extends Component {
                 </div>
                 <div className='forest-mrg10' >
                     <span className='forest-search-span' > 施工员： </span>
-                    <Select allowClear className='forest-forestcalcw4'
+                    <Select
+                        allowClear
+                        showSearch
+                        className='forest-forestcalcw4'
                         defaultValue=''
+                        filterOption={
+                            (input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                        }
                         value={sgy}
                         onChange={this.ysTypeChange.bind(this, 'sgy')} >
                         {shigongOptions}
@@ -473,18 +472,36 @@ export default class DegitalAcceptTable extends Component {
                 </div>
                 <div className='forest-mrg10' >
                     <span className='forest-search-span' > 测量员： </span>
-                    <Select allowClear className='forest-forestcalcw4'
+                    <Select
+                        allowClear
+                        showSearch
+                        className='forest-forestcalcw4'
                         defaultValue=''
                         value={cly}
+                        filterOption={
+                            (input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                        }
                         onChange={this.ysTypeChange.bind(this, 'cly')} >
                         {shigongOptions}
                     </Select>
                 </div>
                 <div className='forest-mrg10' >
                     <span className='forest-search-span' > 监理： </span>
-                    <Select allowClear className='forest-forestcalcw4'
+                    <Select
+                        allowClear
+                        showSearch
+                        className='forest-forestcalcw4'
                         defaultValue='全部'
                         value={jl}
+                        filterOption={
+                            (input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                        }
                         onChange={this.ysTypeChange.bind(this, 'jl')} >
                         {jianliOptions}
                     </Select>
@@ -516,12 +533,12 @@ export default class DegitalAcceptTable extends Component {
                 </Col>
                 <Col span={2} >
                     {
-                        /* <Button
-                                            type='primary'
-                                            onClick={this.exportFile.bind(this, 'mutiple')}
-                                        >
-                                            导出
-                                        </Button> */
+                        <Button
+                            type='primary'
+                            onClick={this.exportFile.bind(this, 'mutiple')}
+                        >
+                            导出
+                        </Button>
                     }
                 </Col>
                 <Col span={2} >
@@ -607,20 +624,16 @@ export default class DegitalAcceptTable extends Component {
         let jianliOptions = [];
         if (shigong instanceof Array) {
             shigong.map(item => {
-                shigongOptions.push(<Option value={
-                    item.id
-                } > {
-                        item.account.person_name
-                    } </Option>);
+                shigongOptions.push(<Option value={item.id} key={item.id} title={item.account.person_name}>
+                    {item.account.person_name}
+                </Option>);
             });
         }
         if (jianli instanceof Array) {
             jianli.map(item => {
-                jianliOptions.push(<Option value={
-                    item.id
-                } > {
-                        item.account.person_name
-                    } </Option>);
+                jianliOptions.push(<Option value={item.id} key={item.id} title={item.account.person_name}>
+                    {item.account.person_name}
+                </Option>);
             });
         }
         const {
@@ -755,14 +768,73 @@ export default class DegitalAcceptTable extends Component {
         } = this.props;
         resetinput(leftkeycode);
     }
-
-    exportFile (type, record) {
+    // 导出文件
+    exportFile = async (type, record) => {
+        const {
+            actions: {
+                getExportAcceptList
+            }
+        } = this.props;
+        const {
+            section = '',
+            stime1 = '',
+            etime1 = '',
+            sgy = '',
+            cly = '',
+            jl = '',
+            thinclass = '',
+            thinclassData = '',
+            smallclassData = '',
+            zt = '',
+            ystype = '',
+            treetypename = ''
+        } = this.state;
         if (type === 'single') { // 单个导出
 
         } else if (type === 'mutiple') {
-
+            try {
+                if (thinclass === '') {
+                    message.info('请选择项目，标段，小班及细班信息');
+                    return;
+                }
+                let array = thinclass.split('-');
+                let array1 = [];
+                array.map((item, i) => {
+                    if (i !== 2) {
+                        array1.push(item);
+                    }
+                });
+                console.log('array1', array1);
+                let postData = {
+                    section,
+                    checktype: ystype,
+                    thinclass: array1.join('-'),
+                    supervisor: jl,
+                    status: zt,
+                    treetype: treetypename,
+                    surveyor: cly,
+                    constructer: sgy,
+                    stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
+                    etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss')
+                };
+                let data = await getExportAcceptList({}, postData);
+                let download = FOREST_API + '/' + data;
+                this.createLink(this, download);
+            } catch (e) {
+                console.log('mutiple', e);
+            }
         }
     }
+    // 下载
+    createLink = (name, url) => {
+        let link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', this);
+        link.setAttribute('target', '_blank');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     async viewWord (record) {
         const {
@@ -793,7 +865,7 @@ export default class DegitalAcceptTable extends Component {
             return;
         }
         this.setState({
-            itemDetail: rst[0]
+            itemDetailList: rst
         });
         let unQualifiedList = [];
         switch (checktype) {
@@ -836,6 +908,7 @@ export default class DegitalAcceptTable extends Component {
                     status: 0
                 };
                 let result2 = await getTQulityCheckList({}, postdata2);
+                console.log('result2', result2);
                 this.setState({
                     visible5: true
                 });
@@ -849,6 +922,7 @@ export default class DegitalAcceptTable extends Component {
                     problemtype: '栽植过深或过浅,栽植未踏实,土球未解除包装物'
                 };
                 let result3 = await getZZJQulityCheckList({}, postdata3);
+                console.log('result3', result3);
                 this.setState({
                     visible6: true
                 });
@@ -861,6 +935,7 @@ export default class DegitalAcceptTable extends Component {
                     problemtype: '苗木支撑不牢固,苗木支撑不及时,苗木撑杆为非硬木'
                 };
                 let result4 = await getZZJQulityCheckList({}, postdata4);
+                console.log('result4', result4);
                 this.setState({
                     visible7: true
                 });
@@ -873,6 +948,7 @@ export default class DegitalAcceptTable extends Component {
                     problemtype: '土堰直径不满足要求,土堰深度不满足要求,首次浇水不及时、未浇透,浇水后未封穴或封穴不密实'
                 };
                 let result5 = await getZZJQulityCheckList({}, postdata5);
+                console.log('result5', result5);
                 this.setState({
                     visible8: true
                 });
@@ -884,6 +960,7 @@ export default class DegitalAcceptTable extends Component {
                     treetype: record.TreeType
                 };
                 let result6 = await getZZJQulityCheckList({}, postdata6);
+                console.log('result6', result6);
                 this.setState({
                     visible9: true
                 });
@@ -950,7 +1027,9 @@ export default class DegitalAcceptTable extends Component {
             size: size,
             status: zt,
             checktype: ystype,
-            supervisor: jl
+            supervisor: jl,
+            surveyor: cly,
+            constructer: sgy
         };
         this.setState({
             loading: true,

@@ -307,24 +307,6 @@ export const getTreeEntrance = forestFetchAction(
     `${FOREST_API}/tree/nurserystat?`,
     []
 );
-
-// 获取数字化验收列表
-export const getDigitalAcceptList = forestFetchAction(
-    `${FOREST_API}/tree/acceptances`,
-    []
-);
-
-// 获取数字化验收详情
-export const getDigitalAcceptDetail = forestFetchAction(
-    `${FOREST_API}/tree/acceptancedetails`,
-    []
-);
-
-// 获取数字化验收人员列表
-export const getDigitalAcceptUserList = createFetchAction(
-    `${USER_API}/users/?is_active=true`,
-    []
-);
 // 用户分析用户统计
 export const getUserStat = forestFetchAction(
     `${FOREST_API}/tree/userstat`,
@@ -343,21 +325,6 @@ export const getActivityUserStat = forestFetchAction(
 // 用户分析用户按标段统计
 export const getSectionUserStat = forestFetchAction(
     `${FOREST_API}/tree/sectionuserstat`,
-    []
-);
-// 获取苗木质量验收结果列表
-export const getMQulityCheckList = forestFetchAction(
-    `${FOREST_API}/tree/qualitytrees`,
-    []
-);
-// 获取土球质量验收结果列表
-export const getTQulityCheckList = forestFetchAction(
-    `${FOREST_API}/tree/samplingnurserys`,
-    []
-);
-// 获取苗木(栽植/支架/浇水)验收结果列表
-export const getZZJQulityCheckList = forestFetchAction(
-    `${FOREST_API}/tree/patrolevents`,
     []
 );
 // 根据细班信息获取树种列表
@@ -414,6 +381,45 @@ export const putMergeCarPack = forestFetchAction(`${FOREST_API}/tree/packmerge`,
 export const putMoveTreeInCar = forestFetchAction(`${FOREST_API}/tree/packnurserymove`, [], 'PUT', []);
 // 修改现场测量信息
 export const putChangeLocInfo = forestFetchAction(`${FOREST_API}/tree/batchtree`, [], 'PUT', []);
+
+/**
+ * 数字化验收
+ * actions
+ */
+// 获取数字化验收列表
+export const getDigitalAcceptList = forestFetchAction(
+    `${FOREST_API}/tree/acceptances`,
+    []
+);
+
+// 获取数字化验收详情
+export const getDigitalAcceptDetail = forestFetchAction(
+    `${FOREST_API}/tree/acceptancedetails`,
+    []
+);
+
+// 获取数字化验收人员列表
+export const getDigitalAcceptUserList = createFetchAction(
+    `${USER_API}/users/?is_active=true`,
+    []
+);
+// 获取苗木质量验收结果列表
+export const getMQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/qualitytrees`,
+    []
+);
+// 获取土球质量验收结果列表
+export const getTQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/samplingnurserys`,
+    []
+);
+// 获取苗木(栽植/支架/浇水)验收结果列表
+export const getZZJQulityCheckList = forestFetchAction(
+    `${FOREST_API}/tree/patrolevents`,
+    []
+);
+// 数字化验收导出
+export const getExportAcceptList = forestFetchAction(`${FOREST_API}/tree/exportacceptances`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
 export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sections`, [], 'GET', []);
 
@@ -518,7 +524,8 @@ export const actions = {
     putMergeCarPack,
     putMoveTreeInCar,
     putChangeLocInfo,
-    getUnitMessageBySection
+    getUnitMessageBySection,
+    getExportAcceptList
 };
 export default handleActions({
     [getTreeOK]: (state, {

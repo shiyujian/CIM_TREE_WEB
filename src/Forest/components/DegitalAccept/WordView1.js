@@ -23,7 +23,8 @@ export default class WordView1 extends Component {
             loading: false,
             areaLayerList: [],
             leader: '',
-            unitName: ''
+            unitName: '',
+            detail: ''
         };
         this.map = null;
     }
@@ -31,19 +32,22 @@ export default class WordView1 extends Component {
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
-            detail = {}
+            itemDetailList = []
         } = this.props;
-        await this.initMap();
-        console.log('detail', detail);
-        if (detail && detail.Section && detail.ThinClass) {
-            await this._addAreaLayer(detail.ThinClass, detail.Section);
+        if (itemDetailList.length > 0) {
+            let detail = itemDetailList[0];
+            await this.initMap();
+            console.log('detail', detail);
+            if (detail && detail.Section && detail.ThinClass) {
+                await this._addAreaLayer(detail.ThinClass, detail.Section);
+            }
+            detail.Geom && await this.area(wktToJson(detail.Geom));
+            this.setState({
+                detail
+            }, async () => {
+                await this.getUnitMessage();
+            });
         }
-        detail.Geom && await this.area(wktToJson(detail.Geom));
-        await this.getUnitMessage();
-    }
-
-    componentWillUnmount () {
-        this.map = null;
     }
 
     onOk () {
@@ -69,8 +73,6 @@ export default class WordView1 extends Component {
                 maxZoom: 17,
                 zoomOffset: 1
             }).addTo(this.map);
-            // 加载苗木图层
-            // this.getTileLayerTreeBasic();
         } catch (e) {
             console.log('initMap', e);
         }
@@ -170,9 +172,11 @@ export default class WordView1 extends Component {
     }
     getUnitMessage = () => {
         const {
-            detail = {},
             unitMessage = []
         } = this.props;
+        const {
+            detail = {}
+        } = this.state;
         let leader = '';
         let unitName = '';
         if (detail && detail.Section) {
@@ -202,11 +206,11 @@ export default class WordView1 extends Component {
         return handleDetail;
     }
     render () {
-        const { detail } = this.props;
         const {
             leader,
             unitName,
-            loading
+            loading,
+            detail
         } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {

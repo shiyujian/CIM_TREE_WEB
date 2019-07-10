@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Spin, Modal } from 'antd';
+import { Spin, Modal, Tabs } from 'antd';
 import './index.less';
 import moment from 'moment';
+const { TabPane } = Tabs;
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor (props) {
@@ -9,45 +10,54 @@ export default class WordView1 extends Component {
         this.state = {
             loading: false,
             leader: '',
-            unitName: ''
+            unitName: '',
+            detail: ''
         };
     }
 
     componentDidMount = async () => {
-        const { unQualifiedList } = this.props;
-        if (unQualifiedList.length > 0) {
-            for (let i = 0; i < unQualifiedList.length / 2; i++) {
-                let a = 2 * i;
-                let b = 2 * i + 1;
-                if (a !== unQualifiedList.length) {
-                    $('#trskr').after(
-                        '<tr>' +
-                            '<td>' + unQualifiedList[a].SXM + '</td>' +
-                            '<td colSpan="2">' + unQualifiedList[a].SupervisorInfo + '</td>' +
-                            '<td>' + unQualifiedList[b].SXM + '</td>' +
-                            '<td colSpan="2">' + unQualifiedList[b].SupervisorInfo + '</td>' +
-                        '</tr>'
-                    );
-                } else {
-                    $('#trskr').after(
-                        '<tr>' +
-                            '<td>' + unQualifiedList[a].SXM + '</td>' +
-                            '<td colSpan="2">' + unQualifiedList[a].SupervisorInfo + '</td>' +
-                            '<td>' + '' + '</td>' +
-                            '<td colSpan="2">' + '' + '</td>' +
-                        '</tr>'
-                    );
+        const {
+            itemDetailList = [],
+            unQualifiedList = []
+        } = this.props;
+        if (itemDetailList.length > 0) {
+            let detail = itemDetailList[0];
+            if (unQualifiedList.length > 0) {
+                for (let i = 0; i < unQualifiedList.length / 2; i++) {
+                    let a = 2 * i;
+                    let b = 2 * i + 1;
+                    if (a !== unQualifiedList.length) {
+                        $('#trskr').after(
+                            '<tr>' +
+                                '<td>' + unQualifiedList[a].SXM + '</td>' +
+                                '<td colSpan="2">' + unQualifiedList[a].SupervisorInfo + '</td>' +
+                                '<td>' + unQualifiedList[b].SXM + '</td>' +
+                                '<td colSpan="2">' + unQualifiedList[b].SupervisorInfo + '</td>' +
+                            '</tr>'
+                        );
+                    } else {
+                        $('#trskr').after(
+                            '<tr>' +
+                                '<td>' + unQualifiedList[a].SXM + '</td>' +
+                                '<td colSpan="2">' + unQualifiedList[a].SupervisorInfo + '</td>' +
+                                '<td>' + '' + '</td>' +
+                                '<td colSpan="2">' + '' + '</td>' +
+                            '</tr>'
+                        );
+                    }
                 }
             }
+            await this.getUnitMessage(detail);
+            this.setState({
+                detail
+            });
         }
-        await this.getUnitMessage();
     }
     onOk () {
         this.props.onPressOk(4);
     }
-    getUnitMessage = () => {
+    getUnitMessage = (detail) => {
         const {
-            detail = {},
             unitMessage = []
         } = this.props;
         let leader = '';
@@ -91,12 +101,24 @@ export default class WordView1 extends Component {
         handleDetail.qulityok = qulityok;
         return handleDetail;
     }
+    tabChange = async (key) => {
+        const {
+            itemDetailList = []
+        } = this.props;
+        let detail = itemDetailList[key];
+        this.setState({
+            detail
+        });
+    }
     render () {
-        const { detail } = this.props;
+        const {
+            itemDetailList = []
+        } = this.props;
         const {
             leader,
             unitName,
-            loading
+            loading,
+            detail
         } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
@@ -116,92 +138,105 @@ export default class WordView1 extends Component {
                     onCancel={this.onOk.bind(this)}
                     footer={null}
                 >
-                    <div className='trrdd'>
-                        <table style={{ border: 1 }}>
-                            <tbody id='mytable'>
-                                <tr>
-                                    <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
-                                    <td colSpan='3'> {handleDetail.unit}</td>
-                                    <td colSpan='1' width='118px'>细班（小班）</td>
-                                    <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
-                                </tr>
-                                <tr>
-                                    <td height='60;' align='center'>施工单位</td>
-                                    <td colSpan='3'>{unitName}</td>
-                                    <td >项目经理</td>
-                                    <td >{leader}</td>
-                                </tr>
-                                <tr>
-                                    <td height='60;' align='center'>施工员</td>
-                                    <td colSpan='1'>{handleDetail.shigong}</td>
-                                    <td>苗木品种</td>
-                                    <td colSpan='1'>{handleDetail.treetypename}</td>
-                                    <td>苗木规格</td>
-                                    <td > / </td>
-                                </tr>
-                                <tr>
-                                    <td className='hei60' >施工执行标准名称及编号</td>
-                                    <td colSpan='5'> 《雄安新区造林工作手册》</td>
-                                </tr>
-                                <tr>
-                                    <td colSpan='6' style={{height: 200}}>
-                                        <div style={{textAlign: 'left'}}>
-                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对苗木质量进行验收。按照不低于设计数量的30%进行抽检，对苗木品种、规格、质量情况进行打分。</span>
-                                            <span style={{display: 'block'}}>①苗木品种符合设计要求，规格符合设计要求，质量符合用苗要求即为合格，抽检合格率达到95%以上，计95分以上，通过检验；</span>
-                                            <span style={{display: 'block'}}>②苗木品种不符合设计要求；苗木规格低于设计要求；苗木主干弯曲；常绿苗木无顶芽；落叶乔木无中央领导枝；树冠严重偏冠；严重的机械损伤；检疫性或蛀干性病虫害，视为不合格，不予使用。</span>
-                                            <span style={{display: 'block'}}>苗木质量合格率=抽检合格数量/抽检数量。</span>
+                    <Tabs defaultActiveKey='0' onChange={this.tabChange.bind(this)}>
+                        {
+                            itemDetailList.map((item, index) => {
+                                return (
+                                    <TabPane
+                                        tab={(item && item.TreeTypeObj && item.TreeTypeObj.TreeTypeName) || '树种'}
+                                        key={index}>
+                                        <div className='trrdd'>
+                                            <table style={{ border: 1 }}>
+                                                <tbody id='mytable'>
+                                                    <tr>
+                                                        <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
+                                                        <td colSpan='3'> {handleDetail.unit}</td>
+                                                        <td colSpan='1' width='118px'>细班（小班）</td>
+                                                        <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height='60;' align='center'>施工单位</td>
+                                                        <td colSpan='3'>{unitName}</td>
+                                                        <td >项目经理</td>
+                                                        <td >{leader}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height='60;' align='center'>施工员</td>
+                                                        <td colSpan='1'>{handleDetail.shigong}</td>
+                                                        <td>苗木品种</td>
+                                                        <td colSpan='1'>{handleDetail.treetypename}</td>
+                                                        <td>苗木规格</td>
+                                                        <td > / </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className='hei60' >施工执行标准名称及编号</td>
+                                                        <td colSpan='5'> 《雄安新区造林工作手册》</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colSpan='6' style={{height: 200}}>
+                                                            <div style={{textAlign: 'left'}}>
+                                                                <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对苗木质量进行验收。按照不低于设计数量的30%进行抽检，对苗木品种、规格、质量情况进行打分。</span>
+                                                                <span style={{display: 'block'}}>①苗木品种符合设计要求，规格符合设计要求，质量符合用苗要求即为合格，抽检合格率达到95%以上，计95分以上，通过检验；</span>
+                                                                <span style={{display: 'block'}}>②苗木品种不符合设计要求；苗木规格低于设计要求；苗木主干弯曲；常绿苗木无顶芽；落叶乔木无中央领导枝；树冠严重偏冠；严重的机械损伤；检疫性或蛀干性病虫害，视为不合格，不予使用。</span>
+                                                                <span style={{display: 'block'}}>苗木质量合格率=抽检合格数量/抽检数量。</span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height='60;' align='center'>设计数量</td>
+                                                        <td colSpan='1'>{handleDetail.designNum}</td>
+                                                        <td>实际数量</td>
+                                                        <td colSpan='1'>{handleDetail.actualNum}</td>
+                                                        <td>抽检数量</td>
+                                                        <td >{handleDetail.checkNum}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height='60;' colSpan='1' width='118px'>抽检不合格数量</td>
+                                                        <td colSpan='3'>{handleDetail.failedNum}</td>
+                                                        <td colSpan='1' width='118px'>合格率</td>
+                                                        <td colSpan='2'>{`${handleDetail.score}%`}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colSpan='6'>不合格苗木记录</td>
+                                                    </tr>
+                                                    <tr id='trskr'>
+                                                        <td>二维码号牌</td>
+                                                        <td colSpan='2'>不合格原因</td>
+                                                        <td>二维码号牌</td>
+                                                        <td colSpan='2'>不合格原因</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className='hei110' >施工单位质量专检结果</td>
+                                                        <td colSpan='5'>
+                                                            <div>
+                                                                <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                                <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className='hei110' >监理（建设）单位验收记录</td>
+                                                        <td colSpan='5'>
+                                                            <div>
+                                                                <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                                                <p className='marL300'>年</p>
+                                                                <p className='marL30'>月</p>
+                                                                <p className='marL30'>日</p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div>
+                                                <p>注：1.苗木质量不合格记录可另附表。2.附验收过程照片及说明。</p>
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td height='60;' align='center'>设计数量</td>
-                                    <td colSpan='1'>{handleDetail.designNum}</td>
-                                    <td>实际数量</td>
-                                    <td colSpan='1'>{handleDetail.actualNum}</td>
-                                    <td>抽检数量</td>
-                                    <td >{handleDetail.checkNum}</td>
-                                </tr>
-                                <tr>
-                                    <td height='60;' colSpan='1' width='118px'>抽检不合格数量</td>
-                                    <td colSpan='3'>{handleDetail.failedNum}</td>
-                                    <td colSpan='1' width='118px'>合格率</td>
-                                    <td colSpan='2'>{`${handleDetail.score}%`}</td>
-                                </tr>
-                                <tr>
-                                    <td colSpan='6'>不合格苗木记录</td>
-                                </tr>
-                                <tr id='trskr'>
-                                    <td>二维码号牌</td>
-                                    <td colSpan='2'>不合格原因</td>
-                                    <td>二维码号牌</td>
-                                    <td colSpan='2'>不合格原因</td>
-                                </tr>
-                                <tr>
-                                    <td className='hei110' >施工单位质量专检结果</td>
-                                    <td colSpan='5'>
-                                        <div>
-                                            <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
-                                            <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className='hei110' >监理（建设）单位验收记录</td>
-                                    <td colSpan='5'>
-                                        <div>
-                                            <p>监理工程师：</p><p>{handleDetail.jianli}</p>
-                                            <p className='marL300'>年</p>
-                                            <p className='marL30'>月</p>
-                                            <p className='marL30'>日</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div>
-                            <p>注：1.苗木质量不合格记录可另附表。2.附验收过程照片及说明。</p>
-                        </div>
-                    </div>
+                                    </TabPane>
+                                );
+                            })
+                        }
+                    </Tabs>
+
                 </Modal>
             </Spin>
         );

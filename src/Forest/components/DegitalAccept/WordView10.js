@@ -9,20 +9,30 @@ export default class WordView1 extends Component {
         this.state = {
             loading: false,
             leader: '',
-            unitName: ''
+            unitName: '',
+            detail: ''
         };
     }
 
     componentDidMount = async () => {
-        await this.getUnitMessage();
+        const {
+            itemDetailList = [],
+            unQualifiedList = []
+        } = this.props;
+        if (itemDetailList.length > 0) {
+            let detail = itemDetailList[0];
+            await this.getUnitMessage(detail);
+            this.setState({
+                detail
+            });
+        }
     }
 
     onOk () {
         this.props.onPressOk(10);
     }
-    getUnitMessage = () => {
+    getUnitMessage = (detail) => {
         const {
-            detail = {},
             unitMessage = []
         } = this.props;
         let leader = '';
@@ -67,11 +77,11 @@ export default class WordView1 extends Component {
         return handleDetail;
     }
     render () {
-        const { detail } = this.props;
         const {
             leader,
             unitName,
-            loading
+            loading,
+            detail
         } = this.state;
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
@@ -91,7 +101,6 @@ export default class WordView1 extends Component {
                     footer={null}
                 >
                     <div className='trrdd'>
-
                         <table style={{ border: 1 }}>
                             <tbody>
                                 <tr>

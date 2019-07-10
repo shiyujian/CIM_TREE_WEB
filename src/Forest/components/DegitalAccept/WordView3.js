@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Spin, Modal, Row, Col } from 'antd';
+import { Spin, Modal, Row, Col, Tabs } from 'antd';
 import L from 'leaflet';
 import './index.less';
 import {
@@ -15,6 +15,7 @@ import {
 } from './auth';
 import { lineString, buffer } from '@turf/turf';
 import moment from 'moment';
+const { TabPane } = Tabs;
 export default class WordView1 extends Component {
     static propTypes = {};
     constructor (props) {
@@ -23,7 +24,9 @@ export default class WordView1 extends Component {
             loading: false,
             areaLayerList: [],
             leader: '',
-            unitName: ''
+            unitName: '',
+            detail: '',
+            tabKey: 0
         };
         this.map = null;
     }
@@ -31,25 +34,25 @@ export default class WordView1 extends Component {
     // 初始化地图，获取目录树数据
     componentDidMount = async () => {
         const {
-            detail = {}
+            itemDetailList = []
         } = this.props;
-        await this.initMap();
-        console.log('detail', detail);
-        if (detail && detail.Section && detail.ThinClass) {
-            await this._addAreaLayer(detail.ThinClass, detail.Section);
+        if (itemDetailList.length > 0) {
+            let detail = itemDetailList[0];
+            await this.initMap(detail);
+            console.log('detail', detail);
+            await this.getRouteLayer(detail);
+            await this.getUnitMessage(detail);
+            this.setState({
+                detail
+            });
         }
-        detail.Geom && this.area(wktToJson(detail.Geom));
-        await this.getUnitMessage();
-    }
-    componentWillUnmount () {
-        this.map = null;
     }
     /* 初始化地图 */
-    initMap () {
+    initMap (detail) {
         try {
             let mapInitialization = INITLEAFLET_API;
             mapInitialization.crs = L.CRS.EPSG4326;
-            this.map = L.map('mapid', mapInitialization);
+            this.map = L.map(`${detail.AcceptanceID}`, mapInitialization);
             this.tileLayer = L.tileLayer(TILEURLS[1], {
                 subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
                 minZoom: 10,
@@ -63,15 +66,16 @@ export default class WordView1 extends Component {
                 maxZoom: 17,
                 zoomOffset: 1
             }).addTo(this.map);
-            // 加载苗木图层
-            // this.getTileLayerTreeBasic();
-            // 加载秋冬季的细班图层
-            // this.getTileTreeWinterThinClassLayerBasic();
-            // 获取秋冬季的区块范围
-            // this.getTileTreeWinterProjectLayerBasic();
         } catch (e) {
             console.log('initMap', e);
         }
+    }
+    getRouteLayer = async (detail) => {
+        console.log('detail', detail);
+        if (detail && detail.Section && detail.ThinClass) {
+            await this._addAreaLayer(detail.ThinClass, detail.Section);
+        }
+        detail.Geom && await this.area(wktToJson(detail.Geom));
     }
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey, section) => {
@@ -132,6 +136,7 @@ export default class WordView1 extends Component {
     }
     area (points) {
         if (points && points instanceof Array && points.length > 1) {
+            console.log('aaaaaaaa');
             let latlngs = [];
             let lnglats = [];
             for (let i = 0; i < points.length; i++) {
@@ -171,9 +176,8 @@ export default class WordView1 extends Component {
             this.map.panTo(latlngs[0]);
         }
     }
-    getUnitMessage = () => {
+    getUnitMessage = (detail) => {
         const {
-            detail = {},
             unitMessage = []
         } = this.props;
         let leader = '';
@@ -246,13 +250,31 @@ export default class WordView1 extends Component {
         handleDetail.rowList = rowList;
         return handleDetail;
     }
+    tabChange = async (key) => {
+        const {
+            itemDetailList = []
+        } = this.props;
+        let detail = itemDetailList[key];
+        // if (!this.map) {
+        await this.initMap(detail);
+        // }
+        await this.getRouteLayer(detail);
+
+        this.setState({
+            detail
+        });
+    }
     render () {
-        const { detail } = this.props;
+        const {
+            itemDetailList = []
+        } = this.props;
         const {
             leader,
             unitName,
-            loading
+            loading,
+            detail
         } = this.state;
+        console.log('detail', detail);
         let array = ['', '', '', ''];
         if (detail && detail.ThinClass) {
             array = detail.ThinClass.split('-');
@@ -270,113 +292,124 @@ export default class WordView1 extends Component {
                     onCancel={this.onOk.bind(this)}
                     footer={null}
                 >
-                    <div className='trrdd'>
-
-                        <table style={{ border: 1 }}>
-                            <tbody>
-                                <tr>
-                                    <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
-                                    <td colSpan='3'> {handleDetail.unit}</td>
-                                    <td colSpan='1' width='118px'>细班（小班）</td>
-                                    <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
-                                </tr>
-                                <tr>
-                                    <td height='60;' align='center'>施工单位</td>
-                                    <td colSpan='3'>{unitName}</td>
-                                    <td >项目经理</td>
-                                    <td >{leader}</td>
-                                </tr>
-                                <tr>
-                                    <td height='60;' align='center'>施工员</td>
-                                    <td colSpan='1'>{handleDetail.shigong}</td>
-                                    <td>苗木品种及规格</td>
-                                    <td colSpan='1'>{handleDetail.treetypename}</td>
-                                    <td>土球规格</td>
-                                    <td > / </td>
-                                </tr>
-                                <tr>
-                                    <td className='hei60' >施工执行标准名称及编号</td>
-                                    <td colSpan='5'> 《雄安新区造林工作手册》</td>
-                                </tr>
-                                <tr>
-                                    <td colSpan='6' style={{height: 200}}>
-                                        <div style={{textAlign: 'left'}}>
-                                            <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。</span>
-                                            <span style={{display: 'block'}}>①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；</span>
-                                            <span style={{display: 'block'}}>②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。</span>
-                                            <span style={{display: 'block'}}>挖穴合格率=抽检合格数量/抽检数量。</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style={{ height: 300 }} colSpan='6'>
-                                        <div
-                                            id='mapid'
-                                            style={{
-                                                height: 300,
-                                                borderLeft: '1px solid #ccc'
-                                            }}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td height='60;'width='118px'>挖穴标准</td>
-                                    <td colSpan='1'> / </td>
-                                    <td height='60;'width='118px'>设计数量</td>
-                                    <td colSpan='1'>{handleDetail.designNum}</td>
-                                    <td colSpan='1' width='118px'>实际数量</td>
-                                    <td colSpan='1'>{handleDetail.actualNum}</td>
-                                </tr>
-                                <tr>
-                                    <td height='60;'width='118px'>抽检数量</td>
-                                    <td colSpan='1'>{handleDetail.checkNum}</td>
-                                    <td height='60;'width='118px'>抽检合格数量</td>
-                                    <td colSpan='1'>{handleDetail.hgl}</td>
-                                    <td colSpan='1' width='118px'>合格率</td>
-                                    <td colSpan='1'>{`${handleDetail.score}%`}</td>
-                                </tr>
-                                <tr>
-                                    <td colSpan='6'>
-                                        <Row>
-                                            <Col span={3} style={{ width: 116 }}>
-                                                <div style={{ width: 116, marginTop: 20 }}>验收记录
+                    <Tabs defaultActiveKey='0' onChange={this.tabChange.bind(this)}>
+                        {
+                            itemDetailList.map((item, index) => {
+                                return (
+                                    <TabPane
+                                        tab={(item && item.TreeTypeObj && item.TreeTypeObj.TreeTypeName) || '树种'}
+                                        key={index}>
+                                        <div className='trrdd'>
+                                            <table style={{ border: 1 }}>
+                                                <tbody>
+                                                    <tr>
+                                                        <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
+                                                        <td colSpan='3'> {handleDetail.unit}</td>
+                                                        <td colSpan='1' width='118px'>细班（小班）</td>
+                                                        <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height='60;' align='center'>施工单位</td>
+                                                        <td colSpan='3'>{unitName}</td>
+                                                        <td >项目经理</td>
+                                                        <td >{leader}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height='60;' align='center'>施工员</td>
+                                                        <td colSpan='1'>{handleDetail.shigong}</td>
+                                                        <td>苗木品种及规格</td>
+                                                        <td colSpan='1'>{handleDetail.treetypename}</td>
+                                                        <td>土球规格</td>
+                                                        <td > / </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className='hei60' >施工执行标准名称及编号</td>
+                                                        <td colSpan='5'> 《雄安新区造林工作手册》</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colSpan='6' style={{height: 200}}>
+                                                            <div style={{textAlign: 'left'}}>
+                                                                <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对挖穴进行验收。按照不低于设计数量的5%进行抽检，对挖穴直径和深度进行打分。挖穴直径比土球直径大于40厘米，底部平整，深比土球高10～20厘米。</span>
+                                                                <span style={{display: 'block'}}>①挖穴规格不小于上述要求即为合格，合格率达到90%以上，计90分以上，通过检验；</span>
+                                                                <span style={{display: 'block'}}>②挖穴直径未超过土球直径40厘米，或过于随意，大小不均，即不合格，须整改。</span>
+                                                                <span style={{display: 'block'}}>挖穴合格率=抽检合格数量/抽检数量。</span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style={{ height: 300 }} colSpan='6'>
+                                                            <div
+                                                                id={item.AcceptanceID}
+                                                                style={{
+                                                                    height: 300,
+                                                                    borderLeft: '1px solid #ccc'
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height='60;'width='118px'>挖穴标准</td>
+                                                        <td colSpan='1'> / </td>
+                                                        <td height='60;'width='118px'>设计数量</td>
+                                                        <td colSpan='1'>{handleDetail.designNum}</td>
+                                                        <td colSpan='1' width='118px'>实际数量</td>
+                                                        <td colSpan='1'>{handleDetail.actualNum}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td height='60;'width='118px'>抽检数量</td>
+                                                        <td colSpan='1'>{handleDetail.checkNum}</td>
+                                                        <td height='60;'width='118px'>抽检合格数量</td>
+                                                        <td colSpan='1'>{handleDetail.hgl}</td>
+                                                        <td colSpan='1' width='118px'>合格率</td>
+                                                        <td colSpan='1'>{`${handleDetail.score}%`}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colSpan='6'>
+                                                            <Row>
+                                                                <Col span={3} style={{ width: 116 }}>
+                                                                    <div style={{ width: 116, marginTop: 20 }}>验收记录
                                                 合格(√)
                                         不合格(×)</div>
-                                            </Col>
-                                            <Col span={21} style={{ width: 630 }}>
-                                                {
-                                                    handleDetail.rowList
-                                                }
-                                            </Col>
-                                        </Row>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className='hei110' >施工单位质量专检结果</td>
-                                    <td colSpan='5'>
-                                        <div>
-                                            <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
-                                            <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
+                                                                </Col>
+                                                                <Col span={21} style={{ width: 630 }}>
+                                                                    {
+                                                                        handleDetail.rowList
+                                                                    }
+                                                                </Col>
+                                                            </Row>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className='hei110' >施工单位质量专检结果</td>
+                                                        <td colSpan='5'>
+                                                            <div>
+                                                                <p>项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                                <p style={{ marginLeft: 270 }}>{handleDetail.applyTime}</p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className='hei110' >监理（建设）单位验收记录</td>
+                                                        <td colSpan='5'>
+                                                            <div>
+                                                                <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                                                <p className='marL300'>年</p>
+                                                                <p className='marL30'>月</p>
+                                                                <p className='marL30'>日</p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div>
+                                                <p>注：1.挖穴验收记录可另附表。2.附验收过程照片及说明。 </p>
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className='hei110' >监理（建设）单位验收记录</td>
-                                    <td colSpan='5'>
-                                        <div>
-                                            <p>监理工程师：</p><p>{handleDetail.jianli}</p>
-                                            <p className='marL300'>年</p>
-                                            <p className='marL30'>月</p>
-                                            <p className='marL30'>日</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div>
-                            <p>注：1.挖穴验收记录可另附表。2.附验收过程照片及说明。 </p>
-                        </div>
-                    </div>
+                                    </TabPane>
+                                );
+                            })
+                        }
+                    </Tabs>
                 </Modal>
             </Spin>
         );
