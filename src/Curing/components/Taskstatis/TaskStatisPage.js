@@ -28,15 +28,10 @@ export default class TaskStatisPage extends Component {
         } = this.props;
         return (
             <div >
-                {/* <TaskStatisGis
-                    {...this.props}
-                    {...this.state}
-                /> */}
                 <TaskStatisTable
                     {...this.props}
                     {...this.state}
                 />
-
                 {
                     taskStatisGisVisible
                         ? (<TaskStatisGis

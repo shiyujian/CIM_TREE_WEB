@@ -67,7 +67,7 @@ export default class WordView1 extends Component {
         handleDetail.checkNum = (detail && detail.CheckNum) || 0;
         handleDetail.failedNum = (detail && detail.FailedNum) || 0;
         handleDetail.treetypename = (detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName) || '';
-
+        handleDetail.createTime = (detail && detail.CreateTime && moment(detail.CreateTime).format('YYYY年MM月DD日')) || '';
         let hgl = handleDetail.checkNum - handleDetail.failedNum; // 合格量
         let qulityok = 0; // 默认全部不合格
         if (handleDetail.checkNum !== 0) {
@@ -214,7 +214,7 @@ export default class WordView1 extends Component {
                                             <div style={{ float: 'left', marginLeft: 10 }}>
                                                 <p>监理工程师：</p><p>{handleDetail.jianli}</p>
                                             </div>
-                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.checkTime}</p>
+                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
                                         </div>
                                     </td>
                                 </tr>

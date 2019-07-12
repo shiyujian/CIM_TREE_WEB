@@ -203,8 +203,7 @@ export default class WordView1 extends Component {
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
         handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
-        handleDetail.checkTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.CheckTime && moment(detail.AcceptanceObj.CheckTime).format('YYYY年MM月DD日')) || '';
-        handleDetail.designNum = (detail && detail.DesignNum) || 0;
+        handleDetail.createTime = (detail && detail.CreateTime && moment(detail.CreateTime).format('YYYY年MM月DD日')) || ''; handleDetail.designNum = (detail && detail.DesignNum) || 0;
         handleDetail.actualNum = (detail && detail.ActualNum) || 0;
         handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
         handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
@@ -272,9 +271,9 @@ export default class WordView1 extends Component {
                                         <td className='hei60' align='center'>施工员</td>
                                         <td colSpan='1'>{handleDetail.shigong}</td>
                                         <td>设计数量</td>
-                                        <td colSpan='1'>{handleDetail.designNum}</td>
+                                        <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
                                         <td>实际数量</td>
-                                        <td >{handleDetail.actualNum}</td>
+                                        <td >{`${handleDetail.actualNum} (个)`}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' >施工执行标准名称及编号</td>
@@ -304,19 +303,19 @@ export default class WordView1 extends Component {
                                     </tr>
                                     <tr>
                                         <td className='hei60' colSpan='1' width='118px'>设计面积</td>
-                                        <td colSpan='2'>{handleDetail.designArea}</td>
+                                        <td colSpan='2'>{`${handleDetail.designArea} (亩)`}</td>
                                         <td colSpan='1' width='118px'>设计密度</td>
-                                        <td colSpan='2'>{handleDetail.designDensity}</td>
+                                        <td colSpan='2'>{`${handleDetail.designDensity} (个/亩)`}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' colSpan='1' width='118px'>样带面积</td>
-                                        <td colSpan='2'>{handleDetail.sampleTapeArea}</td>
+                                        <td colSpan='2'>{`${handleDetail.sampleTapeArea} (亩)`}</td>
                                         <td colSpan='1' width='118px'>放点数量</td>
-                                        <td colSpan='2'>{handleDetail.loftingNum}</td>
+                                        <td colSpan='2'>{`${handleDetail.loftingNum} (个)`}</td>
                                     </tr>
                                     <tr>
                                         <td className='hei60' colSpan='1' width='118px'>实际密度</td>
-                                        <td colSpan='2'>{handleDetail.truemd}</td>
+                                        <td colSpan='2'>{`${handleDetail.truemd} (个/亩)`}</td>
                                         <td colSpan='1' width='118px'>合格率</td>
                                         <td colSpan='2'>{`${handleDetail.score}%`}</td>
                                     </tr>
@@ -338,7 +337,7 @@ export default class WordView1 extends Component {
                                                 <div style={{ float: 'left', marginLeft: 10 }}>
                                                     <p>监理工程师：</p><p>{handleDetail.jianli}</p>
                                                 </div>
-                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.checkTime}</p>
+                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
                                             </div>
                                         </td>
                                     </tr>

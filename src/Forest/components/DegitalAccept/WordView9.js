@@ -130,8 +130,7 @@ export default class WordView1 extends Component {
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
         handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
-        handleDetail.checkTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.CheckTime && moment(detail.AcceptanceObj.CheckTime).format('YYYY年MM月DD日')) || '';
-        handleDetail.designNum = (detail && detail.DesignNum) || 0;
+        handleDetail.createTime = (detail && detail.CreateTime && moment(detail.CreateTime).format('YYYY年MM月DD日')) || ''; handleDetail.designNum = (detail && detail.DesignNum) || 0;
         handleDetail.actualNum = (detail && detail.ActualNum) || 0;
         handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
         handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
@@ -221,17 +220,17 @@ export default class WordView1 extends Component {
                                                     </tr>
                                                     <tr>
                                                         <td height='60;' align='center'>设计数量</td>
-                                                        <td colSpan='1'>{handleDetail.designNum}</td>
+                                                        <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
                                                         <td>实际栽植数量</td>
-                                                        <td colSpan='1'>{handleDetail.actualNum}</td>
+                                                        <td colSpan='1'>{`${handleDetail.actualNum} (个)`}</td>
                                                         <td>大数据定位量</td>
-                                                        <td >{handleDetail.locationNum}</td>
+                                                        <td >{`${handleDetail.locationNum} (个)`}</td>
                                                     </tr>
                                                     <tr>
                                                         <td height='60;' align='center'>抽检数量</td>
-                                                        <td colSpan='1'>{handleDetail.checkNum}</td>
+                                                        <td colSpan='1'>{`${handleDetail.checkNum} (个)`}</td>
                                                         <td>抽检不合格数量</td>
-                                                        <td colSpan='1'>{handleDetail.failedNum}</td>
+                                                        <td colSpan='1'>{`${handleDetail.failedNum} (个)`}</td>
                                                         <td>合格率</td>
                                                         <td colSpan='1'>{`${handleDetail.score}%`}</td>
                                                     </tr>
@@ -265,7 +264,7 @@ export default class WordView1 extends Component {
                                                                 <div style={{ float: 'left', marginLeft: 10 }}>
                                                                     <p>监理工程师：</p><p>{handleDetail.jianli}</p>
                                                                 </div>
-                                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.checkTime}</p>
+                                                                <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
                                                             </div>
                                                         </td>
                                                     </tr>

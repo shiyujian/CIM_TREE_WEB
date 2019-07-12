@@ -9,6 +9,7 @@ import { getUser, getForestImgUrl, getSmallClass, getThinClass } from '_platform
 import {getTaskThinClassName, getTaskStatus} from '../auth';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
+import XLSX from 'xlsx';
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
 window.config = window.config || {};
@@ -49,6 +50,196 @@ export default class TaskStatisTable extends Component {
         this.section = '';
         this.totalDataPer = false;
     }
+    columns = [
+        {
+            title: '序号',
+            dataIndex: 'index',
+            render: (text, record, index) => {
+                return index + 1;
+            }
+        },
+        {
+            title: '类型',
+            dataIndex: 'typeName'
+        },
+        {
+            title: '标段',
+            dataIndex: 'sectionName',
+            render: text => <div className='column'>
+                <span title={text} href='#'>
+                    {text}
+                </span>
+            </div>
+        },
+        {
+            title: '细班',
+            dataIndex: 'thinClassName',
+            render: text => <div className='column'>
+                <span title={text} href='#'>
+                    {text}
+                </span>
+            </div>
+        },
+        {
+            title: '面积(亩)',
+            dataIndex: 'Area'
+        },
+        {
+            title: '养护人员',
+            dataIndex: 'CuringMans',
+            render: text => <div className='column'>
+                <span title={text} href='#'>
+                    {text}
+                </span>
+            </div>
+        },
+        {
+            title: '创建人',
+            dataIndex: 'CreaterObj.Full_Name'
+        },
+        {
+            title: '创建时间',
+            dataIndex: 'CreateTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div style={{textAlign: 'center'}}>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
+        },
+        {
+            title: '预计开始时间',
+            dataIndex: 'PlanStartTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div style={{textAlign: 'center'}}>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
+        },
+        {
+            title: '预计结束时间',
+            dataIndex: 'PlanEndTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div style={{textAlign: 'center'}}>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
+        },
+        {
+            title: '实际开始时间',
+            dataIndex: 'StartTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div style={{textAlign: 'center'}}>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
+        },
+        {
+            title: '实际结束时间',
+            dataIndex: 'EndTime',
+            render: (text, record, index) => {
+                if (text) {
+                    try {
+                        let timeArr = text.split(' ');
+                        let time1 = timeArr[0];
+                        let time2 = timeArr[1];
+                        return (
+                            <div style={{textAlign: 'center'}}>
+                                <div>{time1}</div>
+                                <div>{time2}</div>
+                            </div>
+                        );
+                    } catch (e) {
+                        console.log('处理时间', e);
+                    }
+                } else {
+                    return null;
+                }
+            }
+        },
+        {
+            title: '状态',
+            dataIndex: 'statusName',
+            render: text => <div className='column'>
+                <span title={text} href='#'>
+                    {text}
+                </span>
+            </div>
+        },
+        {
+            title: '图片',
+            render: (text, record, index) => {
+                if (record.Pics) {
+                    return (<a onClick={this.handlePicView.bind(this, record)}>查看图片</a>);
+                } else {
+                    return (<span>无</span>);
+                }
+            }
+        },
+        {
+            title: '操作',
+            render: (text, record, index) => {
+                return (
+                    <a onClick={this.handleGisView.bind(this, record)}>查看</a>
+                );
+            }
+        }
+    ]
 
     componentDidMount = async () => {
         try {
@@ -281,154 +472,6 @@ export default class TaskStatisTable extends Component {
                 current: 1
             }
         });
-    }
-
-    render () {
-        const {
-            taskSearchData,
-            loading,
-            typeOption,
-            picViewVisible,
-            typeSelect,
-            projectOption,
-            sectionOption,
-            smallClassOption,
-            thinClassOption,
-            projectSelect,
-            sectionSelect,
-            smallClassSelect,
-            thinClassSelect,
-            pagination,
-            taskStatusSelect
-        } = this.state;
-        const {
-            taskStatisGisVisible
-        } = this.props;
-        let display = 'block';
-        if (taskStatisGisVisible) {
-            display = 'none';
-        }
-        return (
-            <div className='taskPage-container' style={{display: display}}>
-                <Spin spinning={loading}>
-                    <div className='taskSelect-container'>
-                        <div className='Search-style'>
-                            <span className='taskTable-search-span'>项目：</span>
-                            <Select
-                                className='Select-width'
-                                placeholder={'请选择项目'}
-                                value={projectSelect}
-                                onChange={this.handleProjectChange.bind(this)}
-                            >
-                                {projectOption}
-                            </Select>
-                        </div>
-                        <div className='Search-style'>
-                            <span className='taskTable-search-span'>标段：</span>
-                            <Select
-                                className='Select-width'
-                                placeholder={'请选择标段'}
-                                value={sectionSelect}
-                                onChange={this.handleSectionChange.bind(this)}
-                            >
-                                {sectionOption}
-                            </Select>
-                        </div>
-                        <div className='Search-style'>
-                            <span className='taskTable-search-span'>小班：</span>
-                            <Select
-                                className='Select-width'
-                                placeholder={'请选择小班'}
-                                value={smallClassSelect}
-                                onChange={this.handleSmallClassChange.bind(this)}
-                            >
-                                {smallClassOption}
-                            </Select>
-                        </div>
-                        <div>
-                            <Button type='primary' style={{marginRight: 20}} onClick={this.handleTableChange.bind(this, {current: 1})}>查询</Button>
-                        </div>
-                    </div>
-                    <div className='taskSelect-container'>
-                        <div className='Search-style'>
-                            <span className='taskTable-search-span'>细班：</span>
-                            <Select
-                                className='Select-width'
-                                placeholder={'请选择细班'}
-                                value={thinClassSelect}
-                                onChange={this.handleThinClassChange.bind(this)}
-                            >
-                                {thinClassOption}
-                            </Select>
-                        </div>
-                        <div className='Search-style'>
-                            <span className='taskTable-search-span'>养护类型：</span>
-                            <Select
-                                className='Select-width'
-                                placeholder={'请选择养护类型'}
-                                value={typeSelect}
-                                onSelect={this._handleTypeSelect.bind(this)}
-                            >
-                                {typeOption}
-                            </Select>
-                        </div>
-                        <div className='Search-style'>
-                            <span className='taskTable-search-span'>计划时间：</span>
-                            <div className='DatePicker-width'>
-                                <RangePicker
-                                    style={{verticalAlign: 'middle', width: '100%'}}
-                                    // defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
-                                    showTime={{ format: 'HH:mm:ss' }}
-                                    format={'YYYY-MM-DD HH:mm:ss'}
-                                    onChange={this.datepick.bind(this)}
-                                    value={this.state.timePicker}
-                                />
-                            </div>
-                        </div>
-                        <div style={{marginRight: 83.84}} />
-                    </div>
-                    <div className='taskSelect-container'>
-                        <div className='Search-style'>
-                            <span className='taskTable-search-span'>状态：</span>
-                            <Select
-                                className='Select-width'
-                                placeholder={'请选择状态'}
-                                value={taskStatusSelect}
-                                onChange={this.handleTaskStatusChange.bind(this)}
-                            >
-                                <Option key='已上报' value={2} title='已上报'>已上报</Option>
-                            </Select>
-                        </div>
-                        <div className='Search-style' />
-                        <div className='Search-style' />
-                        <div>
-                            <Button style={{marginRight: 20}} onClick={this.handleResetSearch.bind(this)}>重置</Button>
-                        </div>
-                    </div>
-
-                    <TaskStatisEcharts
-                        {...this.props}
-                        {...this.state} />
-                    <Table
-                        style={{width: '100%'}}
-                        columns={this.columns}
-                        dataSource={taskSearchData}
-                        rowKey='ID'
-                        onChange={this.handleTableChange.bind(this)}
-                        pagination={pagination}
-                    />
-                    {
-                        picViewVisible
-                            ? (<PicViewModal
-                                {...this.state}
-                                onCancel={this.handlePicCancel.bind(this)}
-                            />)
-                            : ''
-                    }
-                </Spin>
-            </div>
-
-        );
     }
     // 设置项目选项
     setProjectOption (projectList) {
@@ -929,178 +972,179 @@ export default class TaskStatisTable extends Component {
         }
     }
 
-    columns = [
-        {
-            title: '序号',
-            dataIndex: 'index',
-            render: (text, record, index) => {
-                return index + 1;
+    handleExport = () => {
+        let tblData = [];
+        let statByTreetype = [];
+
+        let _headers = ['序号', '标段', '施工单位', '监理单位'];
+        let headers = _headers.map((v, i) => Object.assign({}, { v: v, position: String.fromCharCode(65 + i) + 1 }))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let testttt = tblData.map((v, i) => _headers.map((k, j) => Object.assign({}, { v: v[k], position: String.fromCharCode(65 + j) + (i + 2) })))
+            .reduce((prev, next) => prev.concat(next))
+            .reduce((prev, next) => Object.assign({}, prev, { [next.position]: { v: next.v } }), {});
+        let output = Object.assign({}, headers, testttt);
+        // 获取所有单元格的位置
+        let outputPos = Object.keys(output);
+        // 计算出范围
+        let ref = outputPos[0] + ':' + outputPos[outputPos.length - 1];
+        // 构建 workbook 对象
+        let wb = {
+            SheetNames: ['mySheet'],
+            Sheets: {
+                'mySheet': Object.assign({}, output, { '!ref': ref })
             }
-        },
-        {
-            title: '类型',
-            dataIndex: 'typeName'
-        },
-        {
-            title: '标段',
-            dataIndex: 'sectionName',
-            render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
-        },
-        {
-            title: '细班',
-            dataIndex: 'thinClassName',
-            render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
-        },
-        {
-            title: '面积(亩)',
-            dataIndex: 'Area'
-        },
-        {
-            title: '养护人员',
-            dataIndex: 'CuringMans',
-            render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
-        },
-        {
-            title: '创建人',
-            dataIndex: 'CreaterObj.Full_Name'
-        },
-        {
-            title: '创建时间',
-            dataIndex: 'CreateTime',
-            render: (text, record, index) => {
-                if (text) {
-                    try {
-                        let timeArr = text.split(' ');
-                        let time1 = timeArr[0];
-                        let time2 = timeArr[1];
-                        return (
-                            <div>
-                                <div>{time1}</div>
-                                <div>{time2}</div>
-                            </div>
-                        );
-                    } catch (e) {
-                        console.log('处理时间', e);
-                    }
-                } else {
-                    return null;
-                }
-            }
-        },
-        {
-            title: '预计开始时间',
-            dataIndex: 'PlanStartTime',
-            render: (text, record, index) => {
-                if (text) {
-                    try {
-                        let timeArr = text.split(' ');
-                        let time1 = timeArr[0];
-                        let time2 = timeArr[1];
-                        return (
-                            <div>
-                                <div>{time1}</div>
-                                <div>{time2}</div>
-                            </div>
-                        );
-                    } catch (e) {
-                        console.log('处理时间', e);
-                    }
-                } else {
-                    return null;
-                }
-            }
-        },
-        {
-            title: '预计结束时间',
-            dataIndex: 'PlanEndTime',
-            render: (text, record, index) => {
-                if (text) {
-                    try {
-                        let timeArr = text.split(' ');
-                        let time1 = timeArr[0];
-                        let time2 = timeArr[1];
-                        return (
-                            <div>
-                                <div>{time1}</div>
-                                <div>{time2}</div>
-                            </div>
-                        );
-                    } catch (e) {
-                        console.log('处理时间', e);
-                    }
-                } else {
-                    return null;
-                }
-            }
-        },
-        {
-            title: '实际开始时间',
-            dataIndex: 'StartTime',
-            render: (text, record, index) => {
-                if (text) {
-                    try {
-                        let timeArr = text.split(' ');
-                        let time1 = timeArr[0];
-                        let time2 = timeArr[1];
-                        return (
-                            <div>
-                                <div>{time1}</div>
-                                <div>{time2}</div>
-                            </div>
-                        );
-                    } catch (e) {
-                        console.log('处理时间', e);
-                    }
-                } else {
-                    return null;
-                }
-            }
-        },
-        {
-            title: '实际结束时间',
-            dataIndex: 'EndTime',
-            render: (text, record, index) => {
-                if (text) {
-                    try {
-                        let timeArr = text.split(' ');
-                        let time1 = timeArr[0];
-                        let time2 = timeArr[1];
-                        return (
-                            <div>
-                                <div>{time1}</div>
-                                <div>{time2}</div>
-                            </div>
-                        );
-                    } catch (e) {
-                        console.log('处理时间', e);
-                    }
-                } else {
-                    return null;
-                }
-            }
-        },
-        {
-            title: '状态',
-            dataIndex: 'statusName',
-            render: text => <div className='column'><span title={text} href='#'>{text}</span></div>
-        },
-        {
-            title: '图片',
-            render: (text, record, index) => {
-                if (record.Pics) {
-                    return (<a onClick={this.handlePicView.bind(this, record)}>查看图片</a>);
-                } else {
-                    return (<span>无</span>);
-                }
-            }
-        },
-        {
-            title: '操作',
-            render: (text, record, index) => {
-                return (
-                    <a onClick={this.handleGisView.bind(this, record)}>查看</a>
-                );
-            }
+        };
+        XLSX.writeFile(wb, `养护统计.xlsx`);
+    }
+
+    render () {
+        const {
+            taskSearchData,
+            loading,
+            typeOption,
+            picViewVisible,
+            typeSelect,
+            projectOption,
+            sectionOption,
+            smallClassOption,
+            thinClassOption,
+            projectSelect,
+            sectionSelect,
+            smallClassSelect,
+            thinClassSelect,
+            pagination,
+            taskStatusSelect
+        } = this.state;
+        const {
+            taskStatisGisVisible
+        } = this.props;
+        let display = 'block';
+        if (taskStatisGisVisible) {
+            display = 'none';
         }
-    ]
+        return (
+            <div className='taskPage-container' style={{display: display}}>
+                <Spin spinning={loading}>
+                    <div className='taskSelect-container'>
+                        <div className='Search-style'>
+                            <span className='taskTable-search-span'>项目：</span>
+                            <Select
+                                className='Select-width'
+                                placeholder={'请选择项目'}
+                                value={projectSelect}
+                                onChange={this.handleProjectChange.bind(this)}
+                            >
+                                {projectOption}
+                            </Select>
+                        </div>
+                        <div className='Search-style'>
+                            <span className='taskTable-search-span'>标段：</span>
+                            <Select
+                                className='Select-width'
+                                placeholder={'请选择标段'}
+                                value={sectionSelect}
+                                onChange={this.handleSectionChange.bind(this)}
+                            >
+                                {sectionOption}
+                            </Select>
+                        </div>
+                        <div className='Search-style'>
+                            <span className='taskTable-search-span'>小班：</span>
+                            <Select
+                                className='Select-width'
+                                placeholder={'请选择小班'}
+                                value={smallClassSelect}
+                                onChange={this.handleSmallClassChange.bind(this)}
+                            >
+                                {smallClassOption}
+                            </Select>
+                        </div>
+                        <div>
+                            <Button type='primary' style={{marginRight: 20}} onClick={this.handleTableChange.bind(this, {current: 1})}>查询</Button>
+                        </div>
+                    </div>
+                    <div className='taskSelect-container'>
+                        <div className='Search-style'>
+                            <span className='taskTable-search-span'>细班：</span>
+                            <Select
+                                className='Select-width'
+                                placeholder={'请选择细班'}
+                                value={thinClassSelect}
+                                onChange={this.handleThinClassChange.bind(this)}
+                            >
+                                {thinClassOption}
+                            </Select>
+                        </div>
+                        <div className='Search-style'>
+                            <span className='taskTable-search-span'>养护类型：</span>
+                            <Select
+                                className='Select-width'
+                                placeholder={'请选择养护类型'}
+                                value={typeSelect}
+                                onSelect={this._handleTypeSelect.bind(this)}
+                            >
+                                {typeOption}
+                            </Select>
+                        </div>
+                        <div className='Search-style'>
+                            <span className='taskTable-search-span'>计划时间：</span>
+                            <div className='DatePicker-width'>
+                                <RangePicker
+                                    style={{verticalAlign: 'middle', width: '100%'}}
+                                    // defaultValue={[moment(this.state.stime, 'YYYY-MM-DD HH:mm:ss'), moment(this.state.etime, 'YYYY-MM-DD HH:mm:ss')]}
+                                    showTime={{ format: 'HH:mm:ss' }}
+                                    format={'YYYY-MM-DD HH:mm:ss'}
+                                    onChange={this.datepick.bind(this)}
+                                    value={this.state.timePicker}
+                                />
+                            </div>
+                        </div>
+                        <div style={{marginRight: 83.84}} />
+                        {/* <div>
+                            <Button style={{marginRight: 20}} onClick={this.handleExport.bind(this)}>导出</Button>
+                        </div> */}
+                    </div>
+                    <div className='taskSelect-container'>
+                        <div className='Search-style'>
+                            <span className='taskTable-search-span'>状态：</span>
+                            <Select
+                                className='Select-width'
+                                placeholder={'请选择状态'}
+                                value={taskStatusSelect}
+                                onChange={this.handleTaskStatusChange.bind(this)}
+                            >
+                                <Option key='已上报' value={2} title='已上报'>已上报</Option>
+                            </Select>
+                        </div>
+                        <div className='Search-style' />
+                        <div className='Search-style' />
+                        <div>
+                            <Button style={{marginRight: 20}} onClick={this.handleResetSearch.bind(this)}>重置</Button>
+                        </div>
+                    </div>
+
+                    <TaskStatisEcharts
+                        {...this.props}
+                        {...this.state} />
+                    <Table
+                        style={{width: 'calc(100% - 170px)'}}
+                        columns={this.columns}
+                        dataSource={taskSearchData}
+                        rowKey='ID'
+                        onChange={this.handleTableChange.bind(this)}
+                        pagination={pagination}
+                    />
+                    {
+                        picViewVisible
+                            ? (<PicViewModal
+                                {...this.state}
+                                onCancel={this.handlePicCancel.bind(this)}
+                            />)
+                            : ''
+                    }
+                </Spin>
+            </div>
+
+        );
+    }
 }

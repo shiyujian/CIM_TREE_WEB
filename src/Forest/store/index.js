@@ -423,8 +423,10 @@ export const getBigDataCheckList = forestFetchAction(
     `${FOREST_API}/tree/trees`,
     []
 );
-// 数字化验收导出
+// 数字化验收导出表格数据
 export const getExportAcceptList = forestFetchAction(`${FOREST_API}/tree/exportacceptances`, [], 'GET', []);
+// 数字化验收导出验收单
+export const getExportAcceptReport = forestFetchAction(`${FOREST_API}/DocExport.ashx?action=acceptance&acceptancedetailid={{acceptancedetailid}}`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
 export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sections`, [], 'GET', []);
 
@@ -531,6 +533,7 @@ export const actions = {
     putChangeLocInfo,
     getUnitMessageBySection,
     getExportAcceptList,
+    getExportAcceptReport,
     getBigDataCheckList
 };
 export default handleActions({
