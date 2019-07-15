@@ -202,7 +202,7 @@ export default class WordView1 extends Component {
         handleDetail.shijmj = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
         handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
-        handleDetail.checkTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.CheckTime && moment(detail.AcceptanceObj.CheckTime).format('YYYY年MM月DD日')) || '';
+        handleDetail.createTime = (detail && detail.CreateTime && moment(detail.CreateTime).format('YYYY年MM月DD日')) || '';
         handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
         return handleDetail;
     }
@@ -250,9 +250,9 @@ export default class WordView1 extends Component {
                                     <td style={{ height: 60, align: 'center' }} colSpan='1'>施工员</td>
                                     <td colSpan='1'>{handleDetail.shigong}</td>
                                     <td colSpan='1'>设计面积</td>
-                                    <td colSpan='1'>{handleDetail.sjmj}</td>
+                                    <td colSpan='1'>{`${handleDetail.sjmj} (亩)`}</td>
                                     <td colSpan='1'>实际面积</td>
-                                    <td colSpan='1'>{handleDetail.shijmj}</td>
+                                    <td colSpan='1'>{`${handleDetail.shijmj} (亩)`}</td>
                                 </tr>
                                 <tr>
                                     <td style={{ height: 60 }} >施工执行标准名称及编号</td>
@@ -280,7 +280,7 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td style={{ width: 118, height: 60 }} colSpan='1'>样带面积</td>
-                                    <td colSpan='2'>{handleDetail.sampleTapeArea}</td>
+                                    <td colSpan='2'>{`${handleDetail.sampleTapeArea}(亩)`}</td>
                                     <td style={{ width: 118 }}>得分</td>
                                     <td colSpan='2'>{handleDetail.score}</td>
                                 </tr>
@@ -302,7 +302,7 @@ export default class WordView1 extends Component {
                                             <div style={{ float: 'left', marginLeft: 10 }}>
                                                 <p>监理工程师：</p><p>{handleDetail.jianli}</p>
                                             </div>
-                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.checkTime}</p>
+                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
                                         </div>
                                     </td>
                                 </tr>
