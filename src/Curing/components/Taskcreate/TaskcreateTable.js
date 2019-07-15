@@ -30,7 +30,6 @@ import {
 } from '_platform/auth';
 
 const Panel = Collapse.Panel;
-window.config = window.config || {};
 
 export default class TaskCreateTable extends Component {
     constructor (props) {

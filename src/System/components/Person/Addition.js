@@ -11,7 +11,6 @@ import {
 import { getUserIsDocument } from '_platform/auth';
 import {getSectionNameBySection} from '_platform/gisAuth';
 import { Promise } from 'es6-promise';
-window.config = window.config || {};
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 

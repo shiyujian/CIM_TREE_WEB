@@ -18,7 +18,6 @@ import ScopeCreateModal from './ScopeCreateModal';
 import '../Checkwork.less';
 
 const Panel = Collapse.Panel;
-window.config = window.config || {};
 
 export default class ScopeCreateTable extends Component {
     constructor (props) {

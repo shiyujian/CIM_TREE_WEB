@@ -3,7 +3,6 @@ import {
     Button, Table
 } from 'antd';
 import AddMember from './AddMember';
-window.config = window.config || {};
 
 export default class AttendanceGroupTable extends Component {
     constructor (props) {

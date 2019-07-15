@@ -14,7 +14,6 @@ import {
     INITLEAFLET_API
 } from '_platform/api';
 const FormItem = Form.Item;
-window.config = window.config || {};
 class Tablelevel extends Component {
     constructor (props) {
         super(props);

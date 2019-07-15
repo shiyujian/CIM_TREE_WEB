@@ -6,7 +6,6 @@ import { getUser } from '_platform/auth';
 import '../Curing.less';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-window.config = window.config || {};
 
 export default class AddMember extends Component {
     constructor (props) {

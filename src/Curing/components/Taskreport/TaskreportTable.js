@@ -33,7 +33,6 @@ import {
 } from '_platform/auth';
 import TaskReportModal from './TaskReportModal';
 const Panel = Collapse.Panel;
-window.config = window.config || {};
 
 export default class TaskReportTable extends Component {
     constructor (props) {

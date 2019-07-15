@@ -44,7 +44,6 @@ import {
 } from '_platform/api';
 import MenuSwitch from '../MenuSwitch';
 
-window.config = window.config || {};
 class OnSite extends Component {
     // export default class OnSite extends Component {
     constructor (props) {

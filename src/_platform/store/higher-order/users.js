@@ -1,7 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {forestFetchAction} from '../fetchAction';
-import { USER_API, SUSER_API, FOREST_API } from '../../api';
+import { USER_API, FOREST_API } from '../../api';
 import { capitalize } from '../util';
 
 export default (ID, service = '') => {
@@ -13,13 +13,13 @@ export default (ID, service = '') => {
         `${USER_API}/users/?page={{page}}`,
         'GET'
     );
-    const postForestUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'POST');
+    const postForestUser = createFetchAction(`${FOREST_API}/system/suser`, [], 'POST');
     const deleteForestUser = createFetchAction(
-        `${SUSER_API}/system/user/{{userID}}`,
+        `${FOREST_API}/system/user/{{userID}}`,
         [],
         'DELETE'
     );
-    const putForestUser = createFetchAction(`${SUSER_API}/system/suser`, [], 'PUT');
+    const putForestUser = createFetchAction(`${FOREST_API}/system/suser`, [], 'PUT');
     const postForestUserBlackList = forestFetchAction(
         `${FOREST_API}/system/blacksuser`,
         [],

@@ -16,7 +16,6 @@ import {
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-window.config = window.config || {};
 
 class Tablelevel extends Component {
     constructor (props) {

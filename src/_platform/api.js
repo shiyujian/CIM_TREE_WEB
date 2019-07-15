@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-06-25 09:48:42
+ * @Last Modified time: 2019-07-15 09:12:34
  */
 /**
  *
@@ -47,10 +47,9 @@ import 'whatwg-fetch';
 require('es6-promise').polyfill();
 
 window.config = window.config || {};
-let DOMAIN, SDOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
+let DOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
 
 DOMAIN = window.config.DOMAIN;
-SDOMAIN = window.config.SDOMAIN;
 USER = window.config.STATIC_FILE_USER;
 PASSWORD = window.config.STATIC_FILE_PASSWORD;
 STATIC_FILE_IP = window.config.STATIC_FILE_IP;
@@ -92,8 +91,7 @@ export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
 }`;
 export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
 // 智慧森林
-export const SUSER_API = `${SDOMAIN}`;
-export const FOREST_API = `${SDOMAIN}`;
+export const FOREST_API = `${DOMAIN}`;
 export const SEEDLING_API = `${window.config.SEEDLING}`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;

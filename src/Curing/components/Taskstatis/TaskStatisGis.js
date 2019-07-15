@@ -11,7 +11,6 @@ import {
 } from '_platform/api';
 import {genPopUpContent, getIconType, getTaskStatus} from '../auth';
 import '../Curing.less';
-window.config = window.config || {};
 
 export default class TaskStatisGis extends Component {
     constructor (props) {

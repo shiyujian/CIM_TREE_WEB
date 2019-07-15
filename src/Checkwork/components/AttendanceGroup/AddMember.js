@@ -5,7 +5,6 @@ import {
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
-window.config = window.config || {};
 
 class AddMember extends Component {
     static layout = {

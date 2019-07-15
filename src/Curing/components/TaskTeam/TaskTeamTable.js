@@ -5,7 +5,6 @@ import {
 import { getUser } from '_platform/auth';
 import AddMember from './AddMember';
 import '../Curing.less';
-window.config = window.config || {};
 
 export default class TaskTeamTable extends Component {
     constructor (props) {

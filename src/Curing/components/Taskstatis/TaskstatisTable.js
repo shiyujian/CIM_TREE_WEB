@@ -11,7 +11,6 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
-window.config = window.config || {};
 
 export default class TaskStatisTable extends Component {
     constructor (props) {

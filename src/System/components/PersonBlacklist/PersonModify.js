@@ -11,7 +11,6 @@ import {
 } from 'antd';
 import './PersonModify.less';
 const FormItem = Form.Item;
-window.config = window.config || {};
 class PersonModify extends Component {
     // export default class PersonModify extends Component {
     constructor (props) {
