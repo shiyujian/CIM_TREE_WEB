@@ -9,6 +9,7 @@ import {
     Select
 } from 'antd';
 import { getUserIsManager, getCompanyDataByOrgCode } from '_platform/auth';
+import {ORGTYPE} from '_platform/api';
 import { handleFilterData } from '../auth';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -38,7 +39,7 @@ class CountFilter extends Component {
         const {
             actions: {
                 getTreeNodeList,
-                getOrgTree
+                getOrgTreeByOrgType
             },
             platform: { tree = {} }
         } = this.props;
@@ -50,21 +51,12 @@ class CountFilter extends Component {
             // 是否为业主或管理员
             let permission = getUserIsManager();
             if (permission) {
-                if (!(tree && tree.org && tree.org.children && tree.org.children instanceof Array && tree.org.children.length > 0)) {
-                    let orgData = await getOrgTree({}, { depth: 7 });
-                    console.log('orgData', orgData);
-                    await orgData.children.map(async (child) => {
-                        if (child.name !== '苗圃基地' && child.name !== '供应商') {
-                            await this.getCompanyList(child);
-                        }
-                    });
-                } else {
-                    await tree.org.children.map(async (child) => {
-                        if (child.name !== '苗圃基地' && child.name !== '供应商') {
-                            await this.getCompanyList(child);
-                        }
-                    });
-                }
+                ORGTYPE.map(async (type) => {
+                    let orgData = await getOrgTreeByOrgType({orgtype: type});
+                    if (orgData && orgData instanceof Array && orgData.length > 0) {
+                        await this.getCompanyList(orgData);
+                    }
+                });
             }
             this.setState({
                 permission
@@ -79,7 +71,7 @@ class CountFilter extends Component {
     getUserCompany = async () => {
         const {
             actions: {
-                getOrgTreeByCode
+                getParentOrgTreeByID
             },
             form: { setFieldsValue }
         } = this.props;
@@ -87,19 +79,19 @@ class CountFilter extends Component {
             let user = localStorage.getItem('QH_USER_DATA');
             user = JSON.parse(user);
             // admin没有部门
-            if (user.username !== 'admin') {
+            if (user.User_Name !== 'admin') {
                 // userOrgCode为登录用户自己的部门code
-                let userOrgCode = user.account.org_code;
-                let parentData = await getCompanyDataByOrgCode(userOrgCode, getOrgTreeByCode);
-                let companyOrgCode = parentData.code;
+                let orgID = user.Org;
+                let parentData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                let companyOrgID = parentData.ID;
                 await setFieldsValue({
-                    org_code: companyOrgCode
+                    orgID: companyOrgID
                 });
                 this.setState({
-                    userCompany: companyOrgCode
+                    userCompany: companyOrgID
                 });
                 // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
-                await this.getCheckGroupList(companyOrgCode);
+                await this.getCheckGroupList(companyOrgID);
                 await this.query();
             }
         } catch (e) {
@@ -108,16 +100,8 @@ class CountFilter extends Component {
     }
     // 查找所有的公司的List
     getCompanyList = async (data) => {
-        if (data && data.extra_params && data.extra_params.companyStatus) {
-            if (data.extra_params.companyStatus === '项目' || data.extra_params.companyStatus === '非公司') {
-                if (data && data.children && data.children.length > 0) {
-                    await data.children.map((child) => {
-                        return this.getCompanyList(child);
-                    });
-                }
-            } else if (data.extra_params.companyStatus === '公司' || data.extra_params.companyStatus.indexOf('单位') !== -1) {
-                await this.companyList.push(data);
-            }
+        if (data && data.ID && data.OrgName) {
+            this.companyList.push(data);
         }
     }
     // 公司选择
@@ -129,7 +113,7 @@ class CountFilter extends Component {
             permission
         } = this.state;
         await setFieldsValue({
-            org_code: value
+            orgID: value
         });
         // 非业主账户只能查找自己的公司的考勤群体
         if (permission) {
@@ -445,7 +429,7 @@ class CountFilter extends Component {
                         <Row>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='公司'>
-                                    {getFieldDecorator('org_code', {
+                                    {getFieldDecorator('orgID', {
 
                                     })(
                                         <Select
@@ -457,8 +441,11 @@ class CountFilter extends Component {
                                         >
                                             {
                                                 this.companyList.map((company) => {
-                                                    return <Option title={company.name} key={company.code} value={company.code}>
-                                                        {company.name}
+                                                    return <Option
+                                                        title={company.OrgName}
+                                                        key={company.ID}
+                                                        value={company.ID}>
+                                                        {company.OrgName}
                                                     </Option>;
                                                 })
                                             }
@@ -654,7 +641,7 @@ class CountFilter extends Component {
             duty: undefined,
             group: undefined,
             name: undefined,
-            org_code: userCompany || undefined,
+            orgID: userCompany || undefined,
             role: undefined,
             searchDate: undefined,
             status: undefined

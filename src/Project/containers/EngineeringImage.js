@@ -47,36 +47,36 @@ export default class EngineeringImage extends Component {
             currentpk: '',
             currentcode: '',
             isAdmin: false,
-            orgCode: '',
+            parentOrgID: '',
             extraOrgLeaf: false,
-            extraOrgCode: ''
+            extraOrgID: ''
         };
     }
 
     componentDidMount = async () => {
         const {
-            actions: { getworkTree, savepk, addDir, getOrgTreeByCode }
+            actions: { getworkTree, savepk, addDir, getParentOrgTreeByID }
         } = this.props;
         try {
             let user = window.localStorage.getItem('QH_USER_DATA');
             user = JSON.parse(user);
             console.log('user', user);
             let isAdmin = false;
-            let parentOrgCode = '';
+            let parentOrgID = '';
             let userButtonAddPermission = false;
             if (user && user.username === 'admin') {
                 userButtonAddPermission = true;
                 isAdmin = true;
             } else {
-                let orgCode = user && user.account && user.account.org_code;
-                let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                parentOrgCode = parent.code;
+                let orgID = user && user.Org;
+                let parent = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                parentOrgID = parent.ID;
             }
             this.setState({
                 user: user,
                 userButtonAddPermission,
                 isAdmin,
-                orgCode: parentOrgCode
+                parentOrgID: parentOrgID
             });
 
             let rst = await getworkTree({ code: Datumcode });
@@ -108,7 +108,7 @@ export default class EngineeringImage extends Component {
     selectStandardDir (keys = [], info) {
         const {
             isAdmin,
-            orgCode
+            parentOrgID
         } = this.state;
         let treeSelected = info.selected;
         this.setState({
@@ -119,13 +119,13 @@ export default class EngineeringImage extends Component {
         let userButtonDelPermission = false;
         if (treeSelected) {
             let treeSelectData = info.node.props.data;
-            let extraOrgCode = treeSelectData.extra_params.orgCode ? treeSelectData.extra_params.orgCode : '';
+            let extraOrgID = treeSelectData.extra_params.parentOrgID ? treeSelectData.extra_params.parentOrgID : '';
             const [code] = keys;
             if (isAdmin) {
                 userButtonAddPermission = true;
                 userButtonDelPermission = true;
             } else {
-                if (extraOrgCode === orgCode) {
+                if (extraOrgID === parentOrgID) {
                     userButtonAddPermission = true;
                     if (treeSelectData && treeSelectData.extra_params && treeSelectData.extra_params.orgDel) {
                         userButtonDelPermission = true;
@@ -140,7 +140,7 @@ export default class EngineeringImage extends Component {
                 userButtonDelPermission,
                 treeSelectData,
                 extraOrgLeaf,
-                extraOrgCode
+                extraOrgID
             });
         } else {
             if (isAdmin) {
@@ -153,7 +153,7 @@ export default class EngineeringImage extends Component {
                 userButtonDelPermission,
                 treeSelectData: '',
                 extraOrgLeaf: false,
-                extraOrgCode: ''
+                extraOrgID: ''
             });
         }
     }
@@ -251,7 +251,7 @@ export default class EngineeringImage extends Component {
             userButtonAddPermission,
             userButtonDelPermission,
             extraOrgLeaf: false,
-            extraOrgCode: ''
+            extraOrgID: ''
         });
     }
 }

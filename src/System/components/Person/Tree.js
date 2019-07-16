@@ -54,7 +54,8 @@ export default class Tree extends Component {
                 getOrgTree,
                 changeSidebarField,
                 getOrgTreeSelect,
-                getOrgTreeByCode,
+                getChildOrgTreeByID,
+                getParentOrgTreeByID,
                 getOrgTreeDataArr,
                 getTablePage
             }
@@ -81,14 +82,14 @@ export default class Tree extends Component {
             let orgTreeArrList = [];
             if (user && user.username !== 'admin') {
                 // 获取登录用户的公司的信息
-                let org_code = user.account.org_code;
+                let orgID = user.Org;
                 // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
-                let parentOrgData = await getCompanyDataByOrgCode(org_code, getOrgTreeByCode);
+                let parentOrgData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
                 // 如果在公司下，则获取公司所有的信息
                 if (parentOrgData) {
                     let parentOrgCode = parentOrgData.code;
                     // 获取公司线下的所有部门信息
-                    orgTreeData = await getOrgTreeByCode({code: parentOrgCode});
+                    orgTreeData = await getChildOrgTreeByID({id: parentOrgCode});
                     orgTreeArrList.push(orgTreeData);
                     // 将公司下的所有部门设置为Select的选项
                     let orgTreeSelectData = Tree.orgloop([orgTreeData]);
@@ -99,8 +100,8 @@ export default class Tree extends Component {
                     await getOrgTreeDataArr(this.orgTreeDataArr);
                     // 如果是施工文书，需要获取苗木基地和供应商，对这两种机构下的人进行审核
                     if (isClericalStaff) {
-                        let nurseryData = await getOrgTreeByCode({code: ORG_NURSERY_CODE});
-                        let supplierData = await getOrgTreeByCode({code: ORG_SUPPLIER_CODE});
+                        let nurseryData = await getChildOrgTreeByID({id: ORG_NURSERY_CODE});
+                        let supplierData = await getChildOrgTreeByID({id: ORG_SUPPLIER_CODE});
                         orgTreeArrList.push(nurseryData);
                         orgTreeArrList.push(supplierData);
                         orgTreeArrList.map(item => {
@@ -113,7 +114,7 @@ export default class Tree extends Component {
                     }
                 } else {
                     // 如果不在公司下，则至获取他所在的组织机构的数据
-                    orgTreeData = await getOrgTreeByCode({code: org_code});
+                    orgTreeData = await getChildOrgTreeByID({id: orgID});
                     console.log('orgTreeData', orgTreeData);
                     if (orgTreeData && orgTreeData.code) {
                         orgTreeData.children = [];
@@ -127,12 +128,12 @@ export default class Tree extends Component {
             }
             // 如果是管理员，获取全部数据
             if (permission) {
-                let rst = await getOrgTree({}, {depth: 7});
+                let rst = await getOrgTree({});
                 // 对苗圃基地和供应商按照区号进行省份和地区的划分
                 if (rst && rst.children) {
                     orgTreeArrList = rst.children;
-                    let nurseryData = await getOrgTreeByCode({code: ORG_NURSERY_CODE});
-                    let supplierData = await getOrgTreeByCode({code: ORG_SUPPLIER_CODE});
+                    let nurseryData = await getChildOrgTreeByID({id: ORG_NURSERY_CODE});
+                    let supplierData = await getChildOrgTreeByID({id: ORG_SUPPLIER_CODE});
                     orgTreeArrList.push(nurseryData);
                     orgTreeArrList.push(supplierData);
                     orgTreeArrList.map(item => {

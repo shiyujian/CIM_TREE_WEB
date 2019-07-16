@@ -27,10 +27,9 @@ export default class AttendanceGroup extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            userOrgCode: '',
-            companyOrgCode: '',
+            userOrgID: '',
+            companyOrgID: '',
             parentData: '',
-            companyDatas: '',
             user: '',
             orgTreeSelectData: []
         };
@@ -39,7 +38,8 @@ export default class AttendanceGroup extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getOrgTreeByCode,
+                getChildOrgTreeByID,
+                getParentOrgTreeByID,
                 changeAsideTreeLoading,
                 getCheckGroup,
                 getCheckGroupOK,
@@ -66,23 +66,23 @@ export default class AttendanceGroup extends Component {
             // 获取用户的公司信息
             let user = localStorage.getItem('QH_USER_DATA');
             user = JSON.parse(user);
-            let userOrgCode = '';
-            let companyOrgCode = '';
+            let userOrgID = '';
+            let companyOrgID = '';
             let parentData = '';
             let companyDatas = '';
             let orgTreeSelectData = [];
-            if (user.username !== 'admin') {
+            if (user.User_Name !== 'admin') {
                 // userOrgCode为登录用户自己的部门code
-                userOrgCode = user.account.org_code;
-                parentData = await getCompanyDataByOrgCode(userOrgCode, getOrgTreeByCode);
-                companyOrgCode = parentData.code;
+                userOrgID = user.Org;
+                parentData = await getCompanyDataByOrgCode(userOrgID, getParentOrgTreeByID);
+                companyOrgID = parentData.ID;
                 // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
                 let postData = {
-                    org_code: companyOrgCode
+                    org_code: companyOrgID
                 };
                 await getCheckGroup({}, postData);
                 // 在关联人员时需要根据各个部门来查找人员，所以需要根据公司的code查找公司内的组织机构
-                companyDatas = await getOrgTreeByCode({code: companyOrgCode});
+                companyDatas = await getChildOrgTreeByID({id: companyOrgID});
                 // 获取组织机构后，构建成TreeSelect
                 orgTreeSelectData = AttendanceGroup.orgloop([companyDatas]);
             }
@@ -90,10 +90,9 @@ export default class AttendanceGroup extends Component {
             await changeAsideTreeLoading(false);
             this.setState({
                 user,
-                userOrgCode,
-                companyOrgCode,
+                userOrgID,
+                companyOrgID,
                 parentData,
-                companyDatas,
                 orgTreeSelectData
             });
         } catch (e) {
@@ -104,7 +103,10 @@ export default class AttendanceGroup extends Component {
     render () {
         return (
             <div className='AttendanceGroup-Layout'>
-                <AsideTree {...this.props} {...this.state} className='AttendanceGroup-aside-Layout' />
+                <AsideTree
+                    {...this.props}
+                    {...this.state}
+                    className='AttendanceGroup-aside-Layout' />
                 <div className='AttendanceGroup-table-Layout'>
                     <AttendanceGroupTable {...this.props} {...this.state} />
                 </div>
@@ -122,20 +124,20 @@ export default class AttendanceGroup extends Component {
             if (item.children && item.children.length > 0) {
                 return (
                     <TreeNode disabled
-                        key={`${item.code}`}
-                        value={item.code}
-                        title={`${item.name}`}>
+                        key={`${item.ID}`}
+                        value={item.ID}
+                        title={`${item.OrgName}`}>
                         {
-                            AttendanceGroup.orgloop(item.children, loopTimes + 1, item.name)
+                            AttendanceGroup.orgloop(item.children, loopTimes + 1)
                         }
                     </TreeNode>
                 );
             } else {
                 return (<TreeNode
                     disabled={loopTimes === 0 && true}
-                    key={`${item.code}`}
-                    value={item.code}
-                    title={`${item.name}`} />);
+                    key={`${item.ID}`}
+                    value={item.ID}
+                    title={`${item.OrgName}`} />);
             }
         });
     };

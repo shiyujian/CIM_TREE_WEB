@@ -8,7 +8,6 @@ export default class Tree extends Component {
         super(props);
         this.state = {
             childList: [],
-            list: [],
             listVisible: true,
             loading: false
         };
@@ -21,31 +20,20 @@ export default class Tree extends Component {
             }
         } = this.props;
         if (!(children && children instanceof Array && children.length > 0)) {
-            await getOrgTree({}, { depth: 7 });
+            await getOrgTree({});
         }
         await this.getOrgDataList();
     }
 
     getOrgDataList = async () => {
         const {
-            platform: { org: { children = [] } = {} },
+            platform: { org = [] },
             actions: {
                 changeOrgTreeDataStatus
             }
         } = this.props;
         try {
-            let dataList = [];
-            dataList = children.filter(item => {
-                if (item.name !== '供应商' && item.name !== '苗圃基地') {
-                    return item;
-                }
-            });
-            console.log('dataList', dataList);
-            await this.setState({
-                dataList
-            });
-            await this.getList(dataList);
-            await this.setState({ list: this.filiter(children) });
+            await this.getList(org);
             await changeOrgTreeDataStatus(false);
         } catch (e) {
             console.log('getOrgDataList', e);
@@ -158,32 +146,6 @@ export default class Tree extends Component {
             }
         });
     }
-
-    // 根据标段信息显示组织结构，人员标段信息和组织机构标段信息要匹配
-    filiter (list) {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        if (!user.is_superuser) {
-            if (!user.account.sections || user.account.sections == []) {
-                return [];
-            } else {
-                for (let i = 0; i < list.length; i++) {
-                    const children = list[i].children;
-                    for (let j = 0; j < children.length; j++) {
-                        let c = children[j];
-                        if (
-                            !this.compare(
-                                user.account.sections,
-                                c.extra_params.sections
-                            )
-                        ) {
-                            delete children[j];
-                        }
-                    }
-                }
-            }
-        }
-        return list;
-    }
     // 人员标段和组织机构标段比较器，如果满足条件返回true
     compare (l1, s) {
         if (s == undefined) {
@@ -235,7 +197,11 @@ export default class Tree extends Component {
     remove = async () => {
         const {
             sidebar: { node = {} } = {},
-            actions: { deleteOrg, getOrgTree, changeOrgTreeDataStatus }
+            actions: {
+                deleteOrg,
+                getOrgTree,
+                changeOrgTreeDataStatus
+            }
         } = this.props;
         try {
             this.setState({
@@ -248,7 +214,7 @@ export default class Tree extends Component {
                         message: '删除成功',
                         duration: 3
                     });
-                    await getOrgTree({}, { depth: 7 });
+                    await getOrgTree({});
                     await changeOrgTreeDataStatus(true);
                     this.setState({
                         loading: false

@@ -1,17 +1,29 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import { capitalize } from '../util';
-import { SERVICE_API } from '../../api';
+import { SERVICE_API, SYSTEM_API } from '../../api';
 
 export default (ID, service = '') => {
     const suffix = service.toUpperCase();
     const SERVICE = capitalize(service);
     const getOrgTreeOK = createAction(`${ID}_GET_ORG_OK_${suffix}`);
-    const getOrgTree = createFetchAction(`${SERVICE_API}/org-tree/`, [
+    const getOrgTree = createFetchAction(`${SYSTEM_API}/orgtree`, [
         getOrgTreeOK
     ]);
-    const getOrgTreeByCode = createFetchAction(
-        `${SERVICE_API}/org-tree/code/{{code}}/`,
+    // 升级后的接口
+    // 分类获取数据
+    const getOrgTreeByOrgType = createFetchAction(
+        `${SYSTEM_API}/orgtree?orgtype={{orgtype}}`,
+        'GET'
+    );
+    // 反查
+    const getParentOrgTreeByID = createFetchAction(
+        `${SYSTEM_API}/revertorgtree?id={{id}}`,
+        'GET'
+    );
+    // 获取某个节点的组织机构树
+    const getChildOrgTreeByID = createFetchAction(
+        `${SYSTEM_API}/suborgtree?id={{id}}`,
         'GET'
     );
 
@@ -32,10 +44,6 @@ export default (ID, service = '') => {
     const orgReducer = handleActions(
         {
             [getOrgTreeOK]: (state, { payload = {} }) => payload
-            // [getOrgTreeOK]: (state, {payload}) => ({
-            //     ...state,
-            //     orgTree: payload
-            // })
         },
         []
     );
@@ -46,7 +54,9 @@ export default (ID, service = '') => {
     orgReducer[`put${SERVICE}Org`] = putOrg;
     orgReducer[`delete${SERVICE}Org`] = deleteOrg;
     orgReducer[`get${SERVICE}OrgParent`] = getOrgParent;
-    orgReducer[`get${SERVICE}OrgTreeByCode`] = getOrgTreeByCode;
+    orgReducer[`get${SERVICE}OrgTreeByOrgType`] = getOrgTreeByOrgType;
+    orgReducer[`get${SERVICE}ParentOrgTreeByID`] = getParentOrgTreeByID;
+    orgReducer[`get${SERVICE}ChildOrgTreeByID`] = getChildOrgTreeByID;
 
     return orgReducer;
 };

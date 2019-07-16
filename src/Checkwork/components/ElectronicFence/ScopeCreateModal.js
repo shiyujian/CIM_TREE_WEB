@@ -58,7 +58,7 @@ class ScopeCreateModal extends Component {
                         <Row>
                             <FormItem {...FormItemLayout} label='公司名称'>
                                 {getFieldDecorator('checkCompany', {
-                                    initialValue: `${parentData && parentData.name}`,
+                                    initialValue: `${parentData && parentData.OrgName}`,
                                     rules: [
                                         { required: true, message: '请输入公司名称' }
                                     ]

@@ -21,8 +21,6 @@ export default class ElectronicFence extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            userOrgCode: '',
-            companyOrgCode: '',
             parentData: '',
             user: '',
             groupTreeLoading: false,
@@ -66,7 +64,7 @@ export default class ElectronicFence extends Component {
     loadCheckGroupData = async (user) => {
         const {
             actions: {
-                getOrgTreeByCode,
+                getParentOrgTreeByID,
                 getCheckGroup
             }
         } = this.props;
@@ -74,22 +72,20 @@ export default class ElectronicFence extends Component {
             this.setState({
                 groupTreeLoading: true
             });
-            let userOrgCode = '';
-            let companyOrgCode = '';
+            let userOrgID = '';
+            let companyOrgID = '';
             let parentData = '';
             // userOrgCode为登录用户自己的部门code
-            userOrgCode = user.account.org_code;
-            parentData = await getCompanyDataByOrgCode(userOrgCode, getOrgTreeByCode);
-            companyOrgCode = parentData.code;
+            userOrgID = user.Org;
+            parentData = await getCompanyDataByOrgCode(userOrgID, getParentOrgTreeByID);
+            companyOrgID = parentData.ID;
             // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
             let postData = {
-                org_code: companyOrgCode
+                org_code: companyOrgID
             };
             await getCheckGroup({}, postData);
             this.setState({
                 user,
-                userOrgCode,
-                companyOrgCode,
                 parentData,
                 groupTreeLoading: false
             });

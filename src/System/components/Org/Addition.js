@@ -188,7 +188,7 @@ class Addition extends Component {
                     console.log('rst', rst);
                     if (rst.pk) {
                         setTimeout(async () => {
-                            await getOrgTree({}, { depth: 7 });
+                            await getOrgTree({});
                             await changeOrgTreeDataStatus(true);
                             this.setState({
                                 loading: false

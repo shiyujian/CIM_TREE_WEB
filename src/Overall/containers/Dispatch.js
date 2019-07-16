@@ -28,14 +28,15 @@ export default class Dispatch extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            datas: []
+            datas: [],
+            orgList: []
         };
     }
     static propTypes = {};
 
     componentDidMount () {
         const {
-            actions: { getReceiveInfoAc, getSentInfoAc, getOrgListAc }
+            actions: { getReceiveInfoAc, getSentInfoAc, getOrgTree }
         } = this.props;
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         let orgCode = getUser().org_code;
@@ -44,7 +45,7 @@ export default class Dispatch extends Component {
             orgListCodes.pop();
             let codeu = orgListCodes.join();
             let ucode = codeu.replace(/,/g, '_');
-            getOrgListAc().then(item => {
+            getOrgTree().then(item => {
                 if (user.is_superuser) {
                     getReceiveInfoAc({
                         user: encodeURIComponent('admin')
@@ -63,6 +64,9 @@ export default class Dispatch extends Component {
                         user: encodeURIComponent(ucode)
                     });
                 }
+                this.setState({
+                    orgList: item
+                });
             });
         }
     }
@@ -80,10 +84,10 @@ export default class Dispatch extends Component {
                 <DynamicTitle title='现场收发文' {...this.props} />
                 <Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
                     <TabPane tab='收文管理' key='1'>
-                        <ReceivePage {...this.props} />
+                        <ReceivePage {...this.props} {...this.state} />
                     </TabPane>
                     <TabPane tab='发文管理' key='2'>
-                        <SendPage {...this.props} />
+                        <SendPage {...this.props} {...this.state} />
                     </TabPane>
                 </Tabs>
             </div>

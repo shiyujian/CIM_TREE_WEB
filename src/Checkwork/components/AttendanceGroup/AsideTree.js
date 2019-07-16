@@ -153,7 +153,7 @@ class AsideTree extends Component {
                                             rules: [
                                                 { required: true, message: '请输入公司名称' }
                                             ],
-                                            initialValue: `${parentData && parentData.name}`
+                                            initialValue: `${parentData && parentData.OrgName}`
                                         })(
                                             <Input
                                                 placeholder='请输入公司名称' readOnly
@@ -186,7 +186,7 @@ class AsideTree extends Component {
             checkGroupsData = [],
             parentData
         } = this.props;
-        let name = (parentData && parentData.name) || '公司名称';
+        let name = (parentData && parentData.OrgName) || '公司名称';
         let groupsTree = [];
         if (checkGroupsData && checkGroupsData.length > 0) {
             groupsTree.push({
@@ -207,11 +207,11 @@ class AsideTree extends Component {
                 changeAsideTreeLoading
             },
             user,
-            companyOrgCode
+            companyOrgID
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
-                if (!companyOrgCode) {
+                if (!companyOrgID) {
                     Notification.error({
                         message: '该用户非公司人员，不能添加群体',
                         duration: 3
@@ -229,7 +229,7 @@ class AsideTree extends Component {
                     project_code: projectCode,
                     project_name: '',
                     org_name: groupcompanyName,
-                    org_code: companyOrgCode
+                    org_code: companyOrgID
                 };
                 let checkgroup = await postCheckGroup({}, postData);
                 if (checkgroup && checkgroup.id) {
@@ -241,7 +241,7 @@ class AsideTree extends Component {
                         teamVisible: false
                     });
                     await changeAsideTreeLoading(true);
-                    await getCheckGroup({}, {org_code: companyOrgCode});
+                    await getCheckGroup({}, {org_code: companyOrgID});
                     await changeAsideTreeLoading(false);
                 } else {
                     Notification.error({
@@ -262,7 +262,7 @@ class AsideTree extends Component {
                 changeAsideTreeLoading,
                 getCheckGroup
             },
-            companyOrgCode
+            companyOrgID
         } = this.props;
         const {
             selectKey,
@@ -282,7 +282,7 @@ class AsideTree extends Component {
                         selected: false
                     });
                     await changeAsideTreeLoading(true);
-                    await getCheckGroup({}, {org_code: companyOrgCode});
+                    await getCheckGroup({}, {org_code: companyOrgID});
                     await changeAsideTreeLoading(false);
                 } else {
                     Notification.error({

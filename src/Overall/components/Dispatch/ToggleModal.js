@@ -767,77 +767,116 @@ class ToggleModal extends Component {
 
     static loop (data = [], arr = []) {
         return data.map(item => {
-            if (item.children && item.children.length) {
-                if (
-                    item.children[0].children &&
-                    item.children[0].children.length == 0
-                ) {
-                    delete item.children;
-                } else {
+            if (item && item.OrgCode) {
+                console.log('data', data);
+                if (item.children && item.children.length > 0) {
                     return (
                         <TreeNode
-                            key={`${item.code}--${item.name}`}
-                            value={`${item.code}--${item.name}`}
-                            title={`${item.name}`}
+                            key={`${item.ID}--${item.OrgName}`}
+                            value={`${item.ID}--${item.OrgName}`}
+                            title={`${item.OrgName}`}
                             disabled={ToggleModal._checkSentDisable(
-                                `${item.code}--${item.name}`,
+                                `${item.ID}--${item.OrgName}`,
                                 arr
                             )}
                         >
                             {ToggleModal.loop(item.children)}
                         </TreeNode>
                     );
+                } else {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}--${item.OrgName}`}
+                            value={`${item.ID}--${item.OrgName}`}
+                            title={`${item.OrgName}`}
+                            disabled={ToggleModal._checkSentDisable(
+                                `${item.ID}--${item.OrgName}`,
+                                arr
+                            )}
+                        />
+                    );
+                }
+            } else {
+                if (item && item.Orgs && item.Orgs.length > 0) {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}--${item.ProjectName}`}
+                            value={`${item.ID}--${item.ProjectName}`}
+                            title={`${item.ProjectName}`}
+                            disabled
+                        >
+                            {ToggleModal.loop(item.Orgs)}
+                        </TreeNode>
+                    );
+                } else {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}--${item.ProjectName}`}
+                            value={`${item.ID}--${item.ProjectName}`}
+                            title={`${item.ProjectName}`}
+                            disabled
+                        />
+                    );
                 }
             }
-            return (
-                <TreeNode
-                    key={`${item.code}--${item.name}`}
-                    value={`${item.code}--${item.name}`}
-                    title={`${item.name}`}
-                    disabled={ToggleModal._checkSentDisable(
-                        `${item.code}--${item.name}`,
-                        arr
-                    )}
-                />
-            );
         });
     }
 
     static loopT (data = [], arr = []) {
+        console.log('data', data);
         return data.map(item => {
-            if (item.children && item.children.length) {
-                if (
-                    item.children[0].children &&
-                    item.children[0].children.length == 0
-                ) {
-                    delete item.children;
-                } else {
+            if (item && item.OrgCode) {
+                console.log('data', data);
+                if (item.children && item.children.length > 0) {
                     return (
                         <TreeNode
-                            key={`${item.code}--${item.name}`}
-                            value={`${item.code}--${item.name}`}
-                            title={`${item.name}`}
-                            disabled={ToggleModal._checkSentDisableT(
-                                `${item.code}--${item.name}`,
+                            key={`${item.ID}--${item.OrgName}`}
+                            value={`${item.ID}--${item.OrgName}`}
+                            title={`${item.OrgName}`}
+                            disabled={ToggleModal._checkSentDisable(
+                                `${item.ID}--${item.OrgName}`,
                                 arr
                             )}
                         >
                             {ToggleModal.loopT(item.children)}
                         </TreeNode>
                     );
+                } else {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}--${item.OrgName}`}
+                            value={`${item.ID}--${item.OrgName}`}
+                            title={`${item.OrgName}`}
+                            disabled={ToggleModal._checkSentDisableT(
+                                `${item.ID}--${item.OrgName}`,
+                                arr
+                            )}
+                        />
+                    );
+                }
+            } else {
+                if (item && item.Orgs && item.Orgs.length > 0) {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}--${item.ProjectName}`}
+                            value={`${item.ID}--${item.ProjectName}`}
+                            title={`${item.ProjectName}`}
+                            disabled
+                        >
+                            {ToggleModal.loopT(item.Orgs)}
+                        </TreeNode>
+                    );
+                } else {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}--${item.ProjectName}`}
+                            value={`${item.ID}--${item.ProjectName}`}
+                            title={`${item.ProjectName}`}
+                            disabled
+                        />
+                    );
                 }
             }
-            return (
-                <TreeNode
-                    key={`${item.code}--${item.name}`}
-                    value={`${item.code}--${item.name}`}
-                    title={`${item.name}`}
-                    disabled={ToggleModal._checkSentDisableT(
-                        `${item.code}--${item.name}`,
-                        arr
-                    )}
-                />
-            );
         });
     }
 }

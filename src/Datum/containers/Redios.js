@@ -51,7 +51,7 @@ export default class Redios extends Component {
             currentSection: '',
             currentSectionName: ''
         };
-        this.orgCode = '';
+        this.orgID = '';
         this.user = '';
     }
 
@@ -86,7 +86,7 @@ export default class Redios extends Component {
             actions: {
                 getTree,
                 getSearchRedioVisible,
-                getOrgTreeByCode,
+                getParentOrgTreeByID,
                 setkeycode,
                 getTreeNodeList
             }
@@ -100,9 +100,9 @@ export default class Redios extends Component {
             this.user = localStorage.getItem('QH_USER_DATA');
             this.user = JSON.parse(this.user);
             if (this.user.username !== 'admin') {
-                let orgCode = this.user.account.org_code;
-                let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                this.orgCode = parent.code;
+                let orgID = this.user.Org;
+                let parent = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                this.orgID = parent.ID;
             }
             await setkeycode('');
             await getSearchRedioVisible(false);
@@ -163,9 +163,9 @@ export default class Redios extends Component {
         } = this.props;
         if (e.selected) {
             let folder = JSON.parse(value);
-            let org_code = folder.extra_params.orgCode;
+            let orgID = folder.Org;
             let code = folder.code;
-            if ((this.user && this.user.username === 'admin') || this.orgCode === org_code) {
+            if ((this.user && this.user.username === 'admin') || this.orgID === orgID) {
                 getSearchRedioVisible(false);
                 setkeycode(value);
                 this.doc_type = e.node.props.title;

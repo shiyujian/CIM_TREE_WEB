@@ -16,12 +16,6 @@ export const setNewsTabActive = createAction('新闻列表的Tab切换状态');
 export const toggleModalAc = createAction(`${ID}发送文件的modal`);
 // 上传的文件列表
 export const postUploadFilesAc = createAction(`${ID}上传的文件列表`);
-// 获取组织机构列表
-export const getOrgListAcOK = createAction(`${ID}获取组织机构列表`);
-export const getOrgListAc = createFetchActionT(
-    `${SERVICE_API}/org-tree/?depth=7`,
-    [getOrgListAcOK]
-);
 // 获取抄送的人员列表
 export const getCopyUsersAcOK = createAction(`${ID}获取抄送的人员列表`);
 export const getCopyUsersAc = createFetchActionT(
@@ -84,18 +78,6 @@ export const sentMessageAc = createFetchAction(
 // 存储table回文信息
 export const setDocInfo = createAction('table回文信息');
 
-// 获取施工单位列表
-const getOrgTreeOK = createAction('DIS获取施工单位列表');
-const getOrgTree = createFetchAction(`${SERVICE_API}/org-tree/`, [
-    getOrgTreeOK
-]);
-
-// 获取部门信息
-const getOrgName = createFetchAction(
-    `${SERVICE_API}/orgs/code/{{code}}/`,
-    [],
-    'GET'
-);
 const loop = (data = [], dataSource = [], datas = []) => {
     return data.map(item => {
         if (item.children && item.children.length) {
@@ -146,15 +128,8 @@ export const actions = {
     patchReceiveDetailAc,
     deleteReceiveDocAc,
     sentMessageAc,
-    getOrgListAcOK,
-    getOrgListAc,
     getCopyUsersAcOK,
     getCopyUsersAc,
-    getOrgName,
-
-    getOrgTreeOK,
-    getOrgTree,
-
     setNewsTabActive
 };
 
@@ -167,10 +142,6 @@ export default handleActions(
         [setTabActive]: (state, { payload }) => ({
             ...state,
             tabValue: payload
-        }),
-        [getOrgListAcOK]: (state, { payload }) => ({
-            ...state,
-            orgList: payload.children
         }),
         [getCopyUsersAcOK]: (state, { payload }) => ({
             ...state,
@@ -227,11 +198,6 @@ export default handleActions(
         [postUploadFilesAc]: (state, { payload }) => ({
             ...state,
             fileList: payload
-        }),
-
-        [getOrgTreeOK]: (state, { payload }) => ({
-            ...state,
-            orgList: payload.children
         })
     },
     {}

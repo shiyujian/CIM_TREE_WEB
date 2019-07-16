@@ -200,7 +200,7 @@ class Addition extends Component {
                     await changeSidebarField('parent', null);
                     await clearAdditionField();
                     setTimeout(async () => {
-                        await getOrgTree({}, { depth: 7 });
+                        await getOrgTree({});
                         await changeOrgTreeDataStatus(true);
                         this.setState({
                             loading: false

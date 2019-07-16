@@ -217,7 +217,7 @@ export default class TreeMessGisOnClickHandle extends Component {
                 getCuringMessage,
                 getForestUserDetail,
                 getUserDetail,
-                getOrgTreeByCode,
+                getParentOrgTreeByID,
                 getTreeLocationCoord,
                 getLocationNameByCoordinate
             },
@@ -324,20 +324,15 @@ export default class TreeMessGisOnClickHandle extends Component {
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
             for (let i = 0; i < treeflowData.length; i++) {
-                let userForestData = await getForestUserDetail({
+                let userDetail = await getForestUserDetail({
                     id: treeflowData[i].FromUser
                 });
-                if (userForestData && userForestData.PK) {
-                    let userEcidiData = await getUserDetail({
-                        pk: userForestData.PK
-                    });
-                    let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
-                    let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                    console.log('parent', parent);
-                    let companyName = (parent && parent.name) || '';
-                    treeflowData[i].companyName = companyName;
-                    treeflowData[i].orgData = parent;
-                }
+                let orgID = userDetail && userDetail.Org;
+                let parent = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                console.log('parent', parent);
+                let companyName = (parent && parent.OrgName) || '';
+                treeflowData[i].companyName = companyName;
+                treeflowData[i].orgData = parent;
             }
             let flowMess = treeflowData;
             let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);
