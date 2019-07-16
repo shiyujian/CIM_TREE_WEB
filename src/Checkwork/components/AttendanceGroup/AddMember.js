@@ -96,7 +96,7 @@ class AddMember extends Component {
     // 获取最开始的初始值，用于最开始获取人员数据，或清空搜索条件
     getInitialUserData = async () => {
         const {
-            userOrgCode,
+            userOrgID,
             actions: {
                 getUsers
             },
@@ -105,10 +105,10 @@ class AddMember extends Component {
             }
         } = this.props;
         setFieldsValue({
-            organization: userOrgCode
+            organization: userOrgID
         });
         let postData = {
-            org_code: userOrgCode,
+            org_code: userOrgID,
             is_active: true,
             page: 1
         };

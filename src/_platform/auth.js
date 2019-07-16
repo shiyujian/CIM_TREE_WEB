@@ -346,8 +346,8 @@ export const getThinClass = (smallClass, list) => {
     return thinClassList;
 };
 // 根据登录用户的部门code获取所在公司
-export const getCompanyDataByOrgCode = async (orgID, getOrgTreeByCode) => {
-    let orgData = await getOrgTreeByCode({parentid: orgID}, {reverse: true});
+export const getCompanyDataByOrgCode = async (orgID, getParentOrgTreeByID) => {
+    let orgData = await getParentOrgTreeByID({id: orgID});
     let parent = {};
     let loopData = loopOrgCompany(orgData);
     parent = loopArrayCompany(loopData);
