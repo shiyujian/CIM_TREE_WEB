@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import queryString from 'query-string';
 import reducer, { actions } from '../store/formmanage';
 import { actions as platformActions } from '_platform/store/global';
 import {
@@ -14,14 +13,8 @@ import {
 } from '_platform/components/layout';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import {
-    WorkTree,
-    SearchInfo,
-    TableInfo,
-    FormAddition
-} from '../components/FormManage';
-import moment from 'moment';
-import { Tabs } from 'antd';
+import PkCodeTree from '../components/PkCodeTree';
+
 export const Datumcode = window.DeathCode.OVERALL_FORM;
 
 @connect(
@@ -44,82 +37,52 @@ export default class FormManage extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            isTreeSelected: false,
-            loading: false,
-            selectedDir: '',
-            depth: ''
+            leftkeycode: ''
         };
     }
     async componentDidMount () {
         const {
-            actions: { getTree, getTreeNodeList },
+            actions: { getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
-        this.setState({ loading: true });
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
-        }
-        getTree({ code: Datumcode }).then(({ children }) => {
-            this.setState({ loading: false });
-        });
-        if (this.props.Doc) {
-            this.setState({ isTreeSelected: true });
         }
     }
 
     onSelect (value = [], data) {
         const [code] = value;
-        const {
-            actions: { setkeycode }
-        } = this.props;
-        console.log('value', value);
-        console.log('data', data);
-        setkeycode(code);
         this.setState({
-            isTreeSelected: data.selected
+            leftkeycode: code
         });
-        if (code === undefined) {
-            return;
-        }
-
-        if (value && value.length) {
-            let arr = value[0].split('--');
-            let depth = arr[2];
-            this.setState({
-                depth: depth
-            });
-        }
-        let selectedDir = data.node.props.data;
-        this.setState({
-            selectedDir
-        });
-
-        // getdocument({code:code.split("--")[1]});
     }
     render () {
-        const { tree = [], Doc = [], keycode } = this.props;
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        const { leftkeycode } = this.state;
+        let treeList = [];
+        if (tree.bigTreeList) {
+            treeList = tree.bigTreeList;
+        }
+        console.log('tree', tree);
         return (
             <div>
                 <DynamicTitle title='表单管理' {...this.props} />
                 <Sidebar>
-                    <WorkTree
-                        treeData={tree}
-                        selectedKeys={keycode}
-                        onSelect={this.onSelect.bind(this)}
-                        {...this.state}
-                    />
+                    <div
+                        style={{ overflow: 'hidden' }}
+                        className='project-tree'
+                    >
+                        <PkCodeTree
+                            treeData={treeList}
+                            selectedKeys={leftkeycode}
+                            onSelect={this.onSelect.bind(this)}
+                        />
+                    </div>
                 </Sidebar>
                 <Content>
-                    <TableInfo
-                        {...this.props}
-                        array={this.array}
-                        {...this.state}
-                    />
-                    <FormAddition
-                        {...this.props}
-                        array={this.array}
-                        {...this.state}
-                    />
+                    表单管理
                 </Content>
             </div>
         );

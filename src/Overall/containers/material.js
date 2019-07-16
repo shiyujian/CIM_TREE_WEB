@@ -11,28 +11,10 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import {
-    GeneralFilter,
-    GeneralTable,
-    Updatemodal,
-    ResourceFilter,
-    ResourceTable,
-    SeedingFilter,
-    SeedingTable
-} from '../components/Material';
 import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
-import moment from 'moment';
-import { Tabs } from 'antd';
 import PkCodeTree from '../components/PkCodeTree';
-import {
-    SeedingAddition,
-    GeneralAddition,
-    ResourceAddition
-} from '../components/Material';
 export const Datumcode = window.DeathCode.OVERALL_MATERIAL;
-
-const TabPane = Tabs.TabPane;
 
 @connect(
     state => {
@@ -61,33 +43,11 @@ export default class Material extends Component {
 
     async componentDidMount () {
         const {
-            actions: { getScheduleTaskList, getTreeNodeList },
+            actions: { getTreeNodeList },
             platform: { tree = {} }
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
-        }
-
-        if (!tree.scheduleTaskList) {
-            let data = await getScheduleTaskList();
-            if (data && data instanceof Array && data.length > 0) {
-                data = data[0];
-
-                let leftkeycode = data.No ? data.No : '';
-                this.setState({
-                    leftkeycode
-                });
-            }
-        } else {
-            let data = tree.projectList;
-            if (data && data instanceof Array && data.length > 0) {
-                data = data[0];
-
-                let leftkeycode = data.No ? data.No : '';
-                this.setState({
-                    leftkeycode
-                });
-            }
         }
     }
 
@@ -102,12 +62,11 @@ export default class Material extends Component {
     render () {
         const { leftkeycode } = this.state;
         const {
-            platform: { tree = {} },
-            tabValue = '1'
+            platform: { tree = {} }
         } = this.props;
         let treeList = [];
-        if (tree.scheduleTaskList) {
-            treeList = tree.scheduleTaskList;
+        if (tree.bigTreeList) {
+            treeList = tree.bigTreeList;
         }
         console.log('tree', tree);
         return (
@@ -127,35 +86,7 @@ export default class Material extends Component {
                         </div>
                     </Sidebar>
                     <Content>
-                        <Tabs
-                            activeKey={tabValue}
-                            onChange={this.tabChange.bind(this)}
-                        >
-                            <TabPane tab='机械设备' key='1'>
-                                <GeneralTable {...this.props} {...this.state} />
-                                <GeneralAddition
-                                    {...this.props}
-                                    {...this.state}
-                                />
-                            </TabPane>
-                            <TabPane tab='工程材料' key='2'>
-                                <ResourceTable
-                                    {...this.props}
-                                    {...this.state}
-                                />
-                                <ResourceAddition
-                                    {...this.props}
-                                    {...this.state}
-                                />
-                            </TabPane>
-                            <TabPane tab='苗木材料' key='3'>
-                                <SeedingTable {...this.props} {...this.state} />
-                                <SeedingAddition
-                                    {...this.props}
-                                    {...this.state}
-                                />
-                            </TabPane>
-                        </Tabs>
+                        物资管理
                     </Content>
                 </Main>
                 <Preview />
