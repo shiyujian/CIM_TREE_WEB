@@ -78,7 +78,6 @@ export default class PerSearch extends Component {
 
         let sections = user.sections;
         sections = JSON.parse(sections);
-        let org_code = ['003'];
         let roles = [];
         if (!(sections && sections instanceof Array && sections.length > 0)) {
             return;
@@ -97,20 +96,11 @@ export default class PerSearch extends Component {
                 // 如果第一步有多个action或者是多个执行人  需要进行判断  重新改写组件
                 if (nextMess && nextMess instanceof Array) {
                     try {
-                        let orgs = nextMess[0].to_state[0].orgs;
-                        org_code = [];
-                        orgs.map(rst => {
-                            org_code.push(rst.code);
-                        });
-
                         let role = nextMess[0].to_state[0].roles;
                         roles = [];
                         role.map(item => {
                             roles.push(item.id);
                         });
-                        // if(roles.length>0){
-                        //     role.push(roles[0]&&roles[0].name)
-                        // }
                     } catch (e) {
                         console.log(e);
                     }
@@ -122,22 +112,13 @@ export default class PerSearch extends Component {
                 let nextStates = getNextStates(task, Number(state_id));
                 if (nextStates && nextStates instanceof Array) {
                     nextStates.map(rst => {
-                        if (rst.action_name != '退回') {
+                        if (rst.action_name !== '退回') {
                             try {
-                                let orgs = rst.to_state[0].orgs;
-                                org_code = [];
-                                orgs.map(org => {
-                                    org_code.push(org.code);
-                                });
-
                                 let role = rst.to_state[0].roles;
                                 roles = [];
                                 role.map(item => {
                                     roles.push(item.id);
                                 });
-                                // if(roles.length>0){
-                                //     role.push(roles[0]&&roles[0].name)
-                                // }
                             } catch (e) {
                                 console.log(e);
                             }
@@ -147,7 +128,6 @@ export default class PerSearch extends Component {
             }
         }
 
-        console.log('org_code', org_code);
         console.log('roles', roles);
 
         try {
@@ -155,20 +135,20 @@ export default class PerSearch extends Component {
             // 是按照部门搜索  还是按照角色搜索
             if (!roleSearch) {
                 postdata = {
-                    org_code: org_code,
                     sections: sections,
                     roles: roles,
-                    is_active: true
+                    status: 1
                 };
             } else {
                 postdata = {
                     roles: roles,
                     sections: sections,
-                    is_active: true
+                    status: 1
                 };
             }
 
-            let users = await getUsers({}, postdata);
+            let datas = await getUsers({}, postdata);
+            let users = (datas && datas.content) || [];
             // 因多个组件公用此组件，不能放在redux里
             this.setState({
                 users
@@ -179,7 +159,7 @@ export default class PerSearch extends Component {
     }
 
     render () {
-        const { fetching, value, users } = this.state;
+        const { users } = this.state;
         let userList = [],
             tree = [],
             dataList = [];
@@ -188,48 +168,46 @@ export default class PerSearch extends Component {
         });
         for (var i = 0; i < userList.length; i++) {
             if (
-                !userList[i].id ||
-                !userList[i].account.person_code ||
-                !userList[i].account.person_name ||
-                !userList[i].username ||
-                !userList[i].account.organization
+                !userList[i].ID ||
+                !userList[i].Full_Name ||
+                !userList[i].User_Name ||
+                !userList[i].Org
             ) {
                 console.log('sssssssssssssssssssssssssss', userList[i]);
             }
 
             if (
-                userList[i].id &&
-                userList[i].account.person_code &&
-                userList[i].account.person_name &&
-                userList[i].account.organization
+                userList[i].ID &&
+                userList[i].User_Name &&
+                userList[i].Full_Name &&
+                userList[i].Org
             ) {
                 tree.push({
-                    pk: userList[i].id,
-                    code: userList[i].account.person_code,
-                    name: userList[i].account.person_name,
-                    username: userList[i].username,
-                    org: userList[i].account.organization
+                    id: userList[i].ID,
+                    phone: userList[i].Phone,
+                    name: userList[i].Full_Name,
+                    username: userList[i].User_Name,
+                    org: userList[i].Org
                 });
             }
         }
         dataList = tree.map(node => ({
             text: node.name + '(' + node.username + ')',
             obj: JSON.stringify({
-                code: node.code,
+                phone: node.phone,
                 name: node.name,
-                pk: node.pk,
+                id: node.id,
                 username: node.username,
                 org: node.org
             }),
-            // value: 'C_PER' + '#' + node.code + '#' + node.name + '#' + node.pk + '#' + node.username,
             value:
                 'C_PER' +
                 '#' +
-                node.code +
+                node.phone +
                 '#' +
                 node.name +
                 '#' +
-                node.pk +
+                node.id +
                 '#' +
                 node.username +
                 '#' +

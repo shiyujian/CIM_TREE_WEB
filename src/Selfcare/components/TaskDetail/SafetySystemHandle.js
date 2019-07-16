@@ -7,10 +7,10 @@ import {
     Input,
     notification
 } from 'antd';
-import PerSearch from '../../../_platform/components/panels/PerSearch';
+import PerSearch from '_platform/components/panels/PerSearch';
 import queryString from 'query-string';
 import { getUser } from '_platform/auth';
-import { getNextStates } from '../../../_platform/components/Progress/util';
+import { getNextStates } from '_platform/components/Progress/util';
 const FormItem = Form.Item;
 
 export default class SafetySystemHandle extends Component {

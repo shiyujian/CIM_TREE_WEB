@@ -47,7 +47,8 @@ window.config = {
     STATIC_FILE_USER: 'bimxan',
     STATIC_FILE_PASSWORD: 'ecidibim',
     // 二维展示根据坐标获取树木顺序码端口
-    DASHBOARD_ONSITE: 'http://39.105.221.187:8081',
+    // DASHBOARD_ONSITE: 'http://39.105.221.187:8081',
+    DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
     // 二维展示获取树种筛选的geoserver服务端口
     DASHBOARD_TREETYPE: 'http://39.96.47.88:8080',
     // 现场收发文接口的端口

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tree, Spin } from 'antd';
 import L from 'leaflet';
-import { FOREST_GIS_TREETYPE_API, FOREST_GIS_API } from '_platform/api';
+import { FOREST_GIS_API } from '_platform/api';
 import './SurvivalRateTree.less';
 // 存活率图片
 import hundredImg from '../../SurvivalRateImg/90~100.png';
@@ -333,11 +333,11 @@ export default class SurvivalRateTree extends Component {
             let url = '';
             // 初次进入成活率模块，没有对标段数据进行处理，选择了范围数据直接对图层进行更改
             if (switchSurvivalRateFirst) {
-                url = FOREST_GIS_TREETYPE_API +
+                url = FOREST_GIS_API +
                     `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
             } else if (survivalRateRateData && survivalRateSectionData) {
                 // 在点击过标段数据之后，只有两种状态都存在，才能进行搜索
-                url = FOREST_GIS_TREETYPE_API +
+                url = FOREST_GIS_API +
                     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
             }
             if (url) {

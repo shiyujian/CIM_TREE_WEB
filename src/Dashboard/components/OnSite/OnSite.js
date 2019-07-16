@@ -37,7 +37,6 @@ import {
 } from '../auth';
 import {
     FOREST_GIS_API,
-    FOREST_GIS_TREETYPE_API,
     WMSTILELAYERURL,
     TILEURLS,
     INITLEAFLET_API
@@ -607,7 +606,7 @@ class OnSite extends Component {
                     if (realThinClassLayerList[eventKey]) {
                         realThinClassLayerList[eventKey].addTo(this.map);
                     } else {
-                        var url = FOREST_GIS_TREETYPE_API +
+                        var url = FOREST_GIS_API +
                         `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27%20and%20Section+LIKE+%27%25${selectSectionNo}%25%27`;
                         let thinClassLayer = L.tileLayer.wms(url,
                             {

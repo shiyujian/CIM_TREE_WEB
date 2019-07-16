@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-12-04 16:22:09
+ * @Last Modified time: 2019-07-16 09:10:08
  */
 import React, { Component } from 'react';
 import {
@@ -29,13 +29,13 @@ import {
 } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { getUser } from '../../../_platform/auth';
+import { getUser } from '_platform/auth';
 import {
     UPLOAD_API,
     WORKFLOW_CODE
-} from '../../../_platform/api';
-import PerSearch from '../../../_platform/components/panels/PerSearch';
-import { getNextStates } from '../../../_platform/components/Progress/util';
+} from '_platform/api';
+import PerSearch from '_platform/components/panels/PerSearch';
+import { getNextStates } from '_platform/components/Progress/util';
 import SearchInfo from './SearchInfo';
 import TotleModal from './TotleModal';
 import './index.less';

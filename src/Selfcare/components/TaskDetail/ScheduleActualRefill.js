@@ -15,12 +15,12 @@ import {
     Steps
 } from 'antd';
 import moment from 'moment';
-import PerSearch from '../../../_platform/components/panels/PerSearch';
-import { getUser } from '../../../_platform/auth';
-import { getNextStates } from '../../../_platform/components/Progress/util';
+import PerSearch from '_platform/components/panels/PerSearch';
+import { getUser } from '_platform/auth';
+import { getNextStates } from '_platform/components/Progress/util';
 import {
     TREETYPENO
-} from '../../../_platform/api';
+} from '_platform/api';
 import queryString from 'query-string';
 const { Option, OptGroup } = Select;
 const FormItem = Form.Item;

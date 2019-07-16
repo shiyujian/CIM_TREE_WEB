@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-15 09:12:34
+ * @Last Modified time: 2019-07-16 09:02:20
  */
 /**
  *
@@ -95,7 +95,6 @@ export const FOREST_API = `${DOMAIN}`;
 export const SEEDLING_API = `${window.config.SEEDLING}`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
-export const FOREST_GIS_TREETYPE_API = `${window.config.DASHBOARD_TREETYPE}`;
 export const INITLEAFLET_API = window.config.initLeaflet;
 export const TREEPIPE_API = `${window.config.PIPE}`;
 

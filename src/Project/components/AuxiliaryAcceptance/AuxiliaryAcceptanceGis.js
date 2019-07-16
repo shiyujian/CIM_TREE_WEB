@@ -8,7 +8,6 @@ import {
 } from '_platform/auth';
 import {
     FOREST_GIS_API,
-    FOREST_GIS_TREETYPE_API,
     TILEURLS,
     INITLEAFLET_API,
     WMSTILELAYERURL
@@ -383,7 +382,7 @@ export default class AuxiliaryAcceptanceGis extends Component {
                 if (realThinClassLayerList[eventKey]) {
                     realThinClassLayerList[eventKey].addTo(me.map);
                 } else {
-                    var url = FOREST_GIS_TREETYPE_API +
+                    var url = FOREST_GIS_API +
                     `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27`;
                     let thinClassLayer = L.tileLayer.wms(url,
                         {

@@ -5,7 +5,7 @@ import {
     getIconType
 } from '../../auth';
 import {
-    FOREST_GIS_TREETYPE_API
+    FOREST_GIS_API
 } from '_platform/api';
 const TreeNode = Tree.TreeNode;
 const Search = Input.Search;
@@ -148,7 +148,7 @@ export default class TreeTypeTree extends Component {
         }
         await this.props.removeTileTreeLayerBasic();
         await this.removeTileTreeTypeLayerFilter();
-        let url = FOREST_GIS_TREETYPE_API +
+        let url = FOREST_GIS_API +
             `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${queryData})`;
         // this.tileTreeTypeLayerFilter指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
         this.tileTreeTypeLayerFilter = L.tileLayer.wms(url,
