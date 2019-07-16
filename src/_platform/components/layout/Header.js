@@ -175,11 +175,11 @@ export default class Header extends Component {
                     mode='horizontal'
                 >
                     {Header.menus.map(menu => {
-                        let has = permissions.some(
-                            permission =>
-                                permission === `appmeta.${menu.id}.READ`
-                        );
-                        // let has = true;
+                        // let has = permissions.some(
+                        //     permission =>
+                        //         permission === `appmeta.${menu.id}.READ`
+                        // );
+                        let has = true;
                         let str;
                         if (has) {
                             if (username !== 'admin') {
@@ -226,23 +226,6 @@ export default class Header extends Component {
                                 </Menu.Item>
                             );
                         }
-                        // for (var i = 0; i < permissions.length; i++) {
-                        // 取出数据使用二进制进行判断对比 如果有这个1就显示否则隐藏
-                        // 	if (permissions[i].value & 1 == "1") {
-                        // 		if (permissions[i].id == `${menu.id}`) {
-                        // 			return (
-                        // 				<Menu.Item
-                        // 					key={menu.key}
-                        // 					className="nav-item">
-                        // 					<Link to={menu.path}>
-                        // 						{menu.icon}
-                        // 						<span className="title">{menu.title}</span>
-                        // 					</Link>
-                        // 				</Menu.Item>)
-                        // 		}
-                        // 	}
-                        // break;
-                        // }
                     })}
                 </Menu>
                 <div className='head-right'>

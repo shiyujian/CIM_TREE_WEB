@@ -54,7 +54,7 @@ export default (
                 .then(response => {
                     // 未授权的跳转登录页面
                     if (response.status === 401) {
-                        window.location.href = '/login';
+                    //     window.location.href = '/login';
                         return;
                     }
                     const contentType = response.headers.get('content-type');

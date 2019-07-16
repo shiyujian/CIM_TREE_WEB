@@ -72,13 +72,11 @@ export const setPermissions = (permissions) => {
 export const getPermissions = () => {
     let permissions = [];
     const text = window.localStorage.getItem('permissions');
-    // var add= localStorage.getItem("TREE_LOGIN_USER")
 
     try {
         permissions = JSON.parse(text);
-        // permissions = JSON.parse(add);
     } catch (e) {
-
+        console.log('getPermissions', e);
     }
     return permissions;
 };
@@ -348,8 +346,8 @@ export const getThinClass = (smallClass, list) => {
     return thinClassList;
 };
 // 根据登录用户的部门code获取所在公司
-export const getCompanyDataByOrgCode = async (orgCode, getOrgTreeByCode) => {
-    let orgData = await getOrgTreeByCode({code: orgCode}, {reverse: true});
+export const getCompanyDataByOrgCode = async (orgID, getOrgTreeByCode) => {
+    let orgData = await getOrgTreeByCode({parentid: orgID}, {reverse: true});
     let parent = {};
     let loopData = loopOrgCompany(orgData);
     parent = loopArrayCompany(loopData);

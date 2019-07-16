@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store/login';
+import { actions } from '../store/login';
 import {
     Form,
     Input,
@@ -23,9 +23,15 @@ import './Login.less';
 const FormItem = Form.Item;
 
 @connect(
-    state => ({}),
+    state => {
+        const { login: { login = {} } = {} } = state;
+        return { ...login };
+    },
     dispatch => ({
-        actions: bindActionCreators(actions, dispatch)
+        actions: bindActionCreators(
+            { ...actions },
+            dispatch
+        )
     })
 )
 class Login extends Component {
@@ -441,7 +447,7 @@ class Login extends Component {
     loginFunc = async (data, loginType, values) => {
         const {
             actions: {
-                login,
+                getUserPermission,
                 getTasks,
                 loginForest
             },
@@ -452,102 +458,93 @@ class Login extends Component {
         await removePermissions();
         await removePermissions();
         console.log('loginFuncloginFuncdata', data);
-        let rst = await login({}, data);
-        if (rst.status === 'Nonactived') {
-            message.error('用户没有被激活');
+        let postData = {};
+        if (data.username === 'admin') {
+            postData = FOREST_LOGIN_DATA;
         } else {
-            if (rst && rst.id) {
-                let postData = {};
-                if (data.username === 'admin') {
-                    postData = FOREST_LOGIN_DATA;
-                } else {
-                    postData = {
-                        phone: data.username,
-                        pwd: data.password
-                    };
-                }
+            postData = {
+                phone: data.username,
+                pwd: data.password
+            };
+        }
+        let forestUserData = await loginForest({}, postData);
+        console.log('forestUserData', forestUserData);
+        if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
+            let forestLoginUserData = forestUserData[0];
+            window.localStorage.setItem(
+                'FOREST_LOGIN_USER_DATA',
+                JSON.stringify(forestLoginUserData)
+            );
+            const {
+                User_Name = '',
+                Full_Name = '',
+                ID,
+                Roles = '',
+                Phone = '',
+                Section = '',
+                Status = '',
+                IsBlack = 0,
+                Number = '',
+                Org = '',
+                Duty = ''
+            } = forestLoginUserData;
+            let tasks = [];
+            // tasks = await getTasks(
+            //     {},
+            //     {
+            //         task: 'processing',
+            //         executor: forestLoginUserData.id,
+            //         pagination: true,
+            //         page: 1
+            //     });
+            let permissions = await getUserPermission({}, {userid: ID});
+            console.log('permissions', permissions);
+            await setPermissions(permissions);
+            Notification.open({
+                message: loginType
+                    ? '自动登录成功'
+                    : '登录成功',
+                description: forestLoginUserData.User_Name
+            });
+            let count = (tasks && tasks.count) || 0;
 
-                let forestUserData = await loginForest({}, postData);
-                console.log('forestUserData', forestUserData);
-                if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
-                    let forestLoginUserData = forestUserData[0];
+            window.localStorage.setItem(
+                'QH_USER_DATA',
+                JSON.stringify(forestLoginUserData)
+            );
+
+            await setUser(
+                User_Name,
+                Full_Name,
+                ID,
+                Roles,
+                Phone,
+                Section,
+                Status,
+                IsBlack,
+                Number,
+                Org,
+                Duty
+            );
+            console.log(getUser(), 'cookie存的信息2');
+
+            if (loginType === 0) {
+                if (values.remember) {
                     window.localStorage.setItem(
-                        'FOREST_LOGIN_USER_DATA',
-                        JSON.stringify(forestLoginUserData)
+                        'LOGIN_USER_PASSDATA',
+                        JSON.stringify(data)
+                    );
+                } else {
+                    window.localStorage.removeItem(
+                        'LOGIN_USER_PASSDATA'
                     );
                 }
-                let tasks = [];
-                tasks = await getTasks({}, { task: 'processing', executor: rst.id, pagination: true, page: 1 });
-                Notification.open({
-                    message: loginType
-                        ? '自动登录成功'
-                        : '登录成功',
-                    description: rst.username
-                });
-                let count = (tasks && tasks.count) || 0;
-                const {
-                    username,
-                    id,
-                    account = {},
-                    all_permissions: permissions = [],
-                    is_superuser = false,
-                    groups = []
-                } = rst;
-                let isOwnerClerk = false;
-                groups.forEach((role) => {
-                    if (role && role.name && role.name === '业主文书') {
-                        isOwnerClerk = true;
-                    }
-                });
-                rst.isOwnerClerk = isOwnerClerk;
-                window.localStorage.setItem(
-                    'QH_USER_DATA',
-                    JSON.stringify(rst)
-                );
-
-                const {
-                    person_name: name,
-                    organization: org,
-                    person_code: code,
-                    org_code,
-                    sections,
-                    person_telephone
-                } = account;
-                await setUser(
-                    username,
-                    id,
-                    name,
-                    org,
-                    count,
-                    data.password,
-                    code,
-                    is_superuser,
-                    org_code,
-                    sections,
-                    isOwnerClerk,
-                    person_telephone
-                );
-                console.log(getUser(), 'cookie存的信息2');
-
-                await setPermissions(permissions);
-                if (loginType === 0) {
-                    if (values.remember) {
-                        window.localStorage.setItem(
-                            'LOGIN_USER_PASSDATA',
-                            JSON.stringify(data)
-                        );
-                    } else {
-                        window.localStorage.removeItem(
-                            'LOGIN_USER_PASSDATA'
-                        );
-                    }
-                }
-                setTimeout(() => {
-                    replace('/');
-                }, 500);
-            } else {
-                message.error('用户名或密码错误！');
             }
+            setTimeout(() => {
+                replace('/');
+            }, 500);
+        } else {
+            message.error('用户名或密码错误！');
         }
     }
 

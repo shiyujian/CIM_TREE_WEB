@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-16 09:02:20
+ * @Last Modified time: 2019-07-16 10:54:19
  */
 /**
  *
@@ -92,6 +92,7 @@ export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
 export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
 // 智慧森林
 export const FOREST_API = `${DOMAIN}`;
+export const SYSTEM_API = `${DOMAIN}/system`;
 export const SEEDLING_API = `${window.config.SEEDLING}`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
@@ -134,6 +135,10 @@ export const FORM_WORKFLOW = [
         value: '总监审查流程',
         code: 'TEMPLATE_012'
     }
+];
+
+export const ORGTYPE = [
+    '业主单位', '施工单位', '监理单位', '养护单位'
 ];
 // 当前执行的项目
 export const DEFAULT_PROJECT = 'P191';
