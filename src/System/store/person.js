@@ -28,8 +28,8 @@ export const changeEditUserVisible = createAction(`${ID}编辑人员Visible`);
 
 const getTags = forestFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
 const checkUsers = forestFetchAction(`${FOREST_API}/system/checksuser`, [], 'POST'); // 审核用户
-const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers`); // 获取供应商列表
-const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃列表
+const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers?status=1`); // 获取供应商列表
+const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybases?status=1`); // 获取苗圃列表
 const getRegionCodes = forestFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
 
 const getMobileCheck = createFetchAction(`http(s)://phonethird.market.alicloudapi.com/mobileCheck`); // 实名认证
@@ -37,8 +37,6 @@ const postUserForbidden = forestFetchAction(`${FOREST_API}/system/forbiddensuser
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
 const filterReducer = fieldFactory(ID, 'filter');
-
-export const getListStore = createAction(`${ID}getListStore`);
 
 export const actions = {
     ...sidebarReducer,
@@ -50,7 +48,6 @@ export const actions = {
     getTreeModal,
     setUpdate,
     getSection,
-    getListStore,
     getTablePage,
     getTreeCode,
     getIsBtn,
@@ -95,10 +92,6 @@ export default handleActions({
     [getTreeModal]: (state, {payload}) => ({
         ...state,
         getTreeModals: payload
-    }),
-    [getListStore]: (state, {payload}) => ({
-        ...state,
-        listStore: payload
     }),
     [getTablePage]: (state, {payload}) => ({
         ...state,

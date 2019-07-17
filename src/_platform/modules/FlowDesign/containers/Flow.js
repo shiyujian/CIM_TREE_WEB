@@ -2,13 +2,8 @@ import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 import {
     Button,
-    Tree,
-    Input,
-    Switch,
-    Modal,
     Row,
     Col,
-    Form,
     message,
     Popconfirm
 } from 'antd';
@@ -21,14 +16,9 @@ import { base } from '../../../api';
 
 import NewTemplateModal from '../components/NewTemplateModal';
 import TemplateTree from '../components/TemplateTree';
-import DynamicTabs from '../components/DynamicTabs';
 import CloseEditConfirm from '../components/CloseEditConfirm';
 
 import styles from './styles.css';
-
-const TreeNode = Tree.TreeNode;
-const FormItem = Form.Item;
-const confirm = Modal.confirm;
 
 @connect(
     state => ({}),
@@ -404,14 +394,6 @@ class Flow extends Component {
                         </div>
                     </Col>
                     <Col span={20}>
-                        {
-                            // <DynamicTabs
-                            // 	tabs={tabs}
-                            // 	activeKey={activeKey}
-                            // 	onChange={this.handleTabsChange}
-                            // 	removeTab={this.openCloseRemoveTabModal}
-                            // />
-                        }
                         <iframe
                             allowFullScreen
                             style={{

@@ -4,7 +4,6 @@ import createFetchAction from 'fetch-action';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import { SERVICE_API, FOREST_API } from '_platform/api';
 import fieldFactory from '_platform/store/service/field';
-import booleanFactory from '_platform/store/higher-order/bool';
 import documentFactory from '_platform/store/higher-order/doc';
 import engineeringReducer, {
     actions as engineeringActions
@@ -31,8 +30,6 @@ export const putdocument = createFetchAction(
 );
 export const SearchOK = createAction(`${ID}_高级搜索`);
 export const Search = createFetchAction(`${SERVICE_API}/searcher/`, [SearchOK]);
-const visibleReducer = booleanFactory(ID, 'addition');
-const followReducer = booleanFactory(ID, 'follow');
 const changeDocs = createAction(`${ID}_CHANGE_DOCS`);
 const setcurrentcode = createAction(`${ID}_CURRENTDODE`);
 const selectDocuments = createAction(`${ID}_SELECTDOUMENT`);
@@ -97,9 +94,7 @@ export const actions = {
     updateForsetVideo,
     deleteForsetVideo,
     ...documentReducer,
-    ...additionReducer,
-    ...visibleReducer,
-    ...followReducer
+    ...additionReducer
 };
 
 export default handleActions(
@@ -125,20 +120,6 @@ export default handleActions(
             ...state,
             addition: additionReducer(state.addition, action)
         }),
-        [combineActions(...actionsMap(visibleReducer))]: (state, action) => ({
-            ...state,
-            additionVisible: visibleReducer(state.additionVisible, action)
-        }),
-        [combineActions(...actionsMap(followReducer))]: (state, action) => ({
-            ...state,
-            follow: followReducer(state.follow, action)
-        }),
-        // [getdirTreeOK]: (state, {payload: {children}}) => {
-        //     return {
-        //         ...state,
-        //         tree: children
-        //     }
-        // },
         [getdocumentOK]: (state, { payload }) => ({
             ...state,
             Doc: payload.result

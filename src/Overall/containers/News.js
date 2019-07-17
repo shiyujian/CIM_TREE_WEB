@@ -35,25 +35,7 @@ export default class News extends Component {
         };
     }
     async componentDidMount () {
-        // const {actions: {getPublicUnitList}} = this.props;
-        // let unit = await getPublicUnitList();
-        // if(unit.children){
-        // 	this.getSomeNode(unit.children);
-        // }
     }
-
-    // 注释掉之前写的获取发布单位的方法，现在从api.js里面直接获取
-    // getSomeNode(children){
-    // 	children.map(item =>{
-    // 		if(item.children.length > 0){
-    // 			this.getSomeNode(item.children);
-    // 		}else{
-    // 			if(item.extra_params.introduction && item.extra_params.introduction === "新闻发布"){
-    // 				this.array.push(item)
-    // 			}
-    // 		}
-    // 	})
-    // }
 
     // 新闻和通知的切换
     tabChange (tabValue) {

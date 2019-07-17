@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Blade from '_platform/components/panels/Blade';
+import Blade from './Blade';
 import { Select } from 'antd';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';

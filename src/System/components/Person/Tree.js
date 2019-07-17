@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import SimpleTree from './SimpleTree';
 import { TreeSelect } from 'antd';
-import {getCompanyDataByOrgCode, addGroup} from '_platform/auth';
+import {getCompanyDataByOrgCode} from '_platform/auth';
+import {addGroup} from '../auth';
 import {ORG_NURSERY_CODE, ORG_SUPPLIER_CODE} from '_platform/api';
+import moment from 'moment';
 const TreeNode = TreeSelect.TreeNode;
 
 export default class Tree extends Component {
@@ -10,7 +12,6 @@ export default class Tree extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            childList: [],
             listVisible: true,
             orgTreeArrList: [],
             permission: false
@@ -18,35 +19,17 @@ export default class Tree extends Component {
         this.orgTreeDataArr = [];
     }
 
-    componentWillMount () {
+    componentWillMount = async () => {
         const {
-            actions: { getSupplierList, getRegionCodes, getNurseryList }
+            actions: { getRegionCodes }
         } = this.props;
         // 获取行政编码
-        getRegionCodes({}, {}).then(rst => {
-            let obj = {};
-            rst.map(item => {
-                obj[item.ID] = item.MergerName;
-            });
-            window.sessionStorage.setItem('regionCode_name', JSON.stringify(obj));
+        let rst = await getRegionCodes({}, {});
+        let obj = {};
+        rst.map(item => {
+            obj[item.ID] = item.MergerName;
         });
-        // 获取供应商列表
-        getSupplierList().then(rst => {
-            window.sessionStorage.setItem('Supplier_list', JSON.stringify(rst.content));
-            let obj = {};
-            rst.content.map(item => {
-                obj[item.OrgPK] = item.RegionCode;
-            });
-            window.sessionStorage.setItem('supplier_regionCode', JSON.stringify(obj));
-        });
-        // 获取苗圃列表
-        getNurseryList().then(rst => {
-            let obj = {};
-            rst.content.map(item => {
-                obj[item.OrgPK] = item.RegionCode;
-            });
-            window.sessionStorage.setItem('nursery_regionCode', JSON.stringify(obj));
-        });
+        window.sessionStorage.setItem('regionCode_name', JSON.stringify(obj));
     }
     componentDidMount = async () => {
         const {
@@ -57,7 +40,8 @@ export default class Tree extends Component {
                 getChildOrgTreeByID,
                 getParentOrgTreeByID,
                 getOrgTreeDataArr,
-                getTablePage
+                getTablePage,
+                getNurseryList
             }
         } = this.props;
         try {
@@ -128,22 +112,31 @@ export default class Tree extends Component {
             }
             // 如果是管理员，获取全部数据
             if (permission) {
+                console.log('aaaaaaa');
                 let rst = await getOrgTree({});
+                console.log('rst', rst);
                 // 对苗圃基地和供应商按照区号进行省份和地区的划分
-                if (rst && rst.children) {
-                    orgTreeArrList = rst.children;
-                    let nurseryData = await getChildOrgTreeByID({id: ORG_NURSERY_CODE});
-                    let supplierData = await getChildOrgTreeByID({id: ORG_SUPPLIER_CODE});
-                    orgTreeArrList.push(nurseryData);
-                    orgTreeArrList.push(supplierData);
-                    orgTreeArrList.map(item => {
-                        if (item.name === '供应商') {
-                            item.children = addGroup(item.children, '供应商');
-                        } else if (item.name === '苗圃基地') {
-                            item.children = addGroup(item.children, '苗圃基地');
+                if (rst && rst instanceof Array) {
+                    orgTreeArrList = rst;
+                    // 获取苗圃列表
+                    let nurseryData = {};
+                    let contentData = await getNurseryList();
+                    if (contentData && contentData.content) {
+                        nurseryData = {
+                            ID: moment().unix(),
+                            OrgType: '苗圃基地',
+                            Orgs: contentData.content,
+                            ProjectName: '苗圃基地'
+                        };
+                        orgTreeArrList.push(nurseryData);
+                    }
+                    orgTreeArrList.map(async item => {
+                        if (item.ProjectName === '苗圃基地') {
+                            item.Orgs = await addGroup(item.Orgs, '苗圃基地');
                         }
                     });
-                    this.getList(orgTreeArrList);
+                    console.log('orgTreeArrList', orgTreeArrList);
+
                     this.setState({
                         orgTreeArrList
                     });
@@ -190,73 +183,6 @@ export default class Tree extends Component {
     }
 
     componentDidUpdate () {
-        const { childList, listVisible } = this.state;
-        if (childList && childList.length > 0 && listVisible) {
-            this.setListStore();
-        }
-    }
-
-    render () {
-        const {
-            sidebar: { node = {} } = {}
-        } = this.props;
-        const {
-            orgTreeArrList
-        } = this.state;
-        const { code } = node || {};
-        return (
-            <SimpleTree
-                dataSource={orgTreeArrList}
-                selectedKey={code}
-                onSelect={this.select.bind(this)}
-            />
-        );
-    }
-
-    // 将二维数组传入store中
-    setListStore () {
-        const {
-            actions: { getListStore }
-        } = this.props;
-        const { childList } = this.state;
-        getListStore(childList);
-        this.setState({
-            listVisible: false
-        });
-    }
-
-    // 将项目分为二维数组，以项目的个数来划分
-    getList (data = []) {
-        const { childList } = this.state;
-        return data.map((item, index) => {
-            childList[index] = [];
-            if (item.children && item.children.length) {
-                childList[index].push({
-                    code: item.code,
-                    name: item.name
-                });
-                this.getChildrenArr(item.children, childList[index]);
-            }
-        });
-    }
-
-    // 获取项目下的所有节点的名字和code
-    getChildrenArr (data = [], List = []) {
-        return data.map(item => {
-            if (item.children && item.children.length) {
-                List.push({
-                    code: item.code,
-                    name: item.name
-                });
-
-                return this.getChildrenArr(item.children, List);
-            } else {
-                List.push({
-                    code: item.code,
-                    name: item.name
-                });
-            }
-        });
     }
 
     select = async (s, node) => {
@@ -275,6 +201,9 @@ export default class Tree extends Component {
         const {
             orgTreeArrList
         } = this.state;
+        console.log('s', JSON.parse(s));
+        console.log('node', node);
+
         let topProject = Tree.loop(orgTreeArrList, eventKey);
         if (this.compare(user, topProject, eventKey)) {
             if (topProject.code) {
@@ -388,5 +317,22 @@ export default class Tree extends Component {
         } catch (e) {
             console.log('orgArrLoop', e);
         }
+    }
+
+    render () {
+        const {
+            sidebar: { node = {} } = {}
+        } = this.props;
+        const {
+            orgTreeArrList
+        } = this.state;
+        const { code } = node || {};
+        return (
+            <SimpleTree
+                dataSource={orgTreeArrList}
+                selectedKey={code}
+                onSelect={this.select.bind(this)}
+            />
+        );
     }
 }

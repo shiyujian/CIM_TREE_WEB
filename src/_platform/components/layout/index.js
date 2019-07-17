@@ -1,5 +1,4 @@
 export Auth from './Auth';
-export Wrapper from './Wrapper';
 export Header from './Header';
 export Aside from './Aside';
 export Content from './Content';
@@ -10,4 +9,3 @@ export Body from './Body';
 export Sidebar from './Sidebar';
 export Main from './Main';
 export Preview from './Preview';
-export DesignSidebar from './DesignSidebar';

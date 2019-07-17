@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Card } from 'antd';
-import Blade from '_platform/components/panels/Blade';
+import Blade from './Blade';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import './styles.less';

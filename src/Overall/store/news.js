@@ -27,8 +27,6 @@ export const deleteData = createFetchAction(`${MAIN_API}/post/{{pk}}/`, [], 'DEL
 
 // 设置上传的文件列表
 export const postUploadFiles = createAction(`${ID}设置上传的文件列表`);
-// 获取发布单位列表
-const getPublicUnitList = createFetchAction(`${SERVICE_API}/org-tree/?depth=4`, [], 'GET');
 
 export const actions = {
     setTabActive,
@@ -44,8 +42,7 @@ export const actions = {
     postData,
     patchData,
     deleteData,
-    postUploadFiles,
-    getPublicUnitList
+    postUploadFiles
 };
 export default handleActions({
     [setTabActive]: (state, { payload }) => ({

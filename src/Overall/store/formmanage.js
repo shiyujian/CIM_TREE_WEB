@@ -22,7 +22,6 @@ export const getTree = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/
 export const getWorkflowsOK = createAction('获取表单管理流程的全部流程实例');
 export const getWorkflows = createFetchAction(`${WORKFLOW_API}/instance/?code={{code}}`, [getWorkflowsOK], 'GET');
 
-const getPublicUnitList = createFetchAction(`${SERVICE_API}/org-tree/?depth=4`, [], 'GET');
 export const actions = {
     FormAddVisible,
     SearchForm,
@@ -35,7 +34,6 @@ export const actions = {
     setkeycode,
     getWorkflowsOK,
     getWorkflows,
-    getPublicUnitList,
     getTreeOK,
     getTree
 };

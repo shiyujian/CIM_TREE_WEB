@@ -18,48 +18,40 @@ class Addition extends Component {
         super(props);
         this.state = {
             companyVisible: false,
-            loading: false
+            loading: false,
+            regionCode: '',
+            sectionList: []
         };
     }
-    componentDidMount = () => {
+    componentDidMount = async () => {
         const {
             form: {
                 setFieldsValue
             },
             addition,
-            sidebar: { node = {}, parent } = {}
+            sidebar: { node = {} } = {}
         } = this.props;
+        await this.getUnits();
+        let sections = [];
+        if (addition && addition.Section) {
+            sections = addition.Section.split(',');
+        }
         setFieldsValue({
-            name: (addition && addition.name) || undefined,
-            code: (addition && addition.code) || undefined,
-            sections: (addition && addition.extra_params && addition.extra_params.sections) || undefined,
-            introduction: (addition && addition.extra_params && addition.extra_params.introduction) || undefined
+            OrgName: (addition && addition.OrgName) || undefined,
+            OrgCode: (addition && addition.OrgCode) || undefined,
+            sections: sections
         });
-        const { extra_params } = node || {};
         let companyVisible = false;
         // 新建项目时，默认显示
-        if (parent && parent.code && parent.code === 'ORG_ROOT') {
-            companyVisible = true;
-        } else {
-            // 未选中任何部门 ，说明新增项目，需要显示
-            if (JSON.stringify(node) === '{}') {
+        if (node && node.ID) {
+            if (node.Orgs) {
                 companyVisible = true;
-            }
-            // 新增信息时   需要显示
-            if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '非公司') {
-                companyVisible = true;
-            }
-            // 编辑公司信息时，需要显示
-            if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus.indexOf('单位') !== -1) {
-                companyVisible = true;
-            }
-
-            // 只分为项目和公司时
-            if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
-                companyVisible = true;
-            }
-            if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
-                companyVisible = true;
+            } else if (node.OrgCode && node.OrgType) {
+                if (node.OrgType === '非公司') {
+                    companyVisible = true;
+                } else if (node.OrgType.indexOf('单位') !== -1) {
+                    companyVisible = true;
+                }
             }
         }
         this.setState({
@@ -71,29 +63,39 @@ class Addition extends Component {
         try {
             const {
                 sidebar: { node = {} } = {},
-                listStore = [],
-                platform: { tree = {} }
+                platform: {
+                    tree = {},
+                    org = []
+                }
             } = this.props;
             let bigTreeList = tree.bigTreeList || [];
             let projectName = '';
-            listStore.map((item, index) => {
-                item.map(rst => {
-                    if (rst.name === node.name && rst.code === node.code) {
-                        projectName = listStore[index]
-                            ? listStore[index][0].name
-                            : '';
+            let regionCode = '';
+            org.map((projectData) => {
+                if (node && node.Orgs) {
+                    if (node.ID === projectData.ID) {
+                        projectName = projectData.ProjectName;
+                        regionCode = projectData.RegionCode;
                     }
-                });
+                } else if (node && node.OrgCode) {
+                    if (node.ProjectID === projectData.ID) {
+                        projectName = projectData.ProjectName;
+                        regionCode = projectData.RegionCode;
+                    }
+                }
             });
-            let units = [];
+            let sectionList = [];
             bigTreeList.map((item) => {
                 let itemNameArr = item.Name.split('项目');
                 let name = itemNameArr[0];
                 if (projectName.indexOf(name) !== -1) {
-                    units = item.children;
+                    sectionList = item.children;
                 }
             });
-            return units;
+            this.setState({
+                sectionList,
+                regionCode
+            });
         } catch (e) {
             console.log('getUnits', e);
         }
@@ -107,9 +109,9 @@ class Addition extends Component {
             }
         } = this.props;
         setFieldsValue({
-            name: e.target.value
+            OrgName: e.target.value
         });
-        changeAdditionField('name', e.target.value);
+        changeAdditionField('OrgName', e.target.value);
     }
 
     changeAdditionCode = (e) => {
@@ -120,9 +122,9 @@ class Addition extends Component {
             }
         } = this.props;
         setFieldsValue({
-            code: e.target.value
+            OrgCode: e.target.value
         });
-        changeAdditionField('code', e.target.value);
+        changeAdditionField('OrgCode', e.target.value);
     }
 
     changeSection (value) {
@@ -150,24 +152,12 @@ class Addition extends Component {
         });
         changeAdditionField('companyStatus', value);
     }
-    changeIntroduction = (value) => {
-        const {
-            actions: { changeAdditionField },
-            form: {
-                setFieldsValue
-            }
-        } = this.props;
-        setFieldsValue({
-            introduction: value
-        });
-        changeAdditionField('introduction', value);
-    }
 
     save = async () => {
         const {
             addition = {},
             actions: {
-                putOrg,
+                putChangeOrg,
                 getOrgTree,
                 changeSidebarField,
                 clearAdditionField,
@@ -176,7 +166,8 @@ class Addition extends Component {
             }
         } = this.props;
         const {
-            companyVisible
+            companyVisible,
+            regionCode
         } = this.state;
         const sections = addition.sections ? addition.sections.join() : [];
         this.props.form.validateFields(async (err, values) => {
@@ -185,16 +176,16 @@ class Addition extends Component {
                     loading: true
                 });
                 let postData = {
-                    obj_type: 'C_ORG',
-                    status: 'A',
-                    name: addition.name,
-                    extra_params: {
-                        introduction: addition.introduction,
-                        sections: sections,
-                        companyStatus: companyVisible ? values.companyStatus : ''
-                    }
+                    ID: addition.ID,
+                    OrgCode: addition.OrgCode,
+                    OrgName: addition.OrgName,
+                    OrgType: companyVisible ? values.companyStatus : '',
+                    ParentID: addition.ParentID,
+                    ProjectID: addition.ProjectID,
+                    RegionCode: regionCode,
+                    Section: sections
                 };
-                let rst = await putOrg({ code: addition.code }, postData);
+                let rst = await putChangeOrg(postData);
                 console.log('rst', rst);
                 if (rst.pk) {
                     await changeSidebarField('parent', null);
@@ -247,13 +238,13 @@ class Addition extends Component {
         } = this.props;
         const {
             companyVisible,
-            loading
+            loading,
+            sectionList
         } = this.state;
-        let units = this.getUnits();
 
         return (
             <Modal
-                title={`编辑 | ${node.name}`}
+                title={`编辑 | ${node.OrgName}`}
                 maskClosable={false}
                 visible={editOrgVisible}
                 footer={null}
@@ -264,7 +255,7 @@ class Addition extends Component {
                 <Spin spinning={loading}>
                     <div>
                         <FormItem {...Addition.layout} label={`名称`}>
-                            {getFieldDecorator('name', {
+                            {getFieldDecorator('OrgName', {
                                 rules: [
                                     {
                                         required: true,
@@ -279,7 +270,7 @@ class Addition extends Component {
                             )}
                         </FormItem>
                         <FormItem {...Addition.layout} label={`编码`}>
-                            {getFieldDecorator('code', {
+                            {getFieldDecorator('OrgCode', {
                                 rules: [
                                     {
                                         required: true,
@@ -310,8 +301,8 @@ class Addition extends Component {
                                     mode='multiple'
                                     style={{ width: '100%' }}
                                 >
-                                    {units
-                                        ? units.map(item => {
+                                    {sectionList
+                                        ? sectionList.map(item => {
                                             return (
                                                 <Option key={item.No} value={item.No}>
                                                     {item.Name}
@@ -329,8 +320,8 @@ class Addition extends Component {
                                     <FormItem {...Addition.layout} label={'公司类型'}>
                                         {getFieldDecorator('companyStatus', {
                                             initialValue: `${
-                                                (addition && addition.companyStatus)
-                                                    ? addition.companyStatus : ''
+                                                (addition && addition.OrgType)
+                                                    ? addition.OrgType : ''
                                             }`,
                                             rules: [
                                                 {
@@ -361,14 +352,6 @@ class Addition extends Component {
                                     </FormItem>
                                 ) : ''
                         }
-                        <FormItem {...Addition.layout} label={`简介`}>
-                            <Input
-                                placeholder='请输入简介'
-                                type='textarea'
-                                rows={4}
-                                onChange={this.changeIntroduction.bind(this)}
-                            />
-                        </FormItem>
                         <Row style={{ marginTop: 10 }}>
                             <Button
                                 key='submit'
