@@ -31,7 +31,7 @@ export default class App extends Component {
         const { default: System } = await import('../../System');
         const { default: Selfcare } = await import('../../Selfcare');
         const { default: Project } = await import('../../Project');
-        const { default: Market } = await import('../../Market');
+        // const { default: Market } = await import('../../Market');
         const { default: Checkwork } = await import('../../Checkwork');
         const { default: Dipping } = await import('../../Dipping');
 
@@ -47,7 +47,7 @@ export default class App extends Component {
             Selfcare,
             System,
             Project,
-            Market,
+            // Market,
             Checkwork,
             Dipping
         });
@@ -66,7 +66,7 @@ export default class App extends Component {
             Selfcare,
             System,
             Project,
-            Market,
+            // Market,
             Checkwork,
             Dipping
         } =
@@ -101,9 +101,9 @@ export default class App extends Component {
                         {Project && (
                             <Route path='/project' component={Project} />
                         )}
-                        {Market && (
+                        {/* {Market && (
                             <Route path='/market' component={Market} />
-                        )}
+                        )} */}
                         {Checkwork && (
                             <Route path='/checkwork' component={Checkwork} />
                         )}

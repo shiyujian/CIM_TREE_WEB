@@ -106,13 +106,13 @@ export default class Header extends Component {
                 path: '/curing/taskcreate',
                 icon: <Icon name='map' />
             },
-            {
-                key: 'market',
-                id: 'MARKET',
-                title: '苗木市场',
-                path: '/market/seedlingsupply',
-                icon: <Icon name='shopping-cart' />
-            },
+            // {
+            //     key: 'market',
+            //     id: 'MARKET',
+            //     title: '苗木市场',
+            //     path: '/market/seedlingsupply',
+            //     icon: <Icon name='shopping-cart' />
+            // },
             {
                 key: 'checkwork',
                 id: 'CHECKWORK',
