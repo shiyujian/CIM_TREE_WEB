@@ -63,7 +63,7 @@ export const USER_API = `${base}/accounts/api`;
 export const SERVICE_API = `${base}/service/construction/api`;
 export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
-export const MAIN_API = `${base}/main/api`;
+export const MAIN_API = `${base}/cms`;
 export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
 // 高德地图逆坐标查询

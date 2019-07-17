@@ -15,7 +15,9 @@ import E from 'wangeditor';
 let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
-
+// 上传附件
+const uploadFileURL = `http://39.97.163.176:6510/ShapeUploadHandler.ashx?layername=1111`;
+// const uploadFileURL = `http://39.105.221.187:6530/service/fileserver/api/user/files/`;
 class NewsAddModal extends Component {
     array = [];
     constructor (props) {
@@ -88,12 +90,12 @@ class NewsAddModal extends Component {
     // 发布新闻
     postData () {
         const {
-            actions: { postData, getNewsList },
+            actions: { postNews },
             form: { validateFields }
         } = this.props;
-        validateFields(async (err, values) => {
-            console.log('values', values);
+        validateFields((err, values) => {
             if (!err) {
+                console.log(values);
                 let coverResp = values.attachment[0].response;
                 let fileList = [];
                 if (values && values.annexFile && values.annexFile.fileList &&
@@ -101,52 +103,82 @@ class NewsAddModal extends Component {
                     values.annexFile.fileList.length > 0) {
                     fileList = values.annexFile.fileList;
                 }
-                let newData = {
-                    'title': values['title'] || '',
-                    'raw': this.state.content,
-                    'content': '',
-                    'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'tags': [1],
-                    'categories': [],
-                    'attachment': {
-                        'fileList': fileList
-                    },
-                    'publisher': getUser().id,
-                    'is_draft': false,
-                    'cover': {
-                        'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'create_time': coverResp.create_time,
-                        'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'id': coverResp.id,
-                        'mime_type': coverResp.mime_type,
-                        'misc': coverResp.misc,
-                        'name': coverResp.name
-                    },
-                    'source': {
-                        'name': values.source
-                    }
-                };
-                let rst = await postData({}, newData);
-                if (rst.id) {
-                    this.modalClick();
-                    Notification.success({
-                        message: '发布新闻成功',
-                        duration: 3
-                    });
-                    // 更新新闻列表数据
-                    getNewsList({}, {
-                        tag: '新闻',
-                        is_draft: false
-                    });
-                } else {
-                    Notification.success({
-                        message: '发布新闻失败！',
-                        duration: 3
-                    });
-                }
+                console.log(coverResp, fileList, this.state.content, getUser().id);
+                postNews({}, {
+                    Author: '',
+                    Content: this.state.content,
+                    Content_Type: 1,
+                    Creater: getUser().id,
+                    KeyWords: '',
+                    Source: values.source,
+                    SubTitle: '',
+                    Summary: '',
+                    Title: values.title,
+                    Thumbnail: coverResp.a_file,
+                    Files: fileList
+                });
             }
         });
+        // const {
+        //     actions: { postData, getNewsList },
+        //     form: { validateFields }
+        // } = this.props;
+        // validateFields(async (err, values) => {
+        //     console.log('values', values);
+        //     if (!err) {
+        //         let coverResp = values.attachment[0].response;
+        //         let fileList = [];
+        //         if (values && values.annexFile && values.annexFile.fileList &&
+        //             values.annexFile.fileList instanceof Array &&
+        //             values.annexFile.fileList.length > 0) {
+        //             fileList = values.annexFile.fileList;
+        //         }
+        //         let newData = {
+        //             'title': values['title'] || '',
+        //             'raw': this.state.content,
+        //             'content': '',
+        //             'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
+        //             'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
+        //             'tags': [1],
+        //             'categories': [],
+        //             'attachment': {
+        //                 'fileList': fileList
+        //             },
+        //             'publisher': getUser().id,
+        //             'is_draft': false,
+        //             'cover': {
+        //                 'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+        //                 'create_time': coverResp.create_time,
+        //                 'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+        //                 'id': coverResp.id,
+        //                 'mime_type': coverResp.mime_type,
+        //                 'misc': coverResp.misc,
+        //                 'name': coverResp.name
+        //             },
+        //             'source': {
+        //                 'name': values.source
+        //             }
+        //         };
+        //         let rst = await postData({}, newData);
+        //         if (rst.id) {
+        //             this.modalClick();
+        //             Notification.success({
+        //                 message: '发布新闻成功',
+        //                 duration: 3
+        //             });
+        //             // 更新新闻列表数据
+        //             getNewsList({}, {
+        //                 tag: '新闻',
+        //                 is_draft: false
+        //             });
+        //         } else {
+        //             Notification.success({
+        //                 message: '发布新闻失败！',
+        //                 duration: 3
+        //             });
+        //         }
+        //     }
+        // });
     }
 
     // 暂存新闻
@@ -217,7 +249,7 @@ class NewsAddModal extends Component {
     uploadPropsFile = {
         name: 'a_file',
         showUploadList: true,
-        action: UPLOAD_API,
+        action: uploadFileURL,
         beforeUpload: () => {
             this.setState({
                 progress: 0,
@@ -261,7 +293,7 @@ class NewsAddModal extends Component {
     };
     uploadPropsCover = {
         name: 'file',
-        action: `${FILE_API}/api/user/files/`,
+        action: uploadFileURL,
         showUploadList: true,
         data: (file) => {
             return {
