@@ -10,10 +10,9 @@ export default (ID, service = '') => {
     const getOrgTree = createFetchAction(`${SYSTEM_API}/orgtree`, [
         getOrgTreeOK
     ]);
-    // 升级后的接口
     // 分类获取数据
     const getOrgTreeByOrgType = createFetchAction(
-        `${SYSTEM_API}/orgtree?orgtype={{orgtype}}`,
+        `${SYSTEM_API}/orgs?orgtype={{orgtype}}`,
         'GET'
     );
     // 反查

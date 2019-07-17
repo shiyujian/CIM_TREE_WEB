@@ -186,7 +186,7 @@ class Addition extends Component {
                     }
                     let rst = await postAddOrg({}, postData);
                     console.log('rst', rst);
-                    if (rst.pk) {
+                    if (rst && rst.code && rst.code === 1) {
                         setTimeout(async () => {
                             await getOrgTree({});
                             await changeOrgTreeDataStatus(true);
@@ -200,6 +200,14 @@ class Addition extends Component {
                     } else if (rst === 'Create Data failed: this code has already exits .') {
                         Notification.error({
                             message: '此编码已存在',
+                            duration: 3
+                        });
+                        this.setState({
+                            loading: false
+                        });
+                    } else {
+                        Notification.error({
+                            message: '新增失败',
                             duration: 3
                         });
                         this.setState({

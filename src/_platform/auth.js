@@ -357,12 +357,11 @@ export const getCompanyDataByOrgCode = async (orgID, getParentOrgTreeByID) => {
 // 对获取的组织机构树进行遍历，返回数组
 export const loopOrgCompany = (orgData) => {
     try {
-        let extra_params = orgData && orgData.extra_params;
-        let companyStatus = extra_params && extra_params.companyStatus;
-        if (companyStatus && (companyStatus === '公司' || companyStatus.indexOf('单位') !== -1)) {
+        let OrgType = (orgData && orgData.OrgType) || '';
+        if (OrgType && OrgType.indexOf('单位') !== -1) {
             return orgData;
         } else if (orgData && orgData.children && orgData.children.length > 0 &&
-            companyStatus && (companyStatus === '项目' || companyStatus === '非公司')) {
+            OrgType && OrgType === '非公司') {
             return orgData.children.map((child) => {
                 return loopOrgCompany(child);
             });
@@ -389,7 +388,7 @@ export const loopArrayCompany = (loopData) => {
 export const getUserIsDocument = () => {
     try {
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        let groups = user.groups;
+        let groups = (user && user.groups) || [];
         let userIsDocument = false;
         groups.map((group) => {
             if (group.name.indexOf('文书') !== -1) {

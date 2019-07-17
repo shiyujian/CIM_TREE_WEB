@@ -65,7 +65,7 @@ export default class Tree extends Component {
                 loading: true
             });
             let deleteData = await deleteOrg({ ID: node.ID });
-            if (!deleteData) {
+            if (deleteData && deleteData.code && deleteData.code === 1) {
                 setTimeout(async () => {
                     Notification.success({
                         message: '删除成功',
@@ -78,12 +78,12 @@ export default class Tree extends Component {
                     });
                 }, 1000);
             } else {
-                if (deleteData === 'Error:This Org has Person Members, DELETE NOT ALLOWED') {
+                if (deleteData.msg && deleteData.msg === 'Error:This Org has Person Members, DELETE NOT ALLOWED') {
                     Notification.error({
                         message: '当前部门下存在人员，不能进行删除',
                         duration: 3
                     });
-                } else if (deleteData === 'Error:This Org has children, DELETE NOT ALLOWED') {
+                } else if (deleteData.msg && deleteData.msg === 'Error:This Org has children, DELETE NOT ALLOWED') {
                     Notification.error({
                         message: '当前部门下存在子节点，不能进行删除',
                         duration: 3

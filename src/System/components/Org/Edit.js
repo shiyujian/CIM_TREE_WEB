@@ -185,9 +185,9 @@ class Addition extends Component {
                     RegionCode: regionCode,
                     Section: sections
                 };
-                let rst = await putChangeOrg(postData);
+                let rst = await putChangeOrg({}, postData);
                 console.log('rst', rst);
-                if (rst.pk) {
+                if (rst && rst.code && rst.code === 1) {
                     await changeSidebarField('parent', null);
                     await clearAdditionField();
                     setTimeout(async () => {

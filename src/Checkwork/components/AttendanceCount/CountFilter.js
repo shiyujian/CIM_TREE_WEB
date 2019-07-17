@@ -49,20 +49,26 @@ class CountFilter extends Component {
             }
             this.companyList = [];
             // 是否为业主或管理员
-            let permission = getUserIsManager();
+            let permission = true;
+            // let permission = getUserIsManager();
             if (permission) {
                 ORGTYPE.map(async (type) => {
                     let orgData = await getOrgTreeByOrgType({orgtype: type});
-                    if (orgData && orgData instanceof Array && orgData.length > 0) {
-                        await this.getCompanyList(orgData);
+                    if (orgData && orgData.content && orgData.content instanceof Array && orgData.content.length > 0) {
+                        await this.getCompanyList(orgData.content);
                     }
+                    console.log('this.companyList', this.companyList);
                 });
+                await this.getUserCompany();
+            } else {
+                let parentData = await this.getUserCompany();
+                if (parentData && parentData.ID) {
+                    this.companyList.push(parentData);
+                }
             }
             this.setState({
                 permission
             });
-            await this.getUserCompany();
-            console.log('this.companyList', this.companyList);
         } catch (e) {
             console.log('componentDidMount', e);
         }
@@ -78,11 +84,13 @@ class CountFilter extends Component {
         try {
             let user = localStorage.getItem('QH_USER_DATA');
             user = JSON.parse(user);
+            let parentData = '';
             // admin没有部门
             if (user.User_Name !== 'admin') {
                 // userOrgCode为登录用户自己的部门code
                 let orgID = user.Org;
-                let parentData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                parentData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                console.log('parentData', parentData);
                 let companyOrgID = parentData.ID;
                 await setFieldsValue({
                     orgID: companyOrgID
@@ -94,14 +102,16 @@ class CountFilter extends Component {
                 await this.getCheckGroupList(companyOrgID);
                 await this.query();
             }
+            return parentData;
         } catch (e) {
             console.log('getUserCompany', e);
         }
     }
     // 查找所有的公司的List
     getCompanyList = async (data) => {
-        if (data && data.ID && data.OrgName) {
-            this.companyList.push(data);
+        console.log('data', data);
+        if (data && data instanceof Array) {
+            this.companyList = this.companyList.concat(data);
         }
     }
     // 公司选择
@@ -127,20 +137,23 @@ class CountFilter extends Component {
         } = this.props;
         let groupArray = [];
         let groupList = await getCheckGroup({}, {org_code: value});
-        groupList.map(group => {
-            groupArray.push(
-                <Option key={group.id} value={group.id}>
-                    {group.name}
-                </Option>
-            );
-        });
+        if (groupList && groupList instanceof Array) {
+            groupList.map(group => {
+                groupArray.push(
+                    <Option key={group.id} value={group.id}>
+                        {group.name}
+                    </Option>
+                );
+            });
+        }
         this.setState({
-            groupArray: groupArray
+            groupArray
         });
     }
 
     renderContent () {
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        user.groups = [];
         const {
             platform: { roles = [] }
         } = this.props;
@@ -243,6 +256,7 @@ class CountFilter extends Component {
     }
     renderTitle () {
         const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        user.groups = [];
         const {
             platform: { roles = [] }
         } = this.props;
