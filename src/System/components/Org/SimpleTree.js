@@ -10,50 +10,50 @@ export default class SimpleTree extends Component {
         selectedKey: PropTypes.string,
         onSelect: PropTypes.func
     };
-    // 如果父级为公司，则可以呗选中，如果为项目，不能呗选中
-    static loop (data = [], companyStatus = false) {
+
+    // static loop (data = []) {
+    //     return data.map(item => {
+    //         if (item.children && item.children.length) {
+    //             return (
+    //                 <TreeNode key={`${item.code}`} title={item.name}>
+    //                     {SimpleTree.loop(item.children)}
+    //                 </TreeNode>
+    //             );
+    //         }
+    //         return <TreeNode key={`${item.code}`} title={item.name} />;
+    //     });
+    // }
+    static loop (data = [], arr = []) {
         return data.map(item => {
             if (item && item.OrgCode) {
-                if (item.OrgType) {
-                    if (item.OrgType.indexOf('单位') !== -1) {
-                        companyStatus = true;
-                    } else if (item.OrgType === '非公司') {
-                        companyStatus = false;
-                    }
-                }
-                if (item && item.OrgPK) {
-                    companyStatus = true;
-                }
                 if (item.children && item.children.length > 0) {
                     return (
                         <TreeNode
-                            key={`${JSON.stringify(item)}`}
-                            disabled={!companyStatus}
+                            key={`${item.ID}`}
+                            value={`${item.ID}`}
                             title={`${item.OrgName}`}
                         >
-                            {SimpleTree.loop(item.children, companyStatus)}
+                            {SimpleTree.loop(item.children)}
                         </TreeNode>
                     );
                 } else {
                     return (
                         <TreeNode
-                            key={`${JSON.stringify(item)}`}
-                            disabled={!companyStatus}
+                            key={`${item.ID}`}
+                            value={`${item.ID}`}
                             title={`${item.OrgName}`}
                         />
                     );
                 }
             } else {
-                companyStatus = false;
                 if (item && item.Orgs && item.Orgs.length > 0) {
                     return (
                         <TreeNode
                             key={`${item.ID}`}
                             value={`${item.ID}`}
-                            disabled
                             title={`${item.ProjectName}`}
                         >
-                            {SimpleTree.loop(item.Orgs, companyStatus)}
+                            {SimpleTree.loop(item.Orgs)}
                         </TreeNode>
                     );
                 } else {
@@ -61,7 +61,6 @@ export default class SimpleTree extends Component {
                         <TreeNode
                             key={`${item.ID}`}
                             value={`${item.ID}`}
-                            disabled
                             title={`${item.ProjectName}`}
                         />
                     );
@@ -71,17 +70,9 @@ export default class SimpleTree extends Component {
     }
 
     render () {
-        const {
-            dataSource = [],
-            selectedKey,
-            onSelect
-        } = this.props;
+        const { dataSource = [], selectedKey, onSelect } = this.props;
         return (
-            <Tree
-                autoExpandParent
-                showLine
-                selectedKeys={[selectedKey]}
-                onSelect={onSelect}>
+            <Tree showLine selectedKeys={[selectedKey]} onSelect={onSelect}>
                 {SimpleTree.loop(dataSource)}
             </Tree>
         );

@@ -18,38 +18,25 @@ class Addition extends Component {
         super(props);
         this.state = {
             companyVisible: false,
-            loading: false
+            loading: false,
+            regionCode: '',
+            sectionList: []
         };
     }
-    componentDidMount = () => {
+    componentDidMount = async () => {
         const {
-            sidebar: { node = {}, parent } = {}
+            sidebar: { node = {} } = {}
         } = this.props;
-        const { extra_params } = node || {};
+        await this.getUnits();
         let companyVisible = false;
         // 新建项目时，默认显示
-        if (parent && parent.code && parent.code === 'ORG_ROOT') {
-            companyVisible = true;
-        } else {
-            // 未选中任何部门 ，说明新增项目，需要显示
-            if (JSON.stringify(node) === '{}') {
+        if (node && node.ID) {
+            if (node.Orgs) {
                 companyVisible = true;
-            }
-            // 新增信息时   需要显示
-            if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '非公司') {
-                companyVisible = true;
-            }
-            // 编辑公司信息时，需要显示
-            if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus.indexOf('单位') !== -1) {
-                companyVisible = true;
-            }
-
-            // 只分为项目和公司时
-            if (extra_params && extra_params.companyStatus && extra_params.companyStatus === '项目') {
-                companyVisible = true;
-            }
-            if (!parent && extra_params && extra_params.companyStatus && extra_params.companyStatus === '公司') {
-                companyVisible = true;
+            } else if (node.OrgCode && node.OrgType) {
+                if (node.OrgType === '非公司') {
+                    companyVisible = true;
+                }
             }
         }
         this.setState({
@@ -60,34 +47,40 @@ class Addition extends Component {
     getUnits = () => {
         try {
             const {
-                sidebar: { node = {}, parent } = {},
-                listStore = [],
-                platform: { tree = {} }
+                sidebar: { node = {} } = {},
+                platform: {
+                    tree = {},
+                    org = []
+                }
             } = this.props;
-            // 新建项目时，默认显示
-            if (parent && parent.code && parent.code === 'ORG_ROOT') {
-                return [];
-            }
             let bigTreeList = tree.bigTreeList || [];
             let projectName = '';
-            listStore.map((item, index) => {
-                item.map(rst => {
-                    if (rst.name === node.name && rst.code === node.code) {
-                        projectName = listStore[index]
-                            ? listStore[index][0].name
-                            : '';
+            let regionCode = '';
+            org.map((projectData) => {
+                if (node && node.Orgs) {
+                    if (node.ID === projectData.ID) {
+                        projectName = projectData.ProjectName;
+                        regionCode = projectData.RegionCode;
                     }
-                });
+                } else if (node && node.OrgCode) {
+                    if (node.ProjectID === projectData.ID) {
+                        projectName = projectData.ProjectName;
+                        regionCode = projectData.RegionCode;
+                    }
+                }
             });
-            let units = [];
+            let sectionList = [];
             bigTreeList.map((item) => {
                 let itemNameArr = item.Name.split('项目');
                 let name = itemNameArr[0];
                 if (projectName.indexOf(name) !== -1) {
-                    units = item.children;
+                    sectionList = item.children;
                 }
             });
-            return units;
+            this.setState({
+                sectionList,
+                regionCode
+            });
         } catch (e) {
             console.log('getUnits', e);
         }
@@ -150,7 +143,7 @@ class Addition extends Component {
             sidebar: { parent } = {},
             addition = {},
             actions: {
-                postOrg,
+                postAddOrg,
                 getOrgTree,
                 changeSidebarField,
                 clearAdditionField,
@@ -158,9 +151,10 @@ class Addition extends Component {
             }
         } = this.props;
         const {
-            companyVisible
+            companyVisible,
+            regionCode
         } = this.state;
-        const sections = addition.sections ? addition.sections.join() : [];
+        const sections = addition.sections ? addition.sections.join() : '';
         this.props.form.validateFields(async (err, values) => {
             console.log('err', err);
             if (!err) {
@@ -168,25 +162,31 @@ class Addition extends Component {
                     this.setState({
                         loading: true
                     });
-                    let postData = {
-                        name: addition.name,
-                        code: addition.code,
-                        obj_type: 'C_ORG',
-                        status: 'A',
-                        extra_params: {
-                            introduction: addition.introduction,
-                            sections: sections,
-                            companyStatus: companyVisible ? values.companyStatus : ''
-                        },
-                        parent: {
-                            pk: parent.pk,
-                            code: parent.code,
-                            obj_type: 'C_ORG'
-                        }
-                    };
-                    let rst = await postOrg({}, postData);
+                    let postData = {};
+                    if (parent && parent.ID && parent.OrgCode) {
+                        postData = {
+                            OrgCode: addition.code,
+                            OrgName: addition.name,
+                            OrgType: companyVisible ? values.companyStatus : '',
+                            ParentID: parent.ID,
+                            ProjectID: parent.ProjectID,
+                            RegionCode: regionCode,
+                            Section: sections
+                        };
+                    } else if (parent && parent.ID && parent.Orgs) {
+                        postData = {
+                            OrgCode: addition.code,
+                            OrgName: addition.name,
+                            OrgType: companyVisible ? values.companyStatus : '',
+                            ParentID: '',
+                            ProjectID: parent.ID,
+                            RegionCode: regionCode,
+                            Section: sections
+                        };
+                    }
+                    let rst = await postAddOrg({}, postData);
                     console.log('rst', rst);
-                    if (rst.pk) {
+                    if (rst && rst.code && rst.code === 1) {
                         setTimeout(async () => {
                             await getOrgTree({});
                             await changeOrgTreeDataStatus(true);
@@ -200,6 +200,14 @@ class Addition extends Component {
                     } else if (rst === 'Create Data failed: this code has already exits .') {
                         Notification.error({
                             message: '此编码已存在',
+                            duration: 3
+                        });
+                        this.setState({
+                            loading: false
+                        });
+                    } else {
+                        Notification.error({
+                            message: '新增失败',
                             duration: 3
                         });
                         this.setState({
@@ -227,24 +235,22 @@ class Addition extends Component {
         const {
             form: { getFieldDecorator },
             sidebar: { parent } = {},
-            addition = {},
-            actions: { changeAdditionField }
+            addition = {}
         } = this.props;
         const {
             companyVisible,
-            loading
+            loading,
+            sectionList
         } = this.state;
-        let units = this.getUnits();
 
+        let parentName = (parent && parent.OrgName) || (parent && parent.ProjectName) || '';
         return (
             <Modal
-                title={`新建组织机构 | ${parent.name}`}
+                title={`新建组织机构 | ${parentName}`}
                 maskClosable={false}
                 visible={addition.visible}
                 footer={null}
                 closable={false}
-                // onOk={this.save.bind(this)}
-                // onCancel={this.cancel.bind(this)}
             >
                 <Spin spinning={loading}>
                     <div>
@@ -295,8 +301,8 @@ class Addition extends Component {
                                     mode='multiple'
                                     style={{ width: '100%' }}
                                 >
-                                    {units
-                                        ? units.map(item => {
+                                    {sectionList
+                                        ? sectionList.map(item => {
                                             return (
                                                 <Option key={item.No} value={item.No}>
                                                     {item.Name}
@@ -345,18 +351,6 @@ class Addition extends Component {
                                     </FormItem>
                                 ) : ''
                         }
-                        <FormItem {...Addition.layout} label={`简介`}>
-                            <Input
-                                placeholder='请输入简介'
-                                value={(addition && addition.introduction) || undefined}
-                                type='textarea'
-                                rows={4}
-                                onChange={changeAdditionField.bind(
-                                    this,
-                                    'introduction'
-                                )}
-                            />
-                        </FormItem>
                         <Row style={{ marginTop: 10 }}>
                             <Button
                                 key='submit'

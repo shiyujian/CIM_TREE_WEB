@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './Footer.less';
-import copyright from './copyright.png';
 import {loadFooterYear, loadFooterCompany} from 'APP/api';
 
 export default class Footer extends Component {

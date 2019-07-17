@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-16 10:54:19
+ * @Last Modified time: 2019-07-17 15:15:12
  */
 /**
  *
@@ -546,38 +546,38 @@ export const MODULES = [
             }
         ]
     },
-    {
-        id: 'MARKET',
-        name: '苗木市场',
-        children: [
-            {
-                id: 'MARKET.SUPERMARKET.NONE',
-                name: '苗木超市',
-                children: [
-                    {
-                        id: 'MARKET.SEEDLINGSUPPLY',
-                        name: '苗木供应'
-                    },
-                    {
-                        id: 'MARKET.SEEDLINGPURCHASE',
-                        name: '苗木求购'
-                    }
-                ]
-            },
-            {
-                id: 'MARKET.SUPPLYRELEASE',
-                name: '供应发布'
-            },
-            {
-                id: 'MARKET.DEMANDRELEASE',
-                name: '需求发布'
-            },
-            {
-                id: 'MARKET.OFFERMANAGE',
-                name: '报价管理'
-            }
-        ]
-    },
+    // {
+    //     id: 'MARKET',
+    //     name: '苗木市场',
+    //     children: [
+    //         {
+    //             id: 'MARKET.SUPERMARKET.NONE',
+    //             name: '苗木超市',
+    //             children: [
+    //                 {
+    //                     id: 'MARKET.SEEDLINGSUPPLY',
+    //                     name: '苗木供应'
+    //                 },
+    //                 {
+    //                     id: 'MARKET.SEEDLINGPURCHASE',
+    //                     name: '苗木求购'
+    //                 }
+    //             ]
+    //         },
+    //         {
+    //             id: 'MARKET.SUPPLYRELEASE',
+    //             name: '供应发布'
+    //         },
+    //         {
+    //             id: 'MARKET.DEMANDRELEASE',
+    //             name: '需求发布'
+    //         },
+    //         {
+    //             id: 'MARKET.OFFERMANAGE',
+    //             name: '报价管理'
+    //         }
+    //     ]
+    // },
     {
         id: 'CHECKWORK',
         name: '考勤管理',

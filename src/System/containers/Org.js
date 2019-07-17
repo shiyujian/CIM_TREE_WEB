@@ -52,10 +52,20 @@ export default class Org extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getTreeNodeList
+                getTreeNodeList,
+                changeSidebarField,
+                clearAdditionField,
+                changeAdditionField,
+                changeEditOrgVisible
             },
             platform: { tree = {} }
         } = this.props;
+        await changeSidebarField('parent', null);
+        await changeSidebarField('addition', false);
+        await changeAdditionField('visible', false);
+        await changeEditOrgVisible(false);
+        await changeSidebarField('node', '');
+        await clearAdditionField();
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
         }

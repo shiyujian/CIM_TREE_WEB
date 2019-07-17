@@ -379,7 +379,6 @@ class Users extends Component {
                 sm: { span: 14 }
             }
         };
-        console.log('dataList', dataList);
         return permissionStatus ? (
             <div>
                 <Spin
