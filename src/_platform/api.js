@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-06-25 09:48:42
+ * @Last Modified time: 2019-07-18 09:44:59
  */
 /**
  *
@@ -519,6 +519,10 @@ export const MODULES = [
                         name: '定位数据导出'
                     }
                 ]
+            },
+            {
+                id: 'FOREST.DEGITALACCEPT',
+                name: '数字化验收'
             }
         ]
     },
