@@ -25,6 +25,7 @@ export default class Home extends Component {
     render () {
         const props = this.props;
         const bannerUrl = banner;
+        console.log('bannerUrl', bannerUrl);
         return (
             <div>
                 <Row>

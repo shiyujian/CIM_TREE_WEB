@@ -269,11 +269,10 @@ export default class Header extends Component {
             history,
             actions: { clearTab }
         } = this.props;
-        console.log('history', history);
         clearUser();
         clearTab();
         removePermissions();
-        window.localStorage.removeItem('FOREST_LOGIN_USER_DATA');
+        window.localStorage.removeItem('LOGIN_USER_DATA');
         let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
         if (!remember) {
             window.localStorage.removeItem('LOGIN_USER_PASSDATA');

@@ -102,7 +102,6 @@ class NewsAddModal extends Component {
                     values.annexFile.fileList.length > 0) {
                     fileList = values.annexFile.fileList;
                 }
-                postNews({}, {
                 fileListNew.map(item => {
                     if (item) {
                         fileList.push({

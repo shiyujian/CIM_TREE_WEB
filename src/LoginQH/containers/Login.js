@@ -70,7 +70,6 @@ class Login extends Component {
                     LOGIN_USER_PASSDATA.password;
                 this.state.checked = LOGIN_USER_PASSDATA.remember;
             }
-            // this.loginFunc(LOGIN_USER_PASSDATA, 1);
         }
     }
 
@@ -469,10 +468,6 @@ class Login extends Component {
         console.log('forestUserData', forestUserData);
         if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
             let forestLoginUserData = forestUserData[0];
-            window.localStorage.setItem(
-                'FOREST_LOGIN_USER_DATA',
-                JSON.stringify(forestLoginUserData)
-            );
             // let tasks = [];
             // tasks = await getTasks(
             //     {},

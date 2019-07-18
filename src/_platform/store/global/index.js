@@ -13,7 +13,6 @@ import {
     tasksFactory,
     usersFactory,
     workflowAction,
-    wpFactory,
     orgFactory,
     metaFactory,
     rolesFactory,
@@ -26,7 +25,6 @@ const ID = 'SINGLETON';
 const dirReducer = dirFactory(ID);
 const docReducer = docFactory(ID);
 const docsReducer = docsFactory(ID);
-const wpReducer = wpFactory(ID);
 const orgReducer = orgFactory(ID);
 const rolesReducer = rolesFactory(ID);
 const membersReducer = membersFactory(ID);
@@ -50,7 +48,6 @@ export const actions = {
     ...taskReducer,
     ...tasksReducer,
     ...usersReducer,
-    ...wpReducer,
     ...orgReducer,
     ...rolesReducer,
     ...membersReducer,
@@ -110,10 +107,6 @@ export default handleActions(
             ...state,
             users: usersReducer(state.users, action)
         }),
-        [combineActions(...actionsMap(wpReducer))]: (state, action) => ({
-            ...state,
-            wp: wpReducer(state.wp, action)
-        }),
         [combineActions(...actionsMap(orgReducer))]: (state, action) => ({
             ...state,
             org: orgReducer(state.org, action)
@@ -152,10 +145,6 @@ export default handleActions(
             ...state,
             locs: locsReducer(state.locs, action)
         })
-        // [combineActions(...actionsMap(progressActions))]: (state, action) => ({
-        // 	...state,
-        // 	progress: progressReducer(state.progress, action),
-        // }),
     },
     {}
 );
