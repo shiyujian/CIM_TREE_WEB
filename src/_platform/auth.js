@@ -181,8 +181,8 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
     if (user.username === 'admin') {
         permission = true;
     }
-    let roles = user.roles || '';
-    if (roles.RoleName.indexOf('业主') !== -1) {
+    let userRoles = user.roles || '';
+    if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
         permission = true;
     }
     if (rst instanceof Array && rst.length > 0) {
@@ -274,8 +274,8 @@ export const getSmallClass = (smallClassList) => {
             if (user.username === 'admin') {
                 permission = true;
             }
-            let roles = user.roles || '';
-            if (roles.RoleName.indexOf('业主') !== -1) {
+            let userRoles = user.roles || '';
+            if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
                 permission = true;
             }
             // permission为true说明是管理员或者业主
@@ -413,8 +413,8 @@ export const getUserIsDocument = () => {
     try {
         const user = getUser();
         let userIsDocument = false;
-        let roles = user.roles || '';
-        if (roles.RoleName.indexOf('文书') !== -1) {
+        let userRoles = user.roles || '';
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('文书') !== -1) {
             userIsDocument = true;
         }
         return userIsDocument;
@@ -446,8 +446,8 @@ export const getUserIsManager = () => {
         if (user.username === 'admin') {
             permission = true;
         }
-        let roles = user.roles || '';
-        if (roles.RoleName.indexOf('业主') !== -1) {
+        let userRoles = user.roles || '';
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
             permission = true;
         }
         return permission;

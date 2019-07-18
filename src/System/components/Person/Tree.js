@@ -51,7 +51,7 @@ export default class Tree extends Component {
             // 施工文书可以查看苗圃基地和供应商
             let isClericalStaff = false;
             let userRoles = user.roles || '';
-            if (userRoles.RoleName.indexOf('施工文书') !== -1) {
+            if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('施工文书') !== -1) {
                 isClericalStaff = true;
             }
             if (user.username === 'admin') {

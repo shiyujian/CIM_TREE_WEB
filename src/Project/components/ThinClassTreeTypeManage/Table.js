@@ -315,7 +315,7 @@ class Tablelevel extends Component {
             });
         }
         let userRoles = userData.roles || '';
-        if (userRoles.RoleName.indexOf('施工设计') !== -1) {
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('施工设计') !== -1) {
             permissionOperate = true;
         }
         this.setState({

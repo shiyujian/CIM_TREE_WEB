@@ -9,6 +9,4 @@
 export * as FlowContainer from './containers';
 export * as FlowStore from './store';
 
-export const routes = 	[
-	'flow'
-	];
+export const routes = ['flow'];

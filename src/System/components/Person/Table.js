@@ -147,11 +147,13 @@ class Users extends Component {
                 let userIsSupplierDocument = false;
                 // 是否为施工，监理，业主文书
                 let userIsProjectDocument = false;
-                if (userRoles.RoleName === '供应商文书') {
-                    userIsSupplierDocument = true;
-                }
-                if (userRoles.RoleName === '业主文书' || userRoles.RoleName === '监理文书' || userRoles.RoleName === '施工文书') {
-                    userIsProjectDocument = true;
+                if (userRoles && userRoles.RoleName) {
+                    if (userRoles.RoleName === '供应商文书') {
+                        userIsSupplierDocument = true;
+                    }
+                    if (userRoles.RoleName === '业主文书' || userRoles.RoleName === '监理文书' || userRoles.RoleName === '施工文书') {
+                        userIsProjectDocument = true;
+                    }
                 }
                 let arr = [];
                 if (user && user.username && user.username === 'admin') {

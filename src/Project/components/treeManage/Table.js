@@ -87,8 +87,8 @@ export default class Tablelevel extends Component {
         if (user && user.username && user.username === 'admin') {
             superUser = true;
         }
-        let roles = user.roles || '';
-        if (roles && roles.RoleName && roles.RoleName.indexOf('业主文书') !== -1) {
+        let userRoles = user.roles || '';
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主文书') !== -1) {
             permission = true;
         }
         return (

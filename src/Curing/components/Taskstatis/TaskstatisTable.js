@@ -245,12 +245,11 @@ export default class TaskStatisTable extends Component {
             if (user.username === 'admin') {
                 this.totalDataPer = true;
             }
-            let roles = user.roles || '';
-            if (roles.RoleName.indexOf('业主') !== -1) {
+            let userRoles = user.roles || '';
+            if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
                 this.totalDataPer = true;
             }
             this.section = user.section;
-            console.log('this.totalDataPer', this.totalDataPer);
             if (this.section || this.totalDataPer) {
                 await this._loadCuringTypes();
                 await this._loadAreaData();
