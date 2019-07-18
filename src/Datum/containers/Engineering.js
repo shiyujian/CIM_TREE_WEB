@@ -112,7 +112,7 @@ export default class Engineering extends Component {
             }
             await this.getSection();
             this.setState({ loading: true });
-            this.user = localStorage.getItem('QH_USER_DATA');
+            this.user = localStorage.getItem('LOGIN_USER_DATA');
             this.user = JSON.parse(this.user);
             if (this.user.username !== 'admin') {
                 let orgID = this.user.Org;

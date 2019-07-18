@@ -50,7 +50,7 @@ class SaveUserMapCustomPositionModal extends Component {
                 });
                 return;
             }
-            const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+            const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
             let postData = {
                 name: name,
                 zoom: saveUserMapCustomPositionZoom,

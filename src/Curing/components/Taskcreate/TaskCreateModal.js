@@ -38,7 +38,7 @@ class TaskCreateModal extends Component {
         this.setState({
             typeOptionArr
         });
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         let username = (user && user.username) || '';
         if (username) {
             let postData = {

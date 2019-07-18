@@ -7,7 +7,7 @@ export default class PkCodeTree extends Component {
     static propTypes = {};
 
     static loop (data = []) {
-        let user = localStorage.getItem('QH_USER_DATA');
+        let user = localStorage.getItem('LOGIN_USER_DATA');
         user = JSON.parse(user);
         let component = [];
         // 是否为业主或管理员

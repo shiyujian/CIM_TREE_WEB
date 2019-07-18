@@ -142,7 +142,7 @@ class Users extends Component {
             key: '10',
             render: (text, record) => {
                 const userc = JSON.parse(
-                    window.localStorage.getItem('QH_USER_DATA')
+                    window.localStorage.getItem('LOGIN_USER_DATA')
                 );
                 let groups = userc.groups || [];
                 // 是否为供应商文书
@@ -292,7 +292,7 @@ class Users extends Component {
         const {
             selectedRowKeys
         } = this.state;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         if (user.is_superuser === true) {
             return (<div>
                 <Col span={3}>
@@ -358,7 +358,7 @@ class Users extends Component {
         const professionRoles = roles.filter(role => role.grouptype === 2);
         const departmentRoles = roles.filter(role => role.grouptype === 3);
         const userc = JSON.parse(
-            window.localStorage.getItem('QH_USER_DATA')
+            window.localStorage.getItem('LOGIN_USER_DATA')
         );
         let userName = userc.username;
         let permissionStatus = false;
@@ -619,7 +619,7 @@ class Users extends Component {
                 is_active: searchUserStatus
             };
             const userc = JSON.parse(
-                window.localStorage.getItem('QH_USER_DATA')
+                window.localStorage.getItem('LOGIN_USER_DATA')
             );
             let userName = userc.username;
             if (!searchOveralSituation || userName !== 'admin') {

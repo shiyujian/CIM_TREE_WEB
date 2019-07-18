@@ -38,7 +38,7 @@ export default class ElectronicFence extends Component {
             }
         } = this.props;
         // 获取用户的公司信息
-        let user = localStorage.getItem('QH_USER_DATA');
+        let user = localStorage.getItem('LOGIN_USER_DATA');
         user = JSON.parse(user);
         try {
             if (user.username !== 'admin') {

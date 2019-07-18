@@ -64,7 +64,7 @@ export default class AttendanceGroup extends Component {
             await changeAsideTreeLoading(true);
 
             // 获取用户的公司信息
-            let user = localStorage.getItem('QH_USER_DATA');
+            let user = localStorage.getItem('LOGIN_USER_DATA');
             user = JSON.parse(user);
             let userOrgID = '';
             let companyOrgID = '';

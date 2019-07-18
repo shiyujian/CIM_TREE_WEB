@@ -29,7 +29,7 @@ class PersonModify extends Component {
 
         console.log('modifyPer', modifyPer);
         console.log('addition', addition);
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         let roles = [];
         if (addition && addition.groups && addition.groups instanceof Array) {
             addition.groups.map(ese => {

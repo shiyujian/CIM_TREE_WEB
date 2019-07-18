@@ -25,7 +25,7 @@ export default class ScheduleActualDeal extends Component {
         wrapperCol: { span: 16 }
     };
     componentDidMount = () => {
-        let user = localStorage.getItem('QH_USER_DATA');
+        let user = localStorage.getItem('LOGIN_USER_DATA');
         user = JSON.parse(user);
         this.setState({
             user

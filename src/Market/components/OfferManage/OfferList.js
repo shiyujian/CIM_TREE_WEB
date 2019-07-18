@@ -22,7 +22,7 @@ class OfferList extends Component {
     }
     componentDidMount () {
         // 获取该用户所在机构类型和code
-        const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const userData = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         if (userData && userData.account && userData.groups.length > 0) {
             userData.groups.map(item => {
                 if (item.grouptype === 0 || item.grouptype === 6) {

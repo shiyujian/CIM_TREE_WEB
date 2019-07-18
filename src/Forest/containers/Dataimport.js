@@ -51,7 +51,7 @@ export default class Dataimport extends Component {
                 getForestUsers
             }
         } = this.props;
-        const loginUser = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const loginUser = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         let username = loginUser && loginUser.username;
         let loginUserSections = loginUser && loginUser.account && loginUser.account.sections;
         let forestUserData = await getForestUsers({}, {username: username});

@@ -23,7 +23,7 @@ class AsideTree extends Component {
     }
 
     componentDidMount = async () => {
-        let user = localStorage.getItem('QH_USER_DATA');
+        let user = localStorage.getItem('LOGIN_USER_DATA');
         user = JSON.parse(user);
         if (user && user.username !== 'admin') {
             this.setState({

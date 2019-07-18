@@ -74,7 +74,7 @@ class Actual extends Component {
             platform: { tree = {} }
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
-        let user = localStorage.getItem('QH_USER_DATA');
+        let user = localStorage.getItem('LOGIN_USER_DATA');
         user = JSON.parse(user);
 
         let sections = user && user.account && user.account.sections;
@@ -193,7 +193,7 @@ class Actual extends Component {
         const { actualData } = this.state;
         const { leftkeycode } = this.props;
         let filterData = [];
-        let user = localStorage.getItem('QH_USER_DATA');
+        let user = localStorage.getItem('LOGIN_USER_DATA');
         user = JSON.parse(user);
         // 是否为业主或管理员
         let permission = getUserIsManager();

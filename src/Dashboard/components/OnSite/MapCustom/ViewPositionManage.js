@@ -163,7 +163,7 @@ export default class ViewPositionManage extends Component {
                     duration: 3
                 });
             }
-            const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+            const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
             await getCustomViewByUserID({id: user.id});
         } catch (e) {
             console.log('handleDeleteMapCustomPosition', e);

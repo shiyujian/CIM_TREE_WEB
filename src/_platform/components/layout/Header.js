@@ -52,6 +52,8 @@ export default class Header extends Component {
         const {
             tabs = {}
         } = this.props;
+        let data = getUser();
+        console.log('data', data);
         let fullScreenState = '';
         if (tabs && tabs.fullScreenState) {
             fullScreenState = tabs.fullScreenState;
