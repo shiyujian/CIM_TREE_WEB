@@ -14,6 +14,7 @@ class NoticeEditModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            fileListNew: [], // 附件
             content: '',
             progress: 0,
             loading: false,
@@ -73,24 +74,54 @@ class NoticeEditModal extends Component {
             }
         };
         editor.create();
+
         const {
-            noticeDetail,
+            noticeID,
+            actions: { getNoticeDetails },
             form: { setFieldsValue }
         } = this.props;
-        this.setState({
-            content: noticeDetail.raw
+        console.log(noticeID, '通知ID');
+        getNoticeDetails({ID: noticeID}, {}).then(rep => {
+            console.log(rep);
+            let { fileListNew } = this.state;
+            rep.Files.map((item, index) => {
+                fileListNew.push({
+                    uid: index,
+                    name: item.FileName,
+                    url: item.FilePath
+                });
+            });
+            console.log(fileListNew);
+            this.setState({
+                noticeID: noticeID,
+                content: rep.Notice_Content,
+                fileListNew
+            });
+            editor.txt.html(rep.Notice_Content);
+            setFieldsValue({
+                'title': rep.Notice_Title || '',
+                'mergency': rep.Notice_Type + '' || ''
+            });
         });
-        editor.txt.html(noticeDetail.raw);
-        let annexFile = noticeDetail.attachment && noticeDetail.attachment.fileList
-            ? noticeDetail.attachment.fileList : [];
-        setFieldsValue({
-            'title': noticeDetail.title || '',
-            'mergency': noticeDetail.degree + '' || '',
-            'annexFile': annexFile
-        });
-        this.setState({
-            annexFileList: annexFile
-        });
+
+        // const {
+        //     noticeDetail,
+        //     form: { setFieldsValue }
+        // } = this.props;
+        // this.setState({
+        //     content: noticeDetail.raw
+        // });
+        // editor.txt.html(noticeDetail.raw);
+        // let annexFile = noticeDetail.attachment && noticeDetail.attachment.fileList
+        //     ? noticeDetail.attachment.fileList : [];
+        // setFieldsValue({
+        //     'title': noticeDetail.title || '',
+        //     'mergency': noticeDetail.degree + '' || '',
+        //     'annexFile': annexFile
+        // });
+        // this.setState({
+        //     annexFileList: annexFile
+        // });
     }
 
     // modal显示与影藏
@@ -99,56 +130,101 @@ class NoticeEditModal extends Component {
     }
 
     // 发布通知
-    postData () {
+    onRelease () {
         const {
-            actions: { getTipsList, patchData, getDraftTipsList },
-            form: { validateFields },
-            noticeDetail
+            actions: { putNotice, getNoticeList },
+            form: { validateFields }
         } = this.props;
-        validateFields((err, values) => {
+        validateFields(async (err, values) => {
             if (!err) {
+                const { noticeID, fileListNew, content } = this.state;
                 let fileList = [];
-                if (values && values.annexFile) {
-                    if (values.annexFile.fileList &&
-                        values.annexFile.fileList instanceof Array &&
-                        values.annexFile.fileList.length > 0) {
-                        fileList = values.annexFile.fileList;
-                    } else {
-                        fileList = values.annexFile;
+                fileListNew.map(item => {
+                    if (item) {
+                        fileList.push({
+                            FileName: item.name,
+                            FilePath: item.url
+                        });
                     }
-                }
-                let newData = {
-                    'title': values['title'] || '',
-                    'raw': this.state.content,
-                    'degree': values['mergency'],
-                    'attachment': {
-                        'fileList': fileList
-                    },
-                    'categories': [],
-                    'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'is_draft': false
-                };
-                patchData({ pk: noticeDetail.id }, newData)
-                    .then(rst => {
-                        if (rst.id) {
-                            this.modalClick();
-                            Notification.success({
-                                message: '编辑通知成功',
-                                duration: 3
-                            });
-                            // 更新通知列表数据
-                            getTipsList({}, {
-                                tag: '公告',
-                                is_draft: false
-                            });
-                            getDraftTipsList({}, {
-                                tag: '公告',
-                                is_draft: true
-                            });
-                        }
+                });
+                console.log('编辑数据', values, content, fileList);
+                let rst = await putNotice({}, {
+                    ID: noticeID,
+                    Notice_Type: parseInt(values.mergency),
+                    Notice_User: 1,
+                    Notice_Title: values.title,
+                    Notice_Content: content,
+                    Remark: '',
+                    Thumbnail: '',
+                    Files: fileList
+                });
+                if (rst.code === 1) {
+                    // 消除弹框重新加载时数据
+                    getNoticeList({}, {
+                        type: '',
+                        name: '',
+                        sdate: '',
+                        edate: '',
+                        page: '',
+                        size: ''
                     });
+                    await this.modalClick();
+                    Notification.success({
+                        message: '编辑通知成功',
+                        duration: 3
+                    });
+                } else {
+                    Notification.error({
+                        message: '编辑通知失败',
+                        duration: 3
+                    });
+                }
             }
         });
+        // validateFields((err, values) => {
+        //     if (!err) {
+        //         let fileList = [];
+        //         if (values && values.annexFile) {
+        //             if (values.annexFile.fileList &&
+        //                 values.annexFile.fileList instanceof Array &&
+        //                 values.annexFile.fileList.length > 0) {
+        //                 fileList = values.annexFile.fileList;
+        //             } else {
+        //                 fileList = values.annexFile;
+        //             }
+        //         }
+        //         let newData = {
+        //             'title': values['title'] || '',
+        //             'raw': this.state.content,
+        //             'degree': values['mergency'],
+        //             'attachment': {
+        //                 'fileList': fileList
+        //             },
+        //             'categories': [],
+        //             'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
+        //             'is_draft': false
+        //         };
+        //         patchData({ pk: noticeDetail.id }, newData)
+        //             .then(rst => {
+        //                 if (rst.id) {
+        //                     this.modalClick();
+        //                     Notification.success({
+        //                         message: '编辑通知成功',
+        //                         duration: 3
+        //                     });
+        //                     // 更新通知列表数据
+        //                     getTipsList({}, {
+        //                         tag: '公告',
+        //                         is_draft: false
+        //                     });
+        //                     getDraftTipsList({}, {
+        //                         tag: '公告',
+        //                         is_draft: true
+        //                     });
+        //                 }
+        //             });
+        //     }
+        // });
     }
 
     // 暂存通知
@@ -203,14 +279,46 @@ class NoticeEditModal extends Component {
             }
         });
     }
+    checkTitle = async (rule, value, callback) => {
+        if (value) {
+            if (value.length <= 40) {
+                callback();
+            } else {
+                callback(`名称须少于40个字，请重新输入`);
+            };
+        } else {
+            callback();
+        }
+    }
     uploadPropsFile = {
         name: 'a_file',
         showUploadList: true,
-        action: UPLOAD_API,
-        beforeUpload: () => {
+        action: '',
+        beforeUpload: (file, fileList) => {
+            let { fileListNew } = this.state;
+            const { uploadFileHandler } = this.props.actions;
+            const formdata = new FormData();
+            formdata.append('file', fileList[0]);
+            uploadFileHandler({}, formdata).then(rep => {
+                file.url = rep;
+                fileListNew.push(file);
+                console.log(fileListNew, '附件');
+                this.setState({
+                    fileListNew
+                });
+            });
+            return false;
+        },
+        onRemove: (file) => {
+            let { fileListNew } = this.state;
+            let fileList = [];
+            fileListNew.map(item => {
+                if (item.uid !== file.uid) {
+                    fileList.push(item);
+                }
+            });
             this.setState({
-                progress: 0,
-                loading: true
+                fileListNew: fileList
             });
         },
         onChange: ({ file, fileList }) => {
@@ -251,17 +359,6 @@ class NoticeEditModal extends Component {
             }
         }
     };
-    checkTitle = async (rule, value, callback) => {
-        if (value) {
-            if (value.length <= 40) {
-                callback();
-            } else {
-                callback(`名称须少于40个字，请重新输入`);
-            };
-        } else {
-            callback();
-        }
-    }
     render () {
         const {
             form: { getFieldDecorator }
@@ -318,16 +415,13 @@ class NoticeEditModal extends Component {
                             </Col>
                             <Col span={5} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
-                                    {getFieldDecorator('annexFile', {
-                                    })(
-                                        <Upload {...this.uploadPropsFile}
-                                            fileList={this.state.annexFileList}
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />上传附件
-                                            </Button>
-                                        </Upload>
-                                    )}
+                                    <Upload {...this.uploadPropsFile}
+                                        fileList={this.state.fileListNew}
+                                    >
+                                        <Button>
+                                            <Icon type='upload' />上传附件
+                                        </Button>
+                                    </Upload>
                                 </FormItem>
                             </Col>
                         </Row>
@@ -340,7 +434,7 @@ class NoticeEditModal extends Component {
                             <Col span={24} offset={10}>
                                 <Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
                                 <Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
-                                <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
+                                <Button style={{ marginLeft: 20 }} type='primary' onClick={this.onRelease.bind(this)}>发布</Button>
                             </Col>
                         </Row>
                     </Form>

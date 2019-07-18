@@ -1,6 +1,7 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
 import fetchAction from 'fetch-action';
+import {createFetchActionWithHeaders as myFetch} from './myfetchAction';
 import { base, MAIN_API, SERVICE_API } from '_platform/api';
 const ID = 'informatization_news';
 // Tab切换状态
@@ -41,17 +42,24 @@ export const getNewsDetails = fetchAction(`${MAIN_API}/news/{{ID}}`);
 export const postNews = fetchAction(`${MAIN_API}/news`, [], 'POST');
 // 新闻编辑
 export const putNews = fetchAction(`${MAIN_API}/news`, [], 'PUT');
+// 新闻删除
+export const deleteNews = fetchAction(`${MAIN_API}/news/{{ID}`, [], 'DELETE');
 
 // 公告类型
 export const getNoticetypes = fetchAction(`${MAIN_API}/noticetypes`);
 // 公告列表
-export const getNoticeList = fetchAction(`${MAIN_API}/notices`);
+export const getNoticeListOK = createAction(`${ID}获取公告列表`);
+export const getNoticeList = fetchAction(`${MAIN_API}/notices`, [getNoticeListOK]);
 // 公告详情
 export const getNoticeDetails = fetchAction(`${MAIN_API}/notice/{{ID}}`);
 // 公告发布
 export const postNotice = fetchAction(`${MAIN_API}/notice`, [], 'POST');
 // 公告编辑
 export const putNotice = fetchAction(`${MAIN_API}/notice`, [], 'PUT');
+// 新闻删除
+export const deleteNotice = fetchAction(`${MAIN_API}/news/{{ID}`, [], 'DELETE');
+// 上传附件
+export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype=news`, [], 'POST');
 
 export const actions = {
     getNewsTypes,
@@ -60,11 +68,15 @@ export const actions = {
     getNewsDetails,
     postNews,
     putNews,
+    deleteNews,
     getNoticetypes,
+    getNoticeListOK,
     getNoticeList,
     getNoticeDetails,
     postNotice,
     putNotice,
+    deleteNotice,
+    uploadFileHandler,
 
     setTabActive,
     toggleModal,
@@ -98,9 +110,9 @@ export default handleActions({
         ...state,
         newsList: payload.content
     }),
-    [getTipsListOK]: (state, { payload }) => ({
+    [getNoticeListOK]: (state, { payload }) => ({
         ...state,
-        tipsList: payload
+        tipsList: payload.content
     }),
     [getDraftTipsListOK]: (state, { payload }) => ({
         ...state,

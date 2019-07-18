@@ -16,13 +16,14 @@ let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 // 上传附件
-const uploadFileURL = `http://39.97.163.176:6510/ShapeUploadHandler.ashx?layername=1111`;
-// const uploadFileURL = `http://39.105.221.187:6530/service/fileserver/api/user/files/`;
+const uploadFileURL = `/OSSUploadHandler.ashx?filetype=news`;
 class NewsAddModal extends Component {
     array = [];
     constructor (props) {
         super(props);
         this.state = {
+            ThumbnailUrl: '', // 缩略图地址
+            fileListNew: [], // 附件
             content: '',
             loading: false,
             progress: 0
@@ -86,17 +87,15 @@ class NewsAddModal extends Component {
         };
         editor.create();
     }
-
     // 发布新闻
-    postData () {
+    onRelease = async () => {
         const {
-            actions: { postNews },
+            actions: { postNews, getNewsListNew },
             form: { validateFields }
         } = this.props;
-        validateFields((err, values) => {
+        validateFields(async (err, values) => {
             if (!err) {
-                console.log(values);
-                let coverResp = values.attachment[0].response;
+                const { fileListNew, ThumbnailUrl, content } = this.state;
                 let fileList = [];
                 if (values && values.annexFile && values.annexFile.fileList &&
                     values.annexFile.fileList instanceof Array &&
@@ -104,18 +103,49 @@ class NewsAddModal extends Component {
                     fileList = values.annexFile.fileList;
                 }
                 postNews({}, {
+                fileListNew.map(item => {
+                    if (item) {
+                        fileList.push({
+                            FileName: item.name,
+                            FilePath: item.url
+                        });
+                    }
+                });
+                let rst = await postNews({}, {
                     Author: '',
-                    Content: this.state.content,
+                    Content: content,
                     Content_Type: 1,
-                    Creater: getUser().ID,
+                    Creater: 1,
                     KeyWords: '',
                     Source: values.source,
                     SubTitle: '',
                     Summary: '',
                     Title: values.title,
-                    Thumbnail: coverResp.a_file,
+                    Thumbnail: ThumbnailUrl,
                     Files: fileList
                 });
+                if (rst.code === 1) {
+                    // 消除弹框重新加载时数据
+                    getNewsListNew({}, {
+                        type: '',
+                        name: '',
+                        ishot: '',
+                        sdate: '',
+                        edate: '',
+                        page: '',
+                        size: ''
+                    });
+                    await this.modalClick();
+                    Notification.success({
+                        message: '发布通知成功',
+                        duration: 3
+                    });
+                } else {
+                    Notification.error({
+                        message: '发布通知失败',
+                        duration: 3
+                    });
+                }
             }
         });
         // const {
@@ -245,54 +275,9 @@ class NewsAddModal extends Component {
     modalClick () {
         this.props.handlePublishNewsModalCancel();
     }
-    uploadPropsFile = {
-        name: 'a_file',
-        showUploadList: true,
-        action: uploadFileURL,
-        beforeUpload: () => {
-            this.setState({
-                progress: 0,
-                loading: true
-            });
-        },
-        onChange: async ({file, fileList}) => {
-            try {
-                console.log('file', file);
-                console.log('fileList', fileList);
-                const status = file.status;
-                if (status === 'done') {
-                    file.url = file && file.response && file.response.a_file;
-                    fileList.map((fileData) => {
-                        if (fileData && fileData.response && fileData.response.a_file) {
-                            fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                        }
-                    });
-                    this.setState({
-                        progress: 1,
-                        loading: false
-                    });
-                    Notification.info({
-                        message: '上传附件成功',
-                        duration: 3
-                    });
-                } else if (status === 'error') {
-                    Notification.error({
-                        message: '上传附件失败',
-                        duration: 3
-                    });
-                    this.setState({
-                        progress: 1,
-                        loading: false
-                    });
-                }
-            } catch (e) {
-                console.log('uploadPropsFile', e);
-            }
-        }
-    };
     uploadPropsCover = {
         name: 'file',
-        action: uploadFileURL,
+        action: '',
         showUploadList: true,
         data: (file) => {
             return {
@@ -300,29 +285,39 @@ class NewsAddModal extends Component {
                 a_file: file
             };
         },
-        beforeUpload: (file) => {
-            let type = file.name.toString().split('.');
-            let len = type.length;
-            if (
-                type[len - 1] === 'jpg' ||
-            type[len - 1] === 'jpeg' ||
-            type[len - 1] === 'png' ||
-            type[len - 1] === 'JPG' ||
-            type[len - 1] === 'JPEG' ||
-            type[len - 1] === 'PNG'
-            ) {
+        beforeUpload: (file, fileList) => {
+            const { uploadFileHandler } = this.props.actions;
+            const formdata = new FormData();
+            formdata.append('file', fileList[0]);
+            uploadFileHandler({}, formdata).then(rep => {
+                console.log(rep);
                 this.setState({
-                    progress: 0,
-                    loading: true
+                    ThumbnailUrl: rep
                 });
-                return true;
-            } else {
-                Notification.error({
-                    message: '请上传jpg,jpeg,png 文件',
-                    duration: 3
-                });
-                return false;
-            }
+            });
+            return false;
+            // let type = file.name.toString().split('.');
+            // let len = type.length;
+            // if (
+            //     type[len - 1] === 'jpg' ||
+            // type[len - 1] === 'jpeg' ||
+            // type[len - 1] === 'png' ||
+            // type[len - 1] === 'JPG' ||
+            // type[len - 1] === 'JPEG' ||
+            // type[len - 1] === 'PNG'
+            // ) {
+            //     this.setState({
+            //         progress: 0,
+            //         loading: true
+            //     });
+            //     return true;
+            // } else {
+            //     Notification.error({
+            //         message: '请上传jpg,jpeg,png 文件',
+            //         duration: 3
+            //     });
+            //     return false;
+            // }
         },
         onChange: ({ file }) => {
             console.log('file', file);
@@ -398,6 +393,74 @@ class NewsAddModal extends Component {
             wrapperCol: { span: 16 }
         };
 
+        const uploadPropsFile = {
+            name: 'file',
+            showUploadList: true,
+            action: '',
+            fileList: this.state.fileListNew,
+            beforeUpload: (file, fileList) => {
+                let { fileListNew } = this.state;
+                const { uploadFileHandler } = this.props.actions;
+                const formdata = new FormData();
+                formdata.append('file', fileList[0]);
+                uploadFileHandler({}, formdata).then(rep => {
+                    file.url = rep;
+                    fileListNew.push(file);
+                    console.log(fileListNew, '附件');
+                    this.setState({
+                        fileListNew
+                    });
+                });
+                return false;
+            },
+            onRemove: (file) => {
+                let { fileListNew } = this.state;
+                let fileList = [];
+                fileListNew.map(item => {
+                    if (item.uid !== file.uid) {
+                        fileList.push(item);
+                    }
+                });
+                this.setState({
+                    fileListNew: fileList
+                });
+            },
+            onChange: async ({file, fileList}) => {
+                // try {
+                //     console.log('file', file);
+                //     console.log('fileList', fileList);
+                //     const status = file.status;
+                //     if (status === 'done') {
+                //         file.url = file && file.response && file.response.a_file;
+                //         fileList.map((fileData) => {
+                //             if (fileData && fileData.response && fileData.response.a_file) {
+                //                 fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                //             }
+                //         });
+                //         this.setState({
+                //             progress: 1,
+                //             loading: false
+                //         });
+                //         Notification.info({
+                //             message: '上传附件成功',
+                //             duration: 3
+                //         });
+                //     } else if (status === 'error') {
+                //         Notification.error({
+                //             message: '上传附件失败',
+                //             duration: 3
+                //         });
+                //         this.setState({
+                //             progress: 1,
+                //             loading: false
+                //         });
+                //     }
+                // } catch (e) {
+                //     console.log('uploadPropsFile', e);
+                // }
+            }
+        };
+
         return (
             <Modal
                 title={'发布新闻'}
@@ -430,7 +493,7 @@ class NewsAddModal extends Component {
                                 <FormItem {...formItemLayout} label='附件'>
                                     {getFieldDecorator('annexFile', {
                                     })(
-                                        <Upload {...this.uploadPropsFile}
+                                        <Upload {...uploadPropsFile}
                                         >
                                             <Button>
                                                 <Icon type='upload' />上传附件
@@ -443,23 +506,12 @@ class NewsAddModal extends Component {
                         <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='封面'>
-                                    {getFieldDecorator('attachment', {
-                                        valuePropName: 'fileList',
-                                        getValueFromEvent: this.coverPicFile,
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请上传封面！'
-                                            }
-                                        ]
-                                    })(
-                                        <Upload {...this.uploadPropsCover}
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />添加文件
-                                            </Button>
-                                        </Upload>
-                                    )}
+                                    <Upload {...this.uploadPropsCover}
+                                    >
+                                        <Button>
+                                            <Icon type='upload' />添加文件
+                                        </Button>
+                                    </Upload>
                                 </FormItem>
                             </Col>
                             <Col span={8} offset={1}>
@@ -486,7 +538,7 @@ class NewsAddModal extends Component {
                         <Col span={24} offset={10} >
                             <Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
                             <Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
-                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
+                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.onRelease.bind(this)}>发布</Button>
                         </Col>
                     </Row>
                 </Spin>

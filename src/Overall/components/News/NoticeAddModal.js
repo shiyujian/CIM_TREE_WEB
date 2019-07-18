@@ -15,6 +15,7 @@ class NoticeAddModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            fileListNew: [],
             content: '',
             progress: 0,
             loading: false
@@ -81,40 +82,41 @@ class NoticeAddModal extends Component {
     }
 
     // 发布通知
-    postData = async () => {
+    onRelease = async () => {
         const {
-            actions: { postData, getTipsList },
+            actions: { postNotice, getNoticeList },
             form: { validateFields }
         } = this.props;
         validateFields(async (err, values) => {
-            console.log('values', values);
             if (!err) {
+                const { content, fileListNew } = this.state;
                 let fileList = [];
-                if (values && values.annexFile && values.annexFile.fileList &&
-                    values.annexFile.fileList instanceof Array &&
-                    values.annexFile.fileList.length > 0) {
-                    fileList = values.annexFile.fileList;
-                }
-                let newData = {
-                    'title': values['title'] || '',
-                    'raw': this.state.content,
-                    'degree': values['mergency'],
-                    'attachment': {
-                        'fileList': fileList
-                    },
-                    'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'tags': [2],
-                    'categories': [],
-                    'publisher': getUser().ID,
-                    'is_draft': false
-                };
-                let rst = await postData({}, newData);
-                if (rst && rst.id) {
-                    // 更新通知列表数据
-                    await getTipsList({}, {
-                        tag: '公告',
-                        is_draft: false
+                fileListNew.map(item => {
+                    if (item) {
+                        fileList.push({
+                            FileName: item.name,
+                            FilePath: item.url
+                        });
+                    }
+                });
+                let rst = await postNotice({}, {
+                    Notice_Type: parseInt(values.mergency),
+                    Notice_User: 1,
+                    Notice_Title: values.title,
+                    Notice_Content: content,
+                    Remark: '',
+                    Thumbnail: '',
+                    Files: fileList
+                });
+                if (rst.code === 1) {
+                    // 消除弹框重新加载时数据
+                    getNoticeList({}, {
+                        type: '',
+                        name: '',
+                        sdate: '',
+                        edate: '',
+                        page: '',
+                        size: ''
                     });
                     await this.modalClick();
                     Notification.success({
@@ -180,51 +182,6 @@ class NoticeAddModal extends Component {
             }
         });
     }
-    uploadPropsFile = {
-        name: 'a_file',
-        showUploadList: true,
-        action: UPLOAD_API,
-        beforeUpload: () => {
-            this.setState({
-                progress: 0,
-                loading: true
-            });
-        },
-        onChange: async ({file, fileList}) => {
-            try {
-                console.log('file', file);
-                console.log('fileList', fileList);
-                const status = file.status;
-                if (status === 'done') {
-                    file.url = file && file.response && file.response.a_file;
-                    fileList.map((fileData) => {
-                        if (fileData && fileData.response && fileData.response.a_file) {
-                            fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                        }
-                    });
-                    this.setState({
-                        progress: 1,
-                        loading: false
-                    });
-                    Notification.info({
-                        message: '上传附件成功',
-                        duration: 3
-                    });
-                } else if (status === 'error') {
-                    Notification.error({
-                        message: '上传附件失败',
-                        duration: 3
-                    });
-                    this.setState({
-                        progress: 1,
-                        loading: false
-                    });
-                }
-            } catch (e) {
-                console.log('uploadPropsFile', e);
-            }
-        }
-    };
     checkTitle = async (rule, value, callback) => {
         if (value) {
             if (value.length <= 40) {
@@ -246,6 +203,72 @@ class NoticeAddModal extends Component {
         const formItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
+        };
+        const uploadPropsFile = {
+            name: 'a_file',
+            showUploadList: true,
+            action: '',
+            fileList: this.state.fileListNew,
+            beforeUpload: (file, fileList) => {
+                let { fileListNew } = this.state;
+                const { uploadFileHandler } = this.props.actions;
+                const formdata = new FormData();
+                formdata.append('file', fileList[0]);
+                uploadFileHandler({}, formdata).then(rep => {
+                    file.url = rep;
+                    fileListNew.push(file);
+                    this.setState({
+                        fileListNew
+                    });
+                });
+                return false;
+            },
+            onRemove: (file) => {
+                let { fileListNew } = this.state;
+                let fileList = [];
+                fileListNew.map(item => {
+                    if (item.uid !== file.uid) {
+                        fileList.push(item);
+                    }
+                });
+                this.setState({
+                    fileListNew: fileList
+                });
+            },
+            onChange: async ({file, fileList}) => {
+                try {
+                    console.log('file', file);
+                    console.log('fileList', fileList);
+                    const status = file.status;
+                    if (status === 'done') {
+                        file.url = file && file.response && file.response.a_file;
+                        fileList.map((fileData) => {
+                            if (fileData && fileData.response && fileData.response.a_file) {
+                                fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                            }
+                        });
+                        this.setState({
+                            progress: 1,
+                            loading: false
+                        });
+                        Notification.info({
+                            message: '上传附件成功',
+                            duration: 3
+                        });
+                    } else if (status === 'error') {
+                        Notification.error({
+                            message: '上传附件失败',
+                            duration: 3
+                        });
+                        this.setState({
+                            progress: 1,
+                            loading: false
+                        });
+                    }
+                } catch (e) {
+                    console.log('uploadPropsFile', e);
+                }
+            }
         };
         return (
             <Modal
@@ -291,15 +314,12 @@ class NoticeAddModal extends Component {
                             </Col>
                             <Col span={5} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
-                                    {getFieldDecorator('annexFile', {
-                                    })(
-                                        <Upload {...this.uploadPropsFile}
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />上传附件
-                                            </Button>
-                                        </Upload>
-                                    )}
+                                    <Upload {...uploadPropsFile}
+                                    >
+                                        <Button>
+                                            <Icon type='upload' />上传附件
+                                        </Button>
+                                    </Upload>
                                 </FormItem>
                             </Col>
                         </Row>
@@ -312,7 +332,7 @@ class NoticeAddModal extends Component {
                             <Col span={24} offset={10}>
                                 <Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
                                 <Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
-                                <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
+                                <Button style={{ marginLeft: 20 }} type='primary' onClick={this.onRelease.bind(this)}>发布</Button>
                             </Col>
                         </Row>
                     </Form>
