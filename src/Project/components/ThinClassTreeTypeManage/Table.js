@@ -314,7 +314,7 @@ class Tablelevel extends Component {
                 section: this.userSection || ''
             });
         }
-        let userMess = window.localStorage.getItem('QH_USER_DATA');
+        let userMess = window.localStorage.getItem('LOGIN_USER_DATA');
         userMess = JSON.parse(userMess);
         let groups = userMess.groups || [];
         groups.map((group) => {

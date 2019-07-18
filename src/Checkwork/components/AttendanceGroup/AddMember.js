@@ -122,7 +122,7 @@ class AddMember extends Component {
     }
 
     renderContent () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         const {
             platform: { roles = [] }
         } = this.props;

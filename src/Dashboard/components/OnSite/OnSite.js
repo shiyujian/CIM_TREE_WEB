@@ -103,7 +103,7 @@ class OnSite extends Component {
                 getCustomViewByUserID
             }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         await getCustomViewByUserID({id: user.id});
         await this.initMap();
     }

@@ -242,7 +242,7 @@ export default class TaskStatisTable extends Component {
 
     componentDidMount = async () => {
         try {
-            let text = window.localStorage.getItem('QH_USER_DATA');
+            let text = window.localStorage.getItem('LOGIN_USER_DATA');
             text = JSON.parse(text);
             console.log('text', text);
             this.user = getUser();

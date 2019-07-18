@@ -179,7 +179,7 @@ class Tablelevel extends Component {
     componentDidMount () {
         const { getRegionCodes, getSupplierList } = this.props.actions;
         // 获取当前组织机构的权限
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         if (user.groups && user.groups.length > 0) {
             this.groupId = user.groups[0].id;
         }

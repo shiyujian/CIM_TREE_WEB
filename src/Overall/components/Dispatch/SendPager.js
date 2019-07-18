@@ -38,7 +38,7 @@ class SendPage1 extends Component {
         const {
             actions: { deleteSentDocAc, getSentInfoAc }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
 
         let orgCode = getUser().org_code;
 
@@ -503,7 +503,7 @@ class SendPage1 extends Component {
         let orgCode = getUser().org_code;
 
         let orgListCodes = orgCode.split('_');
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
 
         orgListCodes.pop();
         let codeu = orgListCodes.join();
@@ -535,7 +535,7 @@ class SendPage1 extends Component {
         });
     }
     confirms () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         if (user.is_superuser == true) {
             return <a>删除</a>;
         } else {

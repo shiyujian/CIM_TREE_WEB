@@ -434,7 +434,7 @@ class ToggleModal extends Component {
         orgListCodes.pop();
         let codeu = orgListCodes.join();
         let ucode = codeu.replace(/,/g, '_');
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
 
         validateFields((err, values) => {
             if (!err) {

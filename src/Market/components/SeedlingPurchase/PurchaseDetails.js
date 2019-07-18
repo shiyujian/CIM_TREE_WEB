@@ -39,7 +39,7 @@ class PurchaseDetails extends Component {
         const { getPurchaseById, getWpunittree, getOrgTree_new, getOfferInventoryById } = this.props.actions;
         this.purchaseid = this.props.purchaseDetailsKey;
         // 获得登陆用户的 苗圃基地/供应商的code
-        const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const userData = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         if (userData && userData.account && userData.groups.length > 0) {
             userData.groups.map(item => {
                 if (item.grouptype === 0 || item.grouptype === 6) {

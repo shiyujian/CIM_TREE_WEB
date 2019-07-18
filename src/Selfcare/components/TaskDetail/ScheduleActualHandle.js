@@ -119,7 +119,7 @@ export default class ScheduleActualHandle extends Component {
             const { state_id = '0' } = queryString.parse(location.search) || {};
 
             let me = this;
-            let user = localStorage.getItem('QH_USER_DATA');
+            let user = localStorage.getItem('LOGIN_USER_DATA');
             user = JSON.parse(user);
             let executor = {
                 username: user.username,
@@ -195,7 +195,7 @@ export default class ScheduleActualHandle extends Component {
 
             let me = this;
             // 获取登陆用户信息
-            let user = localStorage.getItem('QH_USER_DATA');
+            let user = localStorage.getItem('LOGIN_USER_DATA');
             user = JSON.parse(user);
             let executor = {
                 username: user.username,

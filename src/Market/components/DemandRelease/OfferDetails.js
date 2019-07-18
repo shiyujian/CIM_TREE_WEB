@@ -36,7 +36,7 @@ class OfferDetails extends Component {
         const { getPurchaseById, getWpunittree, getOrgTree_new, getOffersListById } = this.props.actions;
         this.purchaseid = this.props.addDemandKey;
         // 获得登陆用户的ID
-        const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const userData = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         if (userData) {
             this.Selecter = userData.id;
         }

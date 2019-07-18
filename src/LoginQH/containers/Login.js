@@ -11,11 +11,9 @@ import {
     Notification
 } from 'antd';
 import {
-    setUser,
     clearUser,
     setPermissions,
-    removePermissions,
-    getUser
+    removePermissions
 } from '_platform/auth';
 import { FOREST_LOGIN_DATA } from '_platform/api';
 import './Login.less';
@@ -475,20 +473,7 @@ class Login extends Component {
                 'FOREST_LOGIN_USER_DATA',
                 JSON.stringify(forestLoginUserData)
             );
-            const {
-                User_Name = '',
-                Full_Name = '',
-                ID,
-                Roles = '',
-                Phone = '',
-                Section = '',
-                Status = '',
-                IsBlack = 0,
-                Number = '',
-                Org = '',
-                Duty = ''
-            } = forestLoginUserData;
-            let tasks = [];
+            // let tasks = [];
             // tasks = await getTasks(
             //     {},
             //     {
@@ -506,27 +491,11 @@ class Login extends Component {
                     : '登录成功',
                 description: forestLoginUserData.User_Name
             });
-            let count = (tasks && tasks.count) || 0;
 
             window.localStorage.setItem(
-                'QH_USER_DATA',
+                'LOGIN_USER_DATA',
                 JSON.stringify(forestLoginUserData)
             );
-
-            await setUser(
-                User_Name,
-                Full_Name,
-                ID,
-                Roles,
-                Phone,
-                Section,
-                Status,
-                IsBlack,
-                Number,
-                Org,
-                Duty
-            );
-            console.log(getUser(), 'cookie存的信息2');
 
             if (loginType === 0) {
                 if (values.remember) {

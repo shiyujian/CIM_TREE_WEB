@@ -38,7 +38,7 @@ export default class Dispatch extends Component {
         const {
             actions: { getReceiveInfoAc, getSentInfoAc, getOrgTree }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         let orgCode = getUser().org_code;
         if (orgCode) {
             let orgListCodes = orgCode.split('_');

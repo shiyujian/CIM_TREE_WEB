@@ -46,7 +46,7 @@ class ReceivePage extends Component {
         const {
             actions: { deleteReceiveDocAc, getReceiveInfoAc }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         let orgCode = getUser().org_code;
 
         let orgListCodes = orgCode.split('_');
@@ -73,7 +73,7 @@ class ReceivePage extends Component {
     _viewClick (id, record) {
         this.setState({ code_id: id });
         let orgCode = getUser().org_code;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         let orgListCodes = orgCode.split('_');
         orgListCodes.pop();
         let codeu = orgListCodes.join();
@@ -119,7 +119,7 @@ class ReceivePage extends Component {
         const {
             actions: { patchReceiveDetailAc, getReceiveInfoAc }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         patchReceiveDetailAc(
             {
                 id: id,
@@ -598,7 +598,7 @@ class ReceivePage extends Component {
     // 	}
     // ];
     confirms () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         if (user.is_superuser == true) {
             return <a>删除</a>;
         } else {

@@ -82,7 +82,7 @@ class CountFilter extends Component {
             form: { setFieldsValue }
         } = this.props;
         try {
-            let user = localStorage.getItem('QH_USER_DATA');
+            let user = localStorage.getItem('LOGIN_USER_DATA');
             user = JSON.parse(user);
             let parentData = '';
             // admin没有部门
@@ -152,7 +152,7 @@ class CountFilter extends Component {
     }
 
     renderContent () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         user.groups = [];
         const {
             platform: { roles = [] }
@@ -255,7 +255,7 @@ class CountFilter extends Component {
         return objs;
     }
     renderTitle () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         user.groups = [];
         const {
             platform: { roles = [] }

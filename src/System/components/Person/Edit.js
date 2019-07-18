@@ -52,7 +52,7 @@ class Edit extends Component {
         };
     }
     renderContent () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         const {
             platform: { roles = [] },
             sidebar: {
@@ -157,7 +157,7 @@ class Edit extends Component {
         return objs;
     }
     renderTitle () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         const {
             platform: { roles = [] }
         } = this.props;
@@ -336,7 +336,7 @@ class Edit extends Component {
         const {
             section
         } = this.state;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         // 用户是否为文书
         let userIsDocument = getUserIsDocument();
         let units = this.getUnits(isSection);

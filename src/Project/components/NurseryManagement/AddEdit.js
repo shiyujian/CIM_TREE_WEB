@@ -38,7 +38,7 @@ class AddEdit extends Component {
             this.regionCode_name = rep;
         });
         // 获取本用户的姓名，电话作为联系人，联系方式
-        const user = JSON.parse(localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(localStorage.getItem('LOGIN_USER_DATA'));
         if (user.account) {
             this.Contacter = user.account.person_name;
             this.ContacterPhone = user.account.person_telephone;

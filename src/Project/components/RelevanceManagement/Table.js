@@ -31,7 +31,7 @@ class Tablelevel extends Component {
         this.Checker = id;
         this.org_code = org_code;
         // 获取当前组织机构的权限
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         console.log(getUser());
         console.log(user);
         if (user.account) {

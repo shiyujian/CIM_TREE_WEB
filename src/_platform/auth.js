@@ -6,51 +6,93 @@ export default () => {
 };
 
 export const getUser = () => {
-    // const permissions = cookie.get('permissions') || '[]';
-    return {
-        username: cookie.get('username'),
-        id: +cookie.get('id'),
-        name: cookie.get('name'),
-        org: cookie.get('org'),
-        tasks: cookie.get('tasks'),
-        password: cookie.get('password'),
-        code: cookie.get('code'),
-        is_superuser: cookie.get('is_superuser') !== 'false',
-        org_code: cookie.get('org_code'),
-        sections: cookie.get('sections'),
-        isOwnerClerk: cookie.get('isOwnerClerk'),
-        phone: cookie.get('phone')
-    };
+    try {
+        let user = window.localStorage.getItem('LOGIN_USER_DATA');
+        if (!user) {
+            return {
+                username: '',
+                ID: '',
+                duty: '',
+                name: '',
+                org: '',
+                phone: '',
+                ssBlack: '',
+                number: '',
+                roles: '',
+                section: '',
+                status: '',
+                token: '',
+                tasks: 0,
+                password: ''
+            };
+        }
+        user = JSON.parse(user);
+        const {
+            User_Name = '',
+            ID = '',
+            Duty = '',
+            Full_Name = '',
+            Org = '',
+            Phone = '',
+            IsBlack = 0,
+            Number = '',
+            Roles = '',
+            Section = '',
+            Status = 1,
+            Token = ''
+        } = user;
+        return {
+            username: User_Name,
+            ID: ID,
+            duty: Duty,
+            name: Full_Name,
+            org: Org,
+            phone: Phone,
+            isBlack: IsBlack,
+            number: Number,
+            roles: Roles,
+            section: Section,
+            status: Status,
+            token: Token,
+            tasks: cookie.get('tasks'),
+            password: cookie.get('password')
+        };
+    } catch (e) {
+        console.log('getUser', e);
+    }
 };
 
-export const setUser = (username, id, name, org, tasks, password, code, is_superuser, org_code, sections, isOwnerClerk, phone) => {
+export const setUser = (username, ID, duty, name, org, phone, isBlack, number, roles, section, status, token, tasks, password) => {
     cookie.set('username', username);
-    cookie.set('id', id);
+    cookie.set('ID', ID);
+    cookie.set('duty', duty);
     cookie.set('name', name);
     cookie.set('org', org);
+    cookie.set('phone', phone);
+    cookie.set('isBlack', isBlack);
+    cookie.set('number', number);
+    cookie.set('roles', roles);
+    cookie.set('section', section);
+    cookie.set('status', status);
+    cookie.set('token', token);
     cookie.set('tasks', tasks);
     cookie.set('password', password);
-    cookie.set('code', code);
-    cookie.set('is_superuser', is_superuser);
-    cookie.set('org_code', org_code); // 所在组织机构code
-    cookie.set('sections', sections);
-    cookie.set('isOwnerClerk', isOwnerClerk);
-    cookie.set('phone', phone); // 用户手机号
 };
 
 export const clearUser = () => {
     cookie.remove('username');
-    cookie.remove('id');
+    cookie.remove('ID');
+    cookie.remove('duty');
     cookie.remove('name');
     cookie.remove('org');
+    cookie.remove('phone');
+    cookie.remove('number');
+    cookie.remove('roles');
+    cookie.remove('section');
+    cookie.remove('status');
+    cookie.remove('token');
     cookie.remove('tasks');
     cookie.remove('password');
-    cookie.remove('code');
-    cookie.remove('is_superuser');
-    cookie.remove('org_code');
-    cookie.remove('sections');
-    cookie.remove('isOwnerClerk');
-    cookie.remove('phone');
 };
 
 export const clearCookies = () => {
@@ -140,7 +182,7 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
     // 单位工程级
     let sectionList = [];
     // 业主和管理员
-    let userMess = window.localStorage.getItem('QH_USER_DATA');
+    let userMess = window.localStorage.getItem('LOGIN_USER_DATA');
     userMess = JSON.parse(userMess);
     let permission = false;
     if (userMess.username === 'admin') {
@@ -242,7 +284,7 @@ export const getSmallClass = (smallClassList) => {
             let sectionNo = noArr[0] + '-' + noArr[1] + '-' + noArr[4];
 
             // 管理员可以查看所有数据，其他人员只能查看符合自己标段的数据
-            let userMess = window.localStorage.getItem('QH_USER_DATA');
+            let userMess = window.localStorage.getItem('LOGIN_USER_DATA');
             userMess = JSON.parse(userMess);
             let permission = false;
             if (userMess.username === 'admin') {
@@ -387,7 +429,7 @@ export const loopArrayCompany = (loopData) => {
 // 判断用户是否为文书
 export const getUserIsDocument = () => {
     try {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         let groups = (user && user.groups) || [];
         let userIsDocument = false;
         groups.map((group) => {
@@ -419,7 +461,7 @@ export const getForestImgUrl = (data) => {
 // 判断用户是否为业主和管理员
 export const getUserIsManager = () => {
     try {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         let permission = false;
         if (user.username === 'admin') {
             permission = true;
@@ -439,7 +481,7 @@ export const getUserIsManager = () => {
 // 判断用户的标段信息
 export const getUserSection = () => {
     try {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         console.log('user', user);
         let sections = (user && user.account && user.account.sections) || [];
         let section = '';

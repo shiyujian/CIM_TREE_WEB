@@ -58,7 +58,7 @@ export default class EngineeringImage extends Component {
             actions: { getworkTree, savepk, addDir, getParentOrgTreeByID }
         } = this.props;
         try {
-            let user = window.localStorage.getItem('QH_USER_DATA');
+            let user = window.localStorage.getItem('LOGIN_USER_DATA');
             user = JSON.parse(user);
             console.log('user', user);
             let isAdmin = false;

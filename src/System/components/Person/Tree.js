@@ -45,7 +45,7 @@ export default class Tree extends Component {
             }
         } = this.props;
         try {
-            const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+            const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
             // 管理员可以查看全部，其他人只能查看自己公司
             let permission = false;
             // 施工文书可以查看苗圃基地和供应商
@@ -186,7 +186,7 @@ export default class Tree extends Component {
     }
 
     select = async (s, node) => {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         const { node: { props: { eventKey = '' } = {} } = {} } = node || {};
         const {
             actions: {
