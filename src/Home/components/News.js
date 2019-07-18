@@ -11,23 +11,25 @@ export default class News extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            newsVisible: false,
-            newsContainer: null,
+            newsVisible: false, // 新闻
             newsTitle: '',
             newsSource: '',
-            newsDetail: '',
-            // 通知
-            noticeDetailVisible: false,
-            noticeDetail: '',
+            Thumbnail: '',
+            newsFileList: [],
+            newsContainer: '',
+
+            noticeDetailVisible: false, // 公告
             noticeTitle: '',
-            noticeDetailDegree: ''
+            noticeDetailDegree: '',
+            noticeFileList: [],
+            noticeContainer: ''
         };
     }
     columns = [
         {
             title: '新闻标题',
-            dataIndex: 'title',
-            key: 'title',
+            dataIndex: 'Title',
+            key: 'Title',
             width: 400,
             render (text, record) {
                 if (text.length > 30) {
@@ -39,11 +41,11 @@ export default class News extends Component {
 
         {
             title: '发布时间',
-            dataIndex: 'pub_time',
-            key: 'pub_time',
+            dataIndex: 'Publish_Time',
+            key: 'Publish_Time',
             width: 200,
-            render: pub_time => {
-                return moment(pub_time)
+            render: (text, record) => {
+                return moment(text)
                     .utc()
                     .format('YYYY-MM-DD HH:mm:ss');
             }
@@ -52,10 +54,10 @@ export default class News extends Component {
         {
             title: '操作',
             width: 100,
-            render: record => {
+            render: (text, record) => {
                 return (
                     <span>
-                        <a onClick={this.handleNewsView.bind(this, record)}>
+                        <a onClick={this.handleNewsView.bind(this, record.ID)}>
                             查看
                         </a>
                     </span>
@@ -67,8 +69,8 @@ export default class News extends Component {
     draftColumns = [
         {
             title: '通知标题',
-            dataIndex: 'title',
-            key: 'title',
+            dataIndex: 'Notice_Title',
+            key: 'Notice_Title',
             width: 400,
             render (text, record) {
                 if (text.length > 30) {
@@ -80,11 +82,11 @@ export default class News extends Component {
 
         {
             title: '发布时间',
-            dataIndex: 'pub_time',
-            key: 'pub_time',
+            dataIndex: 'Notice_Time',
+            key: 'Notice_Time',
             width: 200,
-            render: pub_time => {
-                return moment(pub_time)
+            render: (text, record) => {
+                return moment(text)
                     .utc()
                     .format('YYYY-MM-DD HH:mm:ss');
             }
@@ -96,7 +98,7 @@ export default class News extends Component {
             render: record => {
                 return (
                     <span>
-                        <a onClick={this.handleNoticeView.bind(this, record)}>
+                        <a onClick={this.handleNoticeView.bind(this, record.ID)}>
                             查看
                         </a>
                     </span>
@@ -106,40 +108,50 @@ export default class News extends Component {
     ];
     componentDidMount () {
         const {
-            actions: { getNewsList, getTipsList }
+            actions: { getNewsListNew, getNoticeList }
         } = this.props;
-        getNewsList();
-        getTipsList();
+        getNewsListNew();
+        getNoticeList();
     }
     // 查看新闻
-    handleNewsView (record) {
-        console.log('');
-        this.setState({
-            newsVisible: true,
-            newsContainer: record.raw,
-            newsTitle: record.title,
-            newsSource: record.source,
-            newsDetail: record
+    handleNewsView (ID) {
+        console.log(ID);
+        const { getNewsDetails } = this.props.actions;
+        getNewsDetails({ID}, {}).then(rep => {
+            console.log(rep, '详情信息');
+            this.setState({
+                newsVisible: true,
+                newsTitle: rep.Title,
+                newsSource: rep.Source,
+                Thumbnail: rep.Thumbnail,
+                newsContainer: rep.Content,
+                newsFileList: rep.Files
+            });
         });
     }
     // 查看通知
-    handleNoticeView = async (record) => {
-        let noticeDetailDegree = '';
-        if (record && record.degree) {
-            if (record.degree === 1) {
-                noticeDetailDegree = '加急';
-            } else if (record.degree === 2) {
-                noticeDetailDegree = '特急';
+    handleNoticeView = async (ID) => {
+        console.log(ID);
+        const { getNoticeDetails } = this.props.actions;
+        getNoticeDetails({ID}, {}).then(rep => {
+            console.log(rep, '详情信息');
+            let noticeDetailDegree = '';
+            if (rep.Notice_Type) {
+                if (rep.Notice_Type === 1) {
+                    noticeDetailDegree = '加急';
+                } else if (rep.Notice_Type === 2) {
+                    noticeDetailDegree = '特急';
+                }
+            } else if (rep.Notice_Type === 0) {
+                noticeDetailDegree = '平件';
             }
-        } else if (record.degree === 0) {
-            noticeDetailDegree = '平件';
-        }
-        console.log('noticeDetailDegree', noticeDetailDegree);
-        this.setState({
-            noticeDetail: record,
-            noticeDetailVisible: true,
-            noticeDetailDegree,
-            noticeTitle: record.title
+            this.setState({
+                noticeDetailVisible: true,
+                noticeTitle: rep.Notice_Title,
+                noticeDetailDegree,
+                noticeContainer: rep.Notice_Content,
+                noticeFileList: rep.Files
+            });
         });
     }
     // 新闻和通知的列表切换
@@ -155,13 +167,11 @@ export default class News extends Component {
             newsVisible: false,
             newsContainer: '',
             newsTitle: '',
-            newsSource: '',
-            newsDetail: ''
+            newsSource: ''
         });
     }
     handleNoticeCancel () {
         this.setState({
-            noticeDetail: '',
             noticeDetailVisible: false,
             noticeDetailDegree: '',
             noticeTitle: ''
@@ -170,31 +180,22 @@ export default class News extends Component {
 
     render () {
         const { newsList = [], tipsList = [] } = this.props;
+        console.log(newsList, '新闻列表');
+        console.log(tipsList, '公告列表');
         const {
             newsTitle,
             newsVisible,
-            newsDetail,
             newsSource,
+            Thumbnail,
+            newsFileList,
             newsContainer,
 
             noticeDetailVisible,
-            noticeDetail,
+            noticeFileList,
             noticeDetailDegree,
-            noticeTitle
+            noticeTitle,
+            noticeContainer
         } = this.state;
-        let newsFileList = [];
-        if (newsDetail.attachment && newsDetail.attachment.fileList &&
-            newsDetail.attachment.fileList instanceof Array &&
-            newsDetail.attachment.fileList.length > 0) {
-            newsFileList = newsDetail.attachment.fileList;
-        }
-
-        let noticeFileList = [];
-        if (noticeDetail.attachment && noticeDetail.attachment.fileList &&
-            noticeDetail.attachment.fileList instanceof Array &&
-            noticeDetail.attachment.fileList.length > 0) {
-            noticeFileList = noticeDetail.attachment.fileList;
-        }
         return (
             <Row>
                 <Col style={{ position: 'relative' }} span={22} offset={1}>
@@ -211,7 +212,7 @@ export default class News extends Component {
                                     showQuickJumper: true,
                                     pageSize: 5
                                 }}
-                                rowKey='id'
+                                rowKey='ID'
                             />
                         </TabPane>
                         <TabPane tab='通知' key='2'>
@@ -223,7 +224,7 @@ export default class News extends Component {
                                     showQuickJumper: true,
                                     pageSize: 5
                                 }}
-                                rowKey='id'
+                                rowKey='ID'
                             />
                         </TabPane>
                     </Tabs>
@@ -237,38 +238,13 @@ export default class News extends Component {
                 >
                     <div>
                         <h1 style={{ textAlign: 'center' }}>{newsTitle}</h1>
-                        {
-                            newsSource && newsSource.name
-                                ? <p>{`来源 ：${newsSource.name}`}</p> : (
-                                    <p>{`来源 ：暂无`}</p>
-                                )
-                        }
-                        {
-                            newsDetail && newsDetail.cover && newsDetail.cover.a_file
-                                ? (
-                                    <p>
-                                        封面 ：<a href={STATIC_PREVIEW_API + newsDetail.cover.a_file}
-                                            target='_blank'>
-                                            {newsDetail.cover.name}
-                                        </a>
-                                    </p>
-                                ) : <p>{`封面 ：暂无`}</p>
-                        }
-                        {
-                            newsFileList.map((file) => {
-                                if (file && file.response && file.response.download_url) {
-                                    return (
-                                        <p>
-                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
-                                                {file.name}
-                                            </a>
-                                        </p>
-                                    );
-                                } else {
-                                    return (<p>{`附件 ：暂无`}</p>);
-                                }
-                            })
-                        }
+                        <p>来源 ：{newsSource ? <span>{newsSource}</span> : '暂无'}</p>
+                        <p>封面 ：{Thumbnail ? <a href={Thumbnail} target='_blank'>微信图片.jpg</a> : '暂无'}</p>
+                        <p>
+                            附件 ：{newsFileList.map(item => {
+                                return <a href={item.FilePath} target='_blank' style={{marginRight: 10}}>{item.FileName}</a>;
+                            })}
+                        </p>
                         <div
                             style={{ maxHeight: '800px', overflow: 'auto' }}
                             dangerouslySetInnerHTML={{
@@ -287,32 +263,19 @@ export default class News extends Component {
                     <div>
                         <h1 style={{ textAlign: 'center' }}>{noticeTitle}</h1>
                         <div>
-                            {noticeDetailDegree ? (
-                                <p>{`紧急程度 ：${noticeDetailDegree}`}</p>)
-                                : (<p>{`紧急程度 ：暂无`}</p>)
-                            }
-                            {
-                                noticeFileList.map((file) => {
-                                    if (file && file.response && file.response.download_url) {
-                                        return (
-                                            <p>
-                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
-                                                {file.name}
-                                            </a>
-                                            </p>
-                                        );
-                                    } else {
-                                        return (<p>{`附件 ：暂无`}</p>);
-                                    }
-                                })
-                            }
+                            <p>紧急程度 ：{noticeDetailDegree ? <span>{noticeDetailDegree}</span> : <span>暂无</span>}</p>
+                            <p>
+                                附件 ：{noticeFileList.map(item => {
+                                    return <a href={item.FilePath} target='_blank' style={{marginRight: 10}}>{item.FileName}</a>;
+                                })}
+                            </p>
                             <div
                                 style={{
                                     maxHeight: '800px',
                                     overflow: 'auto',
                                     marginTop: '5px'
                                 }}
-                                dangerouslySetInnerHTML={{ __html: noticeDetail && noticeDetail.raw }}
+                                dangerouslySetInnerHTML={{ __html: noticeContainer }}
                             />
                         </div>
                     </div>

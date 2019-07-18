@@ -21,6 +21,10 @@ class NewsEditModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            newsID: '', // 新闻ID
+            ThumbnailFile: [], // 封面附件
+            ThumbnailUrl: '', // 封面地址
+            fileListNew: [], // 附件
             content: '',
             progress: 0,
             loading: false,
@@ -34,6 +38,7 @@ class NewsEditModal extends Component {
         editor = new E(elem);
         // 使用 onchange 函数监听内容的变化，并实时更新到 state 中
         editor.customConfig.onchange = html => {
+            console.log('监听', html);
             this.setState({
                 content: html
             });
@@ -85,104 +90,184 @@ class NewsEditModal extends Component {
         };
         editor.create();
 
+        // 数据回显
         const {
-            newsDetail,
+            newsID,
+            actions: { getNewsDetails },
             form: { setFieldsValue }
         } = this.props;
-        this.setState({
-            content: newsDetail.raw
+        getNewsDetails({ID: newsID}, {}).then(rep => {
+            console.log(123, rep);
+            let { fileListNew, ThumbnailFile } = this.state;
+            rep.Files.map((item, index) => {
+                fileListNew.push({
+                    uid: index,
+                    name: item.FileName,
+                    url: item.FilePath
+                });
+            });
+            ThumbnailFile.push({
+                uid: '123456',
+                name: '微信图片.jpg',
+                url: rep.Thumbnail
+            });
+            this.setState({
+                newsID: newsID,
+                content: rep.Content,
+                fileListNew,
+                ThumbnailFile,
+                ThumbnailUrl: rep.Thumbnail
+            });
+            editor.txt.html(rep.Content);
+            setFieldsValue({
+                'title': rep.Title || '',
+                'source': rep.Source || ''
+            });
         });
-        editor.txt.html(newsDetail.raw);
-        let attachment = [];
-        if (newsDetail.cover) {
-            attachment.push(newsDetail.cover);
-            attachment[0].uid = '1';
-            attachment[0].status = 'done';
-            if (newsDetail.cover && newsDetail.cover.a_file) {
-                attachment[0].url = STATIC_PREVIEW_API + newsDetail.cover.a_file;
-            }
-        }
-        let annexFile = newsDetail.attachment && newsDetail.attachment.fileList
-            ? newsDetail.attachment.fileList : [];
-        console.log('annexFile', annexFile);
-        setFieldsValue({
-            'title': newsDetail.title || '',
-            'attachment': attachment,
-            'annexFile': annexFile,
-            'source': newsDetail.source && newsDetail.source.name ? newsDetail.source.name : ''
-        });
-        this.setState({
-            annexFileList: annexFile
-        });
+        // this.setState({
+        //     content: newsDetail.raw
+        // });
+        // editor.txt.html(newsDetail.raw);
+        // let attachment = [];
+        // if (newsDetail.cover) {
+        //     attachment.push(newsDetail.cover);
+        //     attachment[0].uid = '1';
+        //     attachment[0].status = 'done';
+        //     if (newsDetail.cover && newsDetail.cover.a_file) {
+        //         attachment[0].url = STATIC_PREVIEW_API + newsDetail.cover.a_file;
+        //     }
+        // }
+        // let annexFile = newsDetail.attachment && newsDetail.attachment.fileList
+        //     ? newsDetail.attachment.fileList : [];
+        // console.log('annexFile', annexFile);
+        // setFieldsValue({
+        //     'title': newsDetail.title || '',
+        //     'attachment': attachment,
+        //     'annexFile': annexFile,
+        //     'source': newsDetail.source && newsDetail.source.name ? newsDetail.source.name : ''
+        // });
+        // this.setState({
+        //     annexFileList: annexFile
+        // });
     }
 
     // 发布新闻
-    postData () {
+    onRelease () {
         const {
-            actions: { getNewsList, patchData, getDraftNewsList },
-            form: { validateFields },
-            newsDetail
+            actions: { putNews, getNewsListNew },
+            form: { validateFields }
         } = this.props;
         validateFields(async (err, values) => {
-            console.log('values', values);
             if (!err) {
-                let coverResp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
+                const { newsID, fileListNew, ThumbnailUrl, content } = this.state;
                 let fileList = [];
-                if (values && values.annexFile) {
-                    if (values.annexFile.fileList &&
-                        values.annexFile.fileList instanceof Array &&
-                        values.annexFile.fileList.length > 0) {
-                        fileList = values.annexFile.fileList;
-                    } else {
-                        fileList = values.annexFile;
+                fileListNew.map(item => {
+                    if (item) {
+                        fileList.push({
+                            FileName: item.name,
+                            FilePath: item.url
+                        });
                     }
-                }
-                let newData = {
-                    'title': values['title'] || '',
-                    'raw': this.state.content,
-                    'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'categories': [],
-                    'attachment': {
-                        'fileList': fileList
-                    },
-                    'is_draft': false,
-                    'cover': {
-                        'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'create_time': coverResp.create_time,
-                        'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'id': coverResp.id,
-                        'mime_type': coverResp.mime_type,
-                        'misc': coverResp.misc,
-                        'name': coverResp.name
-                    },
-                    'source': {
-                        'name': values.source
-                    }
-                };
-                let rst = await patchData({ pk: newsDetail.id }, newData);
-                if (rst.id) {
-                    this.modalClick();
+                });
+                console.log('编辑数据', values, ThumbnailUrl, content, fileList);
+                let rst = await putNews({}, {
+                    ID: newsID,
+                    Author: '',
+                    Content: content,
+                    Content_Type: 1,
+                    Creater: 1,
+                    KeyWords: '',
+                    Source: values.source,
+                    SubTitle: '',
+                    Summary: '',
+                    Title: values.title,
+                    Thumbnail: ThumbnailUrl,
+                    Files: fileList
+                });
+                if (rst.code === 1) {
+                    // 消除弹框重新加载时数据
+                    getNewsListNew({}, {
+                        type: '',
+                        name: '',
+                        ishot: '',
+                        sdate: '',
+                        edate: '',
+                        page: '',
+                        size: ''
+                    });
+                    await this.modalClick();
                     Notification.success({
-                        message: '编辑新闻成功',
+                        message: '编辑通知成功',
                         duration: 3
-                    });
-                    // 更新新闻列表数据
-                    getNewsList({}, {
-                        tag: '新闻',
-                        is_draft: false
-                    });
-                    getDraftNewsList({}, {
-                        tag: '新闻',
-                        is_draft: true
                     });
                 } else {
                     Notification.error({
-                        message: '编辑新闻失败',
+                        message: '编辑通知失败',
                         duration: 3
                     });
                 }
             }
         });
+        // validateFields(async (err, values) => {
+        //     console.log('values', values);
+        //     if (!err) {
+        //         let coverResp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
+        //         let fileList = [];
+        //         if (values && values.annexFile) {
+        //             if (values.annexFile.fileList &&
+        //                 values.annexFile.fileList instanceof Array &&
+        //                 values.annexFile.fileList.length > 0) {
+        //                 fileList = values.annexFile.fileList;
+        //             } else {
+        //                 fileList = values.annexFile;
+        //             }
+        //         }
+        //         let newData = {
+        //             'title': values['title'] || '',
+        //             'raw': this.state.content,
+        //             'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
+        //             'categories': [],
+        //             'attachment': {
+        //                 'fileList': fileList
+        //             },
+        //             'is_draft': false,
+        //             'cover': {
+        //                 'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+        //                 'create_time': coverResp.create_time,
+        //                 'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
+        //                 'id': coverResp.id,
+        //                 'mime_type': coverResp.mime_type,
+        //                 'misc': coverResp.misc,
+        //                 'name': coverResp.name
+        //             },
+        //             'source': {
+        //                 'name': values.source
+        //             }
+        //         };
+        //         let rst = await patchData({ pk: newsDetail.id }, newData);
+        //         if (rst.id) {
+        //             this.modalClick();
+        //             Notification.success({
+        //                 message: '编辑新闻成功',
+        //                 duration: 3
+        //             });
+        //             // 更新新闻列表数据
+        //             getNewsList({}, {
+        //                 tag: '新闻',
+        //                 is_draft: false
+        //             });
+        //             getDraftNewsList({}, {
+        //                 tag: '新闻',
+        //                 is_draft: true
+        //             });
+        //         } else {
+        //             Notification.error({
+        //                 message: '编辑新闻失败',
+        //                 duration: 3
+        //             });
+        //         }
+        //     }
+        // });
     }
 
     // 暂存新闻
@@ -258,58 +343,9 @@ class NewsEditModal extends Component {
     modalClick () {
         this.props.handleNewsEditModalCancel();
     }
-    uploadPropsFile = {
-        name: 'a_file',
-        showUploadList: true,
-        action: UPLOAD_API,
-        beforeUpload: () => {
-            this.setState({
-                progress: 0,
-                loading: true
-            });
-        },
-        onChange: ({ file, fileList }) => {
-            try {
-                console.log('file', file);
-                console.log('fileList', fileList);
-                this.setState({
-                    annexFileList: fileList
-                });
-                const status = file.status;
-                if (status === 'done') {
-                    file.url = file && file.response && file.response.a_file;
-                    fileList.map((fileData) => {
-                        if (fileData && fileData.response && fileData.response.a_file) {
-                            fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                        }
-                    });
-                    this.setState({
-                        progress: 1,
-                        loading: false
-                    });
-                    Notification.info({
-                        message: '上传附件成功',
-                        duration: 3
-                    });
-                } else if (status === 'error') {
-                    Notification.error({
-                        message: '上传附件失败',
-                        duration: 3
-                    });
-                    this.setState({
-                        progress: 1,
-                        loading: false
-                    });
-                }
-            } catch (e) {
-                console.log('uploadPropsFile', e);
-            }
-        }
-    };
-
     uploadPropsCover = {
         name: 'file',
-        action: `${FILE_API}/api/user/files/`,
+        action: ``,
         showUploadList: true,
         data: (file) => {
             return {
@@ -317,29 +353,40 @@ class NewsEditModal extends Component {
                 a_file: file
             };
         },
-        beforeUpload: (file) => {
-            let type = file.name.toString().split('.');
-            let len = type.length;
-            if (
-                type[len - 1] === 'jpg' ||
-            type[len - 1] === 'jpeg' ||
-            type[len - 1] === 'png' ||
-            type[len - 1] === 'JPG' ||
-            type[len - 1] === 'JPEG' ||
-            type[len - 1] === 'PNG'
-            ) {
+        beforeUpload: (file, fileList) => {
+            const { uploadFileHandler } = this.props.actions;
+            const formdata = new FormData();
+            formdata.append('file', fileList[0]);
+            uploadFileHandler({}, formdata).then(rep => {
+                console.log(rep);
                 this.setState({
-                    progress: 0,
-                    loading: true
+                    ThumbnailFile: fileList,
+                    ThumbnailUrl: rep
                 });
-                return true;
-            } else {
-                Notification.error({
-                    message: '请上传jpg,jpeg,png 文件',
-                    duration: 3
-                });
-                return false;
-            }
+            });
+            return false;
+            // let type = file.name.toString().split('.');
+            // let len = type.length;
+            // if (
+            //     type[len - 1] === 'jpg' ||
+            // type[len - 1] === 'jpeg' ||
+            // type[len - 1] === 'png' ||
+            // type[len - 1] === 'JPG' ||
+            // type[len - 1] === 'JPEG' ||
+            // type[len - 1] === 'PNG'
+            // ) {
+            //     this.setState({
+            //         progress: 0,
+            //         loading: true
+            //     });
+            //     return true;
+            // } else {
+            //     Notification.error({
+            //         message: '请上传jpg,jpeg,png 文件',
+            //         duration: 3
+            //     });
+            //     return false;
+            // }
         },
         onChange: ({ file }) => {
             const status = file.status;
@@ -409,7 +456,77 @@ class NewsEditModal extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-
+        const uploadPropsFile = {
+            name: 'a_file',
+            showUploadList: true,
+            action: '',
+            fileList: this.state.fileListNew,
+            beforeUpload: (file, fileList) => {
+                let { fileListNew } = this.state;
+                const { uploadFileHandler } = this.props.actions;
+                const formdata = new FormData();
+                formdata.append('file', fileList[0]);
+                uploadFileHandler({}, formdata).then(rep => {
+                    file.url = rep;
+                    fileListNew.push(file);
+                    console.log(fileListNew, '附件');
+                    this.setState({
+                        fileListNew
+                    });
+                });
+                return false;
+            },
+            onRemove: (file) => {
+                let { fileListNew } = this.state;
+                let fileList = [];
+                fileListNew.map(item => {
+                    if (item.uid !== file.uid) {
+                        fileList.push(item);
+                    }
+                });
+                this.setState({
+                    fileListNew: fileList
+                });
+            },
+            onChange: ({ file, fileList }) => {
+                try {
+                    console.log('file', file);
+                    console.log('fileList', fileList);
+                    this.setState({
+                        annexFileList: fileList
+                    });
+                    const status = file.status;
+                    if (status === 'done') {
+                        file.url = file && file.response && file.response.a_file;
+                        fileList.map((fileData) => {
+                            if (fileData && fileData.response && fileData.response.a_file) {
+                                fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
+                            }
+                        });
+                        this.setState({
+                            progress: 1,
+                            loading: false
+                        });
+                        Notification.info({
+                            message: '上传附件成功',
+                            duration: 3
+                        });
+                    } else if (status === 'error') {
+                        Notification.error({
+                            message: '上传附件失败',
+                            duration: 3
+                        });
+                        this.setState({
+                            progress: 1,
+                            loading: false
+                        });
+                    }
+                } catch (e) {
+                    console.log('uploadPropsFile', e);
+                }
+            }
+        };
+    
         return (
             <Modal
                 title={'编辑新闻'}
@@ -440,39 +557,24 @@ class NewsEditModal extends Component {
                             </Col>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
-                                    {getFieldDecorator('annexFile', {
-                                    })(
-                                        <Upload {...this.uploadPropsFile}
-                                            fileList={this.state.annexFileList}
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />上传附件
-                                            </Button>
-                                        </Upload>
-                                    )}
+                                    <Upload {...uploadPropsFile}
+                                    >
+                                        <Button>
+                                            <Icon type='upload' />上传附件
+                                        </Button>
+                                    </Upload>
                                 </FormItem>
                             </Col>
                         </Row>
                         <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='封面'>
-                                    {getFieldDecorator('attachment', {
-                                        valuePropName: 'fileList',
-                                        getValueFromEvent: this.coverPicFile,
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请上传封面！'
-                                            }
-                                        ]
-                                    })(
-                                        <Upload {...this.uploadPropsCover}
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />添加文件
-                                            </Button>
-                                        </Upload>
-                                    )}
+                                    <Upload {...this.uploadPropsCover} fileList={this.state.ThumbnailFile}
+                                    >
+                                        <Button>
+                                            <Icon type='upload' />添加文件
+                                        </Button>
+                                    </Upload>
                                 </FormItem>
                             </Col>
                             <Col span={8} offset={1}>
@@ -499,7 +601,7 @@ class NewsEditModal extends Component {
                         <Col span={24} offset={10} >
                             <Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
                             <Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
-                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.postData.bind(this)}>发布</Button>
+                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.onRelease.bind(this)}>发布</Button>
                         </Col>
                     </Row>
                 </Spin>

@@ -37,6 +37,7 @@ class NewsTable extends Component {
             editNewsVisible: false,
             addNewsVisible: false,
             newsDetail: '',
+            newsID: '',
             viewCoverVisible: false,
             coverArr: []
         };
@@ -103,9 +104,13 @@ class NewsTable extends Component {
                             查看
                         </a>
                         <Divider type='vertical' />
+                        <a onClick={this.handleNewsEdit.bind(this, record.ID)}>
+                            修改
+                        </a>
+                        <Divider type='vertical' />
                         <Popconfirm
                             title='确定删除吗?'
-                            onConfirm={this.handleNewsDelete.bind(this, record)}
+                            onConfirm={this.handleNewsDelete.bind(this, record.ID)}
                             okText='确定'
                             cancelText='取消'
                         >
@@ -184,13 +189,13 @@ class NewsTable extends Component {
                             发布
                         </a>
                         <Divider type='vertical' />
-                        <a onClick={this.handleNewsEdit.bind(this, record)}>
+                        <a onClick={this.handleNewsEdit.bind(this, record.ID)}>
                             修改
                         </a>
                         <Divider type='vertical' />
                         <Popconfirm
                             title='确定删除吗?'
-                            onConfirm={this.handleNewsDelete.bind(this, record)}
+                            onConfirm={this.handleNewsDelete.bind(this, record.ID)}
                             okText='确定'
                             cancelText='取消'
                         >
@@ -214,7 +219,7 @@ class NewsTable extends Component {
             sdate: '',
             edate: '',
             page: '',
-            size: '',
+            size: ''
         });
     }
     // 查看封面
@@ -259,10 +264,11 @@ class NewsTable extends Component {
         });
     }
     // 编辑新闻
-    handleNewsEdit = async (record) => {
+    handleNewsEdit = async (ID) => {
+        console.log(ID, '编辑');
         this.setState({
             editNewsVisible: true,
-            newsDetail: record
+            newsID: ID
         });
     }
     handleNewsEditModalCancel = async () => {
@@ -272,41 +278,26 @@ class NewsTable extends Component {
         });
     }
     // 删除新闻
-    handleNewsDelete = async (record) => {
+    handleNewsDelete = async (ID) => {
         const {
             actions: {
-                deleteData,
-                getNewsList,
-                getDraftNewsList
+                deleteNews
             }
         } = this.props;
-        const {
-            newsTabValue
-        } = this.state;
-        let data = await deleteData({ pk: record.id });
-        console.log('data', data);
-        if (data) {
-            Notification.error({
-                message: '删除新闻失败！',
-                duration: 3
-            });
-        } else {
-            Notification.success({
-                message: '删除新闻成功！',
-                duration: 3
-            });
-            if (newsTabValue === 'publish') {
-                await getNewsList({}, {
-                    tag: '新闻',
-                    is_draft: false
+        deleteNews({ID}, {}).then(rep => {
+            if (rep.code === 1) {
+                Notification.success({
+                    message: '删除新闻成功！',
+                    duration: 3
                 });
+                this.queryPublish();
             } else {
-                await getDraftNewsList({}, {
-                    tag: '新闻',
-                    is_draft: true
+                Notification.error({
+                    message: '删除新闻失败！',
+                    duration: 3
                 });
             }
-        }
+        });
     }
     // 发布新闻
     handleNewsPublish = async (record) => {
@@ -421,7 +412,6 @@ class NewsTable extends Component {
             draftNewsLis = [],
             form: { getFieldDecorator }
         } = this.props;
-        console.log(newsList, '数据');
         const {
             newsTabValue,
             editNewsVisible,

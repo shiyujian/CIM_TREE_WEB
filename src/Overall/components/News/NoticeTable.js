@@ -30,6 +30,8 @@ class NoticeTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            noticeID: '', // 通知ID
+            Files: [], // 通知附件
             tipsTabValue: 'publish',
             editNoticeVisible: false,
             addNoticeVisible: false,
@@ -42,28 +44,29 @@ class NoticeTable extends Component {
 
     componentDidMount () {
         const {
-            actions: { getTipsList, getDraftTipsList }
+            actions: { getNoticetypes, getNoticeList }
         } = this.props;
-        getTipsList({}, {
-            tag: '公告',
-            is_draft: false
-        });
-        getDraftTipsList({}, {
-            tag: '公告',
-            is_draft: true
+        // getNoticetypes({}, {});
+        getNoticeList({}, {
+            type: '',
+            name: '',
+            sdate: '',
+            edate: '',
+            page: '',
+            size: ''
         });
     }
     columns = [
         {
             title: '通知查询ID',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'ID',
+            key: 'ID',
             width: '10%'
         },
         {
             title: '名称',
-            dataIndex: 'title',
-            key: 'title',
+            dataIndex: 'Notice_Title',
+            key: 'Notice_Title',
             width: '40%'
         },
         {
@@ -79,8 +82,8 @@ class NoticeTable extends Component {
         },
         {
             title: '紧急程度',
-            dataIndex: 'degree',
-            key: 'degree',
+            dataIndex: 'Notice_Type',
+            key: 'Notice_Type',
             width: '10%',
             render: text => {
                 if (text === 0) {
@@ -96,29 +99,29 @@ class NoticeTable extends Component {
         },
         {
             title: '创建时间',
-            key: 'pub_time',
+            key: 'Notice_Time',
             width: '15%',
             render: (text, record) => {
-                return moment(record.pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
+                return moment(record.Notice_Time).utc().format('YYYY-MM-DD HH:mm:ss');
             }
         },
         {
             title: '操作',
             width: '15%',
-            render: record => {
+            render: (text, record) => {
                 return (
                     <span>
-                        <a onClick={this.handleNoticeView.bind(this, record)}>
+                        <a onClick={this.handleNoticeView.bind(this, record.ID)}>
                             查看
                         </a>
                         <Divider type='vertical' />
-                        {/* <a onClick={this.handleNoticeEdit.bind(this, record)}>
+                        <a onClick={this.handleNoticeEdit.bind(this, record.ID)}>
                             修改
                         </a>
-                        <Divider type='vertical' /> */}
+                        <Divider type='vertical' />
                         <Popconfirm
                             title='确定删除吗?'
-                            onConfirm={this.handleNoticeDelete.bind(this, record)}
+                            onConfirm={this.handleNoticeDelete.bind(this, record.ID)}
                             okText='确定'
                             cancelText='取消'
                         >
@@ -197,13 +200,13 @@ class NoticeTable extends Component {
                             发布
                         </a>
                         <Divider type='vertical' />
-                        <a onClick={this.handleNoticeEdit.bind(this, record)}>
+                        <a onClick={this.handleNoticeEdit.bind(this, record.ID)}>
                             修改
                         </a>
                         <Divider type='vertical' />
                         <Popconfirm
                             title='确定删除吗?'
-                            onConfirm={this.handleNoticeDelete.bind(this, record)}
+                            onConfirm={this.handleNoticeDelete.bind(this, record.ID)}
                             okText='确定'
                             cancelText='取消'
                         >
@@ -214,23 +217,47 @@ class NoticeTable extends Component {
             }
         }
     ];
-    handleNoticeView = async (record) => {
-        let detailDegree = '';
-        if (record && record.degree) {
-            if (record.degree === 1) {
-                detailDegree = '加急';
-            } else if (record.degree === 2) {
-                detailDegree = '特急';
+    // 查看通知
+    handleNoticeView = async (ID) => {
+        console.log(ID, '通知ID');
+        const { getNoticeDetails } = this.props.actions;
+        getNoticeDetails({
+            ID
+        }).then(rep => {
+            console.log(rep);
+            let detailDegree = '';
+            if (rep && rep.Notice_Type) {
+                if (rep.Notice_Type === 1) {
+                    detailDegree = '加急';
+                } else if (rep.Notice_Type === 2) {
+                    detailDegree = '特急';
+                }
+            } else if (rep.degree === 0) {
+                detailDegree = '平件';
             }
-        } else if (record.degree === 0) {
-            detailDegree = '平件';
-        }
-        console.log('detailDegree', detailDegree);
-        this.setState({
-            noticeDetail: record,
-            detailVisible: true,
-            detailDegree
+            this.setState({
+                Files: rep.Files,
+                Notice_Content: rep.Notice_Content,
+                detailVisible: true,
+                detailDegree
+            });
         });
+        // let detailDegree = '';
+        // if (record && record.Notice_Type) {
+        //     if (record.Notice_Type === 1) {
+        //         detailDegree = '加急';
+        //     } else if (record.Notice_Type === 2) {
+        //         detailDegree = '特急';
+        //     }
+        // } else if (record.degree === 0) {
+        //     detailDegree = '平件';
+        // }
+        // console.log('detailDegree', detailDegree);
+        // this.setState({
+        //     noticeDetail: record,
+        //     detailVisible: true,
+        //     detailDegree
+        // });
     }
     handleCancel = async () => {
         this.setState({
@@ -240,10 +267,11 @@ class NoticeTable extends Component {
         });
     }
     // 编辑通知
-    handleNoticeEdit = async (record) => {
+    handleNoticeEdit = async (ID) => {
+        console.log(ID);
         this.setState({
             editNoticeVisible: true,
-            noticeDetail: record
+            noticeID: ID
         });
     }
     handleNoticeEditModalCancel = async () => {
@@ -253,41 +281,26 @@ class NoticeTable extends Component {
         });
     }
     // 删除通知
-    handleNoticeDelete = async (record) => {
+    handleNoticeDelete = async (ID) => {
         const {
             actions: {
-                deleteData,
-                getTipsList,
-                getDraftTipsList
+                deleteNotice
             }
         } = this.props;
-        const {
-            tipsTabValue
-        } = this.state;
-        let data = await deleteData({ pk: record.id });
-        console.log('handleNoticeDelete', data);
-        if (data) {
-            Notification.error({
-                message: '删除通知失败！',
-                duration: 3
-            });
-        } else {
-            Notification.success({
-                message: '删除通知成功！',
-                duration: 3
-            });
-            if (tipsTabValue === 'publish') {
-                getTipsList({}, {
-                    tag: '公告',
-                    is_draft: false
+        deleteNotice({ID}, {}).then(rep => {
+            if (rep.code === 1) {
+                Notification.success({
+                    message: '删除通知成功！',
+                    duration: 3
                 });
+                this.queryPublish();
             } else {
-                getDraftTipsList({}, {
-                    tag: '公告',
-                    is_draft: true
+                Notification.error({
+                    message: '删除通知失败！',
+                    duration: 3
                 });
             }
-        }
+        });
     }
     // 发布通知
     handleNoticePublish = async (record) => {
@@ -319,23 +332,23 @@ class NoticeTable extends Component {
             });
         }
     }
-    // 查询
+    // 发布的通知查询
     queryPublish () {
         const {
-            actions: { getTipsList }
+            actions: { getNoticeList }
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
-            console.log('err', err);
-            await getTipsList({}, {
-                tag: '公告',
-                is_draft: false,
-                pub_time_begin: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
-                    ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
-                    ? moment(values.worktime[1]).add(1, 'days').format('YYYY-MM-DD') : '',
-                title: values.theme || '',
-                degree: values.degree || ''
-            });
+            if (!err) {
+                console.log(123, values, values.degree);
+                getNoticeList({}, {
+                    type: '',
+                    name: values.theme || '',
+                    sdate: values.worktime ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
+                    edate: values.worktime ? moment(values.worktime[1]).format('YYYY-MM-DD') : '',
+                    page: '',
+                    size: ''
+                });
+            }
         });
     }
     // 清除
@@ -347,7 +360,7 @@ class NoticeTable extends Component {
         });
         this.queryPublish();
     }
-
+    // 查询
     queryTemporary () {
         const {
             actions: { getDraftTipsList }
@@ -399,6 +412,7 @@ class NoticeTable extends Component {
             draftTipsList = [],
             form: { getFieldDecorator }
         } = this.props;
+        console.log('公告列表', tipsList);
         const {
             tipsTabValue,
             editNoticeVisible,
@@ -411,12 +425,6 @@ class NoticeTable extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        let annexFileList = [];
-        if (noticeDetail.attachment && noticeDetail.attachment.fileList &&
-            noticeDetail.attachment.fileList instanceof Array &&
-            noticeDetail.attachment.fileList.length > 0) {
-            annexFileList = noticeDetail.attachment.fileList;
-        }
         return (
             <Row>
                 {
@@ -450,19 +458,7 @@ class NoticeTable extends Component {
                                 : (<p>{`紧急程度 ：暂无`}</p>)
                             }
                             {
-                                annexFileList.map((file) => {
-                                    if (file && file.response && file.response.download_url) {
-                                        return (
-                                            <p>
-                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
-                                                    {file.name}
-                                                </a>
-                                            </p>
-                                        );
-                                    } else {
-                                        return (<p>{`附件 ：暂无`}</p>);
-                                    }
-                                })
+                                this.state.Files.length > 0 ? <p>文件</p> : <p>附件: 暂无</p>
                             }
                             <div
                                 style={{
@@ -470,7 +466,7 @@ class NoticeTable extends Component {
                                     overflow: 'auto',
                                     marginTop: '5px'
                                 }}
-                                dangerouslySetInnerHTML={{ __html: noticeDetail && noticeDetail.raw }}
+                                dangerouslySetInnerHTML={{ __html: this.state.Notice_Content }}
                             />
                         </div>
                     </div>
