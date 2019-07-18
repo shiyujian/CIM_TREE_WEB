@@ -1,13 +1,11 @@
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import { SERVICE_API } from '_platform/api';
-// import dirFactory from '_platform/store/higher-order/dir';
 
 export const ID = 'riskFactor';
 export const getworkTreeOK = createAction(`${ID}_文档目录树`);
 export const getworkTree = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getworkTreeOK]);
 export const setcurrentcode = createAction(`${ID}_Current_Code`);
-// const dirReducer = dirFactory(ID);
 
 const addDir = createFetchAction(`${SERVICE_API}/directories/`, 'POST');
 
@@ -26,7 +24,6 @@ export const setcurrentpk = createAction(`${ID}_setcurrentpk`);
 export const savepk = createAction(`${ID}_savepk`);
 
 export const actions = {
-    // ...dirReducer,
     getworkTreeOK,
     getworkTree,
     setcurrentcode,
@@ -45,10 +42,6 @@ export default handleActions({
         ...state,
         onSelectnode: payload
     }),
-    // [combineActions(...actionsMap(dirReducer))]: (state, action) => ({
-    // 	...state,
-    // 	tree: dirReducer(state.tree, action),
-    // }),
     [getworkTreeOK]: (state, {payload: {children}}) => ({
 	    ...state,
 	    worktree: children

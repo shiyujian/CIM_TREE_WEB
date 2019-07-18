@@ -14,6 +14,7 @@ const getOrgName = createFetchAction(
     [],
     'GET'
 );
+const getMembers = createFetchAction(`${USER_API}/roles/{{id}}/members/`, [], 'GET');
 export const actions3 = {
     getLoginUser
 };
@@ -33,7 +34,8 @@ export const actions = {
     getOrgName,
     getUserFristPage,
     getUserFristData,
-    getUserLoading
+    getUserLoading,
+    getMembers
 };
 
 export default handleActions(

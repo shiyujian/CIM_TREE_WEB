@@ -7,7 +7,6 @@ export const ID = 'riskEvaluation';
 export const getworkTreeOK = createAction(`${ID}_文档目录树`);
 export const getworkTree = createFetchAction(`${SERVICE_API}/dir-tree/code/{{code}}/?depth=7`, [getworkTreeOK]);
 export const setcurrentcode = createAction(`${ID}_Current_Code`);
-// const dirReducer = dirFactory(ID);
 
 const addDir = createFetchAction(`${SERVICE_API}/directories/`, 'POST');
 
@@ -26,7 +25,6 @@ export const setcurrentpk = createAction(`${ID}_setcurrentpk`);
 export const savepk = createAction(`${ID}_savepk`);
 
 export const actions = {
-    // ...dirReducer,
     getworkTreeOK,
     getworkTree,
     setcurrentcode,
@@ -49,10 +47,6 @@ export default handleActions({
         ...state,
         onSelectnode: payload
     }),
-    // [combineActions(...actionsMap(dirReducer))]: (state, action) => ({
-    // 	...state,
-    // 	tree: dirReducer(state.tree, action),
-    // }),
     [setcurrentcode]: (state, { payload }) => ({
         ...state,
         currentcode: payload

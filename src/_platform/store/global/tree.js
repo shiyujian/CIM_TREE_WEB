@@ -18,8 +18,6 @@ export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`
 
 // 获获取养护类型
 export const getCuringTypes = forestFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
-// 获获取养护类型
-export const delCuringTask = forestFetchAction(`${FOREST_API}/curing/curing/{{curingID}}`, [], 'DELETE');
 
 // 苗木养护记录查询
 export const getCuringTreeInfo = forestFetchAction(`${FOREST_API}/curing/curingtrees`, []);
