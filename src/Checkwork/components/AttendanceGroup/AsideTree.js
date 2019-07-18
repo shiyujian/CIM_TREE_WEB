@@ -3,6 +3,7 @@ import { Tree, Spin, Button, Popconfirm, Modal, Form, Row, Input, Notification }
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import './AttendanceGroupTable.less';
+import {getUser} from '_platform/auth';
 const TreeNode = Tree.TreeNode;
 const FormItem = Form.Item;
 export const CuringDocCode = window.DeathCode.CURING_TEAM;
@@ -23,8 +24,7 @@ class AsideTree extends Component {
     }
 
     componentDidMount = async () => {
-        let user = localStorage.getItem('LOGIN_USER_DATA');
-        user = JSON.parse(user);
+        let user = getUser();
         if (user && user.username !== 'admin') {
             this.setState({
                 addDisabled: false
@@ -206,7 +206,6 @@ class AsideTree extends Component {
                 getCheckGroup,
                 changeAsideTreeLoading
             },
-            user,
             companyOrgID
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
@@ -217,10 +216,11 @@ class AsideTree extends Component {
                         duration: 3
                     });
                 }
+                let user = getUser();
                 let groupName = values.groupName;
                 let groupcompanyName = values.groupcompanyName;
                 let groupDesc = values.groupDesc;
-                let section = (user && user.account && user.account.sections && user.account.sections[0]) || '';
+                let section = (user && user.section) || '';
                 let projectCode = section && section.split('-')[0];
                 let postData = {
                     name: groupName,

@@ -106,7 +106,7 @@ class NoticeAddModal extends Component {
                     'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
                     'tags': [2],
                     'categories': [],
-                    'publisher': getUser().id,
+                    'publisher': getUser().ID,
                     'is_draft': false
                 };
                 let rst = await postData({}, newData);
@@ -156,7 +156,7 @@ class NoticeAddModal extends Component {
                     'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
                     'tags': [2],
                     'categories': [],
-                    'publisher': getUser().id,
+                    'publisher': getUser().ID,
                     'is_draft': true
                 };
                 let rst = await postData({}, newData);

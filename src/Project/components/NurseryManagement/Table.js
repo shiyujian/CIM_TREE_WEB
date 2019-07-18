@@ -179,10 +179,9 @@ class Tablelevel extends Component {
     componentDidMount () {
         const { getRegionCodes, getSupplierList } = this.props.actions;
         // 获取当前组织机构的权限
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        if (user.groups && user.groups.length > 0) {
-            this.groupId = user.groups[0].id;
-        }
+        const user = getUser();
+        let userRoles = user.roles || '';
+        this.groupId = userRoles && userRoles.ID;
         let permission = getUserIsManager();
         this.setState({
             permission
@@ -295,10 +294,10 @@ class Tablelevel extends Component {
             if (err) {
                 return;
             }
-            const { id } = getUser();
+            const { ID } = getUser();
             const param = {
                 ID: this.state.record.ID,
-                Checker: id,
+                Checker: ID,
                 CheckStatus: values.CheckStatus,
                 CheckInfo: values.CheckInfo,
                 CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')

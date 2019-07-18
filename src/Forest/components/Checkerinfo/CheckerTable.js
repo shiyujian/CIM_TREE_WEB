@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import { getSmallThinNameByPlaceData } from '../auth';
 import {
@@ -56,8 +56,6 @@ export default class CheckerTable extends Component {
         };
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     render () {
         const { tblData } = this.state;

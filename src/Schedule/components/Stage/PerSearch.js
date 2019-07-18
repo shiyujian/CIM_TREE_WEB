@@ -63,10 +63,9 @@ export default class PerSearch extends Component {
             actions: { getUsers, getRoles }
         } = this.props;
         let user = await getUser();
-        let sections = user.sections;
-        sections = JSON.parse(sections);
+        let section = user.section;
         let roles = await getRoles();
-        if (!(sections && sections instanceof Array && sections.length > 0)) {
+        if (!section) {
             return;
         }
         let postRole = [];
@@ -78,7 +77,7 @@ export default class PerSearch extends Component {
         try {
             let postdata = {
                 roles: postRole,
-                sections: sections,
+                sections: section,
                 is_active: true,
                 page: 1,
                 page_size: 20
@@ -91,7 +90,7 @@ export default class PerSearch extends Component {
                 for (let i = 0; i < (total / 20) - 1; i++) {
                     postdata = {
                         roles: postRole,
-                        sections: sections,
+                        sections: section,
                         is_active: true,
                         page: i + 2,
                         page_size: 20

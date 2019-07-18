@@ -8,7 +8,7 @@ import {
     AsideTree
 } from '../components/AttendanceGroup';
 import { TreeSelect } from 'antd';
-import { getCompanyDataByOrgCode } from '_platform/auth';
+import { getCompanyDataByOrgCode, getUser } from '_platform/auth';
 import './index.less';
 const TreeNode = TreeSelect.TreeNode;
 @connect(
@@ -30,7 +30,6 @@ export default class AttendanceGroup extends Component {
             userOrgID: '',
             companyOrgID: '',
             parentData: '',
-            user: '',
             orgTreeSelectData: []
         };
     }
@@ -64,16 +63,15 @@ export default class AttendanceGroup extends Component {
             await changeAsideTreeLoading(true);
 
             // 获取用户的公司信息
-            let user = localStorage.getItem('LOGIN_USER_DATA');
-            user = JSON.parse(user);
+            let user = getUser();
             let userOrgID = '';
             let companyOrgID = '';
             let parentData = '';
             let companyDatas = '';
             let orgTreeSelectData = [];
-            if (user.User_Name !== 'admin') {
+            if (user.username !== 'admin') {
                 // userOrgCode为登录用户自己的部门code
-                userOrgID = user.Org;
+                userOrgID = user.org;
                 parentData = await getCompanyDataByOrgCode(userOrgID, getParentOrgTreeByID);
                 companyOrgID = parentData.ID;
                 // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
@@ -89,7 +87,6 @@ export default class AttendanceGroup extends Component {
 
             await changeAsideTreeLoading(false);
             this.setState({
-                user,
                 userOrgID,
                 companyOrgID,
                 parentData,

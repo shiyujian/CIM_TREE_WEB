@@ -34,8 +34,7 @@ class AsideTree extends Component {
         } = this.props;
         try {
             this.user = getUser();
-            let sections = this.user.sections;
-            sections = JSON.parse(sections);
+            let section = this.user.section;
             await changeSelectMemTeam('');
             // 首先查看是否为管理员，是的话，获取全部信息
             if (this.user.username === 'admin') {
@@ -43,7 +42,7 @@ class AsideTree extends Component {
                     await getTreeNodeList();
                 }
                 await this._getAdminData();
-            } else if (sections && sections instanceof Array && sections.length > 0) {
+            } else if (section && section instanceof Array && section.length > 0) {
                 // 然后查看有没有关联标段，没有关联的人无法获取列表
                 await this._getSectionData();
             }
@@ -53,10 +52,8 @@ class AsideTree extends Component {
     }
     // 非管理员，获取文档数据
     _getSectionData = async () => {
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
+        this.section = this.user.section;
         // 使目录树和标段相关联
-        this.section = sections[0];
         await this._getSectionTeams();
         this.setState({
             addDisabled: false

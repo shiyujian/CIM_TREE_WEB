@@ -17,7 +17,6 @@ import {
 import NoticeAddModal from './NoticeAddModal';
 import NoticeEditModal from './NoticeEditModal';
 import moment from 'moment';
-import { getUser } from '_platform/auth';
 import { STATIC_DOWNLOAD_API } from '_platform/api';
 import './index.less';
 
@@ -455,8 +454,8 @@ class NoticeTable extends Component {
                                         return (
                                             <p>
                                             附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
-                                                    {file.name}
-                                                </a>
+                                                {file.name}
+                                            </a>
                                             </p>
                                         );
                                     } else {

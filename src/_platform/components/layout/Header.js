@@ -52,8 +52,6 @@ export default class Header extends Component {
         const {
             tabs = {}
         } = this.props;
-        let data = getUser();
-        console.log('data', data);
         let fullScreenState = '';
         if (tabs && tabs.fullScreenState) {
             fullScreenState = tabs.fullScreenState;
@@ -156,7 +154,7 @@ export default class Header extends Component {
         if (ignore) {
             return null;
         }
-        const { username = '', name = '', is_superuser = false } = getUser();
+        const { username = '', name = '' } = getUser();
         let permissions = getPermissions() || [];
         // permissions.splice(4,1,"appmeta.PROJECT.NURSERY.NONE.READ");
         // console.log('permissions333', permissions);

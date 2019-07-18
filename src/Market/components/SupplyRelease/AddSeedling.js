@@ -128,11 +128,11 @@ class AddSeedling extends Component {
             });
         });
         // 获取苗圃基地的责任人电话，以及绑定的供应商
-        const { id, org_code } = getUser();
+        const { ID, org } = getUser();
         console.log(getUser(), '---');
-        this.Creater = id;
-        if (org_code) {
-            getNurseryByPk({}, {pk: org_code}).then((rep) => {
+        this.Creater = ID;
+        if (org) {
+            getNurseryByPk({}, {pk: org}).then((rep) => {
                 if (rep.code === 200 && rep.content.length > 0) {
                     const obj = rep.content[0];
                     if (!this.props.form.getFieldValue('Phone')) {

@@ -10,6 +10,7 @@ import {
 import PerSearch from '../PersonSearch/Schedule/PerHandleSearch';
 import queryString from 'query-string';
 import { getNextStates } from '_platform/components/Progress/util';
+import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 
 export default class ScheduleActualHandle extends Component {
@@ -119,14 +120,12 @@ export default class ScheduleActualHandle extends Component {
             const { state_id = '0' } = queryString.parse(location.search) || {};
 
             let me = this;
-            let user = localStorage.getItem('LOGIN_USER_DATA');
-            user = JSON.parse(user);
+            let user = getUser();
             let executor = {
                 username: user.username,
-                person_code: user && user.account && user.account.person_code,
-                person_name: user && user.account && user.account.person_name,
-                id: user && parseInt(user.id),
-                org: user && user.account && user.account.org_code
+                name: user && user.name,
+                id: user && parseInt(user.ID),
+                org: user && user.org
             };
             let nextUser = {};
 
@@ -195,14 +194,12 @@ export default class ScheduleActualHandle extends Component {
 
             let me = this;
             // 获取登陆用户信息
-            let user = localStorage.getItem('LOGIN_USER_DATA');
-            user = JSON.parse(user);
+            let user = getUser();
             let executor = {
                 username: user.username,
-                person_code: user && user.account && user.account.person_code,
-                person_name: user && user.account && user.account.person_name,
-                id: user && parseInt(user.id),
-                org: user && user.account && user.account.org_code
+                name: user && user.name,
+                id: user && parseInt(user.ID),
+                org: user && user.org
             };
 
             // 获取流程的action名称

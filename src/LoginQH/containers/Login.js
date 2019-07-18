@@ -482,7 +482,7 @@ class Login extends Component {
             //         pagination: true,
             //         page: 1
             //     });
-            let permissions = await getUserPermission({}, {userid: ID});
+            let permissions = await getUserPermission({}, {userid: forestLoginUserData.ID});
             console.log('permissions', permissions);
             await setPermissions(permissions);
             Notification.open({

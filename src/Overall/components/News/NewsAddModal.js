@@ -103,12 +103,11 @@ class NewsAddModal extends Component {
                     values.annexFile.fileList.length > 0) {
                     fileList = values.annexFile.fileList;
                 }
-                console.log(coverResp, fileList, this.state.content, getUser().id);
                 postNews({}, {
                     Author: '',
                     Content: this.state.content,
                     Content_Type: 1,
-                    Creater: getUser().id,
+                    Creater: getUser().ID,
                     KeyWords: '',
                     Source: values.source,
                     SubTitle: '',
@@ -144,7 +143,7 @@ class NewsAddModal extends Component {
         //             'attachment': {
         //                 'fileList': fileList
         //             },
-        //             'publisher': getUser().id,
+        //             'publisher': getUser().ID,
         //             'is_draft': false,
         //             'cover': {
         //                 'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
@@ -206,7 +205,7 @@ class NewsAddModal extends Component {
                     'attachment': {
                         'fileList': fileList
                     },
-                    'publisher': getUser().id,
+                    'publisher': getUser().ID,
                     'is_draft': true,
                     'cover': {
                         'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),

@@ -22,21 +22,15 @@ class OfferList extends Component {
     }
     componentDidMount () {
         // 获取该用户所在机构类型和code
-        const userData = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        if (userData && userData.account && userData.groups.length > 0) {
-            userData.groups.map(item => {
-                if (item.grouptype === 0 || item.grouptype === 6) {
-                    this.grouptype = item.grouptype;
-                }
-            });
-            this.org_code = userData.account.org_code;
-        }
+        const user = getUser();
+        let roles = user.roles || '';
+        this.grouptype = roles.ParentID;
+        this.org_code = user.org;
         // 获取所有项目和标段
         const { getWpunittree } = this.props.actions;
         getWpunittree().then(rep => {
             // 获取所在单位pk
-            const { org_code } = getUser();
-            this.org = org_code;
+            this.org = user.org;
             this.setState({
                 projectList: rep
             }, () => {

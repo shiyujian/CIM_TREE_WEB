@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import '../index.less';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl } from '_platform/auth';
 import {
     getSectionNameBySection,
     getProjectNameBySection
@@ -294,8 +294,6 @@ export default class NursOverallTable extends Component {
         ];
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     render () {
         const { seedlingMess, treeMess, flowMess, curingMess, sxm } = this.state;

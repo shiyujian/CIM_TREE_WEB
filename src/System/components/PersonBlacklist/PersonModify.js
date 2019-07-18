@@ -10,6 +10,7 @@ import {
     Upload
 } from 'antd';
 import './PersonModify.less';
+import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 class PersonModify extends Component {
     // export default class PersonModify extends Component {
@@ -27,9 +28,7 @@ class PersonModify extends Component {
         } = this.props;
         const addition = modifyPer;
 
-        console.log('modifyPer', modifyPer);
-        console.log('addition', addition);
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+        const user = getUser();
         let roles = [];
         if (addition && addition.groups && addition.groups instanceof Array) {
             addition.groups.map(ese => {
@@ -101,7 +100,7 @@ class PersonModify extends Component {
                                         value={addition.id_num}
                                     />
                                 </FormItem>
-                                {user.is_superuser ? (
+                                {user.username === 'admin' ? (
                                     <FormItem
                                         {...PersonModify.layout}
                                         label='部门编码'
@@ -188,7 +187,7 @@ class PersonModify extends Component {
                                         style={{ width: '100%' }}
                                     />
                                 </FormItem>
-                                {user.is_superuser ? (
+                                {user.username === 'admin' ? (
                                     <FormItem
                                         {...PersonModify.layout}
                                         label='部门名称'

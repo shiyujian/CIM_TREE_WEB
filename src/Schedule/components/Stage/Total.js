@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-16 09:10:08
+ * @Last Modified time: 2019-07-18 14:43:35
  */
 import React, { Component } from 'react';
 import {
@@ -180,14 +180,11 @@ class Total extends Component {
         let filterData = [];
         let user = getUser();
 
-        let sections = user.sections;
-
-        sections = JSON.parse(sections);
-
+        let section = user.section;
         let selectCode = '';
         // 关联标段的人只能看自己项目的进度流程
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let code = sections[0].split('-');
+        if (section) {
+            let code = section.split('-');
             selectCode = code[0] || '';
 
             totolData.map(task => {
@@ -196,7 +193,7 @@ class Total extends Component {
 
                 if (
                     projectCode === selectCode &&
-                    task.section === sections[0]
+                    task.section === section
                 ) {
                     filterData.push(task);
                 }
@@ -240,13 +237,11 @@ class Total extends Component {
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
 
-        let sections = user.sections;
+        let section = user.section;
         let currentSectionName = '';
         let projectName = '';
 
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
+        if (section) {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
@@ -556,9 +551,9 @@ class Total extends Component {
 
         let user = getUser(); // 当前登录用户
 
-        let sections = user.sections || [];
+        let section = user.section;
 
-        if (!sections || sections.length === 0) {
+        if (!section) {
             notification.error({
                 message: '当前用户未关联标段，不能创建流程',
                 duration: 3
@@ -586,9 +581,8 @@ class Total extends Component {
 
                 const currentUser = {
                     username: user.username,
-                    person_code: user.code,
                     person_name: user.name,
-                    id: parseInt(user.id)
+                    id: parseInt(user.ID)
                 };
 
                 let subject = [

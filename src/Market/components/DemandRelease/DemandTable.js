@@ -25,8 +25,8 @@ class DemandTable extends Component {
         const { getWpunittree } = this.props.actions;
         getWpunittree().then(rep => {
             // 获取所在单位pk
-            const { org_code } = getUser();
-            this.org = org_code;
+            const { org } = getUser();
+            this.org = org;
             this.setState({
                 projectList: rep
             }, () => {

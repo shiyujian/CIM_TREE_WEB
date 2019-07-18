@@ -46,8 +46,8 @@ class ReceivePage extends Component {
         const {
             actions: { deleteReceiveDocAc, getReceiveInfoAc }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        let orgCode = getUser().org_code;
+        const user = getUser();
+        let orgCode = user.org;
 
         let orgListCodes = orgCode.split('_');
         orgListCodes.pop();
@@ -56,7 +56,7 @@ class ReceivePage extends Component {
         deleteReceiveDocAc({ id: _id, user: encodeURIComponent(ucode) }).then(
             () => {
                 message.success('删除收文成功！');
-                if (user.is_superuser) {
+                if (user.username === 'admin') {
                     getReceiveInfoAc({
                         user: encodeURIComponent('admin')
                     });
@@ -72,8 +72,9 @@ class ReceivePage extends Component {
     // 查看信息详情
     _viewClick (id, record) {
         this.setState({ code_id: id });
-        let orgCode = getUser().org_code;
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+
+        const user = getUser();
+        let orgCode = user.org;
         let orgListCodes = orgCode.split('_');
         orgListCodes.pop();
         let codeu = orgListCodes.join();
@@ -87,7 +88,7 @@ class ReceivePage extends Component {
             visible: true,
             _viewClickinfo: record
         });
-        if (user.is_superuser) {
+        if (user.username === 'admin') {
             getReceiveDetailAc({
                 id: id,
                 user: encodeURIComponent('admin')
@@ -119,7 +120,7 @@ class ReceivePage extends Component {
         const {
             actions: { patchReceiveDetailAc, getReceiveInfoAc }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+        const user = getUser();
         patchReceiveDetailAc(
             {
                 id: id,
@@ -131,7 +132,7 @@ class ReceivePage extends Component {
         ).then(rst => {
             if (rst._id) {
                 message.success('已设置已阅！');
-                if (user.is_superuser) {
+                if (user.username === 'admin') {
                     getReceiveInfoAc({
                         user: encodeURIComponent('admin')
                     });
@@ -164,7 +165,6 @@ class ReceivePage extends Component {
         } = this.props;
         const { notifications = [] } = receiveInfo;
 
-        // const user = getUser();
         let searchList = [];
         this.props.form.validateFields(async (err, values) => {
             console.log('err', err);
@@ -598,8 +598,8 @@ class ReceivePage extends Component {
     // 	}
     // ];
     confirms () {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        if (user.is_superuser == true) {
+        const user = getUser();
+        if (user.username === 'admin') {
             return <a>删除</a>;
         } else {
             return [];

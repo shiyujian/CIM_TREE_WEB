@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Notification, Select, Spin } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { getUser } from '_platform/auth';
 import { UPLOAD_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
 import E from 'wangeditor';
 

@@ -17,11 +17,10 @@ export default class TaskTeamTable extends Component {
     }
 
     async componentDidMount () {
-        this.user = getUser();
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
+        const user = getUser();
+        let section = user.section;
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (sections && sections instanceof Array && sections.length > 0) {
+        if (section) {
             this.setState({
                 relateDisabled: false
             });

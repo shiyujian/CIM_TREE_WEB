@@ -165,7 +165,7 @@ export const getTaskThinClassName = (task, totalThinClass, bigTreeList) => {
     }
 };
 // 查找区域内的细班的名称
-export const getThinClassName = (regionThinClass, totalThinClass, sections, bigTreeList) => {
+export const getThinClassName = (regionThinClass, totalThinClass, signSection, bigTreeList) => {
     // 经过筛选后的细班No
     let regionThinNo = '';
     // 经过筛选后的细班Name
@@ -179,7 +179,6 @@ export const getThinClassName = (regionThinClass, totalThinClass, sections, bigT
     let regionSectionName = '';
     // 标段是否是登陆用户所在标段
     let sectionBool = true;
-    let signSection = sections[0];
 
     // 细班数组，查看细班是否重复，重复不再查询
     let thinNoList = [];
@@ -287,12 +286,10 @@ export const getTaskStatus = (task) => {
 
 export const getCuringTaskCreateTreeData = async (getCuringTypes, getCuring) => {
     let user = getUser();
-    let sections = user.sections;
-    sections = JSON.parse(sections);
+    let section = user.section;
     let curingTypes = [];
     let taskTreeData = [];
-    if (sections && sections instanceof Array && sections.length > 0) {
-        let section = sections[0];
+    if (section) {
         let postData = {
             section: section,
             status: 2
@@ -341,12 +338,10 @@ export const getCuringTaskCreateTreeData = async (getCuringTypes, getCuring) => 
 };
 export const getCuringTaskReportTreeData = async (getCuringTypes, getCuring) => {
     let user = getUser();
-    let sections = user.sections;
-    sections = JSON.parse(sections);
+    let section = user.section;
     let curingTypes = [];
     let taskTreeData = [];
-    if (sections && sections instanceof Array && sections.length > 0) {
-        let section = sections[0];
+    if (section) {
         let postData = {
             section: section,
             status: 1

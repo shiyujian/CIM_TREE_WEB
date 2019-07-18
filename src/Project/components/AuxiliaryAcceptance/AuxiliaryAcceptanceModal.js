@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Button, Modal, Form, Row, DatePicker, Select, Input, Notification, Spin, Table } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { getUser } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;

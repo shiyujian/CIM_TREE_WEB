@@ -82,7 +82,7 @@ class Tablelevel extends Component {
     componentDidMount () {
         this.initMap();
         let userData = getUser();
-        this.userSection = userData.sections.slice(2, -2);
+        this.userSection = userData.section;
         if (userData.username === 'admin') {
             this.setState({
                 isSuperAdmin: true

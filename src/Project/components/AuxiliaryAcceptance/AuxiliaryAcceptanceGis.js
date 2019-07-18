@@ -3,7 +3,6 @@ import { Button, Row } from 'antd';
 import L from 'leaflet';
 import './AuxiliaryAcceptanceGis.less';
 import {
-    getUser,
     getAreaTreeData
 } from '_platform/auth';
 import {
@@ -62,12 +61,6 @@ export default class AuxiliaryAcceptanceGis extends Component {
                 tree = {}
             }
         } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
-        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
-            this.section = this.sections[0];
-        }
         try {
             // 初始化地图
             await this._initMap();

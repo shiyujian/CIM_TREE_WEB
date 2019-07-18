@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import * as actions from '../store/electronicFence';
 import { actions as platformActions } from '_platform/store/global';
 import { ScopeCreateTable } from '../components/ElectronicFence';
-import { getCompanyDataByOrgCode, getAreaTreeData } from '_platform/auth';
+import { getCompanyDataByOrgCode, getAreaTreeData, getUser } from '_platform/auth';
 @connect(
     state => {
         const { checkwork: { electronicFence = {} }, platform } = state;
@@ -22,7 +22,6 @@ export default class ElectronicFence extends Component {
         super(props);
         this.state = {
             parentData: '',
-            user: '',
             groupTreeLoading: false,
             areaTreeLoading: false
         };
@@ -38,8 +37,7 @@ export default class ElectronicFence extends Component {
             }
         } = this.props;
         // 获取用户的公司信息
-        let user = localStorage.getItem('LOGIN_USER_DATA');
-        user = JSON.parse(user);
+        let user = getUser();
         try {
             if (user.username !== 'admin') {
                 // // 获取考勤群体数据
@@ -76,7 +74,7 @@ export default class ElectronicFence extends Component {
             let companyOrgID = '';
             let parentData = '';
             // userOrgCode为登录用户自己的部门code
-            userOrgID = user.Org;
+            userOrgID = user.org;
             parentData = await getCompanyDataByOrgCode(userOrgID, getParentOrgTreeByID);
             companyOrgID = parentData.ID;
             // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
@@ -85,7 +83,6 @@ export default class ElectronicFence extends Component {
             };
             await getCheckGroup({}, postData);
             this.setState({
-                user,
                 parentData,
                 groupTreeLoading: false
             });

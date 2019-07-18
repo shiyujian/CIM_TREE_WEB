@@ -429,20 +429,19 @@ class ToggleModal extends Component {
             message.warning('请上传文件！');
             return;
         }
-        let orgCode = getUser().org_code;
+        const user = getUser();
+        let orgCode = user.org;
         let orgListCodes = orgCode.split('_');
         orgListCodes.pop();
         let codeu = orgListCodes.join();
         let ucode = codeu.replace(/,/g, '_');
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
 
         validateFields((err, values) => {
             if (!err) {
                 if (toggleData.status === 'ADD') {
                     let sendData = {
-                        from_whom: user.is_superuser == true ? 'admin' : ucode,
-                        from_whom_department:
-                        user.is_superuser == true ? 'admin' : ucode,
+                        from_whom: user.username === 'admin' ? 'admin' : ucode,
+                        from_whom_department: user.username === 'admin' ? 'admin' : ucode,
                         to_whom: this._getOrgText(sentUsers),
                         cc: this._getOrgText(copyUsers),
                         title: values['title3'],
@@ -465,13 +464,13 @@ class ToggleModal extends Component {
                     postSentDocAc({}, sendData).then(rst => {
                         if (rst._id) {
                             message.success('发送文件成功！');
-                            let orgCode = getUser().org_code;
+                            let orgCode = getUser().org;
 
                             let orgListCodes = orgCode.split('_');
                             orgListCodes.pop();
                             let codeu = orgListCodes.join();
                             let ucode = codeu.replace(/,/g, '_');
-                            if (user.is_superuser == true) {
+                            if (user.username === 'admin') {
                                 getSentInfoAc({
                                     user: encodeURIComponent('admin')
                                 });
@@ -579,7 +578,7 @@ class ToggleModal extends Component {
                     postSentDocAc({}, sendData).then(rst => {
                         if (rst._id) {
                             message.success('发送文件成功！');
-                            let orgCode = getUser().org_code;
+                            let orgCode = getUser().org;
 
                             let orgListCodes = orgCode.split('_');
                             orgListCodes.pop();

@@ -200,8 +200,6 @@ export default class CarPackage extends Component {
             platform: { tree = {} }
         } = this.props;
         let treeList = tree.thinClassTree;
-
-        let user = getUser();
         let keycode = keys[0] || '';
         const {
             actions: { setkeycode }
@@ -223,14 +221,15 @@ export default class CarPackage extends Component {
             sectionsData
         });
         // 标段
-        let sections = JSON.parse(user.sections);
+        let user = getUser();
+        let section = user.section;
         let permission = getUserIsManager();
         if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
         } else {
             sectionsData.map((sectionData) => {
-                if (sections[0] === sectionData.No) {
+                if (section && section === sectionData.No) {
                     this.setSectionOption(sectionData);
                 }
             });

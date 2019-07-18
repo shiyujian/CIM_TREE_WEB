@@ -141,24 +141,20 @@ class Users extends Component {
             title: '操作',
             key: '10',
             render: (text, record) => {
-                const userc = JSON.parse(
-                    window.localStorage.getItem('LOGIN_USER_DATA')
-                );
-                let groups = userc.groups || [];
+                const user = getUser();
+                let userRoles = user.roles || '';
                 // 是否为供应商文书
                 let userIsSupplierDocument = false;
                 // 是否为施工，监理，业主文书
                 let userIsProjectDocument = false;
-                groups.map((group) => {
-                    if (group.name === '供应商文书') {
-                        userIsSupplierDocument = true;
-                    }
-                    if (group.name === '业主文书' || group.name === '监理文书' || group.name === '施工文书') {
-                        userIsProjectDocument = true;
-                    }
-                });
+                if (userRoles.RoleName === '供应商文书') {
+                    userIsSupplierDocument = true;
+                }
+                if (userRoles.RoleName === '业主文书' || userRoles.RoleName === '监理文书' || userRoles.RoleName === '施工文书') {
+                    userIsProjectDocument = true;
+                }
                 let arr = [];
-                if (userc && userc.username && userc.username === 'admin') {
+                if (user && user.username && user.username === 'admin') {
                     if (record.is_active) {
                         if (record.account.is_black === 0) {
                             arr.push(<a
@@ -235,7 +231,7 @@ class Users extends Component {
         }
     ];
     componentDidMount () {
-        this.Checker = getUser().id;
+        this.Checker = getUser().ID;
     }
     componentWillReceiveProps (nextProps) {
         this.setState({ TreeCodes: this.props.getTreeCodes });
@@ -260,17 +256,15 @@ class Users extends Component {
             orgTreeDataArr = []
         } = this.props;
         try {
-            let groups = user.groups;
+            let userRoles = user.roles || '';
             let isClericalStaff = false;
-            groups.map((group) => {
-                if (group.name === '施工文书') {
-                    isClericalStaff = true;
-                }
-            });
+            if (userRoles.RoleName === '施工文书') {
+                isClericalStaff = true;
+            }
             if (isClericalStaff && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
                 return true;
             }
-            if (user.is_superuser) {
+            if (user.username === 'admin') {
                 return true;
             }
             let status = false;
@@ -292,8 +286,8 @@ class Users extends Component {
         const {
             selectedRowKeys
         } = this.state;
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        if (user.is_superuser === true) {
+        const user = getUser();
+        if (user.username === 'admin') {
             return (<div>
                 <Col span={3}>
                     <Button
@@ -357,16 +351,14 @@ class Users extends Component {
         const projectRoles = roles.filter(role => role.grouptype === 1);
         const professionRoles = roles.filter(role => role.grouptype === 2);
         const departmentRoles = roles.filter(role => role.grouptype === 3);
-        const userc = JSON.parse(
-            window.localStorage.getItem('LOGIN_USER_DATA')
-        );
-        let userName = userc.username;
+        const user = getUser();
+        let username = user.username;
         let permissionStatus = false;
-        if (userc.is_superuser) {
+        if (username === 'admin') {
             permissionStatus = true;
         } else {
             if (code) {
-                permissionStatus = this.compare(userc, node, code);
+                permissionStatus = this.compare(user, node, code);
             }
         }
         const formItemLayout = {
@@ -469,7 +461,7 @@ class Users extends Component {
                                 </Select>
                             </div>
                             {
-                                userName === 'admin'
+                                username === 'admin'
                                     ? (<div className='system-person-mrg20'>
                                         <Select
                                             placeholder='是否全局搜索'
@@ -618,11 +610,9 @@ class Users extends Component {
                 roles: searchRoles,
                 is_active: searchUserStatus
             };
-            const userc = JSON.parse(
-                window.localStorage.getItem('LOGIN_USER_DATA')
-            );
-            let userName = userc.username;
-            if (!searchOveralSituation || userName !== 'admin') {
+            const user = getUser();
+            let username = user.username;
+            if (!searchOveralSituation || username !== 'admin') {
                 postData.org_code = getTreeCodes;
             }
             this.setState({ loading: true });

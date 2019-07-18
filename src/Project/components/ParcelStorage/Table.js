@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Upload, Input, Icon, Button, Table, Pagination, Modal, Form, Spin, message } from 'antd';
 import L from 'leaflet';
-import { getUser, formItemLayout } from '_platform/auth';
+import { formItemLayout } from '_platform/auth';
 import {
     fillAreaColor,
     getCoordsArr,
@@ -32,7 +32,6 @@ class Tablelevel extends Component {
             spinning: false // 加载中
         };
         this.dataList = []; // 暂存数据
-        this.userSection = ''; // 用户所属标段
         this.newDataList = []; // 筛选后的数据
         this.onSearch = this.onSearch.bind(this); // 查询地块
         this.handleSection = this.handleSection.bind(this); // 地块编号
@@ -75,8 +74,6 @@ class Tablelevel extends Component {
     componentDidMount () {
         // 初始化地图
         this.initMap();
-        let userData = getUser();
-        this.userSection = userData.sections.slice(2, -2);
     }
     initMap () {
         // 基础设置
@@ -344,8 +341,6 @@ class Tablelevel extends Component {
                     item.key = index;
                 });
                 this.dataList = rep.features;
-                console.log(this.userSection, '123');
-                console.log(this.dataList);
                 this.setState({
                     confirmLoading: false,
                     indexBtn: 0,

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-06-25 10:12:20
+ * @Last Modified time: 2019-07-18 16:31:49
  */
 import React, { Component } from 'react';
 import {
@@ -41,6 +41,7 @@ import {
     TILEURLS,
     INITLEAFLET_API
 } from '_platform/api';
+import {getUser} from '_platform/auth';
 import MenuSwitch from '../MenuSwitch';
 
 class OnSite extends Component {
@@ -103,8 +104,8 @@ class OnSite extends Component {
                 getCustomViewByUserID
             }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        await getCustomViewByUserID({id: user.id});
+        let user = getUser();
+        await getCustomViewByUserID({id: user.ID});
         await this.initMap();
     }
     /* 初始化地图 */

@@ -1,4 +1,3 @@
-import { getUser } from '_platform/auth';
 // 校验手机号 以13等开头9位,以0554-4418039
 export const checkTel = (tel) => {
     let mobile = /^1[3|5|4|6|8|7|9|]\d{9}$/, phone = /^0\d{2,3}-?\d{7,8}$/;

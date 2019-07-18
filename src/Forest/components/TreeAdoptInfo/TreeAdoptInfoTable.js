@@ -11,7 +11,6 @@ import {
     message
 } from 'antd';
 import moment from 'moment';
-import { getUser } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData,
@@ -115,8 +114,6 @@ export default class TreeAdoptInfoTable extends Component {
         ];
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     render () {
         const {

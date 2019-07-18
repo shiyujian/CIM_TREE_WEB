@@ -36,7 +36,7 @@ export default class Tasks extends Component {
             {
                 ...filter,
                 task: type,
-                executor: user.id,
+                executor: user.ID,
                 order_by: '-real_start_time'
             }
         );

@@ -8,7 +8,8 @@ import {
     notification
 } from 'antd';
 import queryString from 'query-string';
-import { getNextStates } from '../../../_platform/components/Progress/util';
+import { getNextStates } from '_platform/components/Progress/util';
+import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 
 export default class ScheduleActualDeal extends Component {
@@ -25,8 +26,7 @@ export default class ScheduleActualDeal extends Component {
         wrapperCol: { span: 16 }
     };
     componentDidMount = () => {
-        let user = localStorage.getItem('LOGIN_USER_DATA');
-        user = JSON.parse(user);
+        let user = getUser();
         this.setState({
             user
         });
@@ -89,13 +89,11 @@ export default class ScheduleActualDeal extends Component {
             const { state_id = '0' } = queryString.parse(location.search) || {};
             let me = this;
             // 获取登陆用户信息
-            console.log('user', user);
             let executor = {
                 username: user.username,
-                person_code: user && user.account && user.account.person_code,
-                person_name: user && user.account && user.account.person_name,
-                id: user && parseInt(user.id),
-                org: user && user.account && user.account.org_code
+                name: user && user.name,
+                id: user && parseInt(user.ID),
+                org: user && user.org
             };
             // 获取流程的action名称
             let action_name = '';
@@ -200,13 +198,11 @@ export default class ScheduleActualDeal extends Component {
         try {
             const { state_id = '0' } = queryString.parse(location.search) || {};
             let me = this;
-            console.log('user', user);
             let executor = {
                 username: user.username,
-                person_code: user && user.account && user.account.person_code,
-                person_name: user && user.account && user.account.person_name,
-                id: user && parseInt(user.id),
-                org: user && user.account && user.account.org_code
+                name: user && user.name,
+                id: user && parseInt(user.ID),
+                org: user && user.org
             };
 
             // 获取流程的action名称

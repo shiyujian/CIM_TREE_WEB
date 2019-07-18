@@ -18,6 +18,7 @@ export default class AddMember extends Component {
             totalUserData: []
         };
         this.user = null;
+        this.section = '';
     }
 
     async componentDidMount () {
@@ -27,10 +28,9 @@ export default class AddMember extends Component {
             }
         } = this.props;
         this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
+        this.section = this.user.sections;
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (!(this.sections && this.sections instanceof Array && this.sections.length > 0) && (this.user.username !== 'admin')) {
+        if (!this.section && (this.user.username !== 'admin')) {
             return;
         }
         // 需要找到是养护角色的人
@@ -56,21 +56,21 @@ export default class AddMember extends Component {
         if (roles.length === 0) {
             return;
         }
-        let sections = [];
+        let section = '';
         if (this.user.username === 'admin') {
             // 如果没有点击节点，则获取全部养护人员，为防止人员列表过长，需要禁止
             if (!selectSection) {
                 return;
             }
-            sections.push(selectSection);
+            section = selectSection;
         } else {
-            sections = this.sections;
+            section = this.section;
         }
         try {
             let postdata = {};
             postdata = {
                 roles: roles,
-                sections: sections,
+                sections: section,
                 is_active: true
             };
 

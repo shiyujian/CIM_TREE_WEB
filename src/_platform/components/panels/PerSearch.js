@@ -76,10 +76,9 @@ export default class PerSearch extends Component {
         } = this.props;
         let user = getUser();
 
-        let sections = user.sections;
-        sections = JSON.parse(sections);
+        let section = user.section;
         let roles = [];
-        if (!(sections && sections instanceof Array && sections.length > 0)) {
+        if (!section) {
             return;
         }
 
@@ -135,14 +134,14 @@ export default class PerSearch extends Component {
             // 是按照部门搜索  还是按照角色搜索
             if (!roleSearch) {
                 postdata = {
-                    sections: sections,
+                    sections: section,
                     roles: roles,
                     status: 1
                 };
             } else {
                 postdata = {
                     roles: roles,
-                    sections: sections,
+                    sections: section,
                     status: 1
                 };
             }

@@ -56,8 +56,6 @@ export default class SeedlingsChange extends Component {
         };
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
 
     columns1 = [

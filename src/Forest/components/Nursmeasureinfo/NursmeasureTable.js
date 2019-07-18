@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import {
     getSectionNameBySection,
@@ -52,8 +52,6 @@ export default class NursmeasureTable extends Component {
         };
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     render () {
         const { tblData, imgvisible } = this.state;

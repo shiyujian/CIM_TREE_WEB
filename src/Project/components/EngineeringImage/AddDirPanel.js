@@ -17,7 +17,6 @@ class AddDirPanel extends Component {
             datumpk = {},
             currentcode = {},
             currentpk = {},
-            user,
             isAdmin,
             extraOrgLeaf,
             extraOrgCode

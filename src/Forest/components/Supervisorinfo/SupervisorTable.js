@@ -55,10 +55,11 @@ export default class SupervisorTable extends Component {
             smallclassData: '',
             thinclassData: ''
         };
+        this.section = '';
     }
     componentDidMount () {
         let user = getUser();
-        this.sections = JSON.parse(user.sections);
+        this.section = user.section;
     }
     render () {
         const { tblData } = this.state;
@@ -668,7 +669,7 @@ export default class SupervisorTable extends Component {
             bigType = '',
             treetype = ''
         } = this.state;
-        if (this.sections.length !== 0) {
+        if (this.section) {
             // 不是admin，要做查询判断了
             if (section === '') {
                 message.info('请选择标段信息');

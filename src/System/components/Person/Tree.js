@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import SimpleTree from './SimpleTree';
 import { TreeSelect } from 'antd';
-import {getCompanyDataByOrgCode} from '_platform/auth';
+import {getCompanyDataByOrgCode, getUser} from '_platform/auth';
 import {addGroup} from '../auth';
 import {ORG_NURSERY_CODE, ORG_SUPPLIER_CODE} from '_platform/api';
 import moment from 'moment';
@@ -45,17 +45,15 @@ export default class Tree extends Component {
             }
         } = this.props;
         try {
-            const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+            const user = getUser();
             // 管理员可以查看全部，其他人只能查看自己公司
             let permission = false;
             // 施工文书可以查看苗圃基地和供应商
             let isClericalStaff = false;
-            let groups = user.groups || [];
-            groups.map((group) => {
-                if (group.name.indexOf('施工文书') !== -1) {
-                    isClericalStaff = true;
-                }
-            });
+            let userRoles = user.roles || '';
+            if (userRoles.RoleName.indexOf('施工文书') !== -1) {
+                isClericalStaff = true;
+            }
             if (user.username === 'admin') {
                 permission = true;
             }
@@ -66,7 +64,7 @@ export default class Tree extends Component {
             let orgTreeArrList = [];
             if (user && user.username !== 'admin') {
                 // 获取登录用户的公司的信息
-                let orgID = user.Org;
+                let orgID = user.org;
                 // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
                 let parentOrgData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
                 // 如果在公司下，则获取公司所有的信息
@@ -186,7 +184,6 @@ export default class Tree extends Component {
     }
 
     select = async (s, node) => {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         const { node: { props: { eventKey = '' } = {} } = {} } = node || {};
         const {
             actions: {
@@ -201,9 +198,7 @@ export default class Tree extends Component {
         const {
             orgTreeArrList
         } = this.state;
-        console.log('s', JSON.parse(s));
-        console.log('node', node);
-
+        const user = getUser();
         let topProject = Tree.loop(orgTreeArrList, eventKey);
         if (this.compare(user, topProject, eventKey)) {
             if (topProject.code) {
@@ -226,17 +221,15 @@ export default class Tree extends Component {
         }
     }
     compare (user, topProject, eventKey) {
-        let groups = user.groups;
+        let userRoles = user.roles || '';
         let isClericalStaff = false;
-        groups.map((group) => {
-            if (group.name === '施工文书') {
-                isClericalStaff = true;
-            }
-        });
+        if (userRoles.RoleName === '施工文书') {
+            isClericalStaff = true;
+        }
         if (isClericalStaff && (topProject.topParent === '苗圃基地' || topProject.topParent === '供应商')) {
             return true;
         }
-        if (user.is_superuser) {
+        if (user.username === 'admin') {
             return true;
         }
         let status = false;

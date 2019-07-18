@@ -15,7 +15,6 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import {
-    getUser,
     getAreaTreeData
 } from '_platform/auth';
 

@@ -4,7 +4,6 @@ import { actions } from '../store/query';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '_platform/store/global';
-import { getUser } from '_platform/auth';
 import { DatePicker, Row, Col, Button, Table } from 'antd';
 import { IN_OFF_DUTY_API } from '_platform/api';
 import moment from 'moment';
@@ -37,14 +36,6 @@ export default class Query extends Component {
     }
 
     componentDidMount () {
-        const { actions: { getCheckListAc } } = this.props;
-        let time = moment().format('YYYY-MM');
-        // getCheckListAc({
-        // 	month: time
-        // });
-        if (getUser().org_code) {
-            // this._getOrgInfo(getUser().org_code)
-        }
     }
 
     onMonthChange (value) {

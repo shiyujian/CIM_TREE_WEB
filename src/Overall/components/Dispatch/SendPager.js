@@ -38,15 +38,15 @@ class SendPage1 extends Component {
         const {
             actions: { deleteSentDocAc, getSentInfoAc }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+        const user = getUser();
 
-        let orgCode = getUser().org_code;
+        let orgCode = user.org;
 
         let orgListCodes = orgCode.split('_');
         orgListCodes.pop();
         let codeu = orgListCodes.join();
         let ucode = codeu.replace(/,/g, '_');
-        if (user.is_superuser) {
+        if (user.username === 'admin') {
             deleteSentDocAc({
                 id: _id,
                 user: encodeURIComponent('admin')
@@ -500,15 +500,15 @@ class SendPage1 extends Component {
             visible: true,
             viewClickinfo: record
         });
-        let orgCode = getUser().org_code;
+        let orgCode = getUser().org;
 
         let orgListCodes = orgCode.split('_');
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+        const user = getUser();
 
         orgListCodes.pop();
         let codeu = orgListCodes.join();
         let ucode = codeu.replace(/,/g, '_');
-        if (user.is_superuser) {
+        if (user.username === 'admin') {
             getSendDetailAc({
                 id: id,
                 user: encodeURIComponent('admin')
@@ -535,8 +535,8 @@ class SendPage1 extends Component {
         });
     }
     confirms () {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        if (user.is_superuser == true) {
+        const user = getUser();
+        if (user.username === 'admin') {
             return <a>删除</a>;
         } else {
             return [];

@@ -201,7 +201,7 @@ class ScheduleActualRefill extends Component {
                                                     </div>
                                                 }
                                                 description={
-                                                    userID === +user.id && (
+                                                    userID === +user.ID && (
                                                         <div>
                                                             <Row>
                                                                 <Col
@@ -387,9 +387,7 @@ class ScheduleActualRefill extends Component {
             location
         } = this.props;
         const { actualDataSource, oldSubject } = this.state;
-        let user = localStorage.getItem('LOGIN_USER_DATA');
-        user = JSON.parse(user);
-        console.log('user', user);
+        let user = getUser();
         let me = this;
         let postData = {};
         me.props.form.validateFields(async (err, values) => {
@@ -402,10 +400,9 @@ class ScheduleActualRefill extends Component {
 
                 let executor = {
                     username: user.username,
-                    person_code: user && user.account && user.account.person_code,
-                    person_name: user && user.account && user.account.person_name,
-                    id: user && parseInt(user.id),
-                    org: user && user.account && user.account.org_code
+                    name: user && user.name,
+                    id: user && parseInt(user.ID),
+                    org: user && user.org
                 };
                 let subject = [
                     {

@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getForestImgUrl, getUserIsManager } from '_platform/auth';
+import { getForestImgUrl, getUserIsManager } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -327,8 +327,6 @@ export default class LocmeasureTable extends Component {
         ];
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     // 表格的多选设置
     onRowSelectChange = (selectedRowKeys, selectedRows) => {

@@ -38,15 +38,15 @@ export default class Dispatch extends Component {
         const {
             actions: { getReceiveInfoAc, getSentInfoAc, getOrgTree }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        let orgCode = getUser().org_code;
+        const user = getUser();
+        let orgCode = user.org;
         if (orgCode) {
             let orgListCodes = orgCode.split('_');
             orgListCodes.pop();
             let codeu = orgListCodes.join();
             let ucode = codeu.replace(/,/g, '_');
             getOrgTree().then(item => {
-                if (user.is_superuser) {
+                if (user.username === 'admin') {
                     getReceiveInfoAc({
                         user: encodeURIComponent('admin')
                     });
@@ -55,7 +55,7 @@ export default class Dispatch extends Component {
                         user: encodeURIComponent(ucode)
                     });
                 }
-                if (user.is_superuser) {
+                if (user.username === 'admin') {
                     getSentInfoAc({
                         user: encodeURIComponent('admin')
                     });

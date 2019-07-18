@@ -3,11 +3,10 @@ import { Button, Modal, Form, Row, Col, DatePicker, Select, Input, Notification,
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import PersonTree from './PersonTree';
-import { getUser } from '_platform/auth';
+import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
-const { TextArea } = Input;
 
 class TaskCreateModal extends Component {
     constructor (props) {
@@ -38,7 +37,7 @@ class TaskCreateModal extends Component {
         this.setState({
             typeOptionArr
         });
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+        let user = getUser();
         let username = (user && user.username) || '';
         if (username) {
             let postData = {

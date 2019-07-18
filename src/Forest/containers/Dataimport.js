@@ -20,6 +20,8 @@ import {
     DynamicTitle
 } from '_platform/components/layout';
 import { SERVICE_API, NURSERYLOCATION_DOWLOAD } from '_platform/api';
+import {getUser} from '_platform/auth';
+
 @connect(
     state => {
         const { forest, platform } = state;
@@ -41,29 +43,15 @@ export default class Dataimport extends Component {
             title: '',
             dataSource: [],
             loginUser: '',
-            forestUser: '',
-            loginUserSections: ''
+            loginUserSection: ''
         };
     }
     componentDidMount = async () => {
-        const {
-            actions: {
-                getForestUsers
-            }
-        } = this.props;
-        const loginUser = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        let username = loginUser && loginUser.username;
-        let loginUserSections = loginUser && loginUser.account && loginUser.account.sections;
-        let forestUserData = await getForestUsers({}, {username: username});
-        let forestUser = '';
-
-        if (forestUserData && forestUserData.content && forestUserData.content.length > 0) {
-            forestUser = forestUserData.content[0];
-        }
+        const loginUser = getUser();
+        let loginUserSection = loginUser && loginUser.section;
         this.setState({
             loginUser,
-            loginUserSections,
-            forestUser
+            loginUserSection
         });
     }
 
@@ -75,13 +63,13 @@ export default class Dataimport extends Component {
             showUploadList: false,
             beforeUpload (file) {
                 const {
-                    loginUserSections
+                    loginUserSection
                 } = that.state;
                 if (
                     file.name.indexOf('xls') !== -1 ||
                     file.name.indexOf('xlxs') !== -1
                 ) {
-                    if (loginUserSections && loginUserSections instanceof Array && loginUserSections.length > 0) {
+                    if (loginUserSection) {
                         return true;
                     } else {
                         message.info('该用户未关联标段，不能上传文件。');
@@ -193,10 +181,9 @@ export default class Dataimport extends Component {
     handleExcelData = async (data) => {
         const {
             loginUser,
-            loginUserSections,
-            forestUser
+            loginUserSection
         } = this.state;
-        if (!(loginUser && forestUser)) {
+        if (!(loginUser)) {
             Notification.error({
                 message: `当前登录用户数据错误，请确认后再次上传`
             });
@@ -210,7 +197,7 @@ export default class Dataimport extends Component {
             if (item[1] !== '') {
                 let single = {
                     index: item[0] || (index + 1),
-                    Section: loginUserSections[0],
+                    Section: loginUserSection,
                     SXM: item[1] || '',
                     X: item[2] || '',
                     Y: item[3] || '',
@@ -242,8 +229,8 @@ export default class Dataimport extends Component {
         } = this.props;
         const {
             dataSource,
-            loginUserSections,
-            forestUser
+            loginUserSection,
+            loginUser
         } = this.state;
         if (dataSource.length === 0) {
             message.info('上传数据不能为空');
@@ -258,7 +245,7 @@ export default class Dataimport extends Component {
         }
         let checkDatas = await Promise.all(gettreeMessArr);
         checkDatas.map((checkData) => {
-            if (checkData && checkData.Section && checkData.Section !== loginUserSections[0]) {
+            if (checkData && checkData.Section && checkData.Section !== loginUserSection) {
                 sectionCheckStatus = true;
             }
         });
@@ -268,7 +255,7 @@ export default class Dataimport extends Component {
             });
             return;
         }
-        let rst = await postPositionData({ id: forestUser.ID }, dataSource);
+        let rst = await postPositionData({ id: loginUser.ID }, dataSource);
         if (rst.code) {
             message.info('定位数据导入成功');
         } else {

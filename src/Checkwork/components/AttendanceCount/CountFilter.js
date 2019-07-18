@@ -8,7 +8,7 @@ import {
     DatePicker,
     Select
 } from 'antd';
-import { getUserIsManager, getCompanyDataByOrgCode } from '_platform/auth';
+import { getUser, getCompanyDataByOrgCode } from '_platform/auth';
 import {ORGTYPE} from '_platform/api';
 import { handleFilterData } from '../auth';
 const FormItem = Form.Item;
@@ -82,13 +82,12 @@ class CountFilter extends Component {
             form: { setFieldsValue }
         } = this.props;
         try {
-            let user = localStorage.getItem('LOGIN_USER_DATA');
-            user = JSON.parse(user);
+            let user = getUser();
             let parentData = '';
             // admin没有部门
-            if (user.User_Name !== 'admin') {
+            if (user.username !== 'admin') {
                 // userOrgCode为登录用户自己的部门code
-                let orgID = user.Org;
+                let orgID = user.org;
                 parentData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
                 console.log('parentData', parentData);
                 let companyOrgID = parentData.ID;
@@ -152,8 +151,8 @@ class CountFilter extends Component {
     }
 
     renderContent () {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        user.groups = [];
+        let user = getUser();
+        let userRoles = user.roles || '';
         const {
             platform: { roles = [] }
         } = this.props;
@@ -187,56 +186,54 @@ class CountFilter extends Component {
                 value: roles.filter(role => role.grouptype === 6)
             });
         } else {
-            for (let i = 0; i < user.groups.length; i++) {
-                const rolea = user.groups[i].grouptype;
-                switch (rolea) {
-                    case 0:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        break;
-                    case 1:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        systemRoles.push({
-                            name: '施工角色',
-                            value: roles.filter(role => role.grouptype === 1)
-                        });
-                        systemRoles.push({
-                            name: '养护角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 2:
-                        systemRoles.push({
-                            name: '监理角色',
-                            value: roles.filter(role => role.grouptype === 2)
-                        });
-                        break;
-                    case 3:
-                        systemRoles.push({
-                            name: '业主角色',
-                            value: roles.filter(role => role.grouptype === 3)
-                        });
-                        break;
-                    case 4:
-                        systemRoles.push({
-                            name: '养护角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 6:
-                        systemRoles.push({
-                            name: '供应商角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    default:
-                        break;
-                }
+            const rolea = userRoles.ParentID;
+            switch (rolea) {
+                case 0:
+                    systemRoles.push({
+                        name: '苗圃角色',
+                        value: roles.filter(role => role.grouptype === 0)
+                    });
+                    break;
+                case 1:
+                    systemRoles.push({
+                        name: '苗圃角色',
+                        value: roles.filter(role => role.grouptype === 0)
+                    });
+                    systemRoles.push({
+                        name: '施工角色',
+                        value: roles.filter(role => role.grouptype === 1)
+                    });
+                    systemRoles.push({
+                        name: '养护角色',
+                        value: roles.filter(role => role.grouptype === 4)
+                    });
+                    break;
+                case 2:
+                    systemRoles.push({
+                        name: '监理角色',
+                        value: roles.filter(role => role.grouptype === 2)
+                    });
+                    break;
+                case 3:
+                    systemRoles.push({
+                        name: '业主角色',
+                        value: roles.filter(role => role.grouptype === 3)
+                    });
+                    break;
+                case 4:
+                    systemRoles.push({
+                        name: '养护角色',
+                        value: roles.filter(role => role.grouptype === 4)
+                    });
+                    break;
+                case 6:
+                    systemRoles.push({
+                        name: '供应商角色',
+                        value: roles.filter(role => role.grouptype === 4)
+                    });
+                    break;
+                default:
+                    break;
             }
         }
         const objs = systemRoles.map(roless => {
@@ -255,8 +252,8 @@ class CountFilter extends Component {
         return objs;
     }
     renderTitle () {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        user.groups = [];
+        let user = getUser();
+        let userRoles = user.roles || '';
         const {
             platform: { roles = [] }
         } = this.props;
@@ -306,74 +303,72 @@ class CountFilter extends Component {
                 value: roles.filter(role => role.grouptype === 6)
             });
         } else {
-            for (let i = 0; i < user.groups.length; i++) {
-                const rolea = user.groups[i].grouptype;
-                switch (rolea) {
-                    case 0:
-                        systemRoles.push({
-                            name: '苗圃职务',
-                            children: ['苗圃'],
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        break;
-                    case 1:
-                        systemRoles.push({
-                            name: '苗圃职务',
-                            children: ['苗圃'],
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        systemRoles.push({
-                            name: '施工职务',
-                            children: [
-                                '施工领导',
-                                '协调调度人',
-                                '质量负责人',
-                                '安全负责人',
-                                '文明负责人',
-                                '普通员工',
-                                '施工文书',
-                                '测量员',
-                                '施工整改人'
-                            ],
-                            value: roles.filter(role => role.grouptype === 1)
-                        });
-                        break;
-                    case 2:
-                        systemRoles.push({
-                            name: '监理职务',
-                            children: [
-                                '总监',
-                                '监理组长',
-                                '普通监理',
-                                '监理文书'
-                            ],
-                            value: roles.filter(role => role.grouptype === 2)
-                        });
-                        break;
-                    case 3:
-                        systemRoles.push({
-                            name: '业主职务',
-                            children: ['业主', '业主文书', '业主领导'],
-                            value: roles.filter(role => role.grouptype === 3)
-                        });
-                        break;
-                    case 5:
-                        systemRoles.push({
-                            name: '苗圃基地职务',
-                            children: ['苗圃基地'],
-                            value: roles.filter(role => role.grouptype === 5)
-                        });
-                        break;
-                    case 6:
-                        systemRoles.push({
-                            name: '供应商职务',
-                            children: ['供应商'],
-                            value: roles.filter(role => role.grouptype === 6)
-                        });
-                        break;
-                    default:
-                        break;
-                }
+            const rolea = userRoles.ParentID;
+            switch (rolea) {
+                case 0:
+                    systemRoles.push({
+                        name: '苗圃职务',
+                        children: ['苗圃'],
+                        value: roles.filter(role => role.grouptype === 0)
+                    });
+                    break;
+                case 1:
+                    systemRoles.push({
+                        name: '苗圃职务',
+                        children: ['苗圃'],
+                        value: roles.filter(role => role.grouptype === 0)
+                    });
+                    systemRoles.push({
+                        name: '施工职务',
+                        children: [
+                            '施工领导',
+                            '协调调度人',
+                            '质量负责人',
+                            '安全负责人',
+                            '文明负责人',
+                            '普通员工',
+                            '施工文书',
+                            '测量员',
+                            '施工整改人'
+                        ],
+                        value: roles.filter(role => role.grouptype === 1)
+                    });
+                    break;
+                case 2:
+                    systemRoles.push({
+                        name: '监理职务',
+                        children: [
+                            '总监',
+                            '监理组长',
+                            '普通监理',
+                            '监理文书'
+                        ],
+                        value: roles.filter(role => role.grouptype === 2)
+                    });
+                    break;
+                case 3:
+                    systemRoles.push({
+                        name: '业主职务',
+                        children: ['业主', '业主文书', '业主领导'],
+                        value: roles.filter(role => role.grouptype === 3)
+                    });
+                    break;
+                case 5:
+                    systemRoles.push({
+                        name: '苗圃基地职务',
+                        children: ['苗圃基地'],
+                        value: roles.filter(role => role.grouptype === 5)
+                    });
+                    break;
+                case 6:
+                    systemRoles.push({
+                        name: '供应商职务',
+                        children: ['供应商'],
+                        value: roles.filter(role => role.grouptype === 6)
+                    });
+                    break;
+                default:
+                    break;
             }
         }
         const objs = systemRoles.map(roless => {

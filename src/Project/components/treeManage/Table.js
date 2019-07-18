@@ -87,12 +87,10 @@ export default class Tablelevel extends Component {
         if (user && user.username && user.username === 'admin') {
             superUser = true;
         }
-        let groups = user.groups || [];
-        groups.map((group) => {
-            if (group.name.indexOf('业主文书') !== -1) {
-                permission = true;
-            }
-        });
+        let roles = user.roles || '';
+        if (roles && roles.RoleName && roles.RoleName.indexOf('业主文书') !== -1) {
+            permission = true;
+        }
         return (
             <div>
                 <div>

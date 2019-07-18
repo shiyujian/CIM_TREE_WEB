@@ -73,7 +73,6 @@ export default class TaskCreateTable extends Component {
         this.tileLayer = null;
         this.tileTreeLayerBasic = null;
         this.map = null;
-        this.sections = [];
         this.section = '';
         this.totalSmallClass = [];
         /* 菜单宽度调整 */
@@ -138,12 +137,8 @@ export default class TaskCreateTable extends Component {
                 tree = {}
             }
         } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
-        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
-            this.section = this.sections[0];
-        }
+        let user = getUser();
+        this.section = user.section;
         try {
             await changeCheckedKeys([]);
             await changeSelectMap('细班选择');
@@ -873,10 +868,8 @@ export default class TaskCreateTable extends Component {
             treeCoords
         } = this.state;
 
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (!(this.sections && this.sections instanceof Array && this.sections.length > 0)) {
+        if (!this.section) {
             Notification.error({
                 message: '当前登录用户未关联标段，不能下发任务',
                 duration: 2
@@ -943,7 +936,7 @@ export default class TaskCreateTable extends Component {
             regionArea = regionArea * 0.0015;
             // 包括的细班号
             let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
-            let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections, bigTreeList);
+            let regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
             // let sectionBool = regionData.sectionBool;
             // if (!sectionBool) {
             //     Notification.error({

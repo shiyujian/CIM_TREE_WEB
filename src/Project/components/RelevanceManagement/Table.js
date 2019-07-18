@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Select, Table, Modal, Form, Button, Row, Col, Spin, message, Pagination } from 'antd';
-import { getUser, formItemLayout } from '_platform/auth';
+import { formItemLayout, getUser } from '_platform/auth';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -17,8 +17,6 @@ class Tablelevel extends Component {
             nurserybaseid: '', // 苗圃ID
             showModal: false // 新增弹窗
         };
-        this.Checker = ''; // 登陆用户
-        this.org_code = ''; // 所在组织机构
         this.name = ''; // 登陆用户姓名
         this.SupplierList = []; // 供应商列表
         this.NurseryList = []; // 苗圃列表
@@ -27,16 +25,9 @@ class Tablelevel extends Component {
     }
     componentDidMount () {
         const { getSupplierList, getNurseryList } = this.props.actions;
-        const { id, org_code } = getUser();
-        this.Checker = id;
-        this.org_code = org_code;
         // 获取当前组织机构的权限
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        console.log(getUser());
-        console.log(user);
-        if (user.account) {
-            this.name = user.account.person_name;
-        }
+        const user = getUser();
+        this.name = user.name;
         // 获取供应商列表
         getSupplierList({}, {
             status: 1

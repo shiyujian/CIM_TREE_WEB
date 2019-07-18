@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Input, Modal, Form, Notification } from 'antd';
 import { PROJECTPOSITIONCENTER } from '_platform/api';
 import './SaveUserMapCustomPositionModal.less';
+import {getUser} from '_platform/auth';
 
 class SaveUserMapCustomPositionModal extends Component {
     constructor (props) {
@@ -50,7 +51,7 @@ class SaveUserMapCustomPositionModal extends Component {
                 });
                 return;
             }
-            const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+            let user = getUser();
             let postData = {
                 name: name,
                 zoom: saveUserMapCustomPositionZoom,
@@ -60,7 +61,7 @@ class SaveUserMapCustomPositionModal extends Component {
                         lat: saveUserMapCustomPositionCenter.lat
                     }
                 ],
-                user: user.id
+                user: user.ID
             };
             let data = await postUserCustomView({}, postData);
             if (data && data.id) {
@@ -74,7 +75,7 @@ class SaveUserMapCustomPositionModal extends Component {
                     duration: 3
                 });
             }
-            await getCustomViewByUserID({id: user.id});
+            await getCustomViewByUserID({id: user.ID});
             await this.props.onCancel();
         } catch (e) {
             console.log('handleSaveCustomPositionOk', e);

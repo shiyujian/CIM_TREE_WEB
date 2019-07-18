@@ -204,9 +204,9 @@ class AddDemand extends Component {
             });
         }
         // 获取施工方的责任人电话
-        const { id, org_code, phone, name } = getUser();
-        this.Creater = id;
-        this.CreaterOrg = org_code;
+        const { ID, org, phone, name } = getUser();
+        this.Creater = ID;
+        this.CreaterOrg = org;
         this.props.form.setFieldsValue({
             Contacter: name,
             Phone: phone

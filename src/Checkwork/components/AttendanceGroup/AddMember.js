@@ -3,6 +3,7 @@ import {
     Button, Modal, Table, Checkbox, Notification, Row, Form, Col, Select, Input, TreeSelect, Spin
 } from 'antd';
 import 'moment/locale/zh-cn';
+import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
 
@@ -122,12 +123,13 @@ class AddMember extends Component {
     }
 
     renderContent () {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
         const {
             platform: { roles = [] }
         } = this.props;
+        let user = getUser();
+        let userRoles = user.roles || '';
         var systemRoles = [];
-        if (user.is_superuser) {
+        if (user.username === 'admin') {
             systemRoles.push({
                 name: '苗圃角色',
                 value: roles.filter(role => role.grouptype === 0)
@@ -153,56 +155,54 @@ class AddMember extends Component {
                 value: roles.filter(role => role.grouptype === 6)
             });
         } else {
-            for (let i = 0; i < user.groups.length; i++) {
-                const rolea = user.groups[i].grouptype;
-                switch (rolea) {
-                    case 0:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        break;
-                    case 1:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        systemRoles.push({
-                            name: '施工角色',
-                            value: roles.filter(role => role.grouptype === 1)
-                        });
-                        systemRoles.push({
-                            name: '养护角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 2:
-                        systemRoles.push({
-                            name: '监理角色',
-                            value: roles.filter(role => role.grouptype === 2)
-                        });
-                        break;
-                    case 3:
-                        systemRoles.push({
-                            name: '业主角色',
-                            value: roles.filter(role => role.grouptype === 3)
-                        });
-                        break;
-                    case 4:
-                        systemRoles.push({
-                            name: '养护角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 6:
-                        systemRoles.push({
-                            name: '供应商角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    default:
-                        break;
-                }
+            const rolea = userRoles.ParentID;
+            switch (rolea) {
+                case 0:
+                    systemRoles.push({
+                        name: '苗圃角色',
+                        value: roles.filter(role => role.grouptype === 0)
+                    });
+                    break;
+                case 1:
+                    systemRoles.push({
+                        name: '苗圃角色',
+                        value: roles.filter(role => role.grouptype === 0)
+                    });
+                    systemRoles.push({
+                        name: '施工角色',
+                        value: roles.filter(role => role.grouptype === 1)
+                    });
+                    systemRoles.push({
+                        name: '养护角色',
+                        value: roles.filter(role => role.grouptype === 4)
+                    });
+                    break;
+                case 2:
+                    systemRoles.push({
+                        name: '监理角色',
+                        value: roles.filter(role => role.grouptype === 2)
+                    });
+                    break;
+                case 3:
+                    systemRoles.push({
+                        name: '业主角色',
+                        value: roles.filter(role => role.grouptype === 3)
+                    });
+                    break;
+                case 4:
+                    systemRoles.push({
+                        name: '养护角色',
+                        value: roles.filter(role => role.grouptype === 4)
+                    });
+                    break;
+                case 6:
+                    systemRoles.push({
+                        name: '供应商角色',
+                        value: roles.filter(role => role.grouptype === 4)
+                    });
+                    break;
+                default:
+                    break;
             }
         }
         const objs = systemRoles.map(roless => {

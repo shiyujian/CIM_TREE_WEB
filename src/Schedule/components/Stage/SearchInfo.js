@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
 import moment from 'moment';
-import { getUser } from '../../../_platform/auth';
+import { getUser } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
@@ -39,10 +39,8 @@ export default class SearchInfo extends Component {
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
         let optionArray = [];
-        let sections = user.sections;
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
+        let section = user.section;
+        if (section) {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目

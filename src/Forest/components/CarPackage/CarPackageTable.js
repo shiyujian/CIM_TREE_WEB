@@ -15,7 +15,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getUserIsManager } from '_platform/auth';
+import { getUserIsManager } from '_platform/auth';
 import CarPackDetailModal from './CarPackDetailModal'; // 查看车内苗木信息
 import HandleChangeDetailModal from './HandleChangeDetailModal'; // 移动或修改车内苗木
 import ChangeCarInfoModal from './ChangeCarInfoModal'; // 修改车辆信息
@@ -240,8 +240,6 @@ export default class CarPackageTable extends Component {
         }
     ];
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode != this.state.leftkeycode) {

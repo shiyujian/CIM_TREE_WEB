@@ -10,6 +10,7 @@ import customViewCloseSelImg from '../../InitialPositionImg/delete2.png';
 import {
     PROJECTPOSITIONCENTER
 } from '_platform/api';
+import {getUser} from '_platform/auth';
 
 export default class ViewPositionManage extends Component {
     constructor (props) {
@@ -163,8 +164,8 @@ export default class ViewPositionManage extends Component {
                     duration: 3
                 });
             }
-            const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-            await getCustomViewByUserID({id: user.id});
+            let user = getUser();
+            await getCustomViewByUserID({id: user.ID});
         } catch (e) {
             console.log('handleDeleteMapCustomPosition', e);
         }

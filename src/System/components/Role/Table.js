@@ -17,8 +17,7 @@ export default class Roles extends Component {
             actions: { getRoles, getLoginUser }
         } = this.props;
         getRoles();
-        // getUser()是调用auth里面的函数，然后获取登录人的信息
-        let userid = getUser().id;
+        let userid = getUser().ID;
         getLoginUser({
             id: userid
         }).then(rst => {

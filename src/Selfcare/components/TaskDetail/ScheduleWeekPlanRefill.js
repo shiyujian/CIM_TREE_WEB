@@ -14,6 +14,7 @@ import {
 import moment from 'moment';
 import PerSearch from '../PersonSearch/Schedule/PerRefillSearch';
 import { getNextStates } from '_platform/components/Progress/util';
+import {getUser} from '_platform/auth';
 import queryString from 'query-string';
 const FormItem = Form.Item;
 const Step = Steps.Step;
@@ -524,9 +525,7 @@ class ScheduleWeekPlanRefill extends Component {
             etime
         } = this.state;
         try {
-            let user = localStorage.getItem('LOGIN_USER_DATA');
-            user = JSON.parse(user);
-            console.log('user', user);
+            let user = getUser();
             let me = this;
             let postData = {};
             me.props.form.validateFields(async (err, values) => {
@@ -538,10 +537,9 @@ class ScheduleWeekPlanRefill extends Component {
                     postData.upload_time = moment().format('YYYY-MM-DD HH:mm:ss');
                     let executor = {
                         username: user.username,
-                        person_code: user && user.account && user.account.person_code,
-                        person_name: user && user.account && user.account.person_name,
-                        id: user && parseInt(user.id),
-                        org: user && user.account && user.account.org_code
+                        name: user && user.name,
+                        id: user && parseInt(user.ID),
+                        org: user && user.org
                     };
                     let subject = [
                         {

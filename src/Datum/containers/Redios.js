@@ -97,10 +97,9 @@ export default class Redios extends Component {
             }
             await this.getSection();
             this.setState({ loading: true });
-            this.user = localStorage.getItem('LOGIN_USER_DATA');
-            this.user = JSON.parse(this.user);
+            this.user = getUser();
             if (this.user.username !== 'admin') {
-                let orgID = this.user.Org;
+                let orgID = this.user.org;
                 let parent = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
                 this.orgID = parent.ID;
             }
@@ -120,13 +119,11 @@ export default class Redios extends Component {
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
-        let sections = user.sections;
+        let section = user.section;
         let currentSectionName = '';
         let projectName = '';
 
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
+        if (section) {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目

@@ -90,9 +90,8 @@ export default class ScheduleTotalDeal extends Component {
         const user = getUser();
         let executor = {
             username: user.username,
-            person_code: user.code,
             person_name: user.name,
-            id: parseInt(user.id),
+            id: parseInt(user.ID),
             org: user.org
         };
 
@@ -198,9 +197,8 @@ export default class ScheduleTotalDeal extends Component {
         const user = getUser();
         let executor = {
             username: user.username,
-            person_code: user.code,
             person_name: user.name,
-            id: parseInt(user.id),
+            id: parseInt(user.ID),
             org: user.org
         };
 

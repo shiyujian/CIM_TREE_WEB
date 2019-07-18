@@ -29,25 +29,13 @@ export default class TaskStep extends Component {
             actions
         } = this.props;
         const { history = [], transitions = [], states = [] } = task;
-        const user = TaskStep.getCurrentUser();
+        const user = getUser();
 
         if (task && task.workflow && task.workflow.code) {
             let code = task.workflow.code;
             let name = task.current ? task.current[0].name : '';
 
-            if (code === WORKFLOW_CODE.机械设备报批流程 && name === '填报') {
-                return null;
-            } else if (
-                code === WORKFLOW_CODE.工程材料报批流程 &&
-                name === '填报'
-            ) {
-                return null;
-            } else if (
-                code === WORKFLOW_CODE.苗木资料报批流程 &&
-                name === '填报'
-            ) {
-                return null;
-            } else if (
+            if (
                 code === WORKFLOW_CODE.总进度计划报批流程 &&
                 name === '填报'
             ) {
@@ -65,17 +53,6 @@ export default class TaskStep extends Component {
             } else if (
                 code === WORKFLOW_CODE.每周进度填报流程 &&
                 name === '施工填报'
-            ) {
-                return null;
-            } else if (code === WORKFLOW_CODE.普通审查流程 && name === '填报') {
-                return null;
-            } else if (code === WORKFLOW_CODE.审查核定流程 && name === '填报') {
-                return null;
-            } else if (code === WORKFLOW_CODE.总监审查流程 && name === '填报') {
-                return null;
-            } else if (
-                code === WORKFLOW_CODE.安全体系报批流程 &&
-                name === '填报'
             ) {
                 return null;
             } else {
@@ -139,7 +116,7 @@ export default class TaskStep extends Component {
                                                         </div>
                                                     }
                                                     description={
-                                                        userID === +user.id && (
+                                                        userID === +user.ID && (
                                                             <Progress
                                                                 state={state}
                                                                 states={states}
@@ -255,9 +232,5 @@ export default class TaskStep extends Component {
         return states.find(
             state => state.status === 'processing' && state.id === +state_id
         );
-    }
-
-    static getCurrentUser () {
-        return getUser();
     }
 }

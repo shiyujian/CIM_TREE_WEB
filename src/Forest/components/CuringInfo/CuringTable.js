@@ -14,7 +14,7 @@ import {
     Card
 } from 'antd';
 import moment from 'moment';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -98,8 +98,6 @@ export default class CuringTable extends Component {
             this.setState({
                 curingTypes
             });
-            let user = getUser();
-            this.sections = JSON.parse(user.sections);
         } catch (e) {
             console.log('getCuringTypes', e);
         }

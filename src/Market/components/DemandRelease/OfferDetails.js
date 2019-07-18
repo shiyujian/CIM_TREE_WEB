@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, Table, InputNumber, Tag, Modal, message } from 'antd';
 import { CULTIVATIONMODE } from '_platform/api';
-import { getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl, getUser } from '_platform/auth';
 
 class OfferDetails extends Component {
     constructor (props) {
@@ -36,9 +36,9 @@ class OfferDetails extends Component {
         const { getPurchaseById, getWpunittree, getOrgTree_new, getOffersListById } = this.props.actions;
         this.purchaseid = this.props.addDemandKey;
         // 获得登陆用户的ID
-        const userData = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+        let userData = getUser();
         if (userData) {
-            this.Selecter = userData.id;
+            this.Selecter = userData.ID;
         }
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {

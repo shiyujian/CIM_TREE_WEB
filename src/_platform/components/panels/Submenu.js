@@ -9,7 +9,12 @@ const SubMenu = Menu.SubMenu;
 export default class Submenu extends Component {
     render () {
         const {menus = [], defaultOpenKeys = []} = this.props;
-        const {is_superuser = false} = getUser();
+        // let isSuperuser = false;
+        let isSuperuser = true;
+        // const user = getUser();
+        // if (user && user.username === 'admin') {
+        //     isSuperuser = true;
+        // }
         const permissions = getPermissions() || [];
         return (
             <Menu mode='inline'
@@ -24,7 +29,7 @@ export default class Submenu extends Component {
                             children.forEach(item => {
                                 const {key, name, path, disabled, icon, id} = item;
                                 const has = permissions.some(permission => permission === `appmeta.${id}.READ`);
-                                if (is_superuser || has) {
+                                if (isSuperuser || has) {
                                     rst.push(
                                         <Item key={key}>
                                             <Link onClick={e => disabled && e.preventDefault()} to={path}>
@@ -42,7 +47,7 @@ export default class Submenu extends Component {
                         } else {
                             const {key, name, path, disabled, icon, id} = menu;
                             const has = permissions.some(permission => permission === `appmeta.${id}.READ`);
-                            if (is_superuser || has) {
+                            if (isSuperuser || has) {
                                 return (
                                     <Item key={key}>
                                         <Link onClick={e => disabled && e.preventDefault()} to={path}>

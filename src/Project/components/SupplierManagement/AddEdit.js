@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Icon, Input, Button, Select, Modal, Form, Upload, Cascader, Switch, notification, message } from 'antd';
 import { checkTel, isCardNo, layoutT } from '../common';
-import { getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl, getUser } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -32,11 +32,9 @@ class AddEdit extends Component {
     }
     componentDidMount () {
         // 获取本用户的姓名，电话作为联系人，联系方式
-        const user = JSON.parse(localStorage.getItem('LOGIN_USER_DATA'));
-        if (user.account) {
-            this.Contacter = user.account.person_name;
-            this.ContacterPhone = user.account.person_telephone;
-        }
+        const user = getUser();
+        this.Contacter = user.name;
+        this.ContacterPhone = user.phone;
         this.setState({
             optionList: this.props.optionList,
             RegionCodeList: this.props.RegionCodeList

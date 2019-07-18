@@ -170,30 +170,21 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
             rst[index].children = [];
         });
     }
-    let user = getUser();
-    let sections = user.sections;
-    let section = '';
-    sections = JSON.parse(sections);
-    if (sections && sections instanceof Array && sections.length > 0) {
-        section = sections[0];
-    }
     // 项目级
     let projectList = [];
     // 单位工程级
     let sectionList = [];
     // 业主和管理员
-    let userMess = window.localStorage.getItem('LOGIN_USER_DATA');
-    userMess = JSON.parse(userMess);
+    let user = getUser();
+    let section = user.section;
     let permission = false;
-    if (userMess.username === 'admin') {
+    if (user.username === 'admin') {
         permission = true;
     }
-    let groups = userMess.groups || [];
-    groups.map((group) => {
-        if (group.name.indexOf('业主') !== -1) {
-            permission = true;
-        }
-    });
+    let roles = user.roles || '';
+    if (roles.RoleName.indexOf('业主') !== -1) {
+        permission = true;
+    }
     if (rst instanceof Array && rst.length > 0) {
         rst.map(node => {
             if (permission) {
@@ -261,12 +252,7 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
     let user = getUser();
-    let sections = user.sections;
-    let section = '';
-    sections = JSON.parse(sections);
-    if (sections && sections instanceof Array && sections.length > 0) {
-        section = sections[0];
-    }
+    let section = user.section;
     // 将小班的code获取到，进行去重
     let uniqueSmallClass = [];
     // 进行数组去重的数组
@@ -284,18 +270,14 @@ export const getSmallClass = (smallClassList) => {
             let sectionNo = noArr[0] + '-' + noArr[1] + '-' + noArr[4];
 
             // 管理员可以查看所有数据，其他人员只能查看符合自己标段的数据
-            let userMess = window.localStorage.getItem('LOGIN_USER_DATA');
-            userMess = JSON.parse(userMess);
             let permission = false;
-            if (userMess.username === 'admin') {
+            if (user.username === 'admin') {
                 permission = true;
             }
-            let groups = userMess.groups || [];
-            groups.map((group) => {
-                if (group.name.indexOf('业主') !== -1) {
-                    permission = true;
-                }
-            });
+            let roles = user.roles || '';
+            if (roles.RoleName.indexOf('业主') !== -1) {
+                permission = true;
+            }
             // permission为true说明是管理员或者业主
             if (permission) {
                 // console.log('wwwww', sectionNo);
@@ -429,14 +411,12 @@ export const loopArrayCompany = (loopData) => {
 // 判断用户是否为文书
 export const getUserIsDocument = () => {
     try {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        let groups = (user && user.groups) || [];
+        const user = getUser();
         let userIsDocument = false;
-        groups.map((group) => {
-            if (group.name.indexOf('文书') !== -1) {
-                userIsDocument = true;
-            }
-        });
+        let roles = user.roles || '';
+        if (roles.RoleName.indexOf('文书') !== -1) {
+            userIsDocument = true;
+        }
         return userIsDocument;
     } catch (e) {
         console.log('getUserIsDocument', e);
@@ -461,34 +441,16 @@ export const getForestImgUrl = (data) => {
 // 判断用户是否为业主和管理员
 export const getUserIsManager = () => {
     try {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
+        const user = getUser();
         let permission = false;
         if (user.username === 'admin') {
             permission = true;
         }
-        let groups = user.groups || [];
-        groups.map((group) => {
-            if (group.name.indexOf('业主') !== -1) {
-                permission = true;
-            }
-        });
-        return permission;
-    } catch (e) {
-        console.log('getUserIsManager', e);
-    }
-};
-
-// 判断用户的标段信息
-export const getUserSection = () => {
-    try {
-        const user = JSON.parse(window.localStorage.getItem('LOGIN_USER_DATA'));
-        console.log('user', user);
-        let sections = (user && user.account && user.account.sections) || [];
-        let section = '';
-        if (sections && sections instanceof Array && sections.length > 0) {
-            section = sections[0];
+        let roles = user.roles || '';
+        if (roles.RoleName.indexOf('业主') !== -1) {
+            permission = true;
         }
-        return section;
+        return permission;
     } catch (e) {
         console.log('getUserIsManager', e);
     }
@@ -501,7 +463,8 @@ export const getDefaultProject = async () => {
         if (permission) {
             return DEFAULT_PROJECT;
         } else {
-            let section = await getUserSection();
+            const user = getUser();
+            let section = user.section;
             if (section) {
                 let sectionArr = section.split('-');
                 if (sectionArr && sectionArr instanceof Array && sectionArr.length > 0) {

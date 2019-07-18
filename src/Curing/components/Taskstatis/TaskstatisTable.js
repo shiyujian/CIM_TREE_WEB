@@ -45,7 +45,6 @@ export default class TaskStatisTable extends Component {
             statisData: [],
             taskStatusSelect: ''
         };
-        this.sections = [];
         this.section = '';
         this.totalDataPer = false;
     }
@@ -242,24 +241,17 @@ export default class TaskStatisTable extends Component {
 
     componentDidMount = async () => {
         try {
-            let text = window.localStorage.getItem('LOGIN_USER_DATA');
-            text = JSON.parse(text);
-            console.log('text', text);
-            this.user = getUser();
-            if (text.username === 'admin') {
+            const user = getUser();
+            if (user.username === 'admin') {
                 this.totalDataPer = true;
             }
-            let groups = text.groups || [];
-            groups.map((group) => {
-                if (group.name.indexOf('业主') !== -1) {
-                    this.totalDataPer = true;
-                }
-            });
-            let sections = this.user.sections;
-            this.sections = JSON.parse(sections);
+            let roles = user.roles || '';
+            if (roles.RoleName.indexOf('业主') !== -1) {
+                this.totalDataPer = true;
+            }
+            this.section = user.section;
             console.log('this.totalDataPer', this.totalDataPer);
-            if ((this.sections && this.sections instanceof Array && this.sections.length > 0) || this.totalDataPer) {
-                this.section = this.sections[0];
+            if (this.section || this.totalDataPer) {
                 await this._loadCuringTypes();
                 await this._loadAreaData();
                 await this._loadTaskData();

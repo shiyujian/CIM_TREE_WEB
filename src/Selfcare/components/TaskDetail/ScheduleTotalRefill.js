@@ -163,41 +163,34 @@ class ScheduleTotalRefill extends Component {
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
-        console.log('user', user);
-        let sections = user.sections;
+        let section = user.section;
         let sectionSchedule = [];
         let sectionName = '';
         let projectName = '';
-        console.log('sections', sections);
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            sections.map(section => {
-                let code = section.split('-');
-                if (code && code.length === 3) {
-                    // 获取当前标段所在的项目
-                    sectionData.map(item => {
-                        if (code[0] === item.No) {
-                            projectName = item.Name;
-                            let units = item.children;
-                            units.map(unit => {
-                                // 获取当前标段的名字
-                                if (unit.No === section) {
-                                    sectionName = unit.Name;
-                                    console.log('sectionName', sectionName);
-                                    console.log('projectName', projectName);
-                                }
-                            });
-                        }
-                    });
-                }
-                sectionSchedule.push({
-                    value: section,
-                    name: sectionName
+        if (section) {
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        let units = item.children;
+                        units.map(unit => {
+                            // 获取当前标段的名字
+                            if (unit.No === section) {
+                                sectionName = unit.Name;
+                                console.log('sectionName', sectionName);
+                                console.log('projectName', projectName);
+                            }
+                        });
+                    }
                 });
+            }
+            sectionSchedule.push({
+                value: section,
+                name: sectionName
             });
 
-            console.log('sectionSchedule', sectionSchedule);
-            console.log('projectName', projectName);
             this.setState({
                 sectionSchedule,
                 projectName
@@ -220,20 +213,18 @@ class ScheduleTotalRefill extends Component {
 
     render () {
         const {
-            platform: { task = {}, users = {} } = {},
-            location,
-            actions,
+            platform: {
+                task = {}
+            } = {},
             form: { getFieldDecorator }
         } = this.props;
-        const { history = [], transitions = [], states = [] } = task;
-        const { sectionSchedule } = this.state;
+        const { history = [] } = task;
         const user = getUser();
 
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        let sectionOption = this.getSectionOption();
         return (
             <div>
                 <Spin spinning={this.state.loading}>
@@ -408,7 +399,7 @@ class ScheduleTotalRefill extends Component {
                                                         </div>
                                                     }
                                                     description={
-                                                        userID === +user.id && (
+                                                        userID === +user.ID && (
                                                             <div>
                                                                 <Row>
                                                                     <Col
@@ -631,9 +622,8 @@ class ScheduleTotalRefill extends Component {
                 console.log('state_id', state_id);
                 let executor = {
                     username: user.username,
-                    person_code: user.code,
                     person_name: user.name,
-                    id: parseInt(user.id),
+                    id: parseInt(user.ID),
                     org: user.org
                 };
                 let nextUser = {};

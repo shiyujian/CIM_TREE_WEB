@@ -80,7 +80,6 @@ export default class TaskReportTable extends Component {
         this.tileLayer = null;
         this.tileTreeLayerBasic = null;
         this.map = null;
-        this.sections = [];
         this.section = '';
         /* 菜单宽度调整 */
         this.menu = {
@@ -107,12 +106,8 @@ export default class TaskReportTable extends Component {
                 tree = {}
             }
         } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
-        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
-            this.section = this.sections[0];
-        }
+        const user = getUser();
+        this.section = user.section;
         // 初始化地图
         await this._initMap();
         // 获取地块树数据
@@ -1011,7 +1006,7 @@ export default class TaskReportTable extends Component {
                 // 包括的细班号
                 let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
                 // let regionData = await this._getThinClassName(regionThinClass);
-                let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections, bigTreeList);
+                let regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
                 let regionThinName = regionData.regionThinName;
                 let regionThinNo = regionData.regionThinNo;
                 let regionSectionNo = regionData.regionSectionNo;

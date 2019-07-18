@@ -295,8 +295,6 @@ export default class TreeDataClearTable extends Component {
         ];
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     render () {
         const {

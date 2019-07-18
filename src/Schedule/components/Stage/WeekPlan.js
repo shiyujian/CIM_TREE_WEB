@@ -19,7 +19,7 @@ import {
     WORKFLOW_CODE
 } from '_platform/api';
 import { getNextStates } from '_platform/components/Progress/util';
-import { getUserIsManager } from '_platform/auth';
+import { getUserIsManager, getUser } from '_platform/auth';
 import PerSearch from './PerSearch';
 import WeekPlanSearchInfo from './WeekPlanSearchInfo';
 import WeekPlanModal from './WeekPlanModal';
@@ -69,15 +69,12 @@ class WeekPlan extends Component {
             platform: { tree = {} }
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
-        let user = localStorage.getItem('LOGIN_USER_DATA');
-        user = JSON.parse(user);
+        let user = getUser();
 
-        let sections = user && user.account && user.account.sections;
+        let section = user && user.section;
         let currentSectionName = '';
         let projectName = '';
-        let section = '';
-        if (sections && sections instanceof Array && sections.length > 0) {
-            section = sections[0];
+        if (section) {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
@@ -192,8 +189,7 @@ class WeekPlan extends Component {
         const { weekData } = this.state;
         const { leftkeycode } = this.props;
         let filterData = [];
-        let user = localStorage.getItem('LOGIN_USER_DATA');
-        user = JSON.parse(user);
+        let user = getUser();
         // 是否为业主或管理员
         let permission = getUserIsManager();
         if (permission) {
@@ -210,11 +206,11 @@ class WeekPlan extends Component {
                 }
             });
         } else {
-            let sections = user && user.account && user.account.sections;
+            let section = user && user.section;
             let selectCode = '';
             // 关联标段的人只能看自己项目的进度流程
-            if (sections && sections instanceof Array && sections.length > 0) {
-                let code = sections[0].split('-');
+            if (section) {
+                let code = section.split('-');
                 selectCode = code[0] || '';
 
                 weekData.map(task => {
@@ -223,7 +219,7 @@ class WeekPlan extends Component {
 
                     if (
                         projectCode === selectCode &&
-                            task.section === sections[0]
+                            task.section === section
                     ) {
                         filterData.push(task);
                     }
@@ -586,10 +582,9 @@ class WeekPlan extends Component {
 
                 const currentUser = {
                     username: user.username,
-                    person_code: user && user.account && user.account.person_code,
-                    person_name: user && user.account && user.account.person_name,
-                    id: user && parseInt(user.id),
-                    org: user && user.account && user.account.org_code
+                    name: user && user.name,
+                    id: user && parseInt(user.ID),
+                    org: user && user.org
                 };
 
                 let subject = [
