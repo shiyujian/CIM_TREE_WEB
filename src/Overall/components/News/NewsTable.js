@@ -44,40 +44,35 @@ class NewsTable extends Component {
     columns = [
         {
             title: '新闻查询ID',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'ID',
+            key: 'ID',
             width: '10%'
         },
         {
             title: '名称',
-            dataIndex: 'title',
-            key: 'title',
+            dataIndex: 'Title',
+            key: 'Title',
             width: '40%'
         },
         {
             title: '发布单位',
-            dataIndex: 'abstract',
-            key: 'abstract',
+            dataIndex: 'News_Type',
+            key: 'News_Type',
             width: '10%',
             render: (text, record) => {
-                if (record.abstract) {
-                    return record.abstract;
-                } else {
-                    if (record.pub_unit && record.pub_unit.name) {
-                        return record.pub_unit.name;
-                    } else {
-                        return '/';
-                    }
+                if (text === 4) {
+                    return '业主单位';
                 }
             }
         },
         {
             title: '创建时间',
-            key: 'pub_time',
+            dataIndex: 'Create_Time',
+            key: 'Create_Time',
             width: '15%',
             render: (text, record) => {
-                if (record.pub_time) {
-                    return moment(record.pub_time)
+                if (text) {
+                    return moment(text)
                         .utc()
                         .format('YYYY-MM-DD HH:mm:ss');
                 } else {
@@ -87,10 +82,10 @@ class NewsTable extends Component {
         },
         {
             title: '封面',
-            dataIndex: 'cover',
-            key: 'cover',
+            dataIndex: 'Thumbnail',
+            key: 'Thumbnail',
             width: '10%',
-            render: (text, record, index) => {
+            render: (text, record) => {
                 return (<a
                     onClick={this.handleViewCover.bind(this, text)}
                 >
@@ -101,17 +96,13 @@ class NewsTable extends Component {
         {
             title: '操作',
             width: '15%',
-            render: record => {
+            render: (text, record) => {
                 return (
                     <span>
                         <a onClick={this.handleNewsView.bind(this, record)}>
                             查看
                         </a>
                         <Divider type='vertical' />
-                        {/* <a onClick={this.handleNewsEdit.bind(this, record)}>
-                            修改
-                        </a>
-                        <Divider type='vertical' /> */}
                         <Popconfirm
                             title='确定删除吗?'
                             onConfirm={this.handleNewsDelete.bind(this, record)}
@@ -213,25 +204,25 @@ class NewsTable extends Component {
 
     componentDidMount () {
         const {
-            actions: { getNewsList, getDraftNewsList }
+            actions: { getNewsListNew }
         } = this.props;
-        // 获取发布新闻
-        getNewsList({}, {
-            tag: '新闻',
-            is_draft: false
-        });
-        // 获取暂存新闻
-        getDraftNewsList({}, {
-            tag: '新闻',
-            is_draft: true
+        // 获取新闻
+        getNewsListNew({}, {
+            type: '',
+            name: '',
+            ishot: '',
+            sdate: '',
+            edate: '',
+            page: '',
+            size: '',
         });
     }
     // 查看封面
-    handleViewCover = async (cover) => {
+    handleViewCover = async (imgUrl) => {
         let coverArr = [];
-        if (cover && cover.a_file) {
+        if (imgUrl) {
             coverArr.push(
-                <img style={{ width: '490px' }} src={STATIC_PREVIEW_API + cover.a_file} alt='图片' />
+                <img style={{ width: '490px' }} src={imgUrl} alt='图片' />
             );
         }
         this.setState({
@@ -246,12 +237,14 @@ class NewsTable extends Component {
         });
     }
     // 查看新闻
-    handleNewsView = async (record) => {
+    handleNewsView (record) {
+        console.log(record, '查看');
         this.setState({
             detailVisible: true,
-            container: record.raw,
-            detailTitle: record.title,
-            source: record.source,
+            container: record.Content,
+            detailTitle: record.Title,
+            Thumbnail: record.Thumbnail,
+            source: record.Source,
             newsDetail: record
         });
     }
@@ -356,30 +349,31 @@ class NewsTable extends Component {
             newsTabValue
         });
     }
-    // 发布的新闻搜索
+    // 发布的新闻查询
     queryPublish () {
         const {
-            actions: { getNewsList }
+            actions: { getNewsListNew }
         } = this.props;
-        this.props.form.validateFields(async (err, values) => {
-            console.log('values', values);
-            console.log('err', err);
-            await getNewsList({}, {
-                tag: '新闻',
-                is_draft: false,
-                pub_time_begin: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
-                    ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
-                    ? moment(values.worktime[1]).add(1, 'days').format('YYYY-MM-DD') : '',
-                title: values.theme || ''
-            });
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                console.log(123, values);
+                getNewsListNew({}, {
+                    type: '',
+                    name: values.theme || '',
+                    ishot: '',
+                    sdate: values.worktime ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
+                    edate: values.worktime ? moment(values.worktime[1]).format('YYYY-MM-DD') : '',
+                    page: '',
+                    size: '',
+                });
+            }
         });
     }
     // 清除发布新闻的搜索条件
     clearPublish () {
         this.props.form.setFieldsValue({
-            theme: undefined,
-            worktime: undefined
+            theme: '',
+            worktime: ''
         });
         this.queryPublish();
     }
@@ -427,6 +421,7 @@ class NewsTable extends Component {
             draftNewsLis = [],
             form: { getFieldDecorator }
         } = this.props;
+        console.log(newsList, '数据');
         const {
             newsTabValue,
             editNewsVisible,
@@ -476,23 +471,13 @@ class NewsTable extends Component {
                 >
                     <div>
                         <h1 style={{ textAlign: 'center' }}>{detailTitle}</h1>
-                        {
-                            source && source.name
-                                ? <p>{`来源 ：${source.name}`}</p> : (
-                                    <p>{`来源 ：暂无`}</p>
-                                )
-                        }
-                        {
-                            newsDetail && newsDetail.cover && newsDetail.cover.a_file
-                                ? (
-                                    <p>
-                                        封面 ：<a href={STATIC_PREVIEW_API + newsDetail.cover.a_file}
-                                            target='_blank'>
-                                            {newsDetail.cover.name}
-                                        </a>
-                                    </p>
-                                ) : <p>{`封面 ：暂无`}</p>
-                        }
+                        <p>{`来源 ：${source}`}</p>
+                        <p>
+                            封面 ：<a href={this.state.Thumbnail}
+                                target='_blank'>
+                                微信图片.jpg
+                            </a>
+                        </p>
                         {
                             annexFileList.map((file) => {
                                 if (file && file.response && file.response.download_url) {
