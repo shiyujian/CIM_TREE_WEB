@@ -12,6 +12,7 @@ export default (ID, service = '') => {
     const postRole = createFetchAction(`${USER_API}/roles/`, 'POST');
     const putRole = createFetchAction(`${USER_API}/roles/{{id}}/`, 'PUT');
     const deleteRole = createFetchAction(`${USER_API}/roles/{{id}}/`, 'DELETE');
+    const getMembers = createFetchAction(`${USER_API}/roles/{{id}}/members/`, [], 'GET');
 
     const rolesReducer = handleActions(
         {
@@ -31,6 +32,7 @@ export default (ID, service = '') => {
     rolesReducer[`post${SERVICE}Role`] = postRole;
     rolesReducer[`put${SERVICE}Role`] = putRole;
     rolesReducer[`delete${SERVICE}Role`] = deleteRole;
+    rolesReducer[`delete${SERVICE}Members`] = getMembers;
 
     return rolesReducer;
 };

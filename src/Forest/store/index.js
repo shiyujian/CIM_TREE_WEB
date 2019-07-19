@@ -12,8 +12,7 @@ import faithInfoReducer, {
 } from './faithInfo';
 import {
     FOREST_API,
-    TENCENTANALYSIS_API,
-    USER_API
+    TENCENTANALYSIS_API
 } from '_platform/api';
 import {
     forestFetchAction
@@ -335,7 +334,6 @@ export const getTreetypeByThinclass = forestFetchAction(
 
 export const getCustomViewByUserIDOk = createAction(`${ID}根据用户ID获取用户自定义视图`);
 // 根据用户ID获取用户自定义视图
-export const getCustomViewByUserID = createFetchAction(`${USER_API}/user/{{id}}/custom-view/`, [getCustomViewByUserIDOk], 'GET');
 export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET'); // 获取细班详情
 
 // 苗木来源地分析苗圃总览 苗圃基地、供应商数据统计
@@ -398,11 +396,6 @@ export const getDigitalAcceptDetail = forestFetchAction(
     []
 );
 
-// 获取数字化验收人员列表
-export const getDigitalAcceptUserList = createFetchAction(
-    `${USER_API}/users/?is_active=true`,
-    []
-);
 // 获取苗木质量验收结果列表
 export const getMQulityCheckList = forestFetchAction(
     `${FOREST_API}/tree/qualitytrees`,
@@ -506,7 +499,6 @@ export const actions = {
     getNurseryFromData,
     getTreeEntrance,
     getDigitalAcceptList,
-    getDigitalAcceptUserList,
     getDigitalAcceptDetail,
     getUserStat,
     getNewUserStat,
@@ -515,7 +507,6 @@ export const actions = {
     getTQulityCheckList,
     getZZJQulityCheckList,
     getCustomViewByUserIDOk,
-    getCustomViewByUserID,
     getTreearea,
     getNurseryBaseStat,
     getNurseryEnterStat,

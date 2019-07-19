@@ -270,18 +270,20 @@ export default class DegitalAcceptTable extends Component {
     async onSectionChange (value) {
         const {
             actions: {
-                getDigitalAcceptUserList
+                getUsers
             }
         } = this.props;
         if (!value) {
             return;
         }
         // only choose the section, you can search the people
-        let shigong = await getDigitalAcceptUserList({}, {
+        let shigong = await getUsers({}, {
+            is_active: true,
             sections: value,
             grouptype: 1
         });
-        let jianli = await getDigitalAcceptUserList({}, {
+        let jianli = await getUsers({}, {
+            is_active: true,
             sections: value,
             grouptype: 2
         });

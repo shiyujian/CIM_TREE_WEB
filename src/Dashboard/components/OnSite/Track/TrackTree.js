@@ -380,7 +380,7 @@ export default class TrackTree extends Component {
                     if (this.userDetailList[data.PatrolerUser.PK]) {
                         user = this.userDetailList[data.PatrolerUser.PK];
                     } else {
-                        user = await getUserDetail({pk: data.PatrolerUser.PK});
+                        user = await getUserDetail({id: data.PatrolerUser.PK});
                         this.userDetailList[data.PatrolerUser.PK] = user;
                     };
                     let sectionName = '';

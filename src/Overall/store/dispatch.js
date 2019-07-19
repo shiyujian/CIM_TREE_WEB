@@ -1,9 +1,6 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from './dispatchFetchAction';
-import createFetchActionT from 'fetch-action';
 import {
-    USER_API,
-    SERVICE_API,
     CODE_API
 } from '_platform/api';
 const ID = 'DISPATCH';
@@ -16,12 +13,7 @@ export const setNewsTabActive = createAction('新闻列表的Tab切换状态');
 export const toggleModalAc = createAction(`${ID}发送文件的modal`);
 // 上传的文件列表
 export const postUploadFilesAc = createAction(`${ID}上传的文件列表`);
-// 获取抄送的人员列表
-export const getCopyUsersAcOK = createAction(`${ID}获取抄送的人员列表`);
-export const getCopyUsersAc = createFetchActionT(
-    `${USER_API}/users/?org_code={{code}}`,
-    [getCopyUsersAcOK]
-);
+
 // 获取收文列表
 export const getReceiveInfoAcOK = createAction(`${ID}获取收文列表`);
 export const getReceiveInfoAc = createFetchAction(
@@ -128,8 +120,6 @@ export const actions = {
     patchReceiveDetailAc,
     deleteReceiveDocAc,
     sentMessageAc,
-    getCopyUsersAcOK,
-    getCopyUsersAc,
     setNewsTabActive
 };
 
@@ -142,10 +132,6 @@ export default handleActions(
         [setTabActive]: (state, { payload }) => ({
             ...state,
             tabValue: payload
-        }),
-        [getCopyUsersAcOK]: (state, { payload }) => ({
-            ...state,
-            copyUsersList: payload
         }),
         [toggleModalAc]: (state, { payload }) => ({
             ...state,

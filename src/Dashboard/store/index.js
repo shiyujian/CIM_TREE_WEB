@@ -24,8 +24,6 @@ export const getNurserys = forestFetchAction(`${FOREST_API}/tree/nurserys`, []);
 export const getCarpackbysxm = forestFetchAction(`${FOREST_API}/tree/carpackbysxm/{{sxm}}`, []);
 // 获取树木现场种植的信息
 export const getTreeMess = forestFetchAction(`${FOREST_API}/tree/tree/{{sxm}}`, []);
-// 获取人员的具体详情
-export const getUserDetail = createFetchAction(`${USER_API}/users/{{pk}}/`, []);
 // 获取树的树种类型
 export const getTreeTypeAction = forestFetchAction(`${FOREST_API}/tree/treetypes`, []);
 // 苗木养护查询
@@ -91,7 +89,6 @@ export const actions = {
     getNurserys,
     getCarpackbysxm,
     getTreeMess,
-    getUserDetail,
     getTreeTypeAction,
     getCuring,
     getAdoptTreeOk,

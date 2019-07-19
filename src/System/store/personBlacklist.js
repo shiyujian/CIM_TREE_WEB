@@ -3,7 +3,6 @@ import { actionsMap } from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import fieldFactory from '_platform/store/service/field';
 import {
-    USER_API,
     FOREST_API
 } from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
@@ -20,11 +19,6 @@ export const setModifyPer = createAction('人员存储要变更的数据');
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
 const filterReducer = fieldFactory(ID, 'filter');
-const getPersonInfo = createFetchAction(
-    `${USER_API}/users/?is_black={{is_black}}&page={{page}}`,
-    [],
-    'GET'
-);
 
 export const actions = {
     ...sidebarReducer,
@@ -33,8 +27,7 @@ export const actions = {
     getTagsOK,
     getTags,
     ModifyVisible,
-    setModifyPer,
-    getPersonInfo
+    setModifyPer
 };
 
 export default handleActions(

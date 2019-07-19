@@ -116,7 +116,7 @@ export default class Engineering extends Component {
             if (this.user.username !== 'admin') {
                 let orgID = this.user.org;
                 let parent = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
-                this.orgID = parent.ID;
+                this.orgID = (parent && parent.ID) || '';
             }
             await setkeycode('');
             await searchEnginVisible(false);

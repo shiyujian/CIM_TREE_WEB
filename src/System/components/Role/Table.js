@@ -14,11 +14,14 @@ export default class Roles extends Component {
 
     componentDidMount () {
         const {
-            actions: { getRoles, getLoginUser }
+            actions: {
+                getRoles,
+                getUserDetail
+            }
         } = this.props;
         getRoles();
         let userid = getUser().ID;
-        getLoginUser({
+        getUserDetail({
             id: userid
         }).then(rst => {
             let flag = true;

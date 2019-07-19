@@ -9,6 +9,8 @@ export default (ID, service = '') => {
     const SERVICE = capitalize(service);
     const getUsersOK = createAction(`${ID}_GET_USERS_OK_${suffix}`);
     const getUsers = createFetchAction(`${USER_API}/users/`, [getUsersOK]);
+    // 获取人员的具体详情
+    const getUserDetail = createFetchAction(`${USER_API}/users/{{id}}/`, []);
     const getUsersPage = createFetchAction(
         `${USER_API}/users/?page={{page}}`,
         'GET'
@@ -53,9 +55,10 @@ export default (ID, service = '') => {
         []
     );
 
-    usersReducer[`get${SERVICE}Users`] = getUsers;
-    usersReducer[`get${SERVICE}UsersPage`] = getUsersPage;
     usersReducer[`get${SERVICE}UsersOK`] = getUsersOK;
+    usersReducer[`get${SERVICE}Users`] = getUsers;
+    usersReducer[`get${SERVICE}UserDetail`] = getUserDetail;
+    usersReducer[`get${SERVICE}UsersPage`] = getUsersPage;
     usersReducer[`post${SERVICE}ForestUser`] = postForestUser;
     usersReducer[`put${SERVICE}ForestUser`] = putForestUser;
     usersReducer[`post${SERVICE}ForestUserBlackList`] = postForestUserBlackList;

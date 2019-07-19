@@ -271,7 +271,7 @@ export default class Member extends Component {
         const {
             actions: {
                 putForestUser,
-                getOrgName
+                getChildOrgTreeByID
             },
             member: { role = [] }
         } = this.props;
@@ -290,7 +290,7 @@ export default class Member extends Component {
         this.setState({
             relationMemberIDList: rst
         });
-        let items = await getOrgName({ code: user.account.org_code });
+        let items = await getChildOrgTreeByID({ id: user.ID });
         await putForestUser(
             {},
             {
@@ -304,7 +304,7 @@ export default class Member extends Component {
                     person_avatar_url: '',
                     person_signature_url: '',
                     organization: {
-                        pk: items.pk,
+                        pk: items.ID,
                         code: user.account.org_code,
                         obj_type: 'C_ORG',
                         rel_type: 'member',
@@ -336,7 +336,7 @@ export default class Member extends Component {
         const {
             actions: {
                 putForestUser,
-                getOrgName
+                getChildOrgTreeByID
             },
             member: { role = [] }
         } = this.props;
@@ -355,7 +355,7 @@ export default class Member extends Component {
         this.setState({
             relationMemberIDList: rst
         });
-        let items = await getOrgName({ code: user.account.org_code });
+        let items = await getChildOrgTreeByID({ id: user.ID });
         await putForestUser(
             {},
             {
@@ -369,7 +369,7 @@ export default class Member extends Component {
                     person_avatar_url: '',
                     person_signature_url: '',
                     organization: {
-                        pk: items.pk,
+                        pk: items.ID,
                         code: user.account.org_code,
                         obj_type: 'C_ORG',
                         rel_type: 'member',
