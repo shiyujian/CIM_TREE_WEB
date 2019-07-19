@@ -43,7 +43,7 @@ export const postNews = fetchAction(`${MAIN_API}/news`, [], 'POST');
 // 新闻编辑
 export const putNews = fetchAction(`${MAIN_API}/news`, [], 'PUT');
 // 新闻删除
-export const deleteNews = fetchAction(`${MAIN_API}/news/{{ID}`, [], 'DELETE');
+export const deleteNews = fetchAction(`${MAIN_API}/news/{{ID}}`, [], 'DELETE');
 
 // 公告类型
 export const getNoticetypes = fetchAction(`${MAIN_API}/noticetypes`);
@@ -56,8 +56,8 @@ export const getNoticeDetails = fetchAction(`${MAIN_API}/notice/{{ID}}`);
 export const postNotice = fetchAction(`${MAIN_API}/notice`, [], 'POST');
 // 公告编辑
 export const putNotice = fetchAction(`${MAIN_API}/notice`, [], 'PUT');
-// 新闻删除
-export const deleteNotice = fetchAction(`${MAIN_API}/news/{{ID}`, [], 'DELETE');
+// 公告删除
+export const deleteNotice = fetchAction(`${MAIN_API}/notice/{{ID}}`, [], 'DELETE');
 // 上传附件
 export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype=news`, [], 'POST');
 

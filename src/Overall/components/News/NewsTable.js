@@ -29,14 +29,15 @@ class NewsTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            content: '',
             detailVisible: false,
-            detailTitle: '',
-            container: null,
+            newsTitle: '', // 新闻标题
+            newsContent: '', // 新闻内容
+            newsThumbnail: '', // 新闻封面
+            newsSource: '', // 新闻来源
+            fileList: [], // 附件列表
             newsTabValue: 'publish',
             editNewsVisible: false,
             addNewsVisible: false,
-            newsDetail: '',
             newsID: '',
             viewCoverVisible: false,
             coverArr: []
@@ -100,7 +101,7 @@ class NewsTable extends Component {
             render: (text, record) => {
                 return (
                     <span>
-                        <a onClick={this.handleNewsView.bind(this, record)}>
+                        <a onClick={this.handleNewsView.bind(this, record.ID)}>
                             查看
                         </a>
                         <Divider type='vertical' />
@@ -179,7 +180,7 @@ class NewsTable extends Component {
             render: record => {
                 return (
                     <span>
-                        <a onClick={this.handleNewsView.bind(this, record)}>
+                        <a onClick={this.handleNewsView.bind(this, record.ID)}>
                             查看
                         </a>
                         <Divider type='vertical' />
@@ -242,25 +243,28 @@ class NewsTable extends Component {
         });
     }
     // 查看新闻
-    handleNewsView (record) {
-        console.log(record, '查看');
-        this.setState({
-            detailVisible: true,
-            container: record.Content,
-            detailTitle: record.Title,
-            Thumbnail: record.Thumbnail,
-            source: record.Source,
-            newsDetail: record
+    handleNewsView (ID) {
+        console.log(ID, '查看');
+        const { getNewsDetails } = this.props.actions;
+        getNewsDetails({ID}, {}).then(rep => {
+            console.log(rep, '详情信息');
+            this.setState({
+                detailVisible: true,
+                newsTitle: rep.Title,
+                newsSource: rep.Source,
+                newsThumbnail: rep.Thumbnail,
+                newsContent: rep.Content,
+                fileList: rep.Files
+            });
         });
     }
     // 关闭新闻预览弹窗
     handleCancel () {
         this.setState({
             detailVisible: false,
-            container: null,
-            detailTitle: '',
-            source: '',
-            newsDetail: ''
+            newsContent: '',
+            newsTitle: '',
+            newsSource: ''
         });
     }
     // 编辑新闻
@@ -273,8 +277,7 @@ class NewsTable extends Component {
     }
     handleNewsEditModalCancel = async () => {
         this.setState({
-            editNewsVisible: false,
-            newsDetail: ''
+            editNewsVisible: false
         });
     }
     // 删除新闻
@@ -416,24 +419,19 @@ class NewsTable extends Component {
             newsTabValue,
             editNewsVisible,
             addNewsVisible,
-            source,
+            newsSource,
             detailVisible,
-            container,
-            detailTitle,
+            newsThumbnail,
+            newsContent,
+            fileList,
+            newsTitle,
             viewCoverVisible,
-            coverArr,
-            newsDetail
+            coverArr
         } = this.state;
         const formItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        let annexFileList = [];
-        if (newsDetail.attachment && newsDetail.attachment.fileList &&
-            newsDetail.attachment.fileList instanceof Array &&
-            newsDetail.attachment.fileList.length > 0) {
-            annexFileList = newsDetail.attachment.fileList;
-        }
         return (
             <Row>
                 {
@@ -453,40 +451,30 @@ class NewsTable extends Component {
                         /> : ''
                 }
                 <Modal
-                    title={detailTitle}
+                    title='新闻预览'
                     width='800px'
                     visible={detailVisible}
                     onCancel={this.handleCancel.bind(this)}
                     footer={null}
                 >
                     <div>
-                        <h1 style={{ textAlign: 'center' }}>{detailTitle}</h1>
-                        <p>{`来源 ：${source}`}</p>
+                        <h1 style={{ textAlign: 'center' }}>{newsTitle}</h1>
+                        <p>来源 ：{newsSource ? <span>{newsSource}</span> : '未知'}</p>
                         <p>
-                            封面 ：<a href={this.state.Thumbnail}
+                            封面 ：{ newsThumbnail ? <a href={newsThumbnail}
                                 target='_blank'>
                                 微信图片.jpg
-                            </a>
+                            </a> : '暂无'}
                         </p>
-                        {
-                            annexFileList.map((file) => {
-                                if (file && file.response && file.response.download_url) {
-                                    return (
-                                        <p>
-                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
-                                                {file.name}
-                                            </a>
-                                        </p>
-                                    );
-                                } else {
-                                    return (<p>{`附件 ：暂无`}</p>);
-                                }
-                            })
-                        }
+                        <p>
+                            附件 ：{fileList.length ? fileList.map(item => {
+                                return <a href={item.FilePath} target='_blank' style={{marginRight: 10}}>{item.FileName}</a>;
+                            }) : '暂无'}
+                        </p>
                         <div
                             style={{ maxHeight: '800px', overflow: 'auto' }}
                             dangerouslySetInnerHTML={{
-                                __html: container
+                                __html: newsContent
                             }}
                         />
                     </div>

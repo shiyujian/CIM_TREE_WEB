@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Row, Col, Modal, Tabs } from 'antd';
 import moment from 'moment';
-import { STATIC_PREVIEW_API, STATIC_DOWNLOAD_API } from '_platform/api';
 
 import './styles.less';
 
@@ -14,7 +13,7 @@ export default class News extends Component {
             newsVisible: false, // 新闻
             newsTitle: '',
             newsSource: '',
-            Thumbnail: '',
+            newThumbnail: '',
             newsFileList: [],
             newsContainer: '',
 
@@ -123,7 +122,7 @@ export default class News extends Component {
                 newsVisible: true,
                 newsTitle: rep.Title,
                 newsSource: rep.Source,
-                Thumbnail: rep.Thumbnail,
+                newThumbnail: rep.Thumbnail,
                 newsContainer: rep.Content,
                 newsFileList: rep.Files
             });
@@ -186,7 +185,7 @@ export default class News extends Component {
             newsTitle,
             newsVisible,
             newsSource,
-            Thumbnail,
+            newThumbnail,
             newsFileList,
             newsContainer,
 
@@ -238,12 +237,12 @@ export default class News extends Component {
                 >
                     <div>
                         <h1 style={{ textAlign: 'center' }}>{newsTitle}</h1>
-                        <p>来源 ：{newsSource ? <span>{newsSource}</span> : '暂无'}</p>
-                        <p>封面 ：{Thumbnail ? <a href={Thumbnail} target='_blank'>微信图片.jpg</a> : '暂无'}</p>
+                        <p>来源 ：{newsSource ? <span>{newsSource}</span> : '未知'}</p>
+                        <p>封面 ：{newThumbnail ? <a href={newThumbnail} target='_blank'>微信图片.jpg</a> : '暂无'}</p>
                         <p>
-                            附件 ：{newsFileList.map(item => {
+                            附件 ：{newsFileList.length ? newsFileList.map(item => {
                                 return <a href={item.FilePath} target='_blank' style={{marginRight: 10}}>{item.FileName}</a>;
-                            })}
+                            }) : '暂无'}
                         </p>
                         <div
                             style={{ maxHeight: '800px', overflow: 'auto' }}
@@ -265,9 +264,9 @@ export default class News extends Component {
                         <div>
                             <p>紧急程度 ：{noticeDetailDegree ? <span>{noticeDetailDegree}</span> : <span>暂无</span>}</p>
                             <p>
-                                附件 ：{noticeFileList.map(item => {
+                                附件 ：{noticeFileList.length ? noticeFileList.map(item => {
                                     return <a href={item.FilePath} target='_blank' style={{marginRight: 10}}>{item.FileName}</a>;
-                                })}
+                                }) : '暂无'}
                             </p>
                             <div
                                 style={{

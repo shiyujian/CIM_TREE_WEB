@@ -4,10 +4,8 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
     UPLOAD_API,
-    STATIC_DOWNLOAD_API,
-    SOURCE_API,
-    FILE_API,
-    STATIC_PREVIEW_API
+    STATIC_PREVIEW_API,
+    SOURCE_API
 } from '_platform/api';
 import E from 'wangeditor';
 
@@ -96,7 +94,7 @@ class NewsEditModal extends Component {
             form: { setFieldsValue }
         } = this.props;
         getNewsDetails({ID: newsID}, {}).then(rep => {
-            console.log(123, rep);
+            console.log('回显来源', rep);
             let { fileListNew, ThumbnailFile } = this.state;
             rep.Files.map((item, index) => {
                 fileListNew.push({
@@ -105,11 +103,14 @@ class NewsEditModal extends Component {
                     url: item.FilePath
                 });
             });
-            ThumbnailFile.push({
-                uid: '123456',
-                name: '微信图片.jpg',
-                url: rep.Thumbnail
-            });
+            if (rep.Thumbnail) {
+                ThumbnailFile.push({
+                    uid: '123456',
+                    name: '微信图片.jpg',
+                    url: rep.Thumbnail
+                });
+            }
+            console.log('回显', fileListNew);
             this.setState({
                 newsID: newsID,
                 content: rep.Content,
@@ -123,31 +124,6 @@ class NewsEditModal extends Component {
                 'source': rep.Source || ''
             });
         });
-        // this.setState({
-        //     content: newsDetail.raw
-        // });
-        // editor.txt.html(newsDetail.raw);
-        // let attachment = [];
-        // if (newsDetail.cover) {
-        //     attachment.push(newsDetail.cover);
-        //     attachment[0].uid = '1';
-        //     attachment[0].status = 'done';
-        //     if (newsDetail.cover && newsDetail.cover.a_file) {
-        //         attachment[0].url = STATIC_PREVIEW_API + newsDetail.cover.a_file;
-        //     }
-        // }
-        // let annexFile = newsDetail.attachment && newsDetail.attachment.fileList
-        //     ? newsDetail.attachment.fileList : [];
-        // console.log('annexFile', annexFile);
-        // setFieldsValue({
-        //     'title': newsDetail.title || '',
-        //     'attachment': attachment,
-        //     'annexFile': annexFile,
-        //     'source': newsDetail.source && newsDetail.source.name ? newsDetail.source.name : ''
-        // });
-        // this.setState({
-        //     annexFileList: annexFile
-        // });
     }
 
     // 发布新闻
@@ -207,66 +183,6 @@ class NewsEditModal extends Component {
                 }
             }
         });
-        // validateFields(async (err, values) => {
-        //     console.log('values', values);
-        //     if (!err) {
-        //         let coverResp = values.attachment[0].response ? values.attachment[0].response : values.attachment[0];
-        //         let fileList = [];
-        //         if (values && values.annexFile) {
-        //             if (values.annexFile.fileList &&
-        //                 values.annexFile.fileList instanceof Array &&
-        //                 values.annexFile.fileList.length > 0) {
-        //                 fileList = values.annexFile.fileList;
-        //             } else {
-        //                 fileList = values.annexFile;
-        //             }
-        //         }
-        //         let newData = {
-        //             'title': values['title'] || '',
-        //             'raw': this.state.content,
-        //             'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-        //             'categories': [],
-        //             'attachment': {
-        //                 'fileList': fileList
-        //             },
-        //             'is_draft': false,
-        //             'cover': {
-        //                 'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-        //                 'create_time': coverResp.create_time,
-        //                 'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-        //                 'id': coverResp.id,
-        //                 'mime_type': coverResp.mime_type,
-        //                 'misc': coverResp.misc,
-        //                 'name': coverResp.name
-        //             },
-        //             'source': {
-        //                 'name': values.source
-        //             }
-        //         };
-        //         let rst = await patchData({ pk: newsDetail.id }, newData);
-        //         if (rst.id) {
-        //             this.modalClick();
-        //             Notification.success({
-        //                 message: '编辑新闻成功',
-        //                 duration: 3
-        //             });
-        //             // 更新新闻列表数据
-        //             getNewsList({}, {
-        //                 tag: '新闻',
-        //                 is_draft: false
-        //             });
-        //             getDraftNewsList({}, {
-        //                 tag: '新闻',
-        //                 is_draft: true
-        //             });
-        //         } else {
-        //             Notification.error({
-        //                 message: '编辑新闻失败',
-        //                 duration: 3
-        //             });
-        //         }
-        //     }
-        // });
     }
 
     // 暂存新闻
@@ -342,74 +258,6 @@ class NewsEditModal extends Component {
     modalClick () {
         this.props.handleNewsEditModalCancel();
     }
-    uploadPropsCover = {
-        name: 'file',
-        action: ``,
-        showUploadList: true,
-        data: (file) => {
-            return {
-                name: file.fileName,
-                a_file: file
-            };
-        },
-        beforeUpload: (file, fileList) => {
-            const { uploadFileHandler } = this.props.actions;
-            const formdata = new FormData();
-            formdata.append('file', fileList[0]);
-            uploadFileHandler({}, formdata).then(rep => {
-                console.log(rep);
-                this.setState({
-                    ThumbnailFile: fileList,
-                    ThumbnailUrl: rep
-                });
-            });
-            return false;
-            // let type = file.name.toString().split('.');
-            // let len = type.length;
-            // if (
-            //     type[len - 1] === 'jpg' ||
-            // type[len - 1] === 'jpeg' ||
-            // type[len - 1] === 'png' ||
-            // type[len - 1] === 'JPG' ||
-            // type[len - 1] === 'JPEG' ||
-            // type[len - 1] === 'PNG'
-            // ) {
-            //     this.setState({
-            //         progress: 0,
-            //         loading: true
-            //     });
-            //     return true;
-            // } else {
-            //     Notification.error({
-            //         message: '请上传jpg,jpeg,png 文件',
-            //         duration: 3
-            //     });
-            //     return false;
-            // }
-        },
-        onChange: ({ file }) => {
-            const status = file.status;
-            if (status === 'done') {
-                Notification.info({
-                    message: '上传封面成功',
-                    duration: 3
-                });
-                this.setState({
-                    progress: 1,
-                    loading: false
-                });
-            } else if (status === 'error') {
-                Notification.info({
-                    message: '上传封面失败',
-                    duration: 3
-                });
-                this.setState({
-                    progress: 1,
-                    loading: false
-                });
-            }
-        }
-    };
     coverPicFile = (e) => {
         if (Array.isArray(e)) {
             return e;
@@ -444,6 +292,105 @@ class NewsEditModal extends Component {
             callback();
         }
     }
+    uploadPropsCover = {
+        name: 'file',
+        action: '',
+        showUploadList: true,
+        beforeUpload: (file, fileList) => {
+            let type = file.name.toString().split('.');
+            let len = type.length;
+            if (
+                type[len - 1] === 'jpg' ||
+                type[len - 1] === 'jpeg' ||
+                type[len - 1] === 'png' ||
+                type[len - 1] === 'JPG' ||
+                type[len - 1] === 'JPEG' ||
+                type[len - 1] === 'PNG'
+            ) {
+                this.setState({
+                    progress: 0,
+                    loading: true
+                });
+                // 开始上传
+                const { uploadFileHandler } = this.props.actions;
+                const formdata = new FormData();
+                formdata.append('file', fileList[0]);
+                uploadFileHandler({}, formdata).then(rep => {
+                    console.log(rep);
+                    fileList[0].url = rep;
+                    this.setState({
+                        progress: 1,
+                        loading: false,
+                        ThumbnailFile: fileList,
+                        ThumbnailUrl: rep
+                    });
+                });
+            } else {
+                Notification.error({
+                    message: '请上传jpg,jpeg,png 文件',
+                    duration: 3
+                });
+            }
+            return false;
+        },
+        onRemove: (file) => {
+            let { ThumbnailFile } = this.state;
+            let fileList = [];
+            ThumbnailFile.map(item => {
+                if (item.uid !== file.uid) {
+                    fileList.push(item);
+                }
+            });
+            this.setState({
+                ThumbnailFile: fileList,
+                ThumbnailUrl: ''
+            });
+        },
+        onChange: ({ file }) => {
+
+        }
+    };
+    uploadPropsFile = {
+        name: 'a_file',
+        showUploadList: true,
+        action: '',
+        beforeUpload: (file, fileList) => {
+            this.setState({
+                progress: 0,
+                loading: true
+            });
+            let { fileListNew } = this.state;
+            const { uploadFileHandler } = this.props.actions;
+            const formdata = new FormData();
+            formdata.append('file', fileList[0]);
+            uploadFileHandler({}, formdata).then(rep => {
+                file.url = rep;
+                fileListNew.push(file);
+                console.log(fileListNew, '附件');
+                this.setState({
+                    progress: 1,
+                    loading: false,
+                    fileListNew
+                });
+            });
+            return false;
+        },
+        onRemove: (file) => {
+            let { fileListNew } = this.state;
+            let fileList = [];
+            fileListNew.map(item => {
+                if (item.uid !== file.uid) {
+                    fileList.push(item);
+                }
+            });
+            this.setState({
+                fileListNew: fileList
+            });
+        },
+        onChange: ({ file, fileList }) => {
+
+        }
+    };
     render () {
         const {
             form: { getFieldDecorator }
@@ -455,77 +402,6 @@ class NewsEditModal extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        const uploadPropsFile = {
-            name: 'a_file',
-            showUploadList: true,
-            action: '',
-            fileList: this.state.fileListNew,
-            beforeUpload: (file, fileList) => {
-                let { fileListNew } = this.state;
-                const { uploadFileHandler } = this.props.actions;
-                const formdata = new FormData();
-                formdata.append('file', fileList[0]);
-                uploadFileHandler({}, formdata).then(rep => {
-                    file.url = rep;
-                    fileListNew.push(file);
-                    console.log(fileListNew, '附件');
-                    this.setState({
-                        fileListNew
-                    });
-                });
-                return false;
-            },
-            onRemove: (file) => {
-                let { fileListNew } = this.state;
-                let fileList = [];
-                fileListNew.map(item => {
-                    if (item.uid !== file.uid) {
-                        fileList.push(item);
-                    }
-                });
-                this.setState({
-                    fileListNew: fileList
-                });
-            },
-            onChange: ({ file, fileList }) => {
-                try {
-                    console.log('file', file);
-                    console.log('fileList', fileList);
-                    this.setState({
-                        annexFileList: fileList
-                    });
-                    const status = file.status;
-                    if (status === 'done') {
-                        file.url = file && file.response && file.response.a_file;
-                        fileList.map((fileData) => {
-                            if (fileData && fileData.response && fileData.response.a_file) {
-                                fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                            }
-                        });
-                        this.setState({
-                            progress: 1,
-                            loading: false
-                        });
-                        Notification.info({
-                            message: '上传附件成功',
-                            duration: 3
-                        });
-                    } else if (status === 'error') {
-                        Notification.error({
-                            message: '上传附件失败',
-                            duration: 3
-                        });
-                        this.setState({
-                            progress: 1,
-                            loading: false
-                        });
-                    }
-                } catch (e) {
-                    console.log('uploadPropsFile', e);
-                }
-            }
-        };
-    
         return (
             <Modal
                 title={'编辑新闻'}
@@ -556,7 +432,7 @@ class NewsEditModal extends Component {
                             </Col>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
-                                    <Upload {...uploadPropsFile}
+                                    <Upload {...this.uploadPropsFile} fileList={this.state.fileListNew}
                                     >
                                         <Button>
                                             <Icon type='upload' />上传附件

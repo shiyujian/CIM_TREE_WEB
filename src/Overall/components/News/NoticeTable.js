@@ -17,7 +17,6 @@ import {
 import NoticeAddModal from './NoticeAddModal';
 import NoticeEditModal from './NoticeEditModal';
 import moment from 'moment';
-import { STATIC_DOWNLOAD_API } from '_platform/api';
 import './index.less';
 
 const TabPane = Tabs.TabPane;
@@ -30,14 +29,15 @@ class NoticeTable extends Component {
         super(props);
         this.state = {
             noticeID: '', // 通知ID
-            Files: [], // 通知附件
+            noticeTitle: '', // 通知名称
+            noticeContent: '', // 通知内容
+            detailDegree: '', // 紧急程度
+            fileList: [], // 附件列表
             tipsTabValue: 'publish',
             editNoticeVisible: false,
             addNoticeVisible: false,
-            noticeDetail: '',
             record: '',
-            detailVisible: false,
-            detailDegree: ''
+            detailVisible: false
         };
     }
 
@@ -113,10 +113,10 @@ class NoticeTable extends Component {
                         <a onClick={this.handleNoticeView.bind(this, record.ID)}>
                             查看
                         </a>
-                        <Divider type='vertical' />
+                        {/* <Divider type='vertical' />
                         <a onClick={this.handleNoticeEdit.bind(this, record.ID)}>
                             修改
-                        </a>
+                        </a> */}
                         <Divider type='vertical' />
                         <Popconfirm
                             title='确定删除吗?'
@@ -223,7 +223,6 @@ class NoticeTable extends Component {
         getNoticeDetails({
             ID
         }).then(rep => {
-            console.log(rep);
             let detailDegree = '';
             if (rep && rep.Notice_Type) {
                 if (rep.Notice_Type === 1) {
@@ -231,36 +230,21 @@ class NoticeTable extends Component {
                 } else if (rep.Notice_Type === 2) {
                     detailDegree = '特急';
                 }
-            } else if (rep.degree === 0) {
+            } else if (rep.Notice_Type === 0) {
                 detailDegree = '平件';
             }
+            console.log('查看显示', rep);
             this.setState({
-                Files: rep.Files,
-                Notice_Content: rep.Notice_Content,
                 detailVisible: true,
+                fileList: rep.Files,
+                noticeTitle: rep.Notice_Title,
+                noticeContent: rep.Notice_Content,
                 detailDegree
             });
         });
-        // let detailDegree = '';
-        // if (record && record.Notice_Type) {
-        //     if (record.Notice_Type === 1) {
-        //         detailDegree = '加急';
-        //     } else if (record.Notice_Type === 2) {
-        //         detailDegree = '特急';
-        //     }
-        // } else if (record.degree === 0) {
-        //     detailDegree = '平件';
-        // }
-        // console.log('detailDegree', detailDegree);
-        // this.setState({
-        //     noticeDetail: record,
-        //     detailVisible: true,
-        //     detailDegree
-        // });
     }
     handleCancel = async () => {
         this.setState({
-            noticeDetail: '',
             detailVisible: false,
             detailDegree: ''
         });
@@ -275,8 +259,7 @@ class NoticeTable extends Component {
     }
     handleNoticeEditModalCancel = async () => {
         this.setState({
-            editNoticeVisible: false,
-            noticeDetail: ''
+            editNoticeVisible: false
         });
     }
     // 删除通知
@@ -286,6 +269,8 @@ class NoticeTable extends Component {
                 deleteNotice
             }
         } = this.props;
+        console.log('删除ID', ID);
+        console.log('删除ID', typeof ID);
         deleteNotice({ID}, {}).then(rep => {
             if (rep.code === 1) {
                 Notification.success({
@@ -340,7 +325,7 @@ class NoticeTable extends Component {
             if (!err) {
                 console.log(123, values, values.degree);
                 getNoticeList({}, {
-                    type: '',
+                    type: values.degree || '',
                     name: values.theme || '',
                     sdate: values.worktime ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
                     edate: values.worktime ? moment(values.worktime[1]).format('YYYY-MM-DD') : '',
@@ -353,9 +338,9 @@ class NoticeTable extends Component {
     // 清除
     clearPublish () {
         this.props.form.setFieldsValue({
-            theme: undefined,
-            worktime: undefined,
-            degree: undefined
+            theme: '',
+            worktime: '',
+            degree: ''
         });
         this.queryPublish();
     }
@@ -413,11 +398,13 @@ class NoticeTable extends Component {
         } = this.props;
         console.log('公告列表', tipsList);
         const {
+            fileList,
             tipsTabValue,
             editNoticeVisible,
             addNoticeVisible,
-            noticeDetail,
-            detailDegree
+            noticeTitle,
+            detailDegree,
+            noticeContent
         } = this.state;
 
         const formItemLayout = {
@@ -450,22 +437,21 @@ class NoticeTable extends Component {
                     footer={null}
                 >
                     <div>
-                        <h1 style={{ textAlign: 'center' }}>{noticeDetail && noticeDetail.title}</h1>
+                        <h1 style={{ textAlign: 'center' }}>{noticeTitle}</h1>
                         <div>
-                            {detailDegree ? (
-                                <p>{`紧急程度 ：${detailDegree}`}</p>)
-                                : (<p>{`紧急程度 ：暂无`}</p>)
-                            }
-                            {
-                                this.state.Files.length > 0 ? <p>文件</p> : <p>附件: 暂无</p>
-                            }
+                            <p>紧急程度 ：{detailDegree ? <span>{detailDegree}</span> : '暂无'}</p>
+                            <p>
+                                附件 ：{fileList.length ? fileList.map(item => {
+                                    return <a href={item.FilePath} target='_blank' style={{marginRight: 10}}>{item.FileName}</a>;
+                                }) : '暂无'}
+                            </p>
                             <div
                                 style={{
                                     maxHeight: '800px',
                                     overflow: 'auto',
                                     marginTop: '5px'
                                 }}
-                                dangerouslySetInnerHTML={{ __html: this.state.Notice_Content }}
+                                dangerouslySetInnerHTML={{ __html: noticeContent }}
                             />
                         </div>
                     </div>
