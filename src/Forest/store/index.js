@@ -381,6 +381,8 @@ export const putMergeCarPack = forestFetchAction(`${FOREST_API}/tree/packmerge`,
 export const putMoveTreeInCar = forestFetchAction(`${FOREST_API}/tree/packnurserymove`, [], 'PUT', []);
 // 修改现场测量信息
 export const putChangeLocInfo = forestFetchAction(`${FOREST_API}/tree/batchtree`, [], 'PUT', []);
+// 导出苗木死亡信息
+export const exportEcporttreestatuss = forestFetchAction(`${FOREST_API}/tree/ecporttreestatuss`, [], 'GET', []);
 
 /**
  * 数字化验收
@@ -431,6 +433,7 @@ export const getExportAcceptReport = forestFetchAction(`${FOREST_API}/DocExport.
 export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sections`, [], 'GET', []);
 
 export const actions = {
+    exportEcporttreestatuss,
     getTotalSat,
     getTreeLocations,
     getExportTreeLocations,

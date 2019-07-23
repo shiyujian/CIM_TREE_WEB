@@ -114,8 +114,11 @@ export default class TreeAdoptInfo extends Component {
                 <Option key={'死亡'} value={'0'} title={'死亡'}>
                     死亡
                 </Option>,
-                <Option key={'结缘入库'} value={'1'} title={'结缘入库'}>
-                    结缘入库
+                <Option key={'存活'} value={'1'} title={'存活'}>
+                    存活
+                </Option>,
+                <Option key={'待定'} value={'2'} title={'待定'}>
+                    待定
                 </Option>
             ];
             this.setState({ statusoption });
@@ -139,7 +142,7 @@ export default class TreeAdoptInfo extends Component {
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='苗木状态信息' {...this.props} />
+                    <DynamicTitle title='苗木死亡调查' {...this.props} />
                     <Sidebar width={190}>
                         <PkCodeTree
                             treeData={treeList}

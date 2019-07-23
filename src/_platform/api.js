@@ -498,7 +498,7 @@ export const MODULES = [
                     },
                     {
                         id: 'FOREST.TREEADOPTINFO',
-                        name: '苗木状态信息'
+                        name: '苗木死亡调查'
                     }
                 ]
             },

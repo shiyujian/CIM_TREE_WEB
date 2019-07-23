@@ -359,7 +359,7 @@ export default class ForestContainer extends Component {
                     key: 'treeadoptinfo',
                     id: 'FOREST.TREEADOPTINFO',
                     path: '/forest/treeadoptinfo',
-                    name: '苗木状态信息'
+                    name: '苗木死亡调查'
                 }
             ]
         },
