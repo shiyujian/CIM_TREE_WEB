@@ -43,11 +43,10 @@ export default class PerSearch extends Component {
             actions: { getUsers, getRoles }
         } = this.props;
         let roles = await getRoles();
-        console.log('roles', roles);
-        let postRole = [];
+        let postRoleData = [];
         roles.map((role) => {
-            if (role && role.id && role.name && role.name.indexOf('业主') !== -1) {
-                postRole.push(role.id);
+            if (role && role.ID && role.ParentID && role.RoleName === '业主文书') {
+                postRoleData = role.ID;
             }
         });
         try {
@@ -55,7 +54,7 @@ export default class PerSearch extends Component {
             await OWNERCHECKLIST.map(async (owner) => {
                 let postdata = {
                     keyword: owner,
-                    roles: postRole,
+                    role: postRoleData,
                     is_active: true,
                     page: 1,
                     page_size: 20
@@ -68,7 +67,7 @@ export default class PerSearch extends Component {
                 if (total > 20) {
                     for (let i = 0; i < (total / 20) - 1; i++) {
                         postdata = {
-                            roles: postRole,
+                            role: postRoleData,
                             is_active: true,
                             page: i + 2,
                             page_size: 20
@@ -77,8 +76,6 @@ export default class PerSearch extends Component {
                         results = results.concat((datas && datas.results) || []);
                     }
                 }
-                console.log('results', results);
-
                 this.setState({
                     users: results
                 });

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-18 16:31:49
+ * @Last Modified time: 2019-07-22 09:24:25
  */
 import React, { Component } from 'react';
 import {
@@ -118,8 +118,8 @@ class OnSite extends Component {
             // 根据用户的自定义视图来查看聚焦点
             if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
                 let view = customViewByUserID[0];
-                let center = [view.center[0].lat, view.center[0].lng];
-                let zoom = view.zoom;
+                let center = [view.Lat, view.Lng];
+                let zoom = view.Zoom;
                 mapInitialization.center = center;
                 mapInitialization.zoom = zoom;
             };

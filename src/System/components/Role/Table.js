@@ -14,31 +14,21 @@ export default class Roles extends Component {
 
     componentDidMount () {
         const {
-            actions: { getRoles, getLoginUser }
+            actions: {
+                getRoles
+            }
         } = this.props;
         getRoles();
-        let userid = getUser().ID;
-        getLoginUser({
-            id: userid
-        }).then(rst => {
-            let flag = true;
-            rst.groups.map(item => {
-                if (item.name === '超级管理员') {
-                    flag = true;
-                } else {
-                    flag = false;
-                }
+        let user = getUser();
+        if (user && user.username && user.username === 'admin') {
+            this.setState({
+                userLogin: 'admin'
             });
-            if (flag) {
-                this.setState({
-                    userLogin: 'admin'
-                });
-            } else {
-                this.setState({
-                    userLogin: 'common'
-                });
-            }
-        });
+        } else {
+            this.setState({
+                userLogin: 'common'
+            });
+        }
     }
 
     append (type) {

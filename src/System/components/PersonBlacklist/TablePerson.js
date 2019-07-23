@@ -41,9 +41,9 @@ class TablePerson extends Component {
     async componentDidMount () {
         this.setState({ loading: true });
         const {
-            actions: { getPersonInfo }
+            actions: { getUsers }
         } = this.props;
-        let rst = await getPersonInfo({}, { is_black: 1 });
+        let rst = await getUsers({}, { is_black: 1 });
 
         // 分页获取数据
         let personlist = rst;
@@ -499,11 +499,11 @@ class TablePerson extends Component {
         if (!this.state.btn) {
             this.setState({ loading: true, pages: obj.current });
             const {
-                actions: { getPersonInfo }
+                actions: { getUsers }
             } = this.props;
             // 分页获取数据
             let pageSize = 10;
-            let rst = await getPersonInfo({ is_black: 1, page: obj.current });
+            let rst = await getUsers({}, { is_black: 1, page: obj.current });
             let personlist = rst.results;
             this.setState({ serialNumber: obj });
             let persons = [];

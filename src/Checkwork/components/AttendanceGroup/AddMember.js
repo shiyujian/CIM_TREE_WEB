@@ -124,94 +124,45 @@ class AddMember extends Component {
 
     renderContent () {
         const {
-            platform: { roles = [] }
+            platform: {
+                roles = []
+            }
         } = this.props;
-        let user = getUser();
+        const user = getUser();
         let userRoles = user.roles || '';
         var systemRoles = [];
-        if (user.username === 'admin') {
-            systemRoles.push({
-                name: '苗圃角色',
-                value: roles.filter(role => role.grouptype === 0)
-            });
-            systemRoles.push({
-                name: '施工角色',
-                value: roles.filter(role => role.grouptype === 1)
-            });
-            systemRoles.push({
-                name: '监理角色',
-                value: roles.filter(role => role.grouptype === 2)
-            });
-            systemRoles.push({
-                name: '业主角色',
-                value: roles.filter(role => role.grouptype === 3)
-            });
-            systemRoles.push({
-                name: '养护角色',
-                value: roles.filter(role => role.grouptype === 4)
-            });
-            systemRoles.push({
-                name: '供应商角色',
-                value: roles.filter(role => role.grouptype === 6)
+        let parentRoleType = [];
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID === 0) {
+                parentRoleType.push(role);
+            }
+        });
+        console.log('parentRoleType', parentRoleType);
+        if (user.username && user.username === 'admin') {
+            parentRoleType.map((type) => {
+                systemRoles.push({
+                    name: type && type.RoleName,
+                    value: roles.filter(role => role.ParentID === type.ID)
+                });
             });
         } else {
             const rolea = userRoles.ParentID;
-            switch (rolea) {
-                case 0:
+            parentRoleType.map((type) => {
+                if (rolea === type.ID) {
                     systemRoles.push({
-                        name: '苗圃角色',
-                        value: roles.filter(role => role.grouptype === 0)
+                        name: type && type.RoleName,
+                        value: roles.filter(role => role.ParentID === type.ID)
                     });
-                    break;
-                case 1:
-                    systemRoles.push({
-                        name: '苗圃角色',
-                        value: roles.filter(role => role.grouptype === 0)
-                    });
-                    systemRoles.push({
-                        name: '施工角色',
-                        value: roles.filter(role => role.grouptype === 1)
-                    });
-                    systemRoles.push({
-                        name: '养护角色',
-                        value: roles.filter(role => role.grouptype === 4)
-                    });
-                    break;
-                case 2:
-                    systemRoles.push({
-                        name: '监理角色',
-                        value: roles.filter(role => role.grouptype === 2)
-                    });
-                    break;
-                case 3:
-                    systemRoles.push({
-                        name: '业主角色',
-                        value: roles.filter(role => role.grouptype === 3)
-                    });
-                    break;
-                case 4:
-                    systemRoles.push({
-                        name: '养护角色',
-                        value: roles.filter(role => role.grouptype === 4)
-                    });
-                    break;
-                case 6:
-                    systemRoles.push({
-                        name: '供应商角色',
-                        value: roles.filter(role => role.grouptype === 4)
-                    });
-                    break;
-                default:
-                    break;
-            }
+                }
+            });
         }
         const objs = systemRoles.map(roless => {
             return (
                 <OptGroup label={roless.name} key={roless.name}>
                     {roless.value.map(role => {
                         return (
-                            <Option key={role.id} value={String(role.id)}>
-                                {role.name}
+                            <Option key={role.ID} value={String(role.ID)}>
+                                {role.RoleName}
                             </Option>
                         );
                     })}
@@ -227,7 +178,6 @@ class AddMember extends Component {
             orgTreeSelectData
         } = this.props;
         const {
-            relationMem,
             loading = false,
             page,
             total,

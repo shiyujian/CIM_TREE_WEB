@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-17 15:15:12
+ * @Last Modified time: 2019-07-22 09:30:27
  */
 /**
  *
@@ -160,29 +160,29 @@ export const ORG_SUPPLIER_CODE = 'ORG_SUPPLIER';
 // 综合展示 各个项目的中心坐标
 export const PROJECTPOSITIONCENTER = [
     {
-        name: '九号地块',
+        Name: '九号地块',
         center: [38.99042701799772, 116.0396146774292],
-        zoom: 14
+        Zoom: 14
     },
     {
-        name: '苗景兼用林项目',
+        Name: '苗景兼用林项目',
         center: [39.02511978201801, 116.25842285575345],
-        zoom: 13
+        Zoom: 13
     },
     {
-        name: '市民中心景观项目',
+        Name: '市民中心景观项目',
         center: [39.04825544272171, 115.90770578315642],
-        zoom: 16
+        Zoom: 16
     },
     {
-        name: '2018秋季造林',
+        Name: '2018秋季造林',
         center: [38.784605024411576, 115.73293304652907],
-        zoom: 13
+        Zoom: 13
     },
     {
-        name: '2019春季造林',
+        Name: '2019春季造林',
         center: [39.068756148044486, 115.92073061387055],
-        zoom: 12
+        Zoom: 12
     }
 ];
 // 树种大类

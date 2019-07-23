@@ -218,7 +218,6 @@ class Updatemodal extends Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 let user = getUser();
-                // debugger
                 let resp = values.attachment1[0].response
                     ? values.attachment1[0].response
                     : values.attachment1[0];

@@ -27,7 +27,11 @@ import { actions } from '../store/personBlacklist';
 export default class PersonBlacklist extends Component {
     componentDidMount = async () => {
         const {
-            actions: { getTags, getRoles, getTreeNodeList },
+            actions: {
+                getTags,
+                getRoles,
+                getTreeNodeList
+            },
             platform: { tree = {} }
         } = this.props;
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {

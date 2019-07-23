@@ -77,7 +77,7 @@ export default class Roles extends Component {
             actions: { changeTableField }
         } = this.props;
         const { node: { props: { eventKey = '' } = {} } = {} } = node || {};
-        const role = roles.find(role => role.id === +eventKey);
+        const role = roles.find(role => role.ID === +eventKey);
         role && changeTableField('role', role);
         role &&
             role.permissions &&

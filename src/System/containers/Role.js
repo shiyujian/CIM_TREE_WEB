@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { actions, actions3 } from '../store/role';
-import { actions as actions2 } from '../store/coop';
+import { actions } from '../store/role';
 import { Table, Addition } from '../components/Role';
 
 @connect(
@@ -17,7 +16,7 @@ import { Table, Addition } from '../components/Role';
     },
     dispatch => ({
         actions: bindActionCreators(
-            { ...actions, ...platformActions, ...actions2, ...actions3 },
+            { ...actions, ...platformActions },
             dispatch
         )
     })

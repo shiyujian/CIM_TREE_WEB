@@ -401,7 +401,7 @@ class ToggleModal extends Component {
             actions: {
                 postSentDocAc,
                 getSentInfoAc,
-                getCopyUsersAc,
+                getUsers,
                 sentMessageAc
             },
 
@@ -486,15 +486,15 @@ class ToggleModal extends Component {
                             let promises_all = [];
                             if (isSentMsg) {
                                 promises_one = sentUsers.map(org => {
-                                    return getCopyUsersAc({
-                                        code: org.split('--')[0]
+                                    return getUsers({}, {
+                                        org_code: org.split('--')[0]
                                     });
                                 });
                             }
                             if (isCopyMsg) {
                                 promises_two = copyUsers.map(org => {
-                                    return getCopyUsersAc({
-                                        code: org.split('--')[0]
+                                    return getUsers({}, {
+                                        org_code: org.split('--')[0]
                                     });
                                 });
                             }
@@ -593,15 +593,15 @@ class ToggleModal extends Component {
                             let promises_all = [];
                             if (isSentMsg) {
                                 promises_one = sentUsers.map(org => {
-                                    return getCopyUsersAc({
-                                        code: org.split('--')[0]
+                                    return getUsers({}, {
+                                        org_code: org.split('--')[0]
                                     });
                                 });
                             }
                             if (isCopyMsg) {
                                 promises_two = copyUsers.map(org => {
-                                    return getCopyUsersAc({
-                                        code: org.split('--')[0]
+                                    return getUsers({}, {
+                                        org_code: org.split('--')[0]
                                     });
                                 });
                             }

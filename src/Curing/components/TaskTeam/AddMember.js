@@ -12,7 +12,7 @@ export default class AddMember extends Component {
         super(props);
         this.state = {
             modalVisible: false,
-            roles: [],
+            curingRoleID: [],
             dataSource: [],
             RelationMem: [],
             totalUserData: []
@@ -34,18 +34,22 @@ export default class AddMember extends Component {
             return;
         }
         // 需要找到是养护角色的人
-        let role = await getRoles();
-        const curingRoles = role.filter(rst => rst.grouptype === 4);
-        let roles = curingRoles.map(item => { return item.id; });
+        let roleData = await getRoles();
+        let curingRoleID = '';
+        roleData.map((role) => {
+            if (role && role.ID && role.ParentID && role.RoleName === '养护') {
+                curingRoleID = role.ID;
+            };
+        });
         this.setState({
-            roles: roles
+            curingRoleID
         });
         await this._queryMember();
     };
     // 查找人员
     _queryMember = async () => {
         const {
-            roles = []
+            curingRoleID = ''
         } = this.state;
         const {
             actions: {
@@ -53,7 +57,7 @@ export default class AddMember extends Component {
             },
             selectSection
         } = this.props;
-        if (roles.length === 0) {
+        if (!curingRoleID) {
             return;
         }
         let section = '';
@@ -69,7 +73,7 @@ export default class AddMember extends Component {
         try {
             let postdata = {};
             postdata = {
-                roles: roles,
+                role: curingRoleID,
                 sections: section,
                 is_active: true
             };

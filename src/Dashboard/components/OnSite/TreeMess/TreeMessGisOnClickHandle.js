@@ -216,7 +216,6 @@ export default class TreeMessGisOnClickHandle extends Component {
                 getCuringTypes,
                 getCuringMessage,
                 getForestUserDetail,
-                getUserDetail,
                 getParentOrgTreeByID,
                 getTreeLocationCoord,
                 getLocationNameByCoordinate

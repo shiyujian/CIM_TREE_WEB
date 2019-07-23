@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import SimpleTree from './SimpleTree';
-import { TreeSelect } from 'antd';
 import {getCompanyDataByOrgCode, getUser} from '_platform/auth';
 import {addGroup} from '../auth';
 import {ORG_NURSERY_CODE, ORG_SUPPLIER_CODE} from '_platform/api';
 import moment from 'moment';
-const TreeNode = TreeSelect.TreeNode;
 
 export default class Tree extends Component {
     static propTypes = {};
@@ -13,8 +11,7 @@ export default class Tree extends Component {
         super(props);
         this.state = {
             listVisible: true,
-            orgTreeArrList: [],
-            permission: false
+            orgTreeArrList: []
         };
         this.orgTreeDataArr = [];
     }
@@ -36,10 +33,10 @@ export default class Tree extends Component {
             actions: {
                 getOrgTree,
                 changeSidebarField,
-                getOrgTreeSelect,
                 getChildOrgTreeByID,
                 getParentOrgTreeByID,
                 getOrgTreeDataArr,
+                getCompanyOrgTree,
                 getTablePage,
                 getNurseryList
             }
@@ -48,18 +45,16 @@ export default class Tree extends Component {
             const user = getUser();
             // 管理员可以查看全部，其他人只能查看自己公司
             let permission = false;
+            if (user.username === 'admin') {
+                permission = true;
+            }
             // 施工文书可以查看苗圃基地和供应商
             let isClericalStaff = false;
             let userRoles = user.roles || '';
             if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('施工文书') !== -1) {
                 isClericalStaff = true;
             }
-            if (user.username === 'admin') {
-                permission = true;
-            }
-            this.setState({
-                permission
-            });
+
             let orgTreeData = {};
             let orgTreeArrList = [];
             if (user && user.username !== 'admin') {
@@ -68,29 +63,33 @@ export default class Tree extends Component {
                 // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
                 let parentOrgData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
                 // 如果在公司下，则获取公司所有的信息
-                if (parentOrgData) {
-                    let parentOrgCode = parentOrgData.code;
+                if (parentOrgData && parentOrgData.ID) {
+                    let parentOrgID = parentOrgData.ID;
                     // 获取公司线下的所有部门信息
-                    orgTreeData = await getChildOrgTreeByID({id: parentOrgCode});
+                    orgTreeData = await getChildOrgTreeByID({id: parentOrgID});
+                    await getCompanyOrgTree(orgTreeData);
                     orgTreeArrList.push(orgTreeData);
-                    // 将公司下的所有部门设置为Select的选项
-                    let orgTreeSelectData = Tree.orgloop([orgTreeData]);
+                    // 将公司的部门的ID全部进行存储,用来判断用户是否有权限查看点击的组织机构
                     this.orgTreeDataArr = [];
-                    await getOrgTreeSelect(orgTreeSelectData);
-                    // 将公司的部门的code全部进行存储
                     await this.orgArrLoop([orgTreeData], 0);
                     await getOrgTreeDataArr(this.orgTreeDataArr);
                     // 如果是施工文书，需要获取苗木基地和供应商，对这两种机构下的人进行审核
                     if (isClericalStaff) {
-                        let nurseryData = await getChildOrgTreeByID({id: ORG_NURSERY_CODE});
-                        let supplierData = await getChildOrgTreeByID({id: ORG_SUPPLIER_CODE});
-                        orgTreeArrList.push(nurseryData);
-                        orgTreeArrList.push(supplierData);
-                        orgTreeArrList.map(item => {
-                            if (item.name === '供应商') {
-                                item.children = addGroup(item.children, '供应商');
-                            } else if (item.name === '苗圃基地') {
-                                item.children = addGroup(item.children, '苗圃基地');
+                        // 获取苗圃列表
+                        let nurseryData = {};
+                        let contentData = await getNurseryList();
+                        if (contentData && contentData.content) {
+                            nurseryData = {
+                                ID: moment().unix(),
+                                OrgType: '苗圃基地',
+                                Orgs: contentData.content,
+                                ProjectName: '苗圃基地'
+                            };
+                            orgTreeArrList.push(nurseryData);
+                        }
+                        orgTreeArrList.map(async item => {
+                            if (item.ProjectName === '苗圃基地') {
+                                item.Orgs = await addGroup(item.Orgs, '苗圃基地');
                             }
                         });
                     }
@@ -98,10 +97,10 @@ export default class Tree extends Component {
                     // 如果不在公司下，则至获取他所在的组织机构的数据
                     orgTreeData = await getChildOrgTreeByID({id: orgID});
                     console.log('orgTreeData', orgTreeData);
-                    if (orgTreeData && orgTreeData.code) {
+                    if (orgTreeData && orgTreeData.ID) {
                         orgTreeData.children = [];
                         orgTreeArrList.push(orgTreeData);
-                        await getOrgTreeDataArr([orgTreeData.code]);
+                        await getOrgTreeDataArr([orgTreeData.ID]);
                     }
                 }
                 this.setState({
@@ -147,11 +146,10 @@ export default class Tree extends Component {
                 };
                 await getTablePage(pagination);
             } else {
-                if (orgTreeData && orgTreeData.pk) {
+                if (orgTreeData && orgTreeData.ID) {
                     // 作为选中的节点，将机构的数据上传至redux
                     await changeSidebarField('node', orgTreeData);
-                    const codes = Tree.collect(orgTreeData);
-                    await this.getOrgUserList(codes);
+                    await this.getOrgUserList(orgTreeData.ID);
                 }
             }
         } catch (e) {
@@ -159,67 +157,72 @@ export default class Tree extends Component {
         }
     }
 
-    getOrgUserList = async (codes) => {
+    getOrgUserList = async (org) => {
         const {
             actions: {
-                getTreeCode,
                 getUsers,
-                getTablePage,
-                getTreeModal
+                getTablePage
             }
         } = this.props;
-        await getTreeCode(codes);
-        let userList = await getUsers({}, { org_code: codes, page: 1 });
-        if (userList && userList.results) {
+        let postData = {
+            org: org,
+            page: 1,
+            size: 10
+        };
+        let userList = await getUsers({}, postData);
+        console.log('userList', userList);
+        if (userList && userList.code && userList.code === 200) {
             let pagination = {
                 current: 1,
-                total: userList.count
+                total: userList.pageinfo.total
             };
             await getTablePage(pagination);
         }
-        await getTreeModal(false);
-    }
-
-    componentDidUpdate () {
     }
 
     select = async (s, node) => {
-        const { node: { props: { eventKey = '' } = {} } = {} } = node || {};
+        const {
+            node: {
+                props: {
+                    eventKey = ''
+                } = {}
+            } = {}
+        } = node || {};
         const {
             actions: {
                 changeSidebarField,
                 getUsers,
-                getTreeModal,
-                setUpdate,
-                getTablePage,
-                getTreeCode
+                getTablePage
             }
         } = this.props;
         const {
             orgTreeArrList
         } = this.state;
-        const user = getUser();
-        let topProject = Tree.loop(orgTreeArrList, eventKey);
-        if (this.compare(user, topProject, eventKey)) {
-            if (topProject.code) {
-                await getTreeModal(true);
-            } else {
-                await getTreeModal(false);
+        if (eventKey) {
+            let selectOrgData = JSON.parse(eventKey);
+            if (selectOrgData && selectOrgData.ID) {
+                const user = getUser();
+                let topProject = Tree.loop(orgTreeArrList, selectOrgData.ID);
+                if (this.compare(user, topProject, selectOrgData.ID)) {
+                    await changeSidebarField('node', selectOrgData);
+                    let postData = {
+                        org: selectOrgData.ID,
+                        page: 1,
+                        size: 10
+                    };
+                    let userList = await getUsers({}, postData);
+                    if (userList && userList.code && userList.code === 200) {
+                        let pagination = {
+                            current: 1,
+                            total: userList.pageinfo.total
+                        };
+                        await getTablePage(pagination);
+                    }
+                }
             }
-            await changeSidebarField('node', topProject);
-            const codes = Tree.collect(topProject);
-
-            await getTreeCode(codes);
-            let userList = await getUsers({}, { org_code: codes, page: 1 });
-            let pagination = {
-                current: 1,
-                total: userList.count
-            };
-            await getTreeModal(false);
-            await setUpdate(true);
-            await getTablePage(pagination);
         }
     }
+    // 判断点击的点  用户是否有权限查看
     compare (user, topProject, eventKey) {
         let userRoles = user.roles || '';
         let isClericalStaff = false;
@@ -233,25 +236,28 @@ export default class Tree extends Component {
             return true;
         }
         let status = false;
-        this.orgTreeDataArr.map((code) => {
-            if (code === eventKey) {
+        this.orgTreeDataArr.map((ID) => {
+            if (ID === eventKey) {
                 status = true;
             }
         });
         return status;
     }
-    static loop = (list, code, loopTimes = 0, topParent) => {
+    static loop = (list, ID, loopTimes = 0, topParent) => {
         let rst = null;
         list.forEach((item = {}) => {
             if (loopTimes === 0) {
                 topParent = item.name;
             }
-            const { code: value, children = [] } = item;
-            if (value === code) {
+            const {
+                ID: value,
+                children = []
+            } = item;
+            if (value === ID) {
                 rst = item;
                 rst.topParent = topParent;
             } else {
-                const tmp = Tree.loop(children, code, loopTimes + 1, topParent);
+                const tmp = Tree.loop(children, ID, loopTimes + 1, topParent);
                 if (tmp) {
                     rst = tmp;
                     rst.topParent = topParent;
@@ -261,39 +267,7 @@ export default class Tree extends Component {
         return rst;
     };
 
-    static collect = (node = {}) => {
-        const { code } = node;
-        let rst = [];
-        rst.push(code);
-        return rst;
-    };
-    // 设置登录用户所在的公司的部门项
-    static orgloop (data = [], loopTimes = 0) {
-        if (data.length === 0) {
-            return;
-        }
-        return data.map((item) => {
-            if (item.children && item.children.length > 0) {
-                return (
-                    <TreeNode disabled
-                        key={`${item.code}`}
-                        value={JSON.stringify(item)}
-                        title={`${item.name}`}>
-                        {
-                            Tree.orgloop(item.children, loopTimes + 1, item.name)
-                        }
-                    </TreeNode>
-                );
-            } else {
-                return (<TreeNode
-                    disabled={loopTimes === 0 && true}
-                    key={`${item.code}`}
-                    value={JSON.stringify(item)}
-                    title={`${item.name}`} />);
-            }
-        });
-    };
-    // 设置登录用户所在公司的所有部门作为选项数组
+    // 设置登录用户所在公司的所有部门作为选项数组,用来判断用户点击的部门是否是自己所在的公司下的部门
     orgArrLoop (data = [], loopTimes = 0) {
         try {
             if (data.length === 0) {
@@ -301,10 +275,10 @@ export default class Tree extends Component {
             }
             return data.map((item) => {
                 if (item.children && item.children.length > 0) {
-                    this.orgTreeDataArr.push(item.code);
+                    this.orgTreeDataArr.push(item.ID);
                     this.orgArrLoop(item.children, loopTimes + 1);
                 } else {
-                    this.orgTreeDataArr.push(item.code);
+                    this.orgTreeDataArr.push(item.ID);
                 }
             });
         } catch (e) {
@@ -319,11 +293,10 @@ export default class Tree extends Component {
         const {
             orgTreeArrList
         } = this.state;
-        const { code } = node || {};
         return (
             <SimpleTree
                 dataSource={orgTreeArrList}
-                selectedKey={code}
+                selectedKey={JSON.stringify(node)}
                 onSelect={this.select.bind(this)}
             />
         );

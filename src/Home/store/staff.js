@@ -1,6 +1,6 @@
 import { createAction, handleActions, combineActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
-import { MAIN_API, USER_API } from '_platform/api';
+import { MAIN_API } from '_platform/api';
 
 const ID = 'home_staff';
 
@@ -13,18 +13,11 @@ const getOrgAttendInfoT = createFetchAction(
     `${MAIN_API}/staff-statistic2/?org_code=&fromyear={{fromyear}}&frommonth={{frommonth}}&toyear={{toyear}}&tomonth={{tomonth}}`,
     []
 );
-const getCurrentUserOrgCodeOK = createAction(`${ID}_获取当前用户org-code`);
-const getCurrentUserOrgCode = createFetchAction(
-    `${USER_API}/users/{{userId}}/`,
-    [getCurrentUserOrgCodeOK]
-);
 
 const setMonthSection = createAction(`${ID}_设置统计时间区间`);
 export const actions = {
     getOrgAttendInfoOK,
     getOrgAttendInfo,
-    getCurrentUserOrgCodeOK,
-    getCurrentUserOrgCode,
     setMonthSection,
     getOrgAttendInfoT
 };
@@ -35,17 +28,6 @@ export default handleActions(
             ...state,
             orgAttendInfo: payload
         }),
-        [getCurrentUserOrgCodeOK]: (state, { payload }) => {
-            // TOFIX:管理员账户无法获取当前用户组织名称,当管理员登录时写死
-            return {
-                ...state,
-                thisOrgCode: payload.account
-                    ? payload.account.org_code
-                        ? payload.account.org_code
-                        : window.DeathCode.OVERALL_APPROVAL_UNIT_CODE
-                    : window.DeathCode.OVERALL_APPROVAL_UNIT_CODE
-            };
-        },
         [setMonthSection]: (state, { payload }) => ({
             ...state,
             monthSection: payload
