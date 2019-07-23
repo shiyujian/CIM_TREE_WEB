@@ -2,10 +2,10 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import {
-    USER_API,
     FOREST_API,
     LBSAMAP_API,
-    TREEPIPE_API
+    TREEPIPE_API,
+    SYSTEM_API
 } from '_platform/api';
 const ID = 'dashboard';
 // 获取隐患列表
@@ -43,13 +43,13 @@ export const getAdoptTrees = forestFetchAction(`${FOREST_API}/adopt/adopttrees`,
 export const getLocationNameByCoordinate = createFetchAction(`${LBSAMAP_API}/v3/geocode/regeo`, [], 'GET');
 // 灌溉官网查询数据
 export const getQueryTreePipe = createFetchAction(`${TREEPIPE_API}/pipe/query`, [], 'POST');
-export const getCustomViewByUserIDOk = createAction(`${ID}根据用户ID获取用户自定义视图`);
 // 根据用户ID获取用户自定义视图
-export const getCustomViewByUserID = createFetchAction(`${USER_API}/user/{{id}}/custom-view/`, [getCustomViewByUserIDOk], 'GET');
+export const getCustomViewByUserIDOk = createAction(`${ID}根据用户ID获取用户自定义视图`);
+export const getCustomViewByUserID = createFetchAction(`${SYSTEM_API}/userviews?userid={{id}}`, [getCustomViewByUserIDOk], 'GET');
 // 用户创建自定义视图
-export const postUserCustomView = createFetchAction(`${USER_API}/custom-view/`, [], 'POST');
+export const postUserCustomView = createFetchAction(`${SYSTEM_API}/userview`, [], 'POST');
 // 用户删除自定义视图
-export const deleteUserCustomView = createFetchAction(`${USER_API}/custom-view/{{id}}/`, [], 'DELETE');
+export const deleteUserCustomView = createFetchAction(`${SYSTEM_API}/userview/{{id}}`, [], 'DELETE');
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);

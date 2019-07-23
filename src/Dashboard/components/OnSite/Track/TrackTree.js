@@ -375,17 +375,17 @@ export default class TrackTree extends Component {
                 routes.forEach(item => {
                     latlngs.push([item.Y, item.X]);
                 });
-                if (data && data.PatrolerUser && data.PatrolerUser.PK) {
+                if (data && data.PatrolerUser && data.PatrolerUser.ID) {
                     let user = {};
-                    if (this.userDetailList[data.PatrolerUser.PK]) {
-                        user = this.userDetailList[data.PatrolerUser.PK];
+                    if (this.userDetailList[data.PatrolerUser.ID]) {
+                        user = this.userDetailList[data.PatrolerUser.ID];
                     } else {
-                        user = await getUserDetail({id: data.PatrolerUser.PK});
-                        this.userDetailList[data.PatrolerUser.PK] = user;
+                        user = await getUserDetail({id: data.PatrolerUser.ID});
+                        this.userDetailList[data.PatrolerUser.ID] = user;
                     };
                     let sectionName = '';
-                    if (user && user.account && user.account.sections && user.account.sections.length > 0) {
-                        let section = user.account.sections[0];
+                    if (user && user.Section) {
+                        let section = user.Section;
                         sectionName = getSectionName(section);
                     }
 
@@ -396,9 +396,8 @@ export default class TrackTree extends Component {
                         },
                         key: selectKey,
                         properties: {
-                            name: user.account.person_name ? user.account.person_name : user.username,
-                            organization: user.account.organization ? user.account.organization : '',
-                            person_telephone: user.account.person_telephone ? user.account.person_telephone : '',
+                            name: user.Full_Name ? user.Full_Name : user.User_Name,
+                            phone: user.Phone ? user.Phone : '',
                             sectionName: sectionName,
                             type: 'track'
                         },

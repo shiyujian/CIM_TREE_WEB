@@ -332,8 +332,6 @@ export const getTreetypeByThinclass = forestFetchAction(
     []
 );
 
-export const getCustomViewByUserIDOk = createAction(`${ID}根据用户ID获取用户自定义视图`);
-// 根据用户ID获取用户自定义视图
 export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET'); // 获取细班详情
 
 // 苗木来源地分析苗圃总览 苗圃基地、供应商数据统计
@@ -506,7 +504,6 @@ export const actions = {
     getSectionUserStat,
     getTQulityCheckList,
     getZZJQulityCheckList,
-    getCustomViewByUserIDOk,
     getTreearea,
     getNurseryBaseStat,
     getNurseryEnterStat,
@@ -589,12 +586,6 @@ export default handleActions({
         ...state,
         nurseryName: payload
     }),
-    [getCustomViewByUserIDOk]: (state, { payload }) => {
-        return {
-            ...state,
-            customViewByUserID: payload
-        };
-    },
     [getNurseryListOK]: (state, { payload }) => {
         return {
             ...state,

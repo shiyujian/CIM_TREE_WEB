@@ -35,12 +35,12 @@ class SaveUserMapCustomPositionModal extends Component {
             }
             let repeat = false;
             PROJECTPOSITIONCENTER.map((view) => {
-                if (name === view.name) {
+                if (name === view.Name) {
                     repeat = true;
                 }
             });
             customViewByUserID.map((view) => {
-                if (name === view.name) {
+                if (name === view.Name) {
                     repeat = true;
                 }
             });
@@ -53,18 +53,20 @@ class SaveUserMapCustomPositionModal extends Component {
             }
             let user = getUser();
             let postData = {
-                name: name,
-                zoom: saveUserMapCustomPositionZoom,
-                center: [
-                    {
-                        lng: saveUserMapCustomPositionCenter.lng,
-                        lat: saveUserMapCustomPositionCenter.lat
-                    }
-                ],
-                user: user.ID
+                Name: name,
+                Zoom: saveUserMapCustomPositionZoom,
+                Lng: saveUserMapCustomPositionCenter.lng,
+                Lat: saveUserMapCustomPositionCenter.lat,
+                // center: [
+                //     {
+                //         lng: saveUserMapCustomPositionCenter.lng,
+                //         lat: saveUserMapCustomPositionCenter.lat
+                //     }
+                // ],
+                Creater: user.ID
             };
             let data = await postUserCustomView({}, postData);
-            if (data && data.id) {
+            if (data && data.code && data.code === 1) {
                 Notification.success({
                     message: '保存视图成功',
                     duration: 3

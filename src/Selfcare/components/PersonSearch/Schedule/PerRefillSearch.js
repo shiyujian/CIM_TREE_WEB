@@ -40,7 +40,10 @@ export default class PerSearch extends Component {
 
     query = async () => {
         const {
-            actions: { getUsers, getRoles }
+            actions: {
+                getUsers,
+                getRoles
+            }
         } = this.props;
         let user = await getUser();
         let section = user.section;
@@ -48,15 +51,15 @@ export default class PerSearch extends Component {
         if (!section) {
             return;
         }
-        let postRole = [];
+        let postRoleData = '';
         roles.map((role) => {
-            if (role && role.id && role.name && role.name === '监理文书') {
-                postRole.push(role.id);
+            if (role && role.ID && role.ParentID && role.RoleName === '监理文书') {
+                postRoleData = role.ID;
             }
         });
         try {
             let postdata = {
-                roles: postRole,
+                role: postRoleData,
                 sections: section,
                 is_active: true,
                 page: 1,
@@ -70,7 +73,7 @@ export default class PerSearch extends Component {
             if (total > 20) {
                 for (let i = 0; i < (total / 20) - 1; i++) {
                     postdata = {
-                        roles: postRole,
+                        role: postRoleData,
                         sections: section,
                         is_active: true,
                         page: i + 2,

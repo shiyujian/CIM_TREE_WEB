@@ -41,6 +41,10 @@ export const getUser = () => {
             Status = 1,
             Token = ''
         } = user;
+        let roles = '';
+        if (Roles && Roles instanceof Array && Roles.length > 0) {
+            roles = Roles[0];
+        }
         return {
             username: User_Name,
             ID: ID,
@@ -50,7 +54,7 @@ export const getUser = () => {
             phone: Phone,
             isBlack: IsBlack,
             number: Number,
-            roles: Roles,
+            roles: roles,
             section: Section,
             status: Status,
             token: Token,

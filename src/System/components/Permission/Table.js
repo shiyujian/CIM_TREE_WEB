@@ -203,8 +203,15 @@ export default class PermissionTable extends Component {
     }
     save = async () => {
         const {
-            table: { role = {}, permissions = [] } = {},
-            actions: { changeTableField, putRole, getRoles }
+            table: {
+                role = {},
+                permissions = []
+            } = {},
+            actions: {
+                changeTableField,
+                putRole,
+                getRoles
+            }
         } = this.props;
         try {
             this.setState({

@@ -194,8 +194,7 @@ export const genPopUpContent = (geo) => {
         case 'track': {
             return `<div class="popupBox">
 						<h2><span>姓名：</span>${properties.name}</h2>
-						<h2><span>所属单位：</span>${properties.organization}</h2>
-						<h2><span>联系方式：</span>${properties.person_telephone}</h2>
+						<h2><span>联系方式：</span>${properties.phone}</h2>
 						<h2><span>标段：</span>${properties.sectionName}</h2>
 					</div>`;
         }

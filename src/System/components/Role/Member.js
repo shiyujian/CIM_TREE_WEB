@@ -22,7 +22,7 @@ export default class Member extends Component {
             member: { role = {} } = {},
             actions: {
                 getMembers,
-                getUsersPage
+                getUsers
             }
         } = this.props;
         try {
@@ -31,7 +31,7 @@ export default class Member extends Component {
             let relationMember = (data && data.members) || [];
             let relationMemberIDList = relationMember.map(member => member.id);
 
-            let allUserData = await getUsersPage({ page: 1 });
+            let allUserData = await getUsers({}, { page: 1 });
             let pagination = {
                 current: 1,
                 total: (allUserData && allUserData.count) || 0,
@@ -129,7 +129,6 @@ export default class Member extends Component {
     changePage = async (pagina) => {
         const {
             actions: {
-                getUsersPage,
                 getUsers
             }
         } = this.props;
@@ -153,7 +152,7 @@ export default class Member extends Component {
                 loading: false
             });
         } else {
-            let allUserData = await getUsersPage({ page: pagina.current });
+            let allUserData = await getUsers({}, { page: pagina.current });
             pagination.total = (allUserData && allUserData.count) || 0;
             this.setState({
                 pagination,

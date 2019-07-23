@@ -40,7 +40,12 @@ export default class Info extends Component {
     save () {
         const {
             addition = {},
-            actions: { getRoles, postRole, clearAdditionField, putRole }
+            actions: {
+                getRoles,
+                postRole,
+                clearAdditionField,
+                putRole
+            }
         } = this.props;
         if (!addition.name) {
             Notification.error({
