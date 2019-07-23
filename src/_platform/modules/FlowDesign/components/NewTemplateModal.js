@@ -71,6 +71,13 @@ class NewTemplateModal extends React.Component {
                         }
                         <p style={{ color: '#ccc' }}>唯一，默认自动生成，可手动修改</p>
                     </FormItem>
+                    <FormItem {...formItemLayout} label='模板说明'>
+                        {
+                            getFieldDecorator('FlowDescribe')(
+                                <Input placeholder='请输入模板编码' />
+                            )
+                        }
+                    </FormItem>
                 </Form>
             </Modal>
 

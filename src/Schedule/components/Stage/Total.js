@@ -534,152 +534,184 @@ class Total extends Component {
             </div>
         );
     }
-
-    // 确认提交
+    // 确认新增
     sendWork () {
         const {
-            actions: { createFlow, getWorkflowById, putFlow },
-            location
+            actions: { postStartwork },
+            form: { validateFields }
         } = this.props;
-        const {
-            TreatmentData,
-            sectionSchedule,
-            projectName,
-            currentSectionName,
-            currentSection
-        } = this.state;
-
-        let user = getUser(); // 当前登录用户
-
-        let section = user.section;
-
-        if (!section) {
-            notification.error({
-                message: '当前用户未关联标段，不能创建流程',
-                duration: 3
-            });
-            return;
-        }
-
-        let me = this;
-        // 共有信息
-        let postData = {};
-        me.props.form.validateFields((err, values) => {
+        validateFields((err, values) => {
             if (!err) {
-                if (TreatmentData.length === 0) {
-                    notification.error({
-                        message: '请上传文件',
-                        duration: 5
-                    });
-                    return;
-                }
+                console.log(values.Tsection, values.Tnumbercode, values.Ttotledocument, values.TdataReview);
+                let FormParams = [{
+                    Key: 'Tsection',
+                    FieldType: 0,
+                    Val: values.Tsection
+                }];
 
-                postData.upload_unit = user.org ? user.org : '';
-                postData.type = '总进度计划';
-                postData.upload_person = user.name ? user.name : user.username;
-                postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
-
-                const currentUser = {
-                    username: user.username,
-                    person_name: user.name,
-                    id: parseInt(user.ID)
-                };
-
-                let subject = [
-                    {
-                        section: JSON.stringify(currentSection),
-                        sectionName: JSON.stringify(currentSectionName),
-                        projectName: JSON.stringify(projectName),
-                        // "superunit": JSON.stringify(values.Tsuperunit),
-                        dataReview: JSON.stringify(values.TdataReview),
-                        numbercode: JSON.stringify(values.Tnumbercode),
-                        timedate: JSON.stringify(moment().format('YYYY-MM-DD')),
-                        totledocument: JSON.stringify(values.Ttotledocument),
-                        postData: JSON.stringify(postData),
-                        TreatmentData: JSON.stringify(TreatmentData)
-                    }
-                ];
-                const nextUser = this.member;
-                let WORKFLOW_MAP = {
-                    name: '总进度计划报批流程',
-                    desc: '进度管理模块总进度计划报批流程',
-                    code: WORKFLOW_CODE.总进度计划报批流程
-                };
-                let workflowdata = {
-                    name: WORKFLOW_MAP.name,
-                    description: WORKFLOW_MAP.desc,
-                    subject: subject,
-                    code: WORKFLOW_MAP.code,
-                    creator: currentUser,
-                    plan_start_time: null,
-                    deadline: null,
-                    status: 2
-                };
-                createFlow({}, workflowdata).then(instance => {
-                    if (!instance.id) {
-                        notification.error({
-                            message: '数据提交失败',
-                            duration: 2
-                        });
-                        return;
-                    }
-                    const { id, workflow: { states = [] } = {} } = instance;
-                    const [
-                        {
-                            id: state_id,
-                            actions: [action]
-                        }
-                    ] = states;
-
-                    getWorkflowById({ id: id }).then(instance => {
-                        if (instance && instance.current) {
-                            let currentStateId = instance.current[0].id;
-                            let nextStates = getNextStates(
-                                instance,
-                                currentStateId
-                            );
-                            let stateid = nextStates[0].to_state[0].id;
-
-                            let postInfo = {
-                                next_states: [
-                                    {
-                                        state: stateid,
-                                        participants: [nextUser],
-                                        deadline: null,
-                                        remark: null
-                                    }
-                                ],
-                                state: instance.workflow.states[0].id,
-                                executor: currentUser,
-                                action: nextStates[0].action_name,
-                                note: '提交',
-                                attachment: null
-                            };
-                            let data = { pk: id };
-                            // 提交流程到下一步
-                            putFlow(data, postInfo).then(rst => {
-                                if (rst && rst.creator) {
-                                    notification.success({
-                                        message: '流程提交成功',
-                                        duration: 2
-                                    });
-                                    this.gettaskSchedule(); // 重新更新流程列表
-                                    this.setState({
-                                        visible: false
-                                    });
-                                } else {
-                                    notification.error({
-                                        message: '流程提交失败',
-                                        duration: 2
-                                    });
-                                }
-                            });
-                        }
-                    });
+                postStartwork({}, {
+                    FlowID: '99a7897f-1b60-421a-8051-c646a4e2add8', // 模板ID
+                    FlowName: '总进度计划报批流程', // 模板名称
+                    FormValue: { // 表单值
+                        FormParams: FormParams,
+                        NodeID: ''
+                    },
+                    NextExecutor: 14, // 下一节点执行人
+                    Starter: 1, // 发起人
+                    Title: '3标段计划', // 任务标题
+                    WFState: 1 // 流程状态 1运行中
+                }).then(rep => {
+        
                 });
             }
         });
     }
+
+    // 确认提交
+    // sendWork () {
+    //     const {
+    //         actions: { createFlow, getWorkflowById, putFlow },
+    //         location
+    //     } = this.props;
+    //     const {
+    //         TreatmentData,
+    //         sectionSchedule,
+    //         projectName,
+    //         currentSectionName,
+    //         currentSection
+    //     } = this.state;
+
+    //     let user = getUser(); // 当前登录用户
+
+    //     let section = user.section;
+
+    //     if (!section) {
+    //         notification.error({
+    //             message: '当前用户未关联标段，不能创建流程',
+    //             duration: 3
+    //         });
+    //         return;
+    //     }
+
+    //     let me = this;
+    //     // 共有信息
+    //     let postData = {};
+    //     me.props.form.validateFields((err, values) => {
+    //         if (!err) {
+    //             if (TreatmentData.length === 0) {
+    //                 notification.error({
+    //                     message: '请上传文件',
+    //                     duration: 5
+    //                 });
+    //                 return;
+    //             }
+
+    //             postData.upload_unit = user.org ? user.org : '';
+    //             postData.type = '总进度计划';
+    //             postData.upload_person = user.name ? user.name : user.username;
+    //             postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
+
+    //             const currentUser = {
+    //                 username: user.username,
+    //                 person_name: user.name,
+    //                 id: parseInt(user.ID)
+    //             };
+
+    //             let subject = [
+    //                 {
+    //                     section: JSON.stringify(currentSection),
+    //                     sectionName: JSON.stringify(currentSectionName),
+    //                     projectName: JSON.stringify(projectName),
+    //                     // "superunit": JSON.stringify(values.Tsuperunit),
+    //                     dataReview: JSON.stringify(values.TdataReview),
+    //                     numbercode: JSON.stringify(values.Tnumbercode),
+    //                     timedate: JSON.stringify(moment().format('YYYY-MM-DD')),
+    //                     totledocument: JSON.stringify(values.Ttotledocument),
+    //                     postData: JSON.stringify(postData),
+    //                     TreatmentData: JSON.stringify(TreatmentData)
+    //                 }
+    //             ];
+    //             const nextUser = this.member;
+    //             let WORKFLOW_MAP = {
+    //                 name: '总进度计划报批流程',
+    //                 desc: '进度管理模块总进度计划报批流程',
+    //                 code: WORKFLOW_CODE.总进度计划报批流程
+    //             };
+    //             let workflowdata = {
+    //                 name: WORKFLOW_MAP.name,
+    //                 description: WORKFLOW_MAP.desc,
+    //                 subject: subject,
+    //                 code: WORKFLOW_MAP.code,
+    //                 creator: currentUser,
+    //                 plan_start_time: null,
+    //                 deadline: null,
+    //                 status: 2
+    //             };
+    //             createFlow({}, workflowdata).then(instance => {
+    //                 if (!instance.id) {
+    //                     notification.error({
+    //                         message: '数据提交失败',
+    //                         duration: 2
+    //                     });
+    //                     return;
+    //                 }
+    //                 const { id, workflow: { states = [] } = {} } = instance;
+    //                 const [
+    //                     {
+    //                         id: state_id,
+    //                         actions: [action]
+    //                     }
+    //                 ] = states;
+
+    //                 getWorkflowById({ id: id }).then(instance => {
+    //                     if (instance && instance.current) {
+    //                         let currentStateId = instance.current[0].id;
+    //                         let nextStates = getNextStates(
+    //                             instance,
+    //                             currentStateId
+    //                         );
+    //                         let stateid = nextStates[0].to_state[0].id;
+
+    //                         let postInfo = {
+    //                             next_states: [
+    //                                 {
+    //                                     state: stateid,
+    //                                     participants: [nextUser],
+    //                                     deadline: null,
+    //                                     remark: null
+    //                                 }
+    //                             ],
+    //                             state: instance.workflow.states[0].id,
+    //                             executor: currentUser,
+    //                             action: nextStates[0].action_name,
+    //                             note: '提交',
+    //                             attachment: null
+    //                         };
+    //                         let data = { pk: id };
+    //                         // 提交流程到下一步
+    //                         putFlow(data, postInfo).then(rst => {
+    //                             if (rst && rst.creator) {
+    //                                 notification.success({
+    //                                     message: '流程提交成功',
+    //                                     duration: 2
+    //                                 });
+    //                                 this.gettaskSchedule(); // 重新更新流程列表
+    //                                 this.setState({
+    //                                     visible: false
+    //                                 });
+    //                             } else {
+    //                                 notification.error({
+    //                                     message: '流程提交失败',
+    //                                     duration: 2
+    //                                 });
+    //                             }
+    //                         });
+    //                     }
+    //                 });
+    //             });
+    //         }
+    //     });
+    // }
 
     onSelectChange = (selectedRowKeys, selectedRows) => {
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });

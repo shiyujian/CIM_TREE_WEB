@@ -1,7 +1,10 @@
 $(function () {
     var $target = $('#property'),
         flow,
-        $slider = $('#slider'),
+        $sliderNode = $('#sliderNode'),
+        $sliderLine = $('#sliderLine'),
+        $nodeOkBtn = $('#nodeOk_btn'),
+        $lineOkBtn = $('#lineOk_btn'),
         $sliderbtn = $('#sliderbtn');
 
     var prefix = getUrlParam('serverURL'); // http://bimcd.ecidi.com:6544';
@@ -11,6 +14,20 @@ $(function () {
     var ORGTREE = prefix + '/service/construction/api/org-tree/';
     var USERTREE = prefix + '/accounts/api/users/';
     var ROLESET = prefix + '/accounts/api/roles/';
+
+    // 2019-7-22 两库合并新接口
+    // 节点查询列表
+    var getNodeListUrl = prefix + '/flow/nodes';
+    // 节点新增
+    var postNodeUrl = prefix + '/flow/node';
+    // 节点编辑
+    var putNodeUrl = prefix + '/flow/node';
+    // 流向查询列表
+    var getLineListUrl = prefix + '/flow/directions';
+    // 流向新增
+    var postDirectionUrl = prefix + '/flow/direction';
+    // 流向编辑
+    var putDirectionUrl = prefix + '/flow/direction';
 
     var CALLBACKSET = [];
     $.getJSON('./configData/yinghuan.json', function (data) {
@@ -27,8 +44,10 @@ $(function () {
         USERS = [],
         ROLES = [];
 
+    let originData = [];
     var temp_name = getUrlParam('name');
     var temp_id = getUrlParam('id');
+    console.log('传值信息', prefix, temp_id, temp_name);
     var h = document.documentElement.clientHeight - 20;
     var w = document.documentElement.clientWidth - 20;
     var toolBts = [
@@ -98,8 +117,8 @@ $(function () {
         haveGroup: false,
         useOperStack: false
     };
-
-    function getProperty (data) {
+    
+    function getProperty (data, id) {
         var type,
             detail = data.detail;
         for (var i in toolBts) {
@@ -120,118 +139,18 @@ $(function () {
             {
                 name: '节点ID',
                 field: 'no',
-                value: data.detail.id,
+                value: id,
                 group: '节点信息'
             },
             {
-                name: '执行部门',
+                name: '节点说明',
                 field: 'orgs',
-                value: detail.orgs.join(','),
-                group: '流程信息',
+                value: '',
+                group: '节点信息',
                 editor: {
-                    type: 'combotree',
-                    options: {
-                        multiple: true,
-                        data: ORGS
-                    },
+                    type: 'textbox',
                     onChange: function (value) {
-                        detail.orgs = value;
-                    }
-                }
-            },
-            // {
-            //     name: '执行人',
-            //     field: 'participants',
-            //     value: detail.participants.join(','),
-            //     group: '流程信息',
-            //     editor: {
-            //         type: 'combotree',
-            //         options: {
-            //             multiple: true,
-            //             data: USERS
-            //         },
-            //         onChange: function (value) {
-            //             detail.participants = value;
-            //         }
-            //     }
-            // },
-            {
-                name: '执行角色',
-                field: 'roles',
-                value: detail.roles.join(','),
-                group: '流程信息',
-                editor: {
-                    type: 'combotree',
-                    options: {
-                        multiple: true,
-                        data: ROLES
-                    },
-                    onChange: function (value) {
-                        detail.roles = value;
-                    }
-                }
-            },
-            {
-                name: '是否可委托',
-                field: 'allow_delegation',
-                value: String(detail.allow_delegation),
-                group: '流程信息',
-                editor: {
-                    type: 'checkbox',
-                    options: {
-                        on: true,
-                        off: false
-                    },
-                    onChange: function (value) {
-                        detail.allow_delegation = value;
-                    }
-                }
-            },
-            {
-                name: '是否可废止',
-                field: 'allow_abolish',
-                value: String(detail.allow_abolish),
-                group: '流程信息',
-                editor: {
-                    type: 'checkbox',
-                    options: {
-                        on: true,
-                        off: false
-                    },
-                    onChange: function (value) {
-                        detail.allow_abolish = value;
-                    }
-                }
-            },
-            {
-                name: '是否可抄送',
-                field: 'allow_carbon_copy',
-                value: String(detail.allow_carbon_copy),
-                group: '流程信息',
-                editor: {
-                    type: 'checkbox',
-                    options: {
-                        on: true,
-                        off: false
-                    },
-                    onChange: function (value) {
-                        detail.allow_carbon_copy = value;
-                    }
-                }
-            },
-            {
-                name: '逾期提醒',
-                field: 'deadline_warning',
-                value: String(detail.deadline_warning),
-                group: '流程信息',
-                editor: {
-                    type: 'checkbox',
-                    options: {
-                        on: true,
-                        off: false
-                    },
-                    onChange: function (value) {
-                        detail.deadline_warning = value;
+                        data.NodeDescribe = value;
                     }
                 }
             }
@@ -241,61 +160,49 @@ $(function () {
             columns: [
                 [
                     { field: 'name', title: 'Name', width: 50, sortable: true },
-                    {
-                        field: 'value',
-                        title: 'Value',
-                        width: 100,
-                        sortable: true,
-                        formatter: function (value, rowData, rowIndex) {
-                            var handleOnChange = rowData.editor
-                                ? rowData.editor.onChange
-                                : function () {};
-                            switch (rowData.field) {
-                                case 'allow_delegation':
-                                case 'allow_abolish':
-                                case 'allow_carbon_copy':
-                                case 'deadline_warning':
-                                    handleOnChange(value);
-                                    return value == 'true' ? '是' : '否';
-                                case 'orgs':
-                                    handleOnChange(value.split(','));
-                                    var orgs = getOrgs(
-                                        value,
-                                        rowData.editor.options.data
-                                    );
-                                    var orgNames = orgs.map(function (o) {
-                                        return o.name;
-                                    });
-                                    return orgNames;
-                                case 'roles':
-                                    var rolesValue = value.split(',');
-                                    handleOnChange(rolesValue);
-                                    return ROLES.filter(function (role) {
-                                        return rolesValue.some(function (
-                                            roleId
-                                        ) {
-                                            return role.id == roleId;
-                                        });
-                                    }).map(function (resultRole) {
-                                        return resultRole.text;
-                                    });
-                                // case 'participants':
-                                //     var target = value.split(','),
-                                //         result = [];
-                                //     handleOnChange(target);
-                                //     USERS.forEach(function (user) {
-                                //         if (
-                                //             target.indexOf(String(user.id)) > -1
-                                //         ) {
-                                //             result.push(user.text);
-                                //         }
-                                //     });
-                                //     return result;
-                                default:
-                                    return value;
-                            }
-                        }
-                    }
+                    // {
+                    //     field: 'value',
+                    //     title: 'Value',
+                    //     width: 100,
+                    //     sortable: true,
+                    //     formatter: function (value, rowData, rowIndex) {
+                    //         var handleOnChange = rowData.editor
+                    //             ? rowData.editor.onChange
+                    //             : function () {};
+                    //         switch (rowData.field) {
+                    //             case 'allow_delegation':
+                    //             case 'allow_abolish':
+                    //             case 'allow_carbon_copy':
+                    //             case 'deadline_warning':
+                    //                 handleOnChange(value);
+                    //                 return value == 'true' ? '是' : '否';
+                    //             case 'orgs':
+                    //                 handleOnChange(value.split(','));
+                    //                 var orgs = getOrgs(
+                    //                     value,
+                    //                     rowData.editor.options.data
+                    //                 );
+                    //                 var orgNames = orgs.map(function (o) {
+                    //                     return o.name;
+                    //                 });
+                    //                 return orgNames;
+                    //             case 'roles':
+                    //                 var rolesValue = value.split(',');
+                    //                 handleOnChange(rolesValue);
+                    //                 return ROLES.filter(function (role) {
+                    //                     return rolesValue.some(function (
+                    //                         roleId
+                    //                     ) {
+                    //                         return role.id == roleId;
+                    //                     });
+                    //                 }).map(function (resultRole) {
+                    //                     return resultRole.text;
+                    //                 });
+                    //             default:
+                    //                 return value;
+                    //         }
+                    //     }
+                    // }
                 ]
             ],
             data: config,
@@ -384,15 +291,52 @@ $(function () {
         }
         return obj;
     }
-
+    // 确认节点
+    function onSubmitNode () {
+        console.log('确认node', focusObj, flow, flow.$nodeData);
+        if (flow.$nodeData[focusObj.id]) {
+            let $node_name = $('#node_name').val();
+            let $node_describe = $('#node_describe').val();
+            flow.$nodeData[focusObj.id].describe = $node_describe;
+            console.log('确认值', flow.$nodeData);
+            flow.setName(focusObj.id, $node_name, 'node');
+            $sliderNode.hide();
+        }
+        flow.blurItem();
+    }
+    function onSubmitLine () {
+        if (flow.$lineData[focusObj.id]) {
+            let $line_name = $('#line_name').val();
+            let $line_describe = $('#line_describe').val();
+            console.log('确认line', focusObj, flow.$lineData, $line_name, $line_describe);
+            flow.$lineData[focusObj.id].describe = $line_describe;
+            flow.setName(focusObj.id, $line_name, 'line');
+            $sliderLine.hide();
+        }
+        flow.blurItem();
+    }
+    let focusObj = {}; // 焦点元素原值
+    // 获取焦点
     function onItemFocus (id, mode) {
         var obj = _getObj.call(this, id, mode);
-        if (mode == 'node') {
-            $slider.show();
-            getProperty(obj);
-        } else if (mode == 'line') {
-            $slider.show();
-            getLineProperty(obj);
+        console.log('编辑节点', id, mode, obj);
+        obj.id = id;
+        if (mode === 'node') {
+            $sliderNode.show();
+            // getProperty(obj, id);
+            focusObj = obj;
+            $('#node_code').val(obj.code);
+            $('#node_name').val(obj.name);
+            $('#node_type').val(obj.type);
+            $('#node_describe').val(obj.describe);
+        } else if (mode === 'line') {
+            $sliderLine.show();
+            // getLineProperty(obj);
+            focusObj = obj;
+            $('#line_id').val(id);
+            $('#line_name').val(obj.name);
+            $('#line_type').val(obj.type);
+            $('#line_describe').val(obj.describe);
         }
         return true;
     }
@@ -482,126 +426,224 @@ $(function () {
         );
     }
 
-    function wholeUpdate (data) {
-        data = JSON.parse(JSON.stringify(data));
-
-        var states = [],
-            transitions = [];
-        for (var i in data.nodes) {
-            var item = data.nodes[i].detail;
-
-            if (item.orgs.length > 0) {
-                var orgs = getOrgs(item.orgs.join(','), ORGS);
-                console.log('orgs', orgs);
-                console.log('item.orgs', item.orgs);
-                item.orgs = orgs.map(function (o) {
-                    // delete o.children;
-                    return {
-                        code: o.code || null,
-                        id: o.id || null,
-                        pk: o.pk || null,
-                        name: o.name || null,
-                        text: o.text || null
-                    };
+    // 保存
+    function wholeUpdate (nodeData, lineData) {
+        for (let item in lineData) {
+            console.log('保存', lineData, originData);
+            if (originData.includes(item)) {
+                let params = {
+                    ID: item,
+                    Name: lineData[item].name, // 流向名称
+                    DCondition: lineData[item].describe, // 流向条件
+                    FromNode: lineData[item].from, // 节点起点
+                    ToNode: lineData[item].to // 节点终点
+                };
+                $.ajax({
+                    url: putDirectionUrl,
+                    data: JSON.stringify(params),
+                    contentType: 'application/json',
+                    type: 'PUT',
+                    success: function (rep) {
+                        if (rep.code === 1) {
+                            alert('编辑流向成功');
+                        } else {
+                            alert(rep.msg);
+                        }
+                    }
+                });
+            } else {
+                let params = {
+                    Creater: 9, // 新增人ID
+                    FlowID: temp_id, // 流程ID
+                    FlowName: temp_name, // 流程名称
+                    Name: lineData[item].name, // 流向名称
+                    DCondition: lineData[item].describe, // 流向条件
+                    FromNode: lineData[item].from, // 节点起点
+                    ToNode: lineData[item].to // 节点终点
+                };
+                $.ajax({
+                    url: postDirectionUrl,
+                    data: JSON.stringify(params),
+                    contentType: 'application/json',
+                    type: 'POST',
+                    success: function (rep) {
+                        if (rep.code === 1) {
+                            alert('创建流向成功');
+                        } else {
+                            alert(rep.msg);
+                        }
+                    }
                 });
             }
-            // if (item.participants.length > 0) {
-            //     item.participants = USERS.filter(function (user) {
-            //         return item.participants.indexOf(String(user.id)) > -1;
-            //     });
-            // }
-
-            // update roles
-            if (item.roles.length > 0) {
-                item.roles = ROLES.filter(function (r) {
-                    return item.roles.indexOf(String(r.id)) > -1;
-                }).map(function (newRole) {
-                    delete newRole.text;
-                    return newRole;
+        }
+        for (let item in nodeData) {
+            // 确定节点类型
+            let NodeType = '';
+            if (nodeData[item].type === 'start round mix') {
+                NodeType = 1;
+            } else if (nodeData[item].type === 'task') {
+                NodeType = 2;
+            }
+            // 是否为编辑
+            if (originData.includes(item)) {
+                let params = {
+                    ID: item, // 新增人ID
+                    Name: nodeData[item].name, // 节点名称
+                    NodeDescribe: nodeData[item].describe // 节点说明
+                };
+                $.ajax({
+                    url: putNodeUrl,
+                    data: JSON.stringify(params),
+                    contentType: 'application/json',
+                    type: 'PUT',
+                    success: function (rep) {
+                        if (rep.code === 1) {
+                            alert('编辑节点成功');
+                        } else {
+                            alert(rep.msg);
+                        }
+                    }
+                });
+            } else {
+                let params = {
+                    Creater: 9, // 新增人ID
+                    FlowID: temp_id, // 流程ID
+                    FlowName: temp_name, // 流程名称
+                    Name: nodeData[item].name, // 节点名称
+                    NodeDescribe: nodeData[item].describe, // 节点说明
+                    NodeType // 节点类型
+                };
+                $.ajax({
+                    url: postNodeUrl,
+                    data: JSON.stringify(params),
+                    contentType: 'application/json',
+                    type: 'POST',
+                    success: function (rep) {
+                        if (rep.code === 1) {
+                            alert('创建节点成功');
+                        } else {
+                            alert(rep.msg);
+                        }
+                    }
                 });
             }
-            if (item.state_type == 6) {
-                item.state_type = 0;
-            }
-
-            // update Position
-            var node = data.nodes[i];
-            item.position = {
-                height: node.height,
-                width: node.width,
-                top: node.top,
-                left: node.left
-            };
-
-            // set code
-            item.code = node.code || i;
-
-            // name
-            item.name = node.name;
-
-            states.push(item);
         }
-
-        for (var i in data.lines) {
-            var item = data.lines[i];
-
-            var fromNode = states.find(function (s) {
-                return s.id == item.from;
-            });
-            item.from = fromNode.code;
-            var to = states.find(function (s) {
-                return s.id == item.to;
-            });
-            item.to = to.code;
-
-            var transit = {
-                name: item.name || '连线',
-                from_state: item.from,
-                to_state: item.to,
-                condition: item.detail.condition,
-                callback: item.detail.callback,
-                position: {
-                    type: item.type,
-                    M: item.M,
-                    marked: item.marked,
-                    dash: item.dash
-                }
-            };
-
-            if (transit.callback) {
-                // line
-                if (transit.callback.length > 0) {
-                    transit.callback = transit.callback.map(function (index) {
-                        delete CALLBACKSET[index].text;
-                        return CALLBACKSET[index];
-                    });
-                }
-            }
-
-            transitions.push(transit);
-        }
-
-        var data = {
-            template: true,
-            workflow: {
-                name: TEMP.name,
-                code: TEMP.code,
-                status: 0, // 默认设置为0
-                position: {}
-            },
-            states: states,
-            transitions: transitions
-        };
-        $.ajax({
-            url: SERVER + temp_id + '/whole/',
-            data: JSON.stringify(data),
-            contentType: 'application/json',
-            type: 'PUT',
-            success: function (rep) {
-                alert('更新成功');
-            }
-        });
     }
+    // function wholeUpdate (data) {
+    //     data = JSON.parse(JSON.stringify(data));
+
+    //     var states = [],
+    //         transitions = [];
+    //     for (var i in data.nodes) {
+    //         var item = data.nodes[i].detail;
+
+    //         if (item.orgs.length > 0) {
+    //             var orgs = getOrgs(item.orgs.join(','), ORGS);
+    //             console.log('orgs', orgs);
+    //             console.log('item.orgs', item.orgs);
+    //             item.orgs = orgs.map(function (o) {
+    //                 // delete o.children;
+    //                 return {
+    //                     code: o.code || null,
+    //                     id: o.id || null,
+    //                     pk: o.pk || null,
+    //                     name: o.name || null,
+    //                     text: o.text || null
+    //                 };
+    //             });
+    //         }
+
+    //         // update roles
+    //         if (item.roles.length > 0) {
+    //             item.roles = ROLES.filter(function (r) {
+    //                 return item.roles.indexOf(String(r.id)) > -1;
+    //             }).map(function (newRole) {
+    //                 delete newRole.text;
+    //                 return newRole;
+    //             });
+    //         }
+    //         if (item.state_type == 6) {
+    //             item.state_type = 0;
+    //         }
+
+    //         // update Position
+    //         var node = data.nodes[i];
+    //         item.position = {
+    //             height: node.height,
+    //             width: node.width,
+    //             top: node.top,
+    //             left: node.left
+    //         };
+
+    //         // set code
+    //         item.code = node.code || i;
+
+    //         // name
+    //         item.name = node.name;
+
+    //         states.push(item);
+    //     }
+
+    //     for (var i in data.lines) {
+    //         var item = data.lines[i];
+
+    //         var fromNode = states.find(function (s) {
+    //             return s.id == item.from;
+    //         });
+    //         item.from = fromNode.code;
+    //         var to = states.find(function (s) {
+    //             return s.id == item.to;
+    //         });
+    //         item.to = to.code;
+
+    //         var transit = {
+    //             name: item.name || '连线',
+    //             from_state: item.from,
+    //             to_state: item.to,
+    //             condition: item.detail.condition,
+    //             callback: item.detail.callback,
+    //             position: {
+    //                 type: item.type,
+    //                 M: item.M,
+    //                 marked: item.marked,
+    //                 dash: item.dash
+    //             }
+    //         };
+
+    //         if (transit.callback) {
+    //             // line
+    //             if (transit.callback.length > 0) {
+    //                 transit.callback = transit.callback.map(function (index) {
+    //                     delete CALLBACKSET[index].text;
+    //                     return CALLBACKSET[index];
+    //                 });
+    //             }
+    //         }
+
+    //         transitions.push(transit);
+    //     }
+
+    //     var data = {
+    //         template: true,
+    //         workflow: {
+    //             name: TEMP.name,
+    //             code: TEMP.code,
+    //             status: 0, // 默认设置为0
+    //             position: {}
+    //         },
+    //         states: states,
+    //         transitions: transitions
+    //     };
+    //     $.ajax({
+    //         url: SERVER + temp_id + '/whole/',
+    //         data: JSON.stringify(data),
+    //         contentType: 'application/json',
+    //         type: 'PUT',
+    //         success: function (rep) {
+    //             alert('更新成功');
+    //         }
+    //     });
+    // }
 
     function updateNode (node) {
         if (!node) {
@@ -693,7 +735,8 @@ $(function () {
         } else {
             updateLine(this.$lineData[id], id);
         }
-        $slider.hide();
+        $sliderNode.hide();
+        $sliderLine.hide();
         return true;
     }
 
@@ -704,42 +747,119 @@ $(function () {
         return null; // 返回参数值
     }
 
+    // 初始化
     function initFlow () {
-        $.get(SERVER + temp_id + '/', {}).success(function (rep) {
-            var exportName = 'export';
-            TEMP = rep;
-            console.log('======= resp Data ====', rep);
-
-            if (rep.status === 0) {
-                flow = $.createGooFlow($('#flow'), property);
-            } else if (rep.status === 1) {
-                flow = $.createGooFlow($('#flow'), readOnlyProperty);
-                $('.Gooflow_extend_right').remove();
-                $('.Gooflow_extend_bottom').remove();
-
-                flow.onEditClick = onEditClick;
-            }
-
-            // flow.setNodeRemarks(remark);
-            flow.loadData(transData(rep));
-            flow.onBtnSaveClick = function () {
-                flow.blurItem();
-                wholeUpdate({ nodes: flow.$nodeData, lines: flow.$lineData });
-            };
-            $('#loading').remove();
-            $('#svg').remove();
-
-            flow.onItemAdd = onItemAdd;
-            flow.onItemFocus = onItemFocus;
-            // flow.onItemBlur = onItemBlur;
-            flow.onItemDel = onItemDel;
-            flow.onPrintClick = function () {
-                flow.exportDiagram(exportName);
-            };
-            flow.onFullsreenClick = fullscreen;
-
-            $sliderbtn.click(handleCloseProperty);
+        flow = $.createGooFlow($('#flow'), property);
+        $('#loading').remove();
+        $('#svg').remove();
+        flow.onBtnSaveClick = function () {
+            console.log('保存节点');
+            flow.blurItem();
+            wholeUpdate(flow.$nodeData, flow.$lineData);
+        };
+        flow.onItemFocus = onItemFocus;
+        $nodeOkBtn.click(onSubmitNode);
+        $lineOkBtn.click(onSubmitLine);
+        $.get(getNodeListUrl, {
+            flowid: temp_id, // 流程ID
+            name: '', // 节点名称
+            type: '', // 节点类型
+            status: '' // 节点状态
+        }).success(function (rep) {
+            let nodes = {};
+            rep.map((item, index) => {
+                originData.push(item.ID);
+                if (item.NodeType === 1) {
+                    nodes[item.ID] = {
+                        name: item.Name,
+                        describe: item.NodeDescribe,
+                        code: item.Code,
+                        height: 28,
+                        width: 30,
+                        top: 40,
+                        left: 220,
+                        alt: true,
+                        type: 'start round mix'
+                    };
+                } else if (item.NodeType === 2) {
+                    nodes[item.ID] = {
+                        name: item.Name,
+                        describe: item.NodeDescribe,
+                        code: item.Code,
+                        height: 28,
+                        width: 30,
+                        top: 180 + index * 140,
+                        left: 180,
+                        alt: true,
+                        type: 'task'
+                    };
+                }
+            });
+            $.get(getLineListUrl, {
+                flowid: temp_id, // 流程ID
+                name: '', // 流程名称
+                type: '', // 流向状态
+                page: '', // 节点状态
+                siez: '' // 每页数量
+            }).success(rep => {
+                let lines = {};
+                rep.map((item, index) => {
+                    originData.push(item.ID);
+                    lines[item.ID] = {
+                        id: item.ID,
+                        name: item.Name,
+                        describe: item.DCondition,
+                        from: item.FromNode,
+                        to: item.ToNode,
+                        type: 'sl'
+                    };
+                });
+                let data = {
+                    title: '',
+                    nodes: nodes,
+                    lines: lines,
+                    areas: {},
+                    initNum: 0
+                };
+                console.log('回显的数据', data);
+                flow.loadData(data);
+            });
         });
+
+        // $.get(SERVER + temp_id + '/', {}).success(function (rep) {
+        //     var exportName = 'export';
+        //     TEMP = rep;
+        //     console.log('======= resp Data ====', rep);
+
+        //     if (rep.status === 0) {
+        //         flow = $.createGooFlow($('#flow'), property);
+        //     } else if (rep.status === 1) {
+        //         flow = $.createGooFlow($('#flow'), readOnlyProperty);
+        //         $('.Gooflow_extend_right').remove();
+        //         $('.Gooflow_extend_bottom').remove();
+
+        //         flow.onEditClick = onEditClick;
+        //     }
+
+        //     // flow.setNodeRemarks(remark);
+        //     flow.loadData(transData(rep));
+        //     flow.onBtnSaveClick = function () {
+        //         flow.blurItem();
+        //         wholeUpdate({ nodes: flow.$nodeData, lines: flow.$lineData });
+        //     };
+        //     $('#loading').remove();
+        //     $('#svg').remove();
+
+        //     flow.onItemAdd = onItemAdd;
+        //     // flow.onItemBlur = onItemBlur;
+        //     flow.onItemDel = onItemDel;
+        //     flow.onPrintClick = function () {
+        //         flow.exportDiagram(exportName);
+        //     };
+        //     flow.onFullsreenClick = fullscreen;
+
+        //     $sliderbtn.click(handleCloseProperty);
+        // });
     }
 
     function fullscreen () {
@@ -986,10 +1106,11 @@ $(function () {
     }
 
     if (temp_id) {
-        $.get(ORGTREE, {}).success(function (rep) {
-            ORGS = transTree(rep);
-            initFlow();
-        });
+        initFlow();
+        // $.get(ORGTREE, {}).success(function (rep) {
+        //     ORGS = transTree(rep);
+        //     initFlow();
+        // });
 
         // $.get(USERTREE, {}).success(function (rep) {
         //     USERS = rep.map(function (item) {
