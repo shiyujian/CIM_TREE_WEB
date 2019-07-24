@@ -1,78 +1,56 @@
 import React, { Component } from 'react';
 import { Table, Spin } from 'antd';
-import moment from 'moment';
-import { Link } from 'react-router-dom';
-import '../../../Datum/components/Datum/index.less'
+class TaskTable extends Component {
+    columns = [{
+        title: '序号',
+        dataIndex: 'index',
+        render (text, record, index) {
+            return index;
+        }
+    }, {
+        title: '任务名称',
+        dataIndex: 'Title'
+    }, {
+        title: '任务状态',
+        dataIndex: 'WFState'
+    }, {
+        title: '当前节点名称',
+        dataIndex: 'CurrentNodeName'
+    }, {
+        title: '发送人',
+        dataIndex: 'Sender'
+    }, {
+        title: '执行人',
+        dataIndex: 'Executor'
+    }, {
+        title: '执行组织机构',
+        dataIndex: 'ExecuteOrg'
+    }, {
+        title: '执行角色',
+        dataIndex: 'ExecuteRole'
+    }, {
+        title: '流程名称',
+        dataIndex: 'FlowName'
+    }];
+    onChange () {
 
-export default class TaskTable extends Component {
-
-	static propTypes = {};
-
-	onChange = (pagination, filters, sorter) => {
-		const {
-			actions: { setTablePage }
-		} = this.props;
-		setTablePage(pagination)
-	}
-	render() {
-		const rowSelection = {
-			// selectedRowKeys,
-			onChange: this.onSelectChange,
-		};
-		//console.log("TaskTable  ====  ", this.state, this.props);
-		let loading = this.props.loadingstatus ? this.props.loadingstatus : false;
-		const { platform: { tasks = [] }, pagination = {} } = this.props;
-		console.log(tasks)
-		tasks.forEach((task, index) => {
-			task.index = index + 1;
-		});
-		return (
-			<Spin tip="加载中" spinning={loading}>
-				<Table columns={this.columns} dataSource={tasks}
-					rowSelection={rowSelection}
-					bordered
-					rowKey='rowKey'
-					className="foresttables"
-					onChange={this.onChange.bind(this)}
-					pagination={pagination} />
-			</Spin>
-		);
-	}
-
-	columns = [
-		{
-			title: '序号',
-			dataIndex: 'index',
-		}, {
-			title: '任务名称',
-			dataIndex: 'name',
-		}, {
-			title: '任务类型',
-			dataIndex: 'type',
-		}, {
-			title: '发起人',
-			dataIndex: 'creatorName',
-		}, {
-			title: '发起时间',
-			dataIndex: 'real_start_time',
-			sorter: (a, b) => moment(a['real_start_time']).unix() - moment(b['real_start_time']).unix(),
-			render: text => {
-				return moment(text).format('YYYY-MM-DD');
-			}
-		},
-		{
-			title: '当前执行人',
-			dataIndex: 'executorName',
-		},
-		{
-			title: '流转状态',
-			dataIndex: 'status',
-		}, {
-			title: '操作',
-			render: (item) => {
-				const { id, state: { id: stateId = '' } = {} } = item;
-				return <Link to={`/selfcare/task/${id}?state_id=${stateId}`}>查看</Link>;
-			},
-		}];
-
+    }
+    render () {
+        let loading = false;
+        const { backlogDataList } = this.props;
+        console.log('渲染待办', backlogDataList);
+        return (
+            <div>
+                <Spin tip='加载中' spinning={loading}>
+                    <Table columns={this.columns}
+                        dataSource={backlogDataList}
+                        bordered
+                        rowKey='ID'
+                        onChange={this.onChange.bind(this)}
+                    />
+                </Spin>
+            </div>
+        );
+    }
 };
+export default TaskTable;

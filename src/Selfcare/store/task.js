@@ -3,6 +3,7 @@ import { actionsMap } from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
 import createFetchAction from 'fetch-action';
 import {
+    base,
     WORKFLOW_API,
     FOREST_API
 } from '_platform/api';
@@ -51,7 +52,10 @@ export const gettreetype = forestFetchAction(
 const changeDocs = createAction(`${ID}_22CHANGE_DOCS`);
 const selectDocuments = createAction(`${ID}_22SELECTDOUMENT`);
 
+// 获取任务详情
+export const getWorkDetails = createFetchAction(`${base}/flow/work/{{ID}}`, [], 'GET');
 export const actions = {
+    getWorkDetails,
     ...parameterReducer,
     setTaskDetailLoading,
     patchDeadline,

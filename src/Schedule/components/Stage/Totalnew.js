@@ -327,7 +327,7 @@ class Total extends Component {
                     {...this.state}
                     gettaskSchedule={this.gettaskSchedule.bind(this)}
                 />
-                <Button onClick={this.addClick.bind(this)}>新增</Button>
+                <Button onClick={this.onAdd.bind(this)}>新增</Button>
                 {username === 'admin' ? (
                     <Popconfirm
                         placement='leftTop'
@@ -356,130 +356,9 @@ class Total extends Component {
                     maskClosable={false}
                     onCancel={this.closeModal.bind(this)}
                     onOk={this.sendWork.bind(this)}
-                    // key={this.state.key}
                 >
                     <div>
-                        <Spin spinning={this.state.loading}>
-                            <Form>
-                                <Row>
-                                    <Col span={24}>
-                                        <Row>
-                                            <Col span={12}>
-                                                <FormItem
-                                                    {...FormItemLayout}
-                                                    label='标段'
-                                                >
-                                                    {getFieldDecorator(
-                                                        'Tsection',
-                                                        {
-                                                            initialValue: {
-                                                                currentSectionName
-                                                            }
-                                                            // rules: [
-                                                            //     {
-                                                            //         required: true,
-                                                            //         message:
-                                                            //             '请输入标段'
-                                                            //     }
-                                                            // ]
-                                                        }
-                                                    )(
-                                                        <Input
-                                                            placeholder='请输入标段'
-                                                        />
-                                                    )}
-                                                </FormItem>
-                                            </Col>
-                                            <Col span={12}>
-                                                <FormItem
-                                                    {...FormItemLayout}
-                                                    label='编号'
-                                                >
-                                                    {getFieldDecorator(
-                                                        'Tnumbercode'
-                                                    )(
-                                                        <Input placeholder='请输入编号' />
-                                                    )}
-                                                </FormItem>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col span={12}>
-                                                <FormItem
-                                                    {...FormItemLayout}
-                                                    label='文档类型'
-                                                >
-                                                    {getFieldDecorator(
-                                                        'Ttotledocument',
-                                                        {
-                                                            initialValue: `总计划进度`,
-                                                            rules: [
-                                                            ]
-                                                        }
-                                                    )(<Input readOnly />)}
-                                                </FormItem>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Dragger {...this.uploadProps}>
-                                                <p className='ant-upload-drag-icon'>
-                                                    <Icon type='inbox' />
-                                                </p>
-                                                <p className='ant-upload-text'>
-                                                    点击或者拖拽开始上传
-                                                </p>
-                                                <p className='ant-upload-hint'>
-                                                    支持 pdf、doc、docx 文件
-                                                </p>
-                                            </Dragger>
-                                            <Table
-                                                columns={this.columns1}
-                                                pagination
-                                                dataSource={
-                                                    this.state.TreatmentData
-                                                }
-                                                className='foresttable'
-                                            />
-                                        </Row>
-                                        <Row style={{ marginTop: 20 }}>
-                                            <Col span={8} offset={4}>
-                                                <FormItem
-                                                    {...FormItemLayout}
-                                                    label='审核人'
-                                                >
-                                                    {getFieldDecorator(
-                                                        'TdataReview'
-                                                    )(
-                                                        <Input />
-                                                        // <PerSearch
-                                                        //     selectMember={this.selectMember.bind(
-                                                        //         this
-                                                        //     )}
-                                                        //     code={
-                                                        //         WORKFLOW_CODE.总进度计划报批流程
-                                                        //     }
-                                                        //     visible={
-                                                        //         this.state
-                                                        //             .visible
-                                                        //     }
-                                                        // />
-                                                    )}
-                                                </FormItem>
-                                            </Col>
-                                            <Col span={8} offset={4}>
-                                                <Checkbox
-                                                    onChange={this._cpoyMsgT.bind(
-                                                        this
-                                                    )}
-                                                >
-                                                    短信通知
-                                                </Checkbox>
-                                            </Col>
-                                        </Row>
-                                    </Col>
-                                </Row>
-                            </Form>
-                        </Spin>
+                        hh
                     </div>
                 </Modal>
             </div>
@@ -741,17 +620,9 @@ class Total extends Component {
     }
 
     // 新增按钮
-    addClick = () => {
+    onAdd = () => {
         this.setState({
-            visible: true,
-            TreatmentData: [],
-            key: Math.random()
-        });
-        this.props.form.setFieldsValue({
-            // Tsuperunit: undefined,
-            Tsection: this.state.currentSectionName || undefined,
-            TdataReview: undefined,
-            Tnumbercode: undefined
+            visible: true
         });
     };
     // 关闭弹框
