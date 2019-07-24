@@ -1,4 +1,5 @@
 import createFetchAction from '../fetchAction';
+import { base } from '../../../api';
 
 export const getTemplate = createFetchAction(`{{Workflow_API}}/service/workflow/api/template/?status={{status}}`, []);
 
@@ -33,7 +34,22 @@ export const updateInstance = createFetchAction(
     `{{Workflow_API}}/service/workflow/api/instance/{{pk}}/subject/`, [], 'POST'
 );
 
+// 2019-7-22两库合并接口
+// 获取流程列表
+export const getflowList = createFetchAction(`{{Workflow_API}}/flow/flows`, []);
+// 增加流程
+export const postflow = createFetchAction(`{{Workflow_API}}/flow/flow`, [], 'POST');
+// 编辑流程
+export const putflowNew = createFetchAction(`{{Workflow_API}}/flow/flow`, [], 'PUT');
+// 删除流程
+export const deleteflow = createFetchAction(`${base}/flow/flow/{{ID}}`, [], 'DELETE');
+
 export default {
+    getflowList,
+    postflow,
+    putflowNew,
+    deleteflow,
+
     getFlows,
     createFlow,
     addActor,
