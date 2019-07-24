@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Button, Switch, Spin } from 'antd';
+import { Table, Button, Switch, Spin, Notification } from 'antd';
 import { MODULES } from '_platform/api';
 import Card from '_platform/components/panels/Card';
 import './index.css';
@@ -10,7 +10,8 @@ export default class PermissionTable extends Component {
         this.state = {
             permissionData: [],
             editing: false,
-            loading: false
+            loading: false,
+            allPermissions: []
         };
     }
     columns = [
@@ -24,7 +25,7 @@ export default class PermissionTable extends Component {
             width: '25%',
             render: item => {
                 const {
-                    table: { permissions = [] } = {}
+                    table: { permissionsCodes = [] } = {}
                 } = this.props;
                 const {
                     editing
@@ -32,8 +33,8 @@ export default class PermissionTable extends Component {
 
                 const key = `appmeta.${item.id}.READ`;
                 // permissions里面是当前用户拥有的所有的权限
-                const value = permissions.some(
-                    permission => permission === key
+                const value = permissionsCodes.some(
+                    permissionCode => permissionCode === key
                 );
                 return (
                     <Switch
@@ -58,11 +59,26 @@ export default class PermissionTable extends Component {
             return module;
         });
     };
-    componentDidMount () {
-        let permissionData = PermissionTable.loop(MODULES);
-        this.setState({
-            permissionData
-        });
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getAllPermissions
+            }
+        } = this.props;
+        try {
+            let permissionData = PermissionTable.loop(MODULES);
+            let allPermissions = await getAllPermissions();
+            if (allPermissions && allPermissions instanceof Array) {
+                this.setState({
+                    allPermissions
+                });
+            }
+            this.setState({
+                permissionData
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
     }
     findParent = (data2, nodeId2) => {
         let arrRes = [];
@@ -124,12 +140,13 @@ export default class PermissionTable extends Component {
     }
     check (key, checked) {
         const {
-            table: { permissions = [] } = {},
+            table: { permissionsCodes = [] } = {},
             actions: { changeTableField }
         } = this.props;
         const {
             permissionData
         } = this.state;
+
         let currentKey = key.slice(key.indexOf('appmeta.') + 8, key.indexOf('.READ'));
         if (checked) {
             let parentDatas = this.findParent(permissionData, currentKey);
@@ -137,8 +154,8 @@ export default class PermissionTable extends Component {
             if (parentDatas && parentDatas.length > 0) {
                 parentDatas.map((data) => {
                     let id = `appmeta.${data.id}.READ`;
-                    if (permissions.indexOf(id) === -1) {
-                        permissions.push(id);
+                    if (permissionsCodes.indexOf(id) === -1) {
+                        permissionsCodes.push(id);
                     }
                 });
             }
@@ -149,8 +166,8 @@ export default class PermissionTable extends Component {
                 childDatas.map((data) => {
                     if (data) {
                         let id = `appmeta.${data}.READ`;
-                        if (permissions.indexOf(id) === -1) {
-                            permissions.push(id);
+                        if (permissionsCodes.indexOf(id) === -1) {
+                            permissionsCodes.push(id);
                         }
                     }
                 });
@@ -161,8 +178,8 @@ export default class PermissionTable extends Component {
                 childDatas.map((data) => {
                     if (data) {
                         let id = `appmeta.${data}.READ`;
-                        if (permissions.indexOf(id) !== -1) {
-                            permissions.splice(permissions.indexOf(id), 1);
+                        if (permissionsCodes.indexOf(id) !== -1) {
+                            permissionsCodes.splice(permissionsCodes.indexOf(id), 1);
                         }
                     }
                 });
@@ -174,8 +191,8 @@ export default class PermissionTable extends Component {
                     let data = parentDatas[i];
                     if (i === parentDatas.length) {
                         let id = `appmeta.${data.id}.READ`;
-                        if (permissions.indexOf(id) !== -1) {
-                            permissions.splice(permissions.indexOf(id), 1);
+                        if (permissionsCodes.indexOf(id) !== -1) {
+                            permissionsCodes.splice(permissionsCodes.indexOf(id), 1);
                         }
                     } else {
                         if (data && data.children && data.children.length > 0) {
@@ -184,14 +201,14 @@ export default class PermissionTable extends Component {
                             for (let s = 0; s < children.length; s++) {
                                 let child = children[s];
                                 let id = `appmeta.${child.id}.READ`;
-                                if (permissions.indexOf(id) !== -1) {
+                                if (permissionsCodes.indexOf(id) !== -1) {
                                     isEmpty = false;
                                 }
                             }
                             if (isEmpty) {
                                 let id = `appmeta.${data.id}.READ`;
-                                if (permissions.indexOf(id) !== -1) {
-                                    permissions.splice(permissions.indexOf(id), 1);
+                                if (permissionsCodes.indexOf(id) !== -1) {
+                                    permissionsCodes.splice(permissionsCodes.indexOf(id), 1);
                                 }
                             }
                         }
@@ -199,38 +216,68 @@ export default class PermissionTable extends Component {
                 }
             }
         }
-        changeTableField('permissions', permissions);
+        changeTableField('permissionsCodes', permissionsCodes);
     }
     save = async () => {
         const {
             table: {
                 role = {},
-                permissions = []
+                permissionsCodes = []
             } = {},
             actions: {
                 changeTableField,
-                putRole,
+                changeRolePermission,
                 getRoles
             }
         } = this.props;
+        const {
+            allPermissions
+        } = this.state;
         try {
             this.setState({
                 loading: true
             });
-            await putRole(
-                { id: role.id },
-                { name: role.name, grouptype: role.grouptype, permissions }
-            );
-            let roles = await getRoles();
-            if (roles && roles instanceof Array) {
-                let myrole = roles.find(theRole => {
-                    return theRole.id === role.id;
+            let functions = [];
+            permissionsCodes.map((permissionCode) => {
+                allPermissions.map((allPermission) => {
+                    if (permissionCode === allPermission.FunctionCode) {
+                        functions.push({
+                            ID: allPermission.ID
+                        });
+                    }
                 });
-                myrole && changeTableField('role', myrole);
-                myrole &&
-                    myrole.permissions &&
-                    changeTableField('permissions', myrole.permissions);
+            });
+            let postData = {
+                ID: role.ID,
+                Functions: functions
             };
+            let changePermissionData = await changeRolePermission({}, postData);
+            if (changePermissionData && changePermissionData.code && changePermissionData.code === 1) {
+                let roles = await getRoles();
+                if (roles && roles instanceof Array) {
+                    let myrole = roles.find(theRole => {
+                        return theRole.ID === role.ID;
+                    });
+                    if (myrole && myrole.ID && myrole.ParentID && myrole.Functions) {
+                        let newPermissionsCodes = [];
+                        myrole.Functions.map((permission) => {
+                            newPermissionsCodes.push((permission.FunctionCode));
+                        });
+                        await changeTableField('role', myrole);
+                        await changeTableField('permissionsCodes', newPermissionsCodes);
+                    }
+                };
+                Notification.success({
+                    message: '权限设置成功',
+                    duration: 3
+                });
+            } else {
+                Notification.error({
+                    message: '权限设置失败',
+                    duration: 3
+                });
+            }
+
             this.setState({
                 editing: false,
                 loading: false
@@ -258,7 +305,7 @@ export default class PermissionTable extends Component {
             table: { role = {} } = {}
         } = this.props;
         let disabled = true;
-        if (role && role.id) {
+        if (role && role.ID) {
             disabled = false;
         }
         return (

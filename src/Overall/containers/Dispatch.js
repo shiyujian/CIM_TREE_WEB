@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Tabs } from 'antd';
 import { actions } from '../store/dispatch';
-import { ReceivePage, SendPage } from '../components/Dispatch';
 import { getUser } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 
@@ -82,14 +81,7 @@ export default class Dispatch extends Component {
         return (
             <div style={{ overflow: 'hidden', padding: 20 }}>
                 <DynamicTitle title='现场收发文' {...this.props} />
-                <Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
-                    <TabPane tab='收文管理' key='1'>
-                        <ReceivePage {...this.props} {...this.state} />
-                    </TabPane>
-                    <TabPane tab='发文管理' key='2'>
-                        <SendPage {...this.props} {...this.state} />
-                    </TabPane>
-                </Tabs>
+                现场收发文
             </div>
         );
     }

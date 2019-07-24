@@ -60,27 +60,30 @@ export default class PerSearch extends Component {
         try {
             let postdata = {
                 role: postRoleData,
-                sections: section,
-                is_active: true,
+                section: section,
+                status: 1,
                 page: 1,
-                page_size: 20
+                size: 20
             };
             let results = [];
-            let users = await getUsers({}, postdata);
-            console.log('users', users);
-            results = results.concat((users && users.results) || []);
-            let total = users.count;
-            if (total > 20) {
-                for (let i = 0; i < (total / 20) - 1; i++) {
-                    postdata = {
-                        role: postRoleData,
-                        sections: section,
-                        is_active: true,
-                        page: i + 2,
-                        page_size: 20
-                    };
-                    let datas = await getUsers({}, postdata);
-                    results = results.concat((datas && datas.results) || []);
+            let userList = await getUsers({}, postdata);
+            if (userList && userList.code && userList.code === 200) {
+                results = results.concat((userList && userList.content) || []);
+                let total = userList.pageinfo.total;
+                if (total > 20) {
+                    for (let i = 0; i < (total / 20) - 1; i++) {
+                        postdata = {
+                            role: postRoleData,
+                            section: section,
+                            status: 1,
+                            page: i + 2,
+                            size: 20
+                        };
+                        let datas = await getUsers({}, postdata);
+                        if (datas && datas.code && datas.code === 200) {
+                            results = results.concat((datas && datas.content) || []);
+                        }
+                    }
                 }
             }
             this.setState({
@@ -101,24 +104,21 @@ export default class PerSearch extends Component {
         });
         for (var i = 0; i < userList.length; i++) {
             if (
-                userList[i].id &&
-                userList[i].account.person_code &&
-                userList[i].account.person_name &&
-                userList[i].account.org_code
+                userList[i].ID &&
+                userList[i].Full_Name &&
+                userList[i].User_Name
             ) {
                 tree.push({
                     pk: userList[i].id,
-                    code: userList[i].account.person_code,
-                    name: userList[i].account.person_name,
-                    username: userList[i].username,
-                    org: userList[i].account.org_code
+                    name: userList[i].Full_Name,
+                    username: userList[i].User_Name,
+                    org: userList[i].Org
                 });
             }
         }
         dataList = tree.map(node => ({
             text: node.name + '(' + node.username + ')',
             obj: JSON.stringify({
-                code: node.code,
                 name: node.name,
                 pk: node.pk,
                 username: node.username,
@@ -126,8 +126,6 @@ export default class PerSearch extends Component {
             }),
             value:
                 'C_PER' +
-                '#' +
-                node.code +
                 '#' +
                 node.name +
                 '#' +

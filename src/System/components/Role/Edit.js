@@ -3,7 +3,19 @@ import { Modal, Form, Input, Notification } from 'antd';
 
 const FormItem = Form.Item;
 
-class Addition extends Component {
+class Edit extends Component {
+    componentDidMount = async () => {
+        const {
+            form: {
+                setFieldsValue
+            },
+            editRole
+        } = this.props;
+        setFieldsValue({
+            RoleName: editRole.RoleName,
+            description: editRole.Remark || ''
+        });
+    }
     render () {
         const {
             form: {
@@ -18,7 +30,7 @@ class Addition extends Component {
                 onOk={this.save.bind(this)}
                 onCancel={this.cancel.bind(this)}
             >
-                <FormItem {...Addition.layout} label='角色名称'>
+                <FormItem {...Edit.layout} label='角色名称'>
                     {getFieldDecorator('RoleName', {
                         rules: [
                             {
@@ -32,7 +44,7 @@ class Addition extends Component {
                         />
                     )}
                 </FormItem>
-                <FormItem {...Addition.layout} label='角色描述'>
+                <FormItem {...Edit.layout} label='角色描述'>
                     {getFieldDecorator('description', {
                         rules: [
                             {
@@ -54,29 +66,29 @@ class Addition extends Component {
         const {
             actions: {
                 getRoles,
-                postRole
+                putRole
             },
-            additionType
+            editRole
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
                 let postData = {
-                    ParentID: additionType,
+                    ID: editRole.ID,
+                    ParentID: editRole.ParentID,
                     Remark: values.description,
                     RoleName: values.RoleName
                 };
-                let rst = await postRole({}, postData);
-                console.log('rst', rst);
+                let rst = await putRole({}, postData);
                 if (rst && rst.code && rst.code === 1) {
                     Notification.success({
-                        message: '角色创建成功',
+                        message: '角色修改成功',
                         duration: 3
                     });
                     await getRoles();
-                    this.props.handleCloseAdditionModal();
+                    this.props.handleCloseEditModal();
                 } else {
                     Notification.error({
-                        message: '角色创建失败',
+                        message: '角色修改失败',
                         duration: 3
                     });
                 }
@@ -85,7 +97,7 @@ class Addition extends Component {
     }
 
     cancel () {
-        this.props.handleCloseAdditionModal();
+        this.props.handleCloseEditModal();
     }
 
     static layout = {
@@ -93,4 +105,4 @@ class Addition extends Component {
         wrapperCol: { span: 18 }
     };
 }
-export default Form.create()(Addition);
+export default Form.create()(Edit);

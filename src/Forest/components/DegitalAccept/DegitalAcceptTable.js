@@ -270,36 +270,57 @@ export default class DegitalAcceptTable extends Component {
     async onSectionChange (value) {
         const {
             actions: {
-                getUsers
+                getUsers,
+                getRoles
+            },
+            platform: {
+                roles = []
             }
         } = this.props;
         if (!value) {
             return;
         }
+        let rolesData = [];
+        if (!(roles && roles instanceof Array && roles.length > 0)) {
+            rolesData = await getRoles();
+        } else {
+            rolesData = roles;
+        }
+        let shigongRole = '';
+        let jianliRole = '';
+        rolesData.map((role) => {
+            if (role && role.ID && !role.ParentID) {
+                if (role.RoleName === '施工') {
+                    shigongRole = role.ID;
+                } else if (role.RoleName === '监理') {
+                    jianliRole = role.ID;
+                }
+            }
+        });
         // only choose the section, you can search the people
         let shigong = await getUsers({}, {
-            is_active: true,
-            sections: value,
-            grouptype: 1
+            status: 1,
+            section: value,
+            role: shigongRole
         });
         let jianli = await getUsers({}, {
-            is_active: true,
-            sections: value,
-            grouptype: 2
+            status: 1,
+            section: value,
+            role: jianliRole
         });
         let shigongOptions = [];
         let jianliOptions = [];
-        if (shigong instanceof Array) {
-            shigong.map(item => {
-                shigongOptions.push(<Option value={item.id} key={item.id} title={item.account.person_name}>
-                    {item.account.person_name}
+        if (shigong && shigong.content && shigong.content instanceof Array) {
+            shigong.content.map(item => {
+                shigongOptions.push(<Option value={item.ID} key={item.ID} title={item.Full_Name}>
+                    {item.Full_Name}
                 </Option>);
             });
         }
-        if (jianli instanceof Array) {
-            jianli.map(item => {
-                jianliOptions.push(<Option value={item.id} key={item.id} title={item.account.person_name}>
-                    {item.account.person_name}
+        if (jianli && jianli.content && jianli.content instanceof Array) {
+            jianli.content.map(item => {
+                jianliOptions.push(<Option value={item.ID} key={item.ID} title={item.Full_Name}>
+                    {item.Full_Name}
                 </Option>);
             });
         }

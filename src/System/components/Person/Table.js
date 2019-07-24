@@ -127,10 +127,8 @@ class Users extends Component {
             render: (text, record) => {
                 if (record.Status) {
                     return '已审核';
-                } else if (record.IsBlack === 0) {
-                    return '未审核';
                 } else {
-                    return '已审核';
+                    return '未审核';
                 }
             }
         },
@@ -383,7 +381,7 @@ class Users extends Component {
     }
     // 设置拉入黑名单的背景颜色
     setBlackListColor (record, i) {
-        if (record && record.account && (record.IsBlack === 1)) {
+        if (record && record.IsBlack && (record.IsBlack === 1)) {
             return 'background';
         } else {
             return '';

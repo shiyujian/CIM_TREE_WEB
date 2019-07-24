@@ -71,7 +71,11 @@ export default class CountTable extends Component {
     }
 
     query = async (current, queryParams) => {
-        const {actions: {getCheckRecord}} = this.props;
+        const {
+            actions: {
+                getCheckRecord
+            }
+        } = this.props;
         console.log('current', current);
         try {
             let postaData = {

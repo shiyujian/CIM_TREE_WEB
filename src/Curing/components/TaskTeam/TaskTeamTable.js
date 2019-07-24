@@ -29,13 +29,16 @@ export default class TaskTeamTable extends Component {
 
     componentDidUpdate = async (prevProps, prevState) => {
         const {
-            selectMemTeam
+            selectMemTeam,
+            addMemVisible
         } = this.props;
-        console.log('selectMemTeam', selectMemTeam);
         let selectMemTeamID = (selectMemTeam && selectMemTeam.ID) || '';
         let prevMemTeamID = (prevProps.selectMemTeam && prevProps.selectMemTeam.ID) || '';
         if (selectMemTeamID && selectMemTeamID !== prevMemTeamID) {
             await this.getGetTaskTeamData();
+        }
+        if (!addMemVisible && addMemVisible !== prevProps.addMemVisible) {
+            this.getGetTaskTeamData();
         }
     }
 
@@ -47,7 +50,7 @@ export default class TaskTeamTable extends Component {
             }
         } = this.props;
         try {
-            console.log('curingGroupMans', curingGroupMans);
+            // 因养护班组内的人员数据只有FullName  所以需要重新获取人员详情
             if (curingGroupMans && curingGroupMans.length > 0) {
                 let requestArr = [];
                 curingGroupMans.map((user) => {
@@ -61,7 +64,6 @@ export default class TaskTeamTable extends Component {
                 let dataSource = [];
                 if (requestArr && requestArr.length > 0) {
                     dataSource = await Promise.all(requestArr);
-                    console.log('dataSource', dataSource);
                 }
                 this.setState({
                     dataSource
@@ -110,7 +112,6 @@ export default class TaskTeamTable extends Component {
             }
         } = this.props;
         changeAddMemVisible(true);
-        console.log('addMemberVisible', this.props);
     }
     columns = [
         {

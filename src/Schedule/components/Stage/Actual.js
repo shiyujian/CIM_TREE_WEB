@@ -494,9 +494,9 @@ class Actual extends Component {
 
         me.props.form.validateFields((err, values) => {
             if (!err) {
-                postData.upload_unit = user.account ? user.account.org_code : '';
+                postData.upload_unit = user.org ? user.org : '';
                 postData.type = '每日实际进度';
-                postData.upload_person = user.account ? user.account.person_name : user.username;
+                postData.upload_person = user.name ? user.name : user.username;
                 postData.upload_time = moment().format('YYYY-MM-DD HH:mm:ss');
 
                 const currentUser = {
