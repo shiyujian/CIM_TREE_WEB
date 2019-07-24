@@ -170,7 +170,6 @@ export default class Tree extends Component {
             size: 10
         };
         let userList = await getUsers({}, postData);
-        console.log('userList', userList);
         if (userList && userList.code && userList.code === 200) {
             let pagination = {
                 current: 1,

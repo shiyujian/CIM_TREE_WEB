@@ -13,7 +13,6 @@ const getTags = forestFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [
     getTagsOK
 ]);
 
-export const ModifyVisible = createAction('人员变更Modal显示隐藏');
 export const setModifyPer = createAction('人员存储要变更的数据');
 
 const sidebarReducer = fieldFactory(ID, 'sidebar');
@@ -26,7 +25,6 @@ export const actions = {
     ...filterReducer,
     getTagsOK,
     getTags,
-    ModifyVisible,
     setModifyPer
 };
 
@@ -35,10 +33,6 @@ export default handleActions(
         [getTagsOK]: (state, { payload }) => ({
             ...state,
             tags: payload
-        }),
-        [ModifyVisible]: (state, { payload }) => ({
-            ...state,
-            Modvisible: payload
         }),
         [setModifyPer]: (state, { payload }) => ({
             ...state,

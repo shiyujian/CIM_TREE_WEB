@@ -1,17 +1,17 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import { capitalize } from '../util';
-import { USER_API, SYSTEM_API } from '../../api';
+import { SYSTEM_API } from '../../api';
 
 export default (ID, service = '') => {
     const suffix = service.toUpperCase();
     const SERVICE = capitalize(service);
     const getRolesOK = createAction(`${ID}_GET_ROLES_OK_${suffix}`);
     const getRoles = createFetchAction(`${SYSTEM_API}/roles`, [getRolesOK]);
-    const postRole = createFetchAction(`${USER_API}/roles/`, 'POST');
-    const putRole = createFetchAction(`${USER_API}/roles/{{id}}/`, 'PUT');
-    const deleteRole = createFetchAction(`${USER_API}/roles/{{id}}/`, 'DELETE');
-    const getMembers = createFetchAction(`${USER_API}/roles/{{id}}/members/`, [], 'GET');
+    const postRole = createFetchAction(`${SYSTEM_API}/role`, 'POST');
+    const putRole = createFetchAction(`${SYSTEM_API}/role`, 'PUT');
+    const deleteRole = createFetchAction(`${SYSTEM_API}/role/{{id}}`, 'DELETE');
+    const changeRolePermission = createFetchAction(`${SYSTEM_API}/rolefunction`, 'POST');
 
     const rolesReducer = handleActions(
         {
@@ -29,7 +29,7 @@ export default (ID, service = '') => {
     rolesReducer[`post${SERVICE}Role`] = postRole;
     rolesReducer[`put${SERVICE}Role`] = putRole;
     rolesReducer[`delete${SERVICE}Role`] = deleteRole;
-    rolesReducer[`delete${SERVICE}Members`] = getMembers;
+    rolesReducer[`change${SERVICE}RolePermission`] = changeRolePermission;
 
     return rolesReducer;
 };

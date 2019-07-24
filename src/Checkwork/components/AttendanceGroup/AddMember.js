@@ -37,35 +37,62 @@ class AddMember extends Component {
             }
         },
         {
-            title: '部门',
-            dataIndex: 'account.organization'
-        },
-        {
             title: '姓名',
-            dataIndex: 'account.person_name'
+            key: '1',
+            dataIndex: 'Full_Name'
         },
         {
-            title: '账号',
-            dataIndex: 'username'
+            title: '用户名',
+            key: '2',
+            dataIndex: 'User_Name'
+        },
+        {
+            title: '性别',
+            key: '3',
+            dataIndex: 'Sex',
+            render: (text, record) => {
+                return record.Sex ? '女' : '男';
+            }
         },
         {
             title: '角色',
-            dataIndex: 'groups[0].name'
+            width: '15%',
+            key: '4',
+            render: (text, record) => {
+                if (record.Roles && record.Roles instanceof Array && record.Roles.length > 0) {
+                    return record.Roles[0].RoleName;
+                } else {
+                    return '';
+                }
+            }
         },
         {
             title: '职务',
-            dataIndex: 'account.title'
+            key: '5',
+            dataIndex: 'Duty'
         },
         {
             title: '手机号码',
-            dataIndex: 'account.person_telephone'
+            key: '6',
+            dataIndex: 'Phone'
+        },
+        {
+            title: '所属部门',
+            key: '7',
+            dataIndex: 'OrgObj',
+            render: (text, record) => {
+                return record.OrgObj ? record.OrgObj : '';
+            }
         },
         {
             title: '关联',
             render: user => {
                 const { relationMem = [] } = this.state;
-                const checked = relationMem.some(memberID => Number(memberID) === user.id);
 
+                let checked = [];
+                if (user && user.ID && relationMem && relationMem instanceof Array) {
+                    checked = relationMem.some(memberID => Number(memberID) === user.ID);
+                }
                 return (
                     <Checkbox
                         checked={checked}
@@ -108,15 +135,17 @@ class AddMember extends Component {
         setFieldsValue({
             organization: userOrgID
         });
+        console.log('userOrgID', userOrgID);
         let postData = {
-            org_code: userOrgID,
-            is_active: true,
-            page: 1
+            org: userOrgID,
+            status: 1,
+            page: 1,
+            size: 10
         };
         let userData = await getUsers({}, postData);
-        let dataSource = (userData && userData.results) || [];
+        let dataSource = (userData && userData.content) || [];
         this.setState({
-            total: userData.count || 0,
+            total: (userData && userData.pageinfo && userData.pageinfo.total) || 0,
             page: 1,
             dataSource
         });
@@ -227,7 +256,6 @@ class AddMember extends Component {
                                                                     input.toLowerCase()
                                                                 ) >= 0
                                                         }
-                                                        mode='multiple'
                                                         style={{ width: '100%' }}
                                                     >
                                                         {this.renderContent()}
@@ -359,16 +387,17 @@ class AddMember extends Component {
         validateFields(async (err, values) => {
             if (!err) {
                 let postData = {
-                    org_code: values.organization ? values.organization : '',
+                    org: values.organization ? values.organization : '',
                     keyword: values.keyword ? values.keyword : '',
                     roles: values.role ? values.role : '',
-                    is_active: true,
-                    page: current
+                    status: 1,
+                    page: current,
+                    size: 10
                 };
                 let userData = await getUsers({}, postData);
-                let dataSource = (userData && userData.results) || [];
+                let dataSource = (userData && userData.content) || [];
                 this.setState({
-                    total: userData.count || 0,
+                    total: (userData && userData.pageinfo && userData.pageinfo.total) || 0,
                     page: current,
                     dataSource
                 });

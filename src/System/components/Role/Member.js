@@ -17,33 +17,127 @@ export default class Member extends Component {
             searchAllUserPostData: {}
         };
     }
+    columns = [
+        {
+            title: '序号',
+            render: (text, record, index) => {
+                const {
+                    pagination
+                } = this.state;
+                const current = pagination.current;
+                const pageSize = pagination.pageSize;
+                if (current !== undefined && pageSize !== undefined) {
+                    return index + 1 + (current - 1) * pageSize;
+                } else {
+                    return index + 1;
+                }
+            }
+        },
+        {
+            title: '名称',
+            dataIndex: 'Full_Name'
+        },
+        {
+            title: '用户名',
+            dataIndex: 'User_Name'
+        },
+        {
+            title: '职务',
+            dataIndex: 'Duty'
+        },
+        {
+            title: '手机号码',
+            dataIndex: 'Phone'
+        },
+        {
+            title: '关联',
+            render: user => {
+                const {
+                    relationMemberIDList
+                } = this.state;
+                const checked = relationMemberIDList.some(member => member === user.ID);
+
+                return (
+                    <Checkbox
+                        checked={checked}
+                        onChange={this.check.bind(this, user)}
+                    />
+                );
+            }
+        }
+    ];
+    columns1 = [
+        {
+            title: '序号',
+            dataIndex: 'index'
+        },
+        {
+            title: '名称',
+            dataIndex: 'Full_Name'
+        },
+        {
+            title: '用户名',
+            dataIndex: 'User_Name'
+        },
+        {
+            title: '职务',
+            dataIndex: 'Duty'
+        },
+        {
+            title: '手机号码',
+            dataIndex: 'Phone'
+        },
+        {
+            title: '关联',
+            render: user => {
+                const {
+                    relationMemberIDList = []
+                } = this.state;
+                const checked = relationMemberIDList.some(member => member === user.ID);
+                return (
+                    <Checkbox
+                        checked={checked}
+                        onChange={this.cancelRelation.bind(this, user)}
+                    />
+                );
+            }
+        }
+    ];
     componentDidMount = async () => {
         const {
             member: { role = {} } = {},
             actions: {
-                getMembers,
                 getUsers
             }
         } = this.props;
         try {
             this.setState({ loading: true });
-            let data = await getMembers({ id: role.id });
-            let relationMember = (data && data.members) || [];
-            let relationMemberIDList = relationMember.map(member => member.id);
-
-            let allUserData = await getUsers({}, { page: 1 });
-            let pagination = {
-                current: 1,
-                total: (allUserData && allUserData.count) || 0,
-                pageSize: 10
+            let data = await getUsers({}, { role: role.ID });
+            let relationMember = (data && data.content) || [];
+            let relationMemberIDList = relationMember.map(member => member.ID);
+            let postData = {
+                page: 1,
+                size: 10
             };
-            this.setState({
-                relationMember,
-                relationMemberIDList,
-                pagination,
-                allUserData,
-                loading: false
-            });
+            let allUserData = await getUsers({}, postData);
+            if (allUserData && allUserData.code && allUserData.code === 200) {
+                let pagination = {
+                    current: 1,
+                    total: (allUserData.pageinfo && allUserData.pageinfo.total) || 0,
+                    pageSize: 10
+                };
+                this.setState({
+                    relationMember,
+                    relationMemberIDList,
+                    pagination,
+                    allUserData,
+                    loading: false
+                });
+            } else {
+                this.setState({
+                    loading: false
+                });
+            }
         } catch (e) {
             console.log('componentDidMount', e);
         }
@@ -56,25 +150,24 @@ export default class Member extends Component {
         } = this.state;
         let array = [];
         relationMember.map(item => {
-            if (item.username) {
-                if (value && item.username.indexOf(value) > -1) {
+            if (item.User_Name) {
+                if (value && item.User_Name.indexOf(value) > -1) {
                     searchRelationList.push(item);
-                    array.push(item.id);
+                    array.push(item.ID);
                 }
             }
         });
         relationMember.map(item => {
-            if (item.account && item.account.person_name) {
+            if (item.Full_Name) {
                 // 符合搜索条件的名字
-                if (value && item.account.person_name.indexOf(value) > -1) {
+                if (value && item.Full_Name.indexOf(value) > -1) {
                     // 之前没有加入数组
-                    if (array.indexOf(item.id) === -1) {
+                    if (array.indexOf(item.ID) === -1) {
                         searchRelationList.push(item);
                     }
                 }
             }
         });
-        console.log('searchRelationList', searchRelationList);
         if (value) {
             this.setState({
                 searchRelationList: searchRelationList,
@@ -102,21 +195,28 @@ export default class Member extends Component {
             this.setState({ loading: true });
             let searchAllUserPostData = {
                 page: 1,
+                size: 10,
                 keyword: value,
-                is_active: true,
-                is_black: 0
+                status: 1,
+                isblack: 0
             };
             let searchAllUser = await getUsers({}, searchAllUserPostData);
-            pagination.total = (searchAllUser && searchAllUser.count) || 0;
-            this.setState({
-                searchAllUserPostData,
-                searchAllUser,
-                pagination,
-                searchAllUserStatus: true,
-                loading: false
-            });
+            if (searchAllUser && searchAllUser.code && searchAllUser.code === 200) {
+                pagination.total = (searchAllUser.pageinfo && searchAllUser.pageinfo.total) || 0;
+                this.setState({
+                    searchAllUserPostData,
+                    searchAllUser,
+                    pagination,
+                    searchAllUserStatus: true,
+                    loading: false
+                });
+            } else {
+                this.setState({
+                    loading: false
+                });
+            }
         } else {
-            pagination.total = (allUserData && allUserData.count) || 0;
+            pagination.total = (allUserData && allUserData.pageinfo && allUserData.pageinfo.total) || 0;
             this.setState({
                 searchAllUserPostData: {},
                 searchAllUser: {},
@@ -144,21 +244,37 @@ export default class Member extends Component {
         if (searchAllUserStatus) {
             searchAllUserPostData.page = page;
             let searchAllUser = await getUsers({}, searchAllUserPostData);
-            pagination.total = (searchAllUser && searchAllUser.count) || 0;
-            this.setState({
-                searchAllUserPostData,
-                searchAllUser,
-                pagination,
-                loading: false
-            });
+            if (searchAllUser && searchAllUser.code && searchAllUser.code === 200) {
+                pagination.total = (searchAllUser.pageinfo && searchAllUser.pageinfo.total) || 0;
+                this.setState({
+                    searchAllUserPostData,
+                    searchAllUser,
+                    pagination,
+                    loading: false
+                });
+            } else {
+                this.setState({
+                    loading: false
+                });
+            }
         } else {
-            let allUserData = await getUsers({}, { page: pagina.current });
-            pagination.total = (allUserData && allUserData.count) || 0;
-            this.setState({
-                pagination,
-                allUserData,
-                loading: false
-            });
+            let postData = {
+                page: pagina.current,
+                size: 10
+            };
+            let allUserData = await getUsers({}, postData);
+            if (allUserData && allUserData.code && allUserData.code === 200) {
+                pagination.total = (allUserData.pageinfo && allUserData.pageinfo.total) || 0;
+                this.setState({
+                    pagination,
+                    allUserData,
+                    loading: false
+                });
+            } else {
+                this.setState({
+                    loading: false
+                });
+            }
         }
     }
     // 关闭弹窗
@@ -170,232 +286,113 @@ export default class Member extends Component {
         } = this.props;
         changeMemberField('visible', false);
     }
-    columns = [
-        {
-            title: '序号',
-            render: (text, record, index) => {
-                const {
-                    pagination
-                } = this.state;
-                const current = pagination.current;
-                const pageSize = pagination.pageSize;
-                if (current !== undefined && pageSize !== undefined) {
-                    return index + 1 + (current - 1) * pageSize;
-                } else {
-                    return index + 1;
-                }
-            }
-        },
-        {
-            title: '名称',
-            dataIndex: 'account.person_name'
-        },
-        {
-            title: '用户名',
-            dataIndex: 'username'
-        },
-        {
-            title: '所属部门',
-            dataIndex: 'account.organization'
-        },
-        {
-            title: '职务',
-            dataIndex: 'account.title'
-        },
-        {
-            title: '手机号码',
-            dataIndex: 'account.person_telephone'
-        },
-        {
-            title: '关联',
-            render: user => {
-                const {
-                    relationMemberIDList
-                } = this.state;
-                const checked = relationMemberIDList.some(member => member === user.id);
-
-                return (
-                    <Checkbox
-                        checked={checked}
-                        onChange={this.check.bind(this, user)}
-                    />
-                );
-            }
-        }
-    ];
-    columns1 = [
-        {
-            title: '序号',
-            dataIndex: 'index'
-        },
-        {
-            title: '名称',
-            dataIndex: 'account.person_name'
-        },
-        {
-            title: '用户名',
-            dataIndex: 'username'
-        },
-        {
-            title: '所属部门',
-            dataIndex: 'account.organization'
-        },
-        {
-            title: '职务',
-            dataIndex: 'account.title'
-        },
-        {
-            title: '手机号码',
-            dataIndex: 'account.person_telephone'
-        },
-        {
-            title: '关联',
-            render: user => {
-                const {
-                    relationMemberIDList
-                } = this.state;
-                const checked = relationMemberIDList.some(member => member === user.id);
-                return (
-                    <Checkbox
-                        checked={checked}
-                        onChange={this.cancelRelation.bind(this, user)}
-                    />
-                );
-            }
-        }
-    ];
     // user是关联用户里面的其中一行记录
 
     check = async (user) => {
         const {
             actions: {
-                putForestUser,
-                getChildOrgTreeByID
+                putForestUser
             },
             member: { role = [] }
         } = this.props;
         const {
             relationMemberIDList
         } = this.state;
-        const has = relationMemberIDList.some(member => member === user.id);
+        const has = relationMemberIDList.some(member => member === user.ID);
         let rst = [];
-        let groupsa = [];
         if (has) {
-            rst = relationMemberIDList.filter(member => member !== user.id);
+            rst = relationMemberIDList.filter(member => member !== user.ID);
         } else {
-            rst = [...relationMemberIDList, user.id];
-            groupsa.push(role.id);
+            rst = [...relationMemberIDList, user.ID];
         }
         this.setState({
             relationMemberIDList: rst
         });
-        let items = await getChildOrgTreeByID({ id: user.ID });
-        await putForestUser(
-            {},
-            {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                // password: addition.password, // 密码不能变？信息中没有密码
-                account: {
-                    person_name: user.person_name,
-                    person_type: 'C_PER',
-                    person_avatar_url: '',
-                    person_signature_url: '',
-                    organization: {
-                        pk: items.ID,
-                        code: user.account.org_code,
-                        obj_type: 'C_ORG',
-                        rel_type: 'member',
-                        name: user.account.organization
-                    }
-                },
-                tags: user.account.tags,
-                sections: user.account.sections,
-                groups: groupsa,
-                is_active: true,
-                id_num: user.account.id_num,
-                id_image: [],
-                basic_params: {
-                    info: {
-                        电话: user.account.person_telephone || '',
-                        性别: user.account.gender || '',
-                        技术职称: user.account.title || '',
-                        phone: user.account.person_telephone || '',
-                        sex: user.account.gender || '',
-                        duty: ''
-                    }
-                },
-                extra_params: {},
-                title: user.account.title || ''
-            }
-        );
+        // 修改人员信息
+        let putUserPostData = {
+            ID: user.ID, // 用户ID
+            Full_Name: user.Full_Name, // 姓名
+            User_Name: user.User_Name, // 用户名
+            Org: user.Org, // 组织机构
+            Phone: user.Phone, // 电话
+            Duty: user.Duty, // 职务
+            EMail: user.EMail,
+            Sex: user.Sex, // 性别
+            Status: user.Status, // 状态
+            Section: user.Section, // 标段
+            Number: user.Number, // 身份证号码
+            Card: user.Card, // 身份证正面照片
+            CardBack: user.CardBack, // 身份证背面照片
+            Face: user.Face,
+            Roles: [{ // 角色
+                ID: role.ID // 角色ID
+            }]
+        };
+        let userData = await putForestUser({}, putUserPostData);
+        if (userData && userData.code && userData.code === 1) {
+            Notification.success({
+                message: '角色关联成功',
+                duration: 1
+            });
+        } else {
+            Notification.error({
+                message: '角色关联失败',
+                duration: 1
+            });
+        }
     }
     cancelRelation = async (user) => {
         const {
             actions: {
-                putForestUser,
-                getChildOrgTreeByID
+                putForestUser
             },
             member: { role = [] }
         } = this.props;
         const {
             relationMemberIDList
         } = this.state;
-        const has = relationMemberIDList.some(member => member === user.id);
+        const has = relationMemberIDList.some(member => member === user.ID);
         let rst = [];
-        let groupsa = [];
         if (has) {
-            rst = relationMemberIDList.filter(member => member !== user.id);
+            rst = relationMemberIDList.filter(member => member !== user.ID);
         } else {
-            rst = [...relationMemberIDList, user.id];
-            groupsa.push(role.id);
+            rst = [...relationMemberIDList, user.ID];
         }
         this.setState({
             relationMemberIDList: rst
         });
-        let items = await getChildOrgTreeByID({ id: user.ID });
-        await putForestUser(
-            {},
-            {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                // password: addition.password, // 密码不能变？信息中没有密码
-                account: {
-                    person_name: user.person_name,
-                    person_type: 'C_PER',
-                    person_avatar_url: '',
-                    person_signature_url: '',
-                    organization: {
-                        pk: items.ID,
-                        code: user.account.org_code,
-                        obj_type: 'C_ORG',
-                        rel_type: 'member',
-                        name: user.account.organization
-                    }
-                },
-                tags: user.account.tags,
-                sections: user.account.sections,
-                // groups: [7],
-                groups: groupsa,
-                is_active: true,
-                id_num: user.account.id_num,
-                id_image: [],
-                basic_params: {
-                    info: {
-                        电话: user.account.person_telephone || '',
-                        性别: user.account.gender || '',
-                        技术职称: user.account.title || '',
-                        phone: user.account.person_telephone || '',
-                        sex: user.account.gender || '',
-                        duty: ''
-                    }
-                },
-                extra_params: {},
-                title: user.account.title || ''
-            }
-        );
+        // 修改人员信息
+        let putUserPostData = {
+            ID: user.ID, // 用户ID
+            Full_Name: user.Full_Name, // 姓名
+            User_Name: user.User_Name, // 用户名
+            Org: user.Org, // 组织机构
+            Phone: user.Phone, // 电话
+            Duty: user.Duty, // 职务
+            EMail: user.EMail,
+            Sex: user.Sex, // 性别
+            Status: user.Status, // 状态
+            Section: user.Section, // 标段
+            Number: user.Number, // 身份证号码
+            Card: user.Card, // 身份证正面照片
+            CardBack: user.CardBack, // 身份证背面照片
+            Face: user.Face,
+            Roles: [{ // 角色
+                ID: role.ID // 角色ID
+            }]
+        };
+        let userData = await putForestUser({}, putUserPostData);
+        if (userData && userData.code && userData.code === 1) {
+            Notification.success({
+                message: '角色关联成功',
+                duration: 1
+            });
+        } else {
+            Notification.error({
+                message: '角色关联失败',
+                duration: 1
+            });
+        }
     }
 
     render () {
@@ -414,9 +411,9 @@ export default class Member extends Component {
         const title = `关联用户 | ${role ? role.name : ''}`;
         let allUserDataSource = [];
         if (searchAllUserStatus) {
-            allUserDataSource = (searchAllUser && searchAllUser.results) || [];
+            allUserDataSource = (searchAllUser && searchAllUser.content) || [];
         } else {
-            allUserDataSource = (allUserData && allUserData.results) || [];
+            allUserDataSource = (allUserData && allUserData.content) || [];
         }
         let relationDataSource = [];
         if (searchRelationStatus) {
@@ -457,7 +454,7 @@ export default class Member extends Component {
                     </Row>
                     <Table
                         bordered
-                        rowKey='id'
+                        rowKey='ID'
                         size='small'
                         columns={this.columns1}
                         dataSource={relationDataSource}
@@ -480,7 +477,7 @@ export default class Member extends Component {
                     </Row>
                     <Table
                         bordered
-                        rowKey='id'
+                        rowKey='ID'
                         size='small'
                         columns={this.columns}
                         dataSource={allUserDataSource}

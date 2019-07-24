@@ -11,13 +11,13 @@ export default class Roles extends Component {
             platform: { roles = [] } = {},
             table: { role = {} } = {}
         } = this.props;
-        const id = String(role.id);
-        const systemRoles = roles.filter(role => role.grouptype === 0);
-        const projectRoles = roles.filter(role => role.grouptype === 1);
-        const professionRoles = roles.filter(role => role.grouptype === 2);
-        const departmentRoles = roles.filter(role => role.grouptype === 3);
-        const curingRoles = roles.filter(role => role.grouptype === 4);
-        const supplierRoles = roles.filter(role => role.grouptype === 6);
+        let parentRoleType = [];
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID === 0) {
+                parentRoleType.push(role);
+            }
+        });
+        const id = String(role.ID);
         return (
             <div>
                 <Tree
@@ -26,36 +26,19 @@ export default class Roles extends Component {
                     onSelect={this.select.bind(this)}
                     selectedKeys={[id]}
                 >
-                    <TreeNode key='a' title='苗圃'>
-                        {systemRoles.map(role => {
-                            return <TreeNode key={role.id} title={role.name} />;
-                        })}
-                    </TreeNode>
-                    <TreeNode key='b' title='施工'>
-                        {projectRoles.map(role => {
-                            return <TreeNode key={role.id} title={role.name} />;
-                        })}
-                    </TreeNode>
-                    <TreeNode key='c' title='监理'>
-                        {professionRoles.map(role => {
-                            return <TreeNode key={role.id} title={role.name} />;
-                        })}
-                    </TreeNode>
-                    <TreeNode key='d' title='业主'>
-                        {departmentRoles.map(role => {
-                            return <TreeNode key={role.id} title={role.name} />;
-                        })}
-                    </TreeNode>
-                    <TreeNode key='e' title='养护'>
-                        {curingRoles.map(role => {
-                            return <TreeNode key={role.id} title={role.name} />;
-                        })}
-                    </TreeNode>
-                    <TreeNode key='j' title='供应商'>
-                        {supplierRoles.map(role => {
-                            return <TreeNode key={role.id} title={role.name} />;
-                        })}
-                    </TreeNode>
+                    {
+                        parentRoleType.map((type) => {
+                            return (<TreeNode key={type.ID} title={type.RoleName} disabled>
+                                {
+                                    roles.map((role) => {
+                                        if (role && role.ID && role.ParentID && role.ParentID === type.ID) {
+                                            return <TreeNode key={role.ID} title={role.RoleName} />;
+                                        }
+                                    })
+                                }
+                            </TreeNode>);
+                        })
+                    }
                 </Tree>
             </div>
         );
@@ -68,19 +51,26 @@ export default class Roles extends Component {
         } = this.props;
         await getRoles();
         await changeTableField('role', '');
-        await changeTableField('permissions', []);
+        await changeTableField('permissionsCodes', []);
     }
 
-    select (s, node) {
+    select = async (s, node) => {
         const {
             platform: { roles = [] } = {},
             actions: { changeTableField }
         } = this.props;
         const { node: { props: { eventKey = '' } = {} } = {} } = node || {};
         const role = roles.find(role => role.ID === +eventKey);
-        role && changeTableField('role', role);
-        role &&
-            role.permissions &&
-            changeTableField('permissions', role.permissions);
+        if (role && role.ID && role.ParentID && role.Functions) {
+            let permissionsCodes = [];
+            role.Functions.map((permission) => {
+                permissionsCodes.push((permission.FunctionCode));
+            });
+            await changeTableField('role', role);
+            await changeTableField('permissionsCodes', permissionsCodes);
+        } else {
+            await changeTableField('role', '');
+            await changeTableField('permissionsCodes', []);
+        }
     }
 }

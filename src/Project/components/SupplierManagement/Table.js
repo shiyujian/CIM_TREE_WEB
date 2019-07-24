@@ -420,45 +420,47 @@ class Tablelevel extends Component {
                     let supplier = supplierList[index];
                     // 当前被拉黑供应商下的人员
                     let userAllResults = [];
-                    let orgCode = supplier.OrgPK;
+                    let orgID = supplier.ID;
                     let postData = {
-                        org_code: orgCode,
+                        org: orgID,
                         page: 1,
-                        page_size: 20
+                        size: 20
                     };
                     let userList = await getUsers({}, postData);
-                    userAllResults = userAllResults.concat((userList && userList.results) || []);
-                    let total = userList.count;
-                    // 为了防止人员过多，对人员进行分页获取处理
-                    if (total > 20) {
-                        for (let i = 0; i < (total / 20) - 1; i++) {
-                            postData = {
-                                org_code: orgCode,
-                                page: i + 2,
-                                page_size: 20
-                            };
-                            let datas = await getUsers({}, postData);
-                            userAllResults = userAllResults.concat((datas && datas.results) || []);
+                    if (userList && userList.code && userList.code === 200) {
+                        userAllResults = userAllResults.concat((userList && userList.content) || []);
+                        let total = userList.pageinfo.total;
+                        // 为了防止人员过多，对人员进行分页获取处理
+                        if (total > 20) {
+                            for (let i = 0; i < (total / 20) - 1; i++) {
+                                postData = {
+                                    org: orgID,
+                                    page: i + 2,
+                                    size: 20
+                                };
+                                let datas = await getUsers({}, postData);
+                                if (datas && datas.code && datas.code === 200) {
+                                    userAllResults = userAllResults.concat((datas && datas.content) || []);
+                                }
+                            }
                         }
                     }
                     // 人员拉黑请求数组
                     let blackPostRequestList = [];
                     userAllResults.map((user) => {
                         // 之前没有对该身份证进行拉黑，则push进入拉黑请求数组中
-                        if (user && user.account && user.account.id_num && !(user.account.is_black === 1) && userIDNumList.indexOf(user.account.id_num) === -1) {
+                        if (user && user.ID && !user.IsBlack && user.Number && userIDNumList.indexOf(user.Number) === -1) {
                             let blackPostData = {
-                                id: user.id,
-                                is_black: 1,
-                                black_remark: `供应商${supplier.SupplierName}: ${values.BlackInfo}`,
-                                change_all: true
+                                id: user.ID,
+                                is_black: true,
+                                black_remark: `供应商${supplier.SupplierName}: ${values.BlackInfo}`
                             };
                             blackPostRequestList.push(postForestUserBlackList({}, blackPostData));
-                            userIDNumList.push(user.account.id_num);
+                            userIDNumList.push(user.Number);
                         }
                     });
                     let blackData = await Promise.all(blackPostRequestList);
-                    console.log('blackData', blackData);
-                    if (blackData && blackData.length > 0) {
+                    if (blackData && blackData instanceof Array && blackData.length > 0) {
                         Notification.success({
                             message: '供应商人员拉黑成功',
                             duration: 2

@@ -7,7 +7,7 @@ import {
     AttendanceGroupTable,
     AsideTree
 } from '../components/AttendanceGroup';
-import { TreeSelect } from 'antd';
+import { TreeSelect, Notification } from 'antd';
 import { getCompanyDataByOrgCode, getUser } from '_platform/auth';
 import './index.less';
 const TreeNode = TreeSelect.TreeNode;
@@ -73,16 +73,23 @@ export default class AttendanceGroup extends Component {
                 // userOrgCode为登录用户自己的部门code
                 userOrgID = user.org;
                 parentData = await getCompanyDataByOrgCode(userOrgID, getParentOrgTreeByID);
-                companyOrgID = parentData.ID;
-                // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
-                let postData = {
-                    org_code: companyOrgID
-                };
-                await getCheckGroup({}, postData);
-                // 在关联人员时需要根据各个部门来查找人员，所以需要根据公司的code查找公司内的组织机构
-                companyDatas = await getChildOrgTreeByID({id: companyOrgID});
-                // 获取组织机构后，构建成TreeSelect
-                orgTreeSelectData = AttendanceGroup.orgloop([companyDatas]);
+                if (parentData && parentData.ID) {
+                    companyOrgID = parentData.ID;
+                    // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
+                    let postData = {
+                        org_code: companyOrgID
+                    };
+                    await getCheckGroup({}, postData);
+                    // 在关联人员时需要根据各个部门来查找人员，所以需要根据公司的code查找公司内的组织机构
+                    companyDatas = await getChildOrgTreeByID({id: companyOrgID});
+                    // 获取组织机构后，构建成TreeSelect
+                    orgTreeSelectData = AttendanceGroup.orgloop([companyDatas]);
+                } else {
+                    Notification.warning({
+                        message: '当前用户不在公司下，请重新登录',
+                        duration: 3
+                    });
+                }
             }
 
             await changeAsideTreeLoading(false);
@@ -112,29 +119,33 @@ export default class AttendanceGroup extends Component {
         );
     }
 
-    // 设置登录用户所在的公司的部门项
-    static orgloop (data = [], loopTimes = 0) {
+    static orgloop (data = []) {
         if (data.length === 0) {
             return;
         }
         return data.map((item) => {
-            if (item.children && item.children.length > 0) {
+            if (item && item.ID && item.children && item.children.length > 0) {
                 return (
-                    <TreeNode disabled
-                        key={`${item.ID}`}
+                    <TreeNode
                         value={item.ID}
-                        title={`${item.OrgName}`}>
+                        key={item.ID}
+                        title={`${item.OrgName}`}
+                    >
                         {
-                            AttendanceGroup.orgloop(item.children, loopTimes + 1)
+                            AttendanceGroup.orgloop(item.children)
                         }
                     </TreeNode>
                 );
             } else {
-                return (<TreeNode
-                    disabled={loopTimes === 0 && true}
-                    key={`${item.ID}`}
-                    value={item.ID}
-                    title={`${item.OrgName}`} />);
+                if (item && item.ID) {
+                    return (
+                        <TreeNode
+                            value={item.ID}
+                            key={item.ID}
+                            title={`${item.OrgName}`}
+                        />
+                    );
+                }
             }
         });
     };

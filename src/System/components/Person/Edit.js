@@ -78,7 +78,6 @@ class Edit extends Component {
                 parentRoleType.push(role);
             }
         });
-        console.log('parentRoleType', parentRoleType);
         if (user.username && user.username === 'admin') {
             parentRoleType.map((type) => {
                 systemRoles.push({
@@ -372,12 +371,12 @@ class Edit extends Component {
                         }]
                     };
                     let userData = await putForestUser({}, putUserPostData);
-                    if (userData.code === 1) {
+                    if (userData && userData.code && userData.code === 1) {
                         message.info('修改人员成功');
                         // 之前不修改人员的部门   所以不需要重新获取人员列表 但是现在要修改部门   所以要重新获取人员列表
                         let page = this.props.getTablePages.current;
                         let getUserPostData = {
-                            org: (node && node.ID) || '',
+                            org: orgSelect,
                             page: page,
                             size: 10
                         };
@@ -403,7 +402,7 @@ class Edit extends Component {
     }
 
     // 设置登录用户所在的公司的部门项,在编辑用户时，可以切换部门
-    static orgloop (data = [], loopTimes = 0) {
+    static orgloop (data = []) {
         if (data.length === 0) {
             return;
         }
@@ -416,7 +415,7 @@ class Edit extends Component {
                         title={`${item.OrgName}`}
                     >
                         {
-                            Edit.orgloop(item.children, loopTimes + 1)
+                            Edit.orgloop(item.children)
                         }
                     </TreeNode>
                 );

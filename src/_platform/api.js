@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-22 09:30:27
+ * @Last Modified time: 2019-07-23 20:28:13
  */
 /**
  *
@@ -349,12 +349,6 @@ export const MODULES = [
     {
         id: 'DASHBOARD',
         name: '综合展示'
-        // children: [
-        //     {
-        //         id: 'DASHBOARD.ONSITE',
-        //         name: '二维展示'
-        //     }
-        // ]
     },
     {
         id: 'OVERALL',

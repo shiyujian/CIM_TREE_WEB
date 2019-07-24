@@ -44,11 +44,6 @@ class Login extends Component {
             getSecurityCodeStatus: false,
             countDown: 60
         };
-        this.account = [];
-        this.code = [];
-        clearUser();
-        clearUser();
-        clearUser();
         clearUser();
     }
 

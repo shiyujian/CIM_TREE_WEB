@@ -69,65 +69,17 @@ export default class PerSearch extends Component {
 
     async query () {
         const {
-            actions: { getUsers, getWorkflowTemplate },
-            code,
-            roleSearch = false,
-            task
+            actions: {
+                getUsers
+            },
+            roleSearch = false
         } = this.props;
         let user = getUser();
 
         let section = user.section;
-        let roles = [];
         if (!section) {
             return;
         }
-
-        // 如果是开始创建流程时  使用code来查找人员
-        if (code) {
-            let params = {
-                code: code
-            };
-            let templateMess = await getWorkflowTemplate(params);
-            if (templateMess && templateMess.states) {
-                let state = templateMess.states[0];
-                // 获取模版下一个节点的部门信息
-                let nextMess = getTemplateOrg(templateMess);
-                // 如果第一步有多个action或者是多个执行人  需要进行判断  重新改写组件
-                if (nextMess && nextMess instanceof Array) {
-                    try {
-                        let role = nextMess[0].to_state[0].roles;
-                        roles = [];
-                        role.map(item => {
-                            roles.push(item.id);
-                        });
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-            }
-        } else {
-            if (task && task.current) {
-                let state_id = task.current[0].id;
-                let nextStates = getNextStates(task, Number(state_id));
-                if (nextStates && nextStates instanceof Array) {
-                    nextStates.map(rst => {
-                        if (rst.action_name !== '退回') {
-                            try {
-                                let role = rst.to_state[0].roles;
-                                roles = [];
-                                role.map(item => {
-                                    roles.push(item.id);
-                                });
-                            } catch (e) {
-                                console.log(e);
-                            }
-                        }
-                    });
-                }
-            }
-        }
-
-        console.log('roles', roles);
 
         try {
             let postdata = {};
@@ -135,19 +87,20 @@ export default class PerSearch extends Component {
             if (!roleSearch) {
                 postdata = {
                     sections: section,
-                    roles: roles,
                     status: 1
                 };
             } else {
                 postdata = {
-                    roles: roles,
                     sections: section,
                     status: 1
                 };
             }
 
             let datas = await getUsers({}, postdata);
-            let users = (datas && datas.content) || [];
+            let users = [];
+            if (datas && datas.code && datas.code === 200) {
+                users = (datas && datas.content) || [];
+            }
             // 因多个组件公用此组件，不能放在redux里
             this.setState({
                 users
