@@ -431,6 +431,8 @@ export const getExportAcceptList = forestFetchAction(`${FOREST_API}/tree/exporta
 export const getExportAcceptReport = forestFetchAction(`${FOREST_API}/DocExport.ashx?action=acceptance&acceptancedetailid={{acceptancedetailid}}`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
 export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sections`, [], 'GET', []);
+// 获取标段对应的公司名称和项目经理
+export const postMapImage = forestFetchAction(`${FOREST_API}/route/mapimage`, [], 'POST', []);
 
 export const actions = {
     exportEcporttreestatuss,
@@ -537,7 +539,8 @@ export const actions = {
     getUnitMessageBySection,
     getExportAcceptList,
     getExportAcceptReport,
-    getBigDataCheckList
+    getBigDataCheckList,
+    postMapImage
 };
 export default handleActions({
     [getTreeOK]: (state, {

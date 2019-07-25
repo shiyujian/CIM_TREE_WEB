@@ -27,6 +27,9 @@ import WordView8 from './WordView8';
 import WordView9 from './WordView9';
 import WordView10 from './WordView10';
 import WordView11 from './WordView11';
+import ExportView1 from './ExportView1';
+import ExportView2 from './ExportView2';
+import ExportView3 from './ExportView3';
 import '../index.less';
 import {
     getSectionNameBySection,
@@ -85,7 +88,10 @@ export default class DegitalAcceptTable extends Component {
             itemDetailList: {}, // 数字化验收详情
             treetypeoption: [], // 根据小班动态获取的树种列表
             unQualifiedList: [], // 不合格记录列表
-            unitMessage: []
+            unitMessage: [],
+            exportModalVisible1: false,
+            exportModalVisible2: false,
+            exportModalVisible3: false
         };
         this.columns = [
             {
@@ -529,10 +535,10 @@ export default class DegitalAcceptTable extends Component {
             ystype = '',
             treetypename = ''
         } = this.state;
-        if (thinclass === '') {
-            message.info('请选择项目，标段，小班及细班信息');
-            return;
-        }
+        // if (thinclass === '') {
+        //     message.info('请选择项目，标段，小班及细班信息');
+        //     return;
+        // }
 
         const {
             actions: {
@@ -551,13 +557,13 @@ export default class DegitalAcceptTable extends Component {
             }
         });
         let postdata = {
-            section,
-            // section: 'P191-03-04',
+            // section,
+            section: 'P191-03-04',
             treetype: treetypename,
             stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
-            thinclass: array1.join('-'),
-            // thinclass: 'P191-03-209-001',
+            // thinclass: array1.join('-'),
+            thinclass: 'P191-03-209-001',
             page,
             size: size,
             status: zt,
@@ -626,32 +632,80 @@ export default class DegitalAcceptTable extends Component {
                 stime1 = '',
                 etime1 = ''
             } = this.state;
-            const postdata = {
-                acceptanceid: record.ID,
-                status: record.Status, // 用当前条目的状态去查询
-                stime: stime1,
-                etime: etime1
-            };
-            let detailList = await getDigitalAcceptDetail({}, postdata);
-            if (detailList && detailList instanceof Array) {
-                if (detailList.length > 0) {
-                    console.log('detailList', detailList);
-                    for (let i = 0; i < detailList.length; i++) {
-                        let detail = detailList[i];
-                        let downloadUrl = `${FOREST_API}/DocExport.ashx?action=acceptance&acceptancedetailid=${detail.ID}`;
-                        await this.createLink(this, downloadUrl);
+            console.log('record', record);
+            if (record && record.ystype) {
+                if (record.ystype === '土地整理' || record.ystype === '放样点穴' || record.ystype === '挖穴') {
+                    const {
+                        stime1 = '',
+                        etime1 = ''
+                    } = this.state;
+                    let checktype = record.CheckType;
+                    const postdata = {
+                        acceptanceid: record.ID,
+                        status: record.Status, // 用当前条目的状态去查询
+                        stime: stime1,
+                        etime: etime1
+                    };
+                    let rst = await getDigitalAcceptDetail({}, postdata);
+                    if (!(rst instanceof Array) || rst.length === 0) {
+                        message.info('移动端详情尚未提交');
+                        return;
+                    }
+                    this.setState({
+                        itemDetailList: rst
+                    });
+                    console.log('ystype', record.ystype);
+                    if (record.ystype === '土地整理') {
+                        this.setState({
+                            exportModalVisible1: true
+                        });
+                    } else if (record.ystype === '放样点穴') {
+                        this.setState({
+                            exportModalVisible2: true
+                        });
+                    } else if (record.ystype === '挖穴') {
+                        console.log('aaaaaaaaaaa');
+                        this.setState({
+                            exportModalVisible3: true
+                        });
                     }
                 } else {
-                    message.info('移动端详情尚未提交,无法导出');
-                    return;
+                    const postdata = {
+                        acceptanceid: record.ID,
+                        status: record.Status, // 用当前条目的状态去查询
+                        stime: stime1,
+                        etime: etime1
+                    };
+                    let detailList = await getDigitalAcceptDetail({}, postdata);
+                    if (detailList && detailList instanceof Array) {
+                        if (detailList.length > 0) {
+                            console.log('detailList', detailList);
+                            for (let i = 0; i < detailList.length; i++) {
+                                let detail = detailList[i];
+                                let downloadUrl = `${FOREST_API}/DocExport.ashx?action=acceptance&acceptancedetailid=${detail.ID}`;
+                                await this.createLink(this, downloadUrl);
+                            }
+                        } else {
+                            message.info('移动端详情尚未提交,无法导出');
+                            return;
+                        }
+                    } else {
+                        message.error('获取数据出错，请重新获取');
+                        return;
+                    }
                 }
-            } else {
-                message.error('获取数据出错，请重新获取');
-                return;
             }
         } catch (e) {
             console.log('single', e);
         }
+    }
+    handleExportModalClose = async () => {
+        this.setState({
+            exportModalVisible1: false,
+            exportModalVisible2: false,
+            exportModalVisible3: false,
+            itemDetailList: ''
+        });
     }
     createLink = async (name, url) => {
         // 下载
@@ -860,16 +914,7 @@ export default class DegitalAcceptTable extends Component {
                 <Col span={18} className='forest-quryrstcnt' >
                     <span > 此次查询共有苗木： {this.state.totalNum}棵 </span>
                 </Col>
-                <Col span={2} >
-                    {/* {
-                        <Button
-                            type='primary'
-                            onClick={this.exportFile.bind(this, 'mutiple')}
-                        >
-                            导出
-                        </Button>
-                    } */}
-                </Col>
+                <Col span={2} />
                 <Col span={2} >
                     <Button type='primary' onClick={this.resetinput.bind(this)} >
                         重置
@@ -919,7 +964,10 @@ export default class DegitalAcceptTable extends Component {
             visible8,
             visible9,
             visible10,
-            visible11
+            visible11,
+            exportModalVisible1,
+            exportModalVisible2,
+            exportModalVisible3
         } = this.state;
         return (
             <div>
@@ -1013,7 +1061,32 @@ export default class DegitalAcceptTable extends Component {
                         {...this.props}
                         {...this.state}
                     />
-                } </div>
+                }
+                {
+                    exportModalVisible1
+                        ? <ExportView1
+                            onPressOk={this.handleExportModalClose.bind(this)}
+                            {...this.props}
+                            {...this.state}
+                        /> : ''
+                }
+                {
+                    exportModalVisible2
+                        ? <ExportView2
+                            onPressOk={this.handleExportModalClose.bind(this)}
+                            {...this.props}
+                            {...this.state}
+                        /> : ''
+                }
+                {
+                    exportModalVisible3
+                        ? <ExportView3
+                            onPressOk={this.handleExportModalClose.bind(this)}
+                            {...this.props}
+                            {...this.state}
+                        /> : ''
+                }
+            </div>
         );
     }
 }
