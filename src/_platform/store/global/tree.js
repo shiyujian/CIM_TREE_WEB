@@ -8,13 +8,13 @@ export const getTreeNodeListOK = createAction(`${ID}获取森林大数据树节�
 export const getTreeNodeList = forestFetchAction(
     `${FOREST_API}/tree/wpunittree`,
     [getTreeNodeListOK]
-); //    √
-export const getThinClassList = forestFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []); //
+); //
 // 设置区域地块树，对于所有人员获取所有的数据
 export const getOnSiteThinClassTree = createAction(`${ID}所有的区域地块细班树`);
 // 设置区域地块树，对于施工监理只获取自己标段的数据
 export const getThinClassTree = createAction(`${ID}关于标段的区域地块细班树`);
 export const getTotalThinClass = createAction(`${ID}获取所有的小班数据`);
+export const getThinClassList = forestFetchAction(`${FOREST_API}/tree/wpunit4apps?parent={{no}}`, []); //
 
 // 获获取养护类型
 export const getCuringTypes = forestFetchAction(`${FOREST_API}/curing/curingtypes`, [], 'GET');
@@ -25,16 +25,6 @@ export const getCuringTreeInfo = forestFetchAction(`${FOREST_API}/curing/curingt
 // 苗木养护计划详情
 export const getCuringMessage = forestFetchAction(`${FOREST_API}/curing/curing/{{id}}`, [], 'GET');
 
-export const getForestAllUsersData = forestFetchAction(
-    `${FOREST_API}/system/users`,
-    [],
-    'GET'
-);
-export const getForestUserDetail = forestFetchAction(
-    `${FOREST_API}/system/user/{{id}}`,
-    [],
-    'GET'
-);
 export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET'); // 获取细班详情
 
 export default handleActions(

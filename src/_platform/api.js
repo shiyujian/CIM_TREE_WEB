@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-23 20:28:13
+ * @Last Modified time: 2019-07-24 14:33:39
  */
 /**
  *
@@ -142,20 +142,10 @@ export const ORGTYPE = [
 ];
 // 当前执行的项目
 export const DEFAULT_PROJECT = 'P191';
-// admin登录林总接口所用的账号
-export const FOREST_LOGIN_DATA = {
-    phone: 'zhaozz99',
-    pwd: '666666'
-    // phone: 'zhaozz1010',
-    // pwd: '130718'
-};
 // 业主审核进度管理列表人员
 export const OWNERCHECKLIST = [
     '张亮', '陈津陵', '池铭炎', '李红宇', '张大伟', '郝晓飞', '黄雪晨', '李航'
 ];
-
-export const ORG_NURSERY_CODE = 'ORG_NURSERY';
-export const ORG_SUPPLIER_CODE = 'ORG_SUPPLIER';
 
 // 综合展示 各个项目的中心坐标
 export const PROJECTPOSITIONCENTER = [
@@ -649,34 +639,35 @@ export const MODULES = [
         id: 'PROJECT',
         name: '项目管理',
         children: [
+            // {
+            //     id: 'PROJECT.DATAMANAGE.NONE',
+            //     name: '资料管理',
+            //     children: [
+            //         {
+            //             id: 'PROJECT.STANDARD',
+            //             name: '制度标准'
+            //         },
+            //         {
+            //             id: 'PROJECT.ENGINEERINGIMAGE',
+            //             name: '工程影像'
+            //         },
+            //         {
+            //             id: 'PROJECT.PRODOC',
+            //             name: '工程文档'
+            //         }
+            //     ]
+            // },
+            // {
+            //     id: 'PROJECT.OVERALLMANAGE.NONE',
+            //     name: '综合管理',
+            //     children: [
+            //         {
+            //             id: 'PROJECT.FORM',
+            //             name: '表单管理'
+            //         }
+            //     ]
+            // },
             {
-                id: 'PROJECT.DATAMANAGE.NONE',
-                name: '资料管理',
-                children: [
-                    {
-                        id: 'PROJECT.STANDARD',
-                        name: '制度标准'
-                    },
-                    {
-                        id: 'PROJECT.ENGINEERINGIMAGE',
-                        name: '工程影像'
-                    },
-                    {
-                        id: 'PROJECT.PRODOC',
-                        name: '工程文档'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.OVERALLMANAGE.NONE',
-                name: '综合管理',
-                children: [
-                    {
-                        id: 'PROJECT.FORM',
-                        name: '表单管理'
-                    }
-                ]
-            }, {
                 id: 'PROJECT.PLOTMANAGE.NONE',
                 name: '数据管理',
                 children: [
@@ -724,37 +715,5 @@ export const MODULES = [
                 name: '工程影像'
             }
         ]
-    }
-];
-
-// 获取新闻发布单位
-export const DEPARTMENT = [
-    {
-        code: 'ORG_01_19',
-        name: '雄安新区造林指挥部'
-    },
-    {
-        code: 'ORG_03_32',
-        name: '河北远大工程咨询有限公司'
-    },
-    {
-        code: 'ORG_P010_01_02_02',
-        name: '北京政泰隆工程管理有限公司'
-    },
-    {
-        code: 'ORG_P010_01_02_03',
-        name: '北京中城建建设监理有限公司'
-    },
-    {
-        code: 'ORG_P010_01_02_04',
-        name: '浙江江南工程管理股份有限公司'
-    },
-    {
-        code: 'ORG_P010_02_02_01',
-        name: '北京中林华联建设工程监理有限公司'
-    },
-    {
-        code: 'ORG_P010_03_02_01',
-        name: '天津市源天工程咨询有限公司'
     }
 ];

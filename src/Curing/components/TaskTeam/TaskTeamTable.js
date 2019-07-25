@@ -46,7 +46,7 @@ export default class TaskTeamTable extends Component {
         const {
             curingGroupMans = [],
             actions: {
-                getForestUserDetail
+                getUserDetail
             }
         } = this.props;
         try {
@@ -58,7 +58,7 @@ export default class TaskTeamTable extends Component {
                         let postData = {
                             id: user && user.User
                         };
-                        requestArr.push(getForestUserDetail(postData));
+                        requestArr.push(getUserDetail(postData));
                     }
                 });
                 let dataSource = [];

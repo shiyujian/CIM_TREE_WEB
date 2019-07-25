@@ -1,2 +1,1 @@
-export WorkTree from './WorkTree'
 ;

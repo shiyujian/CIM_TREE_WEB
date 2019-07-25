@@ -15,7 +15,6 @@ import {
     setPermissions,
     removePermissions
 } from '_platform/auth';
-import { FOREST_LOGIN_DATA } from '_platform/api';
 import './Login.less';
 
 const FormItem = Form.Item;
@@ -451,9 +450,6 @@ class Login extends Component {
         await removePermissions();
         console.log('loginFuncloginFuncdata', data);
         let postData = {};
-        // if (data.username === 'admin') {
-        //     postData = FOREST_LOGIN_DATA;
-        // } else {
         postData = {
             phone: data.username,
             pwd: data.password

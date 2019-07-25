@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import SimpleTree from './SimpleTree';
 import {getCompanyDataByOrgCode, getUser} from '_platform/auth';
 import {addGroup} from '../auth';
-import {ORG_NURSERY_CODE, ORG_SUPPLIER_CODE} from '_platform/api';
 import moment from 'moment';
 
 export default class Tree extends Component {

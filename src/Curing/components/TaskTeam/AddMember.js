@@ -281,8 +281,8 @@ export default class AddMember extends Component {
             title: '所属部门',
             dataIndex: 'OrgObj',
             render: (text, record, index) => {
-                if (text && text.OrgName) {
-                    return text.OrgName;
+                if (record.OrgObj && record.OrgObj.OrgName) {
+                    return record.OrgObj.OrgName;
                 }
             }
         },

@@ -431,7 +431,7 @@ export default class CarPackageTable extends Component {
         const {
             actions: {
                 getcarpackage,
-                getForestUserDetail
+                getUserDetail
             },
             keycode = '',
             platform: { tree = {} }
@@ -470,7 +470,7 @@ export default class CarPackageTable extends Component {
                         : '/';
                     plan.Project = await getProjectNameBySection(plan.Section, thinClassTree);
                     plan.sectionName = await getSectionNameBySection(plan.Section, thinClassTree);
-                    let userData = await getForestUserDetail({id: plan.Constructioner});
+                    let userData = await getUserDetail({id: plan.Constructioner});
                     plan.ConstructionerName = (userData && userData.Full_Name) || '';
                     plan.ConstructionerUserName = (userData && userData.User_Name) || '';
                     plan.SupervisorName = (plan.SupervisorUser && plan.SupervisorUser.Full_Name) || '';
