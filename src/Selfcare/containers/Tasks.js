@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Content, DynamicTitle } from '_platform/components/layout';
-import { Type, Filter, Table } from '../components/Tasks';
+import { Type, Filter, Table, TaskList } from '../components/Tasks';
 import { actions } from '../store/tasks';
 import { actions as platformActions } from '_platform/store/global';
 import { connect } from 'react-redux';
@@ -20,7 +20,6 @@ import { getUser } from '_platform/auth';
     })
 )
 export default class Tasks extends Component {
-    static propTypes = {};
 
     async componentDidMount () {
         const {
@@ -28,20 +27,43 @@ export default class Tasks extends Component {
             platform = {},
             actions: { getTasks, setLoadingStatus }
         } = this.props;
-        const { type = 'processing' } = filter;
-        const user = getUser();
-        setLoadingStatus(true);
-        await getTasks(
-            {},
-            {
-                ...filter,
-                task: type,
-                executor: user.ID,
-                order_by: '-real_start_time'
-            }
-        );
-        setLoadingStatus(false);
+        // const { type = 'processing' } = filter;
+        // const user = getUser();
+        // setLoadingStatus(false);
+        // await getTasks(
+        //     {},
+        //     {
+        //         ...filter,
+        //         task: type,
+        //         executor: user.ID,
+        //         order_by: '-real_start_time'
+        //     }
+        // );
+        // setLoadingStatus(false);
         // }
+    }
+    getDataList = (params) => {
+        console.log(params, '参数');
+        let { getWorkList } = this.props.actions;
+        getWorkList({}, params).then(rep => {
+            if (rep.code === 200) {
+                let backlogDataList = []; // 待办列表
+                let doneDataList = []; // 已办列表
+                rep.content.map(item => {
+                    if (item.WFState === 1) {
+                        backlogDataList.push(item);
+                    } else {
+                        doneDataList.push(item);
+                    }
+                });
+                console.log('待办列表', backlogDataList);
+                console.log('已办列表', doneDataList);
+                this.setState({
+                    backlogDataList,
+                    doneDataList
+                });
+            }
+        });
     }
 
     render () {
@@ -49,9 +71,10 @@ export default class Tasks extends Component {
         return (
             <Content>
                 <DynamicTitle title='个人任务' {...this.props} />
-                <Type {...this.props} />
-                <Filter {...this.props} />
-                <Table {...this.props} />
+                <TaskList {...this.props} />
+                {/* <Type {...this.props} />
+                <Filter {...this.props} getDataList={this.getDataList} />
+                <Table {...this.props} {...this.state} /> */}
             </Content>
         );
     }

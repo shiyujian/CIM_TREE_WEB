@@ -23,25 +23,26 @@ class Filter extends Component {
     }
 
     componentDidMount () {
-        const {
-            actions: { getTasksList }
-        } = this.props;
-        let ttt = getTasksList();
-        console.log('ttt', ttt);
-        getTasksList().then(rst => {
-            console.log('rst', rst);
-            if (rst.length) {
-                const taskNameArr = [];
-                const newTaskNameArr = [];
-                rst.forEach(task => {
-                    const { id, name } = task;
-                    taskNameArr.push({ id, name });
-                });
-                this.unique(taskNameArr, newTaskNameArr);
-                this.setState({ newTaskNameArr });
-            }
-        });
-        this.getUserSelect();
+        this.query();
+        // const {
+        //     actions: { getTasksList }
+        // } = this.props;
+        // let ttt = getTasksList();
+        // console.log('ttt', ttt);
+        // getTasksList().then(rst => {
+        //     console.log('rst', rst);
+        //     if (rst.length) {
+        //         const taskNameArr = [];
+        //         const newTaskNameArr = [];
+        //         rst.forEach(task => {
+        //             const { id, name } = task;
+        //             taskNameArr.push({ id, name });
+        //         });
+        //         this.unique(taskNameArr, newTaskNameArr);
+        //         this.setState({ newTaskNameArr });
+        //     }
+        // });
+        // this.getUserSelect();
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -282,42 +283,73 @@ class Filter extends Component {
         return newArr;
     }
 
+    // 查询
     query () {
         const {
-            actions: { getTasks, setLoadingStatus },
-            filter = {}
+            actions: { getEmpworkList, getWorkList },
+            getDataList
         } = this.props;
         const user = getUser();
         console.log(this.props);
-        this.props.form.validateFields(async (err, values) => {
-            console.log('err', err);
-            let conditions = {
-                task: filter.type || 'processing',
-                executor: user.ID,
-                workflowactivity: values.workflowactivity || '',
-                workflow: values.workflow || '',
-                creator: values.creator || '',
-                status: values.status || '',
-                real_start_time_begin: '',
-                real_start_time_end: ''
-            };
-            if (values && values.startTime && values.startTime.length > 0) {
-                conditions.real_start_time_begin = moment(
-                    values.startTime[0]
-                ).format('YYYY-MM-DD 00:00:00');
-                conditions.real_start_time_end = moment(
-                    values.startTime[1]
-                ).format('YYYY-MM-DD 23:59:59');
-            }
-            for (const key in conditions) {
-                if (!conditions[key] || conditions[key] == '') {
-                    delete conditions[key];
-                }
-            }
-            setLoadingStatus(true);
-            await getTasks({}, conditions);
-            setLoadingStatus(false);
-        });
+        let params = {
+            workid: '', // 任务ID
+            currentnode: '', // 节点ID
+            prevnode: '', // 上一结点ID
+            executor: '', // 执行人
+            sender: '', // 上一节点发送人
+            haveexecuted: '', // 是否已执行 1已办
+            stime: '', // 开始时间
+            etime: '', // 结束时间
+            page: '', // 页码
+            size: '' // 页数
+        };
+        // 获取数据列表
+        getDataList(params);
+        // getEmpworkList({}, {
+        //     workid: '', // 任务ID
+        //     currentnode: '', // 节点ID
+        //     prevnode: '', // 上一结点ID
+        //     executor: '', // 执行人
+        //     stime: '', // 开始时间
+        //     etime: '', // 结束时间
+        //     page: '', // 页码
+        //     size: '' // 页数
+        // }).then(rep => {
+        //     if (rep.code === 200) {
+        //         this.setState({
+
+        //         });
+        //     }
+        // });
+        // this.props.form.validateFields(async (err, values) => {
+            // console.log('err', err);
+            // let conditions = {
+            //     task: filter.type || 'processing',
+            //     executor: user.ID,
+            //     workflowactivity: values.workflowactivity || '',
+            //     workflow: values.workflow || '',
+            //     creator: values.creator || '',
+            //     status: values.status || '',
+            //     real_start_time_begin: '',
+            //     real_start_time_end: ''
+            // };
+            // if (values && values.startTime && values.startTime.length > 0) {
+            //     conditions.real_start_time_begin = moment(
+            //         values.startTime[0]
+            //     ).format('YYYY-MM-DD 00:00:00');
+            //     conditions.real_start_time_end = moment(
+            //         values.startTime[1]
+            //     ).format('YYYY-MM-DD 23:59:59');
+            // }
+            // for (const key in conditions) {
+            //     if (!conditions[key] || conditions[key] == '') {
+            //         delete conditions[key];
+            //     }
+            // }
+            // setLoadingStatus(true);
+            // await getTasks({}, conditions);
+            // setLoadingStatus(false);
+        // });
     }
 
     clear () {

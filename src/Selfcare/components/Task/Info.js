@@ -8,7 +8,15 @@ export default class Info extends Component {
         labelCol: { span: 4 },
         wrapperCol: { span: 20 }
     };
-
+    async componentDidMount () {
+        const {
+            match: { params: { task_id } = {} },
+            actions: { getTask, setTaskDetailLoading }
+        } = this.props;
+        setTaskDetailLoading(true);
+        await getTask({ task_id: task_id });
+        setTaskDetailLoading(false);
+    }
     render () {
         const { platform: { task = {} } = {} } = this.props;
         return (
@@ -37,16 +45,6 @@ export default class Info extends Component {
                 </Button>
             </div>
         );
-    }
-
-    async componentDidMount () {
-        const {
-            match: { params: { task_id } = {} },
-            actions: { getTask, setTaskDetailLoading }
-        } = this.props;
-        setTaskDetailLoading(true);
-        await getTask({ task_id: task_id });
-        setTaskDetailLoading(false);
     }
     backClick () {
         let to = `/selfcare/task`;

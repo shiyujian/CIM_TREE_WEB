@@ -1,4 +1,5 @@
 export Total from './Total';
+export Totalnew from './Totalnew';
 export TotleModal from './TotleModal';
 export Actual from './Actual';
 export ActualModal from './ActualModal';
