@@ -203,8 +203,14 @@ export default class Tree extends Component {
                 let topProject = Tree.loop(orgTreeArrList, selectOrgData.ID);
                 if (this.compare(user, topProject, selectOrgData.ID)) {
                     await changeSidebarField('node', selectOrgData);
+                    let orgID = '';
+                    if (selectOrgData && selectOrgData.OrgPK) {
+                        orgID = selectOrgData.OrgPK;
+                    } else {
+                        orgID = selectOrgData.ID;
+                    }
                     let postData = {
-                        org: selectOrgData.ID,
+                        org: orgID,
                         page: 1,
                         size: 10
                     };

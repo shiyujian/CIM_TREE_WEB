@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, Notification } from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
-import AddEdit from './AddEdit';
 import Addition from './Addition';
 import Edit from './Edit';
 import './Table.less';
@@ -21,7 +20,6 @@ class Tablelevel extends Component {
             page: 1,
             loading: true,
             supplierList: [], // 供应商列表
-            visible: false, // 新增编辑供应商弹框
             visibleTitle: '', // 弹框标题
             seeVisible: false, // 查看弹框
             auditVisible: false, // 审核弹框
@@ -39,7 +37,6 @@ class Tablelevel extends Component {
             editVisible: false
         };
         this.Checker = '';
-        this.groupId = ''; // 用户分组ID
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
         this.handlePage = this.handlePage.bind(this); // 换页
@@ -201,12 +198,14 @@ class Tablelevel extends Component {
             }
         }
     ];
-    componentDidMount () {
-        const { getRegionCodes, getNurseryList } = this.props.actions;
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getRegionCodes,
+                getNurseryList
+            }
+        } = this.props;
         // 获取当前组织机构的权限
-        const user = getUser();
-        let userRoles = user.roles || '';
-        this.groupId = userRoles && userRoles.roles.ID;
         let permission = getUserIsManager();
         console.log('permission', permission);
         this.setState({
@@ -219,55 +218,53 @@ class Tablelevel extends Component {
             });
         } else {
             // 获取行政区划编码
-            getRegionCodes().then(rep => {
-                let RegionCodeList = [];
-                rep.map(item => {
-                    if (item.LevelType === '1') {
-                        RegionCodeList.push({
-                            value: item.ID,
-                            label: item.Name
+            let rst = await getRegionCodes();
+            let RegionCodeList = [];
+            rst.map(item => {
+                if (item.LevelType === '1') {
+                    RegionCodeList.push({
+                        value: item.ID,
+                        label: item.Name
+                    });
+                }
+            });
+            RegionCodeList.map(item => {
+                let arrCity = [];
+                rst.map(row => {
+                    if (row.LevelType === '2' && item.value === row.ParentId) {
+                        arrCity.push({
+                            value: row.ID,
+                            label: row.Name
                         });
                     }
                 });
-                RegionCodeList.map(item => {
-                    let arrCity = [];
-                    rep.map(row => {
-                        if (row.LevelType === '2' && item.value === row.ParentId) {
-                            arrCity.push({
-                                value: row.ID,
-                                label: row.Name
+                arrCity.map(row => {
+                    let arrCounty = [];
+                    rst.map(record => {
+                        if (record.LevelType === '3' && row.value === record.ParentId) {
+                            arrCounty.push({
+                                value: record.ID,
+                                label: record.Name
                             });
                         }
                     });
-                    arrCity.map(row => {
-                        let arrCounty = [];
-                        rep.map(record => {
-                            if (record.LevelType === '3' && row.value === record.ParentId) {
-                                arrCounty.push({
-                                    value: record.ID,
-                                    label: record.Name
-                                });
-                            }
-                        });
-                        row.children = arrCounty;
-                    });
-                    item.children = arrCity;
+                    row.children = arrCounty;
                 });
-                window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
-                this.setState({
-                    RegionCodeList
-                });
+                item.children = arrCity;
+            });
+            window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
+            this.setState({
+                RegionCodeList
             });
         }
         // 获取所有苗圃
-        getNurseryList({}, {
-            status: 1
-        }).then(rep => {
+        let rep = await getNurseryList({}, {status: 1});
+        if (rep && rep.code && rep.code === 200) {
             this.setState({
                 optionList: rep.content
             });
-        });
-        this.onSearch();
+        }
+        await this.onSearch();
     }
     handlePage (page) {
         this.setState({
@@ -539,7 +536,6 @@ class Tablelevel extends Component {
             supplierList,
             page,
             total,
-            visible,
             addVisible,
             editVisible,
             seeVisible,
@@ -635,8 +631,11 @@ class Tablelevel extends Component {
                 {
                     auditVisible
                         ? (
-                            <Modal title='审核' visible
-                                onOk={this.handleAudit} onCancel={this.handleCancel}
+                            <Modal
+                                title='审核'
+                                visible
+                                onOk={this.handleAudit}
+                                onCancel={this.handleCancel}
                             >
                                 <Form>
                                     <FormItem
@@ -666,7 +665,9 @@ class Tablelevel extends Component {
                         )
                         : null
                 }
-                <Modal title='拉黑' visible={blackVisible}
+                <Modal
+                    title='拉黑'
+                    visible={blackVisible}
                     onCancel={this.handleBlackCancel.bind(this)}
                     onOk={this.handleBlackOk.bind(this)}
                 >
@@ -682,15 +683,6 @@ class Tablelevel extends Component {
                         </FormItem>
                     </Form>
                 </Modal>
-                {
-                    visible
-                        ? <AddEdit
-                            {...this.props}
-                            {...this.state}
-                            handleCancel={this.handleCancel}
-                            onSearch={this.onSearch}
-                        /> : null
-                }
                 {
                     addVisible
                         ? <Addition

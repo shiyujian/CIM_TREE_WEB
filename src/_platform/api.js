@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-24 14:33:39
+ * @Last Modified time: 2019-07-25 13:46:30
  */
 /**
  *
@@ -391,10 +391,6 @@ export const MODULES = [
             {
                 id: 'SCHEDULE.STAGEREPORT',
                 name: '进度填报'
-            },
-            {
-                id: 'SCHEDULE.PROGRESS',
-                name: '项目进度'
             },
             {
                 id: 'SCHEDULE.SCHEDULEDISPLAY',

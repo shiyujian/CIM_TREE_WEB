@@ -266,8 +266,16 @@ class Tablelevel extends Component {
         });
     }
     onSearch () {
-        const { page, status, nurseryname } = this.state;
-        const { getNurseryList } = this.props.actions;
+        const {
+            page,
+            status,
+            nurseryname
+        } = this.state;
+        const {
+            actions: {
+                getNurseryList
+            }
+        } = this.props;
         const param = {
             status: status === undefined ? '' : status,
             nurseryname,

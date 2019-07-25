@@ -9,15 +9,12 @@ const getTasks = createFetchAction(`${WORKFLOW_API}/participant-task/`);
 
 const loginForest = createFetchAction(`${FOREST_API}/system/login`, [], 'GET');
 
-const getUserPermission = createFetchAction(`${FOREST_API}/system/functions`, [], 'GET');
-
 const getSecurityCode = createFetchAction(`${FOREST_API}/ValidateHandler.ashx`, [], 'GET');
 
 export const actions = {
     forgectOK,
     getTasks,
     loginForest,
-    getUserPermission,
     getSecurityCode
 };
 export default handleActions({

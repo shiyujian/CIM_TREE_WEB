@@ -120,9 +120,13 @@ export const setPermissions = (permissions) => {
 export const getPermissions = () => {
     let permissions = [];
     const text = window.localStorage.getItem('permissions');
-
     try {
-        permissions = JSON.parse(text);
+        if (text) {
+            permissions = JSON.parse(text);
+            if (!(permissions && permissions instanceof Array)) {
+                permissions = [];
+            }
+        }
     } catch (e) {
         console.log('getPermissions', e);
     }

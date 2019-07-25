@@ -69,11 +69,11 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                                     });
                                     clearUser();
                                     removePermissions();
+                                    window.localStorage.removeItem('LOGIN_USER_DATA');
                                     let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
                                     if (!remember) {
                                         window.localStorage.removeItem('LOGIN_USER_PASSDATA');
                                     }
-                                    window.localStorage.removeItem('LOGIN_USER_DATA');
                                     window.location.replace(locationStart + '/login');
                                     return;
                                 }

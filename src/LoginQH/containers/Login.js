@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions } from '../store/login';
+import { actions as platformActions } from '_platform/store/global';
 import {
     Form,
     Input,
@@ -21,12 +22,12 @@ const FormItem = Form.Item;
 
 @connect(
     state => {
-        const { login: { login = {} } = {} } = state;
-        return { ...login };
+        const { login: { login = {} } = {}, platform } = state;
+        return { ...login, platform };
     },
     dispatch => ({
         actions: bindActionCreators(
-            { ...actions },
+            { ...actions, ...platformActions },
             dispatch
         )
     })
@@ -440,7 +441,8 @@ class Login extends Component {
             actions: {
                 getUserPermission,
                 getTasks,
-                loginForest
+                loginForest,
+                getRolePermission
             },
             history: { replace }
         } = this.props;
@@ -468,9 +470,14 @@ class Login extends Component {
             //         pagination: true,
             //         page: 1
             //     });
-            let permissions = await getUserPermission({}, {userid: forestLoginUserData.ID});
-            console.log('permissions', permissions);
-            await setPermissions(permissions);
+            let userRole = forestLoginUserData.Roles;
+            if (userRole && userRole instanceof Array && userRole.length > 0) {
+                let permissions = await getRolePermission({roleId: userRole[0].ID});
+                await setPermissions(permissions);
+            } else {
+                await setPermissions([]);
+            }
+
             Notification.open({
                 message: loginType
                     ? '自动登录成功'

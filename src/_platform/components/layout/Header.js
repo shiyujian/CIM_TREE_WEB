@@ -156,8 +156,6 @@ export default class Header extends Component {
         }
         const { username = '', name = '' } = getUser();
         let permissions = getPermissions() || [];
-        // permissions.splice(4,1,"appmeta.PROJECT.NURSERY.NONE.READ");
-        // console.log('permissions333', permissions);
         if (fullScreenState === 'fullScreen') {
             return null;
         }
@@ -175,32 +173,34 @@ export default class Header extends Component {
                     mode='horizontal'
                 >
                     {Header.menus.map(menu => {
-                        // let has = permissions.some(
-                        //     permission =>
-                        //         permission === `appmeta.${menu.id}.READ`
-                        // );
-                        let has = true;
+                        let has = permissions.some(
+                            permission =>
+                                permission.FunctionCode === `appmeta.${menu.id}.READ`
+                        );
+                        // let has = true;
                         let str;
-                        if (has) {
-                            if (username !== 'admin') {
+                        if (has || username === 'admin') {
+                            if (username) {
                                 /*
 									  对用户各个模块权限进行遍历，如果拥有某个子模块的权限，则将子模块的权限
 									进行处理变换成子模块的路径
 									*/
                                 for (var i = 0; i < permissions.length; i++) {
                                     try {
-                                        let missArr = permissions[i].split('.');
-                                        if (missArr[0] === 'appmeta' && missArr[1] === menu.id) {
-                                            if (
-                                                permissions[i].indexOf(menu.id) !==
-                                                    -1 &&
-                                                permissions[i] !==
-                                                    `appmeta.${menu.id}.READ` &&
-                                                permissions[i].indexOf(`.NONE.READ`) ===
-                                                    -1
-                                            ) {
-                                                str = permissions[i];
-                                                break;
+                                        if (permissions[i] && permissions[i].FunctionCode) {
+                                            let missArr = permissions[i].FunctionCode.split('.');
+                                            if (missArr[0] === 'appmeta' && missArr[1] === menu.id) {
+                                                if (
+                                                    permissions[i].FunctionCode.indexOf(menu.id) !==
+                                                        -1 &&
+                                                    permissions[i].FunctionCode !==
+                                                        `appmeta.${menu.id}.READ` &&
+                                                    permissions[i].FunctionCode.indexOf(`.NONE.READ`) ===
+                                                        -1
+                                                ) {
+                                                    str = permissions[i].FunctionCode;
+                                                    break;
+                                                }
                                             }
                                         }
                                     } catch (e) {
