@@ -14,7 +14,7 @@
 import React, { Component } from 'react';
 import {
     Table,
-    Spin,
+    Select,
     Button,
     notification,
     Modal,
@@ -25,6 +25,7 @@ import {
     Checkbox,
     Upload,
     Icon,
+    DatePicker,
     Popconfirm
 } from 'antd';
 import moment from 'moment';
@@ -34,21 +35,27 @@ import {
     UPLOAD_API,
     WORKFLOW_CODE
 } from '_platform/api';
-import PerSearch from '_platform/components/panels/PerSearch';
+import PerSearch from './PerSearch';
 import { getNextStates } from '_platform/components/Progress/util';
 import SearchInfo from './SearchInfo';
 import TotleModal from './TotleModal';
 import './index.less';
+import { SSL_OP_NO_TLSv1_1 } from 'constants';
+import { WFStatusList } from '../common';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
+const { RangePicker } = DatePicker;
+const { Option } = Select;
 moment.locale('zh-cn');
-
 class Total extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
         this.state = {
+            section: '', // 用户所在标段
             username: '', // 用户名
+            formItem: [], // 表单项
+            workID: '', // 任务ID
             totolData: [],
             TotleModaldata: [],
             selectedRowKeys: [],
@@ -58,6 +65,8 @@ class Total extends Component {
             fileList: [],
             isCopyMsg: false, // 接收人员是否发短信
             TreatmentData: [],
+            sectionArray: [], // 标段列表
+            fileDataList: [], // 文件表格
             newFileLists: [],
             key: Math.random(),
             sectionSchedule: [], // 当前用户的标段信息
@@ -70,13 +79,93 @@ class Total extends Component {
         };
     }
     async componentDidMount () {
-        this.setState({
-            username: getUser().username
-        });
-        this.gettaskSchedule();
-        this.getSection();
+        this.getSection(); // 获取当前登陆用户的标段
+        this.getWorkList(); // 获取任务列表
     }
+    getSection () {
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        console.log('获取用户所属标段', tree, 'leftkeycode');
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let user = getUser();
 
+        let section = user.section;
+        let currentSectionName = '';
+        let projectName = '';
+        let sectionArray = [];
+
+        if (section) {
+            console.log(section, '用户所在标段');
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        console.log(item.children, 'item.children');
+                        item.children.map(item => {
+                            // 获取当前标段的名字
+                            if (item.No === section) {
+                                currentSectionName = item.Name;
+                                sectionArray.push(item);
+                            }
+                        });
+                    }
+                });
+            }
+            console.log('sectionArray', sectionArray);
+            this.setState({
+                section: section,
+                sectionArray,
+                currentSection: section,
+                currentSectionName: currentSectionName,
+                projectName: projectName
+            });
+        } else {
+            sectionData.map(project => {
+                if (leftkeycode === project.No) {
+                    project.children.map(item =>
+                        sectionArray.push(item)
+                    );
+                }
+            });
+            this.setState({
+                sectionArray
+            });
+        }
+    }
+    getWorkList () {
+        const { getWorkList } = this.props.actions;
+        let params = {
+            workid: '', // 任务ID
+            title: '', // 任务名称
+            flowname: '总进度计划报批流程', // 流程类型或名称
+            starter: '', // 发起人
+            currentnode: '', // 节点ID
+            prevnode: '', // 上一结点ID
+            executor: '', // 执行人
+            sender: '', // 上一节点发送人
+            haveexecuted: '', // 是否已执行 1已办
+            stime: '', // 开始时间
+            etime: '', // 结束时间
+            page: '', // 页码
+            size: '' // 页数
+        };
+        getWorkList({}, params).then(rep => {
+            if (rep.code === 200) {
+                let workDataList = [];
+                rep.content.map(item => {
+                    workDataList.push(item);
+                });
+                console.log('任务列表', workDataList);
+                this.setState({
+                    workDataList
+                });
+            }
+        });
+    }
     async componentDidUpdate (prevProps, prevState) {
         const { leftkeycode } = this.props;
         if (leftkeycode != prevProps.leftkeycode) {
@@ -233,45 +322,10 @@ class Total extends Component {
         });
         return projectCode;
     }
-    // 获取当前登陆用户的标段
-    getSection () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let user = getUser();
-
-        let section = user.section;
-        let currentSectionName = '';
-        let projectName = '';
-
-        if (section) {
-            let code = section.split('-');
-            if (code && code.length === 3) {
-                // 获取当前标段所在的项目
-                sectionData.map(item => {
-                    if (code[0] === item.No) {
-                        projectName = item.Name;
-                        let units = item.children;
-                        units.map(unit => {
-                            // 获取当前标段的名字
-                            if (unit.No === section) {
-                                currentSectionName = unit.Name;
-                            }
-                        });
-                    }
-                });
-            }
-            this.setState({
-                currentSection: section,
-                currentSectionName: currentSectionName,
-                projectName: projectName
-            });
-        }
-    }
     // 获取当前登陆用户的标段的下拉选项
     getSectionOption () {
         const { sectionSchedule } = this.state;
+        console.log('sectionSchedule', sectionSchedule);
         let option = [];
         sectionSchedule.map(section => {
             option.push(
@@ -282,15 +336,26 @@ class Total extends Component {
         });
         return option;
     }
-
+    onSearch () {
+        let params = {
+            flowname: '总进度计划报批流程', // 流程类型或名称
+            stime: '', // 开始时间
+            etime: '' // 结束时间
+        };
+        this.getWorkList();
+    }
     render () {
         const {
+            workDataList,
+            sectionArray,
+            formItem,
             selectedRowKeys,
             sectionSchedule = [],
             filterData,
             TotleModaldata,
             currentSectionName
         } = this.state;
+        const { auditorList } = this.props;
         const {
             form: { getFieldDecorator },
             fileList = []
@@ -317,36 +382,91 @@ class Total extends Component {
                 {this.state.totlevisible && (
                     <TotleModal
                         {...this.props}
-                        {...this.state.TotleModaldata}
+                        {...this.state}
                         oncancel={this.totleCancle.bind(this)}
                         onok={this.totleOk.bind(this)}
                     />
                 )}
-                <SearchInfo
-                    {...this.props}
-                    {...this.state}
-                    gettaskSchedule={this.gettaskSchedule.bind(this)}
-                />
-                <Button onClick={this.onAdd.bind(this)}>新增</Button>
-                {username === 'admin' ? (
-                    <Popconfirm
-                        placement='leftTop'
-                        title='确定删除吗？'
-                        onConfirm={this.deleteClick.bind(this)}
-                        okText='确认'
-                        cancelText='取消'
+                <Form layout='inline'>
+                    <FormItem label='标段'>
+                        {getFieldDecorator('sunitproject', {
+                            rules: [
+                                {
+                                    required: false,
+                                    message: '请选择标段'
+                                }
+                            ]
+                        })(
+                            <Select placeholder='请选择标段' style={{width: 220}}>
+                                {sectionArray.map(item => {
+                                    return <Option value={item.Name} key={item.No}>{item.Name}</Option>;
+                                })}
+                            </Select>
+                        )}
+                    </FormItem>
+                    <FormItem label='编号'>
+                        {getFieldDecorator('snumbercode', {
+                            rules: [
+                                {
+                                    required: false,
+                                    message: '请输入编号'
+                                }
+                            ]
+                        })(<Input placeholder='请输入编号' style={{width: 220}} />)}
+                    </FormItem>
+                    <FormItem label='日期'>
+                        {getFieldDecorator('stimedate', {
+                            rules: [
+                                {
+                                    type: 'array',
+                                    required: false,
+                                    message: '请选择日期'
+                                }
+                            ]
+                        })(
+                            <RangePicker
+                                size='default'
+                                format='YYYY-MM-DD'
+                                style={{
+                                    width: '100%',
+                                    height: '100%'
+                                }}
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        label='流程状态'
                     >
-                        <Button>删除</Button>
-                    </Popconfirm>
-                ) : (
-                    ''
-                )}
+                        {getFieldDecorator('sstatus', {
+                            rules: [
+                                {
+                                    required: false,
+                                    message: '请选择流程状态'
+                                }
+                            ]
+                        })(
+                            <Select
+                                style={{width: 220}}
+                                placeholder='请选择流程类型'
+                                allowClear
+                            >
+                                {WFStatusList.map(item => {
+                                    return <Option key={item.value} value={item.value}>
+                                        {item.label}
+                                    </Option>;
+                                })}
+                            </Select>
+                        )}
+                    </FormItem>
+                </Form>
+                <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
+                <Button style={{marginLeft: 20}} onClick={this.onAdd.bind(this)}>新增</Button>
                 <Table
                     columns={this.columns}
                     rowSelection={username === 'admin' ? rowSelection : null}
-                    dataSource={filterData}
+                    dataSource={workDataList}
                     bordered
-                    rowKey='index'
+                    rowKey='ID'
                     className='foresttable'
                 />
                 <Modal
@@ -358,7 +478,114 @@ class Total extends Component {
                     onOk={this.sendWork.bind(this)}
                 >
                     <div>
-                        hh
+                        <Form>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='标段'
+                                    >
+                                        {getFieldDecorator(
+                                            'Tsection',
+                                            {
+                                                rules: [{required: true}],
+                                                initialValue: currentSectionName
+                                            }
+                                        )(
+                                            <Input
+                                                style={{width: 220}}
+                                                placeholder='请输入标段'
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='编号'
+                                    >
+                                        {getFieldDecorator(
+                                            'Tnumbercode',
+                                            {
+                                                rules: [{required: true}]
+                                            }
+                                        )(
+                                            <Input
+                                                style={{width: 220}}
+                                                placeholder='请输入编号'
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='文档类型'
+                                    >
+                                        {getFieldDecorator(
+                                            'Ttotledocument',
+                                            {
+                                                rules: [{required: true}],
+                                                initialValue: `总计划进度`
+                                            }
+                                        )(
+                                            <Input style={{width: 220}} readOnly />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Dragger {...this.uploadProps}>
+                                    <p className='ant-upload-drag-icon'>
+                                        <Icon type='inbox' />
+                                    </p>
+                                    <p className='ant-upload-text'>
+                                        点击或者拖拽开始上传
+                                    </p>
+                                    <p className='ant-upload-hint'>
+                                        支持 pdf、doc、docx 文件
+                                    </p>
+                                </Dragger>
+                                <Table
+                                    columns={this.columnFile}
+                                    rowKey='cid'
+                                    pagination
+                                    dataSource={
+                                        this.state.fileDataList
+                                    }
+                                    className='foresttable'
+                                />
+                            </Row>
+                            <Row style={{ marginTop: 20 }}>
+                                <Col span={8} offset={4}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='审核人'
+                                    >
+                                        {getFieldDecorator(
+                                            'TdataReview'
+                                        )(
+                                            <Select style={{ width: 120 }}>
+                                                {auditorList.map(item => {
+                                                    return <Option value={item.id} key={item.id}>{item.name}</Option>;
+                                                })}
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                </Col>
+                                <Col span={8} offset={4}>
+                                    <Checkbox
+                                        onChange={this.changeNote.bind(
+                                            this
+                                        )}
+                                    >
+                                        短信通知
+                                    </Checkbox>
+                                </Col>
+                            </Row>
+                        </Form>
                     </div>
                 </Modal>
             </div>
@@ -372,11 +599,36 @@ class Total extends Component {
         } = this.props;
         validateFields((err, values) => {
             if (!err) {
-                console.log(values.Tsection, values.Tnumbercode, values.Ttotledocument, values.TdataReview);
+                console.log('确认', values.Tsection, values.Tnumbercode, values.Ttotledocument, values.TdataReview);
+                const { section, fileDataList } = this.state;
+                let newFileDataList = [];
+                fileDataList.map(item => {
+                    newFileDataList.push({
+                        name: item.name,
+                        remark: item.remark,
+                        url: item.url
+                    });
+                });
                 let FormParams = [{
                     Key: 'Tsection', // 标段
                     FieldType: 0,
-                    Val: values.Tsection
+                    Val: section
+                }, {
+                    Key: 'Tnumbercode', // 编号
+                    FieldType: 0,
+                    Val: values.Tnumbercode
+                }, {
+                    Key: 'Ttotledocument', // 文档类型
+                    FieldType: 0,
+                    Val: values.Ttotledocument
+                }, {
+                    Key: 'fileDataList', // 文档列表
+                    FieldType: 0,
+                    Val: JSON.stringify(newFileDataList)
+                }, {
+                    Key: 'TdataReview', // 审核人
+                    FieldType: 0,
+                    Val: values.TdataReview
                 }];
                 postStartwork({}, {
                     FlowID: 'dd50b1a8-8b39-4733-8677-10251fd7d9b4', // 模板ID
@@ -387,13 +639,16 @@ class Total extends Component {
                     },
                     NextExecutor: 14, // 下一节点执行人
                     Starter: getUser().ID, // 发起人
-                    Title: '总计划进度' + values.Tsection, // 任务标题
+                    Title: section + ' 总计划进度', // 任务标题
                     WFState: 1 // 流程状态 1运行中
                 }).then(rep => {
                     if (rep.code === 1) {
                         notification.success({
                             message: '新增任务成功',
                             duration: 3
+                        });
+                        this.setState({
+                            visible: false
                         });
                     } else {
                         notification.error({
@@ -406,209 +661,14 @@ class Total extends Component {
         });
     }
 
-    // 确认提交
-    // sendWork () {
-    //     const {
-    //         actions: { createFlow, getWorkflowById, putFlow },
-    //         location
-    //     } = this.props;
-    //     const {
-    //         TreatmentData,
-    //         sectionSchedule,
-    //         projectName,
-    //         currentSectionName,
-    //         currentSection
-    //     } = this.state;
-
-    //     let user = getUser(); // 当前登录用户
-
-    //     let section = user.section;
-
-    //     if (!section) {
-    //         notification.error({
-    //             message: '当前用户未关联标段，不能创建流程',
-    //             duration: 3
-    //         });
-    //         return;
-    //     }
-
-    //     let me = this;
-    //     // 共有信息
-    //     let postData = {};
-    //     me.props.form.validateFields((err, values) => {
-    //         if (!err) {
-    //             if (TreatmentData.length === 0) {
-    //                 notification.error({
-    //                     message: '请上传文件',
-    //                     duration: 5
-    //                 });
-    //                 return;
-    //             }
-
-    //             postData.upload_unit = user.org ? user.org : '';
-    //             postData.type = '总进度计划';
-    //             postData.upload_person = user.name ? user.name : user.username;
-    //             postData.upload_time = moment().format('YYYY-MM-DDTHH:mm:ss');
-
-    //             const currentUser = {
-    //                 username: user.username,
-    //                 person_name: user.name,
-    //                 id: parseInt(user.ID)
-    //             };
-
-    //             let subject = [
-    //                 {
-    //                     section: JSON.stringify(currentSection),
-    //                     sectionName: JSON.stringify(currentSectionName),
-    //                     projectName: JSON.stringify(projectName),
-    //                     // "superunit": JSON.stringify(values.Tsuperunit),
-    //                     dataReview: JSON.stringify(values.TdataReview),
-    //                     numbercode: JSON.stringify(values.Tnumbercode),
-    //                     timedate: JSON.stringify(moment().format('YYYY-MM-DD')),
-    //                     totledocument: JSON.stringify(values.Ttotledocument),
-    //                     postData: JSON.stringify(postData),
-    //                     TreatmentData: JSON.stringify(TreatmentData)
-    //                 }
-    //             ];
-    //             const nextUser = this.member;
-    //             let WORKFLOW_MAP = {
-    //                 name: '总进度计划报批流程',
-    //                 desc: '进度管理模块总进度计划报批流程',
-    //                 code: WORKFLOW_CODE.总进度计划报批流程
-    //             };
-    //             let workflowdata = {
-    //                 name: WORKFLOW_MAP.name,
-    //                 description: WORKFLOW_MAP.desc,
-    //                 subject: subject,
-    //                 code: WORKFLOW_MAP.code,
-    //                 creator: currentUser,
-    //                 plan_start_time: null,
-    //                 deadline: null,
-    //                 status: 2
-    //             };
-    //             createFlow({}, workflowdata).then(instance => {
-    //                 if (!instance.id) {
-    //                     notification.error({
-    //                         message: '数据提交失败',
-    //                         duration: 2
-    //                     });
-    //                     return;
-    //                 }
-    //                 const { id, workflow: { states = [] } = {} } = instance;
-    //                 const [
-    //                     {
-    //                         id: state_id,
-    //                         actions: [action]
-    //                     }
-    //                 ] = states;
-
-    //                 getWorkflowById({ id: id }).then(instance => {
-    //                     if (instance && instance.current) {
-    //                         let currentStateId = instance.current[0].id;
-    //                         let nextStates = getNextStates(
-    //                             instance,
-    //                             currentStateId
-    //                         );
-    //                         let stateid = nextStates[0].to_state[0].id;
-
-    //                         let postInfo = {
-    //                             next_states: [
-    //                                 {
-    //                                     state: stateid,
-    //                                     participants: [nextUser],
-    //                                     deadline: null,
-    //                                     remark: null
-    //                                 }
-    //                             ],
-    //                             state: instance.workflow.states[0].id,
-    //                             executor: currentUser,
-    //                             action: nextStates[0].action_name,
-    //                             note: '提交',
-    //                             attachment: null
-    //                         };
-    //                         let data = { pk: id };
-    //                         // 提交流程到下一步
-    //                         putFlow(data, postInfo).then(rst => {
-    //                             if (rst && rst.creator) {
-    //                                 notification.success({
-    //                                     message: '流程提交成功',
-    //                                     duration: 2
-    //                                 });
-    //                                 this.gettaskSchedule(); // 重新更新流程列表
-    //                                 this.setState({
-    //                                     visible: false
-    //                                 });
-    //                             } else {
-    //                                 notification.error({
-    //                                     message: '流程提交失败',
-    //                                     duration: 2
-    //                                 });
-    //                             }
-    //                         });
-    //                     }
-    //                 });
-    //             });
-    //         }
-    //     });
-    // }
-
     onSelectChange = (selectedRowKeys, selectedRows) => {
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     };
-    // 删除
-    deleteClick = async () => {
-        const {
-            actions: { deleteFlow }
-        } = this.props;
-        const { dataSourceSelected } = this.state;
-        if (dataSourceSelected.length === 0) {
-            notification.warning({
-                message: '请先选择数据！',
-                duration: 3
-            });
-        } else {
-            let user = getUser();
-            let username = user.username;
-
-            if (username != 'admin') {
-                notification.warning({
-                    message: '非管理员不得删除！',
-                    duration: 3
-                });
-                return;
-            }
-
-            let flowArr = dataSourceSelected.map(data => {
-                if (data && data.id) {
-                    return data.id;
-                }
-            });
-
-            let promises = flowArr.map(flow => {
-                let data = flow;
-                let postdata = {
-                    pk: data
-                };
-                return deleteFlow(postdata);
-            });
-
-            Promise.all(promises).then(rst => {
-                notification.success({
-                    message: '删除流程成功',
-                    duration: 3
-                });
-                this.setState({
-                    selectedRowKeys: [],
-                    dataSourceSelected: []
-                });
-                this.gettaskSchedule();
-            });
-        }
-    };
 
     // 操作--查看
-    clickInfo (record) {
-        this.setState({ totlevisible: true, TotleModaldata: record });
+    clickInfo (workID) {
+        // TotleModaldata: record,
+        this.setState({ totlevisible: true, workID });
     }
     // 取消
     totleCancle () {
@@ -634,7 +694,7 @@ class Total extends Component {
     }
 
     // 短信
-    _cpoyMsgT (e) {
+    changeNote (e) {
         this.setState({
             isCopyMsg: e.target.checked
         });
@@ -642,79 +702,114 @@ class Total extends Component {
 
     // 上传文件
     uploadProps = {
-        name: 'a_file',
+        name: 'file',
         multiple: true,
         showUploadList: false,
-        action: UPLOAD_API,
-        onChange: ({ file, fileList, event }) => {
-            this.setState({
-                loading: true
+        action: '',
+        beforeUpload: (file, fileList) => {
+            const { uploadFileHandler } = this.props.actions;
+            const formdata = new FormData();
+            formdata.append('file', fileList[0]);
+            uploadFileHandler({}, formdata).then(rep => {
+                let { fileDataList } = this.state;
+                file.url = rep;
+                file.remark = ''; // 备注
+                fileDataList.push(file);
+                console.log('fileDataList', fileDataList);
+                this.setState({
+                    fileDataList
+                });
             });
-            const status = file.status;
-            // const { newFileLists } = this.state;
-            const { TreatmentData = [] } = this.state;
-            if (status === 'done') {
-                let len = TreatmentData.length;
-                TreatmentData.push({
-                    index: len + 1,
-                    fileName: file.name,
-                    file_id: file.response.id,
-                    file_partial_url:
-                        '/media' + file.response.a_file.split('/media')[1],
-                    send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-                    a_file: '/media' + file.response.a_file.split('/media')[1],
-                    download_url:
-                        '/media' +
-                        file.response.download_url.split('/media')[1],
-                    misc: file.response.misc,
-                    mime_type: file.response.mime_type
-                });
-                notification.success({
-                    message: '文件上传成功',
-                    duration: 3
-                });
-                this.setState({
-                    TreatmentData: TreatmentData,
-                    loading: false
-                });
-            } else if (status === 'error') {
-                notification.error({
-                    message: '文件上传失败',
-                    duration: 3
-                });
-                this.setState({
-                    loading: false
-                });
-            }
+            return false;
         }
+        // onChange: ({ file, fileList, event }) => {
+        //     this.setState({
+        //         loading: true
+        //     });
+        //     const status = file.status;
+        //     // const { newFileLists } = this.state;
+        //     const { TreatmentData = [] } = this.state;
+        //     if (status === 'done') {
+        //         let len = TreatmentData.length;
+        //         TreatmentData.push({
+        //             index: len + 1,
+        //             fileName: file.name,
+        //             file_id: file.response.id,
+        //             file_partial_url:
+        //                 '/media' + file.response.a_file.split('/media')[1],
+        //             send_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+        //             a_file: '/media' + file.response.a_file.split('/media')[1],
+        //             download_url:
+        //                 '/media' +
+        //                 file.response.download_url.split('/media')[1],
+        //             misc: file.response.misc,
+        //             mime_type: file.response.mime_type
+        //         });
+        //         notification.success({
+        //             message: '文件上传成功',
+        //             duration: 3
+        //         });
+        //         this.setState({
+        //             TreatmentData: TreatmentData,
+        //             loading: false
+        //         });
+        //     } else if (status === 'error') {
+        //         notification.error({
+        //             message: '文件上传失败',
+        //             duration: 3
+        //         });
+        //         this.setState({
+        //             loading: false
+        //         });
+        //     }
+        // }
     };
     // 修改备注
 
-    // 删除文件表格中的某行
-    deleteTreatmentFile = (record, index) => {
-        const { TreatmentData } = this.state;
+    onDelete (workID) {
+        console.log('删除workID', workID);
+        const { deleteWork } = this.props.actions;
+        deleteWork({
+            ID: workID
+        }, {}).then(rep => {
 
-        TreatmentData.splice(index, 1);
-        let array = [];
-        TreatmentData.map((item, index) => {
-            let data = {
-                index: index + 1,
-                fileName: item.fileName,
-                file_id: item.file_id,
-                file_partial_url: item.file_partial_url,
-                send_time: item.send_time,
-                a_file: item.a_file,
-                download_url: item.download_url,
-                misc: item.misc,
-                mime_type: item.mime_type
-            };
-            array.push(data);
         });
-        this.setState({ TreatmentData: array });
+    }
+    // 删除文件表格中的某行
+    deleteFile = (uid) => {
+        const { fileDataList } = this.state;
+        let newFileDataList = [];
+        fileDataList.map(item => {
+            if (item.uid !== uid) {
+                newFileDataList.push(item);
+            }
+        });
+        console.log('newFileDataList', newFileDataList);
+        this.setState({
+            fileDataList: newFileDataList
+        });
+        // TreatmentData.splice(index, 1);
+        // let array = [];
+        // TreatmentData.map((item, index) => {
+        //     let data = {
+        //         index: index + 1,
+        //         fileName: item.fileName,
+        //         file_id: item.file_id,
+        //         file_partial_url: item.file_partial_url,
+        //         send_time: item.send_time,
+        //         a_file: item.a_file,
+        //         download_url: item.download_url,
+        //         misc: item.misc,
+        //         mime_type: item.mime_type
+        //     };
+        //     array.push(data);
+        // });
+        // this.setState({ TreatmentData: array });
     };
 
     // 选择人员
     selectMember (memberInfo) {
+        console.log('memberInfo', memberInfo);
         const {
             form: { setFieldsValue }
         } = this.props;
@@ -742,21 +837,25 @@ class Total extends Component {
 
     columns = [
         {
-            title: '项目',
-            dataIndex: 'projectName',
-            key: 'projectName',
-            width: '15%'
+            title: '序号',
+            dataIndex: 'index',
+            render: (text, record, index) => {
+                return index;
+            }
         },
         {
             title: '标段',
-            dataIndex: 'sectionName',
-            key: 'sectionName',
-            width: '10%'
+            dataIndex: 'Title',
+            width: '10%',
+            render: (text, record, index) => {
+                let section = text.split(' ');
+                return section[0];
+            }
         },
         {
             title: '进度类型',
-            dataIndex: 'type',
-            key: 'type',
+            dataIndex: 'FlowName',
+            key: 'FlowName',
             width: '15%'
         },
         {
@@ -773,70 +872,69 @@ class Total extends Component {
         },
         {
             title: '提交时间',
-            dataIndex: 'submittime',
-            key: 'submittime',
-            width: '15%',
-            sorter: (a, b) =>
-                moment(a['submittime']).unix() - moment(b['submittime']).unix(),
-            render: text => {
-                return moment(text).format('YYYY-MM-DD');
-            }
+            dataIndex: 'CreateTime',
+            key: 'CreateTime',
+            width: '15%'
         },
         {
             title: '流程状态',
-            dataIndex: 'status',
-            key: 'status',
+            dataIndex: 'WFState',
+            key: 'WFState',
             width: '10%',
-            render: (record, index) => {
-                if (record === 1) {
-                    return '已提交';
-                } else if (record === 2) {
-                    return '执行中';
-                } else if (record === 3) {
-                    return '已完成';
-                } else {
-                    return '';
-                }
+            render: (text, record, index) => {
+                let statusValue = '';
+                WFStatusList.find(item => {
+                    if (item.value === text) {
+                        statusValue = item.label;
+                    }
+                });
+                return statusValue;
             }
         },
         {
             title: '操作',
-            render: record => {
-                return (
+            render: (text, record, index) => {
+                return (<div>
                     <span>
-                        <a onClick={this.clickInfo.bind(this, record, 'VIEW')}>
+                        <a onClick={this.clickInfo.bind(this, record.WorkID)}>
                             查看
                         </a>
                     </span>
+                    <span style={{marginLeft: 10}}>
+                        <a onClick={this.onDelete.bind(this, record.WorkID)}>
+                            删除
+                        </a>
+                    </span>
+                </div>
                 );
             }
         }
     ];
-    columns1 = [
+    columnFile = [
         {
             title: '序号',
             dataIndex: 'index',
             key: 'index',
-            width: '10%'
+            width: '10%',
+            render: (text, record, index) => {
+                return index;
+            }
         },
         {
             title: '文件名称',
-            dataIndex: 'fileName',
-            key: 'fileName',
+            dataIndex: 'name',
+            key: 'name',
             width: '35%'
         },
         {
             title: '备注',
-            dataIndex: 'remarks',
-            key: 'remarks',
+            dataIndex: 'remark',
+            key: 'remark',
             width: '30%',
             render: (text, record, index) => {
                 return (
-                    <Input
-                        value={record.remarks || ''}
-                        onChange={ele => {
-                            record.remarks = ele.target.value;
-                            this.forceUpdate();
+                    <Input onChange={e => {
+                            record.remark = e.target.value;
                         }}
                     />
                 );
@@ -853,10 +951,9 @@ class Total extends Component {
                         <Popconfirm
                             placement='rightTop'
                             title='确定删除吗？'
-                            onConfirm={this.deleteTreatmentFile.bind(
+                            onConfirm={this.deleteFile.bind(
                                 this,
-                                record,
-                                index
+                                record.uid
                             )}
                             okText='确认'
                             cancelText='取消'

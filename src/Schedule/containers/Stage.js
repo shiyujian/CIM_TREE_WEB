@@ -3,11 +3,12 @@ import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import './Schedule.less';
-import { Actual, Total, WeekPlan, PkCodeTree, Totalnew } from '../components/Stage';
+import { Actual, Total, WeekPlan, PkCodeTree, Totalnew, Actualnew, WeekPlannew } from '../components/Stage';
 import { Spin, Tabs } from 'antd';
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
 import { actions } from '../store/stage';
+import { getUser } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 
 @connect(
@@ -31,6 +32,7 @@ export default class Stage extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            auditorList: [], // 审核人列表
             treetyoption: [],
             treeLists: [],
             leftkeycode: '',
@@ -58,8 +60,47 @@ export default class Stage extends Component {
                 loading: false
             });
         }
+        this.getAuditor();
     }
 
+    getAuditor = async () => {
+        const {
+            actions: {
+                getUsers,
+                getRoles
+            }
+        } = this.props;
+        let user = await getUser();
+        let roles = await getRoles();
+        let postRoleData = ''; // 监理文书ID
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID && role.RoleName === '监理文书') {
+                postRoleData = role.ID;
+            }
+        });
+        let postdata = {
+            role: postRoleData,
+            section: user.section,
+            status: 1,
+            page: '',
+            size: ''
+        };
+        getUsers({}, postdata).then(rep => {
+            if (rep.code === 200) {
+                let auditorList = [];
+                rep.content.map(item => {
+                    auditorList.push({
+                        name: item.Full_Name,
+                        id: item.ID
+                    });
+                });
+                console.log('审核人列表', auditorList);
+                this.setState({
+                    auditorList
+                });
+            }
+        });
+    }
     render () {
         const { leftkeycode, loading } = this.state;
         const {
@@ -69,6 +110,7 @@ export default class Stage extends Component {
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
         }
+        console.log('key', leftkeycode);
         return (
             <div>
                 <DynamicTitle title='进度填报' {...this.props} />
@@ -91,17 +133,26 @@ export default class Stage extends Component {
                             </Sidebar>
                             <Content>
                                 <div>
-                                    <Tabs>
+                                    <Tabs defaultActiveKey='1'>
                                         <TabPane tab='总计划进度' key='1'>
                                             <Totalnew {...this.props} {...this.state} />
                                         </TabPane>
-                                        {/* <TabPane tab='总计划进度' key='1'>
-                                            <Total {...this.props} {...this.state} />
-                                        </TabPane>
-                                        <TabPane tab='每周计划进度' key='2'>
-                                            <WeekPlan {...this.props} {...this.state} />
+                                        {/* <TabPane tab='每周计划进度' key='2'>
+                                            <WeekPlannew {...this.props} {...this.state} />
                                         </TabPane>
                                         <TabPane tab='每日实际进度' key='3'>
+                                            <Actualnew
+                                                {...this.props}
+                                                {...this.state}
+                                            />
+                                        </TabPane> */}
+                                        {/* <TabPane tab='总计划进度' key='1'>
+                                            <Total {...this.props} {...this.state} />
+                                        </TabPane> */}
+                                        {/* <TabPane tab='每周计划进度' key='2'>
+                                            <WeekPlan {...this.props} {...this.state} />
+                                        </TabPane> */}
+                                        {/* <TabPane tab='每日实际进度' key='3'>
                                             <Actual
                                                 {...this.props}
                                                 {...this.state}

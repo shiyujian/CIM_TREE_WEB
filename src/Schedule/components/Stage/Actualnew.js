@@ -7,6 +7,7 @@ import {
     Button,
     Table,
     Modal,
+    Select,
     DatePicker,
     notification,
     Popconfirm
@@ -22,8 +23,11 @@ import { getUserIsManager, getUser } from '_platform/auth';
 import PerSearch from './PerSearch';
 import WeekPlanSearchInfo from './WeekPlanSearchInfo';
 import ActualModal from './ActualModal';
+import { WFStatusList } from '../common';
 moment.locale('zh-cn');
 const FormItem = Form.Item;
+const { RangePicker } = DatePicker;
+const { Option } = Select;
 class Actual extends Component {
     constructor (props) {
         super(props);
@@ -34,6 +38,7 @@ class Actual extends Component {
             // 多选
             selectedRowKeys: [],
             dataSourceSelected: [],
+            sectionArray: [], // 标段列表
             // 项目信息
             projectName: '',
             currentSection: '',
@@ -50,10 +55,63 @@ class Actual extends Component {
     }
 
     async componentDidMount () {
-        this.gettaskSchedule();
-        this.getSection();
+        // this.gettaskSchedule();
+        this.getSection(); // 获取当前登陆用户的标段
     }
+    getSection () {
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        console.log('获取用户所属标段', tree, 'leftkeycode');
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let user = getUser();
 
+        let section = user.section;
+        let currentSectionName = '';
+        let projectName = '';
+        let sectionArray = [];
+
+        if (section) {
+            console.log(section, '用户所在标段');
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        console.log(item.children, 'item.children');
+                        item.children.map(item => {
+                            // 获取当前标段的名字
+                            if (item.No === section) {
+                                currentSectionName = item.Name;
+                                sectionArray.push(item);
+                            }
+                        });
+                    }
+                });
+            }
+            console.log('sectionArray', sectionArray);
+            this.setState({
+                section: section,
+                sectionArray,
+                currentSection: section,
+                currentSectionName: currentSectionName,
+                projectName: projectName
+            });
+        } else {
+            sectionData.map(project => {
+                if (leftkeycode === project.No) {
+                    project.children.map(item =>
+                        sectionArray.push(item)
+                    );
+                }
+            });
+            this.setState({
+                sectionArray
+            });
+        }
+    }
     // 获取项目code
     getProjectCode (projectName) {
         const {
@@ -67,41 +125,6 @@ class Actual extends Component {
             }
         });
         return projectCode;
-    }
-    // 获取当前登陆用户的标段
-    getSection () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let user = getUser();
-        let section = user && user.section;
-        let currentSectionName = '';
-        let projectName = '';
-        if (section) {
-            let code = section.split('-');
-            if (code && code.length === 3) {
-                // 获取当前标段所在的项目
-                sectionData.map(item => {
-                    if (code[0] === item.No) {
-                        projectName = item.Name;
-                        let units = item.children;
-                        units.map(unit => {
-                            // 获取当前标段的名字
-                            if (unit.No === section) {
-                                currentSectionName = unit.Name;
-                            }
-                        });
-                    }
-                });
-            }
-        }
-        this.setState({
-            currentSection: section,
-            currentSectionName: currentSectionName,
-            projectName: projectName,
-            user
-        });
     }
     // 获取日实际进度流程信息
     gettaskSchedule = async () => {
@@ -235,14 +258,18 @@ class Actual extends Component {
             this.filterTask();
         }
     }
+    onSearch () {
 
+    }
     render () {
         const {
+            sectionArray,
             selectedRowKeys,
             filterData,
             currentSectionName,
             user
         } = this.state;
+        const { auditorList } = this.props;
         console.log('WORKFLOW_CODE', WORKFLOW_CODE);
         const {
             form: { getFieldDecorator }
@@ -268,25 +295,70 @@ class Actual extends Component {
                         onok={this.totleCancle.bind(this)}
                     />
                 )}
-                <WeekPlanSearchInfo
-                    {...this.props}
-                    {...this.state}
-                    gettaskSchedule={this.gettaskSchedule.bind(this)}
-                />
-                <Button onClick={this.addClick.bind(this)}>新增</Button>
-                {username === 'admin' ? (
-                    <Popconfirm
-                        placement='leftTop'
-                        title='确定删除吗？'
-                        onConfirm={this.deleteClick.bind(this)}
-                        okText='确认'
-                        cancelText='取消'
+                <Form layout='inline'>
+                    <FormItem label='标段'>
+                        {getFieldDecorator('sunitproject', {
+                            rules: [
+                                {
+                                    required: false,
+                                    message: '请选择标段'
+                                }
+                            ]
+                        })(
+                            <Select placeholder='请选择标段' style={{width: 220}}>
+                                {sectionArray.map(item => {
+                                    return <Option value={item.Name} key={item.No}>{item.Name}</Option>;
+                                })}
+                            </Select>
+                        )}
+                    </FormItem>
+                    <FormItem label='提交日期'>
+                        {getFieldDecorator('stimedate', {
+                            rules: [
+                                {
+                                    type: 'array',
+                                    required: false,
+                                    message: '请选择日期'
+                                }
+                            ]
+                        })(
+                            <RangePicker
+                                size='default'
+                                format='YYYY-MM-DD'
+                                style={{
+                                    width: '100%',
+                                    height: '100%'
+                                }}
+                            />
+                        )}
+                    </FormItem>
+                    <FormItem
+                        label='流程状态'
                     >
-                        <Button>删除</Button>
-                    </Popconfirm>
-                ) : (
-                    ''
-                )}
+                        {getFieldDecorator('sstatus', {
+                            rules: [
+                                {
+                                    required: false,
+                                    message: '请选择流程状态'
+                                }
+                            ]
+                        })(
+                            <Select
+                                style={{width: 220}}
+                                placeholder='请选择流程类型'
+                                allowClear
+                            >
+                                {WFStatusList.map(item => {
+                                    return <Option key={item.value} value={item.value}>
+                                        {item.label}
+                                    </Option>;
+                                })}
+                            </Select>
+                        )}
+                    </FormItem>
+                </Form>
+                <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
+                <Button style={{marginLeft: 20}} onClick={this.onAdd.bind(this)}>新增</Button>
                 <Table
                     columns={this.columns}
                     rowSelection={username === 'admin' ? rowSelection : null}
@@ -389,17 +461,11 @@ class Actual extends Component {
                                                         ]
                                                     }
                                                 )(
-                                                    <PerSearch
-                                                        selectMember={this.selectMember.bind(
-                                                            this
-                                                        )}
-                                                        code={
-                                                            WORKFLOW_CODE.每日进度填报流程
-                                                        }
-                                                        visible={
-                                                            this.state.visible
-                                                        }
-                                                    />
+                                                    <Select style={{ width: 120 }}>
+                                                        {auditorList.map(item => {
+                                                            return <Option value={item.id} key={item.id}>{item.name}</Option>;
+                                                        })}
+                                                    </Select>
                                                 )}
                                             </FormItem>
                                         </Col>
@@ -418,7 +484,7 @@ class Actual extends Component {
         this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
     };
     // 新增按钮
-    addClick = () => {
+    onAdd = () => {
         let treedata = [];
         SCHEDULRPROJECT.map((item) => {
             treedata.push({
@@ -481,200 +547,64 @@ class Actual extends Component {
     // 发起填报
     sendWork () {
         const {
-            actions: { createFlow, getWorkflowById, putFlow }
+            actions: { postStartwork },
+            form: { validateFields }
         } = this.props;
-        const {
-            actualDataSource,
-            projectName,
-            currentSectionName,
-            currentSection,
-            user
-        } = this.state;
-        let me = this;
-        // 共有信息
-        let postData = {};
-
-        me.props.form.validateFields((err, values) => {
+        validateFields((err, values) => {
             if (!err) {
-                postData.upload_unit = user.org ? user.org : '';
-                postData.type = '每日实际进度';
-                postData.upload_person = user.name ? user.name : user.username;
-                postData.upload_time = moment().format('YYYY-MM-DD HH:mm:ss');
-
-                const currentUser = {
-                    username: user.username,
-                    name: user && user.name,
-                    id: user && parseInt(user.ID),
-                    org: user && user.org
-                };
-
-                let subject = [
-                    {
-                        section: JSON.stringify(currentSection),
-                        projectName: JSON.stringify(projectName),
-                        sectionName: JSON.stringify(currentSectionName),
-                        actualSupervisorReview: JSON.stringify(values.actualSupervisorReview),
-                        actualTimeDate: JSON.stringify(moment(values.actualTimeDate._d).format('YYYY-MM-DD')),
-                        actualDataSource: JSON.stringify(actualDataSource),
-                        postData: JSON.stringify(postData),
-                        fillPerson: JSON.stringify(currentUser)
-                    }
-                ];
-                // 准备发起流程
-                const nextUser = this.member;
-                let WORKFLOW_MAP = {
-                    name: '每日实际进度填报流程',
-                    desc: '进度管理模块每日实际进度填报流程',
-                    code: WORKFLOW_CODE.每日进度填报流程
-                };
-                let workflowdata = {
-                    name: WORKFLOW_MAP.name,
-                    description: WORKFLOW_MAP.desc,
-                    subject: subject,
-                    code: WORKFLOW_MAP.code,
-                    creator: currentUser,
-                    plan_start_time: null,
-                    deadline: null,
-                    status: 2
-                };
-                // 创建流程
-                createFlow({}, workflowdata).then(instance => {
-                    if (!instance.id) {
-                        notification.error({
-                            message: '数据提交失败',
-                            duration: 2
-                        });
-                        return;
-                    }
-                    const { id } = instance;
-                    // 获取流程信息
-                    getWorkflowById({ id: id }).then(instance => {
-                        if (instance && instance.current) {
-                            let currentStateId = instance.current[0].id;
-                            let nextStates = getNextStates(
-                                instance,
-                                currentStateId
-                            );
-                            let stateid = nextStates[0].to_state[0].id;
-                            let postInfo = {
-                                next_states: [
-                                    {
-                                        state: stateid,
-                                        participants: [nextUser], // 下一步执行人
-                                        deadline: null,
-                                        remark: null
-                                    }
-                                ],
-                                state: instance.workflow.states[0].id,
-                                executor: currentUser,
-                                action: nextStates[0].action_name,
-                                note: '提交',
-                                attachment: null
-                            };
-                            let data = { pk: id };
-                            // 提交流程到下一步
-                            putFlow(data, postInfo).then(rst => {
-                                if (rst && rst.creator) {
-                                    notification.success({
-                                        message: '流程提交成功',
-                                        duration: 2
-                                    });
-                                    this.gettaskSchedule();
-                                    this.setState({
-                                        visible: false
-                                    });
-                                } else {
-                                    notification.error({
-                                        message: '流程提交失败',
-                                        duration: 2
-                                    });
-                                }
-                            });
-                        }
+                console.log('确认', values.Tsection, values.Ttotledocument, values.TdataReview);
+                const { section, fileDataList } = this.state;
+                let newFileDataList = [];
+                fileDataList.map(item => {
+                    newFileDataList.push({
+                        name: item.name,
+                        remark: item.remark,
+                        url: item.url
                     });
+                });
+                let FormParams = [{
+                    Key: 'Tsection', // 标段
+                    FieldType: 0,
+                    Val: section
+                }, {
+                    Key: 'tableInfo', // 列表信息
+                    FieldType: 0,
+                    Val: JSON.stringify(newFileDataList)
+                }, {
+                    Key: 'TdataReview', // 审核人
+                    FieldType: 0,
+                    Val: values.TdataReview
+                }];
+                postStartwork({}, {
+                    FlowID: 'dd50b1a8-8b39-4733-8677-10251fd7d9b4', // 模板ID
+                    FlowName: '总进度计划报批流程', // 模板名称
+                    FormValue: { // 表单值
+                        FormParams: FormParams,
+                        NodeID: ''
+                    },
+                    NextExecutor: 14, // 下一节点执行人
+                    Starter: getUser().ID, // 发起人
+                    Title: section + ' 总计划进度', // 任务标题
+                    WFState: 1 // 流程状态 1运行中
+                }).then(rep => {
+                    if (rep.code === 1) {
+                        notification.success({
+                            message: '新增任务成功',
+                            duration: 3
+                        });
+                        this.setState({
+                            visible: false
+                        });
+                    } else {
+                        notification.error({
+                            message: '新增任务失败',
+                            duration: 3
+                        });
+                    }
                 });
             }
         });
     }
-    // 删除
-    deleteClick = async () => {
-        const {
-            actions: { deleteFlow }
-        } = this.props;
-        const {
-            dataSourceSelected,
-            user
-        } = this.state;
-        try {
-            if (dataSourceSelected.length === 0) {
-                notification.warning({
-                    message: '请先选择数据！',
-                    duration: 3
-                });
-            } else {
-                let username = user.username;
-                if (username !== 'admin') {
-                    notification.warning({
-                        message: '非管理员不得删除！',
-                        duration: 3
-                    });
-                    return;
-                }
-                let flowArr = dataSourceSelected.map(data => {
-                    if (data && data.id) {
-                        return data.id;
-                    }
-                });
-                let promises = flowArr.map(flow => {
-                    let data = flow;
-                    let postdata = {
-                        pk: data
-                    };
-                    return deleteFlow(postdata);
-                });
-                Promise.all(promises).then(rst => {
-                    // 是否删除失败
-                    let errorStatus = false;
-                    // 删除失败的顺序码
-                    let errorArr = [];
-                    rst.map((data, index) => {
-                        if (data) {
-                            errorStatus = true;
-                            errorArr.push(index + 1);
-                        }
-                    });
-                    // 存在删除失败
-                    if (errorStatus) {
-                        let stringData = '';
-                        // 将删除失败的顺序码数组进行组合
-                        errorArr.map((data, index) => {
-                            if (index === 0) {
-                                stringData = stringData + data;
-                            } else {
-                                stringData = stringData + ',' + data;
-                            }
-                        });
-                        notification.error({
-                            message: `第${stringData}条流程删除失败`,
-                            duration: 3
-                        });
-                    } else {
-                        notification.success({
-                            message: '删除流程成功',
-                            duration: 3
-                        });
-                    }
-                    this.setState({
-                        selectedRowKeys: [],
-                        dataSourceSelected: []
-                    });
-                    this.gettaskSchedule();
-                });
-            }
-        } catch (e) {
-            console.log('deleteClick', e);
-        }
-    };
 
     // 操作--查看
     clickInfo (record) {

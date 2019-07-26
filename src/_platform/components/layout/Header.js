@@ -189,6 +189,8 @@ export default class Header extends Component {
 									*/
                                 for (var i = 0; i < permissions.length; i++) {
                                     try {
+                                        // console.log('bug', permissions);
+                                        // console.log('menu.id', menu.id);
                                         let missArr = permissions[i].split('.');
                                         if (missArr[0] === 'appmeta' && missArr[1] === menu.id) {
                                             if (

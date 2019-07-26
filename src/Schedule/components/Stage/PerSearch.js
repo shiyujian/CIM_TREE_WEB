@@ -66,8 +66,10 @@ export default class PerSearch extends Component {
             }
         } = this.props;
         let user = await getUser();
+        console.log('user', user);
         let section = user.section;
         let roles = await getRoles();
+        console.log('roles', roles);
         if (!section) {
             return;
         }
@@ -87,6 +89,7 @@ export default class PerSearch extends Component {
             };
             let results = [];
             let userList = await getUsers({}, postdata);
+            console.log(userList, 'userList');
             if (userList && userList.code && userList.code === 200) {
                 results = results.concat((userList && userList.content) || []);
                 let total = userList.pageinfo.total;
@@ -156,6 +159,7 @@ export default class PerSearch extends Component {
                 node.org,
             fetching: false
         }));
+        console.log('dataList', dataList);
         return (
             <div>
                 <div>

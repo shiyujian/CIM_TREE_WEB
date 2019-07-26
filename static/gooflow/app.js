@@ -483,6 +483,8 @@ $(function () {
                 NodeType = 1;
             } else if (nodeData[item].type === 'task') {
                 NodeType = 2;
+            } else if (nodeData[item].type === 'end round') {
+                NodeType = 0;
             }
             // 是否为编辑
             if (originData.includes(item)) {
@@ -777,7 +779,7 @@ $(function () {
                         height: 28,
                         width: 30,
                         top: 40,
-                        left: 220,
+                        left: 40,
                         alt: true,
                         type: 'start round mix'
                     };
@@ -788,10 +790,22 @@ $(function () {
                         code: item.Code,
                         height: 28,
                         width: 30,
-                        top: 180 + index * 140,
-                        left: 180,
+                        top: 100 + index * 120,
+                        left: 220,
                         alt: true,
                         type: 'task'
+                    };
+                } else if (item.NodeType === 0) {
+                    nodes[item.ID] = {
+                        name: item.Name,
+                        describe: item.NodeDescribe,
+                        code: item.Code,
+                        height: 28,
+                        width: 30,
+                        top: 480,
+                        left: 480,
+                        alt: true,
+                        type: 'end round'
                     };
                 }
             });

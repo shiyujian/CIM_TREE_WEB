@@ -25,27 +25,47 @@ export default class TotleModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            workID: '', // 任务ID
+            workDetails: {}, // 任务详情
+            workFlow: [], // 任务流程
             TreatmentData: [],
             history: []
         };
     }
     async componentDidMount () {
-        const {
-            actions: { getTask },
-            id
-        } = this.props;
-        let params = {
-            task_id: id
-        };
-        let task = await getTask(params);
-        let history = [];
-        if (task && task.history) {
-            history = task.history;
-        }
+        this.getTaskDetail(); // 获取任务详情
+        // const {
+        //     actions: { getTask },
+        //     id
+        // } = this.props;
+        // let params = {
+        //     task_id: id
+        // };
+        // let task = await getTask(params);
+        // let history = [];
+        // if (task && task.history) {
+        //     history = task.history;
+        // }
 
+        // this.setState({
+        //     TreatmentData: this.props.treatmentdata,
+        //     history
+        // });
+    }
+    getTaskDetail () {
+        const { workID } = this.props;
+        const { getWorkDetails } = this.props.actions;
         this.setState({
-            TreatmentData: this.props.treatmentdata,
-            history
+            workID: workID
+        });
+        getWorkDetails({
+            ID: workID
+        }, {}).then(rep => {
+            console.log('详情', rep);
+            this.setState({
+                workDetails: rep,
+                workFlow: rep.Works
+            });
         });
     }
     onViewClick (record, index) {
@@ -68,7 +88,7 @@ export default class TotleModal extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { history } = this.state;
+        const { history, workFlow } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -195,7 +215,19 @@ export default class TotleModal extends Component {
                                     history.length > 0 ? history.length - 1 : 0
                                 }
                             >
-                                {history
+                                {workFlow.map(item => {
+                                    return <Step title={item.CurrentNodeName} description={
+                                        <div>
+                                            <span>
+                                                {item.CurrentNodeName}人: {item.Executor}
+                                            </span>
+                                            <span>
+                                                {item.CurrentNodeName}时间: {item.RunTime}
+                                            </span>
+                                        </div>
+                                    } />;
+                                })}
+                                {/* {history
                                     .map((step, index) => {
                                         const {
                                             state: {
@@ -323,7 +355,7 @@ export default class TotleModal extends Component {
                                             );
                                         }
                                     })
-                                    .filter(h => !!h)}
+                                    .filter(h => !!h)} */}
                             </Steps>
                         </Card>
                         <Row style={{ marginTop: 10 }}>
