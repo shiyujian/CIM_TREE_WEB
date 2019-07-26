@@ -38,10 +38,12 @@ export default class Person extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getTreeNodeList
+                getTreeNodeList,
+                getUsersOK
             },
             platform: { tree = {} }
         } = this.props;
+        await getUsersOK([]);
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
         }

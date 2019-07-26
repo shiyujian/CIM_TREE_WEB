@@ -29,14 +29,14 @@ class Addition extends Component {
         } = this.props;
         await this.getUnits();
         let companyVisible = false;
-        // 新建项目时，默认显示
         if (node && node.ID) {
-            if (node.Orgs) {
-                companyVisible = true;
-            } else if (node.OrgCode && node.OrgType) {
+            if (node.OrgCode && node.OrgType) {
                 if (node.OrgType === '非公司') {
                     companyVisible = true;
                 }
+            } else {
+                // 新建项目时，默认显示
+                companyVisible = true;
             }
         }
         this.setState({
@@ -146,8 +146,7 @@ class Addition extends Component {
                 postAddOrg,
                 getOrgTree,
                 changeSidebarField,
-                clearAdditionField,
-                changeOrgTreeDataStatus
+                clearAdditionField
             }
         } = this.props;
         const {
@@ -189,7 +188,6 @@ class Addition extends Component {
                     if (rst && rst.code && rst.code === 1) {
                         setTimeout(async () => {
                             await getOrgTree({});
-                            await changeOrgTreeDataStatus(true);
                             this.setState({
                                 loading: false
                             });

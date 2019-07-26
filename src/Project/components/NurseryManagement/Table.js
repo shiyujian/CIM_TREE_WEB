@@ -452,8 +452,8 @@ class Tablelevel extends Component {
                         // 之前没有对该身份证进行拉黑，则push进入拉黑请求数组中
                         if (user && user.ID && !user.IsBlack && user.Number && userIDNumList.indexOf(user.Number) === -1) {
                             let blackPostData = {
-                                id: user.ID,
-                                is_black: true,
+                                id: user.ID + '',
+                                is_black: 1,
                                 black_remark: `苗圃基地${nursery.NurseryName}: ${values.BlackInfo}`
                             };
                             blackPostRequestList.push(postForestUserBlackList({}, blackPostData));

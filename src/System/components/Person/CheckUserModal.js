@@ -88,7 +88,7 @@ class CheckUserModal extends Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 checkUsers({}, {
-                    ID: record.id + '',
+                    ID: record.ID + '',
                     Checker: getUser().ID,
                     CheckTime: moment().format('YYYY-MM-DD HH:mm:ss'),
                     CheckInfo: values.CheckInfo || '用户信息填写有误',
@@ -99,7 +99,7 @@ class CheckUserModal extends Component {
 
                         this.props.handleSuccessCheckModal();
                     } else {
-                        message.success('审核失败');
+                        message.error('审核失败');
                         this.props.handleCloseCheckModal();
                     }
                 });
@@ -107,7 +107,7 @@ class CheckUserModal extends Component {
         });
     }
 
-    cancel () {
+    handleCancel () {
         this.props.handleCloseCheckModal();
     }
 }

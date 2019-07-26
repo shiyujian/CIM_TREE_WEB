@@ -161,8 +161,8 @@ class Addition extends Component {
                 getOrgTree,
                 changeSidebarField,
                 clearAdditionField,
-                changeOrgTreeDataStatus,
-                changeEditOrgVisible
+                changeEditOrgVisible,
+                getChildOrgTreeByID
             }
         } = this.props;
         const {
@@ -190,14 +190,18 @@ class Addition extends Component {
                 if (rst && rst.code && rst.code === 1) {
                     await changeSidebarField('parent', null);
                     await clearAdditionField();
-                    setTimeout(async () => {
-                        await getOrgTree({});
-                        await changeOrgTreeDataStatus(true);
-                        this.setState({
-                            loading: false
-                        });
-                        await changeEditOrgVisible(false);
-                    }, 1000);
+                    let node = await getChildOrgTreeByID({id: addition.ID});
+                    console.log('node', node);
+                    if (node && node.ID) {
+                        changeSidebarField('node', node);
+                    } else {
+                        changeSidebarField('node', '');
+                    }
+                    await getOrgTree({});
+                    this.setState({
+                        loading: false
+                    });
+                    await changeEditOrgVisible(false);
                 } else {
                     Notification.error({
                         message: '修改组织机构信息失败',

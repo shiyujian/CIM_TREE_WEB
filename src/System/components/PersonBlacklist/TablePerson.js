@@ -417,25 +417,23 @@ class TablePerson extends Component {
             console.log('record', record);
             this.setState({ loading: true });
             let blackPostData = {
-                id: record.children[0].id,
+                id: record.children[0].ID,
                 is_black: 0,
-                black_remark: '',
-                change_all: true
+                black_remark: ''
             };
             let rst = await postForestUserBlackList({}, blackPostData);
-            console.log('rst111111111111', rst);
             let tempDatas = [];
-            this.state.tempData.map(item => {
-                if (rst && rst.code && rst.code === 1) {
-                    message.success('移除成功');
+            if (rst && rst.code && rst.code === 1) {
+                message.success('移除成功');
+                this.state.tempData.map(item => {
                     if (item.Number !== record.Number) {
                         tempDatas.push(item);
                     }
-                } else {
-                    message.warn('移除失败');
-                    tempDatas = this.state.tempData;
-                }
-            });
+                });
+            } else {
+                message.warn('移除失败');
+                tempDatas = this.state.tempData;
+            }
             this.setState({
                 tempData: tempDatas,
                 loading: false

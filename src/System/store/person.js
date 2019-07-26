@@ -17,7 +17,7 @@ const getCompanyOrgTree = createAction(`${ID}获取登录用户所在公司组�
 export const postUploadFilesImg = createAction(`${ID}xhy设置上传的文件列表`);
 
 const getTags = forestFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [getTagsOK]);
-const checkUsers = forestFetchAction(`${FOREST_API}/system/checksuser`, [], 'POST'); // 审核用户
+const checkUsers = forestFetchAction(`${FOREST_API}/system/checkuser`, [], 'POST'); // 审核用户
 const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers?status=1`); // 获取供应商列表
 const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybases?status=1`); // 获取苗圃列表
 const getRegionCodes = forestFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码

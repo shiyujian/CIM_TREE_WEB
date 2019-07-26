@@ -18,13 +18,12 @@ export default (ID, service = '') => {
     const postForestUser = createFetchAction(`${SYSTEM_API}/user`, [], 'POST');
     // 修改人员
     const putForestUser = createFetchAction(`${SYSTEM_API}/user`, [], 'PUT');
-    const postForestUserBlackList = forestFetchAction(`${SYSTEM_API}/blacksuser`, [], 'POST');
-    const postForestUserBlackDisabled = forestFetchAction(`${SYSTEM_API}/forbiddensuser`, [], 'POST');
+    const postForestUserBlackList = forestFetchAction(`${SYSTEM_API}/blackuser`, [], 'POST');
+    const postForestUserBlackDisabled = forestFetchAction(`${SYSTEM_API}/forbiddenuser`, [], 'POST');
     const usersReducer = handleActions(
         {
             [getUsersOK]: (state, { payload }) => {
                 if (payload) {
-                    console.log('payload', payload);
                     if (payload && payload.content && payload.content instanceof Array) {
                         return payload.content;
                     } else {

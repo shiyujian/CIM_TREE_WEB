@@ -51,6 +51,37 @@ class Edit extends Component {
             orgSelect: ''
         };
     }
+    // 设置登录用户所在的公司的部门项,在编辑用户时，可以切换部门
+    static orgloop (data = []) {
+        if (data.length === 0) {
+            return;
+        }
+        return data.map((item) => {
+            if (item && item.ID && item.children && item.children.length > 0) {
+                return (
+                    <TreeNode
+                        value={item.ID}
+                        key={item.ID}
+                        title={`${item.OrgName}`}
+                    >
+                        {
+                            Edit.orgloop(item.children)
+                        }
+                    </TreeNode>
+                );
+            } else {
+                if (item && item.ID) {
+                    return (
+                        <TreeNode
+                            value={item.ID}
+                            key={item.ID}
+                            title={`${item.OrgName}`}
+                        />
+                    );
+                }
+            }
+        });
+    };
     static layout = {
         labelCol: { span: 6 },
         wrapperCol: { span: 18 }
@@ -229,7 +260,6 @@ class Edit extends Component {
             if (editUserRecord.Roles && editUserRecord.Roles instanceof Array && editUserRecord.Roles.length > 0) {
                 roles = String(editUserRecord.Roles[0].ID);
             }
-            console.log('editUserRecord', editUserRecord);
             await setFieldsValue({
                 UserName: editUserRecord.User_Name,
                 FullName: editUserRecord.Full_Name,
@@ -317,7 +347,6 @@ class Edit extends Component {
     }
     save = async () => {
         const {
-            sidebar: { node } = {},
             actions: {
                 getUsers,
                 putForestUser,
@@ -339,8 +368,8 @@ class Edit extends Component {
                     // 拉黑处理
                     if (isBlackChecked) {
                         let blackPostData = {
-                            id: editUserRecord.ID,
-                            is_black: true,
+                            id: editUserRecord.ID + '',
+                            is_black: 1,
                             black_remark: black_remarkValue
                         };
                         let blackData = await postForestUserBlackList({}, blackPostData);
@@ -400,38 +429,6 @@ class Edit extends Component {
     cancel () {
         this.props.handleCloseEditModal();
     }
-
-    // 设置登录用户所在的公司的部门项,在编辑用户时，可以切换部门
-    static orgloop (data = []) {
-        if (data.length === 0) {
-            return;
-        }
-        return data.map((item) => {
-            if (item && item.ID && item.children && item.children.length > 0) {
-                return (
-                    <TreeNode
-                        value={item.ID}
-                        key={item.ID}
-                        title={`${item.OrgName}`}
-                    >
-                        {
-                            Edit.orgloop(item.children)
-                        }
-                    </TreeNode>
-                );
-            } else {
-                if (item && item.ID) {
-                    return (
-                        <TreeNode
-                            value={item.ID}
-                            key={item.ID}
-                            title={`${item.OrgName}`}
-                        />
-                    );
-                }
-            }
-        });
-    };
     render () {
         const {
             form: {
@@ -548,7 +545,7 @@ class Edit extends Component {
                                     {getFieldDecorator('section', {
                                         rules: [
                                             {
-                                                required: true,
+                                                required: false,
                                                 message: '请选择标段'
                                             }
                                         ]
