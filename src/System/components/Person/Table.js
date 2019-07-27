@@ -155,44 +155,42 @@ class Users extends Component {
                 }
                 let arr = [];
                 if (user && user.username && user.username === 'admin') {
-                    if (record.Status) {
-                        if (record.IsBlack === 0) {
-                            arr.push(<a
-                                key={3}
-                                style={{marginRight: '.5em'}}
-                                onClick={this.handleUserDisabled.bind(this, record)}
-                            >
-                                禁用
-                            </a>);
-                        }
-                    } else {
-                        if (record.IsBlack === 0) {
-                            arr.push(<a
-                                key={4}
-                                style={{marginRight: '.5em'}}
-                                onClick={this.toAudit.bind(this, record)}
-                            >
-                                审核
-                            </a>);
-                        } else if (record.IsBlack === 2) {
-                            arr.push(<a
-                                key={3}
-                                style={{ marginRight: '.5em', color: 'red' }}
-                                onClick={this.handleUserDisabled.bind(this, record)}
-                            >
-                                启用
-                            </a>);
-                        }
-                    };
-                    arr.push(
-                        <a
-                            onClick={this.edit.bind(this, record)}
-                            key={1}
-                            style={{ marginRight: '.5em' }}
+                    if (!record.Status) {
+                        arr.push(<a
+                            key={4}
+                            style={{marginRight: '.5em'}}
+                            onClick={this.toAudit.bind(this, record)}
                         >
-                            编辑
-                        </a>
-                    );
+                            审核
+                        </a>);
+                    } else if (record.IsBlack) {
+                        arr = [];
+                    } else if (record.IsForbidden) {
+                        arr.push(<a
+                            key={3}
+                            style={{ marginRight: '.5em', color: 'red' }}
+                            onClick={this.handleUserDisabled.bind(this, record)}
+                        >
+                            启用
+                        </a>);
+                    } else if (!record.IsForbidden) {
+                        arr.push(<a
+                            key={3}
+                            style={{marginRight: '.5em'}}
+                            onClick={this.handleUserDisabled.bind(this, record)}
+                        >
+                            禁用
+                        </a>);
+                        arr.push(
+                            <a
+                                onClick={this.edit.bind(this, record)}
+                                key={1}
+                                style={{ marginRight: '.5em' }}
+                            >
+                                编辑
+                            </a>
+                        );
+                    }
                     arr.push(
                         <Popconfirm
                             title='是否真的要删除用户?'
@@ -205,7 +203,7 @@ class Users extends Component {
                         </Popconfirm>
                     );
                 } else if (userIsProjectDocument || userIsSupplierDocument) {
-                    if (!record.Status && record.IsBlack === 0) {
+                    if (!record.Status) {
                         arr.push(<a
                             key={4}
                             style={{marginRight: '.5em'}}
@@ -213,16 +211,20 @@ class Users extends Component {
                         >
                             审核
                         </a>);
+                    } else if (record.IsBlack) {
+                        arr = [];
+                        arr.push('/');
+                    } else if (!record.IsForbidden) {
+                        arr.push(
+                            <a
+                                onClick={this.edit.bind(this, record)}
+                                key={1}
+                                style={{ marginRight: '.5em' }}
+                            >
+                                编辑
+                            </a>
+                        );
                     }
-                    arr.push(
-                        <a
-                            onClick={this.edit.bind(this, record)}
-                            key={1}
-                            style={{ marginRight: '.5em' }}
-                        >
-                            编辑
-                        </a>
-                    );
                 } else {
                     arr.push('/');
                 }
@@ -407,10 +409,13 @@ class Users extends Component {
         const user = getUser();
         let username = user.username;
         let permissionStatus = false;
+        let dataSource = [];
         if (username === 'admin') {
             permissionStatus = true;
+            dataSource = dataList;
         } else {
             if (node && node.ID) {
+                dataSource = dataList;
                 permissionStatus = this.compare(user, node, node.ID);
             }
         }
@@ -505,7 +510,7 @@ class Users extends Component {
                         bordered
                         rowSelection={this.rowSelection}
                         columns={this.columns}
-                        dataSource={node ? dataList : []}
+                        dataSource={dataSource}
                         rowClassName={this.setBlackListColor.bind(this)}
                         pagination={this.props.getTablePages}
                         onChange={this.handleTableChange.bind(this)}
@@ -788,28 +793,34 @@ class Users extends Component {
             getTablePages
         } = this.props;
         try {
+            this.setState({ loading: true });
             let isActive = true;
             let changeName = '';
-            if (user.Status) {
+            console.log('user', user);
+            if (user.IsForbidden === 1) {
+                isActive = true;
+                changeName = '启用';
+            } else if (user.IsForbidden === 0) {
                 isActive = false;
                 changeName = '禁用';
             } else {
-                isActive = true;
-                changeName = '启用';
+                this.setState({ loading: false });
+                message.error(`此用户状态不能更改`);
+                return;
             }
             let postData = {
-                id: user.ID,
+                id: user.ID + '',
                 is_active: isActive
             };
             let data = await postForestUserBlackDisabled({}, postData);
             if (data && data.code && data.code === 1) {
                 message.success(`用户${changeName}成功`);
                 const pager = { ...getTablePages };
-                setTimeout(async () => {
-                    await this.search(pager.current || 1);
-                }, 1000);
+                this.setState({ loading: false });
+                await this.search(pager.current || 1);
             } else {
                 message.error(`用户${changeName}失败`);
+                this.setState({ loading: false });
             }
         } catch (e) {
             console.log('handleUserDisabled', e);
@@ -836,14 +847,13 @@ class Users extends Component {
             message.warn('用户已加入黑名单,不可编辑');
             return;
         }
-        const {
-            sidebar: { node } = {}
-        } = this.props;
-        if (node && node.ID) {
+        if (user && user.ID) {
             this.setState({
                 editVisible: true,
                 editUserRecord: user
             });
+        } else {
+            message.warn('当前用户不可编辑');
         }
     }
     // 单个用户的删除功能
@@ -855,7 +865,7 @@ class Users extends Component {
             getTablePages
         } = this.props;
         const pager = { ...getTablePages };
-        if (user.ID) {
+        if (user && user.ID) {
             this.setState({
                 loading: true
             });

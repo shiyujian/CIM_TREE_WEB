@@ -15,7 +15,7 @@ export default class Info extends Component {
         wrapperCol: { span: 20 }
     };
 
-    edit = async () => {
+    handleEditOrg = async () => {
         const {
             sidebar: { node } = {},
             actions: {
@@ -32,17 +32,32 @@ export default class Info extends Component {
         await changeEditOrgVisible(true);
     }
 
+    handleEditProject = async () => {
+        const {
+            actions: {
+                changeEditProjectVisible
+            }
+        } = this.props;
+        console.log('changeEditProjectVisible');
+        await changeEditProjectVisible(true);
+    }
+
     render () {
         const {
             sidebar: { node = {} } = {}
         } = this.props;
         let nodeIsOrg = false;
         let disabled = true;
-        if (node && node.OrgCode) {
+        let nodeIsProject = false;
+        if (node && node.ID) {
             disabled = false;
-            nodeIsOrg = true;
-        } else if (node && node.Orgs) {
-            nodeIsOrg = false;
+            if (node && node.OrgCode) {
+                nodeIsOrg = true;
+                nodeIsProject = false;
+            } else if (node && node.Orgs) {
+                nodeIsOrg = false;
+                nodeIsProject = true;
+            }
         }
         let companyVisible = false;
         // 新建项目时，默认显示
@@ -64,16 +79,41 @@ export default class Info extends Component {
                             fontWeight: 'bold',
                             paddingRight: '1em'
                         }}
-                    >{`信息管理`}</span>
-                    <Button
-                        onClick={this.edit.bind(this)}
-                        style={{ float: 'right' }}
-                        type='primary'
-                        ghost
-                        disabled={disabled}
                     >
-                        编辑
-                    </Button>
+                        信息管理
+                    </span>
+                    {
+                        disabled
+                            ? <Button
+                                style={{ float: 'right' }}
+                                type='primary'
+                                ghost
+                                disabled
+                            >
+                            编辑
+                            </Button>
+                            : (
+                                nodeIsProject
+                                    ? <Button
+                                        onClick={this.handleEditProject.bind(this)}
+                                        style={{ float: 'right' }}
+                                        type='primary'
+                                        ghost
+                                        disabled={disabled}
+                                    >
+                                        编辑
+                                    </Button>
+                                    : <Button
+                                        onClick={this.handleEditOrg.bind(this)}
+                                        style={{ float: 'right' }}
+                                        type='primary'
+                                        ghost
+                                        disabled={disabled}
+                                    >
+                                        编辑
+                                    </Button>
+                            )
+                    }
                 </div>
                 {
                     nodeIsOrg

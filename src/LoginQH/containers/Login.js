@@ -439,7 +439,6 @@ class Login extends Component {
     loginFunc = async (data, loginType, values) => {
         const {
             actions: {
-                getUserPermission,
                 getTasks,
                 loginForest,
                 getRolePermission
@@ -461,6 +460,25 @@ class Login extends Component {
         console.log('forestUserData', forestUserData);
         if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
             let forestLoginUserData = forestUserData[0];
+            if (forestLoginUserData.IsBlack === 1) {
+                Notification.error({
+                    message: '该用户已被拉黑，不能登录',
+                    duration: 2
+                });
+                return;
+            } else if (forestLoginUserData.IsForbidden === 1) {
+                Notification.error({
+                    message: '该用户已被禁用，不能登录',
+                    duration: 2
+                });
+                return;
+            } else if (forestLoginUserData.Status === 0) {
+                Notification.error({
+                    message: '该用户未经过审核，不能登录',
+                    duration: 2
+                });
+                return;
+            }
             // let tasks = [];
             // tasks = await getTasks(
             //     {},
@@ -506,7 +524,10 @@ class Login extends Component {
                 replace('/');
             }, 500);
         } else {
-            message.error('用户名或密码错误！');
+            Notification.error({
+                message: '用户名或密码错误！',
+                duration: 2
+            });
         }
     }
 

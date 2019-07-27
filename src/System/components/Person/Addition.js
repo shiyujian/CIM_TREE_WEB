@@ -307,20 +307,6 @@ class Addition extends Component {
                                         />
                                     )}
                                 </FormItem>
-                                {(user.username === 'admin') ? (
-                                    <FormItem
-                                        {...Addition.layout}
-                                        label='部门编码'
-                                    >
-                                        <Input
-                                            placeholder='部门编码'
-                                            value={node && node.ID}
-                                            readOnly
-                                        />
-                                    </FormItem>
-                                ) : (
-                                    ''
-                                )}
                                 <FormItem
                                     {...Addition.layout}
                                     label='密码:'
@@ -409,7 +395,7 @@ class Addition extends Component {
                                     {getFieldDecorator('titles', {
                                         rules: [
                                             {
-                                                required: false,
+                                                required: true,
                                                 message: '请选择职务'
                                             }
                                         ]
@@ -429,7 +415,7 @@ class Addition extends Component {
                                     {getFieldDecorator('roles', {
                                         rules: [
                                             {
-                                                required: false,
+                                                required: true,
                                                 message: '请选择角色'
                                             }
                                         ]
@@ -450,7 +436,7 @@ class Addition extends Component {
                                         </Select>
                                     )}
                                 </FormItem>
-                                {((user.username === 'admin') || userIsDocument) ? (
+                                {(userIsDocument) ? (
                                     <FormItem
                                         {...Addition.layout}
                                         label='部门名称'
