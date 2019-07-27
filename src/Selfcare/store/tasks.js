@@ -21,12 +21,14 @@ export const getWorkList = createFetchAction(`${base}/flow/works`, [], 'GET');
 export const getFlowList = createFetchAction(`${base}/flow/flows`, [], 'GET');
 // 获取任务详情
 export const getWorkDetails = createFetchAction(`${base}/flow/work/{{ID}}`, [], 'GET');
-
+// 获取任务详情
+export const postSendwork = createFetchAction(`${base}/flow/sendwork`, [], 'POST');
 export const actions = {
 	getWorkprocessesList,
 	getWorkList,
 	getFlowList,
 	getWorkDetails,
+	postSendwork,
 	...filterReducer,
 	setLoadingStatus,
 	setTablePage,

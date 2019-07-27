@@ -63,7 +63,7 @@ class TotalDetail extends Component {
             TableList,
             form: { getFieldDecorator }
         } = this.props;
-        console.log(TableList);
+        console.log('详情页面', param, TableList);
         return (<div>
             <Form layout='inline'>
                 <Row gutter={15}>

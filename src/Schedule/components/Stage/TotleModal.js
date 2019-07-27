@@ -83,7 +83,7 @@ export default class TotleModal extends Component {
             this.setState({
                 workDetails: rep,
                 TableList,
-                workFlow: rep.Works.reverse()
+                workFlow: rep.Works
             });
         });
     }
@@ -219,7 +219,7 @@ export default class TotleModal extends Component {
                                             <div>
                                                 <span>
                                                     {item.CurrentNodeName}人：
-                                                    {item.ExecutorObj.Full_Name}({item.ExecutorObj.User_Name})
+                                                    {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
                                                 </span>
                                                 <span style={{marginLeft: 20}}>
                                                     {item.CurrentNodeName}时间：
@@ -228,16 +228,27 @@ export default class TotleModal extends Component {
                                             </div>
                                         } />;
                                     } else {
-                                        return <Step title={
-                                            <div>
-                                                <span>{item.CurrentNodeName}</span>
-                                                <span style={{marginLeft: 10}}>-(执行中)</span>
-                                                <span style={{marginLeft: 20}}>
-                                                    当前执行人：
-                                                    <span style={{color: '#108ee9'}}>{item.ExecutorObj.Full_Name}</span>
-                                                </span>
-                                            </div>
-                                        } />;
+                                        if (item.ExecutorObj) {
+                                            // 未结束
+                                            return <Step title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-(执行中)</span>
+                                                    <span style={{marginLeft: 20}}>
+                                                        当前执行人：
+                                                        <span style={{color: '#108ee9'}}>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                                    </span>
+                                                </div>
+                                            } />;
+                                        } else {
+                                            // 已结束
+                                            return <Step title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-(已结束)</span>
+                                                </div>
+                                            } />;
+                                        }
                                     }
                                 })}
                             </Steps>

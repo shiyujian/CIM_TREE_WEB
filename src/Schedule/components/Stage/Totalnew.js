@@ -152,6 +152,7 @@ class Total extends Component {
             workid: '', // 任务ID
             title: '', // 任务名称
             flowid: TOTAL_ID, // 流程类型或名称
+            // flowid: '', // 流程类型或名称
             starter: '', // 发起人
             currentnode: '', // 节点ID
             prevnode: '', // 上一结点ID
@@ -826,7 +827,7 @@ class Total extends Component {
             title: '序号',
             dataIndex: 'index',
             render: (text, record, index) => {
-                return index;
+                return index + 1;
             }
         },
         {
@@ -906,7 +907,7 @@ class Total extends Component {
             key: 'index',
             width: '10%',
             render: (text, record, index) => {
-                return index;
+                return index + 1;
             }
         },
         {

@@ -431,26 +431,26 @@ $(function () {
         for (let item in lineData) {
             console.log('保存', lineData, originData);
             if (originData.includes(item)) {
-                let params = {
-                    ID: item,
-                    Name: lineData[item].name, // 流向名称
-                    DCondition: lineData[item].describe, // 流向条件
-                    FromNode: lineData[item].from, // 节点起点
-                    ToNode: lineData[item].to // 节点终点
-                };
-                $.ajax({
-                    url: putDirectionUrl,
-                    data: JSON.stringify(params),
-                    contentType: 'application/json',
-                    type: 'PUT',
-                    success: function (rep) {
-                        if (rep.code === 1) {
-                            alert('编辑流向成功');
-                        } else {
-                            alert(rep.msg);
-                        }
-                    }
-                });
+                // let params = {
+                //     ID: item,
+                //     Name: lineData[item].name, // 流向名称
+                //     DCondition: lineData[item].describe, // 流向条件
+                //     FromNode: lineData[item].from, // 节点起点
+                //     ToNode: lineData[item].to // 节点终点
+                // };
+                // $.ajax({
+                //     url: putDirectionUrl,
+                //     data: JSON.stringify(params),
+                //     contentType: 'application/json',
+                //     type: 'PUT',
+                //     success: function (rep) {
+                //         if (rep.code === 1) {
+                //             alert('编辑流向成功');
+                //         } else {
+                //             alert(rep.msg);
+                //         }
+                //     }
+                // });
             } else {
                 let params = {
                     Creater: 9, // 新增人ID
@@ -488,24 +488,24 @@ $(function () {
             }
             // 是否为编辑
             if (originData.includes(item)) {
-                let params = {
-                    ID: item, // 新增人ID
-                    Name: nodeData[item].name, // 节点名称
-                    NodeDescribe: nodeData[item].describe // 节点说明
-                };
-                $.ajax({
-                    url: putNodeUrl,
-                    data: JSON.stringify(params),
-                    contentType: 'application/json',
-                    type: 'PUT',
-                    success: function (rep) {
-                        if (rep.code === 1) {
-                            alert('编辑节点成功');
-                        } else {
-                            alert(rep.msg);
-                        }
-                    }
-                });
+                // let params = {
+                //     ID: item, // 新增人ID
+                //     Name: nodeData[item].name, // 节点名称
+                //     NodeDescribe: nodeData[item].describe // 节点说明
+                // };
+                // $.ajax({
+                //     url: putNodeUrl,
+                //     data: JSON.stringify(params),
+                //     contentType: 'application/json',
+                //     type: 'PUT',
+                //     success: function (rep) {
+                //         if (rep.code === 1) {
+                //             alert('编辑节点成功');
+                //         } else {
+                //             alert(rep.msg);
+                //         }
+                //     }
+                // });
             } else {
                 let params = {
                     Creater: 9, // 新增人ID

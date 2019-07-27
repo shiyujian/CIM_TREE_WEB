@@ -13,7 +13,7 @@ import {
     TotalForm,
     // WeekDetail
 } from './FormDetail';
-import { WFStatusList, TotalID } from '../common';
+import { WFStatusList, TOTAL_ID } from '../common';
 const { Step } = Steps;
 const FormItem = Form.Item;
 class TaskDetail extends Component {
@@ -22,7 +22,10 @@ class TaskDetail extends Component {
         this.state = {
             FlowID: '', // 流程ID
             FlowName: '', // 流程名称
-            task_id: '', // 任务ID
+            WorkID: '', // 任务ID
+            CurrentNode: '', // 当前节点
+            CurrentNodeName: '', // 当前节点名称
+            Executor: '', // 当前节点执行人
             TableList: [], // 表格数据
             param: {}, // 表单数据
             workFlow: [], // 任务流程
@@ -57,39 +60,45 @@ class TaskDetail extends Component {
             this.props.actions.setTaskDetailLoading(false);
             console.log('任务详情', param);
             this.setState({
+                WorkID: task_id,
+                CurrentNode: rep.CurrentNode,
+                CurrentNodeName: rep.CurrentNodeName,
+                Executor: rep.NextExecutor,
                 FlowID: rep.FlowID,
                 FlowName: rep.FlowName,
                 param,
                 workDetails: rep,
                 TableList,
-                workFlow: rep.Works.reverse()
+                workFlow: rep.Works
             });
         });
     }
     getFormDetails () {
         let node = '';
         const { FlowID, TableList, param } = this.state;
-        console.log('form', TableList, param);
-        if (FlowID === TotalID) {
+        console.log('form', TableList, param, FlowID, TOTAL_ID);
+        if (FlowID === TOTAL_ID) {
             node = <TotalDetail
                 param={param}
                 TableList={TableList}
             />;
         }
+        console.log('流程详情', node);
         return node;
     }
     getFormItem () {
         let node = '';
-        const { FlowID, TableList, param } = this.state;
-        console.log('form', TableList, param);
-        if (FlowID === TotalID) {
+        const { FlowID } = this.state;
+        if (FlowID === TOTAL_ID) {
             node = <TotalForm
+                {...this.props}
+                {...this.state}
             />;
         }
         return node;
     }
     render () {
-        const { workDetails, workFlow } = this.state;
+        const { workDetails, workFlow, TableList, param } = this.state;
         return (
             <div>
                 <div className='info'>
@@ -114,7 +123,9 @@ class TaskDetail extends Component {
                 </div>
                 <div className='form'>
                     <Card title={'流程详情'} style={{ marginTop: 10 }}>
-                        {this.getFormDetails()}
+                        {
+                            TableList.length > 0 ? this.getFormDetails() : ''
+                        }
                     </Card>
                 </div>
                 <div>
@@ -126,6 +137,7 @@ class TaskDetail extends Component {
                         >
                             {workFlow.map(item => {
                                 if (item.RunTime) {
+                                    // 已完成
                                     return <Step title={
                                         <div>
                                             <span>{item.CurrentNodeName}</span>
@@ -135,7 +147,7 @@ class TaskDetail extends Component {
                                         <div>
                                             <span>
                                                 {item.CurrentNodeName}人：
-                                                {item.ExecutorObj.Full_Name}({item.ExecutorObj.User_Name})
+                                                {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
                                             </span>
                                             <span style={{marginLeft: 20}}>
                                                 {item.CurrentNodeName}时间：
@@ -144,32 +156,31 @@ class TaskDetail extends Component {
                                         </div>
                                     } />;
                                 } else {
-                                    return <Step title={
-                                        <div>
-                                            <span>{item.CurrentNodeName}</span>
-                                            <span style={{marginLeft: 10}}>-(执行中)</span>
-                                            <span style={{marginLeft: 20}}>当前执行人：{item.ExecutorObj.Full_Name}</span>
-                                        </div>
-                                    } description={
-                                        <div>
-                                            {this.getFormItem()}
-                                        </div>
-                                    } />;
+                                    if (item.ExecutorObj) {
+                                        // 未结束
+                                        return <Step title={
+                                            <div>
+                                                <span>{item.CurrentNodeName}</span>
+                                                <span style={{marginLeft: 10}}>-(执行中)</span>
+                                                <span style={{marginLeft: 20}}>当前执行人：{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                            </div>
+                                        } description={
+                                            <div>
+                                                {this.getFormItem()}
+                                            </div>
+                                        } />;
+                                    } else {
+                                        // 已结束
+                                        return <Step title={
+                                            <div>
+                                                <span>{item.CurrentNodeName}</span>
+                                                <span style={{marginLeft: 10}}>-(已结束)</span>
+                                            </div>
+                                        } />;
+                                    }
                                 }
                             })}
                         </Steps>
-                        {/* <div style={{textAlign: 'center'}}>
-                            <Button
-                                type='primary'
-                                onClick={this.handleSubmit.bind(this)}
-                                style={{ marginRight: 20 }}
-                            >
-                                提交
-                            </Button>
-                            <Button onClick={this.handleReject.bind(this)}>
-                                退回
-                            </Button>
-                        </div> */}
                     </Card>
                 </div>
             </div>

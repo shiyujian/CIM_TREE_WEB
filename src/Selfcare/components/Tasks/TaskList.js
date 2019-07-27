@@ -65,7 +65,11 @@ class TaskList extends Component {
             title: '当前执行人',
             dataIndex: 'NextExecutorObj',
             render: (text, record, index) => {
-                return `${text.Full_Name}(${text.User_Name})`;
+                let str = '';
+                if (record.NextExecutorObj && record.NextExecutorObj.Full_Name && record.NextExecutorObj.User_Name) {
+                    str = `${text.Full_Name}(${text.User_Name})`;
+                }
+                return str;
             }
         }, {
             title: '流程名称',
@@ -261,9 +265,9 @@ class TaskList extends Component {
             }
         });
     }
-    onQuery () {
-        this.getProcessList();
-        this.getFinishList();
+    onSearch () {
+        this.getProcessList(); // 获取待办
+        // this.getFinishList();
     }
     onClear () {
 
@@ -337,7 +341,7 @@ class TaskList extends Component {
                             )}
                         </FormItem>
                         <FormItem>
-                            <Button type='primary' onClick={this.onQuery.bind(this)}>
+                            <Button type='primary' onClick={this.onSearch.bind(this)}>
                                 查询
                             </Button>
                         </FormItem>
