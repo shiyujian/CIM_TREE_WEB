@@ -18,3 +18,5 @@ export const WFStatusList = [{
     value: 5,
     label: '转发'
 }];
+export const TotalID = 'c361b0af-a7ec-4181-acd0-39512ffd96b8';
+export const TotalNodeID = '8f3fbe1b-4a06-4952-9f8c-ba5fca1ee893';
