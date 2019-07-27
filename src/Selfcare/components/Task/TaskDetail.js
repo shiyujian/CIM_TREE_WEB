@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
     Steps,
     Card,
+    Input,
     Form,
     Button
 } from 'antd';
@@ -9,6 +10,7 @@ import moment from 'moment';
 import {
     // ActualDetail,
     TotalDetail,
+    TotalForm,
     // WeekDetail
 } from './FormDetail';
 import { WFStatusList, TotalID } from '../common';
@@ -76,22 +78,32 @@ class TaskDetail extends Component {
         }
         return node;
     }
+    getFormItem () {
+        let node = '';
+        const { FlowID, TableList, param } = this.state;
+        console.log('form', TableList, param);
+        if (FlowID === TotalID) {
+            node = <TotalForm
+            />;
+        }
+        return node;
+    }
     render () {
         const { workDetails, workFlow } = this.state;
         return (
             <div>
                 <div className='info'>
                     <div style={{ textAlign: 'center', fontSize: 20 }}>
-                        {workDetails.Title}
+                        {workDetails.FlowName}
                     </div>
                     <div style={{textAlign: 'center', fontSize: 12, color: '#999999'}}>
                         <span>
                             发起人：{workDetails.StarterObj && workDetails.StarterObj.Full_Name}
                         </span>
                         <span style={{ paddingLeft: 40 }}>
-                            当前状态：{WFStatusList.map(item => {
+                            {WFStatusList.map(item => {
                                 if (item.value === workDetails.WFState) {
-                                    return item.label;
+                                    return '当前状态：' + item.label;
                                 }
                             })}
                         </span>
@@ -117,7 +129,7 @@ class TaskDetail extends Component {
                                     return <Step title={
                                         <div>
                                             <span>{item.CurrentNodeName}</span>
-                                            <span style={{marginLeft: 20}}>{'已完成'}</span>
+                                            <span style={{marginLeft: 10}}>-(已完成)</span>
                                         </div>
                                     } description={
                                         <div>
@@ -135,14 +147,18 @@ class TaskDetail extends Component {
                                     return <Step title={
                                         <div>
                                             <span>{item.CurrentNodeName}</span>
-                                            <span style={{marginLeft: 20}}>{'执行中'}</span>
+                                            <span style={{marginLeft: 10}}>-(执行中)</span>
                                             <span style={{marginLeft: 20}}>当前执行人：{item.ExecutorObj.Full_Name}</span>
+                                        </div>
+                                    } description={
+                                        <div>
+                                            {this.getFormItem()}
                                         </div>
                                     } />;
                                 }
                             })}
                         </Steps>
-                        <div style={{textAlign: 'center'}}>
+                        {/* <div style={{textAlign: 'center'}}>
                             <Button
                                 type='primary'
                                 onClick={this.handleSubmit.bind(this)}
@@ -153,7 +169,7 @@ class TaskDetail extends Component {
                             <Button onClick={this.handleReject.bind(this)}>
                                 退回
                             </Button>
-                        </div>
+                        </div> */}
                     </Card>
                 </div>
             </div>

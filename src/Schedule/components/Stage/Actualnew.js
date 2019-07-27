@@ -52,6 +52,8 @@ class Actual extends Component {
             actualModalVisible: false,
             actualModaldata: []
         };
+        this.onAddForm = this.onAddForm.bind(this); // 添加节点表单
+        this.handleOK = this.handleOK.bind(this); // 新增任务
     }
 
     async componentDidMount () {
@@ -111,6 +113,29 @@ class Actual extends Component {
                 sectionArray
             });
         }
+    }
+    onAddForm () {
+        const { postNodefields } = this.props.actions;
+        let userID = getUser().ID;
+        let params = [{
+            Creater: userID, // 创建人
+            NodeName: TOTAL_TWONODE_NAME, // 节点名称
+            NodeID: TOTAL_TWONODE_ID, // 节点ID
+            FieldName: 'Opinion', // 字段名称
+            FieldOptions: '', // 字段列表值
+            FieldType: 0, // 存储方式
+            ShowName: '处理意见', // 显示名称
+            ShowType: 'input', // 显示类型
+            DefaultValue: '' // 默认值
+        }];
+        postNodefields({}, params).then(rep => {
+            if (rep.code) {
+                notification.success({
+                    message: '新增表单成功',
+                    duration: 3
+                });
+            }
+        });
     }
     // 获取项目code
     getProjectCode (projectName) {
@@ -359,6 +384,7 @@ class Actual extends Component {
                 </Form>
                 <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
                 <Button style={{marginLeft: 20}} onClick={this.onAdd.bind(this)}>新增</Button>
+                <Button style={{marginLeft: 20}} onClick={this.onAddForm.bind(this)}>添加节点表单</Button>
                 <Table
                     columns={this.columns}
                     rowSelection={username === 'admin' ? rowSelection : null}

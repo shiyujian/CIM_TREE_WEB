@@ -41,7 +41,15 @@ import SearchInfo from './SearchInfo';
 import TotleModal from './TotleModal';
 import './index.less';
 import { SSL_OP_NO_TLSv1_1 } from 'constants';
-import { WFStatusList } from '../common';
+import { 
+    WFStatusList,
+    TOTAL_ONENODE_NAME,
+    TOTAL_ONENODE_ID,
+    TOTAL_TWONODE_NAME,
+    TOTAL_TWONODE_ID,
+    TOTAL_ID,
+    TOTAL_NAME
+} from '../common';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
 const { RangePicker } = DatePicker;
@@ -77,6 +85,8 @@ class Total extends Component {
             currentSectionName: '',
             loading: false
         };
+        this.onAddForm = this.onAddForm.bind(this); // 添加节点表单
+        this.handleOK = this.handleOK.bind(this); // 新增任务
     }
     async componentDidMount () {
         this.getSection(); // 获取当前登陆用户的标段
@@ -141,7 +151,7 @@ class Total extends Component {
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称
-            flowid: 'c361b0af-a7ec-4181-acd0-39512ffd96b8', // 流程类型或名称
+            flowid: TOTAL_ID, // 流程类型或名称
             starter: '', // 发起人
             currentnode: '', // 节点ID
             prevnode: '', // 上一结点ID
@@ -174,100 +184,6 @@ class Total extends Component {
             this.filterTask();
         }
     }
-    // 获取总进度进度计划流程信息
-    gettaskSchedule = async () => {
-        const {
-            actions: { getTaskSchedule },
-            leftkeycode
-        } = this.props;
-        let reqData = {};
-        this.props.form.validateFields((err, values) => {
-            values.sunitproject
-                ? (reqData.subject_sectionName__contains = values.sunitproject)
-                : '';
-            values.snumbercode
-                ? (reqData.subject_numbercode__contains = values.snumbercode)
-                : '';
-            // values.ssuperunit?reqData.subject_superunit__contains = values.ssuperunit : '';
-            values.stimedate
-                ? (reqData.real_start_time_begin = moment(
-                    values.stimedate[0]._d
-                ).format('YYYY-MM-DD 00:00:00'))
-                : '';
-            values.stimedate
-                ? (reqData.real_start_time_end = moment(
-                    values.stimedate[1]._d
-                ).format('YYYY-MM-DD 23:59:59'))
-                : '';
-            values.sstatus
-                ? (reqData.status = values.sstatus)
-                : values.sstatus === 0
-                    ? (reqData.status = 0)
-                    : '';
-        });
-
-        let tmpData = Object.assign({}, reqData);
-
-        let task = await getTaskSchedule(
-            { code: WORKFLOW_CODE.总进度计划报批流程 },
-            tmpData
-        );
-        let subject = [];
-        let totledata = [];
-        let arrange = {};
-        if (task && task instanceof Array) {
-            task.map((item, index) => {
-                let itemdata = item.subject[0];
-                let itempostdata = itemdata.postData
-                    ? JSON.parse(itemdata.postData)
-                    : null;
-                let itemtreatmentdata = itemdata.TreatmentData
-                    ? JSON.parse(itemdata.TreatmentData)
-                    : null;
-                let itemarrange = {
-                    index: index + 1,
-                    id: item.id,
-                    section: itemdata.section
-                        ? JSON.parse(itemdata.section)
-                        : '',
-                    sectionName: itemdata.sectionName
-                        ? JSON.parse(itemdata.sectionName)
-                        : '',
-                    projectName: itemdata.projectName
-                        ? JSON.parse(itemdata.projectName)
-                        : '',
-                    type: itempostdata.type,
-                    numbercode: itemdata.numbercode
-                        ? JSON.parse(itemdata.numbercode)
-                        : '',
-                    // remarks:itemtreatmentdata[0].remarks||"--",
-                    submitperson: item.creator.person_name,
-                    submittime: moment(item.workflow.created_on)
-                        .utc()
-                        .zone(-8)
-                        .format('YYYY-MM-DD'),
-                    status: item.status,
-                    // totlesuperunit:itemdata.superunit?JSON.parse(itemdata.superunit):'',
-                    totledocument: itemdata.totledocument
-                        ? JSON.parse(itemdata.totledocument)
-                        : '',
-                    treatmentdata: itemtreatmentdata,
-                    dataReview: itemdata.dataReview
-                        ? JSON.parse(itemdata.dataReview).person_name
-                        : ''
-                };
-                totledata.push(itemarrange);
-            });
-            this.setState(
-                {
-                    totolData: totledata
-                },
-                () => {
-                    this.filterTask();
-                }
-            );
-        }
-    };
     // 对流程信息根据选择项目进行过滤
     filterTask () {
         const { totolData } = this.state;
@@ -634,42 +550,12 @@ class Total extends Component {
         let userID = getUser().ID;
         let params = [{
             Creater: userID, // 创建人
-            NodeName: '施工填报', // 节点名称
-            NodeID: '8f3fbe1b-4a06-4952-9f8c-ba5fca1ee893', // 节点ID
-            FieldName: 'Section', // 字段名称
+            NodeName: TOTAL_ONENODE_NAME, // 节点名称
+            NodeID: TOTAL_ONENODE_ID, // 节点ID
+            FieldName: 'Opinion', // 字段名称
             FieldOptions: '', // 字段列表值
             FieldType: 0, // 存储方式
-            ShowName: '标段', // 显示名称
-            ShowType: 'input', // 显示类型
-            DefaultValue: '' // 默认值
-        }, {
-            Creater: userID, // 创建人
-            NodeName: '施工填报', // 节点名称
-            NodeID: '8f3fbe1b-4a06-4952-9f8c-ba5fca1ee893', // 节点ID
-            FieldName: 'NumberCode', // 字段名称
-            FieldOptions: '', // 字段列表值
-            FieldType: 0, // 存储方式
-            ShowName: '编码', // 显示名称
-            ShowType: 'input', // 显示类型
-            DefaultValue: '' // 默认值
-        }, {
-            Creater: userID, // 创建人
-            NodeName: '施工填报', // 节点名称
-            NodeID: '8f3fbe1b-4a06-4952-9f8c-ba5fca1ee893', // 节点ID
-            FieldName: 'FileType', // 字段名称
-            FieldOptions: '', // 字段列表值
-            FieldType: 0, // 存储方式
-            ShowName: '文档类型', // 显示名称
-            ShowType: 'input', // 显示类型
-            DefaultValue: '' // 默认值
-        }, {
-            Creater: userID, // 创建人
-            NodeName: '施工填报', // 节点名称
-            NodeID: '8f3fbe1b-4a06-4952-9f8c-ba5fca1ee893', // 节点ID
-            FieldName: 'TableInfo', // 字段名称
-            FieldOptions: '', // 字段列表值
-            FieldType: 0, // 存储方式
-            ShowName: '表格信息', // 显示名称
+            ShowName: '', // 显示名称
             ShowType: 'input', // 显示类型
             DefaultValue: '' // 默认值
         }];
@@ -694,12 +580,13 @@ class Total extends Component {
                 let newTableList = [];
                 TableList.map(item => {
                     newTableList.push({
-                        cid: item.cid,
+                        uid: item.uid,
                         name: item.name,
                         remark: item.remark,
                         url: item.url
                     });
                 });
+                console.log('确认', TableList);
                 console.log('确认', newTableList);
                 let FormParams = [{
                     Key: 'Section', // 标段
@@ -719,11 +606,11 @@ class Total extends Component {
                     Val: JSON.stringify(newTableList)
                 }];
                 postStartwork({}, {
-                    FlowID: 'c361b0af-a7ec-4181-acd0-39512ffd96b8', // 模板ID
-                    FlowName: '总进度计划报批流程', // 模板名称
+                    FlowID: TOTAL_ID, // 模板ID
+                    FlowName: TOTAL_NAME, // 模板名称
                     FormValue: { // 表单值
                         FormParams: FormParams,
-                        NodeID: '8f3fbe1b-4a06-4952-9f8c-ba5fca1ee893'
+                        NodeID: TOTAL_ONENODE_ID
                     },
                     NextExecutor: values.TdataReview, // 下一节点执行人
                     Starter: getUser().ID, // 发起人

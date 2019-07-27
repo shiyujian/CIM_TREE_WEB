@@ -19,6 +19,7 @@ export default class Schedule extends Component {
     render () {
         const {
             Stage,
+            NodeManage,
             ScheduleAnalyze,
             EnterAnalyze,
             ScheduleDisplay
@@ -39,6 +40,13 @@ export default class Schedule extends Component {
                             exact
                             path='/schedule/stagereport'
                             component={Stage}
+                        />
+                    )}
+                    {NodeManage && (
+                        <Route
+                            exact
+                            path='/schedule/nodemanage'
+                            component={NodeManage}
                         />
                     )}
                     {EnterAnalyze && (
@@ -71,6 +79,13 @@ export default class Schedule extends Component {
             id: 'SCHEDULE.STAGEREPORT',
             name: '进度填报',
             path: '/schedule/stagereport',
+            icon: <Icon name='suitcase' />
+        },
+        {
+            key: 'nodemanage',
+            id: 'SCHEDULE.NODEMANAGE',
+            name: '节点管理',
+            path: '/schedule/nodemanage',
             icon: <Icon name='suitcase' />
         },
         {
