@@ -23,30 +23,6 @@ class Tablelevel extends Component {
         this.handleCancel = this.handleCancel.bind(this); // 取消
         this.handleOk = this.handleOk.bind(this); // 审核
     }
-    componentDidMount () {
-        const { getSupplierList, getNurseryList } = this.props.actions;
-        // 获取当前组织机构的权限
-        const user = getUser();
-        this.name = user.name;
-        // 获取供应商列表
-        getSupplierList({}, {
-            status: 1
-        }).then(rep => {
-            this.SupplierList = rep.content;
-            this.setState({
-                SupplierList: rep.content
-            });
-        });
-        getNurseryList({}, {
-            status: 1
-        }).then(rep => {
-            this.NurseryList = rep.content;
-            this.setState({
-                NurseryList: rep.content
-            });
-        });
-        this.toSearch();
-    }
     columns = [
         {
             title: '供应商',
@@ -69,6 +45,37 @@ class Tablelevel extends Component {
             }
         }
     ]
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getSupplierList,
+                getNurseryList
+            }
+        } = this.props;
+        // 获取当前组织机构的权限
+        const user = getUser();
+        this.name = user.name;
+        // 获取供应商列表
+        let rep = await getSupplierList({}, {
+            status: 1
+        });
+        if (rep && rep.code && rep.code === 200) {
+            this.SupplierList = rep.content;
+            this.setState({
+                SupplierList: rep.content
+            });
+        }
+        let rst = await getNurseryList({}, {
+            status: 1
+        });
+        if (rst && rst.code && rst.code === 200) {
+            this.NurseryList = rst.content;
+            this.setState({
+                NurseryList: rst.content
+            });
+        }
+        await this.toSearch();
+    }
     render () {
         const { dataList, SupplierList, NurseryList, supplierid, nurserybaseid, showModal } = this.state;
         const { getFieldDecorator } = this.props.form;

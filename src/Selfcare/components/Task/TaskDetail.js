@@ -5,13 +5,15 @@ import {
     Button
 } from 'antd';
 import moment from 'moment';
+import { WFStatusList } from '../common';
 const { Step } = Steps;
 class TaskDetail extends Component {
     constructor (props) {
         super(props);
         this.state = {
             task_id: '', // 任务ID
-            Works: [], // 任务流程
+            TableList: [], // 表格数据
+            workFlow: [], // 任务流程
             workDetails: '' // 任务详情
         };
     }
@@ -25,16 +27,30 @@ class TaskDetail extends Component {
         getWorkDetails({
             ID: task_id
         }, {}).then(rep => {
-            console.log('详情', rep.Works);
+            let FormParams = [];
+            if (rep.FormValues && rep.FormValues.length > 0 && rep.FormValues[0].FormParams) {
+                FormParams = rep.FormValues[0].FormParams;
+            }
+            let param = {};
+            let TableList = [];
+            FormParams.map(item => {
+                if (item.Key === 'TableInfo') {
+                    TableList = JSON.parse(item.Val);
+                } else {
+                    param[item.Key] = item.Val;
+                }
+            });
             this.props.actions.setTaskDetailLoading(false);
+            console.log('任务详情', rep.Works);
             this.setState({
                 workDetails: rep,
-                Works: rep.Works
+                TableList,
+                workFlow: rep.Works.reverse()
             });
         });
     }
     render () {
-        const { workDetails, Works } = this.state;
+        const { workDetails, workFlow } = this.state;
         return (
             <div>
                 <div className='info'>
@@ -43,10 +59,14 @@ class TaskDetail extends Component {
                     </div>
                     <div style={{textAlign: 'center', fontSize: 12, color: '#999999'}}>
                         <span>
-                            发起人：{workDetails.Starter}
+                            发起人：{workDetails.StarterObj && workDetails.StarterObj.Full_Name}
                         </span>
                         <span style={{ paddingLeft: 40 }}>
-                            当前状态：{workDetails.WFState}
+                            当前状态：{WFStatusList.map(item => {
+                                if (item.value === workDetails.WFState) {
+                                    return item.label;
+                                }
+                            })}
                         </span>
                     </div>
                     <Button type='primary' onClick={this.backClick.bind(this)}>
@@ -55,7 +75,7 @@ class TaskDetail extends Component {
                 </div>
                 <div className='form'>
                     <Card title={'流程详情'} style={{ marginTop: 10 }}>
-                        {workDetails.FormValues}
+                        123
                     </Card>
                 </div>
                 <div>
@@ -63,26 +83,37 @@ class TaskDetail extends Component {
                         <Steps
                             direction='vertical'
                             size='small'
-                            current={Works.length}
+                            current={workFlow.length - 1}
                         >
-                            {Works.map(item => {
-                                return <Step title={item.CurrentNodeName} description={
-                                    <div>
-                                        <span>执行人：{item.Executor}</span>
-                                        <span style={{marginLeft: 20}}>执行时间：{item.RunTime}</span>
-                                    </div>
-                                } />;
+                            {workFlow.map(item => {
+                                if (item.RunTime) {
+                                    return <Step title={
+                                        <div>
+                                            <span>{item.CurrentNodeName}</span>
+                                            <span style={{marginLeft: 20}}>{'已完成'}</span>
+                                        </div>
+                                    } description={
+                                        <div>
+                                            <span>
+                                                {item.CurrentNodeName}人：
+                                                {item.ExecutorObj.Full_Name}({item.ExecutorObj.User_Name})
+                                            </span>
+                                            <span style={{marginLeft: 20}}>
+                                                {item.CurrentNodeName}时间：
+                                                {item.RunTime}
+                                            </span>
+                                        </div>
+                                    } />;
+                                } else {
+                                    return <Step title={
+                                        <div>
+                                            <span>{item.CurrentNodeName}</span>
+                                            <span style={{marginLeft: 20}}>{'执行中'}</span>
+                                            <span style={{marginLeft: 20}}>当前执行人：{item.ExecutorObj.Full_Name}</span>
+                                        </div>
+                                    } />;
+                                }
                             })}
-                            <Step title={
-                                <div>
-                                    <span>{workDetails.CurrentNodeName}</span>
-                                    <span style={{marginLeft: 20}}>当前执行人：{workDetails.Executor}</span>
-                                </div>
-                            } description={
-                                <div>
-                                    123
-                                </div>
-                            } />
                         </Steps>
                         <div style={{textAlign: 'center'}}>
                             <Button

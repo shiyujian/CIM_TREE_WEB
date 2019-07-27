@@ -25,7 +25,7 @@ export const getWorkDetails = createFetchAction(`${base}/flow/work/{{ID}}`, []);
 // 获取任务已办列表
 export const getWorkList = createFetchAction(`${base}/flow/works`, []);
 // 删除任务
-export const deleteWork = createFetchAction(`${base}/flow/works/{{ID}}`, [], 'DELETE');
+export const deleteWork = createFetchAction(`${base}/flow/work/{{ID}}`, [], 'DELETE');
 // 流程发起
 export const postStartwork = createFetchAction(`${base}/flow/startwork`, [], 'POST');
 // 节点表单列表

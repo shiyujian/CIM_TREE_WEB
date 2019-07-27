@@ -227,7 +227,7 @@ class Edit extends Component {
         try {
             let roles = '';
             if (editUserRecord.Roles && editUserRecord.Roles instanceof Array && editUserRecord.Roles.length > 0) {
-                roles = editUserRecord.Roles[0].ID;
+                roles = String(editUserRecord.Roles[0].ID);
             }
             console.log('editUserRecord', editUserRecord);
             await setFieldsValue({

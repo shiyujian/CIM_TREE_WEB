@@ -215,7 +215,7 @@ export default class TreeMessGisOnClickHandle extends Component {
                 getCuringTreeInfo,
                 getCuringTypes,
                 getCuringMessage,
-                getForestUserDetail,
+                getUserDetail,
                 getParentOrgTreeByID,
                 getTreeLocationCoord,
                 getLocationNameByCoordinate
@@ -323,7 +323,7 @@ export default class TreeMessGisOnClickHandle extends Component {
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
             for (let i = 0; i < treeflowData.length; i++) {
-                let userDetail = await getForestUserDetail({
+                let userDetail = await getUserDetail({
                     id: treeflowData[i].FromUser
                 });
                 let orgID = userDetail && userDetail.Org;

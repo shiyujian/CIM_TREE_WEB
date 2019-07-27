@@ -33,6 +33,7 @@ export const getUser = () => {
             Duty = '',
             Full_Name = '',
             Org = '',
+            OrgObj = '',
             Phone = '',
             IsBlack = 0,
             Number = '',
@@ -51,6 +52,7 @@ export const getUser = () => {
             duty: Duty,
             name: Full_Name,
             org: Org,
+            orgObj: OrgObj,
             phone: Phone,
             isBlack: IsBlack,
             number: Number,
@@ -118,9 +120,13 @@ export const setPermissions = (permissions) => {
 export const getPermissions = () => {
     let permissions = [];
     const text = window.localStorage.getItem('permissions');
-
     try {
-        permissions = JSON.parse(text);
+        if (text) {
+            permissions = JSON.parse(text);
+            if (!(permissions && permissions instanceof Array)) {
+                permissions = [];
+            }
+        }
     } catch (e) {
         console.log('getPermissions', e);
     }

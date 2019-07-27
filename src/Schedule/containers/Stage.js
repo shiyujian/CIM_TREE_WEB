@@ -137,7 +137,7 @@ export default class Stage extends Component {
                                         <TabPane tab='总计划进度' key='1'>
                                             <Totalnew {...this.props} {...this.state} />
                                         </TabPane>
-                                        {/* <TabPane tab='每周计划进度' key='2'>
+                                        <TabPane tab='每周计划进度' key='2'>
                                             <WeekPlannew {...this.props} {...this.state} />
                                         </TabPane>
                                         <TabPane tab='每日实际进度' key='3'>
@@ -145,7 +145,7 @@ export default class Stage extends Component {
                                                 {...this.props}
                                                 {...this.state}
                                             />
-                                        </TabPane> */}
+                                        </TabPane>
                                         {/* <TabPane tab='总计划进度' key='1'>
                                             <Total {...this.props} {...this.state} />
                                         </TabPane> */}

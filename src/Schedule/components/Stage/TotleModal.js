@@ -26,6 +26,8 @@ export default class TotleModal extends Component {
         super(props);
         this.state = {
             workID: '', // 任务ID
+            FormParams: [], // 表单详情
+            TableList: [], // 表格数据
             workDetails: {}, // 任务详情
             workFlow: [], // 任务流程
             TreatmentData: [],
@@ -53,18 +55,35 @@ export default class TotleModal extends Component {
         // });
     }
     getTaskDetail () {
-        const { workID } = this.props;
-        const { getWorkDetails } = this.props.actions;
+        const {
+            workID,
+            actions: { getWorkDetails },
+            form: { setFieldsValue }
+        } = this.props;
         this.setState({
             workID: workID
         });
         getWorkDetails({
             ID: workID
         }, {}).then(rep => {
-            console.log('详情', rep);
+            let FormParams = [];
+            if (rep.FormValues && rep.FormValues.length > 0 && rep.FormValues[0].FormParams) {
+                FormParams = rep.FormValues[0].FormParams;
+            }
+            let param = {};
+            let TableList = [];
+            FormParams.map(item => {
+                if (item.Key === 'TableInfo') {
+                    TableList = JSON.parse(item.Val);
+                } else {
+                    param[item.Key] = item.Val;
+                }
+            });
+            setFieldsValue(param);
             this.setState({
                 workDetails: rep,
-                workFlow: rep.Works
+                TableList,
+                workFlow: rep.Works.reverse()
             });
         });
     }
@@ -88,7 +107,7 @@ export default class TotleModal extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { history, workFlow } = this.state;
+        const { history, workFlow, workDetails, FormParams } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -99,7 +118,6 @@ export default class TotleModal extends Component {
                 <Modal
                     title='总进度计划流程详情'
                     width={800}
-                    // onOk={null}
                     onCancel={this.props.oncancel}
                     visible
                     footer={null}
@@ -115,12 +133,8 @@ export default class TotleModal extends Component {
                                                 label='标段'
                                             >
                                                 {getFieldDecorator(
-                                                    'totlesection',
+                                                    'Section',
                                                     {
-                                                        initialValue: `${this
-                                                            .props
-                                                            .sectionName ||
-                                                            '暂无标段'}`,
                                                         rules: [
                                                             {
                                                                 required: false,
@@ -138,11 +152,8 @@ export default class TotleModal extends Component {
                                                 label='编号'
                                             >
                                                 {getFieldDecorator(
-                                                    'totlenumbercode',
+                                                    'NumberCode',
                                                     {
-                                                        initialValue: `${this
-                                                            .props.numbercode ||
-                                                            '暂无编号'}`,
                                                         rules: [
                                                             {
                                                                 required: false,
@@ -162,12 +173,8 @@ export default class TotleModal extends Component {
                                                 label='文档类型'
                                             >
                                                 {getFieldDecorator(
-                                                    'totledocument',
+                                                    'FileType',
                                                     {
-                                                        initialValue: `${this
-                                                            .props
-                                                            .totledocument ||
-                                                            '暂无文档类型'}`,
                                                         rules: [
                                                             {
                                                                 required: false,
@@ -195,12 +202,12 @@ export default class TotleModal extends Component {
                                     </Row>
                                     <Row>
                                         <Table
-                                            columns={this.columns1}
+                                            columns={this.columns}
                                             pagination
                                             dataSource={
-                                                this.state.TreatmentData
+                                                this.state.TableList
                                             }
-                                            rowKey='index'
+                                            rowKey='name'
                                             className='foresttable'
                                         />
                                     </Row>
@@ -211,9 +218,7 @@ export default class TotleModal extends Component {
                             <Steps
                                 direction='vertical'
                                 size='small'
-                                current={
-                                    history.length > 0 ? history.length - 1 : 0
-                                }
+                                current={workFlow.length - 1}
                             >
                                 {workFlow.map(item => {
                                     return <Step title={item.CurrentNodeName} description={
@@ -221,7 +226,7 @@ export default class TotleModal extends Component {
                                             <span>
                                                 {item.CurrentNodeName}人: {item.Executor}
                                             </span>
-                                            <span>
+                                            <span style={{marginLeft: 20}}>
                                                 {item.CurrentNodeName}时间: {item.RunTime}
                                             </span>
                                         </div>
@@ -378,41 +383,43 @@ export default class TotleModal extends Component {
         const { states = [] } = task;
         return states.find(state => state.status === 'processing');
     }
-    columns1 = [
+    columns = [
         {
             title: '序号',
             dataIndex: 'index',
             key: 'index',
-            width: '10%'
+            render: (text, record, index) => {
+                return index;
+            }
         },
         {
             title: '文件名称',
-            dataIndex: 'fileName',
-            key: 'fileName',
+            dataIndex: 'name',
+            key: 'name',
             width: '35%'
         },
         {
             title: '备注',
-            dataIndex: 'remarks',
-            key: 'remarks',
+            dataIndex: 'remark',
+            key: 'remark',
             width: '30%'
         },
         {
             title: '操作',
-            dataIndex: 'operation',
-            key: 'operation',
+            dataIndex: 'active',
+            key: 'active',
             width: '10%',
             render: (text, record, index) => {
                 return (
                     <div>
-                        <a
-                            href='javascript:;'
-                            onClick={this.onViewClick.bind(this, record, index)}
+                        {/* <a
+                            href=''
+                            onClick={this.onViewClick.bind(this, record.url, index)}
                         >
                             预览
-                        </a>
-                        <Divider type='vertical' />
-                        <a href={`${STATIC_DOWNLOAD_API}${record.a_file}`}>
+                        </a> */}
+                        {/* <Divider type='vertical' /> */}
+                        <a href={record.url} target='_blank'>
                             下载
                         </a>
                     </div>

@@ -50,7 +50,28 @@ class TaskList extends Component {
             title: '任务名称',
             dataIndex: 'Title'
         }, {
-            title: '任务状态',
+            title: '任务类型',
+            dataIndex: 'FlowName'
+        }, {
+            title: '发起人',
+            dataIndex: 'StarterObj',
+            render: (text, record, index) => {
+                return `${text.Full_Name}(${text.User_Name})`;
+            }
+        }, {
+            title: '发起时间',
+            dataIndex: 'CreateTime'
+        }, {
+            title: '当前执行人',
+            dataIndex: 'NextExecutorObj',
+            render: (text, record, index) => {
+                return `${text.Full_Name}(${text.User_Name})`;
+            }
+        }, {
+            title: '流程名称',
+            dataIndex: 'FlowName'
+        }, {
+            title: '流转状态',
             dataIndex: 'WFState',
             render: (text, record, index) => {
                 let statusValue = '';
@@ -61,21 +82,6 @@ class TaskList extends Component {
                 });
                 return statusValue;
             }
-        }, {
-            title: '当前节点',
-            dataIndex: 'CurrentNodeName'
-        }, {
-            title: '发起人',
-            dataIndex: 'Starter'
-        }, {
-            title: '待办人',
-            dataIndex: 'NextExecutor'
-        }, {
-            title: '流程名称',
-            dataIndex: 'FlowName'
-        }, {
-            title: '任务结束时间',
-            dataIndex: 'CompleteTime'
         }, {
             title: '操作',
             dataIndex: 'active',
@@ -153,11 +159,11 @@ class TaskList extends Component {
         this.getProcessList();
         this.getFinishList();
     }
-    getProcessList () {
+    getProcessList () { // 获取待办
         this.setState({
             loadingProcess: true
         });
-        let { getEmpworkList } = this.props.actions;
+        let { getWorkList } = this.props.actions;
         let { validateFields } = this.props.form;
         console.log('当前用户ID', getUser().ID);
         validateFields((err, values) => {
@@ -171,17 +177,18 @@ class TaskList extends Component {
                 let params = {
                     workid: '', // 任务ID
                     title: values.name || '', // 任务名称
-                    flowname: values.type || '', // 流程类型或名称
+                    flowid: values.type || '', // 流程类型或名称
                     starter: values.starter || '', // 发起人
                     currentnode: '', // 节点ID
                     prevnode: '', // 上一结点ID
                     executor: '', // 执行人
+                    wfstate: '0,1', // 待办
                     stime, // 开始时间
                     etime, // 结束时间
                     page: '', // 页码
                     size: '' // 页数
                 };
-                getEmpworkList({}, params).then(rep => {
+                getWorkList({}, params).then(rep => {
                     if (rep.code === 200) {
                         let processList = []; // 待办列表
                         rep.content.map(item => {

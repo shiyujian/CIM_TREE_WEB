@@ -23,7 +23,7 @@ class TaskCreateModal extends Component {
         const {
             actions: {
                 getCuringTypes,
-                getForestAllUsersData
+                getUsers
             }
         } = this.props;
         let curingTypes = await getCuringTypes();
@@ -43,7 +43,7 @@ class TaskCreateModal extends Component {
             let postData = {
                 username
             };
-            let forestData = await getForestAllUsersData({}, postData);
+            let forestData = await getUsers({}, postData);
             if (forestData && forestData.content && forestData.content.length > 0) {
                 let signUser = forestData.content[0];
                 this.setState({

@@ -81,7 +81,9 @@ class AddMember extends Component {
             key: '7',
             dataIndex: 'OrgObj',
             render: (text, record) => {
-                return record.OrgObj ? record.OrgObj : '';
+                if (record.OrgObj && record.OrgObj.OrgName) {
+                    return record.OrgObj.OrgName;
+                }
             }
         },
         {

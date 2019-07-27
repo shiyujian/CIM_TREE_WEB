@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-11 14:22:58
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-03-01 15:47:29
+ * @Last Modified time: 2019-07-24 14:18:36
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -43,11 +43,10 @@ export default class Project extends Component {
             match: {params: {module = ''} = {}} = {}
         } = this.props;
         const {
-            AuxiliaryAcceptance,
             ProjectImage,
             defaultOpenKeys
         } = this.state || {};
-        if (pathname === '/project/auxiliaryacceptance' || pathname === '/project/projectimage') {
+        if (pathname === '/project/projectimage') {
             return (
                 <Body>
                     <AsideComponent>
@@ -60,12 +59,6 @@ export default class Project extends Component {
                     </AsideComponent>
                     <Main>
                         <Switch>
-                            {AuxiliaryAcceptance && (
-                                <Route
-                                    path='/project/auxiliaryAcceptance'
-                                    component={AuxiliaryAcceptance}
-                                />
-                            )}
                             {ProjectImage && (
                                 <Route
                                     path='/project/projectimage'
@@ -106,127 +99,6 @@ export default class Project extends Component {
     }
 
     static menus = [
-        {
-            key: 'dataManage',
-            id: 'PROJECT.DATAMANAGE',
-            name: '资料管理',
-            icon: <Icon name='won' />,
-            children: [
-                {
-                    key: 'Standard',
-                    id: 'PROJECT.STANDARD',
-                    name: '制度标准',
-                    path: '/project/standard',
-                    exact: true,
-                    icon: <Icon name='retweet' />
-                },
-                {
-                    key: 'ProDoc',
-                    id: 'PROJECT.PRODOC',
-                    name: '工程文档',
-                    path: '/project/proDoc',
-                    icon: <Icon name='code' />
-                },
-                {
-                    key: 'EngineeringImage',
-                    id: 'PROJECT.ENGINEERINGIMAGE',
-                    name: '影像资料',
-                    path: '/project/engineeringImage',
-                    exact: true,
-                    icon: <Icon name='retweet' />
-                }
-            ]
-        },
-        {
-            key: 'OverallManage',
-            name: '综合管理',
-            id: 'PROJECT.OVERALLMANAGE',
-            icon: <Icon name='won' />,
-            children: [
-                {
-                    key: 'FormManage',
-                    id: 'PROJECT.FORM',
-                    name: '表单管理',
-                    path: '/project/formmanage',
-                    exact: true,
-                    icon: <Icon name='retweet' />
-                }
-            ]
-        },
-        // {
-        //     key: 'safetyManage',
-        //     name: '安环管理',
-        //     id: 'PROJECT.SAFETYMANAGE',
-        //     icon: <Icon name='won' />,
-        //     children: [
-        //         {
-        //             key: 'SafetySystem',
-        //             id: 'PROJECT.SAFETYSYSTEM',
-        //             name: '安全体系',
-        //             path: '/project/safetySystem',
-        //             exact: true,
-        //             icon: <Icon name='retweet' />
-        //         },
-        //         {
-        //             key: 'Danger',
-        //             id: 'PROJECT.DANGER',
-        //             name: '危险源',
-        //             path: '/project/danger',
-        //             icon: <Icon name='code' />
-        //         },
-        //         {
-        //             key: 'Unbearable',
-        //             id: 'PROJECT.UNBEARABLE',
-        //             name: '环境保护',
-        //             path: '/project/unbearable',
-        //             icon: <Icon name='tag' />
-        //         },
-        //         {
-        //             key: 'HiddenDanger',
-        //             id: 'PROJECT.HIDDENDANGER',
-        //             name: '安全隐患',
-        //             path: '/project/hiddendanger',
-        //             icon: <Icon name='money' />
-        //         },
-        //         {
-        //             key: 'RiskFactor',
-        //             id: 'PROJECT.RISKFACTOR',
-        //             name: '文明施工',
-        //             path: '/project/riskFactor',
-        //             icon: <Icon name='code' />
-        //         },
-        //         {
-        //             key: 'RiskEvaluation',
-        //             id: 'PROJECT.RISKEVALUATION',
-        //             name: '危险源风险评价',
-        //             path: '/project/riskEvaluation',
-        //             icon: <Icon name='retweet' />
-        //         },
-        //         {
-        //             key: 'EducationRegister',
-        //             id: 'PROJECT.EDUCATIONREGISTER',
-        //             name: '安全教育',
-        //             path: '/project/educationRegister',
-        //             icon: <Icon name='tag' />
-        //         }
-        //     ]
-        // },
-        // {
-        //     key: 'massManage',
-        //     name: '质量管理',
-        //     id: 'PROJECT.MASSMANAGE',
-        //     icon: <Icon name='won' />,
-        //     children: [
-        //         {
-        //             key: 'Defects',
-        //             id: 'PROJECT.DEFECTS',
-        //             name: '质量缺陷',
-        //             path: '/project/defects',
-        //             exact: true,
-        //             icon: <Icon name='retweet' />
-        //         }
-        //     ]
-        // },
         {
             key: 'plotManage',
             name: '数据管理',
@@ -319,13 +191,6 @@ export default class Project extends Component {
                     icon: <Icon name='tag' />
                 }
             ]
-        },
-        {
-            key: 'auxiliaryAcceptance',
-            name: '辅助验收',
-            id: 'PROJECT.AUXILIARYACCEPTANCE',
-            path: '/project/auxiliaryacceptance',
-            icon: <Icon name='check' />
         },
         {
             key: 'projectImage',

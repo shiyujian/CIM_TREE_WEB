@@ -344,7 +344,7 @@ class Addition extends Component {
                                     {getFieldDecorator('section', {
                                         rules: [
                                             {
-                                                required: true,
+                                                required: false,
                                                 message: '请选择标段'
                                             }
                                         ]
@@ -515,10 +515,16 @@ class Addition extends Component {
                     message.warn('请输入英文字符、数字');
                     return;
                 }
+                let orgID = '';
+                if (node && node.OrgPK) {
+                    orgID = node.OrgPK;
+                } else {
+                    orgID = node.ID;
+                }
                 let postUserPostData = {
                     Full_Name: values.FullName, // 姓名
                     User_Name: values.UserName, // 用户名
-                    Org: node.ID, // 组织机构
+                    Org: orgID, // 组织机构
                     Phone: values.telephone, // 电话
                     Password: values.PassWord, // 密码
                     Duty: values.titles || '', // 职务
@@ -566,7 +572,7 @@ class Addition extends Component {
                         paget = 1;
                     }
                     let getUserPostData = {
-                        org: (node && node.ID) || '',
+                        org: orgID,
                         page: paget,
                         size: 10
                     };

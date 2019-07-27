@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import SimpleTree from './SimpleTree';
 import {getCompanyDataByOrgCode, getUser} from '_platform/auth';
 import {addGroup} from '../auth';
-import {ORG_NURSERY_CODE, ORG_SUPPLIER_CODE} from '_platform/api';
 import moment from 'moment';
 
 export default class Tree extends Component {
@@ -204,8 +203,14 @@ export default class Tree extends Component {
                 let topProject = Tree.loop(orgTreeArrList, selectOrgData.ID);
                 if (this.compare(user, topProject, selectOrgData.ID)) {
                     await changeSidebarField('node', selectOrgData);
+                    let orgID = '';
+                    if (selectOrgData && selectOrgData.OrgPK) {
+                        orgID = selectOrgData.OrgPK;
+                    } else {
+                        orgID = selectOrgData.ID;
+                    }
                     let postData = {
-                        org: selectOrgData.ID,
+                        org: orgID,
                         page: 1,
                         size: 10
                     };

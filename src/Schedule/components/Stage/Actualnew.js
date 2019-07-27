@@ -47,7 +47,7 @@ class Actual extends Component {
             user: '',
             // 新增流程
             visible: false,
-            actualDataSource: [],
+            TableList: [], // 表格数据
             // 流程详情
             actualModalVisible: false,
             actualModaldata: []
@@ -373,7 +373,7 @@ class Actual extends Component {
                     visible={this.state.visible}
                     maskClosable={false}
                     onCancel={this.closeModal.bind(this)}
-                    onOk={this.sendWork.bind(this)}
+                    onOk={this.handleOK.bind(this)}
                 >
                     <div>
                         <Form>
@@ -434,9 +434,9 @@ class Actual extends Component {
                                     </Row>
                                     <Row>
                                         <Table
-                                            columns={this.columns1}
+                                            columns={this.columnsModal}
                                             dataSource={
-                                                this.state.actualDataSource
+                                                this.state.TableList
                                             }
                                             bordered
                                             className='foresttable'
@@ -498,7 +498,7 @@ class Actual extends Component {
         });
         this.setState({
             visible: true,
-            actualDataSource: treedata
+            TableList: treedata
         });
         this.props.form.setFieldsValue({
             actualSection: this.state.currentSectionName || undefined,
@@ -515,7 +515,7 @@ class Actual extends Component {
         });
         this.setState({
             visible: false,
-            actualDataSource: []
+            TableList: []
         });
     }
 
@@ -545,7 +545,7 @@ class Actual extends Component {
         });
     }
     // 发起填报
-    sendWork () {
+    handleOK () {
         const {
             actions: { postStartwork },
             form: { validateFields }
@@ -553,27 +553,23 @@ class Actual extends Component {
         validateFields((err, values) => {
             if (!err) {
                 console.log('确认', values.Tsection, values.Ttotledocument, values.TdataReview);
-                const { section, fileDataList } = this.state;
-                let newFileDataList = [];
-                fileDataList.map(item => {
-                    newFileDataList.push({
+                const { section, TableList } = this.state;
+                let newTableList = [];
+                TableList.map(item => {
+                    newTableList.push({
                         name: item.name,
                         remark: item.remark,
                         url: item.url
                     });
                 });
                 let FormParams = [{
-                    Key: 'Tsection', // 标段
+                    Key: 'section', // 标段
                     FieldType: 0,
                     Val: section
                 }, {
                     Key: 'tableInfo', // 列表信息
                     FieldType: 0,
-                    Val: JSON.stringify(newFileDataList)
-                }, {
-                    Key: 'TdataReview', // 审核人
-                    FieldType: 0,
-                    Val: values.TdataReview
+                    Val: JSON.stringify(newTableList)
                 }];
                 postStartwork({}, {
                     FlowID: 'dd50b1a8-8b39-4733-8677-10251fd7d9b4', // 模板ID
@@ -682,7 +678,7 @@ class Actual extends Component {
         }
     ];
 
-    columns1 = [
+    columnsModal = [
         {
             title: '序号',
             dataIndex: 'key',
@@ -739,14 +735,15 @@ class Actual extends Component {
         }
     ];
     // 实际数量的输入
-    handleActualNumChange = (index, data) => {
+    handleActualNumChange = (index, e) => {
         const {
-            actualDataSource
+            TableList
         } = this.state;
+        console.log('输入', TableList);
         try {
-            actualDataSource[index].actualNum = data.target.value;
+            TableList[index].actualNum = e.target.value;
             this.setState({
-                actualDataSource
+                TableList
             });
         } catch (e) {
             console.log('e', e);

@@ -40,18 +40,105 @@ class WeekPlan extends Component {
             visible: false,
             flowDetailVisible: false,
             projectName: '',
+            TableList: [], // 列表信息
+            sectionArray: [], // 标段列表
             filterData: [], // 对流程信息根据项目进行过滤
             currentSection: '',
             currentSectionName: '',
             stime: null,
             etime: null,
-            weekPlanDataSource: [],
+            weekPlanDataSource: [], //
             user: ''
         };
     }
     async componentDidMount () {
-        await this.gettaskSchedule();
-        await this.getSection();
+        // await this.gettaskSchedule();
+        this.getSection(); // 获取当前登陆用户的标段
+        this.getWorkList(); // 获取任务列表
+    }
+    getSection () {
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        console.log('获取用户所属标段', tree, 'leftkeycode');
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let user = getUser();
+
+        let section = user.section;
+        let currentSectionName = '';
+        let projectName = '';
+        let sectionArray = [];
+
+        if (section) {
+            console.log(section, '用户所在标段');
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        console.log(item.children, 'item.children');
+                        item.children.map(item => {
+                            // 获取当前标段的名字
+                            if (item.No === section) {
+                                currentSectionName = item.Name;
+                                sectionArray.push(item);
+                            }
+                        });
+                    }
+                });
+            }
+            console.log('sectionArray', sectionArray);
+            this.setState({
+                section: section,
+                sectionArray,
+                currentSection: section,
+                currentSectionName: currentSectionName,
+                projectName: projectName
+            });
+        } else {
+            sectionData.map(project => {
+                if (leftkeycode === project.No) {
+                    project.children.map(item =>
+                        sectionArray.push(item)
+                    );
+                }
+            });
+            this.setState({
+                sectionArray
+            });
+        }
+    }
+    getWorkList (pro = {}) {
+        const { getWorkList } = this.props.actions;
+        let params = {
+            workid: '', // 任务ID
+            title: '', // 任务名称
+            flowname: 'b0eedc49-fe00-4754-a4fe-885e9177e663', // 流程类型或名称
+            starter: '', // 发起人
+            currentnode: '', // 节点ID
+            prevnode: '', // 上一结点ID
+            executor: '', // 执行人
+            sender: '', // 上一节点发送人
+            haveexecuted: '', // 是否已执行 1已办
+            stime: '', // 开始时间
+            etime: '', // 结束时间
+            page: '', // 页码
+            size: '' // 页数
+        };
+        getWorkList({}, params).then(rep => {
+            if (rep.code === 200) {
+                let workDataList = [];
+                rep.content.map(item => {
+                    workDataList.push(item);
+                });
+                console.log('任务列表', workDataList);
+                this.setState({
+                    workDataList
+                });
+            }
+        });
     }
     // 获取项目code
     getProjectCode (projectName) {
@@ -66,42 +153,6 @@ class WeekPlan extends Component {
             }
         });
         return projectCode;
-    }
-    // 获取当前登陆用户的标段
-    getSection () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let user = getUser();
-
-        let section = user && user.section;
-        let currentSectionName = '';
-        let projectName = '';
-        if (section) {
-            let code = section.split('-');
-            if (code && code.length === 3) {
-                // 获取当前标段所在的项目
-                sectionData.map(item => {
-                    if (code[0] === item.No) {
-                        projectName = item.Name;
-                        let units = item.children;
-                        units.map(unit => {
-                            // 获取当前标段的名字
-                            if (unit.No === section) {
-                                currentSectionName = unit.Name;
-                            }
-                        });
-                    }
-                });
-            }
-        }
-        this.setState({
-            currentSection: section,
-            currentSectionName: currentSectionName,
-            projectName: projectName,
-            user
-        });
     }
     // 获取周计划进度流程信息
     gettaskSchedule = async () => {
@@ -245,14 +296,18 @@ class WeekPlan extends Component {
     render () {
         const {
             selectedRowKeys,
+            sectionArray,
             filterData,
             currentSectionName,
             stime,
             etime,
+            workDataList,
             weekPlanDataSource,
+            TableList,
             user
         } = this.state;
         const {
+            auditorList,
             form: { getFieldDecorator }
         } = this.props;
 
@@ -277,7 +332,7 @@ class WeekPlan extends Component {
                     />
                 )}
                 <Form layout='inline'>
-                    <FormItem {...WeekPlanSearchInfo.layout} label='标段'>
+                    <FormItem label='标段'>
                         {getFieldDecorator('sunitproject', {
                             rules: [
                                 {
@@ -286,12 +341,14 @@ class WeekPlan extends Component {
                                 }
                             ]
                         })(
-                            <Select placeholder='请选择标段'>
-                                {optionArray}
+                            <Select placeholder='请选择标段' style={{width: 220}}>
+                                {sectionArray.map(item => {
+                                    return <Option value={item.Name} key={item.No}>{item.Name}</Option>;
+                                })}
                             </Select>
                         )}
                     </FormItem>
-                    <FormItem {...WeekPlanSearchInfo.layout} label='提交日期'>
+                    <FormItem label='提交日期'>
                         {getFieldDecorator('stimedate', {
                             rules: [
                                 {
@@ -312,7 +369,6 @@ class WeekPlan extends Component {
                         )}
                     </FormItem>
                     <FormItem
-                        {...WeekPlanSearchInfo.layout}
                         label='流程状态'
                     >
                         {getFieldDecorator('sstatus', {
@@ -324,6 +380,7 @@ class WeekPlan extends Component {
                             ]
                         })(
                             <Select
+                                style={{width: 220}}
                                 placeholder='请选择流程类型'
                                 allowClear
                             >
@@ -336,16 +393,12 @@ class WeekPlan extends Component {
                         )}
                     </FormItem>
                 </Form>
-                {/* <WeekPlanSearchInfo
-                    {...this.props}
-                    {...this.state}
-                    gettaskSchedule={this.gettaskSchedule.bind(this)}
-                /> */}
-                <Button onClick={this.addClick.bind(this)}>新增</Button>
+                <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
+                <Button style={{marginLeft: 20}} onClick={this.onAdd.bind(this)}>新增</Button>
                 <Table
                     columns={this.columns}
                     rowSelection={username === 'admin' ? rowSelection : null}
-                    dataSource={filterData}
+                    dataSource={workDataList}
                     className='foresttable'
                     bordered
                     rowKey='index'
@@ -356,13 +409,28 @@ class WeekPlan extends Component {
                     visible={this.state.visible}
                     maskClosable={false}
                     onCancel={this.closeModal.bind(this)}
-                    onOk={this.sendWork.bind(this)}
+                    onOk={this.handleOK.bind(this)}
                 >
                     <div>
                         <Form>
                             <Row>
                                 <Col span={24}>
                                     <Row>
+                                        <Col span={12}>
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='任务名称'
+                                            >
+                                                {getFieldDecorator(
+                                                    'Title'
+                                                )(
+                                                    <Input
+                                                        style={{width: 220}}
+                                                        placeholder='请输入'
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </Col>
                                         <Col span={12}>
                                             <FormItem
                                                 {...FormItemLayout}
@@ -438,8 +506,8 @@ class WeekPlan extends Component {
                                     </Row>
                                     <Row>
                                         <Table
-                                            columns={this.columns1}
-                                            dataSource={weekPlanDataSource}
+                                            columns={this.columnsModal}
+                                            dataSource={TableList}
                                             className='foresttable'
                                         />
                                     </Row>
@@ -450,28 +518,13 @@ class WeekPlan extends Component {
                                                 label='审核人'
                                             >
                                                 {getFieldDecorator(
-                                                    'weekSupervisorReview',
-                                                    {
-                                                        rules: [
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    '请选择审核人员'
-                                                            }
-                                                        ]
-                                                    }
+                                                    'TdataReview'
                                                 )(
-                                                    <PerSearch
-                                                        selectMember={this.selectMember.bind(
-                                                            this
-                                                        )}
-                                                        code={
-                                                            WORKFLOW_CODE.每周进度填报流程
-                                                        }
-                                                        visible={
-                                                            this.state.visible
-                                                        }
-                                                    />
+                                                    <Select style={{ width: 120 }}>
+                                                        {auditorList.map(item => {
+                                                            return <Option value={item.id} key={item.id}>{item.name}</Option>;
+                                                        })}
+                                                    </Select>
                                                 )}
                                             </FormItem>
                                         </Col>
@@ -485,8 +538,17 @@ class WeekPlan extends Component {
             </div>
         );
     }
+    // 搜索
+    onSearch () {
+        let params = {
+            flowname: '总进度计划报批流程', // 流程类型或名称
+            stime: '', // 开始时间
+            etime: '' // 结束时间
+        };
+        this.getWorkList();
+    }
     // 新增按钮
-    addClick = () => {
+    onAdd = () => {
         this.setState({
             visible: true
         });
@@ -516,6 +578,7 @@ class WeekPlan extends Component {
     };
     // 设置开始时间
     handleStartChange = (value) => {
+        console.log('开始时间', value);
         const {
             etime
         } = this.state;
@@ -566,19 +629,22 @@ class WeekPlan extends Component {
         } = this.state;
         let start = new Date(stime).getTime();
         let end = new Date(etime).getTime();
-        let weekPlanDataSource = [];
+        console.log('设置表格数据', start, end);
+        // let weekPlanDataSource = [];
+        let TableList = [];
         for (;start <= end; start += 86400000) {
             let tmp = new Date(start);
-            weekPlanDataSource.push({
+            TableList.push({
                 date: moment(tmp).format('YYYY-MM-DD')
             });
         }
+        // console.log('设置表格数据', weekPlanDataSource);
         this.props.form.setFieldsValue({
             weekTimeDate: moment(stime).format('YYYY-MM-DD') + '~' +
                 moment(etime).format('YYYY-MM-DD')
         });
         this.setState({
-            weekPlanDataSource
+            TableList
         });
     }
     // 选择人员
@@ -605,131 +671,66 @@ class WeekPlan extends Component {
             weekSupervisorReview: this.member
         });
     }
-    // 发起填报
-    sendWork () {
+    // 确认新增
+    handleOK () {
         const {
-            actions: { createFlow, getWorkflowById, putFlow }
+            actions: { postStartwork },
+            form: { validateFields }
         } = this.props;
-        const {
-            projectName,
-            currentSectionName,
-            currentSection,
-            stime,
-            etime,
-            weekPlanDataSource,
-            user
-        } = this.state;
-        let me = this;
-        // 共有信息
-        let postData = {};
-
-        me.props.form.validateFields((err, values) => {
-            console.log('err', err);
+        validateFields((err, values) => {
             if (!err) {
-                postData.upload_unit = user.org ? user.org : '';
-                postData.type = '每周计划进度';
-                postData.upload_person = user.name ? user.name : user.username;
-                postData.upload_time = moment().format('YYYY-MM-DD HH:mm:ss');
-
-                const currentUser = {
-                    username: user.username,
-                    name: user && user.name,
-                    id: user && parseInt(user.ID),
-                    org: user && user.org
-                };
-
-                let subject = [
-                    {
-                        section: JSON.stringify(currentSection),
-                        projectName: JSON.stringify(projectName),
-                        sectionName: JSON.stringify(currentSectionName),
-                        supervisorReview: JSON.stringify(values.weekSupervisorReview),
-                        stime: JSON.stringify(moment(stime).format('YYYY-MM-DD')),
-                        etime: JSON.stringify(moment(etime).format('YYYY-MM-DD')),
-                        weekPlanDataSource: JSON.stringify(weekPlanDataSource),
-                        postData: JSON.stringify(postData),
-                        fillPerson: JSON.stringify(currentUser)
-                    }
-                ];
-                // 准备发起流程
-                const nextUser = this.member;
-                let WORKFLOW_MAP = {
-                    name: '每周进度填报流程',
-                    desc: '进度管理模块每周进度填报流程',
-                    code: WORKFLOW_CODE.每周进度填报流程
-                };
-                let workflowdata = {
-                    name: WORKFLOW_MAP.name,
-                    description: WORKFLOW_MAP.desc,
-                    subject: subject,
-                    code: WORKFLOW_MAP.code,
-                    creator: currentUser,
-                    plan_start_time: null,
-                    deadline: null,
-                    status: 2
-                };
-                    // 创建流程
-                createFlow({}, workflowdata).then(instance => {
-                    if (!instance.id) {
-                        notification.error({
-                            message: '数据提交失败',
-                            duration: 2
-                        });
-                        return;
-                    }
-                    const { id } = instance;
-                    // 获取流程信息
-                    getWorkflowById({ id: id }).then(instance => {
-                        if (instance && instance.current) {
-                            let currentStateId = instance.current[0].id;
-                            let nextStates = getNextStates(
-                                instance,
-                                currentStateId
-                            );
-                            let stateid = nextStates[0].to_state[0].id;
-                            let postInfo = {
-                                next_states: [
-                                    {
-                                        state: stateid,
-                                        participants: [nextUser], // 下一步执行人
-                                        deadline: null,
-                                        remark: null
-                                    }
-                                ],
-                                state: instance.workflow.states[0].id,
-                                executor: currentUser,
-                                action: nextStates[0].action_name,
-                                note: '提交',
-                                attachment: null
-                            };
-                            let data = { pk: id };
-                            // 提交流程到下一步
-                            putFlow(data, postInfo).then(rst => {
-                                if (rst && rst.creator) {
-                                    notification.success({
-                                        message: '流程提交成功',
-                                        duration: 2
-                                    });
-                                    this.gettaskSchedule();
-                                    this.setState({
-                                        visible: false
-                                    });
-                                } else {
-                                    notification.error({
-                                        message: '流程提交失败',
-                                        duration: 2
-                                    });
-                                }
-                            });
-                        }
+                const { section, TableList } = this.state;
+                console.log('确认', values.Tsection, TableList);
+                let newTableList = [];
+                TableList.map(item => {
+                    newTableList.push({
+                        name: item.date,
+                        planTreeNum: item.planTreeNum || ''
                     });
+                });
+                let FormParams = [{
+                    Key: 'section', // 标段
+                    FieldType: 0,
+                    Val: section
+                }, {
+                    Key: 'tableInfo', // 列表信息
+                    FieldType: 0,
+                    Val: JSON.stringify(newTableList)
+                }];
+                postStartwork({}, {
+                    FlowID: 'b0eedc49-fe00-4754-a4fe-885e9177e663', // 模板ID
+                    FlowName: '每周进度填报流程', // 模板名称
+                    FormValue: { // 表单值
+                        FormParams: FormParams,
+                        NodeID: '9088d095-7b3e-436c-b8d1-d9b758041ad0'
+                    },
+                    NextExecutor: values.TdataReview, // 下一节点执行人
+                    Starter: getUser().ID, // 发起人
+                    Title: values.Title, // 任务标题
+                    WFState: 1 // 流程状态 1运行中
+                }).then(rep => {
+                    if (rep.code === 1) {
+                        notification.success({
+                            message: '新增任务成功',
+                            duration: 3
+                        });
+                        this.getWorkList();
+                        this.setState({
+                            visible: false
+                        });
+                    } else {
+                        notification.error({
+                            message: '新增任务失败',
+                            duration: 3
+                        });
+                    }
                 });
             }
         });
     }
     // 操作--查看
-    clickInfo (record) {
-        this.setState({ flowDetailVisible: true, flowDetailModaldata: record });
+    onLook (workID) {
+        this.setState({ flowDetailVisible: true, workID });
     }
     // 流程详情取消
     totleCancle () {
@@ -739,12 +740,20 @@ class WeekPlan extends Component {
     totleOk () {
         this.setState({ flowDetailVisible: false });
     }
+    onDelete (workID) {
+        console.log('删除workID', workID);
+        const { deleteWork } = this.props.actions;
+        deleteWork({
+            ID: workID
+        }, {}).then(rep => {
 
+        });
+    }
     columns = [
         {
-            title: '项目',
-            dataIndex: 'projectName',
-            key: 'projectName',
+            title: '任务名称',
+            dataIndex: 'Title',
+            key: 'Title',
             width: '16%'
         },
         {
@@ -796,18 +805,23 @@ class WeekPlan extends Component {
         {
             title: '操作',
             render: record => {
-                return (
+                return (<div>
                     <span>
-                        <a onClick={this.clickInfo.bind(this, record, 'VIEW')}>
+                        <a onClick={this.onLook.bind(this, record.WorkID)}>
                             查看
                         </a>
                     </span>
-                );
+                    <span style={{marginLeft: 10}}>
+                        <a onClick={this.onDelete.bind(this, record.WorkID)}>
+                            删除
+                        </a>
+                    </span>
+                </div>);
             }
         }
     ];
 
-    columns1 = [
+    columnsModal = [
         {
             title: '序号',
             dataIndex: 'index',
@@ -838,14 +852,14 @@ class WeekPlan extends Component {
         }
     ];
     // 计划栽植量的输入
-    handlePlanTreeNumChage = (index, data) => {
+    handlePlanTreeNumChage = (index, e) => {
         const {
-            weekPlanDataSource
+            TableList
         } = this.state;
         try {
-            weekPlanDataSource[index].planTreeNum = data.target.value;
+            TableList[index].planTreeNum = e.target.value;
             this.setState({
-                weekPlanDataSource
+                TableList
             });
         } catch (e) {
             console.log('e', e);

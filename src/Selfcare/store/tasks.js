@@ -13,9 +13,9 @@ export const setTablePage = createAction(`${ID}_设置任务列表Table的页数
 export const getTasksList = createFetchAction(`${WORKFLOW_API}/template/?status=1`, [], 'GET');
 
 // 2019-7-23两库合并新接口
-// 获取待办任务列表
-export const getEmpworkList = createFetchAction(`${base}/flow/empworks`, [], 'GET');
 // 获取已办任务列表
+export const getWorkprocessesList = createFetchAction(`${base}/flow/workprocesses`, [], 'GET');
+// 获取待办任务列表
 export const getWorkList = createFetchAction(`${base}/flow/works`, [], 'GET');
 // 获取流程列表
 export const getFlowList = createFetchAction(`${base}/flow/flows`, [], 'GET');
@@ -23,7 +23,7 @@ export const getFlowList = createFetchAction(`${base}/flow/flows`, [], 'GET');
 export const getWorkDetails = createFetchAction(`${base}/flow/work/{{ID}}`, [], 'GET');
 
 export const actions = {
-	getEmpworkList,
+	getWorkprocessesList,
 	getWorkList,
 	getFlowList,
 	getWorkDetails,

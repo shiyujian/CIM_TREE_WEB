@@ -12,6 +12,7 @@ export default (ID, service = '') => {
     const putRole = createFetchAction(`${SYSTEM_API}/role`, 'PUT');
     const deleteRole = createFetchAction(`${SYSTEM_API}/role/{{id}}`, 'DELETE');
     const changeRolePermission = createFetchAction(`${SYSTEM_API}/rolefunction`, 'POST');
+    const getRolePermission = createFetchAction(`${SYSTEM_API}/functions?roleid={{roleId}}`, 'GET');
 
     const rolesReducer = handleActions(
         {
@@ -30,6 +31,7 @@ export default (ID, service = '') => {
     rolesReducer[`put${SERVICE}Role`] = putRole;
     rolesReducer[`delete${SERVICE}Role`] = deleteRole;
     rolesReducer[`change${SERVICE}RolePermission`] = changeRolePermission;
+    rolesReducer[`get${SERVICE}RolePermission`] = getRolePermission;
 
     return rolesReducer;
 };
