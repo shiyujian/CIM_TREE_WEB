@@ -34,7 +34,7 @@ import {
     UPLOAD_API,
     WORKFLOW_CODE
 } from '../../../_platform/api';
-import PerSearch from '../../../_platform/components/panels/PerSearch';
+import PerSearch from './PerSearch';
 import { getNextStates } from '../../../_platform/components/Progress/util';
 import SearchInfo from './SearchInfo';
 import TotleModal from './TotleModal';
