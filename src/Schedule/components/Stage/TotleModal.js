@@ -26,7 +26,6 @@ export default class TotleModal extends Component {
         super(props);
         this.state = {
             workID: '', // 任务ID
-            FormParams: [], // 表单详情
             TableList: [], // 表格数据
             workDetails: {}, // 任务详情
             workFlow: [], // 任务流程
@@ -36,23 +35,6 @@ export default class TotleModal extends Component {
     }
     async componentDidMount () {
         this.getTaskDetail(); // 获取任务详情
-        // const {
-        //     actions: { getTask },
-        //     id
-        // } = this.props;
-        // let params = {
-        //     task_id: id
-        // };
-        // let task = await getTask(params);
-        // let history = [];
-        // if (task && task.history) {
-        //     history = task.history;
-        // }
-
-        // this.setState({
-        //     TreatmentData: this.props.treatmentdata,
-        //     history
-        // });
     }
     getTaskDetail () {
         const {
@@ -105,9 +87,10 @@ export default class TotleModal extends Component {
     }
     render () {
         const {
+            sectionArray,
             form: { getFieldDecorator }
         } = this.props;
-        const { history, workFlow, workDetails, FormParams } = this.state;
+        const { workFlow } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -143,7 +126,18 @@ export default class TotleModal extends Component {
                                                             }
                                                         ]
                                                     }
-                                                )(<Input readOnly />)}
+                                                )(
+                                                    <Select
+                                                        disabled
+                                                        style={{width: 220}}
+                                                        placeholder='请选择'
+                                                        allowClear
+                                                    >
+                                                        {sectionArray.map(item => {
+                                                            return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                                        })}
+                                                    </Select>
+                                                )}
                                             </FormItem>
                                         </Col>
                                         <Col span={12}>

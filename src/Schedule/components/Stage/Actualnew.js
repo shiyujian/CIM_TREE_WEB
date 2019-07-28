@@ -15,7 +15,10 @@ import {
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
-    WORKFLOW_CODE,
+    WFStatusList,
+    ACYUAL_NAME,
+    ACYUAL_ID,
+    ACYUAL_ONENODE_ID,
     SCHEDULRPROJECT
 } from '_platform/api';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -23,15 +26,19 @@ import { getUserIsManager, getUser } from '_platform/auth';
 import PerSearch from './PerSearch';
 import WeekPlanSearchInfo from './WeekPlanSearchInfo';
 import ActualModal from './ActualModal';
-import { WFStatusList } from '../common';
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
+const dateFormat = 'YYYY-MM-DD';
 class Actual extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            workID: '', // 任务ID
+            workDataList: [], // 任务列表
+            TableList: [], // 表格数据
+            visibleLook: false, // 查看弹框
             // 每日实际进度
             actualData: [],
             filterData: [], // 对流程信息根据项目进行过滤
@@ -40,6 +47,7 @@ class Actual extends Component {
             dataSourceSelected: [],
             sectionArray: [], // 标段列表
             // 项目信息
+            section: '', // 用户所在标段
             projectName: '',
             currentSection: '',
             currentSectionName: '',
@@ -47,25 +55,60 @@ class Actual extends Component {
             user: '',
             // 新增流程
             visible: false,
-            TableList: [], // 表格数据
             // 流程详情
             actualModalVisible: false,
             actualModaldata: []
         };
-        this.onAddForm = this.onAddForm.bind(this); // 添加节点表单
+        this.onAdd = this.onAdd.bind(this); // 新增
+        this.onDelete = this.onDelete.bind(this); // 删除
+        this.onLook = this.onLook.bind(this); // 查看
+        this.handleCancel = this.handleCancel.bind(this); // 取消新增
         this.handleOK = this.handleOK.bind(this); // 新增任务
+        this.getWorkList = this.getWorkList.bind(this); // 获取任务
+        this.onSearch = this.onSearch.bind(this); // 查询
     }
-
     async componentDidMount () {
-        // this.gettaskSchedule();
         this.getSection(); // 获取当前登陆用户的标段
+        this.getWorkList(); // 获取任务列表
+    }
+    getWorkList (pro = {}) {
+        const { getWorkList } = this.props.actions;
+        let params = {
+            workid: '', // 任务ID
+            title: '', // 任务名称
+            // flowid: ACYUAL_ID, // 流程类型或名称
+            flowid: '', // 流程类型或名称
+            starter: '', // 发起人
+            currentnode: '', // 节点ID
+            prevnode: '', // 上一结点ID
+            executor: '', // 执行人
+            sender: '', // 上一节点发送人
+            wfstate: '', // 待办 0,1
+            stime: '', // 开始时间
+            etime: '', // 结束时间
+            keys: pro.keys || '', // 查询键
+            values: pro.values || '', // 查询值
+            page: '', // 页码
+            size: '' // 页数
+        };
+        getWorkList({}, params).then(rep => {
+            if (rep.code === 200) {
+                let workDataList = [];
+                rep.content.map(item => {
+                    workDataList.push(item);
+                });
+                console.log('任务列表', workDataList);
+                this.setState({
+                    workDataList
+                });
+            }
+        });
     }
     getSection () {
         const {
             platform: { tree = {} },
             leftkeycode
         } = this.props;
-        console.log('获取用户所属标段', tree, 'leftkeycode');
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
 
@@ -75,7 +118,6 @@ class Actual extends Component {
         let sectionArray = [];
 
         if (section) {
-            console.log(section, '用户所在标段');
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
@@ -93,9 +135,9 @@ class Actual extends Component {
                     }
                 });
             }
-            console.log('sectionArray', sectionArray);
+            console.log('sectionArray', sectionArray, section);
             this.setState({
-                section: section,
+                section,
                 sectionArray,
                 currentSection: section,
                 currentSectionName: currentSectionName,
@@ -114,208 +156,53 @@ class Actual extends Component {
             });
         }
     }
-    onAddForm () {
-        const { postNodefields } = this.props.actions;
-        let userID = getUser().ID;
-        let params = [{
-            Creater: userID, // 创建人
-            NodeName: TOTAL_TWONODE_NAME, // 节点名称
-            NodeID: TOTAL_TWONODE_ID, // 节点ID
-            FieldName: 'Opinion', // 字段名称
-            FieldOptions: '', // 字段列表值
-            FieldType: 0, // 存储方式
-            ShowName: '处理意见', // 显示名称
-            ShowType: 'input', // 显示类型
-            DefaultValue: '' // 默认值
-        }];
-        postNodefields({}, params).then(rep => {
-            if (rep.code) {
-                notification.success({
-                    message: '新增表单成功',
-                    duration: 3
-                });
-            }
-        });
-    }
-    // 获取项目code
-    getProjectCode (projectName) {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let projectCode = '';
-        sectionData.map(item => {
-            if (projectName === item.Name) {
-                projectCode = item.No;
-            }
-        });
-        return projectCode;
-    }
-    // 获取日实际进度流程信息
-    gettaskSchedule = async () => {
-        const {
-            actions: { getTaskSchedule }
-        } = this.props;
-        let reqData = {};
-        this.props.form.validateFields((err, values) => {
-            console.log('err', err);
-            reqData.subject_section__contains = values.sunitproject
-                ? values.sunitproject
-                : '';
-            reqData.real_start_time_begin = values.stimedate
-                ? moment(values.stimedate[0]._d).format('YYYY-MM-DD 00:00:00')
-                : '';
-            reqData.real_start_time_end = values.stimedate
-                ? moment(values.stimedate[1]._d).format('YYYY-MM-DD 23:59:59')
-                : '';
-            if (values.sstatus) {
-                reqData.status = values.sstatus
-                    ? values.sstatus
-                    : '';
-            }
-        });
-
-        let tmpData = Object.assign({}, reqData);
-
-        let task = await getTaskSchedule(
-            { code: WORKFLOW_CODE.每日进度填报流程 },
-            tmpData
-        );
-
-        let totledata = [];
-        if (task && task instanceof Array) {
-            task.map((item, index) => {
-                let itemdata = item.subject[0];
-                let itempostdata = itemdata.postData
-                    ? JSON.parse(itemdata.postData)
-                    : null;
-                let actualDataSource = itemdata.actualDataSource
-                    ? JSON.parse(itemdata.actualDataSource)
-                    : [];
-                let itemarrange = {
-                    index: index + 1,
-                    id: item.id,
-                    section: itemdata.section
-                        ? JSON.parse(itemdata.section)
-                        : '',
-                    sectionName: itemdata.sectionName
-                        ? JSON.parse(itemdata.sectionName)
-                        : '',
-                    projectName: itemdata.projectName
-                        ? JSON.parse(itemdata.projectName)
-                        : '',
-                    type: itempostdata.type,
-                    submitperson: item.creator.person_name,
-                    submittime: moment(item.workflow.created_on)
-                        .utc()
-                        .zone(-8)
-                        .format('YYYY-MM-DD'),
-                    status: item.status,
-                    actualTimeDate: itemdata.actualTimeDate
-                        ? JSON.parse(itemdata.actualTimeDate)
-                        : '',
-                    actualDataSource: actualDataSource,
-                    actualSupervisorReview: itemdata.actualSupervisorReview
-                        ? JSON.parse(itemdata.actualSupervisorReview).person_name
-                        : ''
-                };
-                totledata.push(itemarrange);
-            });
-            this.setState(
-                {
-                    actualData: totledata
-                },
-                () => {
-                    this.filterTask();
-                }
-            );
-        }
-    };
-
-    // 对流程信息根据选择项目进行过滤
-    filterTask () {
-        const { actualData } = this.state;
-        const { leftkeycode } = this.props;
-        let filterData = [];
-        let user = getUser();
-        // 是否为业主或管理员
-        let permission = getUserIsManager();
-        if (permission) {
-            // 业主或管理员可以看选择项目的进度流程
-            actualData.map(task => {
-                let projectName = task.projectName;
-                let projectCode = this.getProjectCode(projectName);
-                if (leftkeycode) {
-                    if (projectCode === leftkeycode) {
-                        filterData.push(task);
-                    }
-                } else {
-                    filterData.push(task);
-                }
-            });
-        } else {
-            let section = user && user.section;
-            let selectCode = '';
-            // 关联标段的人只能看自己项目的进度流程
-            if (section) {
-                let code = section.split('-');
-                selectCode = code[0] || '';
-                actualData.map(task => {
-                    let projectName = task.projectName;
-                    let projectCode = this.getProjectCode(projectName);
-                    if (
-                        projectCode === selectCode &&
-                            task.section === section
-                    ) {
-                        filterData.push(task);
-                    }
-                });
-            }
-        }
-        this.setState({
-            filterData
-        });
-    }
-
-    async componentDidUpdate (prevProps, prevState) {
-        const { leftkeycode } = this.props;
-        if (leftkeycode !== prevProps.leftkeycode) {
-            this.filterTask();
-        }
-    }
     onSearch () {
-
+        const { validateFields } = this.props.form;
+        validateFields((err, values) => {
+            if (!err) {
+            }
+            console.log('搜索选择', values.Data, values.Number, values.Section, values.Status);
+            let key = '';
+            let value = '';
+            if (values.Section) {
+                key = 'section';
+                value = values.Section;
+                if (values.Number) {
+                    key += '|' + 'number';
+                    value += '|' + values.Number;
+                }
+            } else if (values.Number) {
+                key = 'number';
+                value = values.Number;
+            }
+            let params = {
+                keys: key, // 表单项
+                values: value // 表单值
+            };
+            this.getWorkList(params);
+        });
     }
     render () {
         const {
-            sectionArray,
-            selectedRowKeys,
-            filterData,
-            currentSectionName,
-            user
+            TableList,
+            section,
+            sectionArray
         } = this.state;
-        const { auditorList } = this.props;
-        console.log('WORKFLOW_CODE', WORKFLOW_CODE);
         const {
+            auditorList,
             form: { getFieldDecorator }
         } = this.props;
-
-        const rowSelection = {
-            selectedRowKeys,
-            onChange: this.onSelectChange
-        };
 
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        let username = user && user.username;
         return (
             <div>
-                {this.state.actualModalVisible && (
+                {this.state.visibleLook && (
                     <ActualModal
                         {...this.props}
-                        {...this.state.actualModaldata}
+                        {...this.state}
                         oncancel={this.totleCancle.bind(this)}
                         onok={this.totleCancle.bind(this)}
                     />
@@ -332,7 +219,7 @@ class Actual extends Component {
                         })(
                             <Select placeholder='请选择标段' style={{width: 220}}>
                                 {sectionArray.map(item => {
-                                    return <Option value={item.Name} key={item.No}>{item.Name}</Option>;
+                                    return <Option value={item.No} key={item.No}>{item.Name}</Option>;
                                 })}
                             </Select>
                         )}
@@ -349,7 +236,7 @@ class Actual extends Component {
                         })(
                             <RangePicker
                                 size='default'
-                                format='YYYY-MM-DD'
+                                format={dateFormat}
                                 style={{
                                     width: '100%',
                                     height: '100%'
@@ -384,119 +271,126 @@ class Actual extends Component {
                 </Form>
                 <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
                 <Button style={{marginLeft: 20}} onClick={this.onAdd.bind(this)}>新增</Button>
-                <Button style={{marginLeft: 20}} onClick={this.onAddForm.bind(this)}>添加节点表单</Button>
                 <Table
                     columns={this.columns}
-                    rowSelection={username === 'admin' ? rowSelection : null}
-                    dataSource={filterData}
+                    dataSource={this.state.workDataList}
                     className='foresttable'
                     bordered
-                    rowKey='index'
+                    rowKey='ID'
                 />
                 <Modal
                     title='新增每日实际进度'
                     width={800}
                     visible={this.state.visible}
                     maskClosable={false}
-                    onCancel={this.closeModal.bind(this)}
+                    onCancel={this.handleCancel.bind(this)}
                     onOk={this.handleOK.bind(this)}
                 >
                     <div>
-                        <Form>
+                        <Form layout='inline'>
                             <Row>
-                                <Col span={24}>
-                                    <Row>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='标段'
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='任务名称'
+                                    >
+                                        {getFieldDecorator(
+                                            'Title'
+                                        )(
+                                            <Input
+                                                style={{width: 220}}
+                                                placeholder='请输入'
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='标段'
+                                    >
+                                        {getFieldDecorator('Section', {
+                                            initialValue: section,
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        '请输入标段'
+                                                }
+                                            ]
+                                        })(
+                                            <Select
+                                                disabled
+                                                style={{width: 220}}
+                                                placeholder='请选择流程类型'
+                                                allowClear
                                             >
-                                                {getFieldDecorator('actualSection', {
-                                                    initialValue: {
-                                                        currentSectionName
-                                                    },
-                                                    rules: [
-                                                        {
-                                                            required: true,
-                                                            message:
-                                                                '请输入标段'
-                                                        }
-                                                    ]
-                                                })(
-                                                    <Input
-                                                        readOnly
-                                                        placeholder='请输入标段'
-                                                    />
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='日期'
-                                            >
-                                                {getFieldDecorator(
-                                                    'actualTimeDate',
+                                                {sectionArray.map(item => {
+                                                    return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                                })}
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='日期'
+                                    >
+                                        {getFieldDecorator(
+                                            'TodayDate',
+                                            {
+                                                rules: [
                                                     {
-                                                        rules: [
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    '请输入日期'
-                                                            }
-                                                        ]
+                                                        required: true,
+                                                        message:
+                                                            '请输入日期'
                                                     }
-                                                )(
-                                                    <DatePicker
-                                                        format={'YYYY-MM-DD'}
-                                                        style={{
-                                                            width: '100%',
-                                                            height: '100%'
-                                                        }}
-                                                    />
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Table
-                                            columns={this.columnsModal}
-                                            dataSource={
-                                                this.state.TableList
+                                                ]
                                             }
-                                            bordered
-                                            className='foresttable'
-                                            pagination={false}
-                                        />
-                                    </Row>
-                                    <Row>
-                                        <Col span={8} offset={4}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='审核人'
-                                            >
-                                                {getFieldDecorator(
-                                                    'actualSupervisorReview',
+                                        )(
+                                            <DatePicker
+                                                format={dateFormat}
+                                                style={{width: 220}}
+                                            />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Table
+                                    columns={this.columnsModal}
+                                    dataSource={TableList}
+                                    bordered
+                                    className='foresttable'
+                                    pagination={false}
+                                />
+                            </Row>
+                            <Row style={{ marginTop: 20 }}>
+                                <Col span={8} offset={4}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='审核人'
+                                    >
+                                        {getFieldDecorator(
+                                            'Auditor',
+                                            {
+                                                rules: [
                                                     {
-                                                        rules: [
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    '请选择审核人员'
-                                                            }
-                                                        ]
+                                                        required: true,
+                                                        message:
+                                                            '请选择审核人员'
                                                     }
-                                                )(
-                                                    <Select style={{ width: 120 }}>
-                                                        {auditorList.map(item => {
-                                                            return <Option value={item.id} key={item.id}>{item.name}</Option>;
-                                                        })}
-                                                    </Select>
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={8} offset={4} />
-                                    </Row>
+                                                ]
+                                            }
+                                        )(
+                                            <Select style={{ width: 120 }}>
+                                                {auditorList.map(item => {
+                                                    return <Option value={item.id} key={item.id}>{item.name}</Option>;
+                                                })}
+                                            </Select>
+                                        )}
+                                    </FormItem>
                                 </Col>
                             </Row>
                         </Form>
@@ -504,71 +398,6 @@ class Actual extends Component {
                 </Modal>
             </div>
         );
-    }
-    // 多选
-    onSelectChange = (selectedRowKeys, selectedRows) => {
-        this.setState({ selectedRowKeys, dataSourceSelected: selectedRows });
-    };
-    // 新增按钮
-    onAdd = () => {
-        let treedata = [];
-        SCHEDULRPROJECT.map((item) => {
-            treedata.push({
-                key: item.id - 1,
-                project: item.name,
-                units: item.units,
-                type: item.type,
-                typeFirst: item.typeFirst,
-                typeList: item.typeList || 0
-            });
-        });
-        this.setState({
-            visible: true,
-            TableList: treedata
-        });
-        this.props.form.setFieldsValue({
-            actualSection: this.state.currentSectionName || undefined,
-            actualSupervisorReview: undefined,
-            actualTimeDate: moment().utc()
-        });
-    };
-    // 关闭弹框
-    closeModal () {
-        this.props.form.setFieldsValue({
-            actualSection: undefined,
-            actualSupervisorReview: undefined,
-            actualTimeDate: undefined
-        });
-        this.setState({
-            visible: false,
-            TableList: []
-        });
-    }
-
-    // 选择人员
-    selectMember (memberInfo) {
-        console.log('memberInfo', memberInfo);
-        const {
-            form: { setFieldsValue }
-        } = this.props;
-        this.member = null;
-        if (memberInfo) {
-            let memberValue = memberInfo.toString().split('#');
-            if (memberValue[0] === 'C_PER') {
-                this.member = {
-                    username: memberValue[4],
-                    person_code: memberValue[1],
-                    person_name: memberValue[2],
-                    id: parseInt(memberValue[3]),
-                    org: memberValue[5]
-                };
-            }
-        } else {
-            this.member = null;
-        }
-        setFieldsValue({
-            actualSupervisorReview: this.member
-        });
     }
     // 发起填报
     handleOK () {
@@ -578,35 +407,43 @@ class Actual extends Component {
         } = this.props;
         validateFields((err, values) => {
             if (!err) {
-                console.log('确认', values.Tsection, values.Ttotledocument, values.TdataReview);
                 const { section, TableList } = this.state;
+                console.log('确认', values, TableList, moment(values.TodayDate).format(dateFormat));
                 let newTableList = [];
                 TableList.map(item => {
                     newTableList.push({
-                        name: item.name,
-                        remark: item.remark,
-                        url: item.url
+                        key: item.key,
+                        type: item.type,
+                        project: item.project,
+                        actualNum: item.actualNum,
+                        typeFirst: item.typeFirst,
+                        typeList: item.typeList || '',
+                        units: item.units
                     });
                 });
                 let FormParams = [{
-                    Key: 'section', // 标段
+                    Key: 'Section', // 标段
                     FieldType: 0,
-                    Val: section
+                    Val: values.Section
                 }, {
-                    Key: 'tableInfo', // 列表信息
+                    Key: 'TodayDate', // 日期
+                    FieldType: 0,
+                    Val: moment(values.TodayDate).format(dateFormat)
+                }, {
+                    Key: 'TableInfo', // 列表信息
                     FieldType: 0,
                     Val: JSON.stringify(newTableList)
                 }];
                 postStartwork({}, {
-                    FlowID: 'dd50b1a8-8b39-4733-8677-10251fd7d9b4', // 模板ID
-                    FlowName: '总进度计划报批流程', // 模板名称
+                    FlowID: ACYUAL_ID, // 模板ID
+                    FlowName: ACYUAL_NAME, // 模板名称
                     FormValue: { // 表单值
                         FormParams: FormParams,
-                        NodeID: ''
+                        NodeID: ACYUAL_ONENODE_ID
                     },
-                    NextExecutor: 14, // 下一节点执行人
+                    NextExecutor: values.Auditor, // 下一节点执行人
                     Starter: getUser().ID, // 发起人
-                    Title: section + ' 总计划进度', // 任务标题
+                    Title: values.Title, // 任务标题
                     WFState: 1 // 流程状态 1运行中
                 }).then(rep => {
                     if (rep.code === 1) {
@@ -614,6 +451,7 @@ class Actual extends Component {
                             message: '新增任务成功',
                             duration: 3
                         });
+                        this.getWorkList();
                         this.setState({
                             visible: false
                         });
@@ -627,83 +465,124 @@ class Actual extends Component {
             }
         });
     }
-
-    // 操作--查看
-    clickInfo (record) {
-        this.setState({ actualModalVisible: true, actualModaldata: record });
+    // 新增按钮
+    onAdd = () => {
+        let TableList = [];
+        SCHEDULRPROJECT.map((item) => {
+            TableList.push({
+                key: item.id - 1,
+                project: item.name,
+                units: item.units,
+                type: item.type,
+                typeFirst: item.typeFirst,
+                typeList: item.typeList || 0
+            });
+        });
+        this.setState({
+            visible: true,
+            TableList: TableList
+        });
+    };
+    // 关闭弹框
+    handleCancel () {
+        this.props.form.setFieldsValue({
+            actualSection: undefined,
+            actualSupervisorReview: undefined,
+            actualTimeDate: undefined
+        });
+        this.setState({
+            visible: false,
+            TableList: []
+        });
     }
     // 取消
     totleCancle () {
-        this.setState({ actualModalVisible: false });
+        this.setState({ visibleLook: false });
     }
-
     columns = [
         {
-            title: '项目',
-            dataIndex: 'projectName',
-            key: 'projectName',
-            width: '18%'
-        },
-        {
-            title: '标段',
-            dataIndex: 'sectionName',
-            key: 'sectionName',
-            width: '12%'
-        },
-        {
-            title: '进度类型',
-            dataIndex: 'type',
-            key: 'type',
-            width: '18%'
-        },
-        {
-            title: '提交人',
-            dataIndex: 'submitperson',
-            key: 'submitperson',
-            width: '15%'
-        },
-        {
-            title: '提交时间',
-            dataIndex: 'submittime',
-            key: 'submittime',
-            width: '17%',
-            sorter: (a, b) =>
-                moment(a['submittime']).unix() - moment(b['submittime']).unix(),
-            render: text => {
-                return moment(text).format('YYYY-MM-DD');
+            title: '序号',
+            dataIndex: 'index',
+            render: (text, record, index) => {
+                return index + 1;
             }
         },
         {
+            title: '任务名称',
+            dataIndex: 'Title'
+        },
+        {
+            title: '进度类型',
+            dataIndex: 'FlowName'
+        },
+        {
+            title: '标段',
+            dataIndex: 'Section'
+        },
+        {
+            title: '提交人',
+            dataIndex: 'StarterObj',
+            render: (text, record) => {
+                return `${text.Full_Name}(${text.User_Name})`;
+            }
+        },
+        {
+            title: '提交时间',
+            dataIndex: 'CreateTime'
+        },
+        {
             title: '流程状态',
-            dataIndex: 'status',
-            key: 'status',
-            width: '10%',
-            render: (record, index) => {
-                if (record === 1) {
-                    return '已提交';
-                } else if (record === 2) {
-                    return '执行中';
-                } else if (record === 3) {
-                    return '已完成';
-                } else {
-                    return '';
-                }
+            dataIndex: 'WFState',
+            render: (text, record, index) => {
+                let statusValue = '';
+                WFStatusList.find(item => {
+                    if (item.value === text) {
+                        statusValue = item.label;
+                    }
+                });
+                return statusValue;
             }
         },
         {
             title: '操作',
             render: record => {
-                return (
+                return (<div>
                     <span>
-                        <a onClick={this.clickInfo.bind(this, record, 'VIEW')}>
+                        <a onClick={this.onLook.bind(this, record.ID)}>
                             查看
                         </a>
                     </span>
-                );
+                    <span style={{marginLeft: 10}}>
+                        <a onClick={this.onDelete.bind(this, record.ID)}>
+                            删除
+                        </a>
+                    </span>
+                </div>);
             }
         }
     ];
-
+    onLook (workID) {
+        this.setState({ visibleLook: true, workID: workID });
+    }
+    onDelete (workID) {
+        const { deleteWork } = this.props.actions;
+        deleteWork({
+            ID: workID
+        }, {}).then(rep => {
+            if (rep.code === 1) {
+                notification.success({
+                    message: '删除任务成功',
+                    duration: 3
+                });
+                this.getWorkList();
+            } else {
+                notification.error({
+                    message: '删除任务失败',
+                    duration: 3
+                });
+            }
+        });
+    }
     columnsModal = [
         {
             title: '序号',
@@ -765,7 +644,6 @@ class Actual extends Component {
         const {
             TableList
         } = this.state;
-        console.log('输入', TableList);
         try {
             TableList[index].actualNum = e.target.value;
             this.setState({

@@ -8,12 +8,19 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {
-    // ActualDetail,
+    WeekForm,
     TotalDetail,
     TotalForm,
+    ActualForm,
     // WeekDetail
 } from './FormDetail';
-import { WFStatusList, TOTAL_ID } from '../common';
+import {
+    WEEK_ID,
+    ACYUAL_ID,
+    WFStatusList,
+    OWNERCHECKLIST,
+    TOTAL_ID
+} from '_platform/api';
 const { Step } = Steps;
 const FormItem = Form.Item;
 class TaskDetail extends Component {
@@ -27,14 +34,104 @@ class TaskDetail extends Component {
             CurrentNodeName: '', // 当前节点名称
             Executor: '', // 当前节点执行人
             TableList: [], // 表格数据
+            NextPeopleList: [], // 下一执行人
             param: {}, // 表单数据
             workFlow: [], // 任务流程
             workDetails: '' // 任务详情
         };
+        this.onBack = this.onBack.bind(this); // 返回
     }
     componentDidMount () {
         this.getWorkDetails();
+        this.getNextPeople();
     }
+    getNextPeople = async () => {
+        const {
+            actions: {
+                getUsers,
+                getRoles
+            }
+        } = this.props;
+        let roles = await getRoles();
+        let postRoleData = ''; // 业主文书ID
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID && role.RoleName === '业主文书') {
+                postRoleData = role.ID;
+            }
+        });
+        let NextPeopleList = [];
+        let postdata = {
+            keyword: '',
+            role: postRoleData,
+            status: 1,
+            page: 1,
+            page_size: 20
+        };
+        getUsers({}, postdata).then(rep => {
+            NextPeopleList = rep.content;
+            this.setState({
+                NextPeopleList
+            });
+            console.log('userList', NextPeopleList);
+        });
+    }
+    // getNextPeople = async () => {
+    //     const {
+    //         actions: {
+    //             getUsers,
+    //             getRoles
+    //         }
+    //     } = this.props;
+
+    //     let roles = await getRoles();
+    //     console.log('身份', roles);
+    //     let postRoleData = [];
+    //     roles.map((role) => {
+    //         if (role && role.ID && role.ParentID && role.RoleName === '业主文书') {
+    //             postRoleData = role.ID;
+    //         }
+    //     });
+    //     console.log('身份postRoleData', postRoleData);
+    //     try {
+    //         let results = [];
+    //         await OWNERCHECKLIST.map(async (owner) => {
+    //             let postdata = {
+    //                 keyword: owner,
+    //                 role: postRoleData,
+    //                 status: 1,
+    //                 page: 1,
+    //                 page_size: 20
+    //             };
+    //             let userList = await getUsers({}, postdata);
+    //             console.log('身份userList', userList);
+    //             if (userList && userList.code && userList.code === 200) {
+    //                 results = results.concat((userList && userList.content) || []);
+    //                 let total = userList.pageinfo.total;
+    //                 if (total > 20) {
+    //                     for (let i = 0; i < (total / 20) - 1; i++) {
+    //                         postdata = {
+    //                             keyword: owner,
+    //                             role: postRoleData,
+    //                             status: 1,
+    //                             page: i + 2,
+    //                             page_size: 20
+    //                         };
+    //                         let datas = await getUsers({}, postdata);
+    //                         if (datas && datas.code && datas.code === 200) {
+    //                             results = results.concat((datas && datas.content) || []);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //             console.log('results', results);
+    //             this.setState({
+    //                 users: results
+    //             });
+    //         });
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
     getWorkDetails () {
         const { getWorkDetails } = this.props.actions;
         const { task_id = '' } = this.props.match.params;
@@ -86,11 +183,24 @@ class TaskDetail extends Component {
         console.log('流程详情', node);
         return node;
     }
-    getFormItem () {
+    getFormItem = () => {
         let node = '';
         const { FlowID } = this.state;
         if (FlowID === TOTAL_ID) {
             node = <TotalForm
+                onBack={this.onBack.bind(this)}
+                {...this.props}
+                {...this.state}
+            />;
+        } else if (FlowID === ACYUAL_ID) {
+            node = <ActualForm
+                onBack={this.onBack.bind(this)}
+                {...this.props}
+                {...this.state}
+            />;
+        } else if (FlowID === WEEK_ID) {
+            node = <WeekForm
+                onBack={this.onBack.bind(this)}
                 {...this.props}
                 {...this.state}
             />;
@@ -117,7 +227,7 @@ class TaskDetail extends Component {
                             })}
                         </span>
                     </div>
-                    <Button type='primary' onClick={this.backClick.bind(this)}>
+                    <Button type='primary' onClick={this.onBack.bind(this)}>
                         返回
                     </Button>
                 </div>
@@ -162,7 +272,10 @@ class TaskDetail extends Component {
                                             <div>
                                                 <span>{item.CurrentNodeName}</span>
                                                 <span style={{marginLeft: 10}}>-(执行中)</span>
-                                                <span style={{marginLeft: 20}}>当前执行人：{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                                <span style={{marginLeft: 20}}>
+                                                    当前执行人：
+                                                    <span style={{color: '#108ee9'}}>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                                </span>
                                             </div>
                                         } description={
                                             <div>
@@ -186,7 +299,7 @@ class TaskDetail extends Component {
             </div>
         );
     }
-    backClick () {
+    onBack () {
         let to = `/selfcare/task`;
         this.props.history.push(to);
     }

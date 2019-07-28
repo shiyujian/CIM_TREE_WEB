@@ -80,7 +80,9 @@ class TotalDetail extends Component {
                                         message: '请输入标段'
                                     }
                                 ]
-                            })(<Input readOnly style={{width: 220}} />)}
+                            })(
+                                <Input readOnly style={{width: 220}} />
+                            )}
                         </FormItem>
                     </Col>
                     <Col span={12}>

@@ -5,11 +5,12 @@ import {
     Row,
     Col,
     Input,
-    Card,
+    Select,
     Divider,
     notification
 } from 'antd';
 const FormItem = Form.Item;
+const { Option } = Select;
 const formItemLayout = {
     labelCol: {
         xs: { span: 24 },
@@ -20,7 +21,7 @@ const formItemLayout = {
         sm: { span: 16 }
     }
 };
-class TotalForm extends Component {
+class WeekForm extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -29,12 +30,13 @@ class TotalForm extends Component {
     }
     render () {
         const {
+            NextPeopleList,
             form: { getFieldDecorator }
         } = this.props;
         return (<div>
             <Form layout='inline'>
                 <Row style={{marginTop: 20}}>
-                    <Col>
+                    <Col span={24}>
                         <Form.Item
                             {...formItemLayout}
                             label='处理意见'
@@ -42,6 +44,25 @@ class TotalForm extends Component {
                             {getFieldDecorator('Opinion', {
                             })(
                                 <Input style={{width: 400}} placeholder='请输入处理意见' />
+                            )}
+                        </Form.Item>
+                    </Col>
+                </Row>
+                <Row style={{marginTop: 20}}>
+                    <Col span={24}>
+                        <Form.Item
+                            {...formItemLayout}
+                            label='业主查看人'
+                        >
+                            {getFieldDecorator('NextPeople', {
+                            })(
+                                <Select style={{width: 400}}>
+                                    {
+                                        NextPeopleList.length > 0 ? NextPeopleList.map(item => {
+                                            return <Option value={item.ID} key={item.ID}>{item.Full_Name}</Option>;
+                                        }) : ''
+                                    }
+                                </Select>
                             )}
                         </Form.Item>
                     </Col>
@@ -149,4 +170,4 @@ class TotalForm extends Component {
         });
     }
 }
-export default Form.create()(TotalForm);
+export default Form.create()(WeekForm);

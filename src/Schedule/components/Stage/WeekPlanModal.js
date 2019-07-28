@@ -19,25 +19,43 @@ export default class WeekPlanModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            history: []
+            workFlow: []
         };
     }
     async componentDidMount () {
+        this.getTaskDetail(); // 获取任务详情
+    }
+    getTaskDetail () {
         const {
-            actions: { getTask },
-            id
+            workID,
+            actions: { getWorkDetails },
+            form: { setFieldsValue }
         } = this.props;
-        let params = {
-            task_id: id
-        };
-        let task = await getTask(params);
-        let history = [];
-        if (task && task.history) {
-            history = task.history;
-        }
-
         this.setState({
-            history
+            workID: workID
+        });
+        getWorkDetails({
+            ID: workID
+        }, {}).then(rep => {
+            let FormParams = [];
+            if (rep.FormValues && rep.FormValues.length > 0 && rep.FormValues[0].FormParams) {
+                FormParams = rep.FormValues[0].FormParams;
+            }
+            let param = {};
+            let TableList = [];
+            FormParams.map(item => {
+                if (item.Key === 'TableInfo') {
+                    TableList = JSON.parse(item.Val);
+                } else {
+                    param[item.Key] = item.Val;
+                }
+            });
+            setFieldsValue(param);
+            this.setState({
+                workDetails: rep,
+                TableList,
+                workFlow: rep.Works
+            });
         });
     }
     render () {
@@ -47,7 +65,7 @@ export default class WeekPlanModal extends Component {
             etime = '',
             weekPlanDataSource = []
         } = this.props;
-        const { history } = this.state;
+        const { workFlow } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -130,137 +148,52 @@ export default class WeekPlanModal extends Component {
                             <Steps
                                 direction='vertical'
                                 size='small'
-                                current={
-                                    history.length > 0 ? history.length - 1 : 0
-                                }
+                                current={workFlow.length - 1}
                             >
-                                {history
-                                    .map((step, index) => {
-                                        const {
-                                            state: {
-                                                participants: [
-                                                    { executor = {} } = {}
-                                                ] = []
-                                            } = {}
-                                        } = step;
-                                        const { id: userID } = executor || {};
-
-                                        if (step.status === 'processing') {
-                                            // 根据历史状态显示
-                                            return (
-                                                <Step
-                                                    title={
-                                                        <div
-                                                            style={{
-                                                                marginBottom: 8
-                                                            }}
-                                                        >
-                                                            <span>
-                                                                {
-                                                                    step.state
-                                                                        .name
-                                                                }
-                                                                -(执行中)
-                                                            </span>
-                                                            <span
-                                                                style={{
-                                                                    paddingLeft: 20
-                                                                }}
-                                                            >
-                                                                当前执行人:{' '}
-                                                            </span>
-                                                            <span
-                                                                style={{
-                                                                    color:
-                                                                        '#108ee9'
-                                                                }}
-                                                            >
-                                                                {' '}
-                                                                {`${
-                                                                    executor.person_name
-                                                                }` ||
-                                                                    `${
-                                                                        executor.username
-                                                                    }`}
-                                                            </span>
-                                                        </div>
-                                                    }
-                                                    key={index}
-                                                />
-                                            );
+                                {workFlow.map(item => {
+                                    console.log();
+                                    if (item.RunTime) {
+                                        return <Step title={
+                                            <div>
+                                                <span>{item.CurrentNodeName}</span>
+                                                <span style={{marginLeft: 10}}>-(已完成)</span>
+                                            </div>
+                                        } description={
+                                            <div>
+                                                <span>
+                                                    {item.CurrentNodeName}人：
+                                                    {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
+                                                </span>
+                                                <span style={{marginLeft: 20}}>
+                                                    {item.CurrentNodeName}时间：
+                                                    {item.RunTime}
+                                                </span>
+                                            </div>
+                                        } />;
+                                    } else {
+                                        if (item.ExecutorObj) {
+                                            // 未结束
+                                            return <Step title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-(执行中)</span>
+                                                    <span style={{marginLeft: 20}}>
+                                                        当前执行人：
+                                                        <span style={{color: '#108ee9'}}>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                                    </span>
+                                                </div>
+                                            } />;
                                         } else {
-                                            const {
-                                                records: [record]
-                                            } = step;
-                                            const {
-                                                log_on = '',
-                                                participant: {
-                                                    executor = {}
-                                                } = {},
-                                                note = ''
-                                            } = record || {};
-                                            const {
-                                                person_name: name = ''
-                                            } = executor;
-                                            return (
-                                                <Step
-                                                    key={index}
-                                                    title={`${
-                                                        step.state.name
-                                                    }-(${step.status})`}
-                                                    description={
-                                                        <div
-                                                            style={{
-                                                                lineHeight: 2.6
-                                                            }}
-                                                        >
-                                                            <div>
-                                                                意见：
-                                                                {note}
-                                                            </div>
-                                                            <div>
-                                                                <span>
-                                                                    {`${
-                                                                        step
-                                                                            .state
-                                                                            .name
-                                                                    }`}
-                                                                    人:
-                                                                    {`${name}` ||
-                                                                        `${
-                                                                            executor.username
-                                                                        }`}{' '}
-                                                                    [
-                                                                    {
-                                                                        executor.username
-                                                                    }
-                                                                    ]
-                                                                </span>
-                                                                <span
-                                                                    style={{
-                                                                        paddingLeft: 20
-                                                                    }}
-                                                                >
-                                                                    {`${
-                                                                        step
-                                                                            .state
-                                                                            .name
-                                                                    }`}
-                                                                    时间：
-                                                                    {moment(
-                                                                        log_on
-                                                                    ).format(
-                                                                        'YYYY-MM-DD HH:mm:ss'
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                />
-                                            );
+                                            // 已结束
+                                            return <Step title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-(已结束)</span>
+                                                </div>
+                                            } />;
                                         }
-                                    })
-                                    .filter(h => !!h)}
+                                    }
+                                })}
                             </Steps>
                         </Card>
                         <Row style={{ marginTop: 10 }}>

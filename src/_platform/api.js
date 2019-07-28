@@ -322,6 +322,51 @@ export const SCHEDULRPROJECT = [
         typeFirst: false
     }
 ];
+// 流程状态
+export const WFStatusList = [{
+    value: 0,
+    label: '草稿中'
+}, {
+    value: 1,
+    label: '运行中'
+}, {
+    value: 2,
+    label: '已完成'
+}, {
+    value: 3,
+    label: '挂起'
+}, {
+    value: 4,
+    label: '退回'
+}, {
+    value: 5,
+    label: '转发'
+}];
+// 流程信息
+export const TOTAL_NAME = '总进度计划报批流程';
+export const TOTAL_ID = 'c361b0af-a7ec-4181-acd0-39512ffd96b8';
+export const TOTAL_ONENODE_NAME = '施工填报';
+export const TOTAL_ONENODE_ID = '86299a5b-c073-456d-8707-cfc314691415';
+export const TOTAL_TWONODE_NAME = '监理审核';
+export const TOTAL_TWONODE_ID = '7d36a1a9-b5bd-4dde-82bc-8196e120824f';
+export const TOTAL_THREENODE_NAME = '结束';
+export const TOTAL_THREENODE_ID = 'c9e202a8-dce9-4603-9cf9-cf2c70d4181b';
+
+export const WEEK_NAME = '每周进度填报流程';
+export const WEEK_ID = 'b0eedc49-fe00-4754-a4fe-885e9177e663';
+export const WEEK_ONENODE_NAME = '施工填报';
+export const WEEK_ONENODE_ID = 'f227ba06-4a16-4f50-9313-0f0364db6a72';
+
+export const ACYUAL_NAME = '每日进度填报流程';
+export const ACYUAL_ID = '098dd731-d6fa-4076-8651-082470498a37';
+export const ACYUAL_ONENODE_NAME = '施工填报';
+export const ACYUAL_ONENODE_ID = '273f55b4-1163-4616-b7f9-db404ef0787e';
+export const ACYUAL_TWONODE_NAME = '监理审核';
+export const ACYUAL_TWONODE_ID = '3c6bed0c-6dcd-4c62-95b1-67d28900833a';
+export const ACYUAL_THREENODE_NAME = '业主查看';
+export const ACYUAL_THREENODE_ID = 'a81c5d75-60e6-4528-9c0a-3a0c9b2003cc';
+export const ACYUAL_FOURNODE_NAME = '结束';
+export const ACYUAL_FOURNODE_ID = '5abc1404-2728-4f5d-b816-e96e2568f1bb';
 // 项目管理  树种管理 苗圃测量
 export const NURSERYPARAM = [
     '土球直径', '土球厚度', '高度', '冠幅', '胸径', '地径', '分枝数量', '地径超过1cm分枝数量'

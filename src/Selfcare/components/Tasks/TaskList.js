@@ -44,7 +44,7 @@ class TaskList extends Component {
             title: '序号',
             dataIndex: 'index',
             render (text, record, index) {
-                return index;
+                return index + 1;
             }
         }, {
             title: '任务名称',
@@ -71,9 +71,6 @@ class TaskList extends Component {
                 }
                 return str;
             }
-        }, {
-            title: '流程名称',
-            dataIndex: 'FlowName'
         }, {
             title: '流转状态',
             dataIndex: 'WFState',
@@ -103,11 +100,29 @@ class TaskList extends Component {
             title: '序号',
             dataIndex: 'index',
             render (text, record, index) {
-                return index;
+                return index + 1;
             }
         }, {
             title: '任务名称',
             dataIndex: 'Title'
+        }, {
+            title: '任务类型',
+            dataIndex: 'FlowName'
+        }, {
+            title: '发起人',
+            dataIndex: 'StarterObj',
+            render: (text, record, index) => {
+                return `${text.Full_Name}(${text.User_Name})`;
+            }
+        }, {
+            title: '发起时间',
+            dataIndex: 'StartTime'
+        }, {
+            title: '执行人',
+            dataIndex: 'Executor'
+        }, {
+            title: '执行时间',
+            dataIndex: 'RunTime'
         }, {
             title: '任务状态',
             dataIndex: 'WFState',
@@ -120,27 +135,6 @@ class TaskList extends Component {
                 });
                 return statusValue;
             }
-        }, {
-            title: '上一个节点',
-            dataIndex: 'PrevNodeName'
-        }, {
-            title: '当前节点',
-            dataIndex: 'CurrentNodeName'
-        }, {
-            title: '发送人',
-            dataIndex: 'Sender'
-        }, {
-            title: '执行人',
-            dataIndex: 'Executor'
-        }, {
-            title: '创建时间',
-            dataIndex: 'CreateTime'
-        }, {
-            title: '运行时间',
-            dataIndex: 'RunTime'
-        },{
-            title: '流程名称',
-            dataIndex: 'FlowName'
         }, {
             title: '操作',
             dataIndex: 'active',
@@ -208,7 +202,7 @@ class TaskList extends Component {
         });
     }
     getFinishList () {
-        let { getWorkList } = this.props.actions;
+        let { getWorkprocessesList } = this.props.actions;
         let { validateFields } = this.props.form;
         validateFields((err, values) => {
             if (!err) {
@@ -222,7 +216,7 @@ class TaskList extends Component {
                 let params = {
                     workid: '', // 任务ID
                     title: values.name || '', // 任务名称
-                    flowname: values.type || '', // 流程类型或名称
+                    flowid: '', // 流程类型或名称
                     starter: values.starter || '', // 发起人
                     currentnode: '', // 节点ID
                     prevnode: '', // 上一结点ID
@@ -231,10 +225,12 @@ class TaskList extends Component {
                     haveexecuted: 1, // 是否已执行 1已办
                     stime, // 开始时间
                     etime, // 结束时间
+                    keys: '',
+                    values: '',
                     page: '', // 页码
                     size: '' // 页数
                 };
-                getWorkList({}, params).then(rep => {
+                getWorkprocessesList({}, params).then(rep => {
                     if (rep.code === 200) {
                         let finishList = []; // 已办列表
                         rep.content.map(item => {
@@ -282,10 +278,10 @@ class TaskList extends Component {
             <div>
                 <div style={{textAlign: 'center', marginBottom: 20}}>
                     <RadioGroup value={type} onChange={this.chaneType}>
-                        <RadioButton key={0} value='process'>
+                        <RadioButton key='process' value='process'>
                             待办任务
                         </RadioButton>
-                        <RadioButton key={1} value='finish'>
+                        <RadioButton key='finish' value='finish'>
                             已完成任务
                         </RadioButton>
                     </RadioGroup>
@@ -349,11 +345,11 @@ class TaskList extends Component {
                 </div>
                 {
                     type === 'process' ? <Spin tip='加载中' spinning={loadingProcess}>
-                        <Table columns={this.columnsProcess}
+                        <Table
+                            columns={this.columnsProcess}
                             dataSource={processList}
                             bordered
                             rowKey='ID'
-                            onChange={this.onChangeTable.bind(this)}
                         />
                     </Spin> : <Spin tip='加载中' spinning={loadingFinish}>
                         <Table columns={this.columnsFinish}

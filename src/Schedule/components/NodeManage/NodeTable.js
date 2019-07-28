@@ -271,7 +271,7 @@ class NodeTable extends Component {
             title: '显示类型',
             dataIndex: 'ShowType',
             render: (text, record, index) => {
-                return <Select style={{ width: 100 }} onChange={this.handleShowType.bind(this, index)}>
+                return <Select defaultValue='Input' style={{ width: 100 }} onChange={this.handleShowType.bind(this, index)}>
                     <Option value='Input' key='Input'>Input</Option>
                     <Option value='Select' key='Select'>Select</Option>
                 </Select>;
@@ -281,7 +281,7 @@ class NodeTable extends Component {
             title: '存储方式',
             dataIndex: 'FieldType',
             render: (text, record, index) => {
-                return <Select style={{ width: 100 }} onChange={this.handleFieldType.bind(this, index)}>
+                return <Select defaultValue={0} style={{ width: 100 }} onChange={this.handleFieldType.bind(this, index)}>
                     <Option value={0} key='varchar'>varchar</Option>
                     <Option value={2} key='longtext'>longtext</Option>
                 </Select>;
