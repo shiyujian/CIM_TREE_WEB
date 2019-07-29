@@ -88,7 +88,6 @@ class WeekPlan extends Component {
             platform: { tree = {} },
             leftkeycode
         } = this.props;
-        console.log('获取用户所属标段', tree, 'leftkeycode');
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
 
@@ -98,14 +97,12 @@ class WeekPlan extends Component {
         let sectionArray = [];
 
         if (section) {
-            console.log(section, '用户所在标段');
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
                 sectionData.map(item => {
                     if (code[0] === item.No) {
                         projectName = item.Name;
-                        console.log(item.children, 'item.children');
                         item.children.map(item => {
                             // 获取当前标段的名字
                             if (item.No === section) {
@@ -116,7 +113,6 @@ class WeekPlan extends Component {
                     }
                 });
             }
-            console.log('sectionArray', sectionArray);
             this.setState({
                 section: section,
                 sectionArray,
@@ -138,6 +134,7 @@ class WeekPlan extends Component {
         }
     }
     getWorkList (pro = {}) {
+        console.log(pro, '参数');
         const { getWorkList } = this.props.actions;
         let params = {
             workid: '', // 任务ID
@@ -150,8 +147,8 @@ class WeekPlan extends Component {
             executor: '', // 执行人
             sender: '', // 上一节点发送人
             wfstate: '', // 待办 0,1
-            stime: '', // 开始时间
-            etime: '', // 结束时间
+            stime: pro.stime || '', // 开始时间
+            etime: pro.etime || '', // 结束时间
             keys: pro.keys || '', // 查询键
             values: pro.values || '', // 查询值
             page: '', // 页码
@@ -167,6 +164,35 @@ class WeekPlan extends Component {
                     workDataList
                 });
             }
+        });
+    }// 搜索
+    onSearch () {
+        const { validateFields } = this.props.form;
+        validateFields((err, values) => {
+            if (!err) {
+            }
+            let stime = '';
+            let etime = '';
+            if (values.submitDate) {
+                stime = moment(values.submitDate[0]).format(dateFormat);
+                etime = moment(values.submitDate[1]).format(dateFormat);
+            }
+            // 表单查询
+            let key = '';
+            let value = '';
+            if (values.section) {
+                key = 'Section';
+                value = values.section;
+            }
+            let pro = {
+                keys: key,
+                values: value,
+                stime, // 开始时间
+                etime, // 结束时间
+                status: values.status || '' // 流程状态
+            };
+            console.log('123', pro);
+            this.getWorkList(pro);
         });
     }
     render () {
@@ -201,31 +227,20 @@ class WeekPlan extends Component {
                 )}
                 <Form layout='inline'>
                     <FormItem label='标段'>
-                        {getFieldDecorator('sunitproject', {
-                            rules: [
-                                {
-                                    required: false,
-                                    message: '请选择标段'
-                                }
-                            ]
-                        })(
-                            <Select placeholder='请选择标段' style={{width: 220}}>
+                        {getFieldDecorator('section')(
+                            <Select
+                                placeholder='请选择标段'
+                                style={{width: 220}}
+                                allowClear
+                            >
                                 {sectionArray.map(item => {
-                                    return <Option value={item.Name} key={item.No}>{item.Name}</Option>;
+                                    return <Option value={item.No} key={item.No}>{item.Name}</Option>;
                                 })}
                             </Select>
                         )}
                     </FormItem>
                     <FormItem label='提交日期'>
-                        {getFieldDecorator('stimedate', {
-                            rules: [
-                                {
-                                    type: 'array',
-                                    required: false,
-                                    message: '请选择日期'
-                                }
-                            ]
-                        })(
+                        {getFieldDecorator('submitDate')(
                             <RangePicker
                                 size='default'
                                 format='YYYY-MM-DD'
@@ -239,14 +254,7 @@ class WeekPlan extends Component {
                     <FormItem
                         label='流程状态'
                     >
-                        {getFieldDecorator('sstatus', {
-                            rules: [
-                                {
-                                    required: false,
-                                    message: '请选择流程状态'
-                                }
-                            ]
-                        })(
+                        {getFieldDecorator('status')(
                             <Select
                                 style={{width: 220}}
                                 placeholder='请选择流程类型'
@@ -331,47 +339,34 @@ class WeekPlan extends Component {
                                                 {...FormItemLayout}
                                                 label='日期'
                                             >
-                                                {getFieldDecorator(
-                                                    'weekTimeDate',
-                                                    {
-                                                        rules: [
-                                                            {
-                                                                required: true,
-                                                                message:
-                                                                    '请输入日期'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(
-                                                    <Row gutter={5}>
-                                                        <Col span={12}>
-                                                            <DatePicker
-                                                                disabledDate={this.disabledStartDate.bind(this)}
-                                                                value={stime}
-                                                                onChange={this.handleStartChange.bind(this)}
-                                                                format='YYYY-MM-DD'
-                                                                placeholder='Start'
-                                                                style={{
-                                                                    width: '100%',
-                                                                    height: '100%'
-                                                                }}
-                                                            />
-                                                        </Col>
-                                                        <Col span={12}>
-                                                            <DatePicker
-                                                                disabledDate={this.disabledEndDate.bind(this)}
-                                                                value={etime}
-                                                                onChange={this.handleEndChange.bind(this)}
-                                                                format='YYYY-MM-DD'
-                                                                placeholder='Start'
-                                                                style={{
-                                                                    width: '100%',
-                                                                    height: '100%'
-                                                                }}
-                                                            />
-                                                        </Col>
-                                                    </Row>
-                                                )}
+                                                <Row gutter={5}>
+                                                    <Col span={12}>
+                                                        <DatePicker
+                                                            disabledDate={this.disabledStartDate.bind(this)}
+                                                            value={stime}
+                                                            onChange={this.handleStartChange.bind(this)}
+                                                            format='YYYY-MM-DD'
+                                                            placeholder='Start'
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100%'
+                                                            }}
+                                                        />
+                                                    </Col>
+                                                    <Col span={12}>
+                                                        <DatePicker
+                                                            disabledDate={this.disabledEndDate.bind(this)}
+                                                            value={etime}
+                                                            onChange={this.handleEndChange.bind(this)}
+                                                            format='YYYY-MM-DD'
+                                                            placeholder='Start'
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100%'
+                                                            }}
+                                                        />
+                                                    </Col>
+                                                </Row>
                                             </FormItem>
                                         </Col>
                                     </Row>
@@ -418,11 +413,10 @@ class WeekPlan extends Component {
         validateFields((err, values) => {
             if (!err) {
                 const { TableList, stime, etime, originNodeID } = this.state;
-                console.log('确认', TableList);
                 let newTableList = [];
-                TableList.map((item, index) => {
+                TableList.map(item => {
                     newTableList.push({
-                        ID: index,
+                        ID: item.ID,
                         date: item.date,
                         planTreeNum: item.planTreeNum || ''
                     });
@@ -475,15 +469,6 @@ class WeekPlan extends Component {
             }
         });
     }
-    // 搜索
-    onSearch () {
-        let params = {
-            flowname: '总进度计划报批流程', // 流程类型或名称
-            stime: '', // 开始时间
-            etime: '' // 结束时间
-        };
-        this.getWorkList();
-    }
     // 新增按钮
     onAdd = () => {
         this.setState({
@@ -506,7 +491,6 @@ class WeekPlan extends Component {
     }
     // 设置开始时间
     handleStartChange = (value) => {
-        console.log('开始时间', value);
         const {
             etime
         } = this.state;
@@ -557,11 +541,11 @@ class WeekPlan extends Component {
         } = this.state;
         let start = new Date(stime).getTime();
         let end = new Date(etime).getTime();
-        console.log('设置表格数据', start, end);
         let TableList = [];
-        for (;start <= end; start += 86400000) {
+        for (let id = 0; start <= end; start += 86400000, id++) {
             let tmp = new Date(start);
             TableList.push({
+                ID: id,
                 date: moment(tmp).format('YYYY-MM-DD')
             });
         }
@@ -644,7 +628,6 @@ class WeekPlan extends Component {
         }
     ];
     onDelete (workID) {
-        console.log('删除workID', workID);
         const { deleteWork } = this.props.actions;
         deleteWork({
             ID: workID
@@ -665,7 +648,6 @@ class WeekPlan extends Component {
     }
     // 操作--查看
     onLook (workID) {
-        console.log(workID);
         this.setState({ visibleLook: true, workID });
     }
     columnsModal = [
