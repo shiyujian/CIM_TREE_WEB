@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-29 10:12:05
+ * @Last Modified time: 2019-07-29 15:32:48
  */
 /**
  *
@@ -102,34 +102,19 @@ export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
 /** *********************静态常量**************************/
 export const WORKFLOW_CODE = {
     总进度计划报批流程: 'TEMPLATE_001',
-    表单管理流程: 'TEMPLATE_002',
     每日进度填报流程: 'TEMPLATE_003',
-    机械设备报批流程: 'TEMPLATE_004',
-    工程材料报批流程: 'TEMPLATE_005',
-    苗木资料报批流程: 'TEMPLATE_006',
-    每日进度计划填报流程: 'TEMPLATE_007',
-    检验批验收审批流程: 'TEMPLATE_008',
-    安全体系报批流程: 'TEMPLATE_009',
-    普通审查流程: 'TEMPLATE_010',
-    审查核定流程: 'TEMPLATE_011',
-    总监审查流程: 'TEMPLATE_012',
     每周进度填报流程: 'TEMPLATE_013'
+    // 每日进度计划填报流程: 'TEMPLATE_007',
+    // 表单管理流程: 'TEMPLATE_002',
+    // 机械设备报批流程: 'TEMPLATE_004',
+    // 工程材料报批流程: 'TEMPLATE_005',
+    // 苗木资料报批流程: 'TEMPLATE_006',
+    // 检验批验收审批流程: 'TEMPLATE_008',
+    // 安全体系报批流程: 'TEMPLATE_009',
+    // 普通审查流程: 'TEMPLATE_010',
+    // 审查核定流程: 'TEMPLATE_011',
+    // 总监审查流程: 'TEMPLATE_012'
 };
-// 为表单管理的每个文件夹绑定流程信息
-export const FORM_WORKFLOW = [
-    {
-        value: '普通审查流程',
-        code: 'TEMPLATE_010'
-    },
-    {
-        value: '审查核定流程',
-        code: 'TEMPLATE_011'
-    },
-    {
-        value: '总监审查流程',
-        code: 'TEMPLATE_012'
-    }
-];
 
 export const ORGTYPE = [
     '业主单位', '施工单位', '监理单位', '养护单位'
@@ -680,34 +665,6 @@ export const MODULES = [
         id: 'PROJECT',
         name: '项目管理',
         children: [
-            // {
-            //     id: 'PROJECT.DATAMANAGE.NONE',
-            //     name: '资料管理',
-            //     children: [
-            //         {
-            //             id: 'PROJECT.STANDARD',
-            //             name: '制度标准'
-            //         },
-            //         {
-            //             id: 'PROJECT.ENGINEERINGIMAGE',
-            //             name: '工程影像'
-            //         },
-            //         {
-            //             id: 'PROJECT.PRODOC',
-            //             name: '工程文档'
-            //         }
-            //     ]
-            // },
-            // {
-            //     id: 'PROJECT.OVERALLMANAGE.NONE',
-            //     name: '综合管理',
-            //     children: [
-            //         {
-            //             id: 'PROJECT.FORM',
-            //             name: '表单管理'
-            //         }
-            //     ]
-            // },
             {
                 id: 'PROJECT.PLOTMANAGE.NONE',
                 name: '数据管理',

@@ -4,8 +4,6 @@ import styles from './index.css';
 // 进度管理模块
 import ScheduleTotalDetail from '../TaskDetail/ScheduleTotalDetail';
 import ScheduleTotalRefill from '../TaskDetail/ScheduleTotalRefill';
-import ScheduleDayDetail from '../TaskDetail/ScheduleDayDetail';
-import ScheduleDayRefill from '../TaskDetail/ScheduleDayRefill';
 import ScheduleActualDetail from '../TaskDetail/ScheduleActualDetail';
 import ScheduleActualRefill from '../TaskDetail/ScheduleActualRefill';
 import ScheduleWeekPlanDetail from '../TaskDetail/ScheduleWeekPlanDetail';
@@ -22,11 +20,6 @@ export default class Detail extends Component {
             ) {
                 return <ScheduleTotalDetail {...this.props} {...this.state} />;
             } else if (
-                code === WORKFLOW_CODE.每日进度计划填报流程 &&
-                (name === '审核' || name === '结束')
-            ) {
-                return <ScheduleDayDetail {...this.props} {...this.state} />;
-            } else if (
                 code === WORKFLOW_CODE.每日进度填报流程 &&
                 (name === '监理审核' || name === '业主查看' || name === '结束')
             ) {
@@ -41,11 +34,6 @@ export default class Detail extends Component {
                 name === '填报'
             ) {
                 return <ScheduleTotalRefill {...this.props} {...this.state} />;
-            } else if (
-                code === WORKFLOW_CODE.每日进度计划填报流程 &&
-                name === '填报'
-            ) {
-                return <ScheduleDayRefill {...this.props} {...this.state} />;
             } else if (
                 code === WORKFLOW_CODE.每日进度填报流程 &&
                 name === '施工填报'
