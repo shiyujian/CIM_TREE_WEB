@@ -18,6 +18,8 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Step = Steps.Step;
+const { Option } = Select;
+const dateFormat = 'YYYY-MM-DD';
 export default class ActualModal extends Component {
     constructor (props) {
         super(props);
@@ -55,9 +57,12 @@ export default class ActualModal extends Component {
                     param[item.Key] = item.Val;
                 }
             });
-            console.log('任务ID', rep.Works);
-            setFieldsValue(param);
+            console.log('任务ID', param);
+            setFieldsValue({
+                Section: param.Section
+            });
             this.setState({
+                TodayDate: param.TodayDate,
                 workDetails: rep,
                 TableList,
                 workFlow: rep.Works
@@ -67,9 +72,10 @@ export default class ActualModal extends Component {
 
     render () {
         const {
+            sectionArray,
             form: { getFieldDecorator }
         } = this.props;
-        const { workFlow } = this.state;
+        const { workFlow, TodayDate, TableList } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -79,7 +85,6 @@ export default class ActualModal extends Component {
                 <Modal
                     title='日进度计划流程详情'
                     width={800}
-                    // onOk={this.props.onok}
                     onCancel={this.props.oncancel}
                     visible
                     footer={null}
@@ -87,67 +92,48 @@ export default class ActualModal extends Component {
                     <div>
                         <Form>
                             <Row>
-                                <Col span={24}>
-                                    <Row>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='标段'
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='标段'
+                                    >
+                                        {getFieldDecorator(
+                                            'Section'
+                                        )(
+                                            <Select
+                                                disabled
+                                                style={{width: 220}}
                                             >
-                                                {getFieldDecorator(
-                                                    'Section',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props
-                                                            .sectionName ||
-                                                            '暂无标段'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请选择标段'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='日期'
-                                            >
-                                                {getFieldDecorator(
-                                                    'stagetimedate',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props.actualTimeDate ||
-                                                            '暂无日期'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请输入日期'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Table
-                                            columns={this.columns1}
-                                            dataSource={
-                                                this.state.treeDatasource
-                                            }
-                                            bordered
-                                            rowKey='index'
-                                            className='foresttable'
-                                            pagination={false}
-                                        />
-                                    </Row>
+                                                {sectionArray.map(item => {
+                                                    return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                                })}
+                                            </Select>
+                                        )}
+                                    </FormItem>
                                 </Col>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='日期'
+                                    >
+                                        <DatePicker
+                                            style={{width: 220}}
+                                            disabled
+                                            value={moment(TodayDate, dateFormat)}
+                                            format={dateFormat}
+                                        />
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Table
+                                    columns={this.columns}
+                                    dataSource={this.state.TableList}
+                                    bordered
+                                    rowKey='ID'
+                                    className='foresttable'
+                                    pagination={false}
+                                />
                             </Row>
                         </Form>
                         <Card title={'审批流程'} style={{ marginTop: 10 }}>
@@ -221,7 +207,7 @@ export default class ActualModal extends Component {
         const { states = [] } = task;
         return states.find(state => state.status === 'processing');
     }
-    columns1 = [
+    columns = [
         {
             title: '序号',
             dataIndex: 'key',

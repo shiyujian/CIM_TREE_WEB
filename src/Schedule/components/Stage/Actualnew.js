@@ -95,8 +95,8 @@ class Actual extends Component {
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称
-            // flowid: ACYUAL_ID, // 流程类型或名称
-            flowid: '', // 流程类型或名称
+            flowid: ACYUAL_ID, // 流程类型或名称
+            // flowid: '', // 流程类型或名称
             starter: '', // 发起人
             currentnode: '', // 节点ID
             prevnode: '', // 上一结点ID
@@ -431,7 +431,7 @@ class Actual extends Component {
                 let newTableList = [];
                 TableList.map(item => {
                     newTableList.push({
-                        key: item.key,
+                        ID: item.key,
                         type: item.type,
                         project: item.project,
                         actualNum: item.actualNum,

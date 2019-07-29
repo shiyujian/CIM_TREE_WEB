@@ -348,6 +348,14 @@ export const TOTAL_THREENODE_ID = 'c9e202a8-dce9-4603-9cf9-cf2c70d4181b';
 
 export const WEEK_NAME = '每周进度填报流程';
 export const WEEK_ID = 'b0eedc49-fe00-4754-a4fe-885e9177e663';
+export const WEEK_ONENODE_NAME = '施工填报';
+export const WEEK_ONENODE_ID = 'f227ba06-4a16-4f50-9313-0f0364db6a72';
+export const WEEK_TWONODE_NAME = '监理审核';
+export const WEEK_TWONODE_ID = '7cf6b0b7-a69c-4824-88fe-a8f5a0743417';
+export const WEEK_THREENODE_NAME = '业主查看';
+export const WEEK_THREENODE_ID = 'f180fd9d-cf9e-4703-85ea-84323ff776eb';
+export const WEEK_FOURNODE_NAME = '结束';
+export const WEEK_FOURNODE_ID = '1c0afbfa-7023-447e-ba7c-9e58ee6202f4';
 
 export const ACYUAL_NAME = '每日进度填报流程';
 export const ACYUAL_ID = '098dd731-d6fa-4076-8651-082470498a37';
