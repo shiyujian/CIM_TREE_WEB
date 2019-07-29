@@ -243,6 +243,7 @@ class Actual extends Component {
             currentSectionName,
             user
         } = this.state;
+        console.log('WORKFLOW_CODE', WORKFLOW_CODE);
         const {
             form: { getFieldDecorator }
         } = this.props;
@@ -454,6 +455,7 @@ class Actual extends Component {
 
     // 选择人员
     selectMember (memberInfo) {
+        console.log('memberInfo', memberInfo);
         const {
             form: { setFieldsValue }
         } = this.props;

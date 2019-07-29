@@ -1,78 +1,63 @@
-/**
- *
- * Copyright (c) 2016-present, ecidi.
- * All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * @Author: ecidi.mingey
- * @Date: 2018-02-20 10:14:05
- * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-18 14:43:35
- */
 import React, { Component } from 'react';
 import {
-    Table,
-    Select,
-    Button,
-    notification,
-    Modal,
-    Form,
     Row,
     Col,
     Input,
-    Checkbox,
-    Upload,
-    Icon,
+    Form,
+    Button,
+    Table,
+    Modal,
+    Select,
     DatePicker,
+    notification,
     Popconfirm
 } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { getUser } from '_platform/auth';
-import TotleModal from './TotleModal';
-import './index.less';
 import {
     WFStatusList,
-    TOTAL_ONENODE_ID,
-    TOTAL_ID,
-    TOTAL_NAME
+    ACYUAL_NAME,
+    ACYUAL_ID,
+    ACYUAL_ONENODE_ID,
+    SCHEDULRPROJECT
 } from '_platform/api';
+import { getNextStates } from '_platform/components/Progress/util';
+import { getUserIsManager, getUser } from '_platform/auth';
+import PerSearch from './PerSearch';
+import WeekPlanSearchInfo from './WeekPlanSearchInfo';
+import ActualModal from './ActualModal';
+moment.locale('zh-cn');
 const FormItem = Form.Item;
-const Dragger = Upload.Dragger;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
-moment.locale('zh-cn');
-class Total extends Component {
-    static propTypes = {};
+const dateFormat = 'YYYY-MM-DD';
+class Actual extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            section: '', // 用户所在标段
-            username: '', // 用户名
-            formItem: [], // 表单项
             workID: '', // 任务ID
+            workDataList: [], // 任务列表
+            TableList: [], // 表格数据
             visibleLook: false, // 查看弹框
-            totolData: [],
-            TotleModaldata: [],
+            // 每日实际进度
+            actualData: [],
+            filterData: [], // 对流程信息根据项目进行过滤
+            // 多选
             selectedRowKeys: [],
             dataSourceSelected: [],
-            visible: false,
-            fileList: [],
-            isCopyMsg: false, // 接收人员是否发短信
-            TreatmentData: [],
             sectionArray: [], // 标段列表
-            TableList: [], // 表格信息
-            newFileLists: [],
-            key: Math.random(),
-            sectionSchedule: [], // 当前用户的标段信息
-            file: '',
-            projectName: '', // 当前用户的项目信息
-            filterData: [], // 对流程信息根据项目进行过滤
+            // 项目信息
+            section: '', // 用户所在标段
+            projectName: '',
             currentSection: '',
             currentSectionName: '',
-            loading: false
+            // 用户信息
+            user: '',
+            // 新增流程
+            visible: false,
+            // 流程详情
+            actualModalVisible: false,
+            actualModaldata: []
         };
         this.onAdd = this.onAdd.bind(this); // 新增
         this.onDelete = this.onDelete.bind(this); // 删除
@@ -86,62 +71,13 @@ class Total extends Component {
         this.getSection(); // 获取当前登陆用户的标段
         this.getWorkList(); // 获取任务列表
     }
-    getSection () {
-        const {
-            platform: { tree = {} },
-            leftkeycode
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let user = getUser();
-        let section = user.section;
-        let currentSectionName = '';
-        let projectName = '';
-        let sectionArray = [];
-
-        if (section) {
-            let code = section.split('-');
-            if (code && code.length === 3) {
-                // 获取当前标段所在的项目
-                sectionData.map(item => {
-                    if (code[0] === item.No) {
-                        projectName = item.Name;
-                        item.children.map(item => {
-                            // 获取当前标段的名字
-                            if (item.No === section) {
-                                currentSectionName = item.Name;
-                                sectionArray.push(item);
-                            }
-                        });
-                    }
-                });
-            }
-            this.setState({
-                section,
-                sectionArray,
-                currentSection: section,
-                currentSectionName: currentSectionName,
-                projectName: projectName
-            });
-        } else {
-            sectionData.map(project => {
-                if (leftkeycode === project.No) {
-                    project.children.map(item =>
-                        sectionArray.push(item)
-                    );
-                }
-            });
-            this.setState({
-                sectionArray
-            });
-        }
-    }
     getWorkList (pro = {}) {
         const { getWorkList } = this.props.actions;
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称
-            flowid: TOTAL_ID, // 流程类型或名称
-            // flowid: '', // 流程类型或名称
+            // flowid: ACYUAL_ID, // 流程类型或名称
+            flowid: '', // 流程类型或名称
             starter: '', // 发起人
             currentnode: '', // 节点ID
             prevnode: '', // 上一结点ID
@@ -167,6 +103,58 @@ class Total extends Component {
                 });
             }
         });
+    }
+    getSection () {
+        const {
+            platform: { tree = {} },
+            leftkeycode
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let user = getUser();
+
+        let section = user.section;
+        let currentSectionName = '';
+        let projectName = '';
+        let sectionArray = [];
+
+        if (section) {
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        console.log(item.children, 'item.children');
+                        item.children.map(item => {
+                            // 获取当前标段的名字
+                            if (item.No === section) {
+                                currentSectionName = item.Name;
+                                sectionArray.push(item);
+                            }
+                        });
+                    }
+                });
+            }
+            console.log('sectionArray', sectionArray, section);
+            this.setState({
+                section,
+                sectionArray,
+                currentSection: section,
+                currentSectionName: currentSectionName,
+                projectName: projectName
+            });
+        } else {
+            sectionData.map(project => {
+                if (leftkeycode === project.No) {
+                    project.children.map(item =>
+                        sectionArray.push(item)
+                    );
+                }
+            });
+            this.setState({
+                sectionArray
+            });
+        }
     }
     onSearch () {
         const { validateFields } = this.props.form;
@@ -196,8 +184,8 @@ class Total extends Component {
     }
     render () {
         const {
+            TableList,
             section,
-            workDataList,
             sectionArray
         } = this.state;
         const {
@@ -212,16 +200,16 @@ class Total extends Component {
         return (
             <div>
                 {this.state.visibleLook && (
-                    <TotleModal
+                    <ActualModal
                         {...this.props}
                         {...this.state}
                         oncancel={this.totleCancle.bind(this)}
-                        onok={this.totleOk.bind(this)}
+                        onok={this.totleCancle.bind(this)}
                     />
                 )}
                 <Form layout='inline'>
                     <FormItem label='标段'>
-                        {getFieldDecorator('Section', {
+                        {getFieldDecorator('sunitproject', {
                             rules: [
                                 {
                                     required: false,
@@ -236,18 +224,8 @@ class Total extends Component {
                             </Select>
                         )}
                     </FormItem>
-                    <FormItem label='编号'>
-                        {getFieldDecorator('Number', {
-                            rules: [
-                                {
-                                    required: false,
-                                    message: '请输入编号'
-                                }
-                            ]
-                        })(<Input placeholder='请输入编号' style={{width: 220}} />)}
-                    </FormItem>
-                    <FormItem label='日期'>
-                        {getFieldDecorator('Data', {
+                    <FormItem label='提交日期'>
+                        {getFieldDecorator('stimedate', {
                             rules: [
                                 {
                                     type: 'array',
@@ -258,7 +236,7 @@ class Total extends Component {
                         })(
                             <RangePicker
                                 size='default'
-                                format='YYYY-MM-DD'
+                                format={dateFormat}
                                 style={{
                                     width: '100%',
                                     height: '100%'
@@ -269,7 +247,7 @@ class Total extends Component {
                     <FormItem
                         label='流程状态'
                     >
-                        {getFieldDecorator('Status', {
+                        {getFieldDecorator('sstatus', {
                             rules: [
                                 {
                                     required: false,
@@ -295,13 +273,13 @@ class Total extends Component {
                 <Button style={{marginLeft: 20}} onClick={this.onAdd.bind(this)}>新增</Button>
                 <Table
                     columns={this.columns}
-                    dataSource={workDataList}
+                    dataSource={this.state.workDataList}
+                    className='foresttable'
                     bordered
                     rowKey='ID'
-                    className='foresttable'
                 />
                 <Modal
-                    title='新增文档'
+                    title='新增每日实际进度'
                     width={800}
                     visible={this.state.visible}
                     maskClosable={false}
@@ -309,7 +287,7 @@ class Total extends Component {
                     onOk={this.handleOK.bind(this)}
                 >
                     <div>
-                        <Form>
+                        <Form layout='inline'>
                             <Row>
                                 <Col span={12}>
                                     <FormItem
@@ -331,17 +309,20 @@ class Total extends Component {
                                         {...FormItemLayout}
                                         label='标段'
                                     >
-                                        {getFieldDecorator(
-                                            'Section',
-                                            {
-                                                initialValue: section,
-                                                rules: [{required: true}]
-                                            }
-                                        )(
+                                        {getFieldDecorator('Section', {
+                                            initialValue: section,
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        '请输入标段'
+                                                }
+                                            ]
+                                        })(
                                             <Select
                                                 disabled
                                                 style={{width: 220}}
-                                                placeholder='请选择'
+                                                placeholder='请选择流程类型'
                                                 allowClear
                                             >
                                                 {sectionArray.map(item => {
@@ -354,58 +335,35 @@ class Total extends Component {
                                 <Col span={12}>
                                     <FormItem
                                         {...FormItemLayout}
-                                        label='编号'
+                                        label='日期'
                                     >
                                         {getFieldDecorator(
-                                            'NumberCode',
+                                            'TodayDate',
                                             {
-                                                rules: [{required: true}]
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message:
+                                                            '请输入日期'
+                                                    }
+                                                ]
                                             }
                                         )(
-                                            <Input
+                                            <DatePicker
+                                                format={dateFormat}
                                                 style={{width: 220}}
-                                                placeholder='请输入编号'
                                             />
-                                        )}
-                                    </FormItem>
-                                </Col>
-                                <Col span={12}>
-                                    <FormItem
-                                        {...FormItemLayout}
-                                        label='文档类型'
-                                    >
-                                        {getFieldDecorator(
-                                            'FileType',
-                                            {
-                                                rules: [{required: true}],
-                                                initialValue: `总计划进度`
-                                            }
-                                        )(
-                                            <Input style={{width: 220}} readOnly />
                                         )}
                                     </FormItem>
                                 </Col>
                             </Row>
                             <Row>
-                                <Dragger {...this.uploadProps}>
-                                    <p className='ant-upload-drag-icon'>
-                                        <Icon type='inbox' />
-                                    </p>
-                                    <p className='ant-upload-text'>
-                                        点击或者拖拽开始上传
-                                    </p>
-                                    <p className='ant-upload-hint'>
-                                        支持 pdf、doc、docx 文件
-                                    </p>
-                                </Dragger>
                                 <Table
                                     columns={this.columnsModal}
-                                    rowKey='cid'
-                                    pagination
-                                    dataSource={
-                                        this.state.TableList
-                                    }
+                                    dataSource={TableList}
+                                    bordered
                                     className='foresttable'
+                                    pagination={false}
                                 />
                             </Row>
                             <Row style={{ marginTop: 20 }}>
@@ -415,7 +373,16 @@ class Total extends Component {
                                         label='审核人'
                                     >
                                         {getFieldDecorator(
-                                            'Auditor'
+                                            'Auditor',
+                                            {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message:
+                                                            '请选择审核人员'
+                                                    }
+                                                ]
+                                            }
                                         )(
                                             <Select style={{ width: 120 }}>
                                                 {auditorList.map(item => {
@@ -425,15 +392,6 @@ class Total extends Component {
                                         )}
                                     </FormItem>
                                 </Col>
-                                <Col span={8} offset={4}>
-                                    <Checkbox
-                                        onChange={this.changeNote.bind(
-                                            this
-                                        )}
-                                    >
-                                        短信通知
-                                    </Checkbox>
-                                </Col>
                             </Row>
                         </Form>
                     </div>
@@ -441,7 +399,7 @@ class Total extends Component {
             </div>
         );
     }
-    // 确认新增
+    // 发起填报
     handleOK () {
         const {
             actions: { postStartwork },
@@ -449,14 +407,18 @@ class Total extends Component {
         } = this.props;
         validateFields((err, values) => {
             if (!err) {
-                const { TableList } = this.state;
+                const { section, TableList } = this.state;
+                console.log('确认', values, TableList, moment(values.TodayDate).format(dateFormat));
                 let newTableList = [];
                 TableList.map(item => {
                     newTableList.push({
-                        uid: item.uid,
-                        name: item.name,
-                        remark: item.remark,
-                        url: item.url
+                        key: item.key,
+                        type: item.type,
+                        project: item.project,
+                        actualNum: item.actualNum,
+                        typeFirst: item.typeFirst,
+                        typeList: item.typeList || '',
+                        units: item.units
                     });
                 });
                 let FormParams = [{
@@ -464,24 +426,20 @@ class Total extends Component {
                     FieldType: 0,
                     Val: values.Section
                 }, {
-                    Key: 'NumberCode', // 编号
+                    Key: 'TodayDate', // 日期
                     FieldType: 0,
-                    Val: values.NumberCode
+                    Val: moment(values.TodayDate).format(dateFormat)
                 }, {
-                    Key: 'FileType', // 文档类型
+                    Key: 'TableInfo', // 列表信息
                     FieldType: 0,
-                    Val: values.FileType
-                }, {
-                    Key: 'TableInfo', // 文档列表
-                    FieldType: 2,
                     Val: JSON.stringify(newTableList)
                 }];
                 postStartwork({}, {
-                    FlowID: TOTAL_ID, // 模板ID
-                    FlowName: TOTAL_NAME, // 模板名称
+                    FlowID: ACYUAL_ID, // 模板ID
+                    FlowName: ACYUAL_NAME, // 模板名称
                     FormValue: { // 表单值
                         FormParams: FormParams,
-                        NodeID: TOTAL_ONENODE_ID
+                        NodeID: ACYUAL_ONENODE_ID
                     },
                     NextExecutor: values.Auditor, // 下一节点执行人
                     Starter: getUser().ID, // 发起人
@@ -507,75 +465,40 @@ class Total extends Component {
             }
         });
     }
-    // 取消
-    totleCancle () {
-        this.setState({ visibleLook: false });
-    }
-    // 确定
-    totleOk () {
-        this.setState({ visibleLook: false });
-    }
-
     // 新增按钮
     onAdd = () => {
+        let TableList = [];
+        SCHEDULRPROJECT.map((item) => {
+            TableList.push({
+                key: item.id - 1,
+                project: item.name,
+                units: item.units,
+                type: item.type,
+                typeFirst: item.typeFirst,
+                typeList: item.typeList || 0
+            });
+        });
         this.setState({
-            visible: true
+            visible: true,
+            TableList: TableList
         });
     };
     // 关闭弹框
     handleCancel () {
+        this.props.form.setFieldsValue({
+            actualSection: undefined,
+            actualSupervisorReview: undefined,
+            actualTimeDate: undefined
+        });
         this.setState({
             visible: false,
-            TreatmentData: []
+            TableList: []
         });
     }
-
-    // 短信
-    changeNote (e) {
-        this.setState({
-            isCopyMsg: e.target.checked
-        });
+    // 取消
+    totleCancle () {
+        this.setState({ visibleLook: false });
     }
-
-    // 上传文件
-    uploadProps = {
-        name: 'file',
-        multiple: true,
-        showUploadList: false,
-        action: '',
-        beforeUpload: (file, fileList) => {
-            const { uploadFileHandler } = this.props.actions;
-            const formdata = new FormData();
-            formdata.append('file', fileList[0]);
-            uploadFileHandler({}, formdata).then(rep => {
-                let { TableList } = this.state;
-                file.url = rep;
-                file.remark = ''; // 备注
-                TableList.push(file);
-                console.log('TableList', TableList);
-                this.setState({
-                    TableList
-                });
-            });
-            return false;
-        }
-    };
-
-    // 删除文件表格中的某行
-    deleteFile = (uid) => {
-        const { TableList } = this.state;
-        let newTableList = [];
-        TableList.map(item => {
-            if (item.uid !== uid) {
-                newTableList.push(item);
-            }
-        });
-        console.log('newTableList', newTableList);
-        this.setState({
-            TableList: newTableList
-        });
-    };
-
     columns = [
         {
             title: '序号',
@@ -595,10 +518,6 @@ class Total extends Component {
         {
             title: '标段',
             dataIndex: 'Section'
-        },
-        {
-            title: '编号',
-            dataIndex: 'NumberCode'
         },
         {
             title: '提交人',
@@ -626,7 +545,7 @@ class Total extends Component {
         },
         {
             title: '操作',
-            render: (text, record, index) => {
+            render: record => {
                 return (<div>
                     <span>
                         <a onClick={this.onLook.bind(this, record.ID)}>
@@ -638,16 +557,14 @@ class Total extends Component {
                             删除
                         </a>
                     </span>
-                </div>
-                );
+                </div>);
             }
         }
     ];
     onLook (workID) {
-        this.setState({ visibleLook: true, workID });
+        this.setState({ visibleLook: true, workID: workID });
     }
     onDelete (workID) {
-        console.log('删除workID', workID);
         const { deleteWork } = this.props.actions;
         deleteWork({
             ID: workID
@@ -669,58 +586,72 @@ class Total extends Component {
     columnsModal = [
         {
             title: '序号',
-            dataIndex: 'index',
-            key: 'index',
+            dataIndex: 'key',
+            key: 'key',
             width: '10%',
             render: (text, record, index) => {
-                return index + 1;
+                return <span>{record.key + 1}</span>;
             }
         },
         {
-            title: '文件名称',
-            dataIndex: 'name',
-            key: 'name',
-            width: '35%'
+            title: '类别',
+            dataIndex: 'type',
+            key: 'type',
+            render: (text, record, index) => {
+                const obj = {
+                    children: text,
+                    props: {}
+                };
+                if (record.typeFirst) {
+                    obj.props.rowSpan = record.typeList;
+                } else {
+                    obj.props.rowSpan = 0;
+                }
+                return obj;
+            }
         },
         {
-            title: '备注',
-            dataIndex: 'remark',
-            key: 'remark',
-            width: '30%',
+            title: '项目',
+            dataIndex: 'project',
+            key: 'project',
+            render: (text, record, index) => {
+                if (record.project) {
+                    return text;
+                }
+            }
+        },
+        {
+            title: '单位',
+            dataIndex: 'units',
+            key: 'units'
+        },
+        {
+            title: '数量',
+            dataIndex: 'actualNum',
+            key: 'actualNum',
             render: (text, record, index) => {
                 return (
-                    <Input onChange={e => {
-                            record.remark = e.target.value;
-                        }}
+                    <Input
+                        value={record.actualNum || 0}
+                        onChange={this.handleActualNumChange.bind(this, index)}
                     />
-                );
-            }
-        },
-        {
-            title: '操作',
-            dataIndex: 'operation',
-            key: 'operation',
-            width: '10%',
-            render: (text, record, index) => {
-                return (
-                    <div>
-                        <Popconfirm
-                            placement='rightTop'
-                            title='确定删除吗？'
-                            onConfirm={this.deleteFile.bind(
-                                this,
-                                record.uid
-                            )}
-                            okText='确认'
-                            cancelText='取消'
-                        >
-                            <a>删除</a>
-                        </Popconfirm>
-                    </div>
                 );
             }
         }
     ];
+    // 实际数量的输入
+    handleActualNumChange = (index, e) => {
+        const {
+            TableList
+        } = this.state;
+        try {
+            TableList[index].actualNum = e.target.value;
+            this.setState({
+                TableList
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
 }
-
-export default Form.create()(Total);
+export default Form.create()(Actual);

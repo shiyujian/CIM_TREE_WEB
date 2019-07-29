@@ -40,6 +40,7 @@ export default class PerSearch extends Component {
     }
 
     async componentDidMount () {
+        console.log('是否');
         this.query();
     }
 
@@ -143,6 +144,7 @@ export default class PerSearch extends Component {
                 });
             }
         }
+        console.log('tree', tree);
         dataList = tree.map(node => ({
             text: node.name + '(' + node.username + ')',
             obj: JSON.stringify({
@@ -166,6 +168,7 @@ export default class PerSearch extends Component {
                 node.org,
             fetching: false
         }));
+        console.log('dataList', dataList);
         return (
             <div>
                 <div>

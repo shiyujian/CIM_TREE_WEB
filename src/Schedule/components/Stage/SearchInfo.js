@@ -37,7 +37,9 @@ export default class SearchInfo extends Component {
             leftkeycode
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
+        console.log('sectionData', sectionData);
         let user = getUser();
+        console.log('user', user);
         let optionArray = [];
         let section = user.section;
         if (section) {
@@ -51,6 +53,7 @@ export default class SearchInfo extends Component {
                             // 获取当前标段的名字
                             if (unit.No === section) {
                                 let currentSectionName = unit.Name;
+                                console.log('所在标段', currentSectionName);
                                 optionArray.push(
                                     <Option
                                         key={unit.No}

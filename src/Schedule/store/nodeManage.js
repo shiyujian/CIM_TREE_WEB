@@ -22,6 +22,10 @@ export const getTaskSchedule = createFetchAction(
 // 2019-7-22 两库合并接口
 // 获取任务详情
 export const getWorkDetails = createFetchAction(`${base}/flow/work/{{ID}}`, []);
+// 查询节点列表
+export const getNodeList = createFetchAction(`${base}/flow/nodes`, []);
+// 删除节点
+export const deleteNode = createFetchAction(`${base}/flow/node/{{ID}}`, [], 'DELETE');
 // 获取任务已办列表
 export const getWorkList = createFetchAction(`${base}/flow/works`, []);
 // 删除任务
@@ -32,7 +36,7 @@ export const postStartwork = createFetchAction(`${base}/flow/startwork`, [], 'PO
 export const getNodefieldList = createFetchAction(`${base}/flow/nodefields`, []);
 // 添加节点表单字段
 export const postNodefields = createFetchAction(`${base}/flow/nodefields`, [], 'POST');
-// 添加节点表单字段
+// 修改节点表单字段
 export const putNodefields = createFetchAction(`${base}/flow/nodefields`, [], 'PUT');
 // 删除节点表单字段
 export const deleteNodefields = createFetchAction(`${base}/flow/nodefields/{{ID}}`, [], 'DELETE');
@@ -40,6 +44,8 @@ export const deleteNodefields = createFetchAction(`${base}/flow/nodefields/{{ID}
 export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype=news`, [], 'POST');
 export const actions = {
     getWorkDetails,
+    getNodeList,
+    deleteNode,
     getWorkList,
     deleteWork,
     postStartwork,

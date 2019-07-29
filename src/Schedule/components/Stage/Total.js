@@ -375,13 +375,6 @@ class Total extends Component {
                                                             initialValue: {
                                                                 currentSectionName
                                                             }
-                                                            // rules: [
-                                                            //     {
-                                                            //         required: true,
-                                                            //         message:
-                                                            //             '请输入标段'
-                                                            //     }
-                                                            // ]
                                                         }
                                                     )(
                                                         <Input
