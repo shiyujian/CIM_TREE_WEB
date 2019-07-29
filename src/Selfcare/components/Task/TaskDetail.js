@@ -12,7 +12,7 @@ import {
     TotalDetail,
     TotalForm,
     ActualForm,
-    // WeekDetail
+    WeekDetail
 } from './FormDetail';
 import {
     WEEK_ID,
@@ -39,41 +39,12 @@ class TaskDetail extends Component {
             workFlow: [], // 任务流程
             workDetails: '' // 任务详情
         };
+        this.getWorkDetails = this.getWorkDetails.bind(this); // 获取任务详情
         this.onBack = this.onBack.bind(this); // 返回
     }
     componentDidMount () {
         this.getWorkDetails();
         this.getNextPeople();
-    }
-    getNextPeople = async () => {
-        const {
-            actions: {
-                getUsers,
-                getRoles
-            }
-        } = this.props;
-        let roles = await getRoles();
-        let postRoleData = ''; // 业主文书ID
-        roles.map((role) => {
-            if (role && role.ID && role.ParentID && role.RoleName === '业主文书') {
-                postRoleData = role.ID;
-            }
-        });
-        let NextPeopleList = [];
-        let postdata = {
-            keyword: '',
-            role: postRoleData,
-            status: 1,
-            page: 1,
-            page_size: 20
-        };
-        getUsers({}, postdata).then(rep => {
-            NextPeopleList = rep.content;
-            this.setState({
-                NextPeopleList
-            });
-            console.log('userList', NextPeopleList);
-        });
     }
     // getNextPeople = async () => {
     //     const {
@@ -82,56 +53,85 @@ class TaskDetail extends Component {
     //             getRoles
     //         }
     //     } = this.props;
-
     //     let roles = await getRoles();
-    //     console.log('身份', roles);
-    //     let postRoleData = [];
+    //     let postRoleData = ''; // 业主文书ID
     //     roles.map((role) => {
     //         if (role && role.ID && role.ParentID && role.RoleName === '业主文书') {
     //             postRoleData = role.ID;
     //         }
     //     });
-    //     console.log('身份postRoleData', postRoleData);
-    //     try {
-    //         let results = [];
-    //         await OWNERCHECKLIST.map(async (owner) => {
-    //             let postdata = {
-    //                 keyword: owner,
-    //                 role: postRoleData,
-    //                 status: 1,
-    //                 page: 1,
-    //                 page_size: 20
-    //             };
-    //             let userList = await getUsers({}, postdata);
-    //             console.log('身份userList', userList);
-    //             if (userList && userList.code && userList.code === 200) {
-    //                 results = results.concat((userList && userList.content) || []);
-    //                 let total = userList.pageinfo.total;
-    //                 if (total > 20) {
-    //                     for (let i = 0; i < (total / 20) - 1; i++) {
-    //                         postdata = {
-    //                             keyword: owner,
-    //                             role: postRoleData,
-    //                             status: 1,
-    //                             page: i + 2,
-    //                             page_size: 20
-    //                         };
-    //                         let datas = await getUsers({}, postdata);
-    //                         if (datas && datas.code && datas.code === 200) {
-    //                             results = results.concat((datas && datas.content) || []);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //             console.log('results', results);
-    //             this.setState({
-    //                 users: results
-    //             });
+    //     let NextPeopleList = [];
+    //     let postdata = {
+    //         keyword: '',
+    //         role: postRoleData,
+    //         status: 1,
+    //         page: 1,
+    //         page_size: 20
+    //     };
+    //     getUsers({}, postdata).then(rep => {
+    //         NextPeopleList = rep.content;
+    //         this.setState({
+    //             NextPeopleList
     //         });
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
+    //     });
     // }
+    getNextPeople = async () => {
+        const {
+            actions: {
+                getUsers,
+                getRoles
+            }
+        } = this.props;
+
+        let roles = await getRoles();
+        console.log('身份', roles);
+        let postRoleData = [];
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID && role.RoleName === '业主文书') {
+                postRoleData = role.ID;
+            }
+        });
+        console.log('身份postRoleData', postRoleData);
+        try {
+            let results = [];
+            await OWNERCHECKLIST.map(async (owner) => {
+                let postdata = {
+                    keyword: owner,
+                    role: postRoleData,
+                    status: 1,
+                    page: 1,
+                    page_size: 20
+                };
+                let userList = await getUsers({}, postdata);
+                console.log('身份userList', userList);
+                if (userList && userList.code && userList.code === 200) {
+                    results = results.concat((userList && userList.content) || []);
+                    let total = userList.pageinfo.total;
+                    if (total > 20) {
+                        for (let i = 0; i < (total / 20) - 1; i++) {
+                            postdata = {
+                                keyword: owner,
+                                role: postRoleData,
+                                status: 1,
+                                page: i + 2,
+                                page_size: 20
+                            };
+                            let datas = await getUsers({}, postdata);
+                            if (datas && datas.code && datas.code === 200) {
+                                results = results.concat((datas && datas.content) || []);
+                            }
+                        }
+                    }
+                }
+                console.log('results', results);
+                this.setState({
+                    users: results
+                });
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
     getWorkDetails () {
         const { getWorkDetails } = this.props.actions;
         const { task_id = '' } = this.props.match.params;
@@ -139,14 +139,12 @@ class TaskDetail extends Component {
         getWorkDetails({
             ID: task_id
         }, {}).then(rep => {
-            console.log('任务详情', rep);
             let FormParams = [];
             if (rep.FormValues && rep.FormValues.length > 0 && rep.FormValues[0].FormParams) {
                 FormParams = rep.FormValues[0].FormParams;
             }
             let param = {};
             let TableList = [];
-            console.log('任务详情', FormParams);
             FormParams.map(item => {
                 if (item.Key === 'TableInfo') {
                     TableList = JSON.parse(item.Val);
@@ -155,7 +153,6 @@ class TaskDetail extends Component {
                 }
             });
             this.props.actions.setTaskDetailLoading(false);
-            console.log('任务详情', param);
             this.setState({
                 WorkID: task_id,
                 CurrentNode: rep.CurrentNode,
@@ -173,14 +170,18 @@ class TaskDetail extends Component {
     getFormDetails () {
         let node = '';
         const { FlowID, TableList, param } = this.state;
-        console.log('form', TableList, param, FlowID, TOTAL_ID);
+        // console.log(FlowID, WEEK_ID);
         if (FlowID === TOTAL_ID) {
             node = <TotalDetail
                 param={param}
                 TableList={TableList}
             />;
+        } else if (FlowID === WEEK_ID) {
+            node = <WeekDetail
+                param={param}
+                TableList={TableList}
+            />;
         }
-        console.log('流程详情', node);
         return node;
     }
     getFormItem = () => {
