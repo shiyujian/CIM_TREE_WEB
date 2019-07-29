@@ -34,10 +34,9 @@ import { getUser } from '_platform/auth';
 import TotleModal from './TotleModal';
 import './index.less';
 import {
-    WFStatusList,
-    TOTAL_ONENODE_ID,
     TOTAL_ID,
-    TOTAL_NAME
+    TOTAL_NAME,
+    WFStatusList
 } from '_platform/api';
 const FormItem = Form.Item;
 const Dragger = Upload.Dragger;
@@ -49,6 +48,8 @@ class Total extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            originNodeID: '', // 起点ID
+            originNodeName: '', // 起点name
             section: '', // 用户所在标段
             username: '', // 用户名
             formItem: [], // 表单项
@@ -74,6 +75,7 @@ class Total extends Component {
             currentSectionName: '',
             loading: false
         };
+        this.getOriginNode = this.getOriginNode.bind(this); // 获取流程起点ID
         this.onAdd = this.onAdd.bind(this); // 新增
         this.onDelete = this.onDelete.bind(this); // 删除
         this.onLook = this.onLook.bind(this); // 查看
@@ -85,6 +87,23 @@ class Total extends Component {
     async componentDidMount () {
         this.getSection(); // 获取当前登陆用户的标段
         this.getWorkList(); // 获取任务列表
+        this.getOriginNode(); // 获取流程起点ID
+    }
+    getOriginNode () {
+        const { getNodeList } = this.props.actions;
+        getNodeList({}, {
+            flowid: WEEK_ID, // 流程ID
+            name: '', // 节点名称
+            type: 1, // 节点类型
+            status: 1 // 节点状态
+        }).then(rep => {
+            if (rep.length === 1) {
+                this.setState({
+                    originNodeID: rep[0].ID,
+                    originNodeName: rep[0].Name
+                });
+            }
+        });
     }
     getSection () {
         const {
@@ -449,7 +468,7 @@ class Total extends Component {
         } = this.props;
         validateFields((err, values) => {
             if (!err) {
-                const { TableList } = this.state;
+                const { TableList, originNodeID } = this.state;
                 let newTableList = [];
                 TableList.map(item => {
                     newTableList.push({
@@ -481,7 +500,7 @@ class Total extends Component {
                     FlowName: TOTAL_NAME, // 模板名称
                     FormValue: { // 表单值
                         FormParams: FormParams,
-                        NodeID: TOTAL_ONENODE_ID
+                        NodeID: originNodeID
                     },
                     NextExecutor: values.Auditor, // 下一节点执行人
                     Starter: getUser().ID, // 发起人

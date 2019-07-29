@@ -20,7 +20,7 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Step = Steps.Step;
-
+const { Option } = Select;
 export default class TotleModal extends Component {
     constructor (props) {
         super(props);
@@ -116,16 +116,7 @@ export default class TotleModal extends Component {
                                                 label='标段'
                                             >
                                                 {getFieldDecorator(
-                                                    'Section',
-                                                    {
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请选择标段'
-                                                            }
-                                                        ]
-                                                    }
+                                                    'Section'
                                                 )(
                                                     <Select
                                                         disabled

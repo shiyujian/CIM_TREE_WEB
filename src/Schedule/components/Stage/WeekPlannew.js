@@ -17,9 +17,8 @@ import {
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
-    WEEK_ONENODE_ID,
-    WEEK_ID,
     WEEK_NAME,
+    WEEK_ID,
     WFStatusList
 } from '_platform/api';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -36,6 +35,8 @@ class WeekPlan extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            originNodeID: '', // 起点ID
+            originNodeName: '', // 起点name
             weekData: [],
             flowDetailModaldata: [],
             dataSourceSelected: [],
@@ -52,6 +53,7 @@ class WeekPlan extends Component {
             weekPlanDataSource: [], //
             user: ''
         };
+        this.getOriginNode = this.getOriginNode.bind(this); // 获取流程起点ID
         this.onAdd = this.onAdd.bind(this); // 新增
         this.onDelete = this.onDelete.bind(this); // 删除
         this.onLook = this.onLook.bind(this); // 查看
@@ -61,9 +63,25 @@ class WeekPlan extends Component {
         this.onSearch = this.onSearch.bind(this); // 查询
     }
     async componentDidMount () {
-        // await this.gettaskSchedule();
         this.getSection(); // 获取当前登陆用户的标段
         this.getWorkList(); // 获取任务列表
+        this.getOriginNode(); // 获取流程起点ID
+    }
+    getOriginNode () {
+        const { getNodeList } = this.props.actions;
+        getNodeList({}, {
+            flowid: WEEK_ID, // 流程ID
+            name: '', // 节点名称
+            type: 1, // 节点类型
+            status: 1 // 节点状态
+        }).then(rep => {
+            if (rep.length === 1) {
+                this.setState({
+                    originNodeID: rep[0].ID,
+                    originNodeName: rep[0].Name
+                });
+            }
+        });
     }
     getSection () {
         const {
@@ -124,8 +142,8 @@ class WeekPlan extends Component {
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称
-            // flowid: WEEK_ID, // 流程类型或名称
-            flowid: '', // 流程类型或名称
+            flowid: WEEK_ID, // 流程类型或名称
+            // flowid: '', // 流程类型或名称
             starter: '', // 发起人
             currentnode: '', // 节点ID
             prevnode: '', // 上一结点ID
@@ -247,11 +265,10 @@ class WeekPlan extends Component {
                 <Button style={{marginLeft: 20}} onClick={this.onAdd.bind(this)}>新增</Button>
                 <Table
                     columns={this.columns}
-                    rowSelection={username === 'admin' ? rowSelection : null}
                     dataSource={workDataList}
                     className='foresttable'
                     bordered
-                    rowKey='index'
+                    rowKey='ID'
                 />
                 <Modal
                     title='新增每周计划进度'
@@ -400,11 +417,12 @@ class WeekPlan extends Component {
         } = this.props;
         validateFields((err, values) => {
             if (!err) {
-                const { TableList, stime, etime } = this.state;
-                console.log('确认', moment(stime).format(dateFormat), TableList);
+                const { TableList, stime, etime, originNodeID } = this.state;
+                console.log('确认', TableList);
                 let newTableList = [];
-                TableList.map(item => {
+                TableList.map((item, index) => {
                     newTableList.push({
+                        ID: index,
                         date: item.date,
                         planTreeNum: item.planTreeNum || ''
                     });
@@ -427,11 +445,11 @@ class WeekPlan extends Component {
                     Val: JSON.stringify(newTableList)
                 }];
                 postStartwork({}, {
-                    FlowID: 'b0eedc49-fe00-4754-a4fe-885e9177e663', // 模板ID
-                    FlowName: '每周进度填报流程', // 模板名称
+                    FlowID: WEEK_ID, // 模板ID
+                    FlowName: WEEK_NAME, // 模板名称
                     FormValue: { // 表单值
                         FormParams: FormParams,
-                        NodeID: '9088d095-7b3e-436c-b8d1-d9b758041ad0'
+                        NodeID: originNodeID
                     },
                     NextExecutor: values.TdataReview, // 下一节点执行人
                     Starter: getUser().ID, // 发起人

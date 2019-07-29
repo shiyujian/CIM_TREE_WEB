@@ -12,7 +12,7 @@ import {
     TotalDetail,
     TotalForm,
     ActualForm,
-    // WeekDetail
+    WeekDetail
 } from './FormDetail';
 import {
     WEEK_ID,
@@ -39,6 +39,7 @@ class TaskDetail extends Component {
             workFlow: [], // 任务流程
             workDetails: '' // 任务详情
         };
+        this.getWorkDetails = this.getWorkDetails.bind(this); // 获取任务详情
         this.onBack = this.onBack.bind(this); // 返回
     }
     componentDidMount () {
@@ -139,7 +140,6 @@ class TaskDetail extends Component {
         getWorkDetails({
             ID: task_id
         }, {}).then(rep => {
-            console.log('任务详情', rep);
             let FormParams = [];
             if (rep.FormValues && rep.FormValues.length > 0 && rep.FormValues[0].FormParams) {
                 FormParams = rep.FormValues[0].FormParams;
@@ -155,7 +155,6 @@ class TaskDetail extends Component {
                 }
             });
             this.props.actions.setTaskDetailLoading(false);
-            console.log('任务详情', param);
             this.setState({
                 WorkID: task_id,
                 CurrentNode: rep.CurrentNode,
@@ -176,6 +175,11 @@ class TaskDetail extends Component {
         console.log('form', TableList, param, FlowID, TOTAL_ID);
         if (FlowID === TOTAL_ID) {
             node = <TotalDetail
+                param={param}
+                TableList={TableList}
+            />;
+        } else if (FlowID === WEEK_ID) {
+            node = <WeekDetail
                 param={param}
                 TableList={TableList}
             />;

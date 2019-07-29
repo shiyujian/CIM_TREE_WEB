@@ -6,20 +6,26 @@ import {
     Form,
     Button,
     Table,
+    Select,
     Modal,
     Card,
+    DatePicker,
     Steps
 } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Step = Steps.Step;
-
+const { Option } = Select;
+const dateFormat = 'YYYY-MM-DD';
 export default class WeekPlanModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            workFlow: []
+            workFlow: [],
+            Section: '',
+            StartDate: '',
+            EndDate: ''
         };
     }
     async componentDidMount () {
@@ -50,8 +56,11 @@ export default class WeekPlanModal extends Component {
                     param[item.Key] = item.Val;
                 }
             });
-            setFieldsValue(param);
+            console.log('回显参数', param.Section);
             this.setState({
+                Section: param.Section,
+                StartDate: param.StartDate,
+                EndDate: param.EndDate,
                 workDetails: rep,
                 TableList,
                 workFlow: rep.Works
@@ -60,12 +69,10 @@ export default class WeekPlanModal extends Component {
     }
     render () {
         const {
-            form: { getFieldDecorator },
-            stime = '',
-            etime = '',
-            weekPlanDataSource = []
+            sectionArray
         } = this.props;
-        const { workFlow } = this.state;
+        const { workFlow, Section, TableList, StartDate, EndDate } = this.state;
+        console.log('123', TableList);
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -91,42 +98,39 @@ export default class WeekPlanModal extends Component {
                                                 {...FormItemLayout}
                                                 label='标段'
                                             >
-                                                {getFieldDecorator(
-                                                    'daysection',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props
-                                                            .sectionName ||
-                                                            '暂无标段'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请选择标段'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
+                                                <Select
+                                                    disabled
+                                                    style={{width: 220}}
+                                                    value={Section}
+                                                >
+                                                    {sectionArray.map(item => {
+                                                        return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                                    })}
+                                                </Select>
                                             </FormItem>
                                         </Col>
                                         <Col span={12}>
                                             <FormItem
                                                 {...FormItemLayout}
-                                                label='日期'
+                                                label='开始日期'
                                             >
-                                                {getFieldDecorator(
-                                                    'daytimedate',
-                                                    {
-                                                        initialValue: `${stime} ~ ${etime}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请输入日期'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
+                                                <DatePicker
+                                                    disabled
+                                                    value={moment(StartDate, dateFormat)}
+                                                    format={dateFormat}
+                                                />
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={12}>
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='结束日期'
+                                            >
+                                                <DatePicker
+                                                    disabled
+                                                    value={moment(EndDate, dateFormat)}
+                                                    format={dateFormat}
+                                                />
                                             </FormItem>
                                         </Col>
                                     </Row>
@@ -134,10 +138,8 @@ export default class WeekPlanModal extends Component {
                                         <Table
                                             columns={this.columns1}
                                             pagination
-                                            dataSource={
-                                                weekPlanDataSource
-                                            }
-                                            rowKey='index'
+                                            dataSource={TableList}
+                                            rowKey='ID'
                                             className='foresttable'
                                         />
                                     </Row>

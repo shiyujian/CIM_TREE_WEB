@@ -24,6 +24,7 @@ export const getTaskSchedule = createFetchAction(
 export const getWorkDetails = createFetchAction(`${base}/flow/work/{{ID}}`, []);
 // 获取任务已办列表
 export const getWorkList = createFetchAction(`${base}/flow/works`, []);
+export const getNodeList = createFetchAction(`${base}/flow/nodes`, []);
 // 删除任务
 export const deleteWork = createFetchAction(`${base}/flow/work/{{ID}}`, [], 'DELETE');
 // 流程发起
@@ -41,6 +42,7 @@ export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype
 export const actions = {
     getWorkDetails,
     getWorkList,
+    getNodeList,
     deleteWork,
     postStartwork,
     getNodefieldList,

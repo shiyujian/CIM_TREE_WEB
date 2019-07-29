@@ -18,7 +18,6 @@ import {
     WFStatusList,
     ACYUAL_NAME,
     ACYUAL_ID,
-    ACYUAL_ONENODE_ID,
     SCHEDULRPROJECT
 } from '_platform/api';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -35,6 +34,8 @@ class Actual extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            originNodeID: '', // 起点ID
+            originNodeName: '', // 起点name
             workID: '', // 任务ID
             workDataList: [], // 任务列表
             TableList: [], // 表格数据
@@ -59,6 +60,7 @@ class Actual extends Component {
             actualModalVisible: false,
             actualModaldata: []
         };
+        this.getOriginNode = this.getOriginNode.bind(this); // 获取流程起点ID
         this.onAdd = this.onAdd.bind(this); // 新增
         this.onDelete = this.onDelete.bind(this); // 删除
         this.onLook = this.onLook.bind(this); // 查看
@@ -70,6 +72,23 @@ class Actual extends Component {
     async componentDidMount () {
         this.getSection(); // 获取当前登陆用户的标段
         this.getWorkList(); // 获取任务列表
+        this.getOriginNode(); // 获取流程起点ID
+    }
+    getOriginNode () {
+        const { getNodeList } = this.props.actions;
+        getNodeList({}, {
+            flowid: ACYUAL_ID, // 流程ID
+            name: '', // 节点名称
+            type: 1, // 节点类型
+            status: 1 // 节点状态
+        }).then(rep => {
+            if (rep.length === 1) {
+                this.setState({
+                    originNodeID: rep[0].ID,
+                    originNodeName: rep[0].Name
+                });
+            }
+        });
     }
     getWorkList (pro = {}) {
         const { getWorkList } = this.props.actions;
@@ -407,7 +426,7 @@ class Actual extends Component {
         } = this.props;
         validateFields((err, values) => {
             if (!err) {
-                const { section, TableList } = this.state;
+                const { originNodeID, TableList } = this.state;
                 console.log('确认', values, TableList, moment(values.TodayDate).format(dateFormat));
                 let newTableList = [];
                 TableList.map(item => {
@@ -439,7 +458,7 @@ class Actual extends Component {
                     FlowName: ACYUAL_NAME, // 模板名称
                     FormValue: { // 表单值
                         FormParams: FormParams,
-                        NodeID: ACYUAL_ONENODE_ID
+                        NodeID: originNodeID
                     },
                     NextExecutor: values.Auditor, // 下一节点执行人
                     Starter: getUser().ID, // 发起人
