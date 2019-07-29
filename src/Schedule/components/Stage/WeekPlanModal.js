@@ -136,7 +136,7 @@ export default class WeekPlanModal extends Component {
                                     </Row>
                                     <Row>
                                         <Table
-                                            columns={this.columns1}
+                                            columns={this.columns}
                                             pagination
                                             dataSource={TableList}
                                             rowKey='ID'
@@ -217,7 +217,7 @@ export default class WeekPlanModal extends Component {
         const { states = [] } = task;
         return states.find(state => state.status === 'processing');
     }
-    columns1 = [
+    columns = [
         {
             title: '序号',
             dataIndex: 'index',
