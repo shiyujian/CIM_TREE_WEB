@@ -21,6 +21,7 @@ import {
 } from '_platform/components/layout';
 import { SERVICE_API, NURSERYLOCATION_DOWLOAD } from '_platform/api';
 import {getUser} from '_platform/auth';
+import * as XLSX from 'xlsx';
 
 @connect(
     state => {
@@ -54,134 +55,61 @@ export default class Dataimport extends Component {
             loginUserSection
         });
     }
-
-    render () {
-        let that = this;
-        const analysisProps = {
-            action: `${SERVICE_API}/excel/upload-api/`,
-            headers: {},
-            showUploadList: false,
-            beforeUpload (file) {
+    analysisProps = {
+        headers: {},
+        showUploadList: false,
+        beforeUpload: (file, fileList) => {
+            try {
                 const {
                     loginUserSection
-                } = that.state;
+                } = this.state;
+                let that = this;
                 if (
                     file.name.indexOf('xls') !== -1 ||
                     file.name.indexOf('xlxs') !== -1
                 ) {
-                    if (loginUserSection) {
-                        return true;
-                    } else {
-                        message.info('该用户未关联标段，不能上传文件。');
-                        return false;
-                    }
+                    // if (!loginUserSection) {
+                    //     Notification.info({
+                    //         message: `该用户未关联标段，不能上传文件。`
+                    //     });
+                    //     return false;
+                    // }
+                    const f = fileList[0];
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        console.log('e', e);
+                        if (e && e.target && e.target.result) {
+                            let data = e.target.result;
+                            let workbook = XLSX.read(data, {type: 'binary'});
+                            // 假设我们的数据在第一个标签
+                            let firstWorksheet = workbook.Sheets[workbook.SheetNames[0]];
+                            // XLSX自带了一个工具把导入的数据转成json
+                            let jsonData = XLSX.utils.sheet_to_json(firstWorksheet, {header: 1});
+                            let filterData = jsonData.filter((data) => {
+                                return (data && data instanceof Array && data.length > 0);
+                            });
+                            that.handleExcelData(filterData);
+                        } else {
+                            Notification.error({
+                                message: `解析失败`
+                            });
+                        }
+                    };
+                    reader.readAsBinaryString(f);
+                    return false;
                 } else {
                     message.warning('只能上传excel文件');
                     return false;
                 }
-            },
-            onChange (info) {
-                if (info.file.status !== 'uploading') {
-                }
-                if (info.file.status === 'done') {
-                    let importData = info.file.response.Sheet1;
-                    if (importData.length === 1) {
-                        Notification.error({
-                            message: `${info.file.name}解析失败`
-                        });
-                        return;
-                    }
-                    that.handleExcelData(importData);
-                } else if (info.file.status === 'error') {
-                    Notification.error({
-                        message: `${info.file.name}解析失败，请检查输入`
-                    });
-                }
+            } catch (err) {
+                console.log('err', err);
             }
-        };
-        let columns = [
-            {
-                title: '序号',
-                dataIndex: 'index'
-            },
-            {
-                title: '编号',
-                dataIndex: 'SXM'
-            },
-            {
-                title: 'X',
-                dataIndex: 'X'
-            },
-            {
-                title: 'Y',
-                dataIndex: 'Y'
-            },
-            {
-                title: 'H',
-                dataIndex: 'H'
-            },
-            {
-                title: '定位时间',
-                dataIndex: 'CreateTime'
-            }
-        ];
-        return (
-            <Body>
-                <Main>
-                    <DynamicTitle title='定位数据导入' {...this.props} />
-                    <Row
-                        style={{
-                            fontSize: '20px',
-                            margin: '30px 20px 20px 20px'
-                        }}
-                    >
-                        <Col>
-                            <span>请按照数据格式要求上传定位数据：</span>
-                        </Col>
-                    </Row>
-                    <Row style={{ fontSize: '20px', marginTop: '20px' }}>
-                        <Col span={2}>
-                            <Upload {...analysisProps}>
-                                <Button
-                                    type='primary'
-                                    style={{ fontSize: '14px', marginLeft: 21 }}
-                                >
-                                    点击上传
-                                </Button>
-                            </Upload>
-                        </Col>
-                        <Col span={18}>
-                            <span>
-                                只能上传xls/xlsx文件，且不超过10Mb，苗木定位数据模板
-                            </span>
-                            <a onClick={this.onDownloadClick.bind(this)}>
-                                下载。
-                            </a>
-                        </Col>
-                    </Row>
-                    <Content>
-                        <Table
-                            bordered
-                            columns={columns}
-                            pagination={{ showQuickJumper: true, pageSize: 10 }}
-                            dataSource={this.state.dataSource}
-                        />
-                    </Content>
-                </Main>
-                <Button
-                    type='primary'
-                    onClick={this.postData.bind(this)}
-                    style={{ marginLeft: 21 }}
-                >
-                    确定上传
-                </Button>
-            </Body>
-        );
-    }
+        }
+    };
     handleExcelData = async (data) => {
         const {
             loginUser,
-            loginUserSection
+            loginUserSection = ''
         } = this.state;
         if (!(loginUser)) {
             Notification.error({
@@ -215,6 +143,7 @@ export default class Dataimport extends Component {
                 dataSource.push(single);
             }
         });
+
         if (!flag) {
             // 没有错误再更新数据
             Notification.success({
@@ -264,5 +193,86 @@ export default class Dataimport extends Component {
     }
     onDownloadClick () {
         window.open(NURSERYLOCATION_DOWLOAD);
+    }
+    render () {
+        let columns = [
+            {
+                title: '序号',
+                dataIndex: 'index'
+            },
+            {
+                title: '编号',
+                dataIndex: 'SXM'
+            },
+            {
+                title: 'X',
+                dataIndex: 'X'
+            },
+            {
+                title: 'Y',
+                dataIndex: 'Y'
+            },
+            {
+                title: 'H',
+                dataIndex: 'H'
+            },
+            {
+                title: '定位时间',
+                dataIndex: 'CreateTime'
+            }
+        ];
+        return (
+            <Body>
+                <Main>
+                    <DynamicTitle title='定位数据导入' {...this.props} />
+                    <Row
+                        style={{
+                            fontSize: '20px',
+                            margin: '30px 20px 20px 20px'
+                        }}
+                    >
+                        <Col>
+                            <span>请按照数据格式要求上传定位数据：</span>
+                        </Col>
+                    </Row>
+                    <Row style={{ fontSize: '20px', marginTop: '20px' }}>
+                        <Col span={2}>
+                            <Upload {...this.analysisProps}>
+                                <Button
+                                    type='primary'
+                                    style={{ fontSize: '14px', marginLeft: 21 }}
+                                >
+                                    点击上传
+                                </Button>
+                            </Upload>
+                        </Col>
+                        <Col span={18}>
+                            <span>
+                                只能上传xls/xlsx文件，且不超过10Mb，苗木定位数据模板
+                            </span>
+                            <a onClick={this.onDownloadClick.bind(this)}>
+                                下载。
+                            </a>
+                        </Col>
+                    </Row>
+                    <Content>
+                        <Table
+                            bordered
+                            rowKey='index'
+                            columns={columns}
+                            pagination={{ showQuickJumper: true, pageSize: 10 }}
+                            dataSource={this.state.dataSource}
+                        />
+                    </Content>
+                </Main>
+                <Button
+                    type='primary'
+                    onClick={this.postData.bind(this)}
+                    style={{ marginLeft: 21 }}
+                >
+                    确定上传
+                </Button>
+            </Body>
+        );
     }
 }

@@ -8,7 +8,6 @@ import { connect } from 'react-redux';
 import { WORKFLOW_CODE } from '_platform/api';
 // 进度管理
 import ScheduleTotalDeal from '../TaskDetail/ScheduleTotalDeal';
-import ScheduleDayDeal from '../TaskDetail/ScheduleDayDeal';
 import ScheduleActualHandle from '../TaskDetail/ScheduleActualHandle';
 import ScheduleActualDeal from '../TaskDetail/ScheduleActualDeal';
 import ScheduleWeekPlanHandle from '../TaskDetail/ScheduleWeekPlanHandle';
@@ -41,11 +40,6 @@ export default class Progress extends Component {
             stateName === '审核'
         ) {
             return <ScheduleTotalDeal {...this.props} {...this.state} />;
-        } else if (
-            code === WORKFLOW_CODE.每日进度计划填报流程 &&
-            stateName === '审核'
-        ) {
-            return <ScheduleDayDeal {...this.props} {...this.state} />;
         } else if (
             code === WORKFLOW_CODE.每日进度填报流程 &&
             stateName === '监理审核'

@@ -41,11 +41,6 @@ export default class TaskStep extends Component {
             ) {
                 return null;
             } else if (
-                code === WORKFLOW_CODE.每日进度计划填报流程 &&
-                name === '填报'
-            ) {
-                return null;
-            } else if (
                 code === WORKFLOW_CODE.每日进度填报流程 &&
                 name === '施工填报'
             ) {
