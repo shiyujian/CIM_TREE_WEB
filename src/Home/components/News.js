@@ -117,7 +117,6 @@ export default class News extends Component {
         console.log(ID);
         const { getNewsDetails } = this.props.actions;
         getNewsDetails({ID}, {}).then(rep => {
-            console.log(rep, '详情信息');
             this.setState({
                 newsVisible: true,
                 newsTitle: rep.Title,
@@ -130,10 +129,8 @@ export default class News extends Component {
     }
     // 查看通知
     handleNoticeView = async (ID) => {
-        console.log(ID);
         const { getNoticeDetails } = this.props.actions;
         getNoticeDetails({ID}, {}).then(rep => {
-            console.log(rep, '详情信息');
             let noticeDetailDegree = '';
             if (rep.Notice_Type) {
                 if (rep.Notice_Type === 1) {
@@ -179,8 +176,6 @@ export default class News extends Component {
 
     render () {
         const { newsList = [], tipsList = [] } = this.props;
-        console.log(newsList, '新闻列表');
-        console.log(tipsList, '公告列表');
         const {
             newsTitle,
             newsVisible,

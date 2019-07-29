@@ -567,10 +567,10 @@ class NoticeTable extends Component {
                                 className='foresttables'
                                 columns={this.columns}
                                 bordered
-                                rowKey='id'
+                                rowKey='ID'
                             />
                         </TabPane>
-                        <TabPane tab='暂存的通知' key='temporary'>
+                        {/* <TabPane tab='暂存的通知' key='temporary'>
                             <Row>
                                 <Col span={10}>
                                     <FormItem {...formItemLayout} label='名称'>
@@ -664,7 +664,7 @@ class NoticeTable extends Component {
                                 bordered
                                 rowKey='id'
                             />
-                        </TabPane>
+                        </TabPane> */}
                     </Tabs>
                 </Col>
             </Row>

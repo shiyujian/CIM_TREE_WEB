@@ -8,24 +8,6 @@ const ID = 'informatization_news';
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
 // 发布或编辑新闻或公告的的modal
 export const toggleModal = createAction(`${ID}发布或编辑新闻或公告的的modal`);
-// 获取暂存的新闻列表
-export const getDraftNewsListOK = createAction(`${ID}获取暂存的新闻列表`);
-export const getDraftNewsList = createFetchAction(`${MAIN_API}/post/`, [getDraftNewsListOK]);
-// 获取新闻列表
-export const getNewsListOK = createAction(`${ID}获取新闻列表`);
-export const getNewsList = createFetchAction(`${MAIN_API}/post/`, [getNewsListOK]);
-// 获取暂存的通知列表
-export const getDraftTipsListOK = createAction(`${ID}获取暂存的通知列表`);
-export const getDraftTipsList = createFetchAction(`${MAIN_API}/post/`, [getDraftTipsListOK]);
-// 获取通知列表
-export const getTipsListOK = createAction(`${ID}获取通知列表`);
-export const getTipsList = createFetchAction(`${MAIN_API}/post/`, [getTipsListOK]);
-// 发布新闻或公告
-export const postData = createFetchAction(`${MAIN_API}/post/`, [], 'POST');
-// 编辑新闻或公告
-export const patchData = createFetchAction(`${MAIN_API}/post/{{pk}}/`, [], 'PATCH');
-// 删除新闻或公告
-export const deleteData = createFetchAction(`${MAIN_API}/post/{{pk}}/`, [], 'DELETE');
 
 // 设置上传的文件列表
 export const postUploadFiles = createAction(`${ID}设置上传的文件列表`);
@@ -80,17 +62,6 @@ export const actions = {
 
     setTabActive,
     toggleModal,
-    getDraftNewsListOK,
-    getDraftNewsList,
-    getNewsListOK,
-    getNewsList,
-    getDraftTipsListOK,
-    getDraftTipsList,
-    getTipsListOK,
-    getTipsList,
-    postData,
-    patchData,
-    deleteData,
     postUploadFiles
 };
 export default handleActions({
@@ -102,10 +73,6 @@ export default handleActions({
         ...state,
         toggleData: payload
     }),
-    [getDraftNewsListOK]: (state, { payload }) => ({
-        ...state,
-        draftNewsLis: payload
-    }),
     [getNewsListNewOK]: (state, { payload }) => ({
         ...state,
         newsList: payload.content
@@ -113,10 +80,6 @@ export default handleActions({
     [getNoticeListOK]: (state, { payload }) => ({
         ...state,
         tipsList: payload.content
-    }),
-    [getDraftTipsListOK]: (state, { payload }) => ({
-        ...state,
-        draftTipsList: payload
     }),
     [postUploadFiles]: (state, { payload }) => ({
         ...state,
