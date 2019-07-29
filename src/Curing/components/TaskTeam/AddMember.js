@@ -4,7 +4,6 @@ import {
 } from 'antd';
 import { getUser } from '_platform/auth';
 import '../Curing.less';
-import moment from 'moment';
 import 'moment/locale/zh-cn';
 
 export default class AddMember extends Component {

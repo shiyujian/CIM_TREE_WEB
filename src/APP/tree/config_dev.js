@@ -51,8 +51,6 @@ window.config = {
     DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
     // 二维展示获取树种筛选的geoserver服务端口
     DASHBOARD_TREETYPE: 'http://39.96.47.88:8080',
-    // 现场收发文接口的端口
-    DOC_EXCHANGE_URL: 'http://39.105.221.187:6545',
     // 现场收发文接口验证用的用户名和密码
     DOC_EXCHANGE_USER_PASSWORD: 'bimtest:bimtest',
 
@@ -85,7 +83,7 @@ window.config = {
     // 智慧森林
     // 苗圃定位模板
     nurseryLocation:
-        'http://39.105.221.187:6512/media/documents/meta/nurseryLocation.xlsx',
+        'https://xatree-1.oss-cn-qingdao.aliyuncs.com/nurseryLocation.xlsx',
 
     /** *********************临时资yu源服务**************************/
     initLeaflet: {
@@ -95,10 +93,5 @@ window.config = {
         minZoom: 10
     },
     // 个人考勤的上下班时间，如果当前的部门未配置的话拿此上下班时间，用[--]分开，此处必须配置
-    IN_OFF_DUTY: '08:30:00--18:00:00',
-    // 现场收发文的短信模板NAME和CODE
-    DISPATCH_MSG: {
-        NAME: 'BIM系统',
-        CODE: 'SMS_100920102'
-    }
+    IN_OFF_DUTY: '08:30:00--18:00:00'
 };

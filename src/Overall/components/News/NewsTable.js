@@ -17,7 +17,6 @@ import NewsAddModal from './NewsAddModal';
 import NewsEditModal from './NewsEditModal';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { STATIC_PREVIEW_API, STATIC_DOWNLOAD_API } from '_platform/api';
 import './index.less';
 moment.locale('zh-cn');
 
@@ -358,7 +357,7 @@ class NewsTable extends Component {
                     sdate: values.worktime ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
                     edate: values.worktime ? moment(values.worktime[1]).format('YYYY-MM-DD') : '',
                     page: '',
-                    size: '',
+                    size: ''
                 });
             }
         });

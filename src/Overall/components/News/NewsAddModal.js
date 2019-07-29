@@ -5,7 +5,6 @@ import 'moment/locale/zh-cn';
 import { getUser } from '_platform/auth';
 import {
     UPLOAD_API,
-    STATIC_PREVIEW_API,
     SOURCE_API
 } from '_platform/api';
 import E from 'wangeditor';
@@ -207,30 +206,6 @@ class NewsAddModal extends Component {
     // modal显示与影藏
     modalClick () {
         this.props.handlePublishNewsModalCancel();
-    }
-    coverPicFile = (e) => {
-        console.log('e', e);
-        if (Array.isArray(e)) {
-            return e;
-        }
-        if (e.file.status === 'removed') {
-            return [];
-        }
-        if (e.file.status === 'done' && !e.file.response.a_file) {
-            return [];
-        }
-        let array = [];
-        let length = e.fileList.length - 1;
-        if (e.file.status === 'done' && e.file.response.a_file) {
-            e.fileList[length].response.name = e.file.name;
-            e.fileList[length].url = STATIC_PREVIEW_API + e.file.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-        }
-        array.push(e.fileList[length]);
-        if (e.file.status) {
-            return e && array;
-        } else {
-            return [];
-        }
     }
     checkTitle = async (rule, value, callback) => {
         if (value) {

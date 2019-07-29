@@ -1,14 +1,13 @@
 import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {forestFetchAction} from '../fetchAction';
-import { USER_API, SYSTEM_API } from '../../api';
+import { SYSTEM_API } from '../../api';
 import { capitalize } from '../util';
 
 export default (ID, service = '') => {
     const suffix = service.toUpperCase();
     const SERVICE = capitalize(service);
     const getUsersOK = createAction(`${ID}_GET_USERS_OK_${suffix}`);
-    // const getUsers = createFetchAction(`${USER_API}/users/`, [getUsersOK]);
     const getUsers = createFetchAction(`${SYSTEM_API}/users`, [getUsersOK]);
     // 获取人员详情
     const getUserDetail = createFetchAction(`${SYSTEM_API}/user/{{id}}`, []);

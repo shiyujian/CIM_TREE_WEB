@@ -57,7 +57,7 @@ export default class Dataimport extends Component {
 
     render () {
         let that = this;
-        const props = {
+        const analysisProps = {
             action: `${SERVICE_API}/excel/upload-api/`,
             headers: {},
             showUploadList: false,
@@ -141,7 +141,7 @@ export default class Dataimport extends Component {
                     </Row>
                     <Row style={{ fontSize: '20px', marginTop: '20px' }}>
                         <Col span={2}>
-                            <Upload {...props}>
+                            <Upload {...analysisProps}>
                                 <Button
                                     type='primary'
                                     style={{ fontSize: '14px', marginLeft: 21 }}

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Notification, Select, Spin } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { UPLOAD_API, STATIC_DOWNLOAD_API, SOURCE_API } from '_platform/api';
+import { UPLOAD_API, SOURCE_API } from '_platform/api';
 import E from 'wangeditor';
 
 let editor;
@@ -328,32 +328,6 @@ class NoticeEditModal extends Component {
                 this.setState({
                     annexFileList: fileList
                 });
-                const status = file.status;
-                if (status === 'done') {
-                    file.url = file && file.response && file.response.a_file;
-                    fileList.map((fileData) => {
-                        if (fileData && fileData.response && fileData.response.a_file) {
-                            fileData.url = STATIC_DOWNLOAD_API + fileData.response.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, '');
-                        }
-                    });
-                    this.setState({
-                        progress: 1,
-                        loading: false
-                    });
-                    Notification.info({
-                        message: '上传附件成功',
-                        duration: 3
-                    });
-                } else if (status === 'error') {
-                    Notification.error({
-                        message: '上传附件失败',
-                        duration: 3
-                    });
-                    this.setState({
-                        progress: 1,
-                        loading: false
-                    });
-                }
             } catch (e) {
                 console.log('uploadPropsFile', e);
             }

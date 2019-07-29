@@ -2,7 +2,7 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from './fetchAction';
 import fetchAction from 'fetch-action';
 import {createFetchActionWithHeaders as myFetch} from './myfetchAction';
-import { base, MAIN_API, SERVICE_API } from '_platform/api';
+import { base, MAIN_API } from '_platform/api';
 const ID = 'informatization_news';
 // Tab切换状态
 export const setTabActive = createAction(`${ID}设置当前选中的tab`);
