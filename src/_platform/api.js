@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-25 13:46:30
+ * @Last Modified time: 2019-07-29 10:12:05
  */
 /**
  *
@@ -59,13 +59,21 @@ export { DOMAIN, USER, PASSWORD, TREE_CODE };
 export const CODE_PROJECT = '森林大数据';
 export const base = `${DOMAIN}`;
 export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
-export const USER_API = `${base}/accounts/api`;
 export const SERVICE_API = `${base}/service/construction/api`;
 export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
-export const MAIN_API = `${base}/cms`;
-export const CODE_API = window.config.DOC_EXCHANGE_URL;
 export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
+// 文件预览的接口
+export const previewWord_API = window.config.previewWord_API;
+// 静态资源文件服务==========STATIC_FILE_IP
+export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
+    window.config.STATIC_DOWNLOAD_PORT
+}`;
+export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
+    window.config.STATIC_PREVIEW_PORT
+}`;
+
+export const MAIN_API = `${base}/cms`;
 // 高德地图逆坐标查询
 export const LBSAMAP_API = window.config.LBSAMAP;
 export const LBSAMAP_KEY = '8325164e247e15eea68b59e89200988b';
@@ -77,18 +85,7 @@ export const TILEURLS = {
     1: window.config.IMG_W,
     2: window.config.VEC_W
 };
-// 文件预览的接口
-export const previewWord_API = window.config.previewWord_API;
-// 静态资源文件服务==========STATIC_FILE_IP
-export const STATIC_UPLOAD_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_UPLOAD_PORT
-}`;
-export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_DOWNLOAD_PORT
-}`;
-export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_PREVIEW_PORT
-}`;
+
 export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
 // 智慧森林
 export const FOREST_API = `${DOMAIN}`;
@@ -101,9 +98,6 @@ export const TREEPIPE_API = `${window.config.PIPE}`;
 
 // 考勤打卡
 export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
-
-// 现场收发文
-export const DISPATCH_MSG_API = window.config.DISPATCH_MSG;
 
 /** *********************静态常量**************************/
 export const WORKFLOW_CODE = {

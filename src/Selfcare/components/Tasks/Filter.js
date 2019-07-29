@@ -322,33 +322,33 @@ class Filter extends Component {
         //     }
         // });
         // this.props.form.validateFields(async (err, values) => {
-            // console.log('err', err);
-            // let conditions = {
-            //     task: filter.type || 'processing',
-            //     executor: user.ID,
-            //     workflowactivity: values.workflowactivity || '',
-            //     workflow: values.workflow || '',
-            //     creator: values.creator || '',
-            //     status: values.status || '',
-            //     real_start_time_begin: '',
-            //     real_start_time_end: ''
-            // };
-            // if (values && values.startTime && values.startTime.length > 0) {
-            //     conditions.real_start_time_begin = moment(
-            //         values.startTime[0]
-            //     ).format('YYYY-MM-DD 00:00:00');
-            //     conditions.real_start_time_end = moment(
-            //         values.startTime[1]
-            //     ).format('YYYY-MM-DD 23:59:59');
-            // }
-            // for (const key in conditions) {
-            //     if (!conditions[key] || conditions[key] == '') {
-            //         delete conditions[key];
-            //     }
-            // }
-            // setLoadingStatus(true);
-            // await getTasks({}, conditions);
-            // setLoadingStatus(false);
+        // console.log('err', err);
+        // let conditions = {
+        //     task: filter.type || 'processing',
+        //     executor: user.ID,
+        //     workflowactivity: values.workflowactivity || '',
+        //     workflow: values.workflow || '',
+        //     creator: values.creator || '',
+        //     status: values.status || '',
+        //     real_start_time_begin: '',
+        //     real_start_time_end: ''
+        // };
+        // if (values && values.startTime && values.startTime.length > 0) {
+        //     conditions.real_start_time_begin = moment(
+        //         values.startTime[0]
+        //     ).format('YYYY-MM-DD 00:00:00');
+        //     conditions.real_start_time_end = moment(
+        //         values.startTime[1]
+        //     ).format('YYYY-MM-DD 23:59:59');
+        // }
+        // for (const key in conditions) {
+        //     if (!conditions[key] || conditions[key] == '') {
+        //         delete conditions[key];
+        //     }
+        // }
+        // setLoadingStatus(true);
+        // await getTasks({}, conditions);
+        // setLoadingStatus(false);
         // });
     }
 
