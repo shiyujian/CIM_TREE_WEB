@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-29 15:32:48
+ * @Last Modified time: 2019-07-29 15:47:16
  */
 /**
  *
@@ -47,15 +47,13 @@ import 'whatwg-fetch';
 require('es6-promise').polyfill();
 
 window.config = window.config || {};
-let DOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
+let DOMAIN, STATIC_FILE_IP;
 
 DOMAIN = window.config.DOMAIN;
-USER = window.config.STATIC_FILE_USER;
-PASSWORD = window.config.STATIC_FILE_PASSWORD;
 STATIC_FILE_IP = window.config.STATIC_FILE_IP;
 
 /** *********************公共资源服务**************************/
-export { DOMAIN, USER, PASSWORD, TREE_CODE };
+export { DOMAIN };
 export const CODE_PROJECT = '森林大数据';
 export const base = `${DOMAIN}`;
 export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;

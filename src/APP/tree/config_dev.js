@@ -29,6 +29,8 @@ window.config = {
     // 测试库接口
     // SDOMAIN: 'http://39.97.163.176:6510',
     SDOMAIN: 'http://39.97.163.176',
+    // 二维展示根据坐标获取树木顺序码端口
+    DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
     // 灌溉接口
     PIPE: 'http://39.97.163.176:809',
     // 苗木市场
@@ -43,16 +45,6 @@ window.config = {
     STATIC_UPLOAD_PORT: '6511',
     // 静态文件存储服务下载端口
     STATIC_DOWNLOAD_PORT: '6512',
-    // 静态文件存储服务访问用户和密码
-    STATIC_FILE_USER: 'bimxan',
-    STATIC_FILE_PASSWORD: 'ecidibim',
-    // 二维展示根据坐标获取树木顺序码端口
-    // DASHBOARD_ONSITE: 'http://39.105.221.187:8081',
-    DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
-    // 二维展示获取树种筛选的geoserver服务端口
-    DASHBOARD_TREETYPE: 'http://39.96.47.88:8080',
-    // 现场收发文接口验证用的用户名和密码
-    DOC_EXCHANGE_USER_PASSWORD: 'bimtest:bimtest',
 
     // word在线预览地址
     previewWord_API: 'http://docs.ecidi.com:6500/view/url?url=',
