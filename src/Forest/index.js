@@ -7,6 +7,32 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @Author: ecidi.mingey
+ * @Date: 2019-07-18 09:44:12
+ * @Last Modified by: ecidi.mingey
+ * @Last Modified time: 2019-07-18 09:44:52
+ */
+/**
+ *
+ * Copyright (c) 2016-present, ecidi.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @Author: ecidi.mingey
+ * @Date: 2019-07-18 09:44:07
+ * @Last Modified by: ecidi.mingey
+ * @Last Modified time: 2019-07-18 09:44:07
+ */
+/**
+ *
+ * Copyright (c) 2016-present, ecidi.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ * @Author: ecidi.mingey
  * @Date: 2018-09-25 10:51:59
  * @Last Modified by: ecidi.mingey
  * @Last Modified time: 2019-04-29 14:52:04
@@ -333,7 +359,7 @@ export default class ForestContainer extends Component {
                     key: 'treeadoptinfo',
                     id: 'FOREST.TREEADOPTINFO',
                     path: '/forest/treeadoptinfo',
-                    name: '苗木状态信息'
+                    name: '苗木死亡调查'
                 }
             ]
         },
@@ -370,7 +396,7 @@ export default class ForestContainer extends Component {
         },
         {
             key: 'degitalaccept',
-            id: 'FOREST.DEGITALACCEPT',
+            id: 'FOREST.DEGITALACCEPT',
             path: '/forest/degitalaccept',
             name: '数字化验收'
         }

@@ -11,6 +11,7 @@ import {
     message
 } from 'antd';
 import moment from 'moment';
+import { FOREST_API } from '_platform/api';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData,
@@ -83,7 +84,9 @@ export default class TreeAdoptInfoTable extends Component {
                     if (record.Status === 0) {
                         return <span>死亡</span>;
                     } else if (record.Status === 1) {
-                        return <span>结缘入库</span>;
+                        return <span>存活</span>;
+                    } else if (record.Status === 2) {
+                        return <span>待定</span>;
                     }
                 }
             },
@@ -115,6 +118,7 @@ export default class TreeAdoptInfoTable extends Component {
     }
     componentDidMount () {
     }
+
     render () {
         const {
             treetypeoption,
@@ -268,12 +272,19 @@ export default class TreeAdoptInfoTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={20} className='forest-quryrstcnt'>
+                    <Col span={16} className='forest-quryrstcnt'>
                         <span>此次查询共有苗木：{this.state.totalNum}棵</span>
                     </Col>
-                    <Col span={2} >
+                    <Col span={6} >
                         <Button
                             type='primary'
+                            onClick={this.onExport.bind(this)}
+                        >
+                            导出
+                        </Button>
+                        <Button
+                            type='primary'
+                            style={{marginLeft: 10}}
                             onClick={this.resetinput.bind(this)}
                         >
                             重置
@@ -402,6 +413,36 @@ export default class TreeAdoptInfoTable extends Component {
         this.query(pagination.current);
     }
 
+    onExport () {
+        const { exportEcporttreestatuss } = this.props.actions;
+        const {
+            sxm = '',
+            section = '',
+            bigType = '',
+            treetype = '',
+            stime = '',
+            etime = '',
+            status = '',
+            smallclassData = '',
+            thinclassData = ''
+        } = this.state;
+        exportEcporttreestatuss({}, {
+            sxm, // 二维码
+            status, // 状态
+            treeType: treetype, // 树种
+            bigtype: bigType, // 树种大类
+            section,
+            smallclass: smallclassData,
+            thinclass: thinclassData,
+            inputer: '',
+            inputtype: '',
+            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss')
+        }).then(rep => {
+            window.open(FOREST_API + '/' + rep);
+            console.log(rep);
+        });
+    }
     query = (page) => {
         const {
             sxm = '',
