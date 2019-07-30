@@ -29,52 +29,41 @@ class WeekDetail extends Component {
 
         };
     }
-    componentDidMount () {
-        const {
-            param,
-            TableList,
-            form: { getFieldDecorator }
-        } = this.props;
-        console.log('参数', TableList);
-    }
     render () {
         const {
             param,
-            TableList,
-            form: { getFieldDecorator }
+            TableList
         } = this.props;
-        const { StartDate, EndDate } = this.state;
         return (<div>
-            <Form layout='inline'>
+            <Form {...formItemLayout} layout='inline'>
                 <Row>
-                    <Col span={12}>
+                    <Col span={24}>
                         <FormItem
-                            {...formItemLayout}
                             label='标段:'
                         >
-                            <Input value={param.Section} readOnly style={{width: 220}} />
-                        </FormItem>
-                    </Col>
-                    <Col span={12}>
-                        <FormItem
-                            {...formItemLayout}
-                            label='开始日期'
-                        >
-                            <DatePicker
-                                disabled
-                                value={moment(param.StartDate, dateFormat)}
-                                format={dateFormat}
-                            />
+                            <Input value={param.Section} disabled style={{width: 220}} />
                         </FormItem>
                     </Col>
                 </Row>
                 <Row>
                     <Col span={12}>
                         <FormItem
-                            {...formItemLayout}
+                            label='开始日期'
+                        >
+                            <DatePicker
+                                style={{width: 220}}
+                                disabled
+                                value={moment(param.StartDate, dateFormat)}
+                                format={dateFormat}
+                            />
+                        </FormItem>
+                    </Col>
+                    <Col span={12}>
+                        <FormItem
                             label='结束日期'
                         >
                             <DatePicker
+                                style={{width: 220}}
                                 disabled
                                 value={moment(param.EndDate, dateFormat)}
                                 format={dateFormat}
@@ -85,8 +74,8 @@ class WeekDetail extends Component {
                 <Row>
                     <Col span={24}>
                         <Table
+                            pagination={false}
                             columns={this.columns}
-                            pagination
                             bordered
                             dataSource={TableList}
                             rowKey='ID'

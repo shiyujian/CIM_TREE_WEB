@@ -134,8 +134,8 @@ class WeekPlan extends Component {
         }
     }
     getWorkList (pro = {}) {
-        console.log(pro, '参数');
         const { getWorkList } = this.props.actions;
+        console.log('123', getUser());
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称
@@ -146,7 +146,7 @@ class WeekPlan extends Component {
             prevnode: '', // 上一结点ID
             executor: '', // 执行人
             sender: '', // 上一节点发送人
-            wfstate: '', // 待办 0,1
+            wfstate: pro.status || '', // 待办 0,1
             stime: pro.stime || '', // 开始时间
             etime: pro.etime || '', // 结束时间
             keys: pro.keys || '', // 查询键
@@ -191,7 +191,7 @@ class WeekPlan extends Component {
                 etime, // 结束时间
                 status: values.status || '' // 流程状态
             };
-            console.log('123', pro);
+            console.log('是数据', values);
             this.getWorkList(pro);
         });
     }
@@ -372,6 +372,7 @@ class WeekPlan extends Component {
                                     </Row>
                                     <Row>
                                         <Table
+                                            rowKey='ID'
                                             columns={this.columnsModal}
                                             dataSource={TableList}
                                             className='foresttable'
@@ -553,6 +554,7 @@ class WeekPlan extends Component {
             weekTimeDate: moment(stime).format('YYYY-MM-DD') + '~' +
                 moment(etime).format('YYYY-MM-DD')
         });
+        console.log('表格', TableList);
         this.setState({
             TableList
         });

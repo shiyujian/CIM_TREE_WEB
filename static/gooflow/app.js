@@ -307,8 +307,10 @@ $(function () {
     function onSubmitLine () {
         if (flow.$lineData[focusObj.id]) {
             let $line_name = $('#line_name').val();
+            let $line_channel = $('#line_channel').val();
             let $line_describe = $('#line_describe').val();
-            console.log('确认line', focusObj, flow.$lineData, $line_name, $line_describe);
+            console.log('确认line', focusObj, $line_channel, $line_describe);
+            flow.$lineData[focusObj.id].channel = $line_channel;
             flow.$lineData[focusObj.id].describe = $line_describe;
             flow.setName(focusObj.id, $line_name, 'line');
             $sliderLine.hide();
@@ -335,6 +337,7 @@ $(function () {
             focusObj = obj;
             $('#line_id').val(id);
             $('#line_name').val(obj.name);
+            $('#line_channel').val(obj.channel || '01');
             $('#line_type').val(obj.type);
             $('#line_describe').val(obj.describe);
         }
@@ -429,7 +432,7 @@ $(function () {
     // 保存
     function wholeUpdate (nodeData, lineData) {
         for (let item in lineData) {
-            console.log('保存', lineData, originData);
+            console.log('保存', lineData[item].channel, originData);
             if (originData.includes(item)) {
                 // let params = {
                 //     ID: item,
@@ -459,7 +462,8 @@ $(function () {
                     Name: lineData[item].name, // 流向名称
                     DCondition: lineData[item].describe, // 流向条件
                     FromNode: lineData[item].from, // 节点起点
-                    ToNode: lineData[item].to // 节点终点
+                    ToNode: lineData[item].to, // 节点终点
+                    DirectionChannel: lineData[item].channel // 流向通道 01进 11进退 10退
                 };
                 $.ajax({
                     url: postDirectionUrl,
@@ -766,7 +770,7 @@ $(function () {
             flowid: temp_id, // 流程ID
             name: '', // 节点名称
             type: '', // 节点类型
-            status: '' // 节点状态
+            status: 1 // 节点状态
         }).success(function (rep) {
             let nodes = {};
             rep.map((item, index) => {
@@ -812,8 +816,8 @@ $(function () {
             $.get(getLineListUrl, {
                 flowid: temp_id, // 流程ID
                 name: '', // 流程名称
-                type: '', // 流向状态
-                page: '', // 节点状态
+                status: '', // 流向状态
+                page: '', // 页码
                 siez: '' // 每页数量
             }).success(rep => {
                 let lines = {};
@@ -822,6 +826,7 @@ $(function () {
                     lines[item.ID] = {
                         id: item.ID,
                         name: item.Name,
+                        channel: item.DirectionChannel,
                         describe: item.DCondition,
                         from: item.FromNode,
                         to: item.ToNode,

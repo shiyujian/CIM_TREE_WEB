@@ -92,6 +92,7 @@ class Actual extends Component {
     }
     getWorkList (pro = {}) {
         const { getWorkList } = this.props.actions;
+        console.log(getUser().ID);
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称

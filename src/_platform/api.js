@@ -321,6 +321,23 @@ export const WFStatusList = [{
     value: 5,
     label: '转发'
 }];
+// 执行状态
+export const ExecuteStateList = [{
+    value: 0,
+    label: '待执行'
+}, {
+    value: 1,
+    label: '已执行'
+}, {
+    value: 2,
+    label: '退回'
+}, {
+    value: 3,
+    label: '挂起'
+}, {
+    value: 4,
+    label: '转发'
+}];
 // 流程信息
 export const TOTAL_NAME = '总进度计划报批流程';
 export const TOTAL_ID = 'c361b0af-a7ec-4181-acd0-39512ffd96b8';

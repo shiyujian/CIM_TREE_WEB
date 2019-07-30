@@ -179,8 +179,8 @@ class TaskList extends Component {
                     starter: values.starter || '', // 发起人
                     currentnode: '', // 节点ID
                     prevnode: '', // 上一结点ID
-                    executor: '', // 执行人
-                    wfstate: '0,1', // 待办
+                    executor: getUser().ID || '', // 执行人
+                    wfstate: '0,1,4', // 待办
                     stime, // 开始时间
                     etime, // 结束时间
                     page: '', // 页码
