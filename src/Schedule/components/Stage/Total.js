@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-18 14:43:35
+ * @Last Modified time: 2019-07-30 08:44:12
  */
 import React, { Component } from 'react';
 import {
@@ -34,7 +34,7 @@ import {
     UPLOAD_API,
     WORKFLOW_CODE
 } from '_platform/api';
-import PerSearch from '_platform/components/panels/PerSearch';
+import PerSearch from './PerSearch';
 import { getNextStates } from '_platform/components/Progress/util';
 import SearchInfo from './SearchInfo';
 import TotleModal from './TotleModal';

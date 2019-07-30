@@ -377,6 +377,8 @@ export const putMergeCarPack = forestFetchAction(`${FOREST_API}/tree/packmerge`,
 export const putMoveTreeInCar = forestFetchAction(`${FOREST_API}/tree/packnurserymove`, [], 'PUT', []);
 // 修改现场测量信息
 export const putChangeLocInfo = forestFetchAction(`${FOREST_API}/tree/batchtree`, [], 'PUT', []);
+// 导出苗木死亡信息
+export const exportEcporttreestatuss = forestFetchAction(`${FOREST_API}/tree/ecporttreestatuss`, [], 'GET', []);
 
 /**
  * 数字化验收
@@ -420,8 +422,11 @@ export const getExportAcceptList = forestFetchAction(`${FOREST_API}/tree/exporta
 export const getExportAcceptReport = forestFetchAction(`${FOREST_API}/DocExport.ashx?action=acceptance&acceptancedetailid={{acceptancedetailid}}`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
 export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sections`, [], 'GET', []);
+// 获取标段对应的公司名称和项目经理
+export const postMapImage = forestFetchAction(`${FOREST_API}/route/mapimage`, [], 'POST', []);
 
 export const actions = {
+    exportEcporttreestatuss,
     getTotalSat,
     getTreeLocations,
     getExportTreeLocations,
@@ -522,7 +527,8 @@ export const actions = {
     getUnitMessageBySection,
     getExportAcceptList,
     getExportAcceptReport,
-    getBigDataCheckList
+    getBigDataCheckList,
+    postMapImage
 };
 export default handleActions({
     [getTreeOK]: (state, {

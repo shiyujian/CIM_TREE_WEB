@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-29 15:47:16
+ * @Last Modified time: 2019-07-30 08:44:35
  */
 /**
  *
@@ -500,7 +500,7 @@ export const MODULES = [
                     },
                     {
                         id: 'FOREST.TREEADOPTINFO',
-                        name: '苗木状态信息'
+                        name: '苗木死亡调查'
                     }
                 ]
             },
@@ -521,6 +521,10 @@ export const MODULES = [
                         name: '定位数据导出'
                     }
                 ]
+            },
+            {
+                id: 'FOREST.DEGITALACCEPT',
+                name: '数字化验收'
             }
         ]
     },
