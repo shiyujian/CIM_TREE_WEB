@@ -137,6 +137,7 @@ class TotalForm extends Component {
                 CurrentNodeName, // 当前节点名称
                 FormValue, // 表单值
                 NextExecutor: '', // 下一节点执行人
+                BackNode: '', // 退回节点
                 Executor // 当前节点执行人
             };
             postBackwork({}, params).then(rep => {

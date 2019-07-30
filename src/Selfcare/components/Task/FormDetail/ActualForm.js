@@ -185,6 +185,7 @@ class ActualForm extends Component {
                         NodeID: ACYUAL_ONENODE_ID // 下一节点ID
                     }, // 表单值
                     NextExecutor: Starter, // 下一节点执行人
+                    BackNode: ACYUAL_ONENODE_ID,
                     Executor // 当前节点执行人
                 };
                 postBackwork({}, params).then(rep => {
