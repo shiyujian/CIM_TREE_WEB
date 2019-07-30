@@ -43,6 +43,7 @@ const Dragger = Upload.Dragger;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 moment.locale('zh-cn');
+const dateFormat = 'YYYY-MM-DD';
 class Total extends Component {
     static propTypes = {};
     constructor (props) {
@@ -92,7 +93,7 @@ class Total extends Component {
     getOriginNode () {
         const { getNodeList } = this.props.actions;
         getNodeList({}, {
-            flowid: WEEK_ID, // 流程ID
+            flowid: TOTAL_ID, // 流程ID
             name: '', // 节点名称
             type: 1, // 节点类型
             status: 1 // 节点状态
@@ -167,8 +168,8 @@ class Total extends Component {
             executor: '', // 执行人
             sender: '', // 上一节点发送人
             wfstate: '', // 待办 0,1
-            stime: '', // 开始时间
-            etime: '', // 结束时间
+            stime: pro.stime || '', // 开始时间
+            etime: pro.etime || '', // 结束时间
             keys: pro.keys || '', // 查询键
             values: pro.values || '', // 查询值
             page: '', // 页码
@@ -180,7 +181,6 @@ class Total extends Component {
                 rep.content.map(item => {
                     workDataList.push(item);
                 });
-                console.log('任务列表', workDataList);
                 this.setState({
                     workDataList
                 });
@@ -192,23 +192,32 @@ class Total extends Component {
         validateFields((err, values) => {
             if (!err) {
             }
-            console.log('搜索选择', values.Data, values.Number, values.Section, values.Status);
+            let stime = '';
+            let etime = '';
+            if (values.submitDate) {
+                stime = moment(values.submitDate[0]).format(dateFormat);
+                etime = moment(values.submitDate[1]).format(dateFormat);
+            }
+            // 表单查询
             let key = '';
             let value = '';
-            if (values.Section) {
-                key = 'section';
-                value = values.Section;
-                if (values.Number) {
-                    key += '|' + 'number';
-                    value += '|' + values.Number;
+            if (values.section) {
+                key = 'Section';
+                value = values.section;
+                if (values.numberCode) {
+                    key += '|' + 'NumberCode';
+                    value += '|' + values.numberCode;
                 }
-            } else if (values.Number) {
-                key = 'number';
-                value = values.Number;
+            } else if (values.numberCode) {
+                key = 'NumberCode';
+                value = values.numberCode;
             }
             let params = {
                 keys: key, // 表单项
-                values: value // 表单值
+                values: value, // 表单值
+                stime, // 开始时间
+                etime, // 结束时间
+                status: values.status || '' // 流程状态
             };
             this.getWorkList(params);
         });
@@ -240,15 +249,12 @@ class Total extends Component {
                 )}
                 <Form layout='inline'>
                     <FormItem label='标段'>
-                        {getFieldDecorator('Section', {
-                            rules: [
-                                {
-                                    required: false,
-                                    message: '请选择标段'
-                                }
-                            ]
-                        })(
-                            <Select placeholder='请选择标段' style={{width: 220}}>
+                        {getFieldDecorator('section')(
+                            <Select
+                                placeholder='请选择标段'
+                                style={{width: 220}}
+                                allowClear
+                            >
                                 {sectionArray.map(item => {
                                     return <Option value={item.No} key={item.No}>{item.Name}</Option>;
                                 })}
@@ -256,25 +262,12 @@ class Total extends Component {
                         )}
                     </FormItem>
                     <FormItem label='编号'>
-                        {getFieldDecorator('Number', {
-                            rules: [
-                                {
-                                    required: false,
-                                    message: '请输入编号'
-                                }
-                            ]
-                        })(<Input placeholder='请输入编号' style={{width: 220}} />)}
+                        {getFieldDecorator('numberCode')(
+                            <Input placeholder='请输入编号' style={{width: 220}} />
+                        )}
                     </FormItem>
-                    <FormItem label='日期'>
-                        {getFieldDecorator('Data', {
-                            rules: [
-                                {
-                                    type: 'array',
-                                    required: false,
-                                    message: '请选择日期'
-                                }
-                            ]
-                        })(
+                    <FormItem label='提交日期'>
+                        {getFieldDecorator('submitDate')(
                             <RangePicker
                                 size='default'
                                 format='YYYY-MM-DD'
@@ -288,14 +281,7 @@ class Total extends Component {
                     <FormItem
                         label='流程状态'
                     >
-                        {getFieldDecorator('Status', {
-                            rules: [
-                                {
-                                    required: false,
-                                    message: '请选择流程状态'
-                                }
-                            ]
-                        })(
+                        {getFieldDecorator('status')(
                             <Select
                                 style={{width: 220}}
                                 placeholder='请选择流程类型'
@@ -571,7 +557,6 @@ class Total extends Component {
                 file.url = rep;
                 file.remark = ''; // 备注
                 TableList.push(file);
-                console.log('TableList', TableList);
                 this.setState({
                     TableList
                 });
@@ -589,7 +574,6 @@ class Total extends Component {
                 newTableList.push(item);
             }
         });
-        console.log('newTableList', newTableList);
         this.setState({
             TableList: newTableList
         });
@@ -666,7 +650,6 @@ class Total extends Component {
         this.setState({ visibleLook: true, workID });
     }
     onDelete (workID) {
-        console.log('删除workID', workID);
         const { deleteWork } = this.props.actions;
         deleteWork({
             ID: workID

@@ -598,10 +598,10 @@ class NewsTable extends Component {
                                 columns={this.columns}
                                 className='foresttables'
                                 bordered
-                                rowKey='id'
+                                rowKey='ID'
                             />
                         </TabPane>
-                        <TabPane tab='暂存的新闻' key='temporary'>
+                        {/* <TabPane tab='暂存的新闻' key='temporary'>
                             <Row>
                                 <Col span={18}>
                                     <Row>
@@ -691,7 +691,7 @@ class NewsTable extends Component {
                                 bordered
                                 rowKey='id'
                             />
-                        </TabPane>
+                        </TabPane> */}
                     </Tabs>
                 </Col>
             </Row>

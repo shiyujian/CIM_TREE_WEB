@@ -95,16 +95,16 @@ class Actual extends Component {
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称
-            // flowid: ACYUAL_ID, // 流程类型或名称
-            flowid: '', // 流程类型或名称
+            flowid: ACYUAL_ID, // 流程类型或名称
+            // flowid: '', // 流程类型或名称
             starter: '', // 发起人
             currentnode: '', // 节点ID
             prevnode: '', // 上一结点ID
             executor: '', // 执行人
             sender: '', // 上一节点发送人
             wfstate: '', // 待办 0,1
-            stime: '', // 开始时间
-            etime: '', // 结束时间
+            stime: pro.stime || '', // 开始时间
+            etime: pro.etime || '', // 结束时间
             keys: pro.keys || '', // 查询键
             values: pro.values || '', // 查询值
             page: '', // 页码
@@ -116,7 +116,6 @@ class Actual extends Component {
                 rep.content.map(item => {
                     workDataList.push(item);
                 });
-                console.log('任务列表', workDataList);
                 this.setState({
                     workDataList
                 });
@@ -143,7 +142,6 @@ class Actual extends Component {
                 sectionData.map(item => {
                     if (code[0] === item.No) {
                         projectName = item.Name;
-                        console.log(item.children, 'item.children');
                         item.children.map(item => {
                             // 获取当前标段的名字
                             if (item.No === section) {
@@ -154,7 +152,6 @@ class Actual extends Component {
                     }
                 });
             }
-            console.log('sectionArray', sectionArray, section);
             this.setState({
                 section,
                 sectionArray,
@@ -180,23 +177,25 @@ class Actual extends Component {
         validateFields((err, values) => {
             if (!err) {
             }
-            console.log('搜索选择', values.Data, values.Number, values.Section, values.Status);
+            let stime = '';
+            let etime = '';
+            if (values.submitDate) {
+                stime = moment(values.submitDate[0]).format(dateFormat);
+                etime = moment(values.submitDate[1]).format(dateFormat);
+            }
+            // 表单查询
             let key = '';
             let value = '';
-            if (values.Section) {
-                key = 'section';
-                value = values.Section;
-                if (values.Number) {
-                    key += '|' + 'number';
-                    value += '|' + values.Number;
-                }
-            } else if (values.Number) {
-                key = 'number';
-                value = values.Number;
+            if (values.section) {
+                key = 'Section';
+                value = values.section;
             }
             let params = {
                 keys: key, // 表单项
-                values: value // 表单值
+                values: value, // 表单值
+                stime, // 开始时间
+                etime, // 结束时间
+                status: values.status || '' // 流程状态
             };
             this.getWorkList(params);
         });
@@ -228,14 +227,7 @@ class Actual extends Component {
                 )}
                 <Form layout='inline'>
                     <FormItem label='标段'>
-                        {getFieldDecorator('sunitproject', {
-                            rules: [
-                                {
-                                    required: false,
-                                    message: '请选择标段'
-                                }
-                            ]
-                        })(
+                        {getFieldDecorator('section')(
                             <Select placeholder='请选择标段' style={{width: 220}}>
                                 {sectionArray.map(item => {
                                     return <Option value={item.No} key={item.No}>{item.Name}</Option>;
@@ -244,15 +236,7 @@ class Actual extends Component {
                         )}
                     </FormItem>
                     <FormItem label='提交日期'>
-                        {getFieldDecorator('stimedate', {
-                            rules: [
-                                {
-                                    type: 'array',
-                                    required: false,
-                                    message: '请选择日期'
-                                }
-                            ]
-                        })(
+                        {getFieldDecorator('submitDate')(
                             <RangePicker
                                 size='default'
                                 format={dateFormat}
@@ -266,14 +250,7 @@ class Actual extends Component {
                     <FormItem
                         label='流程状态'
                     >
-                        {getFieldDecorator('sstatus', {
-                            rules: [
-                                {
-                                    required: false,
-                                    message: '请选择流程状态'
-                                }
-                            ]
-                        })(
+                        {getFieldDecorator('status')(
                             <Select
                                 style={{width: 220}}
                                 placeholder='请选择流程类型'
@@ -427,11 +404,10 @@ class Actual extends Component {
         validateFields((err, values) => {
             if (!err) {
                 const { originNodeID, TableList } = this.state;
-                console.log('确认', values, TableList, moment(values.TodayDate).format(dateFormat));
                 let newTableList = [];
                 TableList.map(item => {
                     newTableList.push({
-                        key: item.key,
+                        ID: item.key,
                         type: item.type,
                         project: item.project,
                         actualNum: item.actualNum,

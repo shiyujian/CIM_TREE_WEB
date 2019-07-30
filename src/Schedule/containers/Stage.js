@@ -109,7 +109,6 @@ export default class Stage extends Component {
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
         }
-        console.log('key', leftkeycode);
         return (
             <div>
                 <DynamicTitle title='进度填报' {...this.props} />
@@ -145,18 +144,6 @@ export default class Stage extends Component {
                                                 {...this.state}
                                             />
                                         </TabPane>
-                                        {/* <TabPane tab='总计划进度' key='1'>
-                                            <Total {...this.props} {...this.state} />
-                                        </TabPane> */}
-                                        {/* <TabPane tab='每周计划进度' key='2'>
-                                            <WeekPlan {...this.props} {...this.state} />
-                                        </TabPane> */}
-                                        {/* <TabPane tab='每日实际进度' key='3'>
-                                            <Actual
-                                                {...this.props}
-                                                {...this.state}
-                                            />
-                                        </TabPane> */}
                                     </Tabs>
                                 </div>
                             </Content>

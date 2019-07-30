@@ -87,6 +87,7 @@ class WeekDetail extends Component {
                         <Table
                             columns={this.columns}
                             pagination
+                            bordered
                             dataSource={TableList}
                             rowKey='ID'
                             className='foresttable'

@@ -9,6 +9,10 @@ import {
     Divider,
     notification
 } from 'antd';
+import {
+    WEEK_THREENODE_ID,
+    ACYUAL_THREENODE_ID
+} from '_platform/api';
 const FormItem = Form.Item;
 const { Option } = Select;
 const formItemLayout = {
@@ -98,39 +102,43 @@ class ActualForm extends Component {
         console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
-
+                let FormParams = [{
+                    Key: 'Opinion',
+                    FieldType: 0,
+                    Val: values.Opinion
+                }];
+                console.log('下一执行人', values.NextPeople);
+                let params = {
+                    FlowID, // 流程ID
+                    FlowName, // 流程名称
+                    WorkID, // 任务ID
+                    CurrentNode, // 当前节点
+                    CurrentNodeName, // 当前节点名称
+                    FormValue: {
+                        FormParams: FormParams,
+                        NodeID: ACYUAL_THREENODE_ID // 下一节点ID
+                    }, // 表单值
+                    NextExecutor: values.NextPeople, // 下一节点执行人
+                    Executor // 当前节点执行人
+                };
+                postSendwork({}, params).then(rep => {
+                    if (rep.code === 1) {
+                        notification.success({
+                            message: '提交成功'
+                        });
+                        this.props.onBack();
+                    } else {
+                        notification.error({
+                            message: '提交失败'
+                        });
+                    }
+                });
             }
-            let FormValue = [{
-                Key: 'Opinion',
-                FieldType: 0,
-                Val: values.Opinion
-            }];
-            let params = {
-                FlowID, // 流程ID
-                FlowName, // 流程名称
-                WorkID, // 任务ID
-                CurrentNode, // 当前节点
-                CurrentNodeName, // 当前节点名称
-                FormValue, // 表单值
-                NextExecutor: 0, // 下一节点执行人
-                Executor // 当前节点执行人
-            };
-            postSendwork({}, params).then(rep => {
-                if (rep.code === 1) {
-                    notification.success({
-                        message: '提交成功'
-                    });
-                    this.props.onBack();
-                } else {
-                    notification.error({
-                        message: '提交失败'
-                    });
-                }
-            });
         });
     }
     handleReject () {
         const {
+            Starter,
             FlowID,
             FlowName,
             WorkID,
@@ -143,30 +151,37 @@ class ActualForm extends Component {
         console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
-
+                let FormParams = [{
+                    Key: 'Opinion',
+                    FieldType: 0,
+                    Val: values.Opinion
+                }];
+                let params = {
+                    FlowID, // 流程ID
+                    FlowName, // 流程名称
+                    WorkID, // 任务ID
+                    CurrentNode, // 当前节点
+                    CurrentNodeName, // 当前节点名称
+                    FormValue: {
+                        FormParams: FormParams,
+                        NodeID: ACYUAL_THREENODE_ID // 下一节点ID
+                    }, // 表单值
+                    NextExecutor: Starter, // 下一节点执行人
+                    Executor // 当前节点执行人
+                };
+                postBackwork({}, params).then(rep => {
+                    if (rep.code === 1) {
+                        notification.success({
+                            message: '提交成功'
+                        });
+                        this.props.onBack();
+                    } else {
+                        notification.error({
+                            message: '提交失败'
+                        });
+                    }
+                });
             }
-            let FormValue = [{
-                Key: 'Opinion',
-                FieldType: 0,
-                Val: values.Opinion
-            }];
-            let params = {
-                FlowID, // 流程ID
-                FlowName, // 流程名称
-                WorkID, // 任务ID
-                CurrentNode, // 当前节点
-                CurrentNodeName, // 当前节点名称
-                FormValue, // 表单值
-                NextExecutor: '', // 下一节点执行人
-                Executor // 当前节点执行人
-            };
-            postBackwork({}, params).then(rep => {
-                if (rep.code === 1) {
-                    notification.success({
-                        message: '提交成功'
-                    });
-                }
-            });
         });
     }
 }
