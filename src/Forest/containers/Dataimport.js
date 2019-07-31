@@ -19,7 +19,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { SERVICE_API, NURSERYLOCATION_DOWLOAD } from '_platform/api';
+import { NURSERYLOCATION_DOWLOAD } from '_platform/api';
 import {getUser} from '_platform/auth';
 import * as XLSX from 'xlsx';
 
@@ -68,12 +68,12 @@ export default class Dataimport extends Component {
                     file.name.indexOf('xls') !== -1 ||
                     file.name.indexOf('xlxs') !== -1
                 ) {
-                    // if (!loginUserSection) {
-                    //     Notification.info({
-                    //         message: `该用户未关联标段，不能上传文件。`
-                    //     });
-                    //     return false;
-                    // }
+                    if (!loginUserSection) {
+                        Notification.info({
+                            message: `该用户未关联标段，不能上传文件。`
+                        });
+                        return false;
+                    }
                     const f = fileList[0];
                     let reader = new FileReader();
                     reader.onload = function (e) {

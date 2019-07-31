@@ -135,9 +135,9 @@ class CountFilter extends Component {
             actions: { getCheckGroup }
         } = this.props;
         let groupArray = [];
-        let groupList = await getCheckGroup({}, {org_code: value});
-        if (groupList && groupList instanceof Array) {
-            groupList.map(group => {
+        let groupList = await getCheckGroup({}, {orgCode: value});
+        if (groupList && groupList.content && groupList.content instanceof Array) {
+            groupList.content.map(group => {
                 groupArray.push(
                     <Option key={group.id} value={group.id}>
                         {group.name}
