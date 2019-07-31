@@ -107,13 +107,13 @@ class AddMember extends Component {
 
     componentDidMount = async () => {
         const {
-            actions: {
-                getCheckGroupMansIDList
-            },
-            selectMemGroup
+            dataSource = []
         } = this.props;
         try {
-            let relationMem = await getCheckGroupMansIDList({id: selectMemGroup});
+            let relationMem = [];
+            dataSource.map((data) => {
+                relationMem.push(data && data.user_id);
+            });
             this.setState({
                 relationMem: relationMem || []
             }, async () => {
@@ -201,6 +201,107 @@ class AddMember extends Component {
             );
         });
         return objs;
+    }
+
+    _handleCancel = async () => {
+        const {
+            actions: {
+                changeAddMemVisible
+            }
+        } = this.props;
+        changeAddMemVisible(false);
+    }
+
+    _check = async (user, e) => {
+        const {
+            relationMem = []
+        } = this.state;
+        const {
+            actions: {
+                putCheckGroupMans,
+                checkGroupMemChangeStatus
+            },
+            memberChangeStatus = 0,
+            selectMemGroup
+        } = this.props;
+        let checked = e.target.checked;
+        if (checked) {
+            relationMem.push(user.ID);
+            let postData = {
+                userIds: relationMem.join(','),
+                checkgroup_id: Number(selectMemGroup)
+            };
+            let data = await putCheckGroupMans({}, postData);
+            if (data && data.code && data.code === 1) {
+                await checkGroupMemChangeStatus(memberChangeStatus + 1);
+            } else {
+                Notification.error({
+                    message: '关联失败'
+                });
+            }
+        } else {
+            relationMem.map((memberID, index) => {
+                if (memberID === user.ID) {
+                    relationMem.splice(index, 1); // 删除该元素
+                }
+            });
+            let postData = {
+                userIds: relationMem.join(','),
+                checkgroup_id: Number(selectMemGroup)
+            };
+            let data = await putCheckGroupMans({}, postData);
+            if (data && data.code && data.code === 1) {
+                await checkGroupMemChangeStatus(memberChangeStatus + 1);
+            } else {
+                Notification.error({
+                    message: '关联失败'
+                });
+            }
+        }
+        this.setState({
+            relationMem
+        });
+    }
+
+    changePage = (obj) => {
+        let current = obj.current;
+        this.setState({
+            page: current
+        }, () => {
+            this.query(current);
+        });
+    }
+
+    query (current = 1) {
+        const {
+            form: { validateFields },
+            actions: {
+                getUsers
+            }
+        } = this.props;
+        validateFields(async (err, values) => {
+            if (!err) {
+                let postData = {
+                    org: values.organization ? values.organization : '',
+                    keyword: values.keyword ? values.keyword : '',
+                    role: values.role ? values.role : '',
+                    status: 1,
+                    page: current,
+                    size: 10
+                };
+                let userData = await getUsers({}, postData);
+                let dataSource = (userData && userData.content) || [];
+                this.setState({
+                    total: (userData && userData.pageinfo && userData.pageinfo.total) || 0,
+                    page: current,
+                    dataSource
+                });
+            }
+        });
+    }
+    clear = async () => {
+        this.props.form.resetFields();
+        await this.getInitialUserData();
     }
 
     render () {
@@ -322,93 +423,6 @@ class AddMember extends Component {
             </div>
 
         );
-    }
-
-    _handleCancel = async () => {
-        const {
-            actions: {
-                changeAddMemVisible
-            }
-        } = this.props;
-        changeAddMemVisible(false);
-    }
-
-    _check = async (user, e) => {
-        const {
-            relationMem = []
-        } = this.state;
-        const {
-            actions: {
-                postCheckGroupMans,
-                checkGroupMemChangeStatus
-            },
-            memberChangeStatus = 0,
-            selectMemGroup
-        } = this.props;
-        let checked = e.target.checked;
-        if (checked) {
-            relationMem.push(user.id);
-            let postData = {
-                members: relationMem
-            };
-            await postCheckGroupMans({id: selectMemGroup}, postData);
-            await checkGroupMemChangeStatus(memberChangeStatus + 1);
-        } else {
-            relationMem.map((memberID, index) => {
-                if (memberID === user.id) {
-                    relationMem.splice(index, 1); // 删除该元素
-                }
-            });
-            let postData = {
-                members: relationMem
-            };
-            await postCheckGroupMans({id: selectMemGroup}, postData);
-            await checkGroupMemChangeStatus(memberChangeStatus + 1);
-        }
-        this.setState({
-            relationMem
-        });
-    }
-
-    changePage = (obj) => {
-        let current = obj.current;
-        this.setState({
-            page: current
-        }, () => {
-            this.query(current);
-        });
-    }
-
-    query (current = 1) {
-        const {
-            form: { validateFields },
-            actions: {
-                getUsers
-            }
-        } = this.props;
-        validateFields(async (err, values) => {
-            if (!err) {
-                let postData = {
-                    org: values.organization ? values.organization : '',
-                    keyword: values.keyword ? values.keyword : '',
-                    roles: values.role ? values.role : '',
-                    status: 1,
-                    page: current,
-                    size: 10
-                };
-                let userData = await getUsers({}, postData);
-                let dataSource = (userData && userData.content) || [];
-                this.setState({
-                    total: (userData && userData.pageinfo && userData.pageinfo.total) || 0,
-                    page: current,
-                    dataSource
-                });
-            }
-        });
-    }
-    clear = async () => {
-        this.props.form.resetFields();
-        await this.getInitialUserData();
     }
 }
 export default Form.create()(AddMember);

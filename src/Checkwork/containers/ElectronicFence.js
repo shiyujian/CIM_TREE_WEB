@@ -39,6 +39,7 @@ export default class ElectronicFence extends Component {
         // 获取用户的公司信息
         let user = getUser();
         try {
+            await getCheckGroupOK([]);
             if (user.username !== 'admin') {
                 // // 获取考勤群体数据
                 await this.loadCheckGroupData(user);
@@ -50,8 +51,6 @@ export default class ElectronicFence extends Component {
                 } else {
                     await this._loadAreaData();
                 }
-            } else {
-                await getCheckGroupOK([]);
             }
         } catch (e) {
             console.log('org', e);
@@ -79,7 +78,7 @@ export default class ElectronicFence extends Component {
             companyOrgID = parentData.ID;
             // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
             let postData = {
-                org_code: companyOrgID
+                orgCode: companyOrgID
             };
             await getCheckGroup({}, postData);
             this.setState({

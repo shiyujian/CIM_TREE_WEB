@@ -43,14 +43,11 @@ export default class AttendanceGroup extends Component {
                 getCheckGroup,
                 getCheckGroupOK,
                 changeSelectState,
-                getCheckGroupMansOk,
                 changeSelectMemGroup,
                 checkGroupMemChangeStatus
             }
         } = this.props;
         try {
-            // 将redux中的群体中的人员进行初始化
-            await getCheckGroupMansOk([]);
             // redux中左侧考勤群体树的选中节点初始化
             await changeSelectMemGroup();
             // 左侧考勤群体树的节点选中状态初始化
@@ -77,7 +74,7 @@ export default class AttendanceGroup extends Component {
                     companyOrgID = parentData.ID;
                     // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
                     let postData = {
-                        org_code: companyOrgID
+                        orgCode: companyOrgID
                     };
                     await getCheckGroup({}, postData);
                     // 在关联人员时需要根据各个部门来查找人员，所以需要根据公司的code查找公司内的组织机构
