@@ -6,14 +6,13 @@ import {
     Col,
     Input,
     Select,
-    Divider,
     notification
 } from 'antd';
 import {
+    WEEK_ONENODE_ID,
     WEEK_THREENODE_ID,
-    WEEK_ONENODE_ID
+    WEEK_FOURNODE_ID
 } from '_platform/api';
-const FormItem = Form.Item;
 const { Option } = Select;
 const formItemLayout = {
     labelCol: {
@@ -32,9 +31,40 @@ class WeekForm extends Component {
 
         };
     }
+    getOpinion () {
+        const {
+            CurrentNode,
+            NextPeopleList,
+            form: { getFieldDecorator }
+        } = this.props;
+        let node = '';
+        if (CurrentNode === WEEK_THREENODE_ID) {
+
+        } else {
+            node = <Row style={{marginTop: 20}}>
+                <Col span={24}>
+                    <Form.Item
+                        {...formItemLayout}
+                        label='业主查看人'
+                    >
+                        {getFieldDecorator('NextPeople', {
+                        })(
+                            <Select style={{width: 400}}>
+                                {
+                                    NextPeopleList.length > 0 ? NextPeopleList.map(item => {
+                                        return <Option value={item.ID} key={item.ID}>{item.Full_Name}</Option>;
+                                    }) : ''
+                                }
+                            </Select>
+                        )}
+                    </Form.Item>
+                </Col>
+            </Row>;
+        }
+        return node;
+    }
     render () {
         const {
-            NextPeopleList,
             form: { getFieldDecorator }
         } = this.props;
         return (<div>
@@ -52,25 +82,9 @@ class WeekForm extends Component {
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row style={{marginTop: 20}}>
-                    <Col span={24}>
-                        <Form.Item
-                            {...formItemLayout}
-                            label='业主查看人'
-                        >
-                            {getFieldDecorator('NextPeople', {
-                            })(
-                                <Select style={{width: 400}}>
-                                    {
-                                        NextPeopleList.length > 0 ? NextPeopleList.map(item => {
-                                            return <Option value={item.ID} key={item.ID}>{item.Full_Name}</Option>;
-                                        }) : ''
-                                    }
-                                </Select>
-                            )}
-                        </Form.Item>
-                    </Col>
-                </Row>
+                {
+                    this.getOpinion()
+                }
                 <Row style={{marginTop: 20}}>
                     <Col span={24} style={{textAlign: 'center'}}>
                         <Button
@@ -84,7 +98,7 @@ class WeekForm extends Component {
                             退回
                         </Button>
                     </Col>
-                </Row>
+                </Row>;
             </Form>
         </div>);
     }
@@ -108,6 +122,10 @@ class WeekForm extends Component {
                     Val: values.Opinion
                 }];
                 console.log('下一执行人', values.NextPeople);
+                let NextNode = WEEK_THREENODE_ID;
+                if (CurrentNode === WEEK_THREENODE_ID) {
+                    NextNode = WEEK_FOURNODE_ID;
+                }
                 let params = {
                     FlowID, // 流程ID
                     FlowName, // 流程名称
@@ -116,9 +134,9 @@ class WeekForm extends Component {
                     CurrentNodeName, // 当前节点名称
                     FormValue: {
                         FormParams: FormParams,
-                        NodeID: WEEK_THREENODE_ID // 下一节点ID
+                        NodeID: NextNode // 下一节点ID
                     }, // 表单值
-                    NextExecutor: values.NextPeople, // 下一节点执行人
+                    NextExecutor: values.NextPeople || 0, // 下一节点执行人
                     Executor // 当前节点执行人
                 };
                 postSendwork({}, params).then(rep => {
@@ -167,6 +185,7 @@ class WeekForm extends Component {
                         NodeID: WEEK_ONENODE_ID // 下一节点ID
                     }, // 表单值
                     NextExecutor: Starter, // 下一节点执行人
+                    BackNode: WEEK_ONENODE_ID,
                     Executor // 当前节点执行人
                 };
                 postBackwork({}, params).then(rep => {

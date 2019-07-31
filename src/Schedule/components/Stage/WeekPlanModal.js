@@ -12,6 +12,9 @@ import {
     DatePicker,
     Steps
 } from 'antd';
+import {
+    ExecuteStateList
+} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
@@ -153,32 +156,58 @@ export default class WeekPlanModal extends Component {
                                 current={workFlow.length - 1}
                             >
                                 {workFlow.map(item => {
-                                    console.log();
-                                    if (item.RunTime) {
-                                        return <Step title={
-                                            <div>
-                                                <span>{item.CurrentNodeName}</span>
-                                                <span style={{marginLeft: 10}}>-(已完成)</span>
-                                            </div>
-                                        } description={
-                                            <div>
-                                                <span>
-                                                    {item.CurrentNodeName}人：
-                                                    {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
-                                                </span>
-                                                <span style={{marginLeft: 20}}>
-                                                    {item.CurrentNodeName}时间：
-                                                    {item.RunTime}
-                                                </span>
-                                            </div>
-                                        } />;
+                                    if (item.ExecuteState === 1) {
+                                        if (item.CurrentNodeName === '结束') {
+                                            return <Step title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
+                                                </div>
+                                            } />;
+                                        } else {
+                                            return <Step title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
+                                                </div>
+                                            } description={
+                                                <div>
+                                                    <span>
+                                                        {item.CurrentNodeName}人：
+                                                        {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
+                                                    </span>
+                                                    <span style={{marginLeft: 20}}>
+                                                        {item.CurrentNodeName}时间：
+                                                        {item.RunTime}
+                                                    </span>
+                                                </div>
+                                            } />;
+                                        }
                                     } else {
                                         if (item.ExecutorObj) {
                                             // 未结束
                                             return <Step title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
-                                                    <span style={{marginLeft: 10}}>-(执行中)</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
                                                     <span style={{marginLeft: 20}}>
                                                         当前执行人：
                                                         <span style={{color: '#108ee9'}}>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
@@ -190,7 +219,13 @@ export default class WeekPlanModal extends Component {
                                             return <Step title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
-                                                    <span style={{marginLeft: 10}}>-(已结束)</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
                                                 </div>
                                             } />;
                                         }

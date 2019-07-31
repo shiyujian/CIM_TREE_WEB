@@ -15,11 +15,12 @@ import {
     ActualForm,
     ActualDetail
 } from './FormDetail';
+import { getUser } from '_platform/auth';
 import {
     WEEK_ID,
     ACYUAL_ID,
     WFStatusList,
-    OWNERCHECKLIST,
+    ExecuteStateList,
     TOTAL_ID
 } from '_platform/api';
 const { Step } = Steps;
@@ -194,7 +195,7 @@ class TaskDetail extends Component {
         }
         return node;
     }
-    getFormItem = () => {
+    getFormItem = (item) => {
         let node = '';
         const { FlowID } = this.state;
         if (FlowID === TOTAL_ID) {
@@ -257,12 +258,18 @@ class TaskDetail extends Component {
                             current={workFlow.length - 1}
                         >
                             {workFlow.map(item => {
-                                if (item.RunTime) {
+                                if (item.ExecuteState === 1) {
                                     // 已完成
                                     return <Step title={
                                         <div>
                                             <span>{item.CurrentNodeName}</span>
-                                            <span style={{marginLeft: 10}}>-(已完成)</span>
+                                            <span style={{marginLeft: 10}}>-({
+                                                ExecuteStateList.map(row => {
+                                                    if (row.value === item.ExecuteState) {
+                                                        return row.label;
+                                                    }
+                                                })
+                                            })</span>
                                         </div>
                                     } description={
                                         <div>
@@ -276,23 +283,57 @@ class TaskDetail extends Component {
                                             </span>
                                         </div>
                                     } />;
+                                } else if (item.ExecuteState === 2) {
+                                    // 退回
+                                    return <Step title={
+                                        <div>
+                                            <span>{item.CurrentNodeName}</span>
+                                            <span style={{marginLeft: 10}}>-({
+                                                ExecuteStateList.map(row => {
+                                                    if (row.value === item.ExecuteState) {
+                                                        return row.label;
+                                                    }
+                                                })
+                                            })</span>
+                                        </div>
+                                    } />;
                                 } else {
                                     if (item.ExecutorObj) {
-                                        // 未结束
-                                        return <Step title={
-                                            <div>
-                                                <span>{item.CurrentNodeName}</span>
-                                                <span style={{marginLeft: 10}}>-(执行中)</span>
-                                                <span style={{marginLeft: 20}}>
-                                                    当前执行人：
-                                                    <span style={{color: '#108ee9'}}>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
-                                                </span>
-                                            </div>
-                                        } description={
-                                            <div>
-                                                {this.getFormItem()}
-                                            </div>
-                                        } />;
+                                        if (item.ExecutorObj && item.ExecutorObj.ID === getUser().ID) {
+                                            // 已执行
+                                            return <Step title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
+                                                    <span style={{marginLeft: 20}}>
+                                                        当前执行人：
+                                                        <span style={{color: '#108ee9'}}>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                                    </span>
+                                                </div>
+                                            } description={
+                                                <div>
+                                                    { this.getFormItem(item) }
+                                                </div>
+                                            } />;
+                                        } else {
+                                            // 未执行
+                                            return <Step title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-(未执行)</span>
+                                                    <span style={{marginLeft: 20}}>
+                                                        当前执行人：
+                                                        <span style={{color: '#108ee9'}}>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                                    </span>
+                                                </div>
+                                            } />;
+                                        }
                                     } else {
                                         // 已结束
                                         return <Step title={

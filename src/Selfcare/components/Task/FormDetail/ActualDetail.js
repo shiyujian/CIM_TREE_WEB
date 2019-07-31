@@ -32,34 +32,20 @@ class ActualDetail extends Component {
     render () {
         const {
             param,
-            TableList,
-            form: { getFieldDecorator }
+            TableList
         } = this.props;
-        console.log('详情页面', param, TableList);
         return (<div>
-            <Form layout='inline'>
+            <Form {...formItemLayout} layout='inline'>
                 <Row gutter={15}>
                     <Col span={12}>
                         <FormItem
-                            {...formItemLayout}
                             label='标段:'
                         >
-                            {getFieldDecorator('Section', {
-                                initialValue: param.Section,
-                                rules: [
-                                    {
-                                        required: false,
-                                        message: '请输入标段'
-                                    }
-                                ]
-                            })(
-                                <Input readOnly style={{width: 220}} />
-                            )}
+                            <Input value={param.Section} disabled style={{width: 220}} />
                         </FormItem>
                     </Col>
                     <Col span={12}>
                         <FormItem
-                            {...formItemLayout}
                             label='日期'
                         >
                             <DatePicker
