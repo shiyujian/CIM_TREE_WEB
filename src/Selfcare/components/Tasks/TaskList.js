@@ -40,114 +40,6 @@ class TaskList extends Component {
             loadingProcess: false, // 待办loading
             loadingFinish: false // 待办loading
         };
-        this.columnsProcess = [{
-            title: '序号',
-            dataIndex: 'index',
-            render (text, record, index) {
-                return index + 1;
-            }
-        }, {
-            title: '任务名称',
-            dataIndex: 'Title'
-        }, {
-            title: '任务类型',
-            dataIndex: 'FlowName'
-        }, {
-            title: '发起人',
-            dataIndex: 'StarterObj',
-            render: (text, record, index) => {
-                return `${text.Full_Name}(${text.User_Name})`;
-            }
-        }, {
-            title: '发起时间',
-            dataIndex: 'CreateTime'
-        }, {
-            title: '当前执行人',
-            dataIndex: 'NextExecutorObj',
-            render: (text, record, index) => {
-                let str = '';
-                if (record.NextExecutorObj && record.NextExecutorObj.Full_Name && record.NextExecutorObj.User_Name) {
-                    str = `${text.Full_Name}(${text.User_Name})`;
-                }
-                return str;
-            }
-        }, {
-            title: '流转状态',
-            dataIndex: 'WFState',
-            render: (text, record, index) => {
-                let statusValue = '';
-                WFStatus.find(item => {
-                    if (item.value === text) {
-                        statusValue = item.label;
-                    }
-                });
-                return statusValue;
-            }
-        }, {
-            title: '操作',
-            dataIndex: 'active',
-            render: (text, record, index) => {
-                return (<div>
-                    <Link to={`/selfcare/task/${record.ID}`}>
-                        <span>
-                            查看详情
-                        </span>
-                    </Link>
-                </div>);
-            }
-        }];
-        this.columnsFinish = [{
-            title: '序号',
-            dataIndex: 'index',
-            render (text, record, index) {
-                return index + 1;
-            }
-        }, {
-            title: '任务名称',
-            dataIndex: 'Title'
-        }, {
-            title: '任务类型',
-            dataIndex: 'FlowName'
-        }, {
-            title: '发起人',
-            dataIndex: 'StarterObj',
-            render: (text, record, index) => {
-                return `${text.Full_Name}(${text.User_Name})`;
-            }
-        }, {
-            title: '发起时间',
-            dataIndex: 'StartTime'
-        }, {
-            title: '执行人',
-            dataIndex: 'Executor'
-        }, {
-            title: '执行时间',
-            dataIndex: 'RunTime'
-        }, {
-            title: '任务状态',
-            dataIndex: 'WFState',
-            render: (text, record, index) => {
-                let statusValue = '';
-                WFStatus.find(item => {
-                    if (item.value === text) {
-                        statusValue = item.label;
-                    }
-                });
-                return statusValue;
-            }
-        }, {
-            title: '操作',
-            dataIndex: 'active',
-            render: (text, record, index) => {
-                return (<div>
-                    <Link to={`/selfcare/task/${record.ID}`}>
-                        <span>
-                            查看详情
-                        </span>
-                    </Link>
-                </div>);
-            }
-        }];
         this.getProcessList = this.getProcessList.bind(this); // 获取待办列表
         this.getFinishList = this.getFinishList.bind(this); // 获取已办列表
         this.getFlowList = this.getFlowList.bind(this); // 获取任务列表
@@ -202,7 +94,7 @@ class TaskList extends Component {
         });
     }
     getFinishList () {
-        let { getWorkprocessesList } = this.props.actions;
+        let { getWorkList } = this.props.actions;
         let { validateFields } = this.props.form;
         validateFields((err, values) => {
             if (!err) {
@@ -216,21 +108,18 @@ class TaskList extends Component {
                 let params = {
                     workid: '', // 任务ID
                     title: values.name || '', // 任务名称
-                    flowid: '', // 流程类型或名称
+                    flowid: values.type || '', // 流程类型或名称
                     starter: values.starter || '', // 发起人
                     currentnode: '', // 节点ID
                     prevnode: '', // 上一结点ID
                     executor: '', // 执行人
-                    sender: '', // 上一节点发送人
-                    haveexecuted: 1, // 是否已执行 1已办
+                    wfstate: '2', // 待办
                     stime, // 开始时间
                     etime, // 结束时间
-                    keys: '',
-                    values: '',
                     page: '', // 页码
                     size: '' // 页数
                 };
-                getWorkprocessesList({}, params).then(rep => {
+                getWorkList({}, params).then(rep => {
                     if (rep.code === 200) {
                         let finishList = []; // 已办列表
                         rep.content.map(item => {
@@ -380,6 +269,121 @@ class TaskList extends Component {
             type: event.target.value
         });
     }
+    columnsProcess = [{
+        title: '序号',
+        dataIndex: 'index',
+        render: (text, record, index) => {
+            return index + 1;
+        }
+    }, {
+        title: '任务名称',
+        dataIndex: 'Title'
+    }, {
+        title: '任务类型',
+        dataIndex: 'FlowName'
+    }, {
+        title: '发起人',
+        dataIndex: 'StarterObj',
+        render: (text, record, index) => {
+            return `${text.Full_Name}(${text.User_Name})`;
+        }
+    }, {
+        title: '发起时间',
+        dataIndex: 'CreateTime'
+    }, {
+        title: '当前执行人',
+        dataIndex: 'NextExecutorObj',
+        render: (text, record, index) => {
+            let str = '';
+            if (record.NextExecutorObj && record.NextExecutorObj.Full_Name && record.NextExecutorObj.User_Name) {
+                str = `${text.Full_Name}(${text.User_Name})`;
+            }
+            return str;
+        }
+    }, {
+        title: '流转状态',
+        dataIndex: 'WFState',
+        render: (text, record, index) => {
+            let statusValue = '';
+            WFStatus.find(item => {
+                if (item.value === text) {
+                    statusValue = item.label;
+                }
+            });
+            return statusValue;
+        }
+    }, {
+        title: '操作',
+        dataIndex: 'active',
+        render: (text, record, index) => {
+            return (<div>
+                <Link to={`/selfcare/task/${record.ID}`}>
+                    <span>
+                        查看详情
+                    </span>
+                </Link>
+            </div>);
+        }
+    }];
+    columnsFinish = [{
+        title: '序号',
+        dataIndex: 'index',
+        render: (text, record, index) => {
+            return index + 1;
+        }
+    }, {
+        title: '任务名称',
+        dataIndex: 'Title'
+    }, {
+        title: '任务类型',
+        dataIndex: 'FlowName'
+    }, {
+        title: '发起人',
+        dataIndex: 'StarterObj',
+        render: (text, record, index) => {
+            return `${text.Full_Name}(${text.User_Name})`;
+        }
+    }, {
+        title: '发起时间',
+        dataIndex: 'CreateTime'
+    }, {
+        title: '执行人',
+        dataIndex: 'Executor',
+        render: (text, record, index) => {
+            let Executor = '';
+            if (record.ExecutorObj) {
+                Executor = `${record.ExecutorObj.Full_Name}(${record.ExecutorObj.User_Name})`;
+            }
+            return Executor;
+        }
+    }, {
+        title: '执行时间',
+        dataIndex: 'CompleteTime'
+    }, {
+        title: '任务状态',
+        dataIndex: 'WFState',
+        render: (text, record, index) => {
+            let statusValue = '';
+            WFStatus.find(item => {
+                if (item.value === text) {
+                    statusValue = item.label;
+                }
+            });
+            return statusValue;
+        }
+    }, {
+        title: '操作',
+        dataIndex: 'active',
+        render: (text, record, index) => {
+            return (<div>
+                <Link to={`/selfcare/task/${record.ID}`}>
+                    <span>
+                        查看详情
+                    </span>
+                </Link>
+            </div>);
+        }
+    }];
 }
 
 export default Form.create()(TaskList);
