@@ -131,7 +131,7 @@ export default class Stage extends Component {
                             </Sidebar>
                             <Content>
                                 <div>
-                                    <Tabs defaultActiveKey='3'>
+                                    <Tabs defaultActiveKey='2'>
                                         {/* <TabPane tab='总计划进度' key='1'>
                                             <Totalnew {...this.props} {...this.state} />
                                         </TabPane> */}

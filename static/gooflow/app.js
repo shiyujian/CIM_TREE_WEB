@@ -3,7 +3,9 @@ $(function () {
         flow,
         $sliderNode = $('#sliderNode'),
         $sliderLine = $('#sliderLine'),
+        $nodeResetBtn = $('#nodeReset_btn'),
         $nodeOkBtn = $('#nodeOk_btn'),
+        $lineResetBtn = $('#lineReset_btn'),
         $lineOkBtn = $('#lineOk_btn'),
         $sliderbtn = $('#sliderbtn');
 
@@ -316,6 +318,12 @@ $(function () {
             $sliderLine.hide();
         }
         flow.blurItem();
+    }
+    function onResetLine () {
+
+    }
+    function onResetNode () {
+
     }
     let focusObj = {}; // 焦点元素原值
     // 获取焦点
@@ -736,14 +744,15 @@ $(function () {
     }
 
     function onItemBlur (id, mode) {
-        if (mode == 'node') {
-            updateNode(this.$nodeData[id]);
-        } else {
-            updateLine(this.$lineData[id], id);
-        }
-        $sliderNode.hide();
-        $sliderLine.hide();
-        return true;
+
+        // if (mode == 'node') {
+        //     updateNode(this.$nodeData[id]);
+        // } else {
+        //     updateLine(this.$lineData[id], id);
+        // }
+        // $sliderNode.hide();
+        // $sliderLine.hide();
+        // return true;
     }
 
     function getUrlParam (name) {
@@ -765,7 +774,12 @@ $(function () {
         };
         flow.onItemFocus = onItemFocus;
         $nodeOkBtn.click(onSubmitNode);
+        $nodeResetBtn.click(onResetNode);
         $lineOkBtn.click(onSubmitLine);
+        $lineResetBtn.click(onResetLine);
+        flow.onItemBlur = onItemBlur; // 失去焦点
+        flow.onItemAdd = onItemAdd; // 添加节点和流向
+        flow.onItemDel = onItemDel; // 删除节点流向
         $.get(getNodeListUrl, {
             flowid: temp_id, // 流程ID
             name: '', // 节点名称
@@ -869,9 +883,6 @@ $(function () {
         //     $('#loading').remove();
         //     $('#svg').remove();
 
-        //     flow.onItemAdd = onItemAdd;
-        //     // flow.onItemBlur = onItemBlur;
-        //     flow.onItemDel = onItemDel;
         //     flow.onPrintClick = function () {
         //         flow.exportDiagram(exportName);
         //     };
