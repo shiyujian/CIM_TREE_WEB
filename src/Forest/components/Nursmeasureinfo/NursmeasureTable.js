@@ -761,6 +761,8 @@ export default class NursmeasureTable extends Component {
         }
         let tblData = rst.content;
         if (tblData instanceof Array) {
+            let userIDList = [];
+            let userDataList = {};
             for (let i = 0; i < tblData.length; i++) {
                 let plan = tblData[i];
                 plan.statusname =
@@ -774,7 +776,16 @@ export default class NursmeasureTable extends Component {
                     : '/';
                 plan.Project = getProjectNameBySection(plan.BD, thinClassTree);
                 plan.sectionName = getSectionNameBySection(plan.BD, thinClassTree);
-                let userData = await getUserDetail({id: plan.Inputer});
+                let userData = '';
+                if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
+                    userData = await getUserDetail({id: plan.Inputer});
+                } else {
+                    userData = userDataList[Number(plan.Inputer)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
                 plan.InputerName = (userData && userData.Full_Name) || '';
                 plan.InputerUserName = (userData && userData.User_Name) || '';
             }

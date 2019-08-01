@@ -620,6 +620,8 @@ export default class SupervisorTable extends Component {
         }
         let tblData = rst.content;
         if (tblData instanceof Array) {
+            let userIDList = [];
+            let userDataList = {};
             for (let i = 0; i < tblData.length; i++) {
                 let plan = tblData[i];
                 plan.order = (page - 1) * size + i + 1;
@@ -645,7 +647,16 @@ export default class SupervisorTable extends Component {
                     : '/';
                 plan.yssj1 = yssj1;
                 plan.yssj2 = yssj2;
-                let userData = await getUserDetail({id: plan.Supervisor});
+                let userData = '';
+                if (userIDList.indexOf(Number(plan.Supervisor)) === -1) {
+                    userData = await getUserDetail({id: plan.Supervisor});
+                } else {
+                    userData = userDataList[Number(plan.Supervisor)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
                 plan.SupervisorName = (userData && userData.Full_Name) || '';
                 plan.SupervisorUserName = (userData && userData.User_Name) || '';
             }

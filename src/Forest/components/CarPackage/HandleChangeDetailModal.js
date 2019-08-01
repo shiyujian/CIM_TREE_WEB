@@ -216,6 +216,8 @@ class HandleChangeDetailModal extends Component {
             let rst = await getNurserysByPack({}, postData);
             if (rst && rst.content) {
                 let details = rst.content;
+                let userIDList = [];
+                let userDataList = {};
                 if (details && details instanceof Array && details.length > 0) {
                     for (let i = 0; i < details.length; i++) {
                         let plan = details[i];
@@ -226,7 +228,18 @@ class HandleChangeDetailModal extends Component {
                         plan.liftertime2 = plan.CreateTime
                             ? moment(plan.CreateTime).format('HH:mm:ss')
                             : '/';
-                        let userData = await getUserDetail({id: plan.Inputer});
+
+                        let userData = '';
+                        if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
+                            userData = await getUserDetail({id: plan.Inputer});
+                        } else {
+                            userData = userDataList[Number(plan.Inputer)];
+                        }
+                        if (userData && userData.ID) {
+                            userIDList.push(userData.ID);
+                            userDataList[userData.ID] = userData;
+                        }
+
                         plan.InputerName = (userData && userData.Full_Name) || '';
                         plan.InputerUserName = (userData && userData.User_Name) || '';
                     }

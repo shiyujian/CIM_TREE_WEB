@@ -617,6 +617,8 @@ export default class CheckerTable extends Component {
         }
         let tblData = rst.content;
         if (tblData instanceof Array) {
+            let userIDList = [];
+            let userDataList = {};
             for (let i = 0; i < tblData.length; i++) {
                 let plan = tblData[i];
                 plan.order = (page - 1) * size + i + 1;
@@ -641,7 +643,16 @@ export default class CheckerTable extends Component {
                     : '/';
                 plan.checktime1 = checktime1;
                 plan.checktime2 = checktime2;
-                let userData = await getUserDetail({id: plan.Checker});
+                let userData = '';
+                if (userIDList.indexOf(Number(plan.Checker)) === -1) {
+                    userData = await getUserDetail({id: plan.Checker});
+                } else {
+                    userData = userDataList[Number(plan.Checker)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
                 plan.CheckerName = (userData && userData.Full_Name) || '';
                 plan.CheckerUserName = (userData && userData.User_Name) || '';
             }
