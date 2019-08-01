@@ -464,6 +464,8 @@ export default class CarPackageTable extends Component {
             }
             let tblData = rst.content;
             if (tblData instanceof Array) {
+                let userIDList = [];
+                let userDataList = {};
                 for (let i = 0; i < tblData.length; i++) {
                     let plan = tblData[i];
                     plan.order = (page - 1) * size + i + 1;
@@ -475,7 +477,18 @@ export default class CarPackageTable extends Component {
                         : '/';
                     plan.Project = await getProjectNameBySection(plan.Section, thinClassTree);
                     plan.sectionName = await getSectionNameBySection(plan.Section, thinClassTree);
-                    let userData = await getUserDetail({id: plan.Constructioner});
+
+                    let userData = '';
+                    if (userIDList.indexOf(Number(plan.Constructioner)) === -1) {
+                        userData = await getUserDetail({id: plan.Constructioner});
+                    } else {
+                        userData = userDataList[Number(plan.Constructioner)];
+                    }
+
+                    if (userData && userData.ID) {
+                        userIDList.push(userData.ID);
+                        userDataList[userData.ID] = userData;
+                    }
                     plan.ConstructionerName = (userData && userData.Full_Name) || '';
                     plan.ConstructionerUserName = (userData && userData.User_Name) || '';
                     plan.SupervisorName = (plan.SupervisorUser && plan.SupervisorUser.Full_Name) || '';

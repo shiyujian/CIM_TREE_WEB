@@ -199,12 +199,11 @@ export default class CarPackDetailModal extends Component {
             this.setState({ loading1: false, percent1: 100 });
             if (!rst) return;
             let details = rst.content;
+            let userIDList = [];
+            let userDataList = {};
             if (details instanceof Array) {
                 for (let i = 0; i < details.length; i++) {
                     let plan = details[i];
-                    let userData = await getUserDetail({id: plan.Inputer});
-                    plan.InputerName = (userData && userData.Full_Name) || '';
-                    plan.InputerUserName = (userData && userData.User_Name) || '';
                     plan.order = (page - 1) * size + i + 1;
                     plan.liftertime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
@@ -212,6 +211,18 @@ export default class CarPackDetailModal extends Component {
                     plan.liftertime2 = plan.CreateTime
                         ? moment(plan.CreateTime).format('HH:mm:ss')
                         : '/';
+                    let userData = '';
+                    if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
+                        userData = await getUserDetail({id: plan.Inputer});
+                    } else {
+                        userData = userDataList[Number(plan.Inputer)];
+                    }
+                    if (userData && userData.ID) {
+                        userIDList.push(userData.ID);
+                        userDataList[userData.ID] = userData;
+                    }
+                    plan.InputerName = (userData && userData.Full_Name) || '';
+                    plan.InputerUserName = (userData && userData.User_Name) || '';
                 }
                 const pagination1 = { ...this.state.pagination1 };
                 pagination1.total = rst.pageinfo.total;

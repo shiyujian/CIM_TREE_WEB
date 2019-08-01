@@ -1033,6 +1033,8 @@ export default class LocmeasureTable extends Component {
         }
         let tblData = rst.content;
         if (tblData instanceof Array) {
+            let userIDList = [];
+            let userDataList = {};
             for (let i = 0; i < tblData.length; i++) {
                 let plan = tblData[i];
                 plan.order = (page - 1) * size + i + 1;
@@ -1062,7 +1064,16 @@ export default class LocmeasureTable extends Component {
                 plan.createtime2 = createtime2;
                 plan.createtime3 = createtime3;
                 plan.createtime4 = createtime4;
-                let userData = await getUserDetail({id: plan.Inputer});
+                let userData = '';
+                if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
+                    userData = await getUserDetail({id: plan.Inputer});
+                } else {
+                    userData = userDataList[Number(plan.Inputer)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
                 plan.InputerName = (userData && userData.Full_Name) || '';
                 plan.InputerUserName = (userData && userData.User_Name) || '';
             }
