@@ -54,23 +54,17 @@ export default class Checkerinfo extends Component {
         const {
             actions: {
                 getTreeList,
-                getForestUsers,
                 getTreeNodeList,
                 setkeycode,
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree
             },
-            users,
             treetypes,
             platform: { tree = {} }
         } = this.props;
 
         setkeycode('');
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
         if (!treetypes) {
             getTreeList();
         }

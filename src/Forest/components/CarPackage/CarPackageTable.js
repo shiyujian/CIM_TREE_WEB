@@ -455,8 +455,13 @@ export default class CarPackageTable extends Component {
             });
 
             let rst = await getcarpackage({}, postdata);
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
+            if (!(rst && rst.content)) {
+                this.setState({
+                    loading: false,
+                    percent: 100
+                });
+                return;
+            }
             let tblData = rst.content;
             if (tblData instanceof Array) {
                 for (let i = 0; i < tblData.length; i++) {
@@ -479,7 +484,12 @@ export default class CarPackageTable extends Component {
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
-                this.setState({ tblData, pagination });
+                this.setState({
+                    tblData,
+                    pagination,
+                    loading: false,
+                    percent: 100
+                });
             }
         } catch (e) {
             console.log('query', e);

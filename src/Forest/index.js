@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-18 09:44:52
+ * @Last Modified time: 2019-07-31 20:40:49
  */
 /**
  *
@@ -80,7 +80,6 @@ export default class ForestContainer extends Component {
             Enteranalyze = null,
             Scheduleanalyze = null,
             Dataimport = null,
-            Contrastinfo = null,
             CarPackage = null,
             DataExport = null,
             SeedlingsChange = null,
@@ -178,12 +177,6 @@ export default class ForestContainer extends Component {
                         <Route
                             path='/forest/dataexport'
                             component={DataExport}
-                        />
-                    )}
-                    {Contrastinfo && (
-                        <Route
-                            path='/forest/contrastinfo'
-                            component={Contrastinfo}
                         />
                     )}
                     {SeedlingsChange && (

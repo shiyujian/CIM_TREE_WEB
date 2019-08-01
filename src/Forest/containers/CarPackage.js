@@ -51,7 +51,6 @@ export default class CarPackage extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getForestUsers,
                 getTreeNodeList,
                 setkeycode,
                 getThinClassList,
@@ -63,7 +62,6 @@ export default class CarPackage extends Component {
                 getNurseryListOK,
                 getSupplierListOK
             },
-            users,
             platform: { tree = {} },
             treetypes,
             nurseryList,
@@ -71,10 +69,6 @@ export default class CarPackage extends Component {
         } = this.props;
 
         setkeycode('');
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
         if (!nurseryList) {
             let nurseryData = await getNurseryList();
             if (nurseryData && nurseryData.content) {

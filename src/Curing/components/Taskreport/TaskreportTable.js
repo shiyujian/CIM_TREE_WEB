@@ -324,7 +324,7 @@ export default class TaskReportTable extends Component {
                                 type={
                                     this.state.mapLayerBtnType
                                         ? 'primary'
-                                        : 'info'
+                                        : 'default'
                                 }
                                 onClick={this._toggleTileLayer.bind(this, 1)}
                             >
@@ -333,7 +333,7 @@ export default class TaskReportTable extends Component {
                             <Button
                                 type={
                                     this.state.mapLayerBtnType
-                                        ? 'info'
+                                        ? 'default'
                                         : 'primary'
                                 }
                                 onClick={this._toggleTileLayer.bind(this, 2)}

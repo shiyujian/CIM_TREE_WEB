@@ -249,24 +249,24 @@ export default class RiskTree extends Component {
                                                 </div>
                                                 <div className='RiskTree-button'>
                                                     <Button className='RiskTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'all' ? 'primary' : ''}
+                                                        type={timeType === 'all' ? 'primary' : 'default'}
                                                         id='all' onClick={this.handleTimeChange.bind(this)}>
                                                         全部
                                                     </Button>
                                                     <Button className='RiskTree-button-layout' id='today'
-                                                        type={timeType === 'today' ? 'primary' : ''}
+                                                        type={timeType === 'today' ? 'primary' : 'default'}
                                                         onClick={this.handleTimeChange.bind(this)}>
                                                         今天
                                                     </Button>
                                                 </div>
                                                 <div className='RiskTree-button'>
                                                     <Button className='RiskTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'week' ? 'primary' : ''}
+                                                        type={timeType === 'week' ? 'primary' : 'default'}
                                                         id='week' onClick={this.handleTimeChange.bind(this)}>
                                                         一周内
                                                     </Button>
                                                     <Button className='RiskTree-button-layout' id='custom'
-                                                        type={timeType === 'custom' ? 'primary' : ''}
+                                                        type={timeType === 'custom' ? 'primary' : 'default'}
                                                         onClick={this.handleTimeChange.bind(this)}>
                                                         自定义
                                                     </Button>

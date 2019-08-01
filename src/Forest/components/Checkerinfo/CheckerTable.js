@@ -91,8 +91,7 @@ export default class CheckerTable extends Component {
             smallclassoption,
             thinclassoption,
             typeoption,
-            statusoption,
-            users
+            statusoption
         } = this.props;
         const {
             sxm,
@@ -176,21 +175,15 @@ export default class CheckerTable extends Component {
             },
             {
                 title: '抽查人',
-                dataIndex: 'Checker',
+                dataIndex: 'CheckerName',
                 render: (text, record) => {
-                    if (text === 0) {
+                    if (record.CheckerUserName && record.CheckerName) {
+                        return <p>{record.CheckerName + '(' + record.CheckerUserName + ')'}</p>;
+                    } else if (record.CheckerName && !record.CheckerUserName) {
+                        return <p>{record.CheckerName}</p>;
+                    } else {
                         return <p> / </p>;
                     }
-                    return (
-                        <span>
-                            {users && users[text]
-                                ? users[text].Full_Name +
-                                  '(' +
-                                  users[text].User_Name +
-                                  ')'
-                                : ''}
-                        </span>
-                    );
                 }
             },
             {
@@ -565,7 +558,7 @@ export default class CheckerTable extends Component {
         const { resetinput, leftkeycode } = this.props;
         resetinput(leftkeycode);
     }
-    query (page) {
+    query = async (page) => {
         const {
             sxm = '',
             section = '',
@@ -587,7 +580,10 @@ export default class CheckerTable extends Component {
             return;
         }
         const {
-            actions: { getqueryTree },
+            actions: {
+                getqueryTree,
+                getUserDetail
+            },
             keycode = '',
             platform: { tree = {} }
         } = this.props;
@@ -607,51 +603,63 @@ export default class CheckerTable extends Component {
             treetype
         };
         if (role) postdata[role] = rolename;
-        this.setState({ loading: true, percent: 0 });
-        getqueryTree({}, postdata).then(rst => {
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
-            let tblData = rst.content;
-            if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
-                    // const {attrs = {}} = plan;
-                    plan.order = (page - 1) * size + i + 1;
-                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
-                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-                    let statusname = '';
-                    plan.SupervisorCheck = plan.SupervisorCheck;
-                    plan.CheckStatus = plan.CheckStatus;
-                    plan.statusname = statusname;
-
-                    let locationstatus = plan.LocationTime
-                        ? '已定位'
-                        : '未定位';
-                    plan.locationstatus = locationstatus;
-                    // 改为验收时间
-                    let checktime1 = plan.CheckTime
-                        ? moment(plan.CheckTime).format('YYYY-MM-DD')
-                        : '/';
-                    let checktime2 = plan.CheckTime
-                        ? moment(plan.CheckTime).format('HH:mm:ss')
-                        : '/';
-                    plan.checktime1 = checktime1;
-                    plan.checktime2 = checktime2;
-                });
-                const pagination = { ...this.state.pagination };
-                let messageTotalNum = rst.pageinfo.total;
-                let treeTotalNum = rst.total;
-
-                pagination.total = rst.pageinfo.total;
-                pagination.pageSize = size;
-                this.setState({
-                    tblData,
-                    pagination: pagination,
-                    messageTotalNum: messageTotalNum,
-                    treeTotalNum
-                });
-            }
+        this.setState({
+            loading: true,
+            percent: 0
         });
+        let rst = await getqueryTree({}, postdata);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
+        let tblData = rst.content;
+        if (tblData instanceof Array) {
+            for (let i = 0; i < tblData.length; i++) {
+                let plan = tblData[i];
+                plan.order = (page - 1) * size + i + 1;
+                plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                let statusname = '';
+                plan.SupervisorCheck = plan.SupervisorCheck;
+                plan.CheckStatus = plan.CheckStatus;
+                plan.statusname = statusname;
+
+                let locationstatus = plan.LocationTime
+                    ? '已定位'
+                    : '未定位';
+                plan.locationstatus = locationstatus;
+                // 改为验收时间
+                let checktime1 = plan.CheckTime
+                    ? moment(plan.CheckTime).format('YYYY-MM-DD')
+                    : '/';
+                let checktime2 = plan.CheckTime
+                    ? moment(plan.CheckTime).format('HH:mm:ss')
+                    : '/';
+                plan.checktime1 = checktime1;
+                plan.checktime2 = checktime2;
+                let userData = await getUserDetail({id: plan.Checker});
+                plan.CheckerName = (userData && userData.Full_Name) || '';
+                plan.CheckerUserName = (userData && userData.User_Name) || '';
+            }
+            const pagination = { ...this.state.pagination };
+            let messageTotalNum = rst.pageinfo.total;
+            let treeTotalNum = rst.total;
+
+            pagination.total = rst.pageinfo.total;
+            pagination.pageSize = size;
+            this.setState({
+                tblData,
+                pagination: pagination,
+                messageTotalNum: messageTotalNum,
+                treeTotalNum,
+                loading: false,
+                percent: 100
+            });
+        }
     }
 
     exportexcel () {

@@ -84,14 +84,15 @@ class HandleChangeDetailModal extends Component {
         },
         {
             title: '填报人',
-            dataIndex: 'Inputer',
+            dataIndex: 'InputerName',
             render: (text, record) => {
-                const { users } = this.props;
-                return (
-                    <span>
-                        {users && users[text] ? users[text].Full_Name : ''}
-                    </span>
-                );
+                if (record.InputerUserName && record.InputerName) {
+                    return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                } else if (record.InputerName && !record.InputerUserName) {
+                    return <p>{record.InputerName}</p>;
+                } else {
+                    return <p> / </p>;
+                }
             }
         },
         {
@@ -199,7 +200,8 @@ class HandleChangeDetailModal extends Component {
     getNurseryData = async () => {
         const {
             actions: {
-                getNurserysByPack
+                getNurserysByPack,
+                getUserDetail
             },
             currentRecord
         } = this.props;
@@ -212,11 +214,11 @@ class HandleChangeDetailModal extends Component {
         });
         try {
             let rst = await getNurserysByPack({}, postData);
-            this.setState({ detailModalLoading: false, detailModalPercent: 100 });
             if (rst && rst.content) {
                 let details = rst.content;
                 if (details && details instanceof Array && details.length > 0) {
-                    details.forEach((plan, i) => {
+                    for (let i = 0; i < details.length; i++) {
+                        let plan = details[i];
                         plan.order = i + 1;
                         plan.liftertime1 = plan.CreateTime
                             ? moment(plan.CreateTime).format('YYYY-MM-DD')
@@ -224,10 +226,14 @@ class HandleChangeDetailModal extends Component {
                         plan.liftertime2 = plan.CreateTime
                             ? moment(plan.CreateTime).format('HH:mm:ss')
                             : '/';
-                    });
+                        let userData = await getUserDetail({id: plan.Inputer});
+                        plan.InputerName = (userData && userData.Full_Name) || '';
+                        plan.InputerUserName = (userData && userData.User_Name) || '';
+                    }
                     this.setState({ details });
                 }
             }
+            this.setState({ detailModalLoading: false, detailModalPercent: 100 });
         } catch (e) {
             console.log('e', e);
         }

@@ -49,7 +49,6 @@ export default class CuringInfo extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getForestUsers,
                 getTreeNodeList,
                 setkeycode,
                 getCuringTypes,
@@ -57,13 +56,8 @@ export default class CuringInfo extends Component {
                 getTotalThinClass,
                 getThinClassTree
             },
-            users,
             platform: { tree = {} }
         } = this.props;
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
         getCuringTypes().then((curingTypesData) => {
             let curingTypes = curingTypesData && curingTypesData.content;
             let curingTypesOption = [];

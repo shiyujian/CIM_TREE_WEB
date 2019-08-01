@@ -49,19 +49,13 @@ export default class DegitalAccept extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getForestUsers,
                 getTreeNodeList,
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree
             },
-            users,
             platform: { tree = {} }
         } = this.props;
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];

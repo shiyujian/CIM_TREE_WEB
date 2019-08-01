@@ -241,8 +241,6 @@ export default class SeedlingsChange extends Component {
         );
     }
     treeTable (details) {
-        const { users } = this.props;
-
         let columns = [];
         let header = '';
         columns = [
@@ -280,18 +278,15 @@ export default class SeedlingsChange extends Component {
             },
             {
                 title: '测量人',
-                dataIndex: 'Inputer',
+                dataIndex: 'InputerName',
                 render: (text, record) => {
-                    return (
-                        <span>
-                            {users && users[text]
-                                ? users[text].Full_Name +
-                                  '(' +
-                                  users[text].User_Name +
-                                  ')'
-                                : ''}
-                        </span>
-                    );
+                    if (record.InputerUserName && record.InputerName) {
+                        return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                    } else if (record.InputerName && !record.InputerUserName) {
+                        return <p>{record.InputerName}</p>;
+                    } else {
+                        return <p> / </p>;
+                    }
                 }
             },
             {
@@ -703,10 +698,13 @@ export default class SeedlingsChange extends Component {
         const { resetinput, leftkeycode } = this.props;
         resetinput(leftkeycode);
     }
-    async query (page) {
+    query = async (page) => {
         const { stime = '', etime = '', size } = this.state;
         const {
-            actions: { getqueryTree },
+            actions: {
+                getqueryTree,
+                getUserDetail
+            },
             keycode = '',
             platform: { tree = {} }
         } = this.props;
@@ -737,52 +735,64 @@ export default class SeedlingsChange extends Component {
         };
 
         this.setState({ loading: true, percent: 0 });
-        getqueryTree({}, postdata).then(async rst => {
-            this.setState({ loading: false, percent: 100 });
-            if (!rst || !rst.content) return;
+        let rst = await getqueryTree({}, postdata);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
 
-            let tblData = rst.content;
-            if (tblData instanceof Array) {
-                let sxmArr = [];
+        let tblData = rst.content;
+        if (tblData instanceof Array) {
+            let sxmArr = [];
+            for (let i = 0; i < tblData.length; i++) {
+                let plan = tblData[i];
+                sxmArr.push(plan.ZZBM);
+                plan.order = (page - 1) * size + i + 1;
+                plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
 
-                tblData.map((plan, i) => {
-                    sxmArr.push(plan.ZZBM);
-                    plan.order = (page - 1) * size + i + 1;
-                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
-                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-
-                    let statusname = '';
-                    if (plan.SupervisorCheck == -1) statusname = '未抽查';
-                    else if (plan.SupervisorCheck == 0) { statusname = '抽查未通过'; } else if (plan.SupervisorCheck === 1) {
-                        statusname = '抽查通过';
-                    }
-                    plan.statusname = statusname;
-                    let islocation = plan.LocationTime ? '已定位' : '未定位';
-                    plan.islocation = islocation;
-                    let createtime1 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('YYYY-MM-DD')
-                        : '/';
-                    let createtime2 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('HH:mm:ss')
-                        : '/';
-                    let createtime3 = plan.LocationTime
-                        ? moment(plan.LocationTime).format('YYYY-MM-DD')
-                        : '/';
-                    let createtime4 = plan.LocationTime
-                        ? moment(plan.LocationTime).format('HH:mm:ss')
-                        : '/';
-                    plan.createtime1 = createtime1;
-                    plan.createtime2 = createtime2;
-                    plan.createtime3 = createtime3;
-                    plan.createtime4 = createtime4;
-                });
-
-                const pagination = { ...this.state.pagination };
-                pagination.total = rst.pageinfo.total;
-                pagination.pageSize = size;
-                this.setState({ tblData, pagination: pagination });
+                let statusname = '';
+                if (plan.SupervisorCheck == -1) statusname = '未抽查';
+                else if (plan.SupervisorCheck == 0) { statusname = '抽查未通过'; } else if (plan.SupervisorCheck === 1) {
+                    statusname = '抽查通过';
+                }
+                plan.statusname = statusname;
+                let islocation = plan.LocationTime ? '已定位' : '未定位';
+                plan.islocation = islocation;
+                let createtime1 = plan.CreateTime
+                    ? moment(plan.CreateTime).format('YYYY-MM-DD')
+                    : '/';
+                let createtime2 = plan.CreateTime
+                    ? moment(plan.CreateTime).format('HH:mm:ss')
+                    : '/';
+                let createtime3 = plan.LocationTime
+                    ? moment(plan.LocationTime).format('YYYY-MM-DD')
+                    : '/';
+                let createtime4 = plan.LocationTime
+                    ? moment(plan.LocationTime).format('HH:mm:ss')
+                    : '/';
+                plan.createtime1 = createtime1;
+                plan.createtime2 = createtime2;
+                plan.createtime3 = createtime3;
+                plan.createtime4 = createtime4;
+                let userData = await getUserDetail({id: plan.Inputer});
+                plan.InputerName = (userData && userData.Full_Name) || '';
+                plan.InputerUserName = (userData && userData.User_Name) || '';
             }
-        });
+
+            const pagination = { ...this.state.pagination };
+            pagination.total = rst.pageinfo.total;
+            pagination.pageSize = size;
+            this.setState({
+                tblData,
+                pagination: pagination,
+                loading: false,
+                percent: 100
+            });
+        }
     }
 }

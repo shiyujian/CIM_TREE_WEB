@@ -57,7 +57,6 @@ export default class CheckGroupTree extends Component {
                 contents.push(element);
             }
         }
-        console.log('groupSelectKey', groupSelectKey);
         return (
             <div>
                 <Tree

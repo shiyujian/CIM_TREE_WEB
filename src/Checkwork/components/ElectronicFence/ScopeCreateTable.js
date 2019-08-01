@@ -114,9 +114,7 @@ export default class ScopeCreateTable extends Component {
                 });
                 return;
             }
-            // 此处圈选区域的数组与其他地方不一样，因林总不需要lat，lng这两个字段，院内api需要
-            coordinates.push(e.latlng);
-            // coordinates.push([e.latlng.lat, e.latlng.lng]);
+            coordinates.push([e.latlng.lat, e.latlng.lng]);
             if (me.state.polygonData) {
                 me.map.removeLayer(me.state.polygonData);
             }
@@ -148,6 +146,438 @@ export default class ScopeCreateTable extends Component {
                     tiletype: 'wtms'
                 }
             ).addTo(this.map);
+        }
+    }
+    // 控制基础树图层是否展示
+    treeLayerChange = () => {
+        const {
+            treeLayerChecked
+        } = this.state;
+        if (treeLayerChecked) {
+            if (this.tileTreeLayerBasic) {
+                this.map.removeLayer(this.tileTreeLayerBasic);
+            }
+        } else {
+            this.getTileLayer2();
+        }
+        this.setState({
+            treeLayerChecked: !treeLayerChecked
+        });
+    }
+    // 选择标段是否展示数据，或是隐藏数据
+    async handleAreaCheck (keys, info) {
+        const {
+            areaLayerList
+        } = this.state;
+        let me = this;
+        try {
+            // 当前选中的节点
+            let eventKey = info.node.props.eventKey;
+            let children = info.node.props.children;
+            // 当前的选中状态
+            let checked = info.checked;
+            // 选中节点对key进行处理
+            let handleKey = eventKey.split('-');
+            // 如果选中的是小班，则遍历添加图层
+            if (handleKey.length === 4) {
+                if (children) {
+                    if (checked) {
+                        children.map((child) => {
+                            this.handleThinClassSelect(child.key);
+                        });
+                    } else {
+                        children.map((child) => {
+                            if (areaLayerList[child.key]) {
+                                areaLayerList[child.key].map((layer) => {
+                                    me.map.removeLayer(layer);
+                                });
+                            }
+                        });
+                    }
+                }
+            } else if (handleKey.length === 5) {
+                // 如果选中的是细班，则直接添加图层
+                if (checked) {
+                    this.handleThinClassSelect(eventKey);
+                } else {
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].map((layer) => {
+                            me.map.removeLayer(layer);
+                        });
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('分辨是否为标段', e);
+        }
+    }
+    // 处理细班选择的状态
+    handleThinClassSelect = async (eventKey) => {
+        const {
+            areaLayerList
+        } = this.state;
+        // 如果之前添加过，直接将添加过的再次添加，不用再次请求
+        if (areaLayerList[eventKey]) {
+            areaLayerList[eventKey].map((layer) => {
+                layer.addTo(this.map);
+                this.map.fitBounds(layer.getBounds());
+            });
+        } else {
+            // 如果不是添加过，需要请求数据
+            this._addAreaLayer(eventKey);
+        }
+    }
+    // 选中标段，则在地图上加载电子围栏图层
+    async _addAreaLayer (eventKey) {
+        const {
+            areaLayerList
+        } = this.state;
+        const {
+            actions: {
+                getTreearea
+            }
+        } = this.props;
+        try {
+            let coords = await handleAreaLayerData(eventKey, getTreearea);
+            if (coords && coords instanceof Array && coords.length > 0) {
+                for (let i = 0; i < coords.length; i++) {
+                    let str = coords[i];
+                    let treearea = handleCoordinates(str);
+                    let message = {
+                        key: 3,
+                        type: 'Feature',
+                        properties: {name: '', type: 'area'},
+                        geometry: { type: 'Polygon', coordinates: treearea }
+                    };
+                    let layer = this._createMarker(message);
+                    if (i === coords.length - 1) {
+                        this.map.fitBounds(layer.getBounds());
+                    }
+                    if (areaLayerList[eventKey]) {
+                        areaLayerList[eventKey].push(layer);
+                    } else {
+                        areaLayerList[eventKey] = [layer];
+                    }
+                }
+
+                this.setState({
+                    areaLayerList
+                });
+            };
+        } catch (e) {
+
+        }
+    }
+    // 群体选中的处理
+    handleGroupSelect = async (keys, info) => {
+        const {
+            actions: {
+                getCheckScope
+            }
+        } = this.props;
+        const {
+            groupScopeLayerList,
+            groupScopeDataList
+        } = this.state;
+        try {
+            this._handleCreateScopeCancel();
+            // 节点的点击状态
+            let selected = info.selected;
+            // 节点的具体信息
+            let node = info.node.props;
+            // 点击节点的key
+            let eventKey = (keys && keys[0]) || '';
+            // 点击节点是否存在电子围栏数据
+            let groupScopeStatus = false;
+            // 群体的名称
+            let groupSelectTitle = '';
+            for (let i in groupScopeLayerList) {
+                this.map.removeLayer(groupScopeLayerList[i]);
+            }
+            if (selected) {
+                // 群体名称
+                groupSelectTitle = node.title;
+                // 如果之前获取过数据  则直接加载
+                if (groupScopeLayerList[eventKey]) {
+                    groupScopeLayerList[eventKey].addTo(this.map);
+                    this.map.fitBounds(groupScopeLayerList[eventKey].getBounds());
+                    groupScopeStatus = true;
+                } else {
+                    // 否则重新获取
+                    let data = await getCheckScope({groupId: eventKey});
+                    // 存在数据  说明有电子围栏
+                    if (data && data.content && data.content instanceof Array && data.content.length > 0) {
+                        groupScopeStatus = true;
+                        groupScopeDataList[eventKey] = data.content[0];
+                        // 点击群体的电子围栏的坐标数据
+                        let wkt = data.content[0].Gem;
+                        let str = '';
+                        let groupScopeData = '';
+                        if (wkt) {
+                            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                            groupScopeData = handleCoordinates(str);
+                            console.log('groupScopeData', groupScopeData);
+                            let groupScopeLayer = L.polygon(groupScopeData, {
+                                color: 'yellow',
+                                fillColor: 'yellow',
+                                fillOpacity: 0.3
+                            }).addTo(this.map);
+                            this.map.fitBounds(groupScopeLayer.getBounds());
+                            groupScopeLayerList[eventKey] = groupScopeLayer;
+                        }
+                    }
+                }
+            }
+            this.setState({
+                groupSelectKey: eventKey,
+                groupSelected: selected,
+                groupSelectTitle,
+                groupScopeStatus,
+                groupScopeDataList,
+                groupScopeLayerList
+            });
+        } catch (e) {
+            console.log('handleGroupSelect', e);
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        if (geo.properties.type === 'area') {
+            // 创建区域图形
+            let layer = L.polygon(geo.geometry.coordinates, {
+                color: '#201ffd',
+                fillColor: fillAreaColor(geo.key),
+                fillOpacity: 0.3
+            }).addTo(this.map);
+            return layer;
+        }
+    }
+    // 更新电子围栏按钮
+    _handlePutScope = async () => {
+        this.setState({
+            createBtnVisible: true,
+            scopeAddStatus: '更新'
+        });
+    }
+    // 增加电子围栏按钮
+    _handleAddScope = async () => {
+        this.setState({
+            createBtnVisible: true,
+            scopeAddStatus: '创建'
+        });
+    }
+    // 删除电子围栏按钮
+    _handleDelectScope = async () => {
+        const {
+            groupScopeDataList,
+            groupSelectKey
+        } = this.state;
+        const {
+            actions: {
+                deleteCheckScope
+            }
+        } = this.props;
+        try {
+            // 删除选中群体的电子围栏
+            let data = await deleteCheckScope({id: groupScopeDataList[groupSelectKey].id});
+            if (data && data.code && data.code === 1) {
+                Notification.success({
+                    message: '电子围栏删除成功',
+                    duration: 3
+                });
+                this.deleteGroupSelectScope();
+            } else {
+                Notification.error({
+                    message: '电子围栏删除失败',
+                    duration: 3
+                });
+                return;
+            }
+        } catch (e) {
+            console.log('delete', e);
+        }
+    }
+    // 确定圈选地图
+    _handleCreateScopeOk = async () => {
+        const {
+            coordinates
+        } = this.state;
+        this.setState({
+            scopeModalVisible: true
+        });
+        try {
+            // 坐标
+            // 选择面积
+            let regionArea = 0;
+            regionArea = computeSignedArea(coordinates, 2);
+
+            regionArea = regionArea * 0.0015;
+            this.setState({
+                regionArea,
+                noLoading: true
+            });
+        } catch (e) {
+            console.log('树木数量', e);
+        }
+    }
+    // 圈选图层返回上一步
+    _handleCreateScopeRetreat = async () => {
+        const {
+            coordinates
+        } = this.state;
+        let me = this;
+        if (me.state.polygonData) {
+            me.map.removeLayer(me.state.polygonData);
+        }
+        coordinates.pop();
+        if (coordinates.length === 0) {
+            this.setState({
+                polygonData: '',
+                coordinates: []
+            });
+            return;
+        }
+        let polygonData = L.polygon(coordinates, {
+            color: 'white',
+            fillColor: 'red',
+            fillOpacity: 0.5
+        }).addTo(me.map);
+        me.setState({
+            coordinates,
+            polygonData: polygonData
+        });
+    }
+    // 撤销圈选图层
+    _handleCreateScopeCancel =() => {
+        const {
+            areaLayerList,
+            polygonData
+        } = this.state;
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        for (let i in areaLayerList) {
+            areaLayerList[i].map((layer) => {
+                this.map.removeLayer(layer);
+            });
+        }
+        this.reSetButState();
+    }
+    // 确认下发任务
+    handleScopeModalOk = async () => {
+        const {
+            polygonData
+        } = this.state;
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        await this.deleteGroupSelectScope();
+        // 取消下发任务时清空之前存储的state
+        await this.reSetModalState();
+        // 取消圈选地图和按钮的visible
+        await this.reSetButState();
+        // 更新电子围栏之后，需要重新点击获取电子围栏，所以需要将选中的节点设置为未选中状态
+        await this.reSetGroupTreeSelect();
+    }
+    // 在增加，更新，或删除电子围栏之后，需要将地图上的信息去除，存储的信息去除
+    deleteGroupSelectScope = () => {
+        const {
+            groupScopeDataList,
+            groupScopeLayerList,
+            groupSelectKey
+        } = this.state;
+        // 删除选中的电子围栏坐标数据
+        if (groupScopeDataList[groupSelectKey]) {
+            delete groupScopeDataList[groupSelectKey];
+        }
+        // 删除选中的电子围栏图层数据
+        if (groupScopeLayerList[groupSelectKey]) {
+            this.map.removeLayer(groupScopeLayerList[groupSelectKey]);
+            delete groupScopeLayerList[groupSelectKey];
+        }
+        this.setState({
+            groupScopeStatus: false,
+            groupScopeDataList,
+            groupScopeLayerList
+        });
+    }
+    // 更新电子围栏之后，需要重新点击获取电子围栏，所以需要将选中的节点设置为未选中状态
+    reSetGroupTreeSelect = () => {
+        this.setState({
+            groupSelectKey: '',
+            groupSelected: false,
+            groupSelectTitle: ''
+        });
+    }
+    // 取消下发任务
+    handleScopeModalCancel = () => {
+        this.reSetModalState();
+    }
+    // 取消下发任务时清空之前存储的state
+    reSetModalState = () => {
+        this.setState({
+            scopeModalVisible: false,
+            noLoading: false,
+            regionArea: 0
+        });
+    }
+    // 取消圈选地图和按钮的visible
+    reSetButState = () => {
+        this.setState({
+            createBtnVisible: false,
+            polygonData: '',
+            coordinates: []
+        });
+    }
+    /* 菜单展开收起 */
+    _extendAndFold () {
+        this.setState({ menuIsExtend: !this.state.menuIsExtend });
+    }
+    // 切换为2D
+    _toggleTileLayer (index) {
+        this.tileLayer.setUrl(TILEURLS[index]);
+        this.setState({
+            TileLayerUrl: TILEURLS[index],
+            mapLayerBtnType: !this.state.mapLayerBtnType
+        });
+    }
+    /* 渲染菜单panel */
+    renderPanel (option) {
+        const {
+            platform: {
+                tree = {}
+            },
+            groupTreeLoading,
+            areaTreeLoading,
+            checkGroupsData = []
+        } = this.props;
+        if (option && option.value) {
+            switch (option.value) {
+                // 区域地块
+                case 'geojsonFeature_area':
+                    return (
+                        <Spin spinning={areaTreeLoading}>
+                            <AreaTree
+                                {...this.props}
+                                {...this.state}
+                                onCheck={this.handleAreaCheck.bind(this)}
+                                content={tree.thinClassTree || []}
+                            />
+                        </Spin>
+
+                    );
+                case 'geojsonFeature_checkWork':
+                    return (
+                        <Spin spinning={groupTreeLoading}>
+                            <CheckGroupTree
+                                {...this.props}
+                                {...this.state}
+                                onSelect={this.handleGroupSelect.bind(this)}
+                                content={checkGroupsData || []}
+                            />
+                        </Spin>
+                    );
+            }
         }
     }
     render () {
@@ -321,433 +751,5 @@ export default class ScopeCreateTable extends Component {
                     </div>
                 </div>
             </div>);
-    }
-    /* 渲染菜单panel */
-    renderPanel (option) {
-        const {
-            platform: {
-                tree = {}
-            },
-            groupTreeLoading,
-            areaTreeLoading,
-            checkGroupsData = []
-        } = this.props;
-        if (option && option.value) {
-            switch (option.value) {
-                // 区域地块
-                case 'geojsonFeature_area':
-                    return (
-                        <Spin spinning={areaTreeLoading}>
-                            <AreaTree
-                                {...this.props}
-                                {...this.state}
-                                onCheck={this.handleAreaCheck.bind(this)}
-                                content={tree.thinClassTree || []}
-                            />
-                        </Spin>
-
-                    );
-                case 'geojsonFeature_checkWork':
-                    return (
-                        <Spin spinning={groupTreeLoading}>
-                            <CheckGroupTree
-                                {...this.props}
-                                {...this.state}
-                                onSelect={this.handleGroupSelect.bind(this)}
-                                content={checkGroupsData || []}
-                            />
-                        </Spin>
-                    );
-            }
-        }
-    }
-    // 控制基础树图层是否展示
-    treeLayerChange = () => {
-        const {
-            treeLayerChecked
-        } = this.state;
-        if (treeLayerChecked) {
-            if (this.tileTreeLayerBasic) {
-                this.map.removeLayer(this.tileTreeLayerBasic);
-            }
-        } else {
-            this.getTileLayer2();
-        }
-        this.setState({
-            treeLayerChecked: !treeLayerChecked
-        });
-    }
-    // 选择标段是否展示数据，或是隐藏数据
-    async handleAreaCheck (keys, info) {
-        const {
-            areaLayerList
-        } = this.state;
-        let me = this;
-        try {
-            // 当前选中的节点
-            let eventKey = info.node.props.eventKey;
-            let children = info.node.props.children;
-            // 当前的选中状态
-            let checked = info.checked;
-            // 选中节点对key进行处理
-            let handleKey = eventKey.split('-');
-            // 如果选中的是小班，则遍历添加图层
-            if (handleKey.length === 4) {
-                if (children) {
-                    if (checked) {
-                        children.map((child) => {
-                            this.handleThinClassSelect(child.key);
-                        });
-                    } else {
-                        children.map((child) => {
-                            if (areaLayerList[child.key]) {
-                                areaLayerList[child.key].map((layer) => {
-                                    me.map.removeLayer(layer);
-                                });
-                            }
-                        });
-                    }
-                }
-            } else if (handleKey.length === 5) {
-                // 如果选中的是细班，则直接添加图层
-                if (checked) {
-                    this.handleThinClassSelect(eventKey);
-                } else {
-                    if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].map((layer) => {
-                            me.map.removeLayer(layer);
-                        });
-                    }
-                }
-            }
-        } catch (e) {
-            console.log('分辨是否为标段', e);
-        }
-    }
-    // 处理细班选择的状态
-    handleThinClassSelect = async (eventKey) => {
-        const {
-            areaLayerList
-        } = this.state;
-        // 如果之前添加过，直接将添加过的再次添加，不用再次请求
-        if (areaLayerList[eventKey]) {
-            areaLayerList[eventKey].map((layer) => {
-                layer.addTo(this.map);
-                this.map.fitBounds(layer.getBounds());
-            });
-        } else {
-            // 如果不是添加过，需要请求数据
-            this._addAreaLayer(eventKey);
-        }
-    }
-    // 选中标段，则在地图上加载电子围栏图层
-    async _addAreaLayer (eventKey) {
-        const {
-            areaLayerList
-        } = this.state;
-        const {
-            actions: {
-                getTreearea
-            }
-        } = this.props;
-        try {
-            let coords = await handleAreaLayerData(eventKey, getTreearea);
-            if (coords && coords instanceof Array && coords.length > 0) {
-                for (let i = 0; i < coords.length; i++) {
-                    let str = coords[i];
-                    let treearea = handleCoordinates(str);
-                    let message = {
-                        key: 3,
-                        type: 'Feature',
-                        properties: {name: '', type: 'area'},
-                        geometry: { type: 'Polygon', coordinates: treearea }
-                    };
-                    let layer = this._createMarker(message);
-                    if (i === coords.length - 1) {
-                        this.map.fitBounds(layer.getBounds());
-                    }
-                    if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].push(layer);
-                    } else {
-                        areaLayerList[eventKey] = [layer];
-                    }
-                }
-
-                this.setState({
-                    areaLayerList
-                });
-            };
-        } catch (e) {
-
-        }
-    }
-    // 群体选中的处理
-    handleGroupSelect = async (keys, info) => {
-        const {
-            actions: {
-                getCheckScope
-            }
-        } = this.props;
-        const {
-            groupScopeLayerList,
-            groupScopeDataList
-        } = this.state;
-        try {
-            // 节点的点击状态
-            let selected = info.selected;
-            // 节点的具体信息
-            let node = info.node.props;
-            // 点击节点的key
-            let eventKey = (keys && keys[0]) || '';
-            // 点击节点是否存在电子围栏数据
-            let groupScopeStatus = false;
-            // 群体的名称
-            let groupSelectTitle = '';
-            for (let i in groupScopeLayerList) {
-                this.map.removeLayer(groupScopeLayerList[i]);
-            }
-            if (selected) {
-                // 群体名称
-                groupSelectTitle = node.title;
-                // 如果之前获取过数据  则直接加载
-                if (groupScopeLayerList[eventKey]) {
-                    groupScopeLayerList[eventKey].addTo(this.map);
-                    this.map.fitBounds(groupScopeLayerList[eventKey].getBounds());
-                    groupScopeStatus = true;
-                } else {
-                    // 否则重新获取
-                    let data = await getCheckScope({id: eventKey});
-                    // 存在数据  说明有电子围栏
-                    if (data && data instanceof Array && data.length > 0) {
-                        groupScopeStatus = true;
-                        // 点击群体的电子围栏的坐标数据
-                        let groupScopeData = data && data[0] && data[0].boundary;
-                        let groupScopeLayer = L.polygon(groupScopeData, {
-                            color: 'yellow',
-                            fillColor: 'yellow',
-                            fillOpacity: 0.3
-                        }).addTo(this.map);
-                        this.map.fitBounds(groupScopeLayer.getBounds());
-                        groupScopeLayerList[eventKey] = groupScopeLayer;
-                        groupScopeDataList[eventKey] = data[0];
-                    }
-                }
-            }
-            this.setState({
-                groupSelectKey: eventKey,
-                groupSelected: selected,
-                groupSelectTitle,
-                groupScopeStatus,
-                groupScopeDataList,
-                groupScopeLayerList
-            });
-        } catch (e) {
-            console.log('e', e);
-        }
-    }
-    /* 在地图上添加marker和polygan */
-    _createMarker (geo) {
-        if (geo.properties.type === 'area') {
-            // 创建区域图形
-            let layer = L.polygon(geo.geometry.coordinates, {
-                color: '#201ffd',
-                fillColor: fillAreaColor(geo.key),
-                fillOpacity: 0.3
-            }).addTo(this.map);
-            return layer;
-        }
-    }
-    // 更新电子围栏按钮
-    _handlePutScope = async () => {
-        this.setState({
-            createBtnVisible: true,
-            scopeAddStatus: '更新'
-        });
-    }
-    // 增加电子围栏按钮
-    _handleAddScope = async () => {
-        this.setState({
-            createBtnVisible: true,
-            scopeAddStatus: '创建'
-        });
-    }
-    // 删除电子围栏按钮
-    _handleDelectScope = async () => {
-        const {
-            groupScopeDataList,
-            groupSelectKey
-        } = this.state;
-        const {
-            actions: {
-                deleteCheckScope
-            }
-        } = this.props;
-        try {
-            // 删除选中群体的电子围栏
-            let data = await deleteCheckScope({id: groupScopeDataList[groupSelectKey].id});
-            if (data) {
-                Notification.error({
-                    message: '电子围栏删除失败',
-                    duration: 3
-                });
-                return;
-            } else {
-                Notification.success({
-                    message: '电子围栏删除成功',
-                    duration: 3
-                });
-                this.deleteGroupSelectScope();
-            }
-        } catch (e) {
-            console.log('delete', e);
-        }
-    }
-    // 确定圈选地图
-    _handleCreateScopeOk = async () => {
-        const {
-            coordinates
-        } = this.state;
-        this.setState({
-            scopeModalVisible: true
-        });
-        try {
-            // 坐标
-            let coords = [];
-            coordinates.map((data) => {
-                coords.push([data.lat, data.lng]);
-            });
-            // 选择面积
-            let regionArea = 0;
-            regionArea = computeSignedArea(coords, 2);
-
-            regionArea = regionArea * 0.0015;
-            this.setState({
-                regionArea,
-                noLoading: true
-            });
-        } catch (e) {
-            console.log('树木数量', e);
-        }
-    }
-    // 圈选图层返回上一步
-    _handleCreateScopeRetreat = async () => {
-        const {
-            coordinates
-        } = this.state;
-        let me = this;
-        if (me.state.polygonData) {
-            me.map.removeLayer(me.state.polygonData);
-        }
-        coordinates.pop();
-        if (coordinates.length === 0) {
-            this.setState({
-                polygonData: '',
-                coordinates: []
-            });
-            return;
-        }
-        let polygonData = L.polygon(coordinates, {
-            color: 'white',
-            fillColor: 'red',
-            fillOpacity: 0.5
-        }).addTo(me.map);
-        me.setState({
-            coordinates,
-            polygonData: polygonData
-        });
-    }
-    // 撤销圈选图层
-    _handleCreateScopeCancel =() => {
-        const {
-            areaLayerList,
-            polygonData
-        } = this.state;
-        if (polygonData) {
-            this.map.removeLayer(polygonData);
-        }
-        for (let i in areaLayerList) {
-            areaLayerList[i].map((layer) => {
-                this.map.removeLayer(layer);
-            });
-        }
-        this.reSetButState();
-    }
-    // 确认下发任务
-    handleScopeModalOk = async () => {
-        const {
-            polygonData
-        } = this.state;
-        if (polygonData) {
-            this.map.removeLayer(polygonData);
-        }
-        await this.deleteGroupSelectScope();
-        // 取消下发任务时清空之前存储的state
-        await this.reSetModalState();
-        // 取消圈选地图和按钮的visible
-        await this.reSetButState();
-        // 更新电子围栏之后，需要重新点击获取电子围栏，所以需要将选中的节点设置为未选中状态
-        await this.reSetGroupTreeSelect();
-    }
-    // 在增加，更新，或删除电子围栏之后，需要将地图上的信息去除，存储的信息去除
-    deleteGroupSelectScope = () => {
-        const {
-            groupScopeDataList,
-            groupScopeLayerList,
-            groupSelectKey
-        } = this.state;
-        // 删除选中的电子围栏坐标数据
-        if (groupScopeDataList[groupSelectKey]) {
-            delete groupScopeDataList[groupSelectKey];
-        }
-        // 删除选中的电子围栏图层数据
-        if (groupScopeLayerList[groupSelectKey]) {
-            this.map.removeLayer(groupScopeLayerList[groupSelectKey]);
-            delete groupScopeLayerList[groupSelectKey];
-        }
-        this.setState({
-            groupScopeStatus: false,
-            groupScopeDataList,
-            groupScopeLayerList
-        });
-    }
-    // 更新电子围栏之后，需要重新点击获取电子围栏，所以需要将选中的节点设置为未选中状态
-    reSetGroupTreeSelect = () => {
-        this.setState({
-            groupSelectKey: '',
-            groupSelected: false,
-            groupSelectTitle: ''
-        });
-    }
-    // 取消下发任务
-    handleScopeModalCancel = () => {
-        this.reSetModalState();
-    }
-    // 取消下发任务时清空之前存储的state
-    reSetModalState = () => {
-        this.setState({
-            scopeModalVisible: false,
-            noLoading: false,
-            regionArea: 0
-        });
-    }
-    // 取消圈选地图和按钮的visible
-    reSetButState = () => {
-        this.setState({
-            createBtnVisible: false,
-            polygonData: '',
-            coordinates: []
-        });
-    }
-    /* 菜单展开收起 */
-    _extendAndFold () {
-        this.setState({ menuIsExtend: !this.state.menuIsExtend });
-    }
-    // 切换为2D
-    _toggleTileLayer (index) {
-        this.tileLayer.setUrl(TILEURLS[index]);
-        this.setState({
-            TileLayerUrl: TILEURLS[index],
-            mapLayerBtnType: !this.state.mapLayerBtnType
-        });
     }
 }

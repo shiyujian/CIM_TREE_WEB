@@ -70,23 +70,18 @@ export default class Nursmeasureinfo extends Component {
         const {
             actions: {
                 getTreeList,
-                getForestUsers,
                 getTreeNodeList,
                 setkeycode,
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree
             },
-            users,
             treetypes,
             platform: { tree = {} }
         } = this.props;
         // 避免反复获取森林用户数据，提高效率
 
         setkeycode('');
-        if (!users) {
-            await getForestUsers();
-        }
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
             getTreeList().then(x => this.setTreeTypeOption(x));

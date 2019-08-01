@@ -88,8 +88,7 @@ export default class NursmeasureTable extends Component {
             typeoption,
             mmtypeoption,
             keycode = '',
-            statusoption,
-            users
+            statusoption
         } = this.props;
         const {
             sxm,
@@ -186,18 +185,15 @@ export default class NursmeasureTable extends Component {
         });
         columns.push({
             title: '填报人',
-            dataIndex: 'Inputer',
+            dataIndex: 'InputerName',
             render: (text, record) => {
-                return (
-                    <span>
-                        {users && users[text]
-                            ? users[text].Full_Name +
-                              '(' +
-                              users[text].User_Name +
-                              ')'
-                            : ''}
-                    </span>
-                );
+                if (record.InputerUserName && record.InputerName) {
+                    return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                } else if (record.InputerName && !record.InputerUserName) {
+                    return <p>{record.InputerName}</p>;
+                } else {
+                    return <p> / </p>;
+                }
             }
         });
         columns.push({
@@ -458,7 +454,7 @@ export default class NursmeasureTable extends Component {
                             onChange={this.nurschange.bind(this)}
                         />
                     </div>
-                    <div className='forest-mrg10'>
+                    {/* <div className='forest-mrg10'>
                         <span className='forest-search-span'>填报人：</span>
                         <Input
                             suffix={suffix2}
@@ -466,7 +462,7 @@ export default class NursmeasureTable extends Component {
                             className='forest-forestcalcw4'
                             onChange={this.onRoleNameChange.bind(this)}
                         />
-                    </div>
+                    </div> */}
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>状态：</span>
                         <Select
@@ -701,7 +697,7 @@ export default class NursmeasureTable extends Component {
         resetinput(leftkeycode);
     }
 
-    query (page) {
+    query = async (page) => {
         const {
             sxm = '',
             section = '',
@@ -725,7 +721,10 @@ export default class NursmeasureTable extends Component {
             return;
         }
         const {
-            actions: { getnurserys },
+            actions: {
+                getnurserys,
+                getUserDetail
+            },
             keycode = '',
             platform: { tree = {} }
         } = this.props;
@@ -752,30 +751,43 @@ export default class NursmeasureTable extends Component {
         }
         if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
-        getnurserys({}, postdata).then(rst => {
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
-            let tblData = rst.content;
-            if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
-                    plan.statusname =
-                        plan.IsPack === 0 ? '未打包' : '已打包';
-                    plan.order = (page - 1) * size + i + 1;
-                    plan.liftertime1 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('YYYY-MM-DD')
-                        : '/';
-                    plan.liftertime2 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('HH:mm:ss')
-                        : '/';
-                    plan.Project = getProjectNameBySection(plan.BD, thinClassTree);
-                    plan.sectionName = getSectionNameBySection(plan.BD, thinClassTree);
-                });
-                const pagination = { ...this.state.pagination };
-                pagination.total = rst.pageinfo.total;
-                pagination.pageSize = size;
-                this.setState({ tblData, pagination });
+        let rst = await getnurserys({}, postdata);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
+        let tblData = rst.content;
+        if (tblData instanceof Array) {
+            for (let i = 0; i < tblData.length; i++) {
+                let plan = tblData[i];
+                plan.statusname =
+                    plan.IsPack === 0 ? '未打包' : '已打包';
+                plan.order = (page - 1) * size + i + 1;
+                plan.liftertime1 = plan.CreateTime
+                    ? moment(plan.CreateTime).format('YYYY-MM-DD')
+                    : '/';
+                plan.liftertime2 = plan.CreateTime
+                    ? moment(plan.CreateTime).format('HH:mm:ss')
+                    : '/';
+                plan.Project = getProjectNameBySection(plan.BD, thinClassTree);
+                plan.sectionName = getSectionNameBySection(plan.BD, thinClassTree);
+                let userData = await getUserDetail({id: plan.Inputer});
+                plan.InputerName = (userData && userData.Full_Name) || '';
+                plan.InputerUserName = (userData && userData.User_Name) || '';
             }
-        });
+            const pagination = { ...this.state.pagination };
+            pagination.total = rst.pageinfo.total;
+            pagination.pageSize = size;
+            this.setState({
+                tblData,
+                pagination,
+                loading: false,
+                percent: 100
+            });
+        }
     }
 
     exportexcel () {

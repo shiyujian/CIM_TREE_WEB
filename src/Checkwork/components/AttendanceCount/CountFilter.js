@@ -140,7 +140,7 @@ class CountFilter extends Component {
             groupList.content.map(group => {
                 groupArray.push(
                     <Option key={group.id} value={group.id}>
-                        {group.name}
+                        {group.Name}
                     </Option>
                 );
             });
@@ -394,38 +394,6 @@ class CountFilter extends Component {
         });
     }
 
-    onCheckinChange (value) { // 出勤选择下拉框和状态选择下拉框联动
-        const {
-            form: { setFieldsValue }
-        } = this.props;
-        setFieldsValue({
-            status: undefined
-        });
-        let statusArray = [];
-        if (value === 'y') { // 出勤时可以选择的状态有正常打卡,迟到,和早退
-            let arr = [{label: '正常打卡', value: 4}, {label: '迟到', value: 2}, {label: '早退', value: 3}];
-            arr.map(p => {
-                statusArray.push(
-                    <Option key={p.value} value={p.value}>
-                        {p.label}
-                    </Option>
-                );
-            });
-        } else if (value === 'n') { // 缺勤时可以选择的状态有打卡一次
-            let arr = [{label: '未打卡', value: 1}];
-            arr.map(p => {
-                statusArray.push(
-                    <Option key={p.value} value={p.value}>
-                        {p.label}
-                    </Option>
-                );
-            });
-        }
-        this.setState({
-            statusArray: statusArray
-        });
-    }
-
     render () {
         const {
             form: { getFieldDecorator }
@@ -464,7 +432,7 @@ class CountFilter extends Component {
                             </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='考勤群体'>
-                                    {getFieldDecorator('group', {
+                                    {getFieldDecorator('groupId', {
 
                                     })(
                                         <Select placeholder='请选择考勤群体' allowClear>
@@ -473,21 +441,6 @@ class CountFilter extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='姓名'>
-                                    {getFieldDecorator('name', {
-
-                                    })(
-                                        <Input placeholder='请输入姓名' />
-                                    )}
-                                </FormItem>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-                <Row gutter={24}>
-                    <Col span={18}>
-                        <Row>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='时间'>
                                     {getFieldDecorator('searchDate', {
@@ -507,58 +460,16 @@ class CountFilter extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='出勤'>
-                                    {getFieldDecorator('checkin', {
-
-                                    })(
-                                        <Select
-                                            allowClear
-                                            placeholder='请选择是否出勤'
-                                            onChange={this.onCheckinChange.bind(this)}
-                                        >
-                                            <Option
-                                                key={'n'}
-                                                value={'n'}
-                                            >
-                                                缺勤
-                                            </Option>
-                                            <Option
-                                                key={'y'}
-                                                value={'y'}
-                                            >
-                                                出勤
-                                            </Option>
-                                        </Select>
-                                    )}
-                                </FormItem>
-                            </Col>
-                            <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='状态'>
-                                    {getFieldDecorator('status', {
-
-                                    })(
-                                        <Select placeholder='请选择状态' allowClear>
-                                            {statusArray}
-                                        </Select>
-                                    )}
-                                </FormItem>
-                            </Col>
                         </Row>
                     </Col>
                     <Col span={5} offset={1}>
                         <Row gutter={10}>
                             <Col span={12}>
                                 <Button
-                                    type='Primary'
+                                    type='primary'
                                     onClick={this.query.bind(this)}
                                 >
                                     查询
-                                </Button>
-                            </Col>
-                            <Col span={12}>
-                                <Button onClick={this.clear.bind(this)}>
-                                    清除
                                 </Button>
                             </Col>
                         </Row>
@@ -567,6 +478,34 @@ class CountFilter extends Component {
                 <Row gutter={24}>
                     <Col span={18}>
                         <Row>
+                            <Col span={8}>
+                                <FormItem {...CountFilter.layout} label='状态'>
+                                    {getFieldDecorator('status', {
+
+                                    })(
+                                        <Select placeholder='请选择状态' allowClear>
+                                            <Option tile='出勤' value={1} key='出勤'>
+                                                出勤
+                                            </Option>
+                                            <Option tile='迟到' value={2} key='迟到'>
+                                                迟到
+                                            </Option>
+                                            <Option tile='早退' value={3} key='早退'>
+                                                早退
+                                            </Option>
+                                            <Option tile='迟到并早退' value={4} key='迟到并早退'>
+                                                迟到并早退
+                                            </Option>
+                                            <Option tile='请假' value={5} key='请假'>
+                                                请假
+                                            </Option>
+                                            <Option tile='缺勤' value={0} key='缺勤'>
+                                                缺勤
+                                            </Option>
+                                        </Select>
+                                    )}
+                                </FormItem>
+                            </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='角色'>
                                     {getFieldDecorator('role', {
@@ -608,6 +547,15 @@ class CountFilter extends Component {
                             </Col>
                         </Row>
                     </Col>
+                    <Col span={5} offset={1}>
+                        <Row gutter={10}>
+                            <Col span={12}>
+                                <Button onClick={this.clear.bind(this)}>
+                                    清除
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Col>
                 </Row>
             </Form>
         );
@@ -646,10 +594,8 @@ class CountFilter extends Component {
             end
         } = this.state;
         setFieldsValue({
-            checkin: undefined,
             duty: undefined,
-            group: undefined,
-            name: undefined,
+            groupId: undefined,
             orgID: userCompany || undefined,
             role: undefined,
             searchDate: undefined,

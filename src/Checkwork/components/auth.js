@@ -52,14 +52,12 @@ export const handleCoordinates = (str) => {
 // 处理搜索数据
 export const handleFilterData = (values, start, end) => {
     let params = {};
-    params.org_code = values.org_code ? values.org_code : '';
-    params.group = values.group ? values.group : '';
-    params.name = values.name ? values.name : '';
+    params.orgID = values.orgID ? values.orgID : '';
+    params.groupId = values.groupId ? values.groupId : '';
     if (values.searchDate) {
-        params.start = start;
-        params.end = end;
+        params.sTime = start;
+        params.eTime = end;
     }
-    params.checkin = values.checkin ? values.checkin : '';
     if (values.status === 2) { // 迟到默认可查询状态5
         params.status = values.status + ',5';
     } else if (values.status === 3) { // 早退默认可查询状态5

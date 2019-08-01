@@ -28,13 +28,7 @@ export const changeNursery = createAction(`${ID}传递nurseryName`);
 export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
 export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供应商名字`);
-const getForestUsersOK = createAction('获取森林数据用户列表');
 const getTreeListOK = createAction('获取森林树种列表');
-
-/** ***************************院内************************/
-export const getForestUsers = forestFetchAction(`${FOREST_API}/system/users`, [
-    getForestUsersOK
-]);
 
 export const getTree = forestFetchAction(`${FOREST_API}/tree/wpunits`, [
     getTreeOK
@@ -430,7 +424,6 @@ export const actions = {
     getTotalSat,
     getTreeLocations,
     getExportTreeLocations,
-    getForestUsers,
     getTreeOK,
     getTree,
     setkeycode,
@@ -554,20 +547,6 @@ export default handleActions({
         ...state,
         faith: faithInfoReducer(state.faith, action)
     }),
-    [getForestUsersOK]: (state, {
-        payload: {
-            content
-        }
-    }) => {
-        let users = {};
-        if (content) {
-            content.forEach(user => (users[user.ID] = user));
-        }
-        return {
-            ...state,
-            users
-        };
-    },
     [getTreeListOK]: (state, {
         payload
     }) => ({

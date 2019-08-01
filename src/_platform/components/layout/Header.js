@@ -33,13 +33,36 @@ export default class Header extends Component {
         tasks: 0
     };
     componentDidMount () {
-        const { tasks = 0 } = getUser();
-        if (tasks > 0) {
-            this.setState({
-                dotShow: true,
-                tasks: tasks
-            });
+        const user = getUser();
+        const tasks = user.tasks;
+        if (user && user.ID) {
+            if (tasks > 0) {
+                this.setState({
+                    dotShow: true,
+                    tasks: tasks
+                });
+            }
+        } else {
+            this.clearSystemUser();
         }
+    }
+
+    clearSystemUser = () => {
+        const {
+            history,
+            actions: { clearTab }
+        } = this.props;
+        clearUser();
+        clearTab();
+        removePermissions();
+        window.localStorage.removeItem('LOGIN_USER_DATA');
+        let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
+        if (!remember) {
+            window.localStorage.removeItem('LOGIN_USER_PASSDATA');
+        }
+        setTimeout(() => {
+            history.replace('/login');
+        }, 500);
     }
 
     onClickDot = () => {
@@ -47,6 +70,20 @@ export default class Header extends Component {
             dotShow: false
         });
     };
+
+    selectKeys () {
+        const { match: { params: { module = '' } = {} } = {} } = this.props;
+        const { key = '' } =
+            Header.menus.find(menu => {
+                const pathnames = /^\/(\w+)/.exec(menu.path) || [];
+                return pathnames[1] === module;
+            }) || {};
+        return [key];
+    }
+
+    signOut () {
+        this.clearSystemUser();
+    }
 
     render () {
         const {
@@ -253,34 +290,4 @@ export default class Header extends Component {
             </header>
         );
     }
-
-    selectKeys () {
-        const { match: { params: { module = '' } = {} } = {} } = this.props;
-        const { key = '' } =
-            Header.menus.find(menu => {
-                const pathnames = /^\/(\w+)/.exec(menu.path) || [];
-                return pathnames[1] === module;
-            }) || {};
-        return [key];
-    }
-
-    signOut () {
-        const {
-            history,
-            actions: { clearTab }
-        } = this.props;
-        clearUser();
-        clearTab();
-        removePermissions();
-        window.localStorage.removeItem('LOGIN_USER_DATA');
-        let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
-        if (!remember) {
-            window.localStorage.removeItem('LOGIN_USER_PASSDATA');
-        }
-        setTimeout(() => {
-            history.replace('/login');
-        }, 500);
-    }
-
-    Download () {}
 }

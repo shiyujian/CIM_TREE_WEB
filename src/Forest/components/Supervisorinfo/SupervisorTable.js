@@ -96,7 +96,6 @@ export default class SupervisorTable extends Component {
             treetypeoption,
             thinclassoption,
             statusoption,
-            users,
             typeoption
         } = this.props;
         const {
@@ -166,21 +165,15 @@ export default class SupervisorTable extends Component {
             },
             {
                 title: '监理人',
-                dataIndex: 'Supervisor',
+                dataIndex: 'SupervisorName',
                 render: (text, record) => {
-                    if (text === 0) {
+                    if (record.SupervisorUserName && record.SupervisorName) {
+                        return <p>{record.SupervisorName + '(' + record.SupervisorUserName + ')'}</p>;
+                    } else if (record.SupervisorName && !record.SupervisorUserName) {
+                        return <p>{record.SupervisorName}</p>;
+                    } else {
                         return <p> / </p>;
                     }
-                    return (
-                        <span>
-                            {users && users[text]
-                                ? users[text].Full_Name +
-                                  '(' +
-                                  users[text].User_Name +
-                                  ')'
-                                : ''}
-                        </span>
-                    );
                 }
             },
             {
@@ -553,7 +546,7 @@ export default class SupervisorTable extends Component {
         resetinput(leftkeycode);
     }
 
-    query (page) {
+    query = async (page) => {
         const {
             sxm = '',
             section = '',
@@ -577,7 +570,10 @@ export default class SupervisorTable extends Component {
             return;
         }
         const {
-            actions: { getqueryTree },
+            actions: {
+                getqueryTree,
+                getUserDetail
+            },
             keycode = '',
             platform: { tree = {} },
             treetypes
@@ -606,54 +602,67 @@ export default class SupervisorTable extends Component {
             page,
             size,
             bigType,
-            treetype
+            treetype,
+            role: rolename
         };
         if (role) postdata[role] = rolename;
-        this.setState({ loading: true, percent: 0 });
-        getqueryTree({}, postdata).then(rst => {
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
-            let tblData = rst.content;
-            if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
-                    plan.order = (page - 1) * size + i + 1;
-
-                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
-                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    let statusname = '';
-
-                    plan.SupervisorCheck = plan.SupervisorCheck;
-                    plan.CheckStatus = plan.CheckStatus;
-                    plan.statusname = statusname;
-
-                    plan.statusname = statusname;
-                    let locationstatus = plan.LocationTime
-                        ? '已定位'
-                        : '未定位';
-                    plan.locationstatus = locationstatus;
-                    let yssj1 = plan.SupervisorTime
-                        ? moment(plan.SupervisorTime).format('YYYY-MM-DD')
-                        : '/';
-                    let yssj2 = plan.SupervisorTime
-                        ? moment(plan.SupervisorTime).format('HH:mm:ss')
-                        : '/';
-                    plan.yssj1 = yssj1;
-                    plan.yssj2 = yssj2;
-                });
-                let treeTotalNum = rst.total;
-                let messageTotalNum = rst.pageinfo.total;
-                const pagination = { ...this.state.pagination };
-                pagination.total = rst.pageinfo.total;
-                pagination.pageSize = size;
-                this.setState({
-                    tblData,
-                    pagination: pagination,
-                    messageTotalNum: messageTotalNum,
-                    treeTotalNum
-                });
-            }
+        this.setState({
+            loading: true,
+            percent: 0
         });
+        let rst = await getqueryTree({}, postdata);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
+        let tblData = rst.content;
+        if (tblData instanceof Array) {
+            for (let i = 0; i < tblData.length; i++) {
+                let plan = tblData[i];
+                plan.order = (page - 1) * size + i + 1;
+                plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                let statusname = '';
+
+                plan.SupervisorCheck = plan.SupervisorCheck;
+                plan.CheckStatus = plan.CheckStatus;
+                plan.statusname = statusname;
+
+                plan.statusname = statusname;
+                let locationstatus = plan.LocationTime
+                    ? '已定位'
+                    : '未定位';
+                plan.locationstatus = locationstatus;
+                let yssj1 = plan.SupervisorTime
+                    ? moment(plan.SupervisorTime).format('YYYY-MM-DD')
+                    : '/';
+                let yssj2 = plan.SupervisorTime
+                    ? moment(plan.SupervisorTime).format('HH:mm:ss')
+                    : '/';
+                plan.yssj1 = yssj1;
+                plan.yssj2 = yssj2;
+                let userData = await getUserDetail({id: plan.Supervisor});
+                plan.SupervisorName = (userData && userData.Full_Name) || '';
+                plan.SupervisorUserName = (userData && userData.User_Name) || '';
+            }
+            let treeTotalNum = rst.total;
+            let messageTotalNum = rst.pageinfo.total;
+            const pagination = { ...this.state.pagination };
+            pagination.total = rst.pageinfo.total;
+            pagination.pageSize = size;
+            this.setState({
+                tblData,
+                pagination: pagination,
+                messageTotalNum: messageTotalNum,
+                treeTotalNum,
+                loading: false,
+                percent: 100
+            });
+        }
     }
 
     exportexcel () {

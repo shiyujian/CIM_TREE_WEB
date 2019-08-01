@@ -80,17 +80,15 @@ export default class CountTable extends Component {
         try {
             let postaData = {
                 page: current,
-                page_size: 10,
-                ordering: '-created_on',
-                org_code: queryParams.org_code ? queryParams.org_code : '',
-                group: queryParams.group ? queryParams.group : '',
+                size: 10,
+                orgCode: queryParams.orgID ? queryParams.orgID : '',
+                groupId: queryParams.groupId ? queryParams.groupId : '',
                 name: queryParams.name ? queryParams.name : '',
-                start: queryParams.start ? queryParams.start : '',
-                end: queryParams.end ? queryParams.end : '',
-                checkin: queryParams.checkin ? queryParams.checkin : '',
-                status: queryParams.status ? queryParams.status : '',
+                sTime: queryParams.sTime ? queryParams.sTime : '',
+                eTime: queryParams.eTime ? queryParams.eTime : '',
+                state: queryParams.status ? queryParams.status : '',
                 role: queryParams.role ? queryParams.role : '',
-                duty: queryParams.duty ? queryParams.duty : ''
+                post: queryParams.duty ? queryParams.duty : ''
             };
             this.setState({
                 loading: true
@@ -115,8 +113,7 @@ export default class CountTable extends Component {
 
     // 上班的照片
     previewCheckinImg (record) {
-        let imgs = this.onImgClick((record && record.checkin_record && record.checkin_record.imgs) || []);
-        console.log('imgs', imgs);
+        let imgs = this.onImgClick((record && record.ImagePath) || []);
         this.setState({
             seeVisible: true,
             imgs: imgs
@@ -124,8 +121,7 @@ export default class CountTable extends Component {
     }
     // 下班的照片
     previewCheckoutImg (record) {
-        let imgs = this.onImgClick((record && record.checkout_record && record.checkout_record.imgs) || []);
-        console.log('imgs', imgs);
+        let imgs = this.onImgClick((record && record.ImagePath) || []);
         this.setState({
             seeVisible: true,
             imgs: imgs
@@ -158,71 +154,46 @@ export default class CountTable extends Component {
     columns = [
         {
             title: '部门',
-            dataIndex: 'user.account.organization',
-            key: 'user.account.organization',
+            dataIndex: 'OrgCode',
+            key: 'OrgCode',
             render: (text, record, index) => {
-                let organization = (record && record.user && record.user.account && record.user.account.organization) || '';
-                let company = '';
-                if (record && record.check_group && record.check_group.length > 0) {
-                    company = record.check_group[0].org_name;
-                }
                 return <div style={{textAlign: 'Center'}}>
-                    <div className='column' title={company}>
-                        {company}
-                    </div>
-                    <div className='column' title={organization}>
-                        {organization}
+                    <div className='column' title={text}>
+                        {text}
                     </div>
                 </div>;
             }
         },
         {
             title: '姓名',
-            dataIndex: 'user.account.person_name',
-            key: 'user.account.person_name'
+            dataIndex: 'Name',
+            key: 'Name'
         },
         {
             title: '账号',
-            dataIndex: 'user.username',
-            key: 'user.username'
+            dataIndex: 'Number',
+            key: 'Number'
         },
         {
             title: '角色',
-            render: (text, record, index) => {
-                if (record && record.user && record.user.groups && record.user.groups.length > 0) {
-                    return <span>{record.user.groups[0].name}</span>;
-                }
-            }
+            dataIndex: 'Role',
+            key: 'Role'
         },
         {
             title: '职务',
-            dataIndex: 'user.account.title',
-            key: 'user.account.title'
+            dataIndex: 'Post',
+            key: 'Post'
         },
         {
             title: '考勤群体',
-            render: (text, record, index) => {
-                if (record && record.check_group && record.check_group.length > 0) {
-                    let name = '';
-                    record.check_group.map((group, index) => {
-                        if (index > 0) {
-                            name = name + ',' + group.name;
-                        } else {
-                            name = name + group.name;
-                        }
-                    });
-                    return <div className='column' title={name}>{name}</div>;
-                } else {
-                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
-                }
-            }
+            dataIndex: 'GroupName'
         },
         {
             title: '日期',
-            dataIndex: 'created_on',
-            key: 'created_on',
+            dataIndex: 'Date',
+            key: 'Date',
             render: (text, record, index) => {
-                if (record && record.created_on) {
+                if (record && record.Date) {
                     return <div style={{textAlign: 'Center'}}>
                         <div>
                             {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
@@ -235,30 +206,28 @@ export default class CountTable extends Component {
         },
         {
             title: '上班时间',
-            dataIndex: 'checkin_record.check_time',
-            key: 'checkin_record.check_time',
             render: (text, record, index) => {
-                if (record && record.checkin_record && record.checkin_record.check_time) {
-                    if (record.checkin_record.imgs) {
+                if (record.PunchTime) {
+                    if (record.ImagePath) {
                         return <div style={{textAlign: 'Center'}}>
                             <div>
                                 <a onClick={this.previewCheckinImg.bind(this, record)}>
-                                    {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                                    {moment(record.PunchTime).utc().zone(-0).format('YYYY-MM-DD')}
                                 </a>
                             </div>
                             <div>
                                 <a onClick={this.previewCheckinImg.bind(this, record)}>
-                                    {moment(text).utc().zone(-0).format('HH:mm:ss')}
+                                    {moment(record.PunchTime).utc().zone(-0).format('HH:mm:ss')}
                                 </a>
                             </div>
                         </div>;
                     } else {
                         return <div style={{textAlign: 'Center'}}>
                             <div onClick={this.previewCheckinImg.bind(this, record)}>
-                                {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                                {moment(record.PunchTime).utc().zone(-0).format('YYYY-MM-DD')}
                             </div>
                             <div onClick={this.previewCheckinImg.bind(this, record)}>
-                                {moment(text).utc().zone(-0).format('HH:mm:ss')}
+                                {moment(record.PunchTime).utc().zone(-0).format('HH:mm:ss')}
                             </div>
                         </div>;
                     }
@@ -269,30 +238,28 @@ export default class CountTable extends Component {
         },
         {
             title: '下班时间',
-            dataIndex: 'checkout_record.check_time',
-            key: 'checkout_record.check_time',
             render: (text, record, index) => {
-                if (record && record.checkout_record && record.checkout_record.check_time) {
-                    if (record.checkin_record.imgs) {
+                if (record.PunchTime) {
+                    if (record.ImagePath) {
                         return <div style={{textAlign: 'Center'}}>
                             <div>
                                 <a onClick={this.previewCheckoutImg.bind(this, record)}>
-                                    {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                                    {moment(record.PunchTime).utc().zone(-0).format('YYYY-MM-DD')}
                                 </a>
                             </div>
                             <div>
                                 <a onClick={this.previewCheckoutImg.bind(this, record)}>
-                                    {moment(text).utc().zone(-0).format('HH:mm:ss')}
+                                    {moment(record.PunchTime).utc().zone(-0).format('HH:mm:ss')}
                                 </a>
                             </div>
                         </div>;
                     } else {
                         return <div style={{textAlign: 'Center'}}>
                             <div onClick={this.previewCheckoutImg.bind(this, record)}>
-                                {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
+                                {moment(record.PunchTime).utc().zone(-0).format('YYYY-MM-DD')}
                             </div>
                             <div onClick={this.previewCheckoutImg.bind(this, record)}>
-                                {moment(text).utc().zone(-0).format('HH:mm:ss')}
+                                {moment(record.PunchTime).utc().zone(-0).format('HH:mm:ss')}
                             </div>
                         </div>;
                     }
@@ -303,8 +270,8 @@ export default class CountTable extends Component {
         },
         {
             title: '状态',
-            dataIndex: 'status',
-            key: 'status',
+            dataIndex: 'State',
+            key: 'State',
             render: (text) => {
                 if (text) {
                     if (text === 1) {

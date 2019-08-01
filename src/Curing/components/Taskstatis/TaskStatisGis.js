@@ -119,7 +119,7 @@ export default class TaskStatisGis extends Component {
                                     type={
                                         this.state.mapLayerBtnType
                                             ? 'primary'
-                                            : 'info'
+                                            : 'default'
                                     }
                                     onClick={this._toggleTileLayer.bind(this, 1)}
                                 >
@@ -128,7 +128,7 @@ export default class TaskStatisGis extends Component {
                                 <Button
                                     type={
                                         this.state.mapLayerBtnType
-                                            ? 'info'
+                                            ? 'default'
                                             : 'primary'
                                     }
                                     onClick={this._toggleTileLayer.bind(this, 2)}
@@ -145,7 +145,7 @@ export default class TaskStatisGis extends Component {
                             <Button type='primary' style={{marginRight: 10}} onClick={this._handleReturnTable.bind(this)}>返回</Button>
                         </div>
                         <div className='Curing-buttonStyle'>
-                            <Button type={this.state.treeLayerChecked ? 'primary' : 'info'} onClick={this.treeLayerChange.bind(this)}>{this.state.treeLayerChecked ? '取消树图层' : '展示树图层'}</Button>
+                            <Button type={this.state.treeLayerChecked ? 'primary' : 'default'} onClick={this.treeLayerChange.bind(this)}>{this.state.treeLayerChecked ? '取消树图层' : '展示树图层'}</Button>
                         </div>
                     </div>
                     <div>

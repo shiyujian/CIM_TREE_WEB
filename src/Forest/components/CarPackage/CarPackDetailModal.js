@@ -58,14 +58,15 @@ export default class CarPackDetailModal extends Component {
         },
         {
             title: '填报人',
-            dataIndex: 'Inputer',
+            dataIndex: 'InputerName',
             render: (text, record) => {
-                const { users } = this.props;
-                return (
-                    <span>
-                        {users && users[text] ? users[text].Full_Name : ''}
-                    </span>
-                );
+                if (record.InputerUserName && record.InputerName) {
+                    return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                } else if (record.InputerName && !record.InputerUserName) {
+                    return <p>{record.InputerName}</p>;
+                } else {
+                    return <p> / </p>;
+                }
             }
         },
         {
@@ -178,7 +179,8 @@ export default class CarPackDetailModal extends Component {
     query = async (page) => {
         const {
             actions: {
-                getNurserysByPack
+                getNurserysByPack,
+                getUserDetail
             },
             currentCarID
         } = this.props;
@@ -198,7 +200,11 @@ export default class CarPackDetailModal extends Component {
             if (!rst) return;
             let details = rst.content;
             if (details instanceof Array) {
-                details.forEach((plan, i) => {
+                for (let i = 0; i < details.length; i++) {
+                    let plan = details[i];
+                    let userData = await getUserDetail({id: plan.Inputer});
+                    plan.InputerName = (userData && userData.Full_Name) || '';
+                    plan.InputerUserName = (userData && userData.User_Name) || '';
                     plan.order = (page - 1) * size + i + 1;
                     plan.liftertime1 = plan.CreateTime
                         ? moment(plan.CreateTime).format('YYYY-MM-DD')
@@ -206,7 +212,7 @@ export default class CarPackDetailModal extends Component {
                     plan.liftertime2 = plan.CreateTime
                         ? moment(plan.CreateTime).format('HH:mm:ss')
                         : '/';
-                });
+                }
                 const pagination1 = { ...this.state.pagination1 };
                 pagination1.total = rst.pageinfo.total;
                 pagination1.pageSize = size;

@@ -382,7 +382,7 @@ export default class TaskCreateTable extends Component {
                             <div className='Curing-treeControl2'>
                                 <div>
                                     <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
-                                    {RetreatDisplay ? '' : <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
+                                    {RetreatDisplay ? '' : <Button type='default' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
                                     <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
                                 </div>
                             </div>
@@ -404,7 +404,7 @@ export default class TaskCreateTable extends Component {
                                 type={
                                     this.state.mapLayerBtnType
                                         ? 'primary'
-                                        : 'info'
+                                        : 'default'
                                 }
                                 onClick={this._toggleTileLayer.bind(this, 1)}
                             >
@@ -413,7 +413,7 @@ export default class TaskCreateTable extends Component {
                             <Button
                                 type={
                                     this.state.mapLayerBtnType
-                                        ? 'info'
+                                        ? 'default'
                                         : 'primary'
                                 }
                                 onClick={this._toggleTileLayer.bind(this, 2)}

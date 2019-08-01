@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-22 09:24:25
+ * @Last Modified time: 2019-07-31 11:33:06
  */
 import React, { Component } from 'react';
 import {
@@ -107,6 +107,33 @@ class OnSite extends Component {
         let user = getUser();
         await getCustomViewByUserID({id: user.ID});
         await this.initMap();
+        window.addEventListener('keydown', this.keydownHandler);
+    }
+    // 监听键盘点击esc的事件
+    keydownHandler = ({ key }) => {
+        console.log('key', key);
+        const {
+            platform: {
+                tabs = {}
+            },
+            actions: {
+                switchFullScreenState
+            }
+        } = this.props;
+        switch (key) {
+            case 'Escape':
+                // 切换全屏
+                let fullScreenState = '';
+                if (tabs && tabs.fullScreenState) {
+                    fullScreenState = tabs.fullScreenState;
+                }
+                // 进入全屏
+                if (fullScreenState && fullScreenState === 'fullScreen') {
+                    switchFullScreenState('unFullScreen');
+                }
+                break;
+            default:
+        }
     }
     /* 初始化地图 */
     initMap () {
@@ -204,42 +231,65 @@ class OnSite extends Component {
             fullScreenState = tabs.fullScreenState;
         }
         // 进入全屏
-        if (fullScreenState && fullScreenState === 'fullScreen' && fullScreenState !== prevProps.fullScreenState) {
-            this.startFullScreen();
+        if (fullScreenState && fullScreenState === 'fullScreen') {
+            if (fullScreenState !== prevProps.fullScreenState) {
+                this.startFullScreen();
+            }
         }
         // 退出全屏
         if (fullScreenState && fullScreenState === 'unFullScreen' && fullScreenState !== prevProps.fullScreenState) {
             this.exitFullScreen();
         }
     }
+
     // 进入全屏
     startFullScreen () {
-        let docElm = document.documentElement;
-        // W3C
-        if (docElm.requestFullscreen) {
-            docElm.requestFullscreen();
-        } else if (docElm.mozRequestFullScreen) {
-            // FireFox
-            docElm.mozRequestFullScreen();
-        } else if (docElm.webkitRequestFullScreen) {
-            // Chrome等
-            docElm.webkitRequestFullScreen();
-        } else if (docElm.msRequestFullscreen) {
-            // IE11
-            docElm.msRequestFullscreen();
+        try {
+            if (document && document.documentElement) {
+                let docElm = document.documentElement;
+                // W3C
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen();
+                } else if (docElm.mozRequestFullScreen) {
+                    // FireFox
+                    docElm.mozRequestFullScreen();
+                } else if (docElm.webkitRequestFullScreen) {
+                    // Chrome等
+                    docElm.webkitRequestFullScreen();
+                } else if (docElm.msRequestFullscreen) {
+                    // IE11
+                    docElm.msRequestFullscreen();
+                }
+            }
+        } catch (e) {
+            console.log('startFullScreen', e);
         }
     }
     // 退出全屏
     exitFullScreen () {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
+        try {
+            let data = this.checkFull();
+            console.log('data', data);
+            if (data) {
+                if (document) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitCancelFullScreen) {
+                        document.webkitCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('exitFullScreen', e);
         }
+    }
+    checkFull () {
+        var isFullScreen = document.mozFullScreen || document.webkitIsFullScreen;
+        return isFullScreen;
     }
     // 获取初始化数据的树木瓦片图层
     getTileLayerTreeBasic = () => {
