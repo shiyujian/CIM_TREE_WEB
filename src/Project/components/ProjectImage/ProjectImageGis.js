@@ -220,12 +220,10 @@ export default class ProjectImageGis extends Component {
     // 切换
     toggleTileLayer (e) {
         const index = e.target.value;
-        console.log('index', index);
         this.tileLayer.setUrl(this.tileUrls[index]);
     }
     toggleTileLayer2 (e) {
         const index = e.target.value;
-        console.log('index', index);
         this.tileTreeLayerBasic.setUrl(this.tileUrls[index]);
     }
 }

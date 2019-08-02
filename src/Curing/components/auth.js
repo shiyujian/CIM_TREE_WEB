@@ -1,5 +1,6 @@
 import './Curing.less';
 import { getUser } from '_platform/auth';
+import {handlePOLYGONWktData} from '_platform/gisAuth';
 
 // 获取标段名称
 export const getSectionName = (section, sectionData) => {
@@ -415,7 +416,7 @@ export const handleAreaLayerData = async (eventKey, getTreearea) => {
                 coords.push(str);
             });
         } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+            str = handlePOLYGONWktData(wkt);
             coords.push(str);
         }
         return coords;
@@ -431,7 +432,7 @@ export const handleCoordinates = (str) => {
     let treearea = [];
     let arr = [];
     target.map((data, index) => {
-        if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+        if (data && data instanceof Array && data[1] && data[0]) {
             arr.push([data[1], data[0]]);
         }
     });

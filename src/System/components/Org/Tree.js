@@ -176,9 +176,9 @@ export default class Tree extends Component {
                         message: '当前组织机构存在用户，不能进行删除！',
                         duration: 3
                     });
-                } else if (deleteData.msg && deleteData.msg === '当前组织机构存在子组织机构，不能进行删除！') {
+                } else if (deleteData.msg && deleteData.msg === '该项目存在组织机构关联，请先删除组织机构！') {
                     Notification.error({
-                        message: '当前组织机构存在子组织机构，不能进行删除！',
+                        message: '该项目存在组织机构关联，请先删除组织机构！',
                         duration: 3
                     });
                 } else {

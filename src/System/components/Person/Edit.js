@@ -388,7 +388,7 @@ class Edit extends Component {
                         Phone: values.telephone, // 电话
                         Duty: values.titles, // 职务
                         EMail: values.email,
-                        Sex: values.sex, // 性别
+                        Sex: values.sex ? 1 : 0, // 性别
                         Status: 1, // 状态
                         Section: values.section, // 标段
                         Number: values.idNum, // 身份证号码
@@ -396,7 +396,7 @@ class Edit extends Component {
                         CardBack: '', // 身份证背面照片
                         Face: '',
                         Roles: [{ // 角色
-                            ID: values.roles // 角色ID
+                            ID: Number(values.roles) // 角色ID
                         }]
                     };
                     let userData = await putForestUser({}, putUserPostData);
@@ -518,8 +518,8 @@ class Edit extends Component {
                                             placeholder='请选择性别'
                                             style={{ width: '100%' }}
                                         >
-                                            <Option key='女' value={0}>女</Option>
-                                            <Option key='男' value={1}>男</Option>
+                                            <Option key='女' value={1}>女</Option>
+                                            <Option key='男' value={0}>男</Option>
                                         </Select>
                                     )}
                                 </FormItem>

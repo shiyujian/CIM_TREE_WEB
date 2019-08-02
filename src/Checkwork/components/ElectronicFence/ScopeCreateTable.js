@@ -12,7 +12,8 @@ import {
     handleCoordinates
 } from '../auth';
 import {
-    computeSignedArea
+    computeSignedArea,
+    handlePOLYGONWktData
 } from '_platform/gisAuth';
 import ScopeCreateModal from './ScopeCreateModal';
 import '../Checkwork.less';
@@ -114,6 +115,7 @@ export default class ScopeCreateTable extends Component {
                 });
                 return;
             }
+
             coordinates.push([e.latlng.lat, e.latlng.lng]);
             if (me.state.polygonData) {
                 me.map.removeLayer(me.state.polygonData);
@@ -314,9 +316,8 @@ export default class ScopeCreateTable extends Component {
                         let str = '';
                         let groupScopeData = '';
                         if (wkt) {
-                            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                            str = handlePOLYGONWktData(wkt);
                             groupScopeData = handleCoordinates(str);
-                            console.log('groupScopeData', groupScopeData);
                             let groupScopeLayer = L.polygon(groupScopeData, {
                                 color: 'yellow',
                                 fillColor: 'yellow',
@@ -687,7 +688,7 @@ export default class ScopeCreateTable extends Component {
                             <div className='checkWork-treeControl2'>
                                 <div>
                                     <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateScopeOk.bind(this)}>确定</Button>
-                                    <Button type='info' style={{marginRight: 10}} disabled={retreatDisplay} onClick={this._handleCreateScopeRetreat.bind(this)}>上一步</Button>
+                                    <Button type='default' style={{marginRight: 10}} disabled={retreatDisplay} onClick={this._handleCreateScopeRetreat.bind(this)}>上一步</Button>
                                     <Button type='danger' onClick={this._handleCreateScopeCancel.bind(this)}>撤销</Button>
                                 </div>
                             </div>

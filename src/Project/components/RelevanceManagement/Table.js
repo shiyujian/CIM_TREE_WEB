@@ -76,107 +76,6 @@ class Tablelevel extends Component {
         }
         await this.toSearch();
     }
-    render () {
-        const { dataList, SupplierList, NurseryList, supplierid, nurserybaseid, showModal } = this.state;
-        const { getFieldDecorator } = this.props.form;
-        return (
-            <div className='relevance-table'>
-                <Form layout='inline'>
-                    <FormItem label='供应商名称'>
-                        <Select style={{width: 200}}
-                            value={supplierid} placeholder='请选择供应商'
-                            showSearch
-                            filterOption={false}
-                            onSearch={this.searchSupplier.bind(this)}
-                            onChange={this.handleSupplier.bind(this)}>
-                            {
-                                SupplierList.map(item => {
-                                    return <Option value={item.ID}>{item.SupplierName}</Option>;
-                                })
-                            }
-                        </Select>
-                    </FormItem>
-                    <FormItem label='苗圃名称'>
-                        <Select style={{width: 200}}
-                            value={nurserybaseid} placeholder='请选择苗圃基地'
-                            showSearch
-                            filterOption={false}
-                            onSearch={this.searchNursery.bind(this)}
-                            onChange={this.handleNursery.bind(this)}>
-                            {
-                                NurseryList.map(item => {
-                                    return <Option value={item.ID}>{item.NurseryName}</Option>;
-                                })
-                            }
-                        </Select>
-                    </FormItem>
-                    <FormItem style={{marginLeft: 50}}>
-                        <Button type='primary' onClick={this.toSearch.bind(this)}>查询</Button>
-                        <Button onClick={this.toEmpty.bind(this)} style={{marginLeft: 20}}>清空</Button>
-                    </FormItem>
-                </Form >
-                <Row style={{marginBottom: 10}}>
-                    <Col span={24}>
-                        <Button style={{float: 'right'}} type='primary' onClick={this.addRelevance.bind(this)}>新增绑定</Button>
-                    </Col>
-                </Row>
-                <Spin tip='Loading...' spinning={this.state.loading}>
-                    <Table columns={this.columns} bordered
-                        dataSource={dataList}
-                        rowKey='ID'
-                    />
-                </Spin>
-                <Modal title='新增绑定' visible={showModal}
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
-                >
-                    <Form>
-                        <FormItem
-                            {...formItemLayout}
-                            label='供应商'
-                        >
-                            {getFieldDecorator('supplier', {
-                                rules: [{required: true, message: '必填项'}]
-                            })(
-                                <Select style={{ width: 200 }}
-                                    allowClear
-                                    showSearch
-                                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                                    placeholder='请选择供应商'>
-                                    {
-                                        SupplierList.map(item => {
-                                            return <Option value={item.ID} key={item.ID}>{item.SupplierName}</Option>;
-                                        })
-                                    }
-                                </Select>
-                            )}
-                        </FormItem>
-                        <FormItem
-                            {...formItemLayout}
-                            label='苗圃基地'
-                        >
-                            {getFieldDecorator('nursery', {
-                                rules: [{required: true, message: '必填项'}]
-                            })(
-                                <Select
-                                    style={{ width: 200 }}
-                                    showSearch
-                                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-                                    allowClear
-                                    placeholder='请选择苗圃基地'>
-                                    {
-                                        NurseryList.map(item => {
-                                            return <Option value={item.ID} key={item.ID}>{item.NurseryName}</Option>;
-                                        })
-                                    }
-                                </Select>
-                            )}
-                        </FormItem>
-                    </Form>
-                </Modal>
-            </div>
-        );
-    }
     addRelevance () {
         this.setState({
             showModal: true
@@ -236,6 +135,8 @@ class Tablelevel extends Component {
         this.setState({
             supplierid: '',
             nurserybaseid: ''
+        }, async () => {
+            await this.toSearch();
         });
     }
     handleCancel () {
@@ -259,14 +160,16 @@ class Tablelevel extends Component {
                 SupplierID: values.supplier,
                 NurseryBaseID: values.nursery
             }).then(rep => {
-                if (rep.code === 1) {
+                if (rep && rep.code && rep.code === 1) {
                     message.success('绑定成功');
                     this.toSearch();
                     this.setState({
                         showModal: false
                     });
+                } else if (rep && rep.code && rep.code === 2) {
+                    message.error('绑定重复，请重新绑定');
                 } else {
-                    message.success('绑定失败');
+                    message.error('绑定失败');
                 }
             });
         });
@@ -284,6 +187,122 @@ class Tablelevel extends Component {
                 message.error('解除绑定失败');
             }
         });
+    }
+    render () {
+        const { dataList, SupplierList, NurseryList, supplierid, nurserybaseid, showModal } = this.state;
+        const { getFieldDecorator } = this.props.form;
+        return (
+            <div className='relevance-table'>
+                <Form layout='inline'>
+                    <FormItem label='供应商名称'>
+                        <Select style={{width: 200}}
+                            value={supplierid} placeholder='请选择供应商'
+                            showSearch
+                            filterOption={false}
+                            onSearch={this.searchSupplier.bind(this)}
+                            onChange={this.handleSupplier.bind(this)}>
+                            {
+                                SupplierList.map(item => {
+                                    return <Option value={item.ID}>{item.SupplierName}</Option>;
+                                })
+                            }
+                        </Select>
+                    </FormItem>
+                    <FormItem label='苗圃名称'>
+                        <Select style={{width: 200}}
+                            value={nurserybaseid} placeholder='请选择苗圃基地'
+                            showSearch
+                            filterOption={false}
+                            onSearch={this.searchNursery.bind(this)}
+                            onChange={this.handleNursery.bind(this)}>
+                            {
+                                NurseryList.map(item => {
+                                    return <Option value={item.ID}>{item.NurseryName}</Option>;
+                                })
+                            }
+                        </Select>
+                    </FormItem>
+                    <FormItem style={{marginLeft: 50}}>
+                        <Button
+                            type='primary'
+                            onClick={this.toSearch.bind(this)}>
+                                查询
+                        </Button>
+                        <Button
+                            onClick={this.toEmpty.bind(this)}
+                            style={{marginLeft: 20}}>
+                                清空
+                        </Button>
+                    </FormItem>
+                </Form >
+                <Row style={{marginBottom: 10}}>
+                    <Col span={24}>
+                        <Button
+                            style={{float: 'right'}}
+                            type='primary'
+                            onClick={this.addRelevance.bind(this)}>
+                                新增绑定
+                        </Button>
+                    </Col>
+                </Row>
+                <Spin tip='Loading...' spinning={this.state.loading}>
+                    <Table
+                        columns={this.columns}
+                        bordered
+                        dataSource={dataList}
+                        rowKey='ID'
+                    />
+                </Spin>
+                <Modal title='新增绑定' visible={showModal}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                >
+                    <Form>
+                        <FormItem
+                            {...formItemLayout}
+                            label='供应商'
+                        >
+                            {getFieldDecorator('supplier', {
+                                rules: [{required: true, message: '必填项'}]
+                            })(
+                                <Select style={{ width: 200 }}
+                                    allowClear
+                                    showSearch
+                                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                    placeholder='请选择供应商'>
+                                    {
+                                        SupplierList.map(item => {
+                                            return <Option value={item.ID} key={item.ID}>{item.SupplierName}</Option>;
+                                        })
+                                    }
+                                </Select>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label='苗圃基地'
+                        >
+                            {getFieldDecorator('nursery', {
+                                rules: [{required: true, message: '必填项'}]
+                            })(
+                                <Select
+                                    style={{ width: 200 }}
+                                    showSearch
+                                    filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                    allowClear
+                                    placeholder='请选择苗圃基地'>
+                                    {
+                                        NurseryList.map(item => {
+                                            return <Option value={item.ID} key={item.ID}>{item.NurseryName}</Option>;
+                                        })
+                                    }
+                                </Select>
+                            )}
+                        </FormItem>
+                    </Form>
+                </Modal>
+            </div>
+        );
     }
 }
 
