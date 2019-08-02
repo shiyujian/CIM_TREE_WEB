@@ -129,24 +129,24 @@ export default class TrackTree extends Component {
                     />
                     <div className='TrackTree-button'>
                         <Button className='TrackTree-button-layout' style={{marginRight: 10}}
-                            type={timeType === 'all' ? 'primary' : ''}
+                            type={timeType === 'all' ? 'primary' : 'default'}
                             id='all' onClick={this.handleTimeChange.bind(this)}>
                             全部
                         </Button>
                         <Button className='TrackTree-button-layout' id='today'
-                            type={timeType === 'today' ? 'primary' : ''}
+                            type={timeType === 'today' ? 'primary' : 'default'}
                             onClick={this.handleTimeChange.bind(this)}>
                             今天
                         </Button>
                     </div>
                     <div className='TrackTree-button'>
                         <Button className='TrackTree-button-layout' style={{marginRight: 10}}
-                            type={timeType === 'week' ? 'primary' : ''}
+                            type={timeType === 'week' ? 'primary' : 'default'}
                             id='week' onClick={this.handleTimeChange.bind(this)}>
                             一周内
                         </Button>
                         <Button className='TrackTree-button-layout' id='custom'
-                            type={timeType === 'custom' ? 'primary' : ''}
+                            type={timeType === 'custom' ? 'primary' : 'default'}
                             onClick={this.handleTimeChange.bind(this)}>
                             自定义
                         </Button>
@@ -331,13 +331,14 @@ export default class TrackTree extends Component {
     handleTrackLocation = async (ckeckedData) => {
         try {
             this.handleRemoveAllTrackLayer();
-            ckeckedData.forEach((child, index) => {
-                if (index === ckeckedData.length - 1) {
+            for (let i = 0; i < ckeckedData.length; i++) {
+                let child = ckeckedData[i];
+                if (i === ckeckedData.length - 1) {
                     this.handleTrackAddLayer(child, true);
                 } else {
                     this.handleTrackAddLayer(child, false);
                 }
-            });
+            }
         } catch (e) {
             console.log('handleTrackLocation', e);
         }

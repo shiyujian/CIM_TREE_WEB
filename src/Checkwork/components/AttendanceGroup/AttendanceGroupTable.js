@@ -43,11 +43,44 @@ export default class AttendanceGroupTable extends Component {
             }
         },
         {
+            title: '角色',
+            dataIndex: 'Roles',
+            render: (text, record, index) => {
+                if (record && record.User && record.User.Roles && record.User.Roles instanceof Array && record.User.Roles.length > 0) {
+                    return record.User.Roles[0].RoleName;
+                } else {
+                    return '/';
+                }
+            }
+        },
+        {
             title: '职务',
             dataIndex: 'Duty',
             render: (text, record, index) => {
                 if (record && record.User) {
                     return record.User.Duty || '';
+                } else {
+                    return '/';
+                }
+            }
+        },
+        {
+            title: '部门',
+            dataIndex: 'OrgObj',
+            render: (text, record, index) => {
+                if (record && record.User && record.User.OrgObj && record.User.OrgObj.OrgName) {
+                    return record.User.OrgObj.OrgName;
+                } else {
+                    return '/';
+                }
+            }
+        },
+        {
+            title: '手机',
+            dataIndex: 'Phone',
+            render: (text, record, index) => {
+                if (record && record.User && record.User.Phone) {
+                    return record.User.Phone;
                 } else {
                     return '/';
                 }
