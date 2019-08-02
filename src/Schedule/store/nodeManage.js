@@ -34,12 +34,12 @@ export const deleteWork = createFetchAction(`${base}/flow/work/{{ID}}`, [], 'DEL
 export const postStartwork = createFetchAction(`${base}/flow/startwork`, [], 'POST');
 // 节点表单列表
 export const getNodefieldList = createFetchAction(`${base}/flow/nodefields`, []);
-// 添加节点表单字段
-export const postNodefields = createFetchAction(`${base}/flow/nodefields`, [], 'POST');
-// 修改节点表单字段
-export const putNodefields = createFetchAction(`${base}/flow/nodefields`, [], 'PUT');
-// 删除节点表单字段
-export const deleteNodefields = createFetchAction(`${base}/flow/nodefields/{{ID}}`, [], 'DELETE');
+// 添加节点表单
+export const postNodeform = createFetchAction(`${base}/flow/nodeform`, [], 'POST');
+// 修改节点表单
+export const putNodeform = createFetchAction(`${base}/flow/nodeform`, [], 'PUT');
+// 删除节点表单
+export const deleteNodeform = createFetchAction(`${base}/flow/nodeform/{{ID}}`, [], 'DELETE');
 // 上传附件
 export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype=news`, [], 'POST');
 export const actions = {
@@ -50,9 +50,9 @@ export const actions = {
     deleteWork,
     postStartwork,
     getNodefieldList,
-    postNodefields,
-    putNodefields,
-    deleteNodefields,
+    postNodeform,
+    putNodeform,
+    deleteNodeform,
     uploadFileHandler,
 
     getWorkflowByIdOK,

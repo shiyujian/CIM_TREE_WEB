@@ -81,18 +81,26 @@ class NodeTable extends Component {
             NodeName: Name,
             visibleAdd: true,
             dataListAdd: [{
-                key: 1
+                key: 1,
+                FieldType: 0,
+                ShowType: 'Input'
             }, {
-                key: 2
+                key: 2,
+                FieldType: 0,
+                ShowType: 'Input'
             }, {
-                key: 3
+                key: 3,
+                FieldType: 0,
+                ShowType: 'Input'
             }, {
-                key: 4
+                key: 4,
+                FieldType: 0,
+                ShowType: 'Input'
             }]
         });
     }
     handleOk () {
-        const { postNodefields } = this.props.actions;
+        const { postNodeform } = this.props.actions;
         const { validateFields } = this.props.form;
         const { NodeID, NodeName, dataListAdd } = this.state;
         let userID = getUser().ID;
@@ -113,7 +121,7 @@ class NodeTable extends Component {
             }
         });
         console.log('提交', params);
-        postNodefields({}, params).then(rep => {
+        postNodeform({}, params).then(rep => {
             if (rep.code) {
                 notification.success({
                     message: '新增表单成功',
@@ -157,6 +165,7 @@ class NodeTable extends Component {
                     <a onClick={this.onSee.bind(this, record.ID)}>查看</a>
                     <a onClick={this.onEdit.bind(this, record.ID, record.Name)} style={{marginLeft: 20}}>编辑</a>
                     <a onClick={this.onDelete.bind(this, record.ID)} style={{marginLeft: 20}}>删除</a>
+                    <a onClick={this.onDeleteForm.bind(this, record.ID)} style={{marginLeft: 20}}>删除表单</a>
                 </div>);
             }
         }
@@ -237,6 +246,7 @@ class NodeTable extends Component {
     }
     handleShowType (index, value) {
         const { dataListAdd } = this.state;
+        console.log('值', value);
         dataListAdd.map((item, ind) => {
             if (ind === index) {
                 item.ShowType = value;
@@ -311,8 +321,7 @@ class NodeTable extends Component {
             width: '200',
             render: (text, record) => {
                 return (<div>
-                    <a onClick={this.onSeeForm.bind(this, record.ID)}>查看</a>
-                    <a onClick={this.onDeleteForm.bind(this, record.ID)} style={{marginLeft: 20}}>删除</a>
+                    <a onClick={this.onEditForm.bind(this, record.ID)}>编辑</a>
                 </div>);
             }
         }
@@ -320,8 +329,16 @@ class NodeTable extends Component {
     onSeeForm (ID) {
 
     }
-    onDeleteForm (ID) {
+    onEditForm () {
 
+    }
+    onDeleteForm (ID) {
+        const { deleteNodeform } = this.props.actions;
+        deleteNodeform({
+            ID
+        }).then(rep => {
+
+        });
     }
 }
 export default Form.create()(NodeTable);

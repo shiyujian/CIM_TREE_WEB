@@ -24,6 +24,7 @@ $(function () {
     var putDirectionUrl = prefix + '/flow/direction';
     // 流向删除
     var deleteDirectionUrl = prefix + '/flow/direction/';
+    var postNodeDirection = prefix + '/flow/nodedirection';
 
     let originData = []; // 回显的节点和流向ID
     var temp_name = getUrlParam('name');
@@ -165,124 +166,69 @@ $(function () {
 
     // 保存
     function wholeUpdate (nodeData, lineData) {
-        let promiseArr = [];
-        console.log('保存', lineData, originData);
-        for (let item in lineData) {
-            console.log('保存流向', item);
-            // 流程
-            if (originData.includes(item)) {
-                // let params = {
-                //     ID: item,
-                //     Name: lineData[item].name, // 流向名称
-                //     DCondition: lineData[item].describe, // 流向条件
-                //     FromNode: lineData[item].from, // 节点起点
-                //     ToNode: lineData[item].to // 节点终点
-                // };
-                // $.ajax({
-                //     url: putDirectionUrl,
-                //     data: JSON.stringify(params),
-                //     contentType: 'application/json',
-                //     type: 'PUT',
-                //     success: function (rep) {
-                //         if (rep.code === 1) {
-                //             alert('编辑流向成功');
-                //         } else {
-                //             alert(rep.msg);
-                //         }
-                //     }
-                // });
-            } else {
-                let params = {
-                    Creater: user_id, // 新增人ID
-                    FlowID: temp_id, // 流程ID
-                    FlowName: temp_name, // 流程名称
-                    Name: lineData[item].name, // 流向名称
-                    DCondition: lineData[item].describe, // 流向条件
-                    FromNode: lineData[item].from, // 节点起点
-                    ToNode: lineData[item].to, // 节点终点
-                    DirectionChannel: lineData[item].channel // 流向通道 01进 11进退 10退
-                };
-                console.log('参数', params);
-                $.ajax({
-                    url: postDirectionUrl,
-                    data: JSON.stringify(params),
-                    contentType: 'application/json',
-                    type: 'POST',
-                    success: function (rep) {
-                        if (rep.code === 1) {
-                            alert('创建流向成功');
-                        } else {
-                            alert(rep.msg);
-                        }
-                    }
-                });
-            }
-        }
+        console.log('保存', lineData, nodeData, originData);
+        let Nodes = [];
+        let Directions = [];
         for (let item in nodeData) {
-            // 确定节点类型
-            let NodeType = '';
-            if (nodeData[item].type === 'start round mix') {
-                NodeType = 1;
-            } else if (nodeData[item].type === 'task') {
-                NodeType = 2;
-            } else if (nodeData[item].type === 'end round') {
-                NodeType = 0;
-            }
-            // 是否为编辑
             if (originData.includes(item)) {
-                // let params = {
-                //     ID: item, // 新增人ID
-                //     Name: nodeData[item].name, // 节点名称
-                //     NodeDescribe: nodeData[item].describe // 节点说明
-                // };
-                // $.ajax({
-                //     url: putNodeUrl,
-                //     data: JSON.stringify(params),
-                //     contentType: 'application/json',
-                //     type: 'PUT',
-                //     success: function (rep) {
-                //         if (rep.code === 1) {
-                //             alert('编辑节点成功');
-                //         } else {
-                //             alert(rep.msg);
-                //         }
-                //     }
-                // });
+
             } else {
-                let params = {
-                    Creater: user_id, // 新增人ID
+                // 确定节点类型
+                let NodeType = '';
+                if (nodeData[item].type === 'start round mix') {
+                    NodeType = 1;
+                } else if (nodeData[item].type === 'task') {
+                    NodeType = 2;
+                } else if (nodeData[item].type === 'end round') {
+                    NodeType = 0;
+                } else {
+                    NodeType = 2;
+                }
+                Nodes.push({
+                    Creater: parseInt(user_id), // 创建人
                     FlowID: temp_id, // 流程ID
                     FlowName: temp_name, // 流程名称
                     Name: nodeData[item].name, // 节点名称
-                    NodeDescribe: nodeData[item].describe, // 节点说明
-                    NodeType // 节点类型
-                };
-                promiseArr.push(new Promise((resolve, reject) => {
-                    $.ajax({
-                        url: postNodeUrl,
-                        data: JSON.stringify(params),
-                        contentType: 'application/json',
-                        type: 'POST',
-                        success: function (rep) {
-                            if (rep.code === 1) {
-                                resolve(rep);
-                                console.log('创建节点成功');
-                            } else {
-                                alert(rep.msg);
-                            }
-                        }
-                    });
-                }));
+                    NodeDescribe: nodeData[item].describe || '', // 节点说明
+                    NodeType: NodeType // 节点类型
+                });
             }
         }
-        if (promiseArr.length) {
-            Promise.all(promiseArr).then(rep => {
-                alert(`成功创建了${promiseArr.length}个节点`);
-                getLoadData(); // 刷新工作区
-            });
-        } else {
-            // alert(`如修改节点，请先删除重新添加`);
+        for (let item in lineData) {
+            if (originData.includes(item)) {
+
+            } else {
+                Directions.push({
+                    Creater: parseInt(user_id), // 创建人
+                    FlowID: temp_id, // 流程ID
+                    FlowName: temp_name, // 流程名称
+                    Name: lineData[item].name, // 流向名称
+                    DCondition: lineData[item].describe || '', // 流向条件
+                    FromNode: nodeData[lineData[item].from].name, // 节点起点
+                    ToNode: nodeData[lineData[item].to].name, // 节点终点
+                    DirectionChannel: lineData[item].channel // 流向通道 01进 11进退 10退
+                });
+            }
         }
+        console.log('新增', Nodes, Directions);
+        let params = {
+            Nodes,
+            Directions
+        };
+        $.ajax({
+            url: postNodeDirection,
+            data: JSON.stringify(params),
+            contentType: 'application/json',
+            type: 'POST',
+            success: function (rep) {
+                if (rep.code === 1) {
+                    alert('上传流程模板成功');
+                    getLoadData(); // 刷新工作区
+                } else {
+                    alert('上传流程模板失败');
+                }
+            }
+        });
     }
     function onItemDel (id, mode) {
         console.log('删除', id, mode);
