@@ -9,6 +9,9 @@ import {
     INITLEAFLET_API,
     WMSTILELAYERURL
 } from '_platform/api';
+import {
+    handlePOLYGONWktData
+} from '_platform/gisAuth';
 import {genPopUpContent, getIconType, getTaskStatus} from '../auth';
 import '../Curing.less';
 
@@ -178,7 +181,6 @@ export default class TaskStatisGis extends Component {
         const {
             treeLayerChecked
         } = this.state;
-        console.log('treeLayerChecked', treeLayerChecked);
         if (treeLayerChecked) {
             if (this.tileTreeLayerBasic) {
                 this.map.removeLayer(this.tileTreeLayerBasic);
@@ -285,7 +287,7 @@ export default class TaskStatisGis extends Component {
                     }
                 });
             } else if (wkt.indexOf('POLYGON') !== -1) {
-                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                str = await handlePOLYGONWktData(wkt);
                 if (type === 'plan') {
                     // 只有一个图形，必须要设置图标
                     this._handlePlanCoordLayer(str, task, eventKey, 1);
@@ -306,9 +308,11 @@ export default class TaskStatisGis extends Component {
             taskMessList
         } = this.state;
         try {
+            console.log('_handlePlanCoordLayertarget', str);
             let target = str.split(',').map(item => {
                 return item.split(' ').map(_item => _item - 0);
             });
+            console.log('_handlePlanCoordLayertarget', target);
             let treearea = [];
             let status = getTaskStatus(task);
             task.status = status;
@@ -318,7 +322,7 @@ export default class TaskStatisGis extends Component {
             });
             let arr = [];
             target.map((data, index) => {
-                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+                if (data && data instanceof Array && data[1] && data[0]) {
                     arr.push([data[1], data[0]]);
                 }
             });
@@ -333,7 +337,7 @@ export default class TaskStatisGis extends Component {
                     typeName: task.typeName,
                     status: status || '',
                     CuringMans: task.CuringMans || '',
-                    Area: (taskMess.Area || '') + '亩',
+                    Area: (task.Area || '') + '亩',
                     CreateTime: task.CreateTime || '',
                     PlanStartTime: task.PlanStartTime || '',
                     PlanEndTime: task.PlanEndTime || '',
@@ -390,10 +394,12 @@ export default class TaskStatisGis extends Component {
             let target = str.split(',').map(item => {
                 return item.split(' ').map(_item => _item - 0);
             });
+            console.log('_handleRealCoordLayer', target);
+
             let treearea = [];
             let arr = [];
             target.map((data, index) => {
-                if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+                if (data && data instanceof Array && data[1] && data[0]) {
                     arr.push([data[1], data[0]]);
                 }
             });
@@ -431,7 +437,6 @@ export default class TaskStatisGis extends Component {
             curingid: eventKey
         };
         let taskPositionMess = await getCuringPositions({}, positionPostData);
-        console.log('taskPositionMess', taskPositionMess);
         let taskTracks = taskPositionMess && taskPositionMess.content;
         if (taskTracks && taskTracks instanceof Array && taskTracks.length > 0) {
             this._addTrackLayer(taskTracks, eventKey);
@@ -459,8 +464,6 @@ export default class TaskStatisGis extends Component {
                 }
                 tracksList[CuringManTimes].push([track.Y, track.X]);
             });
-            console.log('tracksList', tracksList);
-            console.log('CuringManList', CuringManList);
             let layerList = [];
             tracksList.map((track, index) => {
                 let polylineData = L.polyline(track, { color: 'pink' }).addTo(

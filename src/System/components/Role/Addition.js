@@ -74,6 +74,11 @@ class Addition extends Component {
                     });
                     await getRoles();
                     this.props.handleCloseAdditionModal();
+                } else if (rst && rst.code && rst.code === 2) {
+                    Notification.error({
+                        message: '当前角色名已存在，请重新创建',
+                        duration: 3
+                    });
                 } else {
                     Notification.error({
                         message: '角色创建失败',

@@ -460,6 +460,13 @@ class Login extends Component {
         console.log('forestUserData', forestUserData);
         if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
             let forestLoginUserData = forestUserData[0];
+            if (!forestLoginUserData.Number && forestLoginUserData.User_Name !== 'admin') {
+                Notification.error({
+                    message: '该用户未进行实名认证，不能登录',
+                    duration: 2
+                });
+                return;
+            }
             if (forestLoginUserData.IsBlack === 1) {
                 Notification.error({
                     message: '该用户已被拉黑，不能登录',

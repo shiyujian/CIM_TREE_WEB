@@ -48,7 +48,7 @@ export const getNewCoordsArrByMULTIPOLYGON = (geom) => {
         finalCoordsArr.push(newfinalCoordsArr);
     });
     return finalCoordsArr;
-}
+};
 
 // 根据[116.0316566299076 38.99911578423726, 116.03163110851324 38.99911806579688]得到MULTIPOLYGON
 export const getWulPolygonByCoordArr = (coordinates) => {
@@ -131,7 +131,7 @@ export const handleCoordinates = (str) => {
     let treearea = [];
     let arr = [];
     target.map((data, index) => {
-        if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+        if (data && data instanceof Array && data[1] && data[0]) {
             arr.push([data[1], data[0]]);
         }
     });

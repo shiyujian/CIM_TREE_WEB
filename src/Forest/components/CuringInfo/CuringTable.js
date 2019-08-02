@@ -424,7 +424,7 @@ export default class CuringTable extends Component {
             let thinclassData = '';
             if (value) {
                 let arr = value.split('-');
-                thinclassData = arr[4];
+                thinclassData = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
             }
             this.setState({
                 thinclass: value,

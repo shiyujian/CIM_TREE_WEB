@@ -1,3 +1,10 @@
+// 处理POLYGON开头的wkt内容
+export const handlePOLYGONWktData = (wkt) => {
+    let str = wkt.slice(wkt.indexOf('('), wkt.indexOf(')'));
+    str = str.replace(/[(]/g, '');
+    console.log('str', str);
+    return str;
+};
 // 点击区域地块处理细班设计坐标数据
 export const handleAreaDesignLayerData = async (eventKey, treeNodeName, getTreearea) => {
     let handleKey = eventKey.split('-');
@@ -21,7 +28,7 @@ export const handleAreaDesignLayerData = async (eventKey, treeNodeName, getTreea
                 coords.push(str);
             });
         } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+            str = handlePOLYGONWktData(wkt);
             coords.push(str);
         }
         return coords;
@@ -56,7 +63,7 @@ export const handleAreaRealLayerData = async (eventKey, treeNodeName, getTreeare
                 coords.push(str);
             });
         } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+            str = handlePOLYGONWktData(wkt);
             coords.push(str);
         }
         return coords;
@@ -72,7 +79,7 @@ export const handleCoordinates = (str) => {
     let treearea = [];
     let arr = [];
     target.map((data, index) => {
-        if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+        if (data && data instanceof Array && data[1] && data[0]) {
             arr.push([data[1], data[0]]);
         }
     });

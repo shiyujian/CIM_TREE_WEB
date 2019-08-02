@@ -3,7 +3,12 @@ import {
     Button, Collapse, Notification, Spin, Checkbox
 } from 'antd';
 import L from 'leaflet';
-import {FOREST_GIS_API, TILEURLS, INITLEAFLET_API, WMSTILELAYERURL} from '_platform/api';
+import {
+    FOREST_GIS_API,
+    TILEURLS,
+    INITLEAFLET_API,
+    WMSTILELAYERURL
+} from '_platform/api';
 import AreaTreeCreate from '../AreaTreeCreate';
 import TaskCheckTree from '../TaskCheckTree';
 import {
@@ -20,7 +25,8 @@ import {
 import {
     getHandleWktData,
     getWktData,
-    computeSignedArea
+    computeSignedArea,
+    handlePOLYGONWktData
 } from '_platform/gisAuth';
 import TaskCreateModal from './TaskCreateModal';
 import '../Curing.less';
@@ -638,7 +644,7 @@ export default class TaskCreateTable extends Component {
                     }
                 });
             } else if (wkt.indexOf('POLYGON') !== -1) {
-                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                str = handlePOLYGONWktData(wkt);
                 if (type === 'plan') {
                     // 只有一个图形，必须要设置图标
                     this._handlePlanCoordLayer(str, task, eventKey, 1, isFocus);

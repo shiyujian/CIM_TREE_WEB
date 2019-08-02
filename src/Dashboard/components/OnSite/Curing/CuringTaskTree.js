@@ -9,6 +9,7 @@ import {
     genPopUpContent,
     handleCuringTaskMess
 } from '../../auth';
+import {handlePOLYGONWktData} from '_platform/gisAuth';
 // 养护任务类型图片
 import curingTaskDrainImg from '../../CuringTaskImg/drain.png';
 import curingTaskFeedImg from '../../CuringTaskImg/feed.png';
@@ -595,7 +596,7 @@ export default class CuringTaskTree extends Component {
                     }
                 });
             } else if (wkt.indexOf('POLYGON') !== -1) {
-                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                str = handlePOLYGONWktData(wkt);
                 if (type === 'plan') {
                     // 只有一个图形，必须要设置图标
                     this._handleCuringPlanCoordLayer(str, task, eventKey, 1, isFocus);

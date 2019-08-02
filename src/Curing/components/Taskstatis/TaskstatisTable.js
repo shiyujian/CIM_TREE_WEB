@@ -89,7 +89,15 @@ export default class TaskStatisTable extends Component {
         },
         {
             title: '面积(亩)',
-            dataIndex: 'Area'
+            dataIndex: 'Area',
+            render: text => {
+                let number = text.toFixed(2);
+                return (
+                    <span title={number} href='#'>
+                        {number}
+                    </span>
+                );
+            }
         },
         {
             title: '养护人员',
@@ -772,7 +780,6 @@ export default class TaskStatisTable extends Component {
                         if (task && task.ID) {
                             for (let t = 0; t < curingTypes.length; t++) {
                                 let type = curingTypes[t];
-                                console.log('type', type);
                                 if (type.ID === task.CuringType) {
                                     // 获取task的养护类型
                                     task.typeName = type.Base_Name;
@@ -1126,7 +1133,6 @@ export default class TaskStatisTable extends Component {
                         {...this.props}
                         {...this.state} />
                     <Table
-                        style={{width: 'calc(100% - 170px)'}}
                         columns={this.columns}
                         dataSource={taskSearchData}
                         rowKey='ID'

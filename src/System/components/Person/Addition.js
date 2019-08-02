@@ -285,8 +285,8 @@ class Addition extends Component {
                                             placeholder='请选择性别'
                                             style={{ width: '100%' }}
                                         >
-                                            <Option key='女' value={0}>女</Option>
-                                            <Option key='男' value={1}>男</Option>
+                                            <Option key='女' value={1}>女</Option>
+                                            <Option key='男' value={0}>男</Option>
                                         </Select>
                                     )}
                                 </FormItem>
@@ -516,7 +516,7 @@ class Addition extends Component {
                     Duty: values.titles || '', // 职务
                     // Duty: '业主文书',
                     EMail: values.email || '',
-                    Sex: values.sex || '', // 性别
+                    Sex: values.sex ? 1 : 0, // 性别
                     Status: 1, // 状态
                     Section: values.section, // 标段
                     Number: values.idNum, // 身份证号码
@@ -524,13 +524,14 @@ class Addition extends Component {
                     CardBack: '', // 身份证背面照片
                     Face: '',
                     Roles: [{
-                        ID: values.roles // 角色ID
+                        ID: Number(values.roles) // 角色ID
                         // ID: 8
                     }]
                 };
                 // 先进行实名认证再注册用户
                 await RealName(values);
                 let userData = await postForestUser({}, postUserPostData);
+                console.log('userData', userData);
                 if (userData && userData.code === 1) {
                     const msgs = JSON.parse(userData.msg);
                     if (msgs && msgs.status && msgs.status === 400 && msgs.error &&
@@ -580,6 +581,8 @@ class Addition extends Component {
                         } else {
                             message.warn('新增人员失败');
                         }
+                    } else {
+                        message.warn('新增人员失败');
                     }
                 }
             }

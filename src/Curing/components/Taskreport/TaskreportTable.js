@@ -24,7 +24,8 @@ import {
 } from '../auth';
 import {
     getHandleWktData,
-    computeSignedArea
+    computeSignedArea,
+    handlePOLYGONWktData
 } from '_platform/gisAuth';
 import '../Curing.less';
 import {
@@ -353,7 +354,7 @@ export default class TaskReportTable extends Component {
                                 createBtnVisible
                                     ? (
                                         <div className='Curing-buttonStyle'>
-                                            <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>
+                                            <Button type='default' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>
                                             <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
                                         </div>
                                     )
@@ -647,7 +648,7 @@ export default class TaskReportTable extends Component {
                     }
                 });
             } else if (wkt.indexOf('POLYGON') !== -1) {
-                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                str = handlePOLYGONWktData(wkt);
                 if (type === 'plan') {
                     // 只有一个图形，必须要设置图标
                     this._handlePlanCoordLayer(str, task, eventKey, 1);

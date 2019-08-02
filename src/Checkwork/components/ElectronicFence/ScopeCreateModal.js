@@ -36,6 +36,7 @@ class ScopeCreateModal extends Component {
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
                 try {
+                    console.log('coordinates', coordinates);
                     let wkt = '';
                     wkt = 'POLYGON(';
                     // 获取手动框选坐标wkt
