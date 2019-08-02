@@ -4,7 +4,7 @@ import shortid from 'shortid';
 import { Form, Modal, Input } from 'antd';
 
 const FormItem = Form.Item;
-
+const { TextArea } = Input;
 class NewTemplateModal extends React.Component {
     static propTypes = {
         title: string,
@@ -74,7 +74,7 @@ class NewTemplateModal extends React.Component {
                     <FormItem {...formItemLayout} label='模板说明'>
                         {
                             getFieldDecorator('FlowDescribe')(
-                                <Input placeholder='请输入模板编码' />
+                                <TextArea rows={4} />
                             )
                         }
                     </FormItem>

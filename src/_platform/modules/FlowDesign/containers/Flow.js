@@ -5,6 +5,7 @@ import {
     Row,
     Col,
     message,
+    notification,
     Popconfirm
 } from 'antd';
 import { bindActionCreators } from 'redux';
@@ -13,12 +14,11 @@ import { Icon } from 'react-fa';
 import * as flowActions from '../store/workflow';
 
 import { base } from '../../../api';
+import { getUser } from '../../../auth';
 
 import NewTemplateModal from '../components/NewTemplateModal';
 import TemplateTree from '../components/TemplateTree';
 import CloseEditConfirm from '../components/CloseEditConfirm';
-
-import styles from './styles.css';
 
 @connect(
     state => ({}),
@@ -186,11 +186,19 @@ class Flow extends Component {
         deleteflow({
             ID: this.state.flowId
         }, {}).then(rep => {
-            message.success('删除模板成功');
-            this.getList();
-            this.setState({
-                flowId: ''
-            });
+            if (rep.code === 1) {
+                this.getList();
+                this.setState({
+                    flowId: ''
+                });
+                notification.success({
+                    message: '删除模板成功'
+                });
+            } else {
+                notification.error({
+                    message: rep.msg || '删除模板失败'
+                });
+            }
         });
     };
 
@@ -201,17 +209,21 @@ class Flow extends Component {
         postflow({
             Workflow_API: base
         }, {
-            Creater: 9,
-            FlowDescribe: '',
-            Name: values.name
+            Creater: getUser().ID,
+            FlowDescribe: values.FlowDescribe || '',
+            Name: values.name || ''
         }).then(rep => {
             console.log(rep);
             if (rep.code === 1) {
-                message.success('新增模板成功');
+                notification.success({
+                    message: '新增模板成功'
+                });
                 this.getList();
                 this.handleCancel();
             } else {
-                message.info('新增模板失败');
+                notification.error({
+                    message: rep.msg
+                });
             }
         });
         // postTemplate(
@@ -441,7 +453,7 @@ class Flow extends Component {
                                 flex: 1,
                                 overflow: 'hidden'
                             }}
-                            src={`/gooflow/index.html?id=${flowId}&name=${flowName}&serverURL=${encodeURIComponent(
+                            src={`/gooflow/index.html?id=${flowId}&name=${flowName}&userID=${getUser().ID}&serverURL=${encodeURIComponent(
                                 base
                             )}`}
                             frameBorder='0'
