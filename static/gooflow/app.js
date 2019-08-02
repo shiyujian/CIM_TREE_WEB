@@ -146,7 +146,7 @@ $(function () {
 
     function onItemAdd (id, mode, obj) {
         console.log('添加节点', id, mode, obj);
-        onItemBlur(); // 先失去焦点
+        onItemBlur(); // 失去焦点
         return true;
     }
 
@@ -165,8 +165,11 @@ $(function () {
 
     // 保存
     function wholeUpdate (nodeData, lineData) {
+        let promiseArr = [];
+        console.log('保存', lineData, originData);
         for (let item in lineData) {
-            console.log('保存', lineData[item].channel, originData);
+            console.log('保存流向', item);
+            // 流程
             if (originData.includes(item)) {
                 // let params = {
                 //     ID: item,
@@ -199,6 +202,7 @@ $(function () {
                     ToNode: lineData[item].to, // 节点终点
                     DirectionChannel: lineData[item].channel // 流向通道 01进 11进退 10退
                 };
+                console.log('参数', params);
                 $.ajax({
                     url: postDirectionUrl,
                     data: JSON.stringify(params),
@@ -253,20 +257,31 @@ $(function () {
                     NodeDescribe: nodeData[item].describe, // 节点说明
                     NodeType // 节点类型
                 };
-                $.ajax({
-                    url: postNodeUrl,
-                    data: JSON.stringify(params),
-                    contentType: 'application/json',
-                    type: 'POST',
-                    success: function (rep) {
-                        if (rep.code === 1) {
-                            alert('创建节点成功');
-                        } else {
-                            alert(rep.msg);
+                promiseArr.push(new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: postNodeUrl,
+                        data: JSON.stringify(params),
+                        contentType: 'application/json',
+                        type: 'POST',
+                        success: function (rep) {
+                            if (rep.code === 1) {
+                                resolve(rep);
+                                console.log('创建节点成功');
+                            } else {
+                                alert(rep.msg);
+                            }
                         }
-                    }
-                });
+                    });
+                }));
             }
+        }
+        if (promiseArr.length) {
+            Promise.all(promiseArr).then(rep => {
+                alert(`成功创建了${promiseArr.length}个节点`);
+                getLoadData(); // 刷新工作区
+            });
+        } else {
+            // alert(`如修改节点，请先删除重新添加`);
         }
     }
     function onItemDel (id, mode) {
@@ -279,6 +294,7 @@ $(function () {
                     contentType: 'application/json',
                     success: (rep) => {
                         if (rep.code === 1) {
+                            onItemBlur(); // 丢失焦点
                             alert('删除节点成功');
                         } else {
                             alert('删除节点失败');
@@ -292,6 +308,7 @@ $(function () {
                     contentType: 'application/json',
                     success: (rep) => {
                         if (rep.code === 1) {
+                            onItemBlur(); // 失去焦点
                             alert('删除流程成功');
                         } else {
                             alert('删除流程失败');
@@ -301,6 +318,92 @@ $(function () {
             }
         }
         return true;
+    }
+    function getLoadData () {
+        originData = [];
+        flow.clearData(); // 先清空工作区
+        console.log('更新前');
+        $.get(getNodeListUrl, {
+            flowid: temp_id, // 流程ID
+            name: '', // 节点名称
+            type: '', // 节点类型
+            status: 1 // 节点状态
+        }).success(function (rep) {
+            let nodes = {};
+            rep.map((item, index) => {
+                originData.push(item.ID);
+                if (item.NodeType === 1) {
+                    nodes[item.ID] = {
+                        id: item.ID,
+                        name: item.Name,
+                        describe: item.NodeDescribe,
+                        code: item.Code,
+                        height: 28,
+                        width: 30,
+                        top: 40,
+                        left: 40,
+                        alt: true,
+                        type: 'start round mix'
+                    };
+                } else if (item.NodeType === 2) {
+                    nodes[item.ID] = {
+                        id: item.ID,
+                        name: item.Name,
+                        describe: item.NodeDescribe,
+                        code: item.Code,
+                        height: 28,
+                        width: 30,
+                        top: 100 + index * 120,
+                        left: 220,
+                        alt: true,
+                        type: 'task'
+                    };
+                } else if (item.NodeType === 0) {
+                    nodes[item.ID] = {
+                        id: item.ID,
+                        name: item.Name,
+                        describe: item.NodeDescribe,
+                        code: item.Code,
+                        height: 28,
+                        width: 30,
+                        top: 480,
+                        left: 480,
+                        alt: true,
+                        type: 'end round'
+                    };
+                }
+            });
+            $.get(getLineListUrl, {
+                flowid: temp_id, // 流程ID
+                name: '', // 流程名称
+                status: '', // 流向状态
+                page: '', // 页码
+                siez: '' // 每页数量
+            }).success(rep => {
+                let lines = {};
+                rep.map((item, index) => {
+                    originData.push(item.ID);
+                    lines[item.ID] = {
+                        id: item.ID,
+                        name: item.Name,
+                        channel: item.DirectionChannel,
+                        describe: item.DCondition,
+                        from: item.FromNode,
+                        to: item.ToNode,
+                        type: 'sl'
+                    };
+                });
+                let data = {
+                    title: '',
+                    nodes: nodes,
+                    lines: lines,
+                    areas: {},
+                    initNum: 0
+                };
+                console.log('回显的数据', data);
+                flow.loadData(data);
+            });
+        });
     }
     // 初始化
     function initFlow () {
@@ -332,6 +435,7 @@ $(function () {
                 originData.push(item.ID);
                 if (item.NodeType === 1) {
                     nodes[item.ID] = {
+                        id: item.ID,
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,
@@ -344,6 +448,7 @@ $(function () {
                     };
                 } else if (item.NodeType === 2) {
                     nodes[item.ID] = {
+                        id: item.ID,
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,
@@ -356,6 +461,7 @@ $(function () {
                     };
                 } else if (item.NodeType === 0) {
                     nodes[item.ID] = {
+                        id: item.ID,
                         name: item.Name,
                         describe: item.NodeDescribe,
                         code: item.Code,

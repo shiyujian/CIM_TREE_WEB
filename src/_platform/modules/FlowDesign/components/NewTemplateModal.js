@@ -61,16 +61,6 @@ class NewTemplateModal extends React.Component {
                             )
                         }
                     </FormItem>
-                    <FormItem {...formItemLayout} label='模板编码'>
-                        {
-                            getFieldDecorator('code', {
-                                rules: [{ required: true, message: '必填', trigger: 'blur' }]
-                            })(
-                                <Input placeholder='请输入模板编码' />
-                            )
-                        }
-                        <p style={{ color: '#ccc' }}>唯一，默认自动生成，可手动修改</p>
-                    </FormItem>
                     <FormItem {...formItemLayout} label='模板说明'>
                         {
                             getFieldDecorator('FlowDescribe')(
