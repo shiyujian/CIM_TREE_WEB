@@ -8,7 +8,11 @@ import {
     DatePicker,
     Select
 } from 'antd';
-import { getUser, getCompanyDataByOrgCode } from '_platform/auth';
+import {
+    getUser,
+    getCompanyDataByOrgCode,
+    getUserIsManager
+} from '_platform/auth';
 import {ORGTYPE} from '_platform/api';
 import { handleFilterData } from '../auth';
 const FormItem = Form.Item;
@@ -28,7 +32,6 @@ class CountFilter extends Component {
             groupArray: [],
             start: '',
             end: '',
-            statusArray: [],
             permission: false,
             userCompany: ''
         };
@@ -49,16 +52,16 @@ class CountFilter extends Component {
             }
             this.companyList = [];
             // 是否为业主或管理员
-            let permission = true;
-            // let permission = getUserIsManager();
+            // let permission = true;
+            let permission = getUserIsManager();
             if (permission) {
-                ORGTYPE.map(async (type) => {
+                for (let i = 0; i < ORGTYPE.length; i++) {
+                    let type = ORGTYPE[i];
                     let orgData = await getOrgTreeByOrgType({orgtype: type});
                     if (orgData && orgData.content && orgData.content instanceof Array && orgData.content.length > 0) {
                         await this.getCompanyList(orgData.content);
                     }
-                    console.log('this.companyList', this.companyList);
-                });
+                }
                 await this.getUserCompany();
             } else {
                 let parentData = await this.getUserCompany();
@@ -66,6 +69,7 @@ class CountFilter extends Component {
                     this.companyList.push(parentData);
                 }
             }
+            this.props.getCompanyDataList(this.companyList);
             this.setState({
                 permission
             });
@@ -249,6 +253,7 @@ class CountFilter extends Component {
                 </OptGroup>
             );
         });
+        console.log('systemRoles', systemRoles);
         return objs;
     }
     renderTitle () {
@@ -398,7 +403,10 @@ class CountFilter extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { groupArray, statusArray } = this.state;
+        const {
+            groupArray
+        } = this.state;
+        console.log('this.companyList', this.companyList);
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
@@ -522,7 +530,6 @@ class CountFilter extends Component {
                                                     ) >= 0
                                             }
                                             allowClear
-                                            // mode='multiple'
                                             style={{ width: '100%' }}
                                         >
                                             {this.renderContent()}

@@ -26,6 +26,7 @@ import {
 import ChangeLocInfoModal from './ChangeLocInfoModal';
 const { RangePicker } = DatePicker;
 const InputGroup = Input.Group;
+const { Option } = Select;
 
 export default class LocmeasureTable extends Component {
     constructor (props) {
@@ -52,7 +53,6 @@ export default class LocmeasureTable extends Component {
             SupervisorCheck: '',
             CheckStatus: '',
             // islocation: '',
-            role: 'inputer',
             rolename: '',
             percent: 0,
             messageTotalNum: '',
@@ -78,7 +78,8 @@ export default class LocmeasureTable extends Component {
             changeLocInfoVisible: false,
             changeLocInfoAllStatus: false,
             example: '',
-            postData: ''
+            postData: '',
+            userOptions: []
         };
         this.columns = [
             {
@@ -421,10 +422,6 @@ export default class LocmeasureTable extends Component {
         this.setState({ sxm: '' });
     };
 
-    emitEmpty2 = () => {
-        this.setState({ rolename: '' });
-    };
-
     sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
@@ -497,8 +494,42 @@ export default class LocmeasureTable extends Component {
         this.setState({ islocation: value || '' });
     }
 
+    handleUserSearch = async (value) => {
+        const {
+            actions: {
+                getUsers
+            }
+        } = this.props;
+        let userList = [];
+        let userOptions = [];
+        if (value.length >= 2) {
+            let postData = {
+                fullname: value
+            };
+            let userData = await getUsers({}, postData);
+            if (userData && userData.content && userData.content instanceof Array) {
+                userList = userData.content;
+                userList.map((user) => {
+                    userOptions.push(
+                        <Option
+                            key={user.ID}
+                            title={`${user.Full_Name}(${user.User_Name})`}
+                            value={user.ID}>
+                            {`${user.Full_Name}(${user.User_Name})`}
+                        </Option>
+                    );
+                });
+            }
+            this.setState({
+                userOptions
+            });
+        }
+    }
     onRoleNameChange (value) {
-        this.setState({ rolename: value.target.value });
+        console.log('value', value);
+        this.setState({
+            rolename: value
+        });
     }
 
     datepick (value) {
@@ -702,7 +733,6 @@ export default class LocmeasureTable extends Component {
             bigType = '',
             treetype = '',
             locationstatus = '',
-            role = '',
             rolename = '',
             stime = '',
             lstime = '',
@@ -836,9 +866,9 @@ export default class LocmeasureTable extends Component {
             gd: gd,
             gf: gf,
             tqhd: tqhd,
-            tqzj: tqzj
+            tqzj: tqzj,
+            inputer: rolename
         };
-        if (role) postData[role] = rolename;
         this.setState({ loading: true, percent: 0 });
         getexportTree({}, postData).then(rst3 => {
             if (rst3 === '') {
@@ -875,7 +905,6 @@ export default class LocmeasureTable extends Component {
             bigType = '',
             treetype = '',
             // islocation = '',
-            role = '',
             rolename = '',
             stime = '',
             etime = '',
@@ -1015,9 +1044,9 @@ export default class LocmeasureTable extends Component {
             gd: gd,
             gf: gf,
             tqhd: tqhd,
-            tqzj: tqzj
+            tqzj: tqzj,
+            inputer: rolename
         };
-        if (role) postData[role] = rolename;
 
         this.setState({
             loading: true,
@@ -1448,14 +1477,11 @@ export default class LocmeasureTable extends Component {
             bigType,
             treetypename,
             status,
-            selectedRowKeys = []
-            // islocation
+            selectedRowKeys = [],
+            userOptions = []
         } = this.state;
         const suffix1 = sxm ? (
             <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
-        const suffix2 = rolename ? (
-            <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
         let header = '';
         let permission = getUserIsManager();
@@ -1570,13 +1596,20 @@ export default class LocmeasureTable extends Component {
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>测量人：</span>
-                        <Input
-                            suffix={suffix2}
-                            value={rolename}
-                            placeholder='请输入用户名'
+                        <Select
+                            allowClear
+                            showSearch
                             className='forest-forestcalcw4'
+                            placeholder={'请输入姓名搜索'}
+                            onSearch={this.handleUserSearch.bind(this)}
                             onChange={this.onRoleNameChange.bind(this)}
-                        />
+                            showArrow={false}
+                            filterOption={false}
+                            notFoundContent={null}
+                            value={rolename || undefined}
+                        >
+                            {userOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg-datePicker'>
                         <span className='forest-search-span'>测量时间：</span>

@@ -21,6 +21,7 @@ import {
     getProjectNameBySection
 } from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 export default class NursmeasureTable extends Component {
     constructor (props) {
@@ -48,7 +49,8 @@ export default class NursmeasureTable extends Component {
             supervisorcheck: '',
             checkstatus: '',
             ispack: '',
-            imgArr: []
+            imgArr: [],
+            userOptions: []
         };
     }
     componentDidMount () {
@@ -100,11 +102,9 @@ export default class NursmeasureTable extends Component {
             bigType,
             treetypename,
             ispack,
-            mmtype = ''
+            mmtype = '',
+            userOptions = []
         } = this.state;
-        const suffix2 = rolename ? (
-            <Icon type='close-circle' onClick={this.emitEmpty2} />
-        ) : null;
         const suffix3 = factory ? (
             <Icon type='close-circle' onClick={this.emitEmpty3} />
         ) : null;
@@ -454,15 +454,23 @@ export default class NursmeasureTable extends Component {
                             onChange={this.nurschange.bind(this)}
                         />
                     </div>
-                    {/* <div className='forest-mrg10'>
+                    <div className='forest-mrg10'>
                         <span className='forest-search-span'>填报人：</span>
-                        <Input
-                            suffix={suffix2}
-                            value={rolename}
+                        <Select
+                            allowClear
+                            showSearch
                             className='forest-forestcalcw4'
+                            placeholder={'请输入姓名搜索'}
+                            onSearch={this.handleUserSearch.bind(this)}
                             onChange={this.onRoleNameChange.bind(this)}
-                        />
-                    </div> */}
+                            showArrow={false}
+                            filterOption={false}
+                            notFoundContent={null}
+                            value={rolename || undefined}
+                        >
+                            {userOptions}
+                        </Select>
+                    </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>状态：</span>
                         <Select
@@ -626,8 +634,42 @@ export default class NursmeasureTable extends Component {
         this.setState({ ispack: value });
     }
 
+    handleUserSearch = async (value) => {
+        const {
+            actions: {
+                getUsers
+            }
+        } = this.props;
+        let userList = [];
+        let userOptions = [];
+        if (value.length >= 2) {
+            let postData = {
+                fullname: value
+            };
+            let userData = await getUsers({}, postData);
+            if (userData && userData.content && userData.content instanceof Array) {
+                userList = userData.content;
+                userList.map((user) => {
+                    userOptions.push(
+                        <Option
+                            key={user.ID}
+                            title={`${user.Full_Name}(${user.User_Name})`}
+                            value={user.ID}>
+                            {`${user.Full_Name}(${user.User_Name})`}
+                        </Option>
+                    );
+                });
+            }
+            this.setState({
+                userOptions
+            });
+        }
+    }
     onRoleNameChange (value) {
-        this.setState({ rolename: value.target.value });
+        console.log('value', value);
+        this.setState({
+            rolename: value
+        });
     }
 
     factorychange (value) {
