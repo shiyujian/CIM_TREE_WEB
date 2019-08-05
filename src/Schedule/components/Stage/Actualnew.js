@@ -16,8 +16,6 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
     WFStatusList,
-    ACYUAL_NAME,
-    ACYUAL_ID,
     SCHEDULRPROJECT
 } from '_platform/api';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -34,6 +32,8 @@ class Actual extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            flowID: '', // 流程ID
+            flowName: '', // 流程名称
             originNodeID: '', // 起点ID
             originNodeName: '', // 起点name
             workID: '', // 任务ID
@@ -71,13 +71,40 @@ class Actual extends Component {
     }
     async componentDidMount () {
         this.getSection(); // 获取当前登陆用户的标段
-        this.getWorkList(); // 获取任务列表
-        this.getOriginNode(); // 获取流程起点ID
+        this.getFlowList(); // 获取流程
+    }
+    getFlowList () {
+        const { getFlowList } = this.props.actions;
+        getFlowList({}, {
+            name: '', // 流程名称
+            status: 1, // 流程状态
+            page: '',
+            size: ''
+        }).then(rep => {
+            if (rep.code === 1) {
+                let flowID = '';
+                let flowName = '';
+                rep.content.map(item => {
+                    if (item.Name === '每日进度填报流程') {
+                        flowID = item.ID;
+                        flowName = item.Name;
+                    }
+                });
+                this.setState({
+                    flowID,
+                    flowName
+                }, () => {
+                    this.getWorkList(); // 获取任务列表
+                    this.getOriginNode(); // 获取流程起点ID
+                });
+            }
+        });
     }
     getOriginNode () {
         const { getNodeList } = this.props.actions;
+        const { flowID } = this.state;
         getNodeList({}, {
-            flowid: ACYUAL_ID, // 流程ID
+            flowid: flowID, // 流程ID
             name: '', // 节点名称
             type: 1, // 节点类型
             status: 1 // 节点状态
@@ -92,18 +119,18 @@ class Actual extends Component {
     }
     getWorkList (pro = {}) {
         const { getWorkList } = this.props.actions;
-        console.log(getUser().ID);
+        const { flowID } = this.state;
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称
-            flowid: ACYUAL_ID, // 流程类型或名称
+            flowid: flowID, // 流程类型或名称
             // flowid: '', // 流程类型或名称
             starter: '', // 发起人
             currentnode: '', // 节点ID
             prevnode: '', // 上一结点ID
             executor: '', // 执行人
             sender: '', // 上一节点发送人
-            wfstate: '', // 待办 0,1
+            wfstate: pro.status || '', // 待办 0,1
             stime: pro.stime || '', // 开始时间
             etime: pro.etime || '', // 结束时间
             keys: pro.keys || '', // 查询键
@@ -178,9 +205,10 @@ class Actual extends Component {
         validateFields((err, values) => {
             if (!err) {
             }
+            console.log('参数', values);
             let stime = '';
             let etime = '';
-            if (values.submitDate) {
+            if (values.submitDate && values.submitDate.length) {
                 stime = moment(values.submitDate[0]).format(dateFormat);
                 etime = moment(values.submitDate[1]).format(dateFormat);
             }
@@ -229,14 +257,18 @@ class Actual extends Component {
                 <Form layout='inline'>
                     <FormItem label='标段'>
                         {getFieldDecorator('section')(
-                            <Select placeholder='请选择标段' style={{width: 220}}>
+                            <Select
+                                allowClear
+                                placeholder='请选择标段'
+                                style={{width: 220}}
+                            >
                                 {sectionArray.map(item => {
                                     return <Option value={item.No} key={item.No}>{item.Name}</Option>;
                                 })}
                             </Select>
                         )}
                     </FormItem>
-                    <FormItem label='提交日期'>
+                    <FormItem label='提交时间'>
                         {getFieldDecorator('submitDate')(
                             <RangePicker
                                 size='default'
@@ -404,7 +436,7 @@ class Actual extends Component {
         } = this.props;
         validateFields((err, values) => {
             if (!err) {
-                const { originNodeID, TableList } = this.state;
+                const { originNodeID, TableList, flowID, flowName } = this.state;
                 let newTableList = [];
                 TableList.map(item => {
                     newTableList.push({
@@ -431,8 +463,8 @@ class Actual extends Component {
                     Val: JSON.stringify(newTableList)
                 }];
                 postStartwork({}, {
-                    FlowID: ACYUAL_ID, // 模板ID
-                    FlowName: ACYUAL_NAME, // 模板名称
+                    FlowID: flowID, // 模板ID
+                    FlowName: flowName, // 模板名称
                     FormValue: { // 表单值
                         FormParams: FormParams,
                         NodeID: originNodeID
@@ -549,9 +581,15 @@ class Actual extends Component {
                         </a>
                     </span>
                     <span style={{marginLeft: 10}}>
-                        <a onClick={this.onDelete.bind(this, record.ID)}>
-                            删除
-                        </a>
+                        <Popconfirm
+                            title='你确定删除该任务吗？'
+                            okText='是' cancelText='否'
+                            onConfirm={this.onDelete.bind(this, record.ID)}
+                        >
+                            <a href='#'>
+                                删除
+                            </a>
+                        </Popconfirm>
                     </span>
                 </div>);
             }

@@ -84,7 +84,7 @@ export default class WeekPlanModal extends Component {
         return (
             <div>
                 <Modal
-                    title='日进度计划流程详情'
+                    title='周进度计划流程详情'
                     width={800}
                     onOk={this.props.onok}
                     onCancel={this.props.oncancel}
@@ -140,7 +140,7 @@ export default class WeekPlanModal extends Component {
                                     <Row>
                                         <Table
                                             columns={this.columns}
-                                            pagination
+                                            pagination={false}
                                             dataSource={TableList}
                                             rowKey='ID'
                                             className='foresttable'

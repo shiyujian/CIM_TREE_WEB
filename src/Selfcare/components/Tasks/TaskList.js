@@ -32,6 +32,7 @@ class TaskList extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            initiatorList: [], // 发起人列表
             workDetails: {}, // 任务详情
             processList: [], // 待办列表
             finishList: [], // 已办列表
@@ -40,14 +41,56 @@ class TaskList extends Component {
             loadingProcess: false, // 待办loading
             loadingFinish: false // 待办loading
         };
+        this.getInitiatorList = this.getInitiatorList.bind(this); // 获取发起人列表
         this.getProcessList = this.getProcessList.bind(this); // 获取待办列表
         this.getFinishList = this.getFinishList.bind(this); // 获取已办列表
         this.getFlowList = this.getFlowList.bind(this); // 获取任务列表
     }
     componentDidMount () {
+        this.getInitiatorList(); // 获取发起人列表
         this.getFlowList();
         this.getProcessList();
         this.getFinishList();
+    }
+    getInitiatorList () {
+        const {
+            actions: {
+                getUsers,
+                getRoles
+            }
+        } = this.props;
+        let user = getUser();
+        getRoles().then(rep => {
+            let RoleID = '';
+            rep.map(item => {
+                if (item.RoleName === '施工文书') {
+                    RoleID = item.ID;
+                }
+            });
+            console.log('获取发起人', user, rep);
+            getUsers({}, {
+                role: RoleID,
+                section: user.section,
+                status: 1,
+                page: '',
+                size: ''
+            }).then(res => {
+                if (res.code === 200) {
+                    let initiatorList = [];
+                    res.content.map(item => {
+                        initiatorList.push({
+                            value: item.ID,
+                            label: item.Full_Name
+                        });
+                    });
+                    this.setState({
+                        initiatorList
+                    });
+                }
+                console.log('获取人', res);
+            });
+        });
+        console.log('获取发起人section', user.section);
     }
     getProcessList () { // 获取待办
         this.setState({
@@ -152,7 +195,7 @@ class TaskList extends Component {
     }
     onSearch () {
         this.getProcessList(); // 获取待办
-        // this.getFinishList();
+        this.getFinishList(); // 获取已办
     }
     onClear () {
 
@@ -161,7 +204,7 @@ class TaskList extends Component {
 
     }
     render () {
-        const { loadingProcess, loadingFinish, type, flowDataList, processList, finishList, workDetails } = this.state;
+        const { loadingProcess, loadingFinish, type, flowDataList, processList, finishList, initiatorList } = this.state;
         const { getFieldDecorator } = this.props.form;
         return (
             <div>
@@ -193,7 +236,7 @@ class TaskList extends Component {
                                         return (
                                             <Option
                                                 key={item.ID}
-                                                value={item.Name}
+                                                value={item.ID}
                                             >
                                                 {item.Name}
                                             </Option>
@@ -211,7 +254,11 @@ class TaskList extends Component {
                                     placeholder='请选择发起人'
                                     optionFilterProp='children'
                                 >
-                                    <Option value='jack' key='jack'>Jack</Option>
+                                    {
+                                        initiatorList.map(item => {
+                                            return <Option value={item.value} key={item.value}>{item.label}</Option>;
+                                        })
+                                    }
                                 </Select>
                             )}
                         </FormItem>
@@ -251,17 +298,6 @@ class TaskList extends Component {
                 }
             </div>
         );
-    }
-    onDetails (ID) {
-        // const { getWorkDetails } = this.props.actions;
-        // getWorkDetails({
-        //     ID
-        // }, {}).then(rep => {
-        //     console.log('详情', rep);
-        //     this.setState({
-        //         workDetails: rep
-        //     });
-        // });
     }
     chaneType = async (event) => {
         console.log('切换', event.target.value);

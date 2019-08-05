@@ -17,8 +17,6 @@ import {
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import {
-    WEEK_NAME,
-    WEEK_ID,
     WFStatusList
 } from '_platform/api';
 import { getNextStates } from '_platform/components/Progress/util';
@@ -35,6 +33,8 @@ class WeekPlan extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            flowID: '', // 流程ID
+            flowName: '', // 流程Name
             originNodeID: '', // 起点ID
             originNodeName: '', // 起点name
             weekData: [],
@@ -64,13 +64,41 @@ class WeekPlan extends Component {
     }
     async componentDidMount () {
         this.getSection(); // 获取当前登陆用户的标段
-        this.getWorkList(); // 获取任务列表
-        this.getOriginNode(); // 获取流程起点ID
+        this.getFlowList(); // 获取流程
+    }
+    getFlowList () {
+        const { getFlowList } = this.props.actions;
+        getFlowList({}, {
+            name: '', // 流程名称
+            status: 1, // 流程状态
+            page: '',
+            size: ''
+        }).then(rep => {
+            if (rep.code === 1) {
+                let flowID = '';
+                let flowName = '';
+                rep.content.map(item => {
+                    if (item.Name === '每周进度填报流程') {
+                        flowID = item.ID;
+                        flowName = item.Name;
+                    }
+                });
+                console.log('每周', rep);
+                this.setState({
+                    flowID,
+                    flowName
+                }, () => {
+                    this.getWorkList(); // 获取任务列表
+                    this.getOriginNode(); // 获取流程起点ID
+                });
+            }
+        });
     }
     getOriginNode () {
         const { getNodeList } = this.props.actions;
+        const { flowID } = this.state;
         getNodeList({}, {
-            flowid: WEEK_ID, // 流程ID
+            flowid: flowID, // 流程ID
             name: '', // 节点名称
             type: 1, // 节点类型
             status: 1 // 节点状态
@@ -135,11 +163,12 @@ class WeekPlan extends Component {
     }
     getWorkList (pro = {}) {
         const { getWorkList } = this.props.actions;
+        const { flowID } = this.state;
         console.log('123', getUser());
         let params = {
             workid: '', // 任务ID
             title: '', // 任务名称
-            flowid: WEEK_ID, // 流程类型或名称
+            flowid: flowID, // 流程类型或名称
             // flowid: '', // 流程类型或名称
             starter: '', // 发起人
             currentnode: '', // 节点ID
@@ -173,7 +202,7 @@ class WeekPlan extends Component {
             }
             let stime = '';
             let etime = '';
-            if (values.submitDate) {
+            if (values.submitDate && values.submitDate.length) {
                 stime = moment(values.submitDate[0]).format(dateFormat);
                 etime = moment(values.submitDate[1]).format(dateFormat);
             }
@@ -413,7 +442,7 @@ class WeekPlan extends Component {
         } = this.props;
         validateFields((err, values) => {
             if (!err) {
-                const { TableList, stime, etime, originNodeID } = this.state;
+                const { TableList, stime, etime, originNodeID, flowID, flowName } = this.state;
                 let newTableList = [];
                 TableList.map(item => {
                     newTableList.push({
@@ -440,8 +469,8 @@ class WeekPlan extends Component {
                     Val: JSON.stringify(newTableList)
                 }];
                 postStartwork({}, {
-                    FlowID: WEEK_ID, // 模板ID
-                    FlowName: WEEK_NAME, // 模板名称
+                    FlowID: flowID, // 模板ID
+                    FlowName: flowName, // 模板名称
                     FormValue: { // 表单值
                         FormParams: FormParams,
                         NodeID: originNodeID
@@ -621,9 +650,15 @@ class WeekPlan extends Component {
                         </a>
                     </span>
                     <span style={{marginLeft: 10}}>
-                        <a onClick={this.onDelete.bind(this, record.ID)}>
-                            删除
-                        </a>
+                        <Popconfirm
+                            title='你确定删除该任务吗？'
+                            okText='是' cancelText='否'
+                            onConfirm={this.onDelete.bind(this, record.ID)}
+                        >
+                            <a href='#'>
+                                删除
+                            </a>
+                        </Popconfirm>
                     </span>
                 </div>);
             }

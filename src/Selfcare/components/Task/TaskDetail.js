@@ -29,9 +29,12 @@ class TaskDetail extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            flowList: [], // 流程列表
             Starter: '', // 发起人ID
             FlowID: '', // 流程ID
             FlowName: '', // 流程名称
+            originNodeID: '', // 起点ID
+            originNodeName: '', // 起点名称
             WorkID: '', // 任务ID
             CurrentNode: '', // 当前节点
             CurrentNodeName: '', // 当前节点名称
@@ -47,8 +50,26 @@ class TaskDetail extends Component {
         this.onBack = this.onBack.bind(this); // 返回
     }
     componentDidMount () {
-        this.getWorkDetails();
-        this.getNextPeople();
+        this.getOriginNode(); // 获取流程起点ID
+        this.getWorkDetails(); // 获取任务详情
+        this.getNextPeople(); // 获取业主文书列表
+    }
+    getOriginNode () {
+        const { getNodeList } = this.props.actions;
+        const { actualID } = this.state;
+        getNodeList({}, {
+            flowid: actualID, // 流程ID
+            name: '', // 节点名称
+            type: 1, // 节点类型
+            status: 1 // 节点状态
+        }).then(rep => {
+            if (rep.length === 1) {
+                this.setState({
+                    originNodeID: rep[0].ID,
+                    originNodeName: rep[0].Name
+                });
+            }
+        });
     }
     getNextPeople = async () => {
         const {
@@ -158,6 +179,7 @@ class TaskDetail extends Component {
                 }
             });
             this.props.actions.setTaskDetailLoading(false);
+            console.log('流程详情', param, TableList);
             this.setState({
                 WorkID: task_id,
                 CurrentNode: rep.CurrentNode,
@@ -175,19 +197,19 @@ class TaskDetail extends Component {
     }
     getFormDetails () {
         let node = '';
-        const { FlowID, TableList, param } = this.state;
-        // console.log(FlowID, WEEK_ID);
-        if (FlowID === TOTAL_ID) {
+        const { FlowName, TableList, param } = this.state;
+        console.log('流程列表', FlowName);
+        if (FlowName === '总计划进度填报流程') {
             node = <TotalDetail
                 param={param}
                 TableList={TableList}
             />;
-        } else if (FlowID === WEEK_ID) {
+        } else if (FlowName === '每周进度填报流程') {
             node = <WeekDetail
                 param={param}
                 TableList={TableList}
             />;
-        } else if (FlowID === ACYUAL_ID) {
+        } else if (FlowName === '每日进度填报流程') {
             node = <ActualDetail
                 param={param}
                 TableList={TableList}
@@ -197,20 +219,20 @@ class TaskDetail extends Component {
     }
     getFormItem = (item) => {
         let node = '';
-        const { FlowID } = this.state;
-        if (FlowID === TOTAL_ID) {
+        const { FlowName } = this.state;
+        if (FlowName === '总计划进度填报流程') {
             node = <TotalForm
                 onBack={this.onBack.bind(this)}
                 {...this.props}
                 {...this.state}
             />;
-        } else if (FlowID === ACYUAL_ID) {
+        } else if (FlowName === '每日进度填报流程') {
             node = <ActualForm
                 onBack={this.onBack.bind(this)}
                 {...this.props}
                 {...this.state}
             />;
-        } else if (FlowID === WEEK_ID) {
+        } else if (FlowName === '每周进度填报流程') {
             node = <WeekForm
                 onBack={this.onBack.bind(this)}
                 {...this.props}
@@ -354,12 +376,6 @@ class TaskDetail extends Component {
     onBack () {
         let to = `/selfcare/task`;
         this.props.history.push(to);
-    }
-    handleSubmit () {
-
-    }
-    handleReject () {
-
     }
 }
 export default TaskDetail;

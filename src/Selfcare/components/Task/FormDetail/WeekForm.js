@@ -9,9 +9,7 @@ import {
     notification
 } from 'antd';
 import {
-    WEEK_ONENODE_ID,
-    WEEK_THREENODE_ID,
-    WEEK_FOURNODE_ID
+    WEEK_THREENODE_ID
 } from '_platform/api';
 const { Option } = Select;
 const formItemLayout = {
@@ -33,12 +31,12 @@ class WeekForm extends Component {
     }
     getOpinion () {
         const {
-            CurrentNode,
+            CurrentNodeName,
             NextPeopleList,
             form: { getFieldDecorator }
         } = this.props;
         let node = '';
-        if (CurrentNode === WEEK_THREENODE_ID) {
+        if (CurrentNodeName === '业主查看') {
 
         } else {
             node = <Row style={{marginTop: 20}}>
@@ -122,10 +120,6 @@ class WeekForm extends Component {
                     Val: values.Opinion
                 }];
                 console.log('下一执行人', values.NextPeople);
-                let NextNode = WEEK_THREENODE_ID;
-                if (CurrentNode === WEEK_THREENODE_ID) {
-                    NextNode = WEEK_FOURNODE_ID;
-                }
                 let params = {
                     FlowID, // 流程ID
                     FlowName, // 流程名称
@@ -134,7 +128,7 @@ class WeekForm extends Component {
                     CurrentNodeName, // 当前节点名称
                     FormValue: {
                         FormParams: FormParams,
-                        NodeID: NextNode // 下一节点ID
+                        NodeID: '' // 下一节点ID
                     }, // 表单值
                     NextExecutor: values.NextPeople || 0, // 下一节点执行人
                     Executor // 当前节点执行人
@@ -159,6 +153,7 @@ class WeekForm extends Component {
             Starter,
             FlowID,
             FlowName,
+            originNodeID,
             WorkID,
             CurrentNode,
             CurrentNodeName,
@@ -182,10 +177,10 @@ class WeekForm extends Component {
                     CurrentNodeName, // 当前节点名称
                     FormValue: {
                         FormParams: FormParams,
-                        NodeID: WEEK_ONENODE_ID // 下一节点ID
+                        NodeID: '' // 下一节点ID
                     }, // 表单值
                     NextExecutor: Starter, // 下一节点执行人
-                    BackNode: WEEK_ONENODE_ID,
+                    BackNode: originNodeID,
                     Executor // 当前节点执行人
                 };
                 postBackwork({}, params).then(rep => {
