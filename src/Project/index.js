@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-11 14:22:58
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-24 14:18:36
+ * @Last Modified time: 2019-08-05 19:03:51
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -141,21 +141,22 @@ export default class Project extends Component {
                     icon: <Icon name='tag' />
                 }
             ]
-        }, {
-            key: 'volunteer',
-            name: '志愿管理',
-            id: 'PROJECT.VOLUNTEER',
-            icon: <Icon name='won' />,
-            children: [
-                {
-                    key: 'VolunteerManage',
-                    id: 'PROJECT.VOLUNTEERMANAGE',
-                    name: '志愿者管理',
-                    path: '/project/volunteerManage',
-                    icon: <Icon name='code' />
-                }
-            ]
         },
+        // {
+        //     key: 'volunteer',
+        //     name: '志愿管理',
+        //     id: 'PROJECT.VOLUNTEER',
+        //     icon: <Icon name='won' />,
+        //     children: [
+        //         {
+        //             key: 'VolunteerManage',
+        //             id: 'PROJECT.VOLUNTEERMANAGE',
+        //             name: '志愿者管理',
+        //             path: '/project/volunteerManage',
+        //             icon: <Icon name='code' />
+        //         }
+        //     ]
+        // },
         {
             key: 'nursery',
             name: '苗木管理',
@@ -191,14 +192,14 @@ export default class Project extends Component {
                     icon: <Icon name='tag' />
                 }
             ]
-        },
-        {
-            key: 'projectImage',
-            name: '工程影像',
-            id: 'PROJECT.PROJECTIMAGE',
-            path: '/project/projectimage',
-            icon: <Icon name='check' />
         }
+        // {
+        //     key: 'projectImage',
+        //     name: '工程影像',
+        //     id: 'PROJECT.PROJECTIMAGE',
+        //     path: '/project/projectimage',
+        //     icon: <Icon name='check' />
+        // }
     ];
 
     static defaultOpenKeys = ['nursery'];

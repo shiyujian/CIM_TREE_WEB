@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-31 20:40:49
+ * @Last Modified time: 2019-08-05 16:59:36
  */
 /**
  *
@@ -285,19 +285,19 @@ export default class ForestContainer extends Component {
                     id: 'FOREST.PLANTSTRENGTHANALYSI',
                     path: '/forest/plantstrengthanalysi',
                     name: '栽植强度分析'
-                },
-                {
-                    key: 'datastatis',
-                    id: 'FOREST.DATASTATIS',
-                    path: '/forest/datastatis',
-                    name: '数据统计'
-                },
-                {
-                    key: 'useranalysis',
-                    id: 'FOREST.USERANALYSIS',
-                    path: '/forest/useranalysis',
-                    name: '用户行为统计'
                 }
+                // {
+                //     key: 'datastatis',
+                //     id: 'FOREST.DATASTATIS',
+                //     path: '/forest/datastatis',
+                //     name: '数据统计'
+                // },
+                // {
+                //     key: 'useranalysis',
+                //     id: 'FOREST.USERANALYSIS',
+                //     path: '/forest/useranalysis',
+                //     name: '用户行为统计'
+                // }
             ]
         },
         {

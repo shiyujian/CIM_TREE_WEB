@@ -115,13 +115,13 @@ export default class Header extends Component {
                 path: '/overall/news',
                 icon: <Icon name='cubes' />
             },
-            {
-                key: 'datum',
-                id: 'DATUM',
-                title: '资料管理',
-                path: '/datum/standard',
-                icon: <Icon name='book' />
-            },
+            // {
+            //     key: 'datum',
+            //     id: 'DATUM',
+            //     title: '资料管理',
+            //     path: '/datum/standard',
+            //     icon: <Icon name='book' />
+            // },
             {
                 key: 'schedule',
                 id: 'SCHEDULE',
@@ -177,14 +177,14 @@ export default class Header extends Component {
                 title: '项目管理',
                 path: '/project/nurseryManagement',
                 icon: <Icon name='sitemap' />
-            },
-            {
-                key: 'dipping',
-                id: 'DIPPING',
-                title: '三维倾斜',
-                path: '/dipping/dipping',
-                icon: <Icon name='plane' />
             }
+            // {
+            //     key: 'dipping',
+            //     id: 'DIPPING',
+            //     title: '三维倾斜',
+            //     path: '/dipping/dipping',
+            //     icon: <Icon name='plane' />
+            // }
         ];
         const { match: { params: { module = '' } = {} } = {} } = this.props;
         const ignore = Header.ignoreModules.some(m => m === module);

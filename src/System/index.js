@@ -80,21 +80,21 @@ export default class System extends Component {
                     name: '人员黑名单',
                     path: '/system/personblacklist',
                     icon: <Icon name='street-view' />
-                },
-                {
-                    key: 'NurseryBlacklist',
-                    id: 'SYSTEM.NURSERYBLACKLIST',
-                    name: '苗圃黑名单',
-                    path: '/system/nurseryblacklist',
-                    icon: <Icon name='leaf' />
-                },
-                {
-                    key: 'SupplierBlacklist',
-                    id: 'SYSTEM.SUPPLIERBLACKLIST',
-                    name: '供应商黑名单',
-                    path: '/system/supplierblacklist',
-                    icon: <Icon name='shopping-cart' />
                 }
+                // {
+                //     key: 'NurseryBlacklist',
+                //     id: 'SYSTEM.NURSERYBLACKLIST',
+                //     name: '苗圃黑名单',
+                //     path: '/system/nurseryblacklist',
+                //     icon: <Icon name='leaf' />
+                // },
+                // {
+                //     key: 'SupplierBlacklist',
+                //     id: 'SYSTEM.SUPPLIERBLACKLIST',
+                //     name: '供应商黑名单',
+                //     path: '/system/supplierblacklist',
+                //     icon: <Icon name='shopping-cart' />
+                // }
             ]
         }
     ];
