@@ -94,21 +94,21 @@ export default class Schedule extends Component {
             name: '进度展示',
             path: '/schedule/scheduledisplay',
             icon: <Icon name='warning' />
-        },
-        {
-            key: 'enteranalyze',
-            id: 'SCHEDULE.ENTERANALYZE',
-            name: '苗木进场分析',
-            path: '/schedule/enteranalyze',
-            icon: <Icon name='ship' />
-        },
-        {
-            key: 'scheduleanalyze',
-            name: '种植进度分析',
-            id: 'SCHEDULE.SCHEDULEANALYZE',
-            path: '/schedule/scheduleanalyze',
-            icon: <Icon name='warning' />
         }
+        // {
+        //     key: 'enteranalyze',
+        //     id: 'SCHEDULE.ENTERANALYZE',
+        //     name: '苗木进场分析',
+        //     path: '/schedule/enteranalyze',
+        //     icon: <Icon name='ship' />
+        // },
+        // {
+        //     key: 'scheduleanalyze',
+        //     name: '种植进度分析',
+        //     id: 'SCHEDULE.SCHEDULEANALYZE',
+        //     path: '/schedule/scheduleanalyze',
+        //     icon: <Icon name='warning' />
+        // }
     ];
 
     static defaultOpenKeys = ['stagereport'];

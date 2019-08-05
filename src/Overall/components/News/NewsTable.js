@@ -188,8 +188,8 @@ class NewsTable extends Component {
                 console.log(123, values);
                 let sdate = '', edate = '';
                 if (values.worktime && values.worktime.length) {
-                    sdate = moment(values.worktime[0]).format('YYYY-MM-DD');
-                    edate = moment(values.worktime[1]).format('YYYY-MM-DD');
+                    sdate = moment(values.worktime[0]).format('YYYY-MM-DD 00:00:00');
+                    edate = moment(values.worktime[1]).format('YYYY-MM-DD 23:59:59');
                 }
                 getNewsListNew({}, {
                     type: '',
@@ -210,33 +210,6 @@ class NewsTable extends Component {
             worktime: ''
         });
         this.queryPublish();
-    }
-    // 暂存的新闻进行搜索
-    queryTemporary () {
-        const {
-            actions: { getDraftNewsList }
-        } = this.props;
-        this.props.form.validateFields(async (err, values) => {
-            console.log('values', values);
-            console.log('err', err);
-            await getDraftNewsList({}, {
-                tag: '新闻',
-                is_draft: true,
-                pub_time_begin: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
-                    ? moment(values.worktimes[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
-                    ? moment(values.worktimes[1]).add(1, 'days').format('YYYY-MM-DD') : '',
-                title: values.title1 || ''
-            });
-        });
-    }
-    // 清除暂存的新闻的搜索条件
-    clearTemporary () {
-        this.props.form.setFieldsValue({
-            title1: undefined,
-            worktimes: undefined
-        });
-        this.queryTemporary();
     }
     // 发布新闻
     handlePublishNews () {
@@ -307,13 +280,13 @@ class NewsTable extends Component {
                             </a> : '暂无'}
                         </p>
                         <p>
-                            附件 ：{fileList.length ? fileList.map(item => {
-                                return (<div>
-                                    <a href={item.FilePath}
+                            {fileList.length ? fileList.map(item => {
+                                return (<p>
+                                    附件 ：<a href={item.FilePath}
                                         target='_blank'
                                     >{item.FileName}</a>
-                                </div>);
-                            }) : '暂无'}
+                                </p>);
+                            }) : (<p>{`附件 ：暂无`}</p>)}
                         </p>
                         <div
                             style={{ maxHeight: '800px', overflow: 'auto' }}

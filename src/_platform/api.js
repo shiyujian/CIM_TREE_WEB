@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-30 08:44:35
+ * @Last Modified time: 2019-08-05 19:12:56
  */
 /**
  *
@@ -412,43 +412,43 @@ export const MODULES = [
             {
                 id: 'OVERALL.NEWS',
                 name: '新闻通知'
-            },
-            {
-                id: 'OVERALL.DISPATCH',
-                name: '现场收发文'
-            },
-            {
-                id: 'OVERALL.MATERAIL',
-                name: '物资管理'
-            },
-            {
-                id: 'OVERALL.FORM',
-                name: '表单管理'
             }
+            // {
+            //     id: 'OVERALL.DISPATCH',
+            //     name: '现场收发文'
+            // },
+            // {
+            //     id: 'OVERALL.MATERAIL',
+            //     name: '物资管理'
+            // },
+            // {
+            //     id: 'OVERALL.FORM',
+            //     name: '表单管理'
+            // }
         ]
     },
-    {
-        id: 'DATUM',
-        name: '资料管理',
-        children: [
-            {
-                id: 'DATUM.STANDARD',
-                name: '制度标准'
-            },
-            {
-                id: 'DATUM.ENGINEERING',
-                name: '工程文档'
-            },
-            {
-                id: 'DATUM.REDIOS',
-                name: '工程影像'
-            },
-            {
-                id: 'DATUM.VIDEO',
-                name: '视频资料'
-            }
-        ]
-    },
+    // {
+    //     id: 'DATUM',
+    //     name: '资料管理',
+    //     children: [
+    //         {
+    //             id: 'DATUM.STANDARD',
+    //             name: '制度标准'
+    //         },
+    //         {
+    //             id: 'DATUM.ENGINEERING',
+    //             name: '工程文档'
+    //         },
+    //         {
+    //             id: 'DATUM.REDIOS',
+    //             name: '工程影像'
+    //         },
+    //         {
+    //             id: 'DATUM.VIDEO',
+    //             name: '视频资料'
+    //         }
+    //     ]
+    // },
     {
         id: 'SCHEDULE',
         name: '进度管理',
@@ -460,15 +460,15 @@ export const MODULES = [
             {
                 id: 'SCHEDULE.SCHEDULEDISPLAY',
                 name: '进度展示'
-            },
-            {
-                id: 'SCHEDULE.ENTERANALYZE',
-                name: '苗木进场分析'
-            },
-            {
-                id: 'SCHEDULE.SCHEDULEANALYZE',
-                name: '种植进度分析'
             }
+            // {
+            //     id: 'SCHEDULE.ENTERANALYZE',
+            //     name: '苗木进场分析'
+            // },
+            // {
+            //     id: 'SCHEDULE.SCHEDULEANALYZE',
+            //     name: '种植进度分析'
+            // }
         ]
     },
     {
@@ -498,15 +498,15 @@ export const MODULES = [
                     {
                         id: 'FOREST.PLANTSTRENGTHANALYSI',
                         name: '栽植强度分析'
-                    },
-                    {
-                        id: 'FOREST.DATASTATIS',
-                        name: '数据统计'
-                    },
-                    {
-                        id: 'FOREST.USERANALYSIS',
-                        name: '用户行为统计'
                     }
+                    // {
+                    //     id: 'FOREST.DATASTATIS',
+                    //     name: '数据统计'
+                    // },
+                    // {
+                    //     id: 'FOREST.USERANALYSIS',
+                    //     name: '用户行为统计'
+                    // }
                 ]
             },
             {
@@ -636,7 +636,7 @@ export const MODULES = [
                 name: '考勤统计'
             },
             {
-                id: 'CHECKWORK.SETUP',
+                id: 'CHECKWORK.SETUP.NONE',
                 name: '考勤设置',
                 children: [
                     {
@@ -659,15 +659,15 @@ export const MODULES = [
             {
                 id: 'SELFCARE.TASK',
                 name: '个人任务'
-            },
-            {
-                id: 'SELFCARE.QUERY',
-                name: '个人考勤'
-            },
-            {
-                id: 'SELFCARE.LEAVE',
-                name: '个人请假'
             }
+            // {
+            //     id: 'SELFCARE.QUERY',
+            //     name: '个人考勤'
+            // },
+            // {
+            //     id: 'SELFCARE.LEAVE',
+            //     name: '个人请假'
+            // }
         ]
     },
     {
@@ -695,8 +695,14 @@ export const MODULES = [
                 name: '组织机构'
             },
             {
-                id: 'SYSTEM.BLACKLIST',
-                name: '黑名单'
+                id: 'SYSTEM.BLACKLIST.NONE',
+                name: '黑名单',
+                children: [
+                    {
+                        id: 'SYSTEM.PERSONBLACKLIST',
+                        name: '人员黑名单'
+                    }
+                ]
             }
         ]
     },
@@ -746,11 +752,11 @@ export const MODULES = [
                         name: '绑定管理'
                     }
                 ]
-            },
-            {
-                id: 'PROJECT.PROJECTIMAGE',
-                name: '工程影像'
             }
+            // {
+            //     id: 'PROJECT.PROJECTIMAGE',
+            //     name: '工程影像'
+            // }
         ]
     }
 ];

@@ -46,7 +46,7 @@ export default class News extends Component {
             render: (text, record) => {
                 let date = '';
                 if (text) {
-                    date = moment(text).utc().format('YYYY-MM-DD HH:mm:ss');
+                    date = moment(text).format('YYYY-MM-DD HH:mm:ss');
                 }
                 return date;
             }
@@ -87,9 +87,7 @@ export default class News extends Component {
             key: 'Notice_Time',
             width: 200,
             render: (text, record) => {
-                return moment(text)
-                    .utc()
-                    .format('YYYY-MM-DD HH:mm:ss');
+                return moment(text).format('YYYY-MM-DD HH:mm:ss');
             }
         },
 
@@ -237,14 +235,14 @@ export default class News extends Component {
                         <p>来源 ：{newsSource ? <span>{newsSource}</span> : '未知'}</p>
                         <p>封面 ：{newThumbnail ? <a href={newThumbnail} target='_blank'>微信图片.jpg</a> : '暂无'}</p>
                         <p>
-                            附件 ：{newsFileList.length ? newsFileList.map(item => {
-                                return (<div>
-                                    <a
+                            {newsFileList.length ? newsFileList.map(item => {
+                                return (<p>
+                                    附件 ：<a
                                         href={item.FilePath}
                                         target='_blank'
                                     >{item.FileName}</a>
-                                </div>);
-                            }) : '暂无'}
+                                </p>);
+                            }) : (<p>{`附件 ：暂无`}</p>)}
                         </p>
                         <div
                             style={{ maxHeight: '800px', overflow: 'auto' }}
@@ -266,13 +264,13 @@ export default class News extends Component {
                         <div>
                             <p>紧急程度 ：{noticeDetailDegree ? <span>{noticeDetailDegree}</span> : <span>暂无</span>}</p>
                             <p>
-                                附件 ：{noticeFileList.length ? noticeFileList.map(item => {
-                                    return (<div>
-                                        <a href={item.FilePath}
+                                {noticeFileList.length ? noticeFileList.map(item => {
+                                    return (<p>
+                                        附件 ：<a href={item.FilePath}
                                             target='_blank'
                                         >{item.FileName}</a>
-                                    </div>);
-                                }) : '暂无'}
+                                    </p>);
+                                }) : (<p>{`附件 ：暂无`}</p>)}
                             </p>
                             <div
                                 style={{
