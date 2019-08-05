@@ -83,9 +83,6 @@ class TaskReportModal extends Component {
             isShowTaskModal,
             taskMess
         } = this.props;
-        const {
-            loading
-        } = this.props;
 
         // 上传文件
         const uploadProps = {
@@ -169,37 +166,18 @@ class TaskReportModal extends Component {
             labelCol: { span: 6 },
             wrapperCol: { span: 18 }
         };
-        let okFooter = [
-            <Button key='back' size='large' onClick={this._handleTaskModalCancel.bind(this)}>
-                关闭
-            </Button>,
-            <Button
-                key='submit'
-                type='primary'
-                size='large'
-                onClick={this._handleTaskModalOk.bind(this)}
-            >
-                总结
-            </Button>
-        ];
-        let canFooter = [
-            <Button key='back' size='large' onClick={this._handleTaskModalCancel.bind(this)}>
-                关闭
-            </Button>
-        ];
         let status = false;
         if (taskMess && taskMess.status === '已完成且未上报' && taskMess.Status === 1) {
             status = true;
         }
 
-        let footer = loading ? null : (status ? okFooter : canFooter);
         return (
             <Modal
                 title='任务详情'
                 visible={isShowTaskModal}
                 width='700px'
                 closable={false}
-                footer={footer}
+                footer={null}
                 maskClosable={false}
             >
                 <Spin spinning={this.state.loading}>
@@ -340,6 +318,32 @@ class TaskReportModal extends Component {
                                         </FormItem>
                                     </Row>
                                 ) : ''
+                        }
+                        {
+                            status
+                                ? <Row style={{ marginTop: 10 }}>
+                                    <Button
+                                        onClick={this._handleTaskModalOk.bind(this)}
+                                        style={{ float: 'right', marginLeft: 10 }}
+                                        type='primary'
+                                    >
+                                        上报
+                                    </Button>
+                                    <Button
+                                        onClick={this._handleTaskModalCancel.bind(this)}
+                                        style={{ float: 'right' }}
+                                    >
+                                        关闭
+                                    </Button>
+                                </Row>
+                                : <Row style={{ marginTop: 10 }}>
+                                    <Button
+                                        onClick={this._handleTaskModalCancel.bind(this)}
+                                        style={{ float: 'right' }}
+                                    >
+                                        关闭
+                                    </Button>
+                                </Row>
                         }
                     </Form>
                 </Spin>
