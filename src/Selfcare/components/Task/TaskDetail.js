@@ -181,6 +181,7 @@ class TaskDetail extends Component {
             this.props.actions.setTaskDetailLoading(false);
             console.log('流程详情', param, TableList);
             this.setState({
+                Section: param.Section,
                 WorkID: task_id,
                 CurrentNode: rep.CurrentNode,
                 CurrentNodeName: rep.CurrentNodeName,

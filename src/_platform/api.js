@@ -258,7 +258,7 @@ export const SCHEDULRPROJECT = [
     {
         id: 8,
         name: '便道施工',
-        units: 'm',
+        units: '米',
         type: '其他',
         typeFirst: true,
         typeList: 6
@@ -266,21 +266,21 @@ export const SCHEDULRPROJECT = [
     {
         id: 9,
         name: '开挖排水沟槽',
-        units: 'm',
+        units: '米',
         type: '其他',
         typeFirst: false
     },
     {
         id: 10,
         name: '安装排水管道',
-        units: 'm',
+        units: '米',
         type: '其他',
         typeFirst: false
     },
     {
         id: 11,
         name: '回填排水',
-        units: 'm',
+        units: '米',
         type: '其他',
         typeFirst: false
     },
