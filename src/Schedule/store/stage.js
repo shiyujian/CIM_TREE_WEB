@@ -20,6 +20,8 @@ export const getTaskSchedule = createFetchAction(
     `${WORKFLOW_API}/instance/?code={{code}}`
 );
 // 2019-7-22 两库合并接口
+// 获取流程列表
+export const getFlowList = createFetchAction(`${base}/flow/flows`, []);
 // 获取任务详情
 export const getWorkDetails = createFetchAction(`${base}/flow/work/{{ID}}`, []);
 // 获取任务已办列表
@@ -40,6 +42,7 @@ export const deleteNodefields = createFetchAction(`${base}/flow/nodefields/{{ID}
 // 上传附件
 export const uploadFileHandler = myFetch(`${base}/OSSUploadHandler.ashx?filetype=news`, [], 'POST');
 export const actions = {
+    getFlowList,
     getWorkDetails,
     getWorkList,
     getNodeList,

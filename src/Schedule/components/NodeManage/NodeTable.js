@@ -122,10 +122,13 @@ class NodeTable extends Component {
         });
         console.log('提交', params);
         postNodeform({}, params).then(rep => {
-            if (rep.code) {
+            if (rep.code === 1) {
                 notification.success({
                     message: '新增表单成功',
                     duration: 3
+                });
+                this.setState({
+                    dataListAdd: []
                 });
                 this.handleCancel();
             }
