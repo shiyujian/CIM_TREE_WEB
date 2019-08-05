@@ -1,6 +1,16 @@
 import React, { Component } from 'react';
-import { Table, Form, Spin, Input, Button, Modal, notification, Select } from 'antd';
+import {
+    Table,
+    Form,
+    Spin,
+    Input,
+    Button,
+    Modal,
+    notification,
+    Popconfirm,
+    Select } from 'antd';
 import { getUser } from '_platform/auth';
+import { NodeType } from '_platform/api';
 const FormItem = Form.Item;
 const { Option } = Select;
 class NodeTable extends Component {
@@ -8,7 +18,7 @@ class NodeTable extends Component {
         super(props);
         this.state = {
             NodeID: '', // 节点ID
-            NodeName: '',
+            NodeName: '', // 节点名称
             visibleAdd: false,
             visible: false,
             dataListAdd: [], // 新增表单列表
@@ -22,10 +32,10 @@ class NodeTable extends Component {
     componentDidMount () {
         this.getNodeList(); // 获取节点列表
     }
-    getNodeList () {
+    getNodeList (pro = {}) {
         const { getNodeList } = this.props.actions;
         getNodeList({}, {
-            flowid: '', // 流程ID
+            flowid: pro.flowID || '', // 流程ID
             name: '', // 节点名称
             type: '', // 节点类型
             status: '' // 节点状态
@@ -53,9 +63,6 @@ class NodeTable extends Component {
         }, () => {
             this.getNodefieldList();
         });
-    }
-    onSearch () {
-        this.getNodeList();
     }
     onDelete (ID) {
         const { deleteNode } = this.props.actions;
@@ -134,45 +141,17 @@ class NodeTable extends Component {
             }
         });
     }
-    columns = [
-        {
-            title: '流程名称',
-            dataIndex: 'FlowName'
-        },
-        {
-            title: '流程ID',
-            dataIndex: 'FlowID'
-        },
-        {
-            title: '节点名称',
-            dataIndex: 'Name'
-        },
-        {
-            title: '节点ID',
-            dataIndex: 'ID'
-        },
-        {
-            title: '节点类型',
-            dataIndex: 'NodeType'
-        },
-        {
-            title: '节点状态',
-            dataIndex: 'Status'
-        },
-        {
-            title: '操作',
-            dataIndex: 'active',
-            width: '15%',
-            render: (text, record) => {
-                return (<div>
-                    <a onClick={this.onSee.bind(this, record.ID)}>查看</a>
-                    <a onClick={this.onEdit.bind(this, record.ID, record.Name)} style={{marginLeft: 20}}>编辑</a>
-                    <a onClick={this.onDelete.bind(this, record.ID)} style={{marginLeft: 20}}>删除</a>
-                    <a onClick={this.onDeleteForm.bind(this, record.ID)} style={{marginLeft: 20}}>删除表单</a>
-                </div>);
+    onSearch () {
+        const { validateFields } = this.props.form;
+        validateFields((err, values) => {
+            if (!err) {
+                let pro = {
+                    flowID: values.flowID
+                };
+                this.getNodeList(pro);
             }
-        }
-    ];
+        });
+    }
     render () {
         const { dataList, dataListForm, dataListAdd } = this.state;
         const { getFieldDecorator } = this.props.form;
@@ -298,6 +277,73 @@ class NodeTable extends Component {
                     <Option value={0} key='varchar'>varchar</Option>
                     <Option value={2} key='longtext'>longtext</Option>
                 </Select>;
+            }
+        }
+    ];
+    columns = [
+        {
+            title: '流程名称',
+            dataIndex: 'FlowName'
+        },
+        {
+            title: '流程ID',
+            dataIndex: 'FlowID'
+        },
+        {
+            title: '节点名称',
+            dataIndex: 'Name'
+        },
+        {
+            title: '节点ID',
+            dataIndex: 'ID'
+        },
+        {
+            title: '节点类型',
+            dataIndex: 'NodeType',
+            render: (text, record, index) => {
+                let str = '';
+                NodeType.map(item => {
+                    if (item.value === text) {
+                        str = item.label;
+                    }
+                });
+                return str;
+            }
+        },
+        {
+            title: '节点状态',
+            dataIndex: 'Status',
+            render: (text, record, index) => {
+                return text === 1 ? '启用' : '禁用';
+            }
+        },
+        {
+            title: '操作',
+            dataIndex: 'active',
+            width: '20%',
+            render: (text, record) => {
+                return (<div>
+                    <a onClick={this.onSee.bind(this, record.ID)}>查看</a>
+                    <a onClick={this.onEdit.bind(this, record.ID, record.Name)} style={{marginLeft: 20}}>编辑</a>
+                    <Popconfirm
+                        title='你确定删除该节点吗？'
+                        okText='是' cancelText='否'
+                        onConfirm={this.onDelete.bind(this, record.ID)}
+                    >
+                        <a href='#' style={{marginLeft: 20}}>
+                            删除
+                        </a>
+                    </Popconfirm>
+                    <Popconfirm
+                        title='你确定删除该节点的表单吗？'
+                        okText='是' cancelText='否'
+                        onConfirm={this.onDeleteForm.bind(this, record.ID)}
+                    >
+                        <a href='#' style={{marginLeft: 20}}>
+                            删除表单
+                        </a>
+                    </Popconfirm>
+                </div>);
             }
         }
     ];

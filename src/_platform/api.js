@@ -336,6 +336,26 @@ export const ExecuteStateList = [{
     value: 4,
     label: '转发'
 }];
+// 节点类型
+export const NodeType = [{
+    value: 0,
+    label: '结束'
+}, {
+    value: 1,
+    label: '开始'
+}, {
+    value: 2,
+    label: '普通'
+}, {
+    value: 3,
+    label: '选择'
+}, {
+    value: 4,
+    label: '分流'
+}, {
+    value: 5,
+    label: '合流'
+}];
 // 流程信息
 export const TOTAL_NAME = '总进度计划报批流程';
 export const TOTAL_ID = 'c361b0af-a7ec-4181-acd0-39512ffd96b8';
