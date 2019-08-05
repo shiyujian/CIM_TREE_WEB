@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Modal, Form, Input, Row, Col, Button, Notification, Spin, Upload, Icon } from 'antd';
+import { Modal, Form, Input, Row, Col, Button, Notification, Spin, Upload, Icon, DatePicker } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import { getUser } from '_platform/auth';
@@ -12,6 +12,7 @@ import E from 'wangeditor';
 let editor;
 moment.locale('zh-cn');
 const FormItem = Form.Item;
+const dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 class NewsAddModal extends Component {
     array = [];
     constructor (props) {
@@ -82,126 +83,6 @@ class NewsAddModal extends Component {
             alert(info + ' \n\n如果粘贴无效，请使用图片上传功能进行上传');
         };
         editor.create();
-    }
-    // 发布新闻
-    onRelease = async () => {
-        const {
-            actions: { postNews, getNewsListNew },
-            form: { validateFields }
-        } = this.props;
-        validateFields(async (err, values) => {
-            if (!err) {
-                const { fileListNew, ThumbnailUrl, content } = this.state;
-                console.log(fileListNew, '发布');
-                let fileList = [];
-                fileListNew.map(item => {
-                    if (item) {
-                        fileList.push({
-                            FileName: item.name,
-                            FilePath: item.url
-                        });
-                    }
-                });
-                console.log(fileList, '发布');
-                let rst = await postNews({}, {
-                    Author: '',
-                    Content: content,
-                    Content_Type: 1,
-                    Creater: 1,
-                    KeyWords: '',
-                    Source: values.source,
-                    SubTitle: '',
-                    Summary: '',
-                    Title: values.title,
-                    Thumbnail: ThumbnailUrl,
-                    Files: fileList
-                });
-                if (rst.code === 1) {
-                    // 消除弹框重新加载时数据
-                    getNewsListNew({}, {
-                        type: '',
-                        name: '',
-                        ishot: '',
-                        sdate: '',
-                        edate: '',
-                        page: '',
-                        size: ''
-                    });
-                    await this.modalClick();
-                    Notification.success({
-                        message: '发布通知成功',
-                        duration: 3
-                    });
-                } else {
-                    Notification.error({
-                        message: '发布通知失败',
-                        duration: 3
-                    });
-                }
-            }
-        });
-    }
-
-    // 暂存新闻
-    draftDataFunc () {
-        const {
-            actions: { postData, getDraftNewsList },
-            form: { validateFields }
-        } = this.props;
-        validateFields(async (err, values) => {
-            console.log('values', values);
-            if (!err) {
-                let coverResp = values.attachment[0].response;
-                let fileList = [];
-                if (values && values.annexFile && values.annexFile.fileList &&
-                    values.annexFile.fileList instanceof Array &&
-                    values.annexFile.fileList.length > 0) {
-                    fileList = values.annexFile.fileList;
-                }
-                let newData = {
-                    'title': values['title'] || '',
-                    'raw': this.state.content || '',
-                    'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'tags': [1],
-                    'categories': [],
-                    'attachment': {
-                        'fileList': fileList
-                    },
-                    'publisher': getUser().ID,
-                    'is_draft': true,
-                    'cover': {
-                        'a_file': coverResp.a_file.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'create_time': coverResp.create_time,
-                        'download_url': coverResp.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, ''),
-                        'id': coverResp.id,
-                        'mime_type': coverResp.mime_type,
-                        'misc': coverResp.misc,
-                        'name': coverResp.name
-                    },
-                    'source': {
-                        'name': values.source
-                    }
-                };
-                let rst = await postData({}, newData);
-                if (rst.id) {
-                    this.modalClick();
-                    Notification.success({
-                        message: '暂存成功！',
-                        duration: 3
-                    });
-                    // 更新暂存的新闻列表数据
-                    getDraftNewsList({}, {
-                        tag: '新闻',
-                        is_draft: true
-                    });
-                } else {
-                    Notification.success({
-                        message: '暂存失败！',
-                        duration: 3
-                    });
-                }
-            }
-        });
     }
     // modal显示与影藏
     modalClick () {
@@ -347,15 +228,18 @@ class NewsAddModal extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={8} offset={1}>
-                                <FormItem {...formItemLayout} label='附件'>
-                                    {getFieldDecorator('annexFile', {
+                                <FormItem {...formItemLayout} label='发布时间'>
+                                    {getFieldDecorator('publishTime', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请选择日期'
+                                            }
+                                        ]
                                     })(
-                                        <Upload {...this.uploadPropsFile} fileList={this.state.fileListNew}
-                                        >
-                                            <Button>
-                                                <Icon type='upload' />上传附件
-                                            </Button>
-                                        </Upload>
+                                        <DatePicker
+                                            showTime
+                                        />
                                     )}
                                 </FormItem>
                             </Col>
@@ -363,12 +247,21 @@ class NewsAddModal extends Component {
                         <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='封面'>
-                                    <Upload {...this.uploadPropsCover} fileList={this.state.ThumbnailFile}
-                                    >
-                                        <Button>
-                                            <Icon type='upload' />添加文件
-                                        </Button>
-                                    </Upload>
+                                    {getFieldDecorator('thumbnailFile', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请上传封面'
+                                            }
+                                        ]
+                                    })(
+                                        <Upload {...this.uploadPropsCover} fileList={this.state.ThumbnailFile}
+                                        >
+                                            <Button>
+                                                <Icon type='upload' />添加文件
+                                            </Button>
+                                        </Upload>
+                                    )}
                                 </FormItem>
                             </Col>
                             <Col span={8} offset={1}>
@@ -385,6 +278,21 @@ class NewsAddModal extends Component {
                                 </FormItem>
                             </Col>
                         </Row>
+                        <Row>
+                            <Col span={8} offset={1}>
+                                <FormItem {...formItemLayout} label='附件'>
+                                    {getFieldDecorator('annexFile', {
+                                    })(
+                                        <Upload {...this.uploadPropsFile} fileList={this.state.fileListNew}
+                                        >
+                                            <Button>
+                                                <Icon type='upload' />上传附件
+                                            </Button>
+                                        </Upload>
+                                    )}
+                                </FormItem>
+                            </Col>
+                        </Row>
                     </Form>
                     <Row>
                         <Col span={22} offset={1}>
@@ -394,7 +302,6 @@ class NewsAddModal extends Component {
                     <Row style={{ marginTop: 20 }}>
                         <Col span={24} offset={10} >
                             <Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
-                            <Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
                             <Button style={{ marginLeft: 20 }} type='primary' onClick={this.onRelease.bind(this)}>发布</Button>
                         </Col>
                     </Row>
@@ -402,6 +309,65 @@ class NewsAddModal extends Component {
             </Modal>
 
         );
+    }
+    // 发布新闻
+    onRelease = async () => {
+        const {
+            actions: { postNews, getNewsListNew },
+            form: { validateFields }
+        } = this.props;
+        validateFields(async (err, values) => {
+            if (!err) {
+                console.log(values, '发布', moment(values.publishTime).format(dateTimeFormat));
+                const { fileListNew, ThumbnailUrl, content } = this.state;
+                let fileList = [];
+                fileListNew.map(item => {
+                    if (item) {
+                        fileList.push({
+                            FileName: item.name,
+                            FilePath: item.url
+                        });
+                    }
+                });
+                console.log(fileList, '发布');
+                let rst = await postNews({}, {
+                    Author: '', // 发布人
+                    Content: content, // 新闻内容
+                    Content_Type: 1, // 内容类型
+                    Creater: getUser().ID, // 创建人
+                    KeyWords: '', // 关键字
+                    Source: values.source, // 来源
+                    SubTitle: '', // 副标题
+                    Summary: '', // 摘要
+                    Publish_Time: values.publishTime ? moment(values.publishTime).format(dateTimeFormat) : '', // 发布时间
+                    Title: values.title, // 新闻标题
+                    Thumbnail: ThumbnailUrl, // 缩略图
+                    Files: fileList // 附件
+                });
+                if (rst.code === 1) {
+                    // 消除弹框重新加载时数据
+                    getNewsListNew({}, {
+                        type: '',
+                        name: '',
+                        ishot: '',
+                        sdate: '',
+                        edate: '',
+                        page: '',
+                        size: ''
+                    });
+                    await this.modalClick();
+                    Notification.success({
+                        message: '发布通知成功',
+                        duration: 3
+                    });
+                } else {
+                    Notification.error({
+                        message: '发布通知失败',
+                        duration: 3
+                    });
+                }
+            }
+        });
     }
 }
 

@@ -91,7 +91,7 @@ class ActualForm extends Component {
                             onClick={this.handleSubmit.bind(this)}
                             style={{ marginRight: 20 }}
                         >
-                            提交
+                            同意
                         </Button>
                         <Button onClick={this.handleReject.bind(this)}>
                             退回

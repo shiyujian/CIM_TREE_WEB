@@ -25,10 +25,11 @@ export default class WeekPlanModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            workFlow: [],
-            Section: '',
-            StartDate: '',
-            EndDate: ''
+            TableList: [], // 表格数据
+            workFlow: [], // 流程节点
+            Section: '', // 标段
+            StartDate: '', // 开始时间
+            EndDate: '' // 结束时间
         };
     }
     async componentDidMount () {
@@ -64,7 +65,6 @@ export default class WeekPlanModal extends Component {
                 Section: param.Section,
                 StartDate: param.StartDate,
                 EndDate: param.EndDate,
-                workDetails: rep,
                 TableList,
                 workFlow: rep.Works
             });
@@ -182,7 +182,16 @@ export default class WeekPlanModal extends Component {
                                                         })
                                                     })</span>
                                                 </div>
-                                            } description={
+                                            } description={<div>
+                                                {
+                                                    item.CurrentNodeName !== '施工填报' ? <div>
+                                                        {
+                                                            item.FormValues && item.FormValues.length ? <div>意见:{
+                                                                item.FormValues[0].FormParams && item.FormValues[0].FormParams.length && item.FormValues[0].FormParams[0].Val
+                                                            }</div> : ''
+                                                        }
+                                                    </div> : ''
+                                                }
                                                 <div>
                                                     <span>
                                                         {item.CurrentNodeName}人：
@@ -193,7 +202,7 @@ export default class WeekPlanModal extends Component {
                                                         {item.RunTime}
                                                     </span>
                                                 </div>
-                                            } />;
+                                            </div>} />;
                                         }
                                     } else {
                                         if (item.ExecutorObj) {

@@ -226,59 +226,6 @@ class NoticeEditModal extends Component {
         //     }
         // });
     }
-
-    // 暂存通知
-    draftDataFunc () {
-        const {
-            actions: { patchData, getTipsList, getDraftTipsList },
-            form: { validateFields },
-            noticeDetail
-        } = this.props;
-        validateFields((err, values) => {
-            let fileList = [];
-            if (values && values.annexFile) {
-                if (values.annexFile.fileList &&
-                    values.annexFile.fileList instanceof Array &&
-                    values.annexFile.fileList.length > 0) {
-                    fileList = values.annexFile.fileList;
-                } else {
-                    fileList = values.annexFile;
-                }
-            }
-            if (!err) {
-                let newData = {
-                    'title': values['title'] || '',
-                    'raw': this.state.content,
-                    'degree': values['mergency'],
-                    'attachment': {
-                        'fileList': fileList
-                    },
-                    'categories': [],
-                    'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'is_draft': true
-                };
-                patchData({ pk: noticeDetail.id }, newData)
-                    .then(rst => {
-                        if (rst.id) {
-                            this.modalClick();
-                            Notification.success({
-                                message: '暂存成功',
-                                duration: 3
-                            });
-                            // 更新暂存的通知列表数据
-                            getTipsList({}, {
-                                tag: '公告',
-                                is_draft: false
-                            });
-                            getDraftTipsList({}, {
-                                tag: '公告',
-                                is_draft: true
-                            });
-                        }
-                    });
-            }
-        });
-    }
     checkTitle = async (rule, value, callback) => {
         if (value) {
             if (value.length <= 40) {
@@ -407,7 +354,6 @@ class NoticeEditModal extends Component {
                         <Row style={{ marginTop: 20 }}>
                             <Col span={24} offset={10}>
                                 <Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
-                                <Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
                                 <Button style={{ marginLeft: 20 }} type='primary' onClick={this.onRelease.bind(this)}>发布</Button>
                             </Col>
                         </Row>

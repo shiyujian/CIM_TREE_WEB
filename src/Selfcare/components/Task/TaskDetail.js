@@ -293,7 +293,16 @@ class TaskDetail extends Component {
                                                 })
                                             })</span>
                                         </div>
-                                    } description={
+                                    } description={<div>
+                                        {
+                                            item.CurrentNodeName !== '施工填报' ? <div>
+                                                {
+                                                    item.FormValues && item.FormValues.length ? <div>意见:{
+                                                        item.FormValues[0].FormParams && item.FormValues[0].FormParams.length && item.FormValues[0].FormParams[0].Val
+                                                    }</div> : ''
+                                                }
+                                            </div> : ''
+                                        }
                                         <div>
                                             <span>
                                                 {item.CurrentNodeName}人：
@@ -304,7 +313,7 @@ class TaskDetail extends Component {
                                                 {item.RunTime}
                                             </span>
                                         </div>
-                                    } />;
+                                    </div>} />;
                                 } else if (item.ExecuteState === 2) {
                                     // 退回
                                     return <Step title={
