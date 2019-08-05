@@ -46,7 +46,7 @@ export default class News extends Component {
     }
 
     render () {
-        const { tabValue = '1' } = this.props;
+        const { tabValue = '2' } = this.props;
         return (
             <div style={{ overflow: 'hidden', padding: 20 }}>
                 <DynamicTitle title='新闻通知' {...this.props} />

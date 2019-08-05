@@ -23,7 +23,7 @@ const TabPane = Tabs.TabPane;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 const FormItem = Form.Item;
-
+const dateTimeFormat = 'YYYY-MM-DD HH:mm:ss';
 class NoticeTable extends Component {
     constructor (props) {
         super(props);
@@ -55,167 +55,7 @@ class NoticeTable extends Component {
             size: ''
         });
     }
-    columns = [
-        {
-            title: '通知查询ID',
-            dataIndex: 'ID',
-            key: 'ID',
-            width: '10%'
-        },
-        {
-            title: '名称',
-            dataIndex: 'Notice_Title',
-            key: 'Notice_Title',
-            width: '40%'
-        },
-        {
-            title: '发布单位',
-            width: '10%',
-            render: (text, record) => {
-                if (record.pub_unit) {
-                    return record.pub_unit.name;
-                } else {
-                    return '/';
-                }
-            }
-        },
-        {
-            title: '紧急程度',
-            dataIndex: 'Notice_Type',
-            key: 'Notice_Type',
-            width: '10%',
-            render: text => {
-                if (text === 0) {
-                    return '平件';
-                } else if (text === 1) {
-                    return '加急';
-                } else if (text === 2) {
-                    return '特急';
-                } else {
-                    return '/';
-                }
-            }
-        },
-        {
-            title: '创建时间',
-            key: 'Notice_Time',
-            width: '15%',
-            render: (text, record) => {
-                return moment(record.Notice_Time).utc().format('YYYY-MM-DD HH:mm:ss');
-            }
-        },
-        {
-            title: '操作',
-            width: '15%',
-            render: (text, record) => {
-                return (
-                    <span>
-                        <a onClick={this.handleNoticeView.bind(this, record.ID)}>
-                            查看
-                        </a>
-                        {/* <Divider type='vertical' />
-                        <a onClick={this.handleNoticeEdit.bind(this, record.ID)}>
-                            修改
-                        </a> */}
-                        <Divider type='vertical' />
-                        <Popconfirm
-                            title='确定删除吗?'
-                            onConfirm={this.handleNoticeDelete.bind(this, record.ID)}
-                            okText='确定'
-                            cancelText='取消'
-                        >
-                            <a>删除</a>
-                        </Popconfirm>
-                    </span>
-                );
-            }
-        }
-    ];
-    draftColumns = [
-        {
-            title: '暂存通知ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: '10%'
-        },
-        {
-            title: '名称',
-            dataIndex: 'title',
-            key: 'title',
-            width: '25%'
-        },
-        {
-            title: '发布单位',
-            width: '10%',
-            render: (text, record) => {
-                if (record.pub_unit) {
-                    return record.pub_unit.name;
-                } else {
-                    return '/';
-                }
-            }
-        },
-        {
-            title: '紧急程度',
-            dataIndex: 'degree',
-            key: 'degree',
-            width: '10%',
-            render: text => {
-                if (text === 0) {
-                    return '平件';
-                } else if (text === 1) {
-                    return '加急';
-                } else if (text === 2) {
-                    return '特急';
-                } else {
-                    return '/';
-                }
-            }
-        },
-        {
-            title: '创建时间',
-            dataIndex: 'pub_time',
-            key: 'pub_time',
-            width: '15%',
-            render: pub_time => {
-                return moment(pub_time)
-                    .utc()
-                    .format('YYYY-MM-DD HH:mm:ss');
-            }
-        },
-        {
-            title: '操作',
-            width: '20%',
-            render: record => {
-                return (
-                    <span>
-                        <a onClick={this.handleNoticeView.bind(this, record)}>
-                            查看
-                        </a>
-                        <Divider type='vertical' />
-                        <a
-                            onClick={this.handleNoticePublish.bind(this, record)}
-                        >
-                            发布
-                        </a>
-                        <Divider type='vertical' />
-                        <a onClick={this.handleNoticeEdit.bind(this, record.ID)}>
-                            修改
-                        </a>
-                        <Divider type='vertical' />
-                        <Popconfirm
-                            title='确定删除吗?'
-                            onConfirm={this.handleNoticeDelete.bind(this, record.ID)}
-                            okText='确定'
-                            cancelText='取消'
-                        >
-                            <a>删除</a>
-                        </Popconfirm>
-                    </span>
-                );
-            }
-        }
-    ];
+  
     // 查看通知
     handleNoticeView = async (ID) => {
         console.log(ID, '通知ID');
@@ -324,11 +164,16 @@ class NoticeTable extends Component {
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
                 console.log(123, values, values.degree);
+                let sdate = '', edate = '';
+                if (values.worktime && values.worktime.length) {
+                    sdate = moment(values.worktime[0]).format('YYYY-MM-DD');
+                    edate = moment(values.worktime[1]).format('YYYY-MM-DD');
+                }
                 getNoticeList({}, {
                     type: values.degree || '',
                     name: values.theme || '',
-                    sdate: values.worktime ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
-                    edate: values.worktime ? moment(values.worktime[1]).format('YYYY-MM-DD') : '',
+                    sdate,
+                    edate,
                     page: '',
                     size: ''
                 });
@@ -344,25 +189,6 @@ class NoticeTable extends Component {
         });
         this.queryPublish();
     }
-    // 查询
-    queryTemporary () {
-        const {
-            actions: { getDraftTipsList }
-        } = this.props;
-        this.props.form.validateFields(async (err, values) => {
-            console.log('err', err);
-            await getDraftTipsList({}, {
-                tag: '公告',
-                is_draft: true,
-                pub_time_begin: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
-                    ? moment(values.worktimes[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
-                    ? moment(values.worktimes[1]).add(1, 'days').format('YYYY-MM-DD') : '',
-                title: values.titles || '',
-                degree: values.degrees || ''
-            });
-        });
-    }
 
     clearTemporary () {
         this.props.form.setFieldsValue({
@@ -370,7 +196,6 @@ class NoticeTable extends Component {
             worktimes: undefined,
             degrees: undefined
         });
-        this.queryTemporary();
     }
     // 通知列表和暂存的通知列表切换
     subTabChange (tipsTabValue) {
@@ -442,7 +267,11 @@ class NoticeTable extends Component {
                             <p>紧急程度 ：{detailDegree ? <span>{detailDegree}</span> : '暂无'}</p>
                             <p>
                                 附件 ：{fileList.length ? fileList.map(item => {
-                                    return <a href={item.FilePath} target='_blank' style={{marginRight: 10}}>{item.FileName}</a>;
+                                    return (<div>
+                                        <a href={item.FilePath}
+                                            target='_blank'
+                                        >{item.FileName}</a>
+                                    </div>);
                                 }) : '暂无'}
                             </p>
                             <div
@@ -488,7 +317,7 @@ class NoticeTable extends Component {
                                 <Col span={10}>
                                     <FormItem
                                         {...formItemLayout}
-                                        label='发布日期'
+                                        label='创建时间'
                                     >
                                         {getFieldDecorator('worktime', {
                                             rules: [
@@ -570,106 +399,80 @@ class NoticeTable extends Component {
                                 rowKey='ID'
                             />
                         </TabPane>
-                        {/* <TabPane tab='暂存的通知' key='temporary'>
-                            <Row>
-                                <Col span={10}>
-                                    <FormItem {...formItemLayout} label='名称'>
-                                        {getFieldDecorator('titles', {
-                                            rules: [
-                                                {
-                                                    required: false,
-                                                    message: '请输入名称'
-                                                }
-                                            ]
-                                        })(<Input placeholder='请输入名称' />)}
-                                    </FormItem>
-                                </Col>
-                                <Col span={10}>
-                                    <FormItem
-                                        {...formItemLayout}
-                                        label='修改日期'
-                                    >
-                                        {getFieldDecorator('worktimes', {
-                                            rules: [
-                                                {
-                                                    required: false,
-                                                    message: '请选择日期'
-                                                }
-                                            ]
-                                        })(
-                                            <RangePicker
-                                                style={{
-                                                    verticalAlign: 'middle',
-                                                    width: '100%'
-                                                }}
-                                                format={'YYYY/MM/DD'}
-                                            />
-                                        )}
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col span={10}>
-                                    <FormItem
-                                        {...formItemLayout}
-                                        label='紧急程度'
-                                    >
-                                        {getFieldDecorator('degrees', {
-                                            rules: [
-                                                {
-                                                    required: false,
-                                                    message: '紧急程度'
-                                                }
-                                            ]
-                                        })(
-                                            <Select
-                                                placeholder='请选择紧急程度'
-                                                style={{ width: '100%' }}>
-                                                <Option value='0'>平件</Option>
-                                                <Option value='1'>加急</Option>
-                                                <Option value='2'>特急</Option>
-                                            </Select>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                                <Col span={10}>
-                                    <FormItem>
-                                        {getFieldDecorator('search', {
-                                            rules: [{ required: false, message: '请选择查询条件' }]
-                                        })(
-                                            <div style={{float: 'right'}}>
-                                                <Button
-                                                    icon='search'
-                                                    style={{marginLeft: 30}}
-                                                    onClick={this.queryTemporary.bind(this)}
-                                                >
-                                            查询
-                                                </Button>
-                                                <Button
-                                                    icon='reload'
-                                                    style={{marginLeft: 30}}
-                                                    onClick={this.clearTemporary.bind(this)}
-                                                >
-                                            清除
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                            <Table
-                                dataSource={draftTipsList}
-                                columns={this.draftColumns}
-                                className='foresttables'
-                                bordered
-                                rowKey='id'
-                            />
-                        </TabPane> */}
                     </Tabs>
                 </Col>
             </Row>
         );
     }
+    columns = [
+        {
+            title: '通知查询ID',
+            dataIndex: 'ID',
+            key: 'ID',
+            width: '10%'
+        },
+        {
+            title: '名称',
+            dataIndex: 'Notice_Title',
+            key: 'Notice_Title',
+            width: '40%'
+        },
+        {
+            title: '紧急程度',
+            dataIndex: 'Notice_Type',
+            key: 'Notice_Type',
+            width: '10%',
+            render: text => {
+                if (text === 0) {
+                    return '平件';
+                } else if (text === 1) {
+                    return '加急';
+                } else if (text === 2) {
+                    return '特急';
+                } else {
+                    return '/';
+                }
+            }
+        },
+        {
+            title: '创建时间',
+            key: 'Notice_Time',
+            width: '15%',
+            render: (text, record) => {
+                let date = '/';
+                if (text) {
+                    date = moment(record.Notice_Time).format(dateTimeFormat);
+                }
+                return date;
+            }
+        },
+        {
+            title: '操作',
+            width: '15%',
+            render: (text, record) => {
+                return (
+                    <span>
+                        <a onClick={this.handleNoticeView.bind(this, record.ID)}>
+                            查看
+                        </a>
+                        <Divider type='vertical' />
+                        <a onClick={this.handleNoticeEdit.bind(this, record.ID)}>
+                            修改
+                        </a>
+                        <Divider type='vertical' />
+                        <Popconfirm
+                            title='确定删除吗?'
+                            onConfirm={this.handleNoticeDelete.bind(this, record.ID)}
+                            okText='确定'
+                            cancelText='取消'
+                        >
+                            <a>删除</a>
+                        </Popconfirm>
+                    </span>
+                );
+            }
+        }
+    ];
 }
 
 export default Form.create()(NoticeTable);

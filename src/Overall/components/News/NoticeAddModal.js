@@ -132,56 +132,6 @@ class NoticeAddModal extends Component {
             }
         });
     }
-
-    // 暂存通知
-    draftDataFunc () {
-        const {
-            actions: { postData, getDraftTipsList },
-            form: { validateFields }
-        } = this.props;
-        validateFields(async (err, values) => {
-            console.log('values', values);
-            if (!err) {
-                let fileList = [];
-                if (values && values.annexFile && values.annexFile.fileList &&
-                    values.annexFile.fileList instanceof Array &&
-                    values.annexFile.fileList.length > 0) {
-                    fileList = values.annexFile.fileList;
-                }
-                let newData = {
-                    'title': values['title'] || '',
-                    'raw': this.state.content,
-                    'degree': values['mergency'],
-                    'attachment': {
-                        'fileList': fileList
-                    },
-                    'pub_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'tags': [2],
-                    'categories': [],
-                    'publisher': getUser().ID,
-                    'is_draft': true
-                };
-                let rst = await postData({}, newData);
-                if (rst && rst.id) {
-                    // 更新暂存的通知列表数据
-                    await getDraftTipsList({}, {
-                        tag: '公告',
-                        is_draft: true
-                    });
-                    await this.modalClick();
-                    Notification.success({
-                        message: '暂存通知成功！',
-                        duration: 3
-                    });
-                } else {
-                    Notification.error({
-                        message: '暂存通知失败',
-                        duration: 3
-                    });
-                }
-            }
-        });
-    }
     checkTitle = async (rule, value, callback) => {
         if (value) {
             if (value.length <= 40) {
@@ -305,7 +255,6 @@ class NoticeAddModal extends Component {
                         <Row style={{ marginTop: 20 }}>
                             <Col span={24} offset={10}>
                                 <Button type='primary' onClick={this.modalClick.bind(this)}>取消</Button>
-                                <Button style={{ marginLeft: 20 }} type='primary' onClick={this.draftDataFunc.bind(this)}>暂存</Button>
                                 <Button style={{ marginLeft: 20 }} type='primary' onClick={this.onRelease.bind(this)}>发布</Button>
                             </Col>
                         </Row>

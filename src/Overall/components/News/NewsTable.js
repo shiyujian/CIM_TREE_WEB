@@ -42,170 +42,6 @@ class NewsTable extends Component {
             coverArr: []
         };
     }
-    columns = [
-        {
-            title: '新闻查询ID',
-            dataIndex: 'ID',
-            key: 'ID',
-            width: '10%'
-        },
-        {
-            title: '名称',
-            dataIndex: 'Title',
-            key: 'Title',
-            width: '40%'
-        },
-        {
-            title: '发布单位',
-            dataIndex: 'News_Type',
-            key: 'News_Type',
-            width: '10%',
-            render: (text, record) => {
-                if (text === 4) {
-                    return '业主单位';
-                }
-            }
-        },
-        {
-            title: '创建时间',
-            dataIndex: 'Create_Time',
-            key: 'Create_Time',
-            width: '15%',
-            render: (text, record) => {
-                if (text) {
-                    return moment(text)
-                        .utc()
-                        .format('YYYY-MM-DD HH:mm:ss');
-                } else {
-                    return '/';
-                }
-            }
-        },
-        {
-            title: '封面',
-            dataIndex: 'Thumbnail',
-            key: 'Thumbnail',
-            width: '10%',
-            render: (text, record) => {
-                return (<a
-                    onClick={this.handleViewCover.bind(this, text)}
-                >
-                    查看
-                </a>);
-            }
-        },
-        {
-            title: '操作',
-            width: '15%',
-            render: (text, record) => {
-                return (
-                    <span>
-                        <a onClick={this.handleNewsView.bind(this, record.ID)}>
-                            查看
-                        </a>
-                        <Divider type='vertical' />
-                        <a onClick={this.handleNewsEdit.bind(this, record.ID)}>
-                            修改
-                        </a>
-                        <Divider type='vertical' />
-                        <Popconfirm
-                            title='确定删除吗?'
-                            onConfirm={this.handleNewsDelete.bind(this, record.ID)}
-                            okText='确定'
-                            cancelText='取消'
-                        >
-                            <a>删除</a>
-                        </Popconfirm>
-                    </span>
-                );
-            }
-        }
-    ];
-    draftColumns = [
-        {
-            title: '暂存新闻ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: '10%'
-        },
-        {
-            title: '名称',
-            dataIndex: 'title',
-            key: 'title',
-            width: '40%'
-        },
-        {
-            title: '发布单位',
-            dataIndex: 'abstract',
-            key: 'abstract',
-            width: '10%',
-            render: (text, record) => {
-                if (record.abstract) {
-                    return record.abstract;
-                } else {
-                    if (record.pub_unit && record.pub_unit.name) {
-                        return record.pub_unit.name;
-                    } else {
-                        return '/';
-                    }
-                }
-            }
-        },
-        {
-            title: '创建时间',
-            dataIndex: 'pub_time',
-            key: 'pub_time',
-            width: '15%',
-            render: pub_time => {
-                return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
-            }
-        },
-        {
-            title: '封面',
-            dataIndex: 'cover',
-            key: 'cover',
-            width: '10%',
-            render: (text, record, index) => {
-                return (<a
-                    onClick={this.handleViewCover.bind(this, text)}
-                >
-                    查看
-                </a>);
-            }
-        },
-        {
-            title: '操作',
-            width: '15%',
-            render: record => {
-                return (
-                    <span>
-                        <a onClick={this.handleNewsView.bind(this, record.ID)}>
-                            查看
-                        </a>
-                        <Divider type='vertical' />
-                        <a
-                            onClick={this.handleNewsPublish.bind(this, record)}
-                        >
-                            发布
-                        </a>
-                        <Divider type='vertical' />
-                        <a onClick={this.handleNewsEdit.bind(this, record.ID)}>
-                            修改
-                        </a>
-                        <Divider type='vertical' />
-                        <Popconfirm
-                            title='确定删除吗?'
-                            onConfirm={this.handleNewsDelete.bind(this, record.ID)}
-                            okText='确定'
-                            cancelText='取消'
-                        >
-                            <a>删除</a>
-                        </Popconfirm>
-                    </span>
-                );
-            }
-        }
-    ];
 
     componentDidMount () {
         const {
@@ -350,12 +186,17 @@ class NewsTable extends Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 console.log(123, values);
+                let sdate = '', edate = '';
+                if (values.worktime && values.worktime.length) {
+                    sdate = moment(values.worktime[0]).format('YYYY-MM-DD');
+                    edate = moment(values.worktime[1]).format('YYYY-MM-DD');
+                }
                 getNewsListNew({}, {
                     type: '',
                     name: values.theme || '',
                     ishot: '',
-                    sdate: values.worktime ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
-                    edate: values.worktime ? moment(values.worktime[1]).format('YYYY-MM-DD') : '',
+                    sdate,
+                    edate,
                     page: '',
                     size: ''
                 });
@@ -467,7 +308,11 @@ class NewsTable extends Component {
                         </p>
                         <p>
                             附件 ：{fileList.length ? fileList.map(item => {
-                                return <a href={item.FilePath} target='_blank' style={{marginRight: 10}}>{item.FileName}</a>;
+                                return (<div>
+                                    <a href={item.FilePath}
+                                        target='_blank'
+                                    >{item.FileName}</a>
+                                </div>);
                             }) : '暂无'}
                         </p>
                         <div
@@ -537,7 +382,7 @@ class NewsTable extends Component {
                                         <Col span={10}>
                                             <FormItem
                                                 {...formItemLayout}
-                                                label='发布日期'
+                                                label='发布时间'
                                             >
                                                 {getFieldDecorator('worktime', {
                                                     rules: [
@@ -601,101 +446,80 @@ class NewsTable extends Component {
                                 rowKey='ID'
                             />
                         </TabPane>
-                        {/* <TabPane tab='暂存的新闻' key='temporary'>
-                            <Row>
-                                <Col span={18}>
-                                    <Row>
-                                        <Col span={8}>
-                                            <FormItem
-                                                {...formItemLayout}
-                                                label='名称'
-                                            >
-                                                {getFieldDecorator('title1', {
-                                                    rules: [
-                                                        {
-                                                            required: false,
-                                                            message:
-                                                                '请输入名称'
-                                                        }
-                                                    ]
-                                                })(
-                                                    <Input placeholder='请输入名称' />
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={10}>
-                                            <FormItem
-                                                {...formItemLayout}
-                                                label='修改日期'
-                                            >
-                                                {getFieldDecorator(
-                                                    'worktimes',
-                                                    {
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请选择日期'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(
-                                                    <RangePicker
-                                                        style={{
-                                                            verticalAlign:
-                                                                'middle',
-                                                            width: '100%'
-                                                        }}
-                                                        format={
-                                                            'YYYY/MM/DD'
-                                                        }
-                                                    />
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                                <Col span={2} offset={1}>
-                                    <FormItem>
-                                        {getFieldDecorator('search', {
-                                            rules: [{ required: false, message: '请选择查询条件' }]
-                                        })(
-                                            <Button
-                                                icon='search'
-                                                onClick={this.queryTemporary.bind(this)}
-                                            >
-                                                查询
-                                            </Button>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                                <Col span={2}>
-                                    <FormItem>
-                                        {getFieldDecorator('reload', {
-                                            rules: [{ required: false, message: '请选择查询条件' }]
-                                        })(
-                                            <Button
-                                                icon='reload'
-                                                onClick={this.clearTemporary.bind(this)}
-                                            >
-                                            清除
-                                            </Button>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                            <Table
-                                dataSource={draftNewsLis}
-                                columns={this.draftColumns}
-                                className='foresttables'
-                                bordered
-                                rowKey='id'
-                            />
-                        </TabPane> */}
                     </Tabs>
                 </Col>
             </Row>
         );
     }
+    columns = [
+        {
+            title: '新闻查询ID',
+            dataIndex: 'ID',
+            key: 'ID',
+            width: '10%'
+        },
+        {
+            title: '名称',
+            dataIndex: 'Title',
+            key: 'Title',
+            width: '40%'
+        },
+        {
+            title: '发布时间',
+            dataIndex: 'Publish_Time',
+            key: 'Publish_Time',
+            width: '15%',
+            render: (text, record) => {
+                let date = '/';
+                if (text) {
+                    date = moment(text).format('YYYY-MM-DD HH:mm:ss');
+                }
+                return date;
+            }
+        },
+        {
+            title: '封面',
+            dataIndex: 'Thumbnail',
+            key: 'Thumbnail',
+            width: '10%',
+            render: (text, record) => {
+                let node = '/';
+                if (text) {
+                    node = <a
+                        onClick={this.handleViewCover.bind(this, text)}
+                    >
+                        查看
+                    </a>;
+                }
+                return node;
+            }
+        },
+        {
+            title: '操作',
+            width: '15%',
+            render: (text, record) => {
+                return (
+                    <span>
+                        <a onClick={this.handleNewsView.bind(this, record.ID)}>
+                            查看
+                        </a>
+                        <Divider type='vertical' />
+                        <a onClick={this.handleNewsEdit.bind(this, record.ID)}>
+                            修改
+                        </a>
+                        <Divider type='vertical' />
+                        <Popconfirm
+                            title='确定删除吗?'
+                            onConfirm={this.handleNewsDelete.bind(this, record.ID)}
+                            okText='确定'
+                            cancelText='取消'
+                        >
+                            <a>删除</a>
+                        </Popconfirm>
+                    </span>
+                );
+            }
+        }
+    ];
 }
 export default Form.create()(NewsTable);
