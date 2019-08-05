@@ -22,6 +22,7 @@ import {
     getProjectNameBySection
 } from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 export default class CheckerTable extends Component {
     constructor (props) {
@@ -45,14 +46,14 @@ export default class CheckerTable extends Component {
             treetype: '',
             CheckStatus: '',
             locationstatus: '',
-            role: 'checker',
             rolename: '',
             percent: 0,
             messageTotalNum: '',
             treeTotalNum: '',
             imgArr: [],
             smallclassData: '',
-            thinclassData: ''
+            thinclassData: '',
+            userOptions: []
         };
     }
     componentDidMount () {
@@ -101,13 +102,11 @@ export default class CheckerTable extends Component {
             smallclass,
             thinclass,
             status,
-            treetypename
+            treetypename,
+            userOptions = []
         } = this.state;
         const suffix1 = sxm ? (
             <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
-        const suffix2 = rolename ? (
-            <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
         let columns = [];
         let header = '';
@@ -317,12 +316,20 @@ export default class CheckerTable extends Component {
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>抽查人：</span>
-                        <Input
-                            suffix={suffix2}
-                            value={rolename}
+                        <Select
+                            allowClear
+                            showSearch
                             className='forest-forestcalcw4'
+                            placeholder={'请输入姓名搜索'}
+                            onSearch={this.handleUserSearch.bind(this)}
                             onChange={this.onRoleNameChange.bind(this)}
-                        />
+                            showArrow={false}
+                            filterOption={false}
+                            notFoundContent={null}
+                            value={rolename || undefined}
+                        >
+                            {userOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg-datePicker6'>
                         <span className='forest-search-span6'>业主抽查时间：</span>
@@ -411,10 +418,6 @@ export default class CheckerTable extends Component {
         this.setState({ sxm: '' });
     };
 
-    emitEmpty2 = () => {
-        this.setState({ rolename: '' });
-    };
-
     sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
@@ -500,8 +503,42 @@ export default class CheckerTable extends Component {
         this.setState({ locationstatus: value });
     }
 
+    handleUserSearch = async (value) => {
+        const {
+            actions: {
+                getUsers
+            }
+        } = this.props;
+        let userList = [];
+        let userOptions = [];
+        if (value.length >= 2) {
+            let postData = {
+                fullname: value
+            };
+            let userData = await getUsers({}, postData);
+            if (userData && userData.content && userData.content instanceof Array) {
+                userList = userData.content;
+                userList.map((user) => {
+                    userOptions.push(
+                        <Option
+                            key={user.ID}
+                            title={`${user.Full_Name}(${user.User_Name})`}
+                            value={user.ID}>
+                            {`${user.Full_Name}(${user.User_Name})`}
+                        </Option>
+                    );
+                });
+            }
+            this.setState({
+                userOptions
+            });
+        }
+    }
     onRoleNameChange (value) {
-        this.setState({ rolename: value.target.value });
+        console.log('value', value);
+        this.setState({
+            rolename: value
+        });
     }
 
     datepick (value) {
@@ -563,7 +600,6 @@ export default class CheckerTable extends Component {
             sxm = '',
             section = '',
             status = '',
-            role = '',
             rolename = '',
             ostime = '',
             oetime = '',
@@ -600,9 +636,9 @@ export default class CheckerTable extends Component {
             smallclass: smallclassData,
             thinclass: thinclassData,
             bigType,
-            treetype
+            treetype,
+            checker: rolename
         };
-        if (role) postdata[role] = rolename;
         this.setState({
             loading: true,
             percent: 0
@@ -678,7 +714,6 @@ export default class CheckerTable extends Component {
             sxm = '',
             section = '',
             // CheckStatus = '',
-            role = '',
             rolename = '',
             ostime = '',
             oetime = '',
@@ -710,9 +745,9 @@ export default class CheckerTable extends Component {
             smallclass: smallclassData,
             thinclass: thinclassData,
             bigType,
-            treetype
+            treetype,
+            checker: rolename
         };
-        if (role) postdata[role] = rolename;
 
         this.setState({ loading: true, percent: 0 });
         getexportTree4Checker({}, postdata).then(rst3 => {
