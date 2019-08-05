@@ -7,14 +7,14 @@
  */
 
 module.exports = () => {
-	return {
-		'icon-url': "'/fonts/iconfont'"
-		/*'disabled-color': '#4D4D4D',
+    return {
+        'icon-url': "'/fonts/iconfont'"
+        /*'disabled-color': '#4D4D4D',
 		'icon-url': "'/fonts/iconfont'",
         'table-header-bg': '#9cc8e4',
         'table-padding-vertical': '8px',
         'card-head-height': '34px',
         'primary-color': '#5189af',
-        'table-selected-row-bg': '#9cc8e4',*/
-	};
+        'table-selected-row-bg': '#9cc8e4', */
+    };
 };

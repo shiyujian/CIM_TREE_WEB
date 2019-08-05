@@ -106,13 +106,13 @@ export default class CuringInfo extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='养护信息' {...this.props} />
-                    <Sidebar width={190}>
+                    {/* <Sidebar width={190}>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
-                    </Sidebar>
+                    </Sidebar> */}
                     <Content>
                         <CuringTable
                             key={resetkey}
