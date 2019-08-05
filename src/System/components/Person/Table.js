@@ -40,7 +40,8 @@ class Users extends Component {
             searchOveralSituation: '', // 是否全局搜索，默认不
             additionVisible: false,
             editVisible: false,
-            editUserRecord: ''
+            editUserRecord: '',
+            queryUserPostData: {}
         };
     }
     static layout = {
@@ -625,7 +626,6 @@ class Users extends Component {
     }
     // 点击查询按钮，进行搜索
     search = async (page) => {
-        let text = document.getElementById('NurseryData').value;
         const {
             actions: {
                 getUsers,
@@ -641,6 +641,7 @@ class Users extends Component {
             searchOveralSituation
         } = this.state;
         try {
+            let text = document.getElementById('NurseryData').value;
             let postData = {
                 page: page,
                 size: 10,
@@ -653,6 +654,7 @@ class Users extends Component {
             if (!searchOveralSituation || username !== 'admin') {
                 postData.org = node.ID;
             }
+            console.log('postData', postData);
             this.setState({ loading: true });
             let data = await getUsers({}, postData);
             if (data && data.code && data.code === 200) {
@@ -663,13 +665,15 @@ class Users extends Component {
                 await getTablePage(pagination);
                 this.setState({
                     loading: false,
-                    dataList: data.content
+                    dataList: data.content,
+                    queryUserPostData: postData
                 });
             } else {
                 message.warning('获取用户失败，请重新获取');
                 this.setState({
                     loading: false,
-                    dataList: []
+                    dataList: [],
+                    queryUserPostData: postData
                 });
                 return;
             }
@@ -715,13 +719,15 @@ class Users extends Component {
                 await getTablePage(pagination);
                 this.setState({
                     loading: false,
-                    dataList: rst.content
+                    dataList: rst.content,
+                    queryUserPostData: postData
                 });
             } else {
                 message.warning('获取用户失败，请重新获取');
                 this.setState({
                     loading: false,
-                    dataList: []
+                    dataList: [],
+                    queryUserPostData: postData
                 });
                 return;
             }

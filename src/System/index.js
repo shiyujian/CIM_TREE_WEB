@@ -36,7 +36,7 @@ export default class System extends Component {
             key: 'Role',
             id: 'SYSTEM.ROLE',
             name: '角色设置',
-            path: '/system',
+            path: '/system/role',
             exact: true,
             icon: <Icon name='users' />
         },
