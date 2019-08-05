@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-18 14:43:35
+ * @Last Modified time: 2019-08-05 21:28:06
  */
 import React, { Component } from 'react';
 import {
@@ -414,7 +414,7 @@ class Total extends Component {
                                 />
                             </Row>
                             <Row style={{ marginTop: 20 }}>
-                                <Col span={8} offset={4}>
+                                <Col span={8}>
                                     <FormItem
                                         {...FormItemLayout}
                                         label='审核人'
@@ -422,10 +422,17 @@ class Total extends Component {
                                         {getFieldDecorator(
                                             'Auditor'
                                         )(
-                                            <Select style={{ width: 120 }}>
-                                                {auditorList.map(item => {
-                                                    return <Option value={item.id} key={item.id}>{item.name}</Option>;
-                                                })}
+                                            <Select style={{ width: 150 }}>
+                                                {
+                                                    auditorList.map(item => {
+                                                        return <Option
+                                                            value={item.id}
+                                                            title={`${item.Full_Name}(${item.User_Name})`}
+                                                            key={item.id}>
+                                                            {`${item.Full_Name}(${item.User_Name})`}
+                                                        </Option>;
+                                                    })
+                                                }
                                             </Select>
                                         )}
                                     </FormItem>
@@ -692,8 +699,8 @@ class Total extends Component {
             render: (text, record, index) => {
                 return (
                     <Input onChange={e => {
-                            record.remark = e.target.value;
-                        }}
+                        record.remark = e.target.value;
+                    }}
                     />
                 );
             }

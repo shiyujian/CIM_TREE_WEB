@@ -80,7 +80,8 @@ class TaskList extends Component {
                     res.content.map(item => {
                         initiatorList.push({
                             value: item.ID,
-                            label: item.Full_Name
+                            Full_Name: item.Full_Name,
+                            User_Name: item.User_Name
                         });
                     });
                     this.setState({
@@ -204,8 +205,17 @@ class TaskList extends Component {
 
     }
     render () {
-        const { loadingProcess, loadingFinish, type, flowDataList, processList, finishList, initiatorList } = this.state;
+        const {
+            loadingProcess,
+            loadingFinish,
+            type,
+            flowDataList,
+            processList,
+            finishList,
+            initiatorList
+        } = this.state;
         const { getFieldDecorator } = this.props.form;
+        console.log('initiatorList', initiatorList);
         return (
             <div>
                 <div style={{textAlign: 'center', marginBottom: 20}}>
@@ -256,7 +266,11 @@ class TaskList extends Component {
                                 >
                                     {
                                         initiatorList.map(item => {
-                                            return <Option value={item.value} key={item.value}>{item.label}</Option>;
+                                            return <Option
+                                                value={item.value}
+                                                key={item.value}>
+                                                {`${item.Full_Name}(${item.User_Name})`}
+                                            </Option>;
                                         })
                                     }
                                 </Select>

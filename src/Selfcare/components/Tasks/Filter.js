@@ -71,6 +71,7 @@ class Filter extends Component {
             tasks.map(task => {
                 creators.push(task.creator);
             });
+            console.log('creators', creators);
             creators = this.getUnique('id', creators);
             creators.map(creator => {
                 arr.push(

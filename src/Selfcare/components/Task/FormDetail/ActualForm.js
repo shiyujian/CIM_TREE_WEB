@@ -36,6 +36,7 @@ class ActualForm extends Component {
             NextPeopleList,
             form: { getFieldDecorator }
         } = this.props;
+        console.log('NextPeopleList', NextPeopleList);
         let node = '';
         if (CurrentNodeName === '业主查看') {
 
@@ -51,7 +52,11 @@ class ActualForm extends Component {
                             <Select style={{width: 400}}>
                                 {
                                     NextPeopleList.length > 0 ? NextPeopleList.map(item => {
-                                        return <Option value={item.ID} key={item.ID}>{item.Full_Name}</Option>;
+                                        return <Option
+                                            value={item.ID}
+                                            key={item.ID}>
+                                            {`${item.Full_Name}(${item.User_Name})`}
+                                        </Option>;
                                     }) : ''
                                 }
                             </Select>
@@ -113,7 +118,10 @@ class ActualForm extends Component {
             Section,
             Starter,
             param,
-            actions: {postSendwork, addSchedule},
+            actions: {
+                postSendwork,
+                addSchedule
+            },
             form: { validateFields }
         } = this.props;
         console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
@@ -138,7 +146,6 @@ class ActualForm extends Component {
                     NextExecutor: values.NextPeople, // 下一节点执行人
                     Executor // 当前节点执行人
                 };
-                console.log('入库数据', TableList);
                 postSendwork({}, params).then(rep => {
                     if (rep.code === 1) {
                         if (CurrentNodeName === '业主查看') {
@@ -152,7 +159,7 @@ class ActualForm extends Component {
                             });
                             let params = {
                                 DocType: 'doc',
-                                item: items,
+                                Items: items,
                                 ProgressNo: Starter, // 发起人
                                 ProgressTime: param.TodayDate, // 日期
                                 ProgressType: '日实际',

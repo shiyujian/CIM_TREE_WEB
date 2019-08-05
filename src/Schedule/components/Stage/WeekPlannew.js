@@ -238,7 +238,6 @@ class WeekPlan extends Component {
             auditorList,
             form: { getFieldDecorator }
         } = this.props;
-
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -408,7 +407,7 @@ class WeekPlan extends Component {
                                         />
                                     </Row>
                                     <Row>
-                                        <Col span={8} offset={4}>
+                                        <Col span={8}>
                                             <FormItem
                                                 {...FormItemLayout}
                                                 label='审核人'
@@ -416,10 +415,17 @@ class WeekPlan extends Component {
                                                 {getFieldDecorator(
                                                     'TdataReview'
                                                 )(
-                                                    <Select style={{ width: 120 }}>
-                                                        {auditorList.map(item => {
-                                                            return <Option value={item.id} key={item.id}>{item.name}</Option>;
-                                                        })}
+                                                    <Select style={{ width: 150 }}>
+                                                        {
+                                                            auditorList.map(item => {
+                                                                return <Option
+                                                                    value={item.id}
+                                                                    title={`${item.Full_Name}(${item.User_Name})`}
+                                                                    key={item.id}>
+                                                                    {`${item.Full_Name}(${item.User_Name})`}
+                                                                </Option>;
+                                                            })
+                                                        }
                                                     </Select>
                                                 )}
                                             </FormItem>

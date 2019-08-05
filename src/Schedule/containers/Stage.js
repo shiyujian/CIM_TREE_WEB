@@ -90,7 +90,8 @@ export default class Stage extends Component {
                 let auditorList = [];
                 rep.content.map(item => {
                     auditorList.push({
-                        name: item.Full_Name,
+                        Full_Name: item.Full_Name,
+                        User_Name: item.User_Name,
                         id: item.ID
                     });
                 });
