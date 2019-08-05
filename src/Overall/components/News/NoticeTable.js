@@ -55,7 +55,7 @@ class NoticeTable extends Component {
             size: ''
         });
     }
-  
+
     // 查看通知
     handleNoticeView = async (ID) => {
         console.log(ID, '通知ID');
@@ -109,8 +109,6 @@ class NoticeTable extends Component {
                 deleteNotice
             }
         } = this.props;
-        console.log('删除ID', ID);
-        console.log('删除ID', typeof ID);
         deleteNotice({ID}, {}).then(rep => {
             if (rep.code === 1) {
                 Notification.success({
@@ -166,8 +164,8 @@ class NoticeTable extends Component {
                 console.log(123, values, values.degree);
                 let sdate = '', edate = '';
                 if (values.worktime && values.worktime.length) {
-                    sdate = moment(values.worktime[0]).format('YYYY-MM-DD');
-                    edate = moment(values.worktime[1]).format('YYYY-MM-DD');
+                    sdate = moment(values.worktime[0]).format('YYYY-MM-DD 00:00:00');
+                    edate = moment(values.worktime[1]).format('YYYY-MM-DD 23:59:59');
                 }
                 getNoticeList({}, {
                     type: values.degree || '',
@@ -188,14 +186,6 @@ class NoticeTable extends Component {
             degree: ''
         });
         this.queryPublish();
-    }
-
-    clearTemporary () {
-        this.props.form.setFieldsValue({
-            titles: undefined,
-            worktimes: undefined,
-            degrees: undefined
-        });
     }
     // 通知列表和暂存的通知列表切换
     subTabChange (tipsTabValue) {
@@ -266,13 +256,13 @@ class NoticeTable extends Component {
                         <div>
                             <p>紧急程度 ：{detailDegree ? <span>{detailDegree}</span> : '暂无'}</p>
                             <p>
-                                附件 ：{fileList.length ? fileList.map(item => {
-                                    return (<div>
-                                        <a href={item.FilePath}
+                                {fileList.length ? fileList.map(item => {
+                                    return (<p>
+                                        附件 ：<a href={item.FilePath}
                                             target='_blank'
                                         >{item.FileName}</a>
-                                    </div>);
-                                }) : '暂无'}
+                                    </p>);
+                                }) : <p>{`附件 ：暂无`}</p>}
                             </p>
                             <div
                                 style={{
