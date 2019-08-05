@@ -272,10 +272,10 @@ export default class TreeAdoptInfoTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={16} className='forest-quryrstcnt'>
+                    <Col span={18} className='forest-quryrstcnt'>
                         <span>此次查询共有苗木：{this.state.totalNum}棵</span>
                     </Col>
-                    <Col span={6} >
+                    <Col span={4} >
                         <Button
                             type='primary'
                             onClick={this.onExport.bind(this)}

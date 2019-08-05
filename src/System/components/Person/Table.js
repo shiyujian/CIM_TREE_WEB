@@ -254,7 +254,7 @@ class Users extends Component {
                 node: nextNode
             } = {}
         } = nextProps;
-        if (node && node.ID && nextNode && nextNode.ID && nextNode.ID !== node.ID) {
+        if (nextNode && nextNode.ID && nextNode.ID !== (node && node.ID)) {
             // 在重新选择树节点之后，将页数进行修改
             this.setState({
                 searchRoles: '',
@@ -262,6 +262,7 @@ class Users extends Component {
                 searchOveralSituation: '',
                 searchKeyword: ''
             });
+            document.getElementById('NurseryData').value = '';
         }
         if (nextProps.platform.users) {
             this.setState({

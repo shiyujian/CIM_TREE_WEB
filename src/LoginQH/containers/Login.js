@@ -42,7 +42,8 @@ class Login extends Component {
             forgectState: false,
             checked: '',
             getSecurityCodeStatus: false,
-            countDown: 60
+            countDown: 60,
+            setUserStatus: false
         };
         clearUser();
     }
@@ -68,11 +69,25 @@ class Login extends Component {
         }
     }
 
+    handleChangeUser = (value) => {
+        console.log('value', value);
+        if (value) {
+            this.setState({
+                setUserStatus: true
+            });
+        } else {
+            this.setState({
+                setUserStatus: false
+            });
+        }
+    }
+
     render () {
         const { getFieldDecorator } = this.props.form;
         const {
             forgectState,
             getSecurityCodeStatus,
+            setUserStatus,
             countDown
         } = this.state;
         const loginTitle = require('./images/logo1.png');
@@ -264,6 +279,7 @@ class Login extends Component {
                                                         borderBottom:
                                                             '1px solid #cccccc'
                                                     }}
+                                                    onChange={this.handleChangeUser.bind(this)}
                                                     placeholder='请输入用户名'
                                                 />
                                             )}
@@ -294,7 +310,7 @@ class Login extends Component {
                                                         placeholder='请输入手机号'
                                                     />
                                                     {
-                                                        getSecurityCodeStatus
+                                                        getSecurityCodeStatus && setUserStatus
                                                             ? <a
                                                                 className='security-code-status'
                                                             >{`${countDown}秒后重发`}</a>
@@ -542,51 +558,83 @@ class Login extends Component {
     handleGetSecurityCode = async () => {
         const {
             actions: {
-                getSecurityCode
+                getSecurityCode,
+                getUsers
+            },
+            form: {
+                getFieldValue
             }
         } = this.props;
         try {
-            let phonenumber = this.props.form.getFieldValue('phone');
-            let partn = /^1[0-9]{10}$/;
-            if (!partn.exec(phonenumber)) {
+            let username = getFieldValue('nickname');
+            if (!username) {
                 Notification.error({
-                    message: '手机号输入错误！',
+                    message: '请输入用户名',
                     duration: 2
                 });
-            } else {
-                this.setState({
-                    getSecurityCodeStatus: true
-                });
-                const data = {
-                    action: 'vcode',
-                    phone: phonenumber
-                };
-                let rst = await getSecurityCode({}, data);
-                let status = false;
-                if (rst.indexOf('code') !== -1) {
-                    let handleData = rst.substring(1, rst.length - 1);
-                    let handleDataArr = handleData.split(',');
-                    if (handleDataArr && handleDataArr instanceof Array && handleDataArr.length > 0) {
-                        let codeArr = handleDataArr[0].split(':');
-                        if (codeArr && codeArr instanceof Array && codeArr.length === 2) {
-                            if (codeArr[1] === '1') {
-                                status = true;
-                            }
+                return;
+            }
+            let userData = await getUsers({}, {username: username});
+            console.log('nickname', userData);
+            if (userData && userData.content && userData.content instanceof Array) {
+                if (userData.content.length > 0) {
+                    let content = userData.content[0];
+                    let phonenumber = (content && content.Phone) || '';
+                    if (!phonenumber) {
+                        Notification.error({
+                            message: '该用户未关联手机号，请联系管理员修改',
+                            duration: 2
+                        });
+                    }
+                    let partn = /^1[0-9]{10}$/;
+                    if (!partn.exec(phonenumber)) {
+                        Notification.error({
+                            message: '手机号输入错误！',
+                            duration: 2
+                        });
+                    } else {
+                        this.setState({
+                            getSecurityCodeStatus: true
+                        });
+                        const data = {
+                            action: 'vcode',
+                            phone: phonenumber
+                        };
+                        let rst = await getSecurityCode({}, data);
+                        let status = false;
+                        if (rst.indexOf('code') !== -1) {
+                            let handleData = rst.substring(1, rst.length - 1);
+                            let handleDataArr = handleData.split(',');
+                            if (handleDataArr && handleDataArr instanceof Array && handleDataArr.length > 0) {
+                                let codeArr = handleDataArr[0].split(':');
+                                if (codeArr && codeArr instanceof Array && codeArr.length === 2) {
+                                    if (codeArr[1] === '1') {
+                                        status = true;
+                                    }
+                                }
+                            };
                         }
-                    };
-                }
-                if (status) {
-                    Notification.success({
-                        message: '验证码发送成功',
-                        duration: 3
-                    });
+                        if (status) {
+                            Notification.success({
+                                message: '验证码发送成功',
+                                duration: 3
+                            });
+                        } else {
+                            Notification.error({
+                                message: '验证码发送失败',
+                                duration: 3
+                            });
+                        }
+                        this.handleSecurityCodeStatus();
+                    }
                 } else {
                     Notification.error({
-                        message: '验证码发送失败',
+                        message: '此用户名不存在，请重新确认',
                         duration: 3
                     });
+                    this.handleSecurityCodeStatus();
+                    return;
                 }
-                this.handleSecurityCodeStatus();
             }
         } catch (e) {
             console.log('handleGetSecurityCode', e);
@@ -621,7 +669,6 @@ class Login extends Component {
         try {
             this.props.form.validateFieldsAndScroll(async (err, values) => {
                 if (!err) {
-                    // let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
                     let partn = /^1[0-9]{10}$/;
                     let phonenumber = values.phone;
                     if (!partn.exec(phonenumber)) {
@@ -665,6 +712,7 @@ class Login extends Component {
                         this.setState({
                             forgectState: false,
                             getSecurityCodeStatus: false,
+                            setUserStatus: false,
                             countDown: 60
                         });
                     }
@@ -677,6 +725,9 @@ class Login extends Component {
     cancel () {
         this.setState({
             forgectState: false
+            // getSecurityCodeStatus: false,
+            // setUserStatus: false,
+            // countDown: 60
         });
     }
 }
