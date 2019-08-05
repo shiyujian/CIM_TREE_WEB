@@ -388,7 +388,7 @@ class WeekPlan extends Component {
                                                             value={etime}
                                                             onChange={this.handleEndChange.bind(this)}
                                                             format='YYYY-MM-DD'
-                                                            placeholder='Start'
+                                                            placeholder='End'
                                                             style={{
                                                                 width: '100%',
                                                                 height: '100%'
