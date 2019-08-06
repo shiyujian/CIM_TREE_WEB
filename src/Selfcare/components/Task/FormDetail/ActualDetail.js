@@ -129,8 +129,10 @@ class ActualDetail extends Component {
             dataIndex: 'actualNum',
             key: 'actualNum',
             render: (text, record, index) => {
+                const {disabled} = this.state;
                 return (
                     <InputNumber
+                        disabled={disabled}
                         value={record.actualNum || 0}
                         onChange={this.props.handleActualNumChange.bind(this, index)}
                     />
