@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-02-20 10:14:05
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-05 21:28:06
+ * @Last Modified time: 2019-08-06 10:54:32
  */
 import React, { Component } from 'react';
 import {
@@ -44,7 +44,7 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 moment.locale('zh-cn');
 const dateFormat = 'YYYY-MM-DD';
-class Total extends Component {
+class TotalNew extends Component {
     static propTypes = {};
     constructor (props) {
         super(props);
@@ -732,4 +732,4 @@ class Total extends Component {
     ];
 }
 
-export default Form.create()(Total);
+export default Form.create()(TotalNew);

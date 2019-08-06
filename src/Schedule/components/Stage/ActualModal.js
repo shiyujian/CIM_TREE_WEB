@@ -4,13 +4,11 @@ import {
     Col,
     Input,
     Form,
-    Icon,
     Button,
     Table,
     Modal,
     DatePicker,
     Select,
-    notification,
     Card,
     Steps
 } from 'antd';
@@ -35,50 +33,70 @@ export default class ActualModal extends Component {
     async componentDidMount () {
         this.getTaskDetail(); // 获取任务详情
     }
-    getTaskDetail () {
+    getTaskDetail = async () => {
         const {
             workID,
             actions: { getWorkDetails },
-            form: { setFieldsValue }
+            form: { setFieldsValue },
+            platform: { tree = {} }
         } = this.props;
         this.setState({
             workID: workID
         });
-        getWorkDetails({
-            ID: workID
-        }, {}).then(rep => {
-            let FormParams = [];
-            if (rep.FormValues && rep.FormValues.length > 0 && rep.FormValues[0].FormParams) {
-                FormParams = rep.FormValues[0].FormParams;
+        let rep = await getWorkDetails({ID: workID}, {});
+        let FormParams = [];
+        if (rep && rep.FormValues && rep.FormValues.length > 0 && rep.FormValues[0].FormParams) {
+            FormParams = rep.FormValues[0].FormParams;
+        }
+        let param = {};
+        let TableList = [];
+        FormParams.map(item => {
+            if (item.Key === 'TableInfo') {
+                TableList = JSON.parse(item.Val);
+            } else {
+                param[item.Key] = item.Val;
             }
-            let param = {};
-            let TableList = [];
-            FormParams.map(item => {
-                if (item.Key === 'TableInfo') {
-                    TableList = JSON.parse(item.Val);
-                } else {
-                    param[item.Key] = item.Val;
+        });
+
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let sectionName = '';
+        let projectName = '';
+
+        let code = param.Section.split('-');
+        if (code && code.length === 3) {
+            // 获取当前标段所在的项目
+            sectionData.map(project => {
+                if (code[0] === project.No) {
+                    projectName = project.Name;
+                    project.children.map(section => {
+                        // 获取当前标段的名字
+                        if (section.No === param.Section) {
+                            sectionName = section.Name;
+                        }
+                    });
                 }
             });
-            console.log('任务ID', param);
-            setFieldsValue({
-                Section: param.Section
-            });
-            this.setState({
-                TodayDate: param.TodayDate,
-                workDetails: rep,
-                TableList,
-                workFlow: rep.Works
-            });
+            param.sectionName = sectionName;
+            param.projectName = projectName;
+        }
+        setFieldsValue({
+            Section: sectionName,
+            TodayDate: param.TodayDate ? moment(param.TodayDate).format(dateFormat) : ''
+        });
+        this.setState({
+            TableList,
+            workFlow: rep.Works
         });
     }
 
     render () {
         const {
-            sectionArray,
             form: { getFieldDecorator }
         } = this.props;
-        const { workFlow, TodayDate, TableList } = this.state;
+        const {
+            workFlow,
+            TableList
+        } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -103,14 +121,7 @@ export default class ActualModal extends Component {
                                         {getFieldDecorator(
                                             'Section'
                                         )(
-                                            <Select
-                                                disabled
-                                                style={{width: 220}}
-                                            >
-                                                {sectionArray.map(item => {
-                                                    return <Option value={item.No} key={item.No}>{item.Name}</Option>;
-                                                })}
-                                            </Select>
+                                            <Input readOnly />
                                         )}
                                     </FormItem>
                                 </Col>
@@ -119,19 +130,18 @@ export default class ActualModal extends Component {
                                         {...FormItemLayout}
                                         label='日期'
                                     >
-                                        <DatePicker
-                                            style={{width: 220}}
-                                            disabled
-                                            value={moment(TodayDate, dateFormat)}
-                                            format={dateFormat}
-                                        />
+                                        {getFieldDecorator(
+                                            'TodayDate'
+                                        )(
+                                            <Input readOnly />
+                                        )}
                                     </FormItem>
                                 </Col>
                             </Row>
                             <Row>
                                 <Table
                                     columns={this.columns}
-                                    dataSource={this.state.TableList}
+                                    dataSource={TableList}
                                     bordered
                                     rowKey='ID'
                                     className='foresttable'
@@ -200,7 +210,9 @@ export default class ActualModal extends Component {
                                                     })</span>
                                                     <span style={{marginLeft: 20}}>
                                                         当前执行人：
-                                                        <span style={{color: '#108ee9'}}>{item.ExecutorObj && item.ExecutorObj.Full_Name}</span>
+                                                        <span style={{color: '#108ee9'}}>
+                                                            {`${item.ExecutorObj && item.ExecutorObj.Full_Name}(${item.ExecutorObj && item.ExecutorObj.User_Name})`}
+                                                        </span>
                                                     </span>
                                                 </div>
                                             } />;

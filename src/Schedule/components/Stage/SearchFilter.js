@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
 import { Form, Row, Col, Input, Select, Button, DatePicker } from 'antd';
-import {getUser} from '_platform/auth';
+import {
+    getUser,
+    getUserIsManager
+} from '_platform/auth';
+import {
+    WFStatusList
+} from '_platform/api';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 
-export default class WeekPlanSearchInfo extends Component {
+export default class SearchFilter extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -39,6 +47,7 @@ export default class WeekPlanSearchInfo extends Component {
         let user = getUser();
         let section = user && user.section;
         let optionArray = [];
+        let permission = getUserIsManager();
         if (section) {
             let code = section.split('-');
             if (code && code.length === 3) {
@@ -66,7 +75,7 @@ export default class WeekPlanSearchInfo extends Component {
                     }
                 });
             }
-        } else {
+        } else if (permission) {
             sectionData.map(project => {
                 if (leftkeycode && leftkeycode === project.No) {
                     let units = project.children;
@@ -79,6 +88,8 @@ export default class WeekPlanSearchInfo extends Component {
                     );
                 }
             });
+        } else {
+            optionArray = [];
         }
         this.setState({
             optionArray: optionArray
@@ -97,74 +108,57 @@ export default class WeekPlanSearchInfo extends Component {
                     <Col span={20}>
                         <Row>
                             <Col span={12}>
-                                <FormItem {...WeekPlanSearchInfo.layout} label='标段'>
-                                    {getFieldDecorator('sunitproject', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择标段'
-                                            }
-                                        ]
-                                    })(
-                                        <Select placeholder='请选择标段'>
-                                            {optionArray}
-                                        </Select>
-                                    )}
+                                <FormItem {...SearchFilter.layout} label='标段'>
+                                    {
+                                        getFieldDecorator('section')(
+                                            <Select
+                                                placeholder='请选择标段'
+                                                style={{width: 220}}
+                                                allowClear
+                                            >
+                                                {optionArray}
+                                            </Select>
+                                        )
+                                    }
                                 </FormItem>
                             </Col>
                             <Col span={12}>
-                                <FormItem {...WeekPlanSearchInfo.layout} label='提交日期'>
-                                    {getFieldDecorator('stimedate', {
-                                        rules: [
-                                            {
-                                                type: 'array',
-                                                required: false,
-                                                message: '请选择日期'
-                                            }
-                                        ]
-                                    })(
-                                        <RangePicker
-                                            size='default'
-                                            format='YYYY-MM-DD'
-                                            style={{
-                                                width: '100%',
-                                                height: '100%'
-                                            }}
-                                        />
-                                    )}
+                                <FormItem {...SearchFilter.layout} label='提交日期'>
+                                    {
+                                        getFieldDecorator('submitDate')(
+                                            <RangePicker
+                                                showTime={{ format: 'HH:mm:ss' }}
+                                                size='default'
+                                                format='YYYY-MM-DD HH:mm:ss'
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%'
+                                                }}
+                                            />
+                                        )
+                                    }
                                 </FormItem>
                             </Col>
                         </Row>
                         <Row>
                             <Col span={12}>
                                 <FormItem
-                                    {...WeekPlanSearchInfo.layout}
+                                    {...SearchFilter.layout}
                                     label='流程状态'
                                 >
-                                    {getFieldDecorator('sstatus', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择流程状态'
-                                            }
-                                        ]
-                                    })(
+                                    {getFieldDecorator('status')(
                                         <Select
+                                            style={{width: 220}}
                                             placeholder='请选择流程类型'
                                             allowClear
                                         >
-                                            <Option
-                                                key={Math.random * 6}
-                                                value={'2'}
-                                            >
-                                                执行中
-                                            </Option>
-                                            <Option
-                                                key={Math.random * 7}
-                                                value={'3'}
-                                            >
-                                                已完成
-                                            </Option>
+                                            {
+                                                WFStatusList.map(item => {
+                                                    return <Option key={item.value} value={item.value}>
+                                                        {item.label}
+                                                    </Option>;
+                                                })
+                                            }
                                         </Select>
                                     )}
                                 </FormItem>
@@ -196,17 +190,48 @@ export default class WeekPlanSearchInfo extends Component {
     }
 
     query () {
-        this.props.gettaskSchedule();
+        this.onSearch();
     }
 
     clear () {
         this.props.form.setFieldsValue({
-            sunitproject: undefined,
-            stimedate: undefined,
-            sstatus: undefined
+            status: undefined,
+            submitDate: undefined,
+            section: undefined
         });
-        this.props.gettaskSchedule();
+        this.onSearch();
+    }
+
+    // 搜索
+    onSearch () {
+        const { validateFields } = this.props.form;
+        validateFields((err, values) => {
+            if (!err) {
+            }
+            let stime = '';
+            let etime = '';
+            if (values.submitDate && values.submitDate.length) {
+                stime = moment(values.submitDate[0]).format('YYYY-MM-DD HH:mm:ss');
+                etime = moment(values.submitDate[1]).format('YYYY-MM-DD HH:mm:ss');
+            }
+            // 表单查询
+            let key = '';
+            let value = '';
+            if (values.section) {
+                key = 'Section';
+                value = values.section;
+            }
+            let pro = {
+                keys: key,
+                values: value,
+                stime, // 开始时间
+                etime, // 结束时间
+                status: values.status // 流程状态
+            };
+            console.log('是数据', values);
+            this.props.getWorkList(pro);
+        });
     }
 }
 
-// export default WeekPlanSearchInfo = Form.create()(WeekPlanSearchInfo);
+// export default SearchFilter = Form.create()(SearchFilter);
