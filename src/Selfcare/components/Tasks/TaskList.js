@@ -426,7 +426,7 @@ class TaskList extends Component {
         dataIndex: 'active',
         render: (text, record, index) => {
             return (<div>
-                <Link to={`/selfcare/task/${record.ID}`}>
+                <Link to={`/selfcare/task/${record.ID}?mode=selfcare`}>
                     <span>
                         查看详情
                     </span>
