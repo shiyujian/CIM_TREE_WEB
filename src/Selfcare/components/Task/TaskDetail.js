@@ -8,6 +8,8 @@ import {
 } from 'antd';
 import moment from 'moment';
 import {
+    ActualFormOrigin,
+    WeekFormOrigin,
     WeekForm,
     WeekDetail,
     TotalDetail,
@@ -29,6 +31,9 @@ class TaskDetail extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            startDate: '', // 开始日期
+            endDate: '', // 结束日期
+            WFState: '', // 流程状态
             flowList: [], // 流程列表
             Starter: '', // 发起人ID
             FlowID: '', // 流程ID
@@ -40,7 +45,8 @@ class TaskDetail extends Component {
             CurrentNodeName: '', // 当前节点名称
             Executor: '', // 当前节点执行人
             TableList: [], // 表格数据
-            NextPeopleList: [], // 下一执行人
+            ownerList: [], // 业主执行人
+            auditorList: [], // 监理执行人
             param: {}, // 表单数据
             workFlow: [], // 任务流程
             workDetails: '' // 任务详情
@@ -78,26 +84,43 @@ class TaskDetail extends Component {
                 getRoles
             }
         } = this.props;
+        let user = await getUser();
         let roles = await getRoles();
-        let postRoleData = ''; // 业主文书ID
+        let ownerID = ''; // 业主文书ID
+        let supervisorID = ''; // 监理文书ID
         roles.map((role) => {
             if (role && role.ID && role.ParentID && role.RoleName === '业主文书') {
-                postRoleData = role.ID;
+                ownerID = role.ID;
+            } else if (role && role.ID && role.ParentID && role.RoleName === '监理文书') {
+                supervisorID = role.ID;
             }
         });
-        let NextPeopleList = [];
-        let postdata = {
+        console.log('业主文书列表.ID', ownerID, supervisorID);
+        let ownerList = [], auditorList = [];
+        getUsers({}, {
             keyword: '',
-            role: postRoleData,
+            role: ownerID,
             status: 1,
             page: 1,
             page_size: 20
-        };
-        getUsers({}, postdata).then(rep => {
-            NextPeopleList = rep.content;
-            console.log('业主文书列表', NextPeopleList);
+        }).then(rep => {
+            ownerList = rep.content;
+            console.log('业主文书列表', rep);
             this.setState({
-                NextPeopleList
+                ownerList
+            });
+        });
+        getUsers({}, {
+            role: supervisorID,
+            section: user.section,
+            status: 1,
+            page: '',
+            size: ''
+        }).then(rep => {
+            auditorList = rep.content;
+            console.log('监理文书列表', rep);
+            this.setState({
+                auditorList
             });
         });
     }
@@ -179,10 +202,13 @@ class TaskDetail extends Component {
                 }
             });
             this.props.actions.setTaskDetailLoading(false);
-            console.log('流程详情', param, TableList);
+            console.log('流程详情', rep.WFState);
             this.setState({
+                startDate: param.StartDate || '',
+                endDate: param.EndDate || '',
                 Section: param.Section,
                 WorkID: task_id,
+                WFState: rep.WFState,
                 CurrentNode: rep.CurrentNode,
                 CurrentNodeName: rep.CurrentNodeName,
                 Executor: rep.NextExecutor,
@@ -196,9 +222,62 @@ class TaskDetail extends Component {
             });
         });
     }
+    handlePlanTreeNumChage (index, value) {
+        const {
+            TableList
+        } = this.state;
+        try {
+            TableList[index].planTreeNum = value;
+            this.setState({
+                TableList
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+    handleActualNumChange (index, value) {
+        const {
+            TableList
+        } = this.state;
+        try {
+            TableList[index].actualNum = value;
+            this.setState({
+                TableList
+            });
+        } catch (e) {
+            console.log('e', e);
+        }
+    }
+    setTableDate (startDate, endDate) {
+        let start = new Date(startDate).getTime();
+        let end = new Date(endDate).getTime();
+        let TableList = [];
+        for (let id = 0; start <= end; start += 86400000, id++) {
+            let tmp = new Date(start);
+            TableList.push({
+                ID: id,
+                date: moment(tmp).format('YYYY-MM-DD')
+            });
+        }
+        console.log('表格数据', TableList, startDate, endDate);
+        this.setState({
+            TableList,
+            startDate,
+            endDate
+        });
+    }
+    handleTodayDate (date, dateString) {
+        const { param } = this.state;
+        this.setState({
+            param: {
+                ...param,
+                TodayDate: dateString
+            }
+        });
+    }
     getFormDetails () {
         let node = '';
-        const { FlowName, TableList, param } = this.state;
+        const { FlowName, TableList, param, WFState } = this.state;
         console.log('流程列表', FlowName);
         if (FlowName === '总计划进度填报流程') {
             node = <TotalDetail
@@ -208,11 +287,17 @@ class TaskDetail extends Component {
         } else if (FlowName === '每周进度填报流程') {
             node = <WeekDetail
                 param={param}
+                setTableDate={this.setTableDate.bind(this)}
+                handlePlanTreeNumChage={this.handlePlanTreeNumChage.bind(this)}
+                WFState={WFState}
                 TableList={TableList}
             />;
         } else if (FlowName === '每日进度填报流程') {
             node = <ActualDetail
                 param={param}
+                handleTodayDate={this.handleTodayDate.bind(this)}
+                handleActualNumChange={this.handleActualNumChange.bind(this)}
+                WFState={WFState}
                 TableList={TableList}
             />;
         }
@@ -220,15 +305,27 @@ class TaskDetail extends Component {
     }
     getFormItem = (item) => {
         let node = '';
-        const { FlowName } = this.state;
+        const { FlowName, CurrentNodeName } = this.state;
         if (FlowName === '总计划进度填报流程') {
             node = <TotalForm
                 onBack={this.onBack.bind(this)}
                 {...this.props}
                 {...this.state}
             />;
+        } else if (FlowName === '每日进度填报流程' && CurrentNodeName === '施工填报') {
+            node = <ActualFormOrigin
+                onBack={this.onBack.bind(this)}
+                {...this.props}
+                {...this.state}
+            />;
         } else if (FlowName === '每日进度填报流程') {
             node = <ActualForm
+                onBack={this.onBack.bind(this)}
+                {...this.props}
+                {...this.state}
+            />;
+        } else if (FlowName === '每周进度填报流程' && CurrentNodeName === '施工填报') {
+            node = <WeekFormOrigin
                 onBack={this.onBack.bind(this)}
                 {...this.props}
                 {...this.state}
@@ -298,7 +395,7 @@ class TaskDetail extends Component {
                                         {
                                             item.CurrentNodeName !== '施工填报' ? <div>
                                                 {
-                                                    item.FormValues && item.FormValues.length ? <div>意见:{
+                                                    item.FormValues && item.FormValues.length ? <div>意见：{
                                                         item.FormValues[0].FormParams && item.FormValues[0].FormParams.length && item.FormValues[0].FormParams[0].Val
                                                     }</div> : ''
                                                 }
@@ -328,7 +425,27 @@ class TaskDetail extends Component {
                                                 })
                                             })</span>
                                         </div>
-                                    } />;
+                                    } description={<div>
+                                        {
+                                            item.CurrentNodeName !== '施工填报' ? <div>
+                                                {
+                                                    item.FormValues && item.FormValues.length ? <div>意见：{
+                                                        item.FormValues[0].FormParams && item.FormValues[0].FormParams.length && item.FormValues[0].FormParams[0].Val
+                                                    }</div> : ''
+                                                }
+                                            </div> : ''
+                                        }
+                                        <div>
+                                            <span>
+                                                {item.CurrentNodeName}人：
+                                                {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
+                                            </span>
+                                            <span style={{marginLeft: 20}}>
+                                                {item.CurrentNodeName}时间：
+                                                {item.RunTime}
+                                            </span>
+                                        </div>
+                                    </div>} />;
                                 } else {
                                     if (item.ExecutorObj) {
                                         if (item.ExecutorObj && item.ExecutorObj.ID === getUser().ID) {

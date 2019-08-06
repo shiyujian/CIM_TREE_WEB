@@ -7,6 +7,7 @@ import {
     Col,
     Input,
     DatePicker,
+    InputNumber,
     Divider,
     Notification
 } from 'antd';
@@ -26,14 +27,36 @@ class WeekDetail extends Component {
     constructor (props) {
         super(props);
         this.state = {
-
+            startDate: '', // 开始日期
+            endDate: '', // 结束日期
+            disabled: '' // 禁用
         };
     }
-    render () {
+    componentDidMount () {
         const {
+            WFState,
             param,
             TableList
         } = this.props;
+        console.log('componentDidMount', WFState, param, TableList);
+        let disabled = true;
+        if (WFState === 4) {
+            // 需要重新填报
+            disabled = false;
+        }
+        this.setState({
+            startDate: param.StartDate,
+            endDate: param.EndDate,
+            disabled
+        });
+    }
+    render () {
+        const {
+            TableList,
+            param
+        } = this.props;
+        const { startDate, endDate, disabled } = this.state;
+        
         return (<div>
             <Form {...formItemLayout} layout='inline'>
                 <Row>
@@ -52,9 +75,11 @@ class WeekDetail extends Component {
                         >
                             <DatePicker
                                 style={{width: 220}}
-                                disabled
-                                value={moment(param.StartDate, dateFormat)}
+                                disabled={disabled}
+                                disabledDate={this.disabledStartDate.bind(this)}
+                                value={moment(startDate, dateFormat)}
                                 format={dateFormat}
+                                onChange={this.handleStartDate.bind(this)}
                             />
                         </FormItem>
                     </Col>
@@ -64,9 +89,11 @@ class WeekDetail extends Component {
                         >
                             <DatePicker
                                 style={{width: 220}}
-                                disabled
-                                value={moment(param.EndDate, dateFormat)}
+                                disabled={disabled}
+                                disabledDate={this.disabledEndDate.bind(this)}
+                                value={moment(endDate, dateFormat)}
                                 format={dateFormat}
+                                onChange={this.handleEndDate.bind(this)}
                             />
                         </FormItem>
                     </Col>
@@ -85,6 +112,38 @@ class WeekDetail extends Component {
                 </Row>
             </Form>
         </div>);
+    }
+    handleStartDate (date, dateString) {
+        const { endDate } = this.state;
+        this.setState({
+            startDate: dateString
+        }, () => {
+            this.props.setTableDate(dateString, endDate);
+        });
+    }
+    handleEndDate (date, dateString) {
+        const { startDate } = this.state;
+        this.setState({
+            endDate: dateString
+        }, () => {
+            this.props.setTableDate(startDate, dateString);
+        });
+    }
+    disabledStartDate (currentDate) {
+        const { endDate } = this.state;
+        if (!currentDate || !endDate) {
+            return false;
+        }
+        let weekDay = moment(endDate).subtract(7, 'days');
+        return (currentDate.valueOf() <= weekDay.valueOf()) || ((currentDate.valueOf() > moment(endDate).valueOf()));
+    }
+    disabledEndDate (currentDate) {
+        const { startDate } = this.state;
+        if (!currentDate || !startDate) {
+            return false;
+        }
+        let weekDay = moment(startDate).add(7, 'days');
+        return (currentDate.valueOf() >= weekDay.valueOf()) || (currentDate.valueOf() < moment(startDate).valueOf());
     }
     columns = [
         {
@@ -107,11 +166,12 @@ class WeekDetail extends Component {
             key: 'planTreeNum',
             width: '34%',
             render: (text, record, index) => {
-                if (record && record.planTreeNum) {
-                    return <span>{record.planTreeNum}</span>;
-                } else {
-                    return <span>0</span>;
-                }
+                const {disabled} = this.state;
+                return (<InputNumber
+                    disabled={disabled}
+                    value={record.planTreeNum}
+                    onChange={this.props.handlePlanTreeNumChage.bind(this, index)}
+                />);
             }
         }
     ]

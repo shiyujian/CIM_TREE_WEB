@@ -22,53 +22,16 @@ const formItemLayout = {
         sm: { span: 16 }
     }
 };
-class WeekForm extends Component {
+class WeekFormOrigin extends Component {
     constructor (props) {
         super(props);
         this.state = {
 
         };
     }
-    getOpinion () {
-        const {
-            CurrentNodeName,
-            ownerList,
-            form: { getFieldDecorator }
-        } = this.props;
-        let node = '';
-        if (CurrentNodeName === '业主查看') {
-
-        } else {
-            node = <Row style={{marginTop: 20}}>
-                <Col span={24}>
-                    <Form.Item
-                        {...formItemLayout}
-                        label='业主查看人'
-                    >
-                        {getFieldDecorator('NextPeople', {
-                            rules: [
-                                {
-                                    required: true,
-                                    message: '请选择业主查看人'
-                                }
-                            ]
-                        })(
-                            <Select style={{width: 400}}>
-                                {
-                                    ownerList.length > 0 ? ownerList.map(item => {
-                                        return <Option value={item.ID} key={item.ID}>{item.Full_Name}</Option>;
-                                    }) : ''
-                                }
-                            </Select>
-                        )}
-                    </Form.Item>
-                </Col>
-            </Row>;
-        }
-        return node;
-    }
     render () {
         const {
+            auditorList,
             form: { getFieldDecorator }
         } = this.props;
         return (<div>
@@ -77,18 +40,31 @@ class WeekForm extends Component {
                     <Col span={24}>
                         <Form.Item
                             {...formItemLayout}
-                            label='处理意见'
+                            label='监理审核人'
                         >
-                            {getFieldDecorator('Opinion', {
+                            {getFieldDecorator('NextPeople', {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: '请选择监理审核人'
+                                    }
+                                ]
                             })(
-                                <Input style={{width: 400}} placeholder='请输入处理意见' />
+                                <Select style={{width: 400}}>
+                                    {
+                                        auditorList.length && auditorList.length > 0 ? auditorList.map(item => {
+                                            return <Option
+                                                value={item.ID}
+                                                key={item.ID}>
+                                                {`${item.Full_Name}(${item.User_Name})`}
+                                            </Option>;
+                                        }) : ''
+                                    }
+                                </Select>
                             )}
                         </Form.Item>
                     </Col>
                 </Row>
-                {
-                    this.getOpinion()
-                }
                 <Row style={{marginTop: 20}}>
                     <Col span={24} style={{textAlign: 'center'}}>
                         <Button
@@ -96,10 +72,7 @@ class WeekForm extends Component {
                             onClick={this.handleSubmit.bind(this)}
                             style={{ marginRight: 20 }}
                         >
-                            同意
-                        </Button>
-                        <Button onClick={this.handleReject.bind(this)}>
-                            退回
+                            重新提交
                         </Button>
                     </Col>
                 </Row>;
@@ -116,18 +89,32 @@ class WeekForm extends Component {
             Executor,
             TableList,
             Section,
+            startDate,
+            endDate,
             actions: {postSendwork, postWeekPlanSchedule},
             form: { validateFields }
         } = this.props;
         console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
+                console.log('下一执行人', Section, TableList, startDate, endDate, values.NextPeople);
                 let FormParams = [{
-                    Key: 'Opinion',
+                    Key: 'Section', // 标段
                     FieldType: 0,
-                    Val: values.Opinion || ''
+                    Val: Section
+                }, {
+                    Key: 'StartDate', // 开始时间
+                    FieldType: 0,
+                    Val: startDate
+                }, {
+                    Key: 'EndDate', // 结束时间
+                    FieldType: 0,
+                    Val: endDate
+                }, {
+                    Key: 'TableInfo', // 列表信息
+                    FieldType: 2,
+                    Val: JSON.stringify(TableList)
                 }];
-                console.log('下一执行人', values.NextPeople);
                 let params = {
                     FlowID, // 流程ID
                     FlowName, // 流程名称
@@ -182,56 +169,5 @@ class WeekForm extends Component {
             }
         });
     }
-    handleReject () {
-        const {
-            Starter,
-            FlowID,
-            FlowName,
-            originNodeID,
-            WorkID,
-            CurrentNode,
-            CurrentNodeName,
-            Executor,
-            actions: {postBackwork},
-            form: { validateFields }
-        } = this.props;
-        console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
-        validateFields((err, values) => {
-            if (!err) {
-                
-            }
-            let FormParams = [{
-                Key: 'Opinion',
-                FieldType: 0,
-                Val: values.Opinion
-            }];
-            let params = {
-                FlowID, // 流程ID
-                FlowName, // 流程名称
-                WorkID, // 任务ID
-                CurrentNode, // 当前节点
-                CurrentNodeName, // 当前节点名称
-                FormValue: {
-                    FormParams: FormParams,
-                    NodeID: '' // 下一节点ID
-                }, // 表单值
-                NextExecutor: Starter, // 下一节点执行人
-                BackNode: originNodeID,
-                Executor // 当前节点执行人
-            };
-            postBackwork({}, params).then(rep => {
-                if (rep.code === 1) {
-                    notification.success({
-                        message: '退回成功'
-                    });
-                    this.props.onBack();
-                } else {
-                    notification.error({
-                        message: '退回失败'
-                    });
-                }
-            });
-        });
-    }
 }
-export default Form.create()(WeekForm);
+export default Form.create()(WeekFormOrigin);

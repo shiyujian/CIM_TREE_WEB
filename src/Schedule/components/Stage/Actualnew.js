@@ -10,7 +10,8 @@ import {
     Select,
     DatePicker,
     notification,
-    Popconfirm
+    Popconfirm,
+    InputNumber
 } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -194,7 +195,7 @@ class ActualNew extends Component {
             key: 'actualNum',
             render: (text, record, index) => {
                 return (
-                    <Input
+                    <InputNumber
                         value={record.actualNum || 0}
                         onChange={this.handleActualNumChange.bind(this, index)}
                     />
@@ -495,12 +496,12 @@ class ActualNew extends Component {
         });
     }
     // 实际数量的输入
-    handleActualNumChange = (index, e) => {
+    handleActualNumChange = (index, value) => {
         const {
             TableList
         } = this.state;
         try {
-            TableList[index].actualNum = e.target.value;
+            TableList[index].actualNum = value;
             this.setState({
                 TableList
             });

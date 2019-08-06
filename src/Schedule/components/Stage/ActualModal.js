@@ -195,6 +195,40 @@ export default class ActualModal extends Component {
                                                 </div>
                                             } />;
                                         }
+                                    } else if (item.ExecuteState === 2) {
+                                        // 退回
+                                        return <Step title={
+                                            <div>
+                                                <span>{item.CurrentNodeName}</span>
+                                                <span style={{marginLeft: 10}}>-({
+                                                    ExecuteStateList.map(row => {
+                                                        if (row.value === item.ExecuteState) {
+                                                            return row.label;
+                                                        }
+                                                    })
+                                                })</span>
+                                            </div>
+                                        } description={<div>
+                                            {
+                                                item.CurrentNodeName !== '施工填报' ? <div>
+                                                    {
+                                                        item.FormValues && item.FormValues.length ? <div>意见：{
+                                                            item.FormValues[0].FormParams && item.FormValues[0].FormParams.length && item.FormValues[0].FormParams[0].Val
+                                                        }</div> : ''
+                                                    }
+                                                </div> : ''
+                                            }
+                                            <div>
+                                                <span>
+                                                    {item.CurrentNodeName}人：
+                                                    {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
+                                                </span>
+                                                <span style={{marginLeft: 20}}>
+                                                    {item.CurrentNodeName}时间：
+                                                    {item.RunTime}
+                                                </span>
+                                            </div>
+                                        </div>} />;
                                     } else {
                                         if (item.ExecutorObj) {
                                             // 未结束

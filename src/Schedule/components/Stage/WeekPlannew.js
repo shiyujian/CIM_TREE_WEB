@@ -10,7 +10,7 @@ import {
     Modal,
     Select,
     DatePicker,
-    Upload,
+    InputNumber,
     notification,
     Popconfirm
 } from 'antd';
@@ -162,7 +162,7 @@ class WeekPlanNew extends Component {
             width: '34%',
             render: (text, record, index) => {
                 return (
-                    <Input
+                    <InputNumber
                         value={record.planTreeNum || 0}
                         onChange={this.handlePlanTreeNumChage.bind(this, index)}
                     />
@@ -534,12 +534,12 @@ class WeekPlanNew extends Component {
         this.setState({ visibleLook: true, workID });
     }
     // 计划栽植量的输入
-    handlePlanTreeNumChage = (index, e) => {
+    handlePlanTreeNumChage = (index, value) => {
         const {
             TableList
         } = this.state;
         try {
-            TableList[index].planTreeNum = e.target.value;
+            TableList[index].planTreeNum = value;
             this.setState({
                 TableList
             });

@@ -7,7 +7,7 @@ import {
     Col,
     Input,
     DatePicker,
-    Divider,
+    InputNumber,
     Notification
 } from 'antd';
 const dateFormat = 'YYYY-MM-DD';
@@ -26,14 +26,29 @@ class ActualDetail extends Component {
     constructor (props) {
         super(props);
         this.state = {
-
+            todayDate: '', // 日期
+            disabled: ''
         };
+    }
+    componentDidMount () {
+        const {
+            WFState
+        } = this.props;
+        let disabled = true;
+        if (WFState === 4) {
+            // 需要重新填报
+            disabled = false;
+        }
+        this.setState({
+            disabled
+        });
     }
     render () {
         const {
             param,
             TableList
         } = this.props;
+        const { disabled } = this.state;
         return (<div>
             <Form {...formItemLayout} layout='inline'>
                 <Row gutter={15}>
@@ -50,9 +65,10 @@ class ActualDetail extends Component {
                         >
                             <DatePicker
                                 style={{width: 220}}
-                                disabled
+                                disabled={disabled}
                                 value={moment(param.TodayDate, dateFormat)}
                                 format={dateFormat}
+                                onChange={this.props.handleTodayDate.bind(this)}
                             />
                         </FormItem>
                     </Col>
@@ -113,11 +129,12 @@ class ActualDetail extends Component {
             dataIndex: 'actualNum',
             key: 'actualNum',
             render: (text, record, index) => {
-                if (record && record.actualNum) {
-                    return <span>{record.actualNum}</span>;
-                } else {
-                    return <span>0</span>;
-                }
+                return (
+                    <InputNumber
+                        value={record.actualNum || 0}
+                        onChange={this.props.handleActualNumChange.bind(this, index)}
+                    />
+                );
             }
         }
     ];
