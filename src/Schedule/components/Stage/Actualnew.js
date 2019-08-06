@@ -328,7 +328,7 @@ class Actual extends Component {
                                         )(
                                             <Input
                                                 style={{width: 220}}
-                                                placeholder='请输入'
+                                                placeholder='请输入任务名称'
                                             />
                                         )}
                                     </FormItem>
@@ -351,7 +351,7 @@ class Actual extends Component {
                                             <Select
                                                 disabled
                                                 style={{width: 220}}
-                                                placeholder='请选择流程类型'
+                                                placeholder='请输入标段'
                                                 allowClear
                                             >
                                                 {sectionArray.map(item => {
