@@ -69,6 +69,10 @@ class Actual extends Component {
         this.getWorkList = this.getWorkList.bind(this); // 获取任务
         this.onSearch = this.onSearch.bind(this); // 查询
     }
+    static layout = {
+        labelCol: { span: 6 },
+        wrapperCol: { span: 18 }
+    };
     async componentDidMount () {
         this.getSection(); // 获取当前登陆用户的标段
         this.getFlowList(); // 获取流程
@@ -229,6 +233,14 @@ class Actual extends Component {
             this.getWorkList(params);
         });
     }
+    clear () {
+        this.props.form.setFieldsValue({
+            status: undefined,
+            submitDate: undefined,
+            section: undefined
+        });
+        this.onSearch();
+    }
     render () {
         const {
             TableList,
@@ -254,52 +266,100 @@ class Actual extends Component {
                         onok={this.totleCancle.bind(this)}
                     />
                 )}
-                <Form layout='inline'>
-                    <FormItem label='标段'>
-                        {getFieldDecorator('section')(
-                            <Select
-                                allowClear
-                                placeholder='请选择标段'
-                                style={{width: 220}}
-                            >
-                                {sectionArray.map(item => {
-                                    return <Option value={item.No} key={item.No}>{item.Name}</Option>;
-                                })}
-                            </Select>
-                        )}
-                    </FormItem>
-                    <FormItem label='提交时间'>
-                        {getFieldDecorator('submitDate')(
-                            <RangePicker
-                                size='default'
-                                format={dateFormat}
-                                style={{
-                                    width: '100%',
-                                    height: '100%'
-                                }}
-                            />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        label='流程状态'
-                    >
-                        {getFieldDecorator('status')(
-                            <Select
-                                style={{width: 220}}
-                                placeholder='请选择流程类型'
-                                allowClear
-                            >
-                                {WFStatusList.map(item => {
-                                    return <Option key={item.value} value={item.value}>
-                                        {item.label}
-                                    </Option>;
-                                })}
-                            </Select>
-                        )}
-                    </FormItem>
+
+                <Form>
+                    <Row>
+                        <Col span={20}>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...Actual.layout}
+                                        label='标段'>
+                                        {
+                                            getFieldDecorator('section')(
+                                                <Select
+                                                    allowClear
+                                                    placeholder='请选择标段'
+                                                    // style={{width: 220}}
+                                                >
+                                                    {sectionArray.map(item => {
+                                                        return <Option value={item.No} key={item.No}>{item.Name}</Option>;
+                                                    })}
+                                                </Select>
+                                            )
+                                        }
+                                    </FormItem>
+                                </Col>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...Actual.layout}
+                                        label='提交时间'>
+                                        {
+                                            getFieldDecorator('submitDate')(
+                                                <RangePicker
+                                                    size='default'
+                                                    format={dateFormat}
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%'
+                                                    }}
+                                                />
+                                            )
+                                        }
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span={12}>
+                                    <FormItem
+                                        label='流程状态'
+                                        {...Actual.layout}
+                                    >
+                                        {getFieldDecorator('status')(
+                                            <Select
+                                                // style={{width: 220}}
+                                                placeholder='请选择流程类型'
+                                                allowClear
+                                            >
+                                                {WFStatusList.map(item => {
+                                                    return <Option key={item.value} value={item.value}>
+                                                        {item.label}
+                                                    </Option>;
+                                                })}
+                                            </Select>
+                                        )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </Col>
+                        <Col span={3} offset={1}>
+                            <Row>
+                                <FormItem>
+                                    <Button
+                                        type='primary'
+                                        onClick={this.onSearch.bind(this)}
+                                    >
+                                            查询
+                                    </Button>
+                                </FormItem>
+                            </Row>
+                            <Row>
+                                <FormItem>
+                                    <Button onClick={this.clear.bind(this)}>
+                                            清除
+                                    </Button>
+                                </FormItem>
+                            </Row>
+                        </Col>
+                    </Row>
+
                 </Form>
-                <Button type='primary' onClick={this.onSearch.bind(this)}>查询</Button>
-                <Button style={{marginLeft: 20}} onClick={this.onAdd.bind(this)}>新增</Button>
+                <Button
+                    type='primary'
+                    style={{marginBottom: 10}}
+                    onClick={this.onAdd.bind(this)}>
+                        新增
+                </Button>
                 <Table
                     columns={this.columns}
                     dataSource={this.state.workDataList}

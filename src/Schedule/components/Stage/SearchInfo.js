@@ -188,7 +188,7 @@ export default class SearchInfo extends Component {
                         <Row>
                             <FormItem>
                                 <Button
-                                    type='Primary'
+                                    type='primary'
                                     onClick={this.query.bind(this)}
                                 >
                                     查询
