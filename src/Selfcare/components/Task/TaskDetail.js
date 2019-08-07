@@ -99,11 +99,9 @@ class TaskDetail extends Component {
         getUsers({}, {
             keyword: '',
             role: ownerID,
-            status: 1,
-            page: 1,
-            page_size: 20
+            status: 1
         }).then(rep => {
-            ownerList = rep.content;
+            ownerList = (rep && rep.content) || [];
             this.setState({
                 ownerList
             });
@@ -111,73 +109,14 @@ class TaskDetail extends Component {
         getUsers({}, {
             role: supervisorID,
             section: user.section,
-            status: 1,
-            page: '',
-            size: ''
+            status: 1
         }).then(rep => {
-            auditorList = rep.content;
+            auditorList = (rep && rep.content) || [];
             this.setState({
                 auditorList
             });
         });
     }
-    // getNextPeople = async () => {
-    //     const {
-    //         actions: {
-    //             getUsers,
-    //             getRoles
-    //         }
-    //     } = this.props;
-
-    //     let roles = await getRoles();
-    //     console.log('身份---------------', roles);
-    //     let postRoleData = [];
-    //     roles.map((role) => {
-    //         if (role && role.ID && role.ParentID && role.RoleName === '业主文书') {
-    //             postRoleData = role.ID;
-    //         }
-    //     });
-    //     console.log('身份postRoleData', postRoleData);
-    //     try {
-    //         let results = [];
-    //         await OWNERCHECKLIST.map(async (owner) => {
-    //             let postdata = {
-    //                 keyword: owner,
-    //                 role: postRoleData,
-    //                 status: 1,
-    //                 page: 1,
-    //                 page_size: 20
-    //             };
-    //             let userList = await getUsers({}, postdata);
-    //             console.log('身份userList', userList);
-    //             if (userList && userList.code && userList.code === 200) {
-    //                 results = results.concat((userList && userList.content) || []);
-    //                 let total = userList.pageinfo.total;
-    //                 if (total > 20) {
-    //                     for (let i = 0; i < (total / 20) - 1; i++) {
-    //                         postdata = {
-    //                             keyword: owner,
-    //                             role: postRoleData,
-    //                             status: 1,
-    //                             page: i + 2,
-    //                             page_size: 20
-    //                         };
-    //                         let datas = await getUsers({}, postdata);
-    //                         if (datas && datas.code && datas.code === 200) {
-    //                             results = results.concat((datas && datas.content) || []);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //             console.log('results', results);
-    //             this.setState({
-    //                 users: results
-    //             });
-    //         });
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
     getWorkDetails () {
         const { getWorkDetails } = this.props.actions;
         const { task_id = '' } = this.props.match.params;

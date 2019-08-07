@@ -12,16 +12,6 @@ import {
 } from 'antd';
 const dateFormat = 'YYYY-MM-DD';
 const FormItem = Form.Item;
-const formItemLayout = {
-    labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 }
-    },
-    wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 }
-    }
-};
 class ActualDetail extends Component {
     constructor (props) {
         super(props);
@@ -83,13 +73,18 @@ class ActualDetail extends Component {
             disabled
         } = this.state;
 
+        const formItemLayout = {
+            labelCol: { span: 8 },
+            wrapperCol: { span: 16 }
+        };
         let sectionName = this.getSectionName(param.Section);
         return (<div>
-            <Form {...formItemLayout} layout='inline'>
+            <Form>
                 <Row gutter={15}>
                     <Col span={12}>
                         <FormItem
                             label='标段:'
+                            {...formItemLayout}
                         >
                             <Input
                                 value={sectionName}
@@ -100,8 +95,10 @@ class ActualDetail extends Component {
                     <Col span={12}>
                         <FormItem
                             label='日期'
+                            {...formItemLayout}
                         >
                             <DatePicker
+                                allowClear={false}
                                 style={{width: 220}}
                                 disabled={disabled}
                                 value={moment(param.TodayDate, dateFormat)}

@@ -56,7 +56,11 @@ class WeekForm extends Component {
                             <Select style={{width: 400}}>
                                 {
                                     ownerList.length > 0 ? ownerList.map(item => {
-                                        return <Option value={item.ID} key={item.ID}>{item.Full_Name}</Option>;
+                                        return <Option
+                                            value={item.ID}
+                                            key={item.ID}>
+                                            {`${item.Full_Name}(${item.User_Name})`}
+                                        </Option>;
                                     }) : ''
                                 }
                             </Select>
@@ -143,7 +147,7 @@ class WeekForm extends Component {
                 };
                 console.log('入库数据', CurrentNodeName, Section, TableList);
                 postSendwork({}, params).then(rep => {
-                    if (rep.code === 1) {
+                    if (rep && rep.code && rep.code === 1) {
                         if (CurrentNodeName === '业主查看') {
                             // 入库数据
                             let paramsArr = [];
@@ -155,8 +159,8 @@ class WeekForm extends Component {
                                 });
                             });
                             console.log('入库数据', paramsArr);
-                            postWeekPlanSchedule({}, paramsArr).then(rep => {
-                                if (rep.code === 1) {
+                            postWeekPlanSchedule({}, paramsArr).then(rst => {
+                                if (rst && rst.code && rst.code === 1) {
                                     notification.success({
                                         message: '提交成功，计划栽植量已入库'
                                     });
@@ -198,7 +202,7 @@ class WeekForm extends Component {
         console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
-                
+
             }
             let FormParams = [{
                 Key: 'Opinion',
@@ -220,7 +224,7 @@ class WeekForm extends Component {
                 Executor // 当前节点执行人
             };
             postBackwork({}, params).then(rep => {
-                if (rep.code === 1) {
+                if (rep && rep.code && rep.code === 1) {
                     notification.success({
                         message: '退回成功'
                     });

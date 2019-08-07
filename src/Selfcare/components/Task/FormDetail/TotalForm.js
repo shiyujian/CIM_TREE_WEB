@@ -95,7 +95,7 @@ class TotalForm extends Component {
                 Executor // 当前节点执行人
             };
             postSendwork({}, params).then(rep => {
-                if (rep.code === 1) {
+                if (rep && rep.code && rep.code === 1) {
                     notification.success({
                         message: '提交成功'
                     });
@@ -141,7 +141,7 @@ class TotalForm extends Component {
                 Executor // 当前节点执行人
             };
             postBackwork({}, params).then(rep => {
-                if (rep.code === 1) {
+                if (rep && rep.code && rep.code === 1) {
                     notification.success({
                         message: '提交成功'
                     });

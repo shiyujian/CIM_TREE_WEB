@@ -8,7 +8,6 @@ const RadioButton = Radio.Button;
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
-const dateFormat = 'YYYY-MM-DD';
 let WFStatus = [{
     value: 0,
     label: '草稿中'
@@ -32,7 +31,6 @@ class TaskList extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            initiatorList: [], // 发起人列表
             workDetails: {}, // 任务详情
             processList: [], // 待办列表
             finishList: [], // 已办列表
@@ -41,57 +39,14 @@ class TaskList extends Component {
             loadingProcess: false, // 待办loading
             loadingFinish: false // 待办loading
         };
-        this.getInitiatorList = this.getInitiatorList.bind(this); // 获取发起人列表
         this.getProcessList = this.getProcessList.bind(this); // 获取待办列表
         this.getFinishList = this.getFinishList.bind(this); // 获取已办列表
         this.getFlowList = this.getFlowList.bind(this); // 获取任务列表
     }
     componentDidMount () {
-        this.getInitiatorList(); // 获取发起人列表
         this.getFlowList();
         this.getProcessList();
         this.getFinishList();
-    }
-    getInitiatorList () {
-        const {
-            actions: {
-                getUsers,
-                getRoles
-            }
-        } = this.props;
-        let user = getUser();
-        getRoles().then(rep => {
-            let RoleID = '';
-            rep.map(item => {
-                if (item.RoleName === '施工文书') {
-                    RoleID = item.ID;
-                }
-            });
-            console.log('获取发起人', user, rep);
-            getUsers({}, {
-                role: RoleID,
-                section: user.section,
-                status: 1,
-                page: '',
-                size: ''
-            }).then(res => {
-                if (res.code === 200) {
-                    let initiatorList = [];
-                    res.content.map(item => {
-                        initiatorList.push({
-                            value: item.ID,
-                            Full_Name: item.Full_Name,
-                            User_Name: item.User_Name
-                        });
-                    });
-                    this.setState({
-                        initiatorList
-                    });
-                }
-                console.log('获取人', res);
-            });
-        });
-        console.log('获取发起人section', user.section);
     }
     getProcessList () { // 获取待办
         this.setState({
@@ -105,8 +60,8 @@ class TaskList extends Component {
                 let stime = '';
                 let etime = '';
                 if (values.startTime && values.startTime.length) {
-                    stime = moment(values.startTime[0]).format(dateFormat);
-                    etime = moment(values.startTime[1]).format(dateFormat);
+                    stime = moment(values.startTime[0]).format('YYYY-MM-DD HH:mm:ss');
+                    etime = moment(values.startTime[1]).format('YYYY-MM-DD HH:mm:ss');
                 }
                 let params = {
                     workid: '', // 任务ID
@@ -123,7 +78,7 @@ class TaskList extends Component {
                     size: '' // 页数
                 };
                 getWorkList({}, params).then(rep => {
-                    if (rep.code === 200) {
+                    if (rep && rep.code && rep.code === 200) {
                         let processList = []; // 待办列表
                         rep.content.map(item => {
                             processList.push(item);
@@ -145,8 +100,8 @@ class TaskList extends Component {
                 let stime = '';
                 let etime = '';
                 if (values.startTime && values.startTime.length) {
-                    stime = moment(values.startTime[0]).format(dateFormat);
-                    etime = moment(values.startTime[1]).format(dateFormat);
+                    stime = moment(values.startTime[0]).format('YYYY-MM-DD HH:mm:ss');
+                    etime = moment(values.startTime[1]).format('YYYY-MM-DD HH:mm:ss');
                 }
                 console.log('值', values.startTime);
                 let params = {
@@ -164,7 +119,7 @@ class TaskList extends Component {
                     size: '' // 页数
                 };
                 getWorkList({}, params).then(rep => {
-                    if (rep.code === 200) {
+                    if (rep && rep.code && rep.code === 200) {
                         let finishList = []; // 已办列表
                         rep.content.map(item => {
                             finishList.push(item);
@@ -186,7 +141,7 @@ class TaskList extends Component {
             page: '', // 页码
             size: ''
         }).then(rep => {
-            if (rep.code === 1) {
+            if (rep && rep.code && rep.code === 1) {
                 console.log(rep.content, 'flow数据');
                 this.setState({
                     flowDataList: rep.content
@@ -199,7 +154,18 @@ class TaskList extends Component {
         this.getFinishList(); // 获取已办
     }
     onClear () {
-
+        const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        setFieldsValue({
+            name: undefined,
+            type: undefined,
+            startTime: undefined
+        });
+        this.getProcessList(); // 获取待办
+        this.getFinishList(); // 获取已办
     }
     onChangeTable () {
 
@@ -211,11 +177,13 @@ class TaskList extends Component {
             type,
             flowDataList,
             processList,
-            finishList,
-            initiatorList
+            finishList
         } = this.state;
         const { getFieldDecorator } = this.props.form;
-        console.log('initiatorList', initiatorList);
+        const formItemLayout = {
+            labelCol: { span: 8 },
+            wrapperCol: { span: 16 }
+        };
         return (
             <div>
                 <div style={{textAlign: 'center', marginBottom: 20}}>
@@ -229,68 +197,87 @@ class TaskList extends Component {
                     </RadioGroup>
                 </div>
                 <div>
-                    <Form layout='inline'>
-                        <FormItem label='任务名称'>
-                            {getFieldDecorator('name')(
-                                <Input placeholder='请输入任务名称' />
-                            )}
-                        </FormItem>
-                        <FormItem label='任务类型'>
-                            {getFieldDecorator('type')(
-                                <Select
-                                    style={{ width: 180 }}
-                                    placeholder='请选择任务类型'
-                                    allowClear
-                                >
-                                    {flowDataList.map(item => {
-                                        return (
-                                            <Option
-                                                key={item.ID}
-                                                value={item.ID}
-                                            >
-                                                {item.Name}
-                                            </Option>
-                                        );
-                                    })}
-                                </Select>
-                            )}
-                        </FormItem>
-                        <FormItem label='发起人'>
-                            {getFieldDecorator('starter')(
-                                <Select
-                                    showSearch
-                                    allowClear
-                                    style={{ width: 180 }}
-                                    placeholder='请选择发起人'
-                                    optionFilterProp='children'
-                                >
-                                    {
-                                        initiatorList.map(item => {
-                                            return <Option
-                                                value={item.value}
-                                                key={item.value}>
-                                                {`${item.Full_Name}(${item.User_Name})`}
-                                            </Option>;
-                                        })
-                                    }
-                                </Select>
-                            )}
-                        </FormItem>
-                        <FormItem label='发起时间'>
-                            {getFieldDecorator('startTime', {
-                                initialValue: []
-                            })(
-                                <RangePicker
-                                    size='default'
-                                    format={dateFormat}
-                                />
-                            )}
-                        </FormItem>
-                        <FormItem>
-                            <Button type='primary' onClick={this.onSearch.bind(this)}>
-                                查询
-                            </Button>
-                        </FormItem>
+                    <Form>
+                        <Row>
+                            <Col span={20}>
+                                <Row>
+                                    <Col span={12}>
+                                        <FormItem
+                                            {...formItemLayout}
+                                            label='任务名称'>
+                                            {
+                                                getFieldDecorator('name')(
+                                                    <Input placeholder='请输入任务名称' />
+                                                )
+                                            }
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={12}>
+                                        <FormItem
+                                            {...formItemLayout}
+                                            label='任务类型'>
+                                            {
+                                                getFieldDecorator('type')(
+                                                    <Select
+                                                        style={{ width: '100%' }}
+                                                        placeholder='请选择任务类型'
+                                                        allowClear
+                                                    >
+                                                        {flowDataList.map(item => {
+                                                            return (
+                                                                <Option
+                                                                    key={item.ID}
+                                                                    value={item.ID}
+                                                                >
+                                                                    {item.Name}
+                                                                </Option>
+                                                            );
+                                                        })}
+                                                    </Select>
+                                                )
+                                            }
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={12}>
+                                        <FormItem
+                                            {...formItemLayout}
+                                            label='发起时间'>
+                                            {
+                                                getFieldDecorator('startTime', {
+                                                    initialValue: []
+                                                })(
+                                                    <RangePicker
+                                                        style={{ width: '100%' }}
+                                                        showTime={{ format: 'HH:mm:ss' }}
+                                                        size='default'
+                                                        format='YYYY-MM-DD HH:mm:ss'
+                                                    />
+                                                )
+                                            }
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col span={3} offset={1}>
+                                <Row>
+                                    <FormItem>
+                                        <Button
+                                            type='primary'
+                                            onClick={this.onSearch.bind(this)}
+                                        >
+                                            查询
+                                        </Button>
+                                    </FormItem>
+                                </Row>
+                                <Row>
+                                    <FormItem>
+                                        <Button onClick={this.onClear.bind(this)}>
+                                            清除
+                                        </Button>
+                                    </FormItem>
+                                </Row>
+                            </Col>
+                        </Row>
                     </Form>
                 </div>
                 {

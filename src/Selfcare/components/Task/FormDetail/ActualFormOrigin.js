@@ -93,8 +93,7 @@ class ActualFormOrigin extends Component {
             Starter,
             param,
             actions: {
-                postSendwork,
-                addSchedule
+                postSendwork
             },
             form: { validateFields }
         } = this.props;
@@ -129,44 +128,11 @@ class ActualFormOrigin extends Component {
                     Executor // 当前节点执行人
                 };
                 postSendwork({}, params).then(rep => {
-                    if (rep.code === 1) {
-                        if (CurrentNodeName === '业主查看') {
-                            let items = [];
-                            TableList.map(item => {
-                                items.push({
-                                    Num: Number(item.actualNum),
-                                    Project: item.project,
-                                    WPNo: Section
-                                });
-                            });
-                            let params = {
-                                DocType: 'doc',
-                                Items: items,
-                                ProgressNo: Starter, // 发起人
-                                ProgressTime: param.TodayDate, // 日期
-                                ProgressType: '日实际',
-                                SMS: 0,
-                                UnitProject: Section, // 标段
-                                WPNo: Section.split('-')[0] // 项目
-                            };
-                            addSchedule({}, params).then(rep => {
-                                if (rep.code === 1) {
-                                    notification.success({
-                                        message: '提交成功，人/机投入已入库'
-                                    });
-                                    this.props.onBack();
-                                } else {
-                                    notification.error({
-                                        message: '提交成功，人/机投入未入库'
-                                    });
-                                }
-                            });
-                        } else {
-                            notification.success({
-                                message: '提交成功'
-                            });
-                            this.props.onBack();
-                        }
+                    if (rep && rep.code && rep.code === 1) {
+                        notification.success({
+                            message: '提交成功'
+                        });
+                        this.props.onBack();
                     } else {
                         notification.error({
                             message: '提交失败'

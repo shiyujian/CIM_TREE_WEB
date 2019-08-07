@@ -75,10 +75,7 @@ class WeekDetail extends Component {
     render () {
         const {
             TableList,
-            param,
-            form: {
-                getFieldDecorator
-            }
+            param
         } = this.props;
         const { startDate, endDate, disabled } = this.state;
         const formItemLayout = {
@@ -110,6 +107,7 @@ class WeekDetail extends Component {
                             label='开始日期'
                         >
                             <DatePicker
+                                allowClear={false}
                                 style={{width: 220}}
                                 disabled={disabled}
                                 disabledDate={this.disabledStartDate.bind(this)}
@@ -126,6 +124,7 @@ class WeekDetail extends Component {
                             label='结束日期'
                         >
                             <DatePicker
+                                allowClear={false}
                                 style={{width: 220}}
                                 disabled={disabled}
                                 disabledDate={this.disabledEndDate.bind(this)}

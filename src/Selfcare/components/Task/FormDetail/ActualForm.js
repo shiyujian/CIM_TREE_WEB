@@ -36,7 +36,6 @@ class ActualForm extends Component {
             ownerList,
             form: { getFieldDecorator }
         } = this.props;
-        console.log('ownerList', ownerList);
         let node = '';
         if (CurrentNodeName === '业主查看') {
 
@@ -153,7 +152,7 @@ class ActualForm extends Component {
                     Executor // 当前节点执行人
                 };
                 postSendwork({}, params).then(rep => {
-                    if (rep.code === 1) {
+                    if (rep && rep.code && rep.code === 1) {
                         if (CurrentNodeName === '业主查看') {
                             let items = [];
                             TableList.map(item => {
@@ -173,8 +172,8 @@ class ActualForm extends Component {
                                 UnitProject: Section, // 标段
                                 WPNo: Section.split('-')[0] // 项目
                             };
-                            addSchedule({}, params).then(rep => {
-                                if (rep.code === 1) {
+                            addSchedule({}, params).then(rst => {
+                                if (rst && rst.code && rst.code === 1) {
                                     notification.success({
                                         message: '提交成功，人/机投入已入库'
                                     });
@@ -237,7 +236,7 @@ class ActualForm extends Component {
                 Executor // 当前节点执行人
             };
             postBackwork({}, params).then(rep => {
-                if (rep.code === 1) {
+                if (rep && rep.code && rep.code === 1) {
                     notification.success({
                         message: '退回成功'
                     });
