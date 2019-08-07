@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Modal, Form, Input, Upload, Icon, Row, Col, Button, Notification, Select, Spin } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { UPLOAD_API, SOURCE_API } from '_platform/api';
 import E from 'wangeditor';
 
 let editor;
@@ -23,6 +22,11 @@ class NoticeEditModal extends Component {
     }
 
     componentDidMount () {
+        const {
+            actions: {
+                uploadFileHandler
+            }
+        } = this.props;
         const elem = this.refs.editorElem;
         editor = new E(elem);
         // 使用 onchange 函数监听内容的变化，并实时更新到 state 中
@@ -33,8 +37,6 @@ class NoticeEditModal extends Component {
         };
         editor.customConfig.zIndex = 900;
         editor.customConfig.uploadImgTimeout = 15000;
-        editor.customConfig.uploadImgServer = UPLOAD_API;
-        editor.customConfig.uploadFileName = 'a_file';
         editor.customConfig.uploadImgMaxLength = 1;
         editor.customConfig.uploadImgMaxSize = 5 * 1024 * 1024;
         editor.customConfig.menus = [
@@ -57,21 +59,19 @@ class NoticeEditModal extends Component {
             'undo', // 撤销
             'redo' // 重复
         ];
-        editor.customConfig.uploadImgHooks = {
-            before: function (xhr, editor, files) {
-            },
-            success: function (xhr, editor, result) {
-            },
-            fail: function (xhr, editor, result) {
-            },
-            error: function (xhr, editor) {
-            },
-            timeout: function (xhr, editor) {
-            },
-            customInsert: function (insertImg, result, editor) {
-                let url = SOURCE_API + '/media/' + result.a_file.split('/media/')[1];
-                insertImg(url);
-            }
+        editor.customConfig.customUploadImg = function (files, insert) {
+            console.log('files', files);
+            console.log('file', files[0]);
+
+            const formdata = new FormData();
+            formdata.append('file', files[0]);
+            uploadFileHandler({}, formdata).then((rep) => {
+                if (rep && rep.indexOf('https') !== -1) {
+                    insert(rep);
+                } else {
+                    alert('上传失败');
+                }
+            });
         };
         editor.create();
 

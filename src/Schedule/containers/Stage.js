@@ -3,7 +3,7 @@ import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import './Schedule.less';
-import { PkCodeTree, TotalNew, ActualNew, WeekPlanNew } from '../components/Stage';
+import { PkCodeTree, ActualNew, WeekPlanNew } from '../components/Stage';
 import { Spin, Tabs } from 'antd';
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
@@ -133,9 +133,6 @@ export default class Stage extends Component {
                             <Content>
                                 <div>
                                     <Tabs defaultActiveKey='2'>
-                                        {/* <TabPane tab='总计划进度' key='1'>
-                                            <TotalNew {...this.props} {...this.state} />
-                                        </TabPane> */}
                                         <TabPane tab='每周计划进度' key='2'>
                                             <WeekPlanNew {...this.props} {...this.state} />
                                         </TabPane>

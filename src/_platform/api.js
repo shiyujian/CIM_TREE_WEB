@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-05 19:12:56
+ * @Last Modified time: 2019-08-07 14:50:55
  */
 /**
  *
@@ -56,20 +56,28 @@ STATIC_FILE_IP = window.config.STATIC_FILE_IP;
 export { DOMAIN };
 export const CODE_PROJECT = '森林大数据';
 export const base = `${DOMAIN}`;
-export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
 export const SERVICE_API = `${base}/service/construction/api`;
-export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
-export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
 // 文件预览的接口
 export const previewWord_API = window.config.previewWord_API;
 // 静态资源文件服务==========STATIC_FILE_IP
-export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_DOWNLOAD_PORT
-}`;
+
 export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
     window.config.STATIC_PREVIEW_PORT
 }`;
+
+/**
+ * 资料管理接口（使用原院内接口）
+ */
+export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
+export const FILE_API = `${base}/service/fileserver`;
+export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
+    window.config.STATIC_DOWNLOAD_PORT
+}`;
+
+/**
+ * 资料管理接口（使用原院内接口）
+ */
 
 export const MAIN_API = `${base}/cms`;
 // 高德地图逆坐标查询
@@ -93,6 +101,7 @@ export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const INITLEAFLET_API = window.config.initLeaflet;
 export const TREEPIPE_API = `${window.config.PIPE}`;
+export const UPLOADFOREST_API = `${base}/OSSUploadHandler.ashx`;
 
 // 考勤打卡
 export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
