@@ -184,11 +184,11 @@ export default class WordView1 extends Component {
                                     <td colSpan='1'>{handleDetail.shigong}</td>
                                     <td>设计数量</td>
                                     <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
-                                    <td>抽检数量</td>
+                                    <td>问题上报数量</td>
                                     <td >{`${handleDetail.checkNum} (个)`}</td>
                                 </tr>
                                 <tr>
-                                    <td height='60;' align='center'>抽检合格数量</td>
+                                    <td height='60;' align='center'>整改不合格数量</td>
                                     <td colSpan='3'>{`${handleDetail.hgl} (个)`}</td>
                                     <td >合格率</td>
                                     <td>{`${handleDetail.score}%`}</td>
@@ -203,7 +203,7 @@ export default class WordView1 extends Component {
                                             <span style={{display: 'block'}}> 验收要点：以细班或小班为单位，对浇水进行验收。按照不低于设计数量的5%进行抽检，对苗木浇水情况进行打分。要求苗木栽植后围砌圆形土堰，土堰内径应大于挖穴直径10厘米，土堰深为20～25厘米，培实，蓄水能力强。栽植后24小时内浇透定根水，一周左右浇透第二遍水。每次浇完水后要及时进行覆土封穴。</span>
                                             <span style={{display: 'block'}}>①定根水浇水及时，做到随栽随浇，第二次浇水在一周内完成，每次浇完水后及时进行覆土封穴，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</span>
                                             <span style={{display: 'block'}}>②土堰内径小于挖穴大小，树盘深小于15厘米，即为不合格，须整改。</span>
-                                            <span style={{display: 'block'}}>苗木浇水合格率=抽检合格数量/抽检数量。</span>
+                                            <span style={{display: 'block'}}>苗木浇水合格率=整改合格数量/问题上报数量。</span>
                                         </div>
                                     </td>
                                 </tr>
