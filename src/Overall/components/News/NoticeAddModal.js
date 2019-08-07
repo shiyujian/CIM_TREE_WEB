@@ -86,9 +86,20 @@ class NoticeAddModal extends Component {
             actions: { postNotice, getNoticeList },
             form: { validateFields }
         } = this.props;
+        const {
+            content,
+            fileListNew
+        } = this.state;
+        console.log('content', content);
         validateFields(async (err, values) => {
             if (!err) {
-                const { content, fileListNew } = this.state;
+                if (!content) {
+                    Notification.warning({
+                        message: '请输入通知详情',
+                        duration: 3
+                    });
+                    return;
+                }
                 let fileList = [];
                 fileListNew.map(item => {
                     if (item) {
@@ -142,6 +153,45 @@ class NoticeAddModal extends Component {
             callback();
         }
     }
+    uploadPropsFile = {
+        name: 'a_file',
+        showUploadList: true,
+        action: '',
+        beforeUpload: (file, fileList) => {
+            this.setState({
+                progress: 0,
+                loading: true
+            });
+            let { fileListNew } = this.state;
+            const { uploadFileHandler } = this.props.actions;
+            const formdata = new FormData();
+            formdata.append('file', fileList[0]);
+            uploadFileHandler({}, formdata).then(rep => {
+                file.url = rep;
+                fileListNew.push(file);
+                this.setState({
+                    progress: 1,
+                    loading: false,
+                    fileListNew
+                });
+            });
+            return false;
+        },
+        onRemove: (file) => {
+            let { fileListNew } = this.state;
+            let fileList = [];
+            fileListNew.map(item => {
+                if (item.uid !== file.uid) {
+                    fileList.push(item);
+                }
+            });
+            this.setState({
+                fileListNew: fileList
+            });
+        },
+        onChange: async ({file, fileList}) => {
+        }
+    };
     render () {
         const {
             form: { getFieldDecorator }
@@ -153,48 +203,9 @@ class NoticeAddModal extends Component {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        const uploadPropsFile = {
-            name: 'a_file',
-            showUploadList: true,
-            action: '',
-            fileList: this.state.fileListNew,
-            beforeUpload: (file, fileList) => {
-                let { fileListNew } = this.state;
-                const { uploadFileHandler } = this.props.actions;
-                const formdata = new FormData();
-                formdata.append('file', fileList[0]);
-                uploadFileHandler({}, formdata).then(rep => {
-                    file.url = rep;
-                    fileListNew.push(file);
-                    this.setState({
-                        fileListNew
-                    });
-                });
-                return false;
-            },
-            onRemove: (file) => {
-                let { fileListNew } = this.state;
-                let fileList = [];
-                fileListNew.map(item => {
-                    if (item.uid !== file.uid) {
-                        fileList.push(item);
-                    }
-                });
-                this.setState({
-                    fileListNew: fileList
-                });
-            },
-            onChange: async ({file, fileList}) => {
-                try {
-                    console.log('file', file);
-                    console.log('fileList', fileList);
-                } catch (e) {
-                    console.log('uploadPropsFile', e);
-                }
-            }
-        };
         return (
             <Modal
+                title={'发布通知'}
                 visible
                 onOk={this.modalClick.bind(this)}
                 onCancel={this.modalClick.bind(this)}
@@ -218,7 +229,7 @@ class NoticeAddModal extends Component {
                                         ],
                                         initialValue: ''
                                     })(
-                                        <Input type='text' />
+                                        <Input type='text' placeholder='请输入通知名称' />
                                     )}
                                 </FormItem>
                             </Col>
@@ -227,7 +238,9 @@ class NoticeAddModal extends Component {
                                     {getFieldDecorator('mergency', {
                                         rules: [{ required: true, message: '请选择紧急程度' }]
                                     })(
-                                        (<Select allowClear>
+                                        (<Select
+                                            placeholder='请选择紧急程度'
+                                            allowClear>
                                             <Option value='0'>平件</Option>
                                             <Option value='1'>加急</Option>
                                             <Option value='2'>特急</Option>
@@ -237,7 +250,8 @@ class NoticeAddModal extends Component {
                             </Col>
                             <Col span={5} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
-                                    <Upload {...uploadPropsFile}
+                                    <Upload {...this.uploadPropsFile}
+                                        fileList={this.state.fileListNew}
                                     >
                                         <Button>
                                             <Icon type='upload' />上传附件

@@ -2,7 +2,15 @@ import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Input } from 'antd';
 import L from 'leaflet';
 import moment from 'moment';
-import {handleTrackData, getSectionName, getIconType, genPopUpContent} from '../../auth';
+import {
+    handleTrackData,
+    getSectionName,
+    getIconType,
+    genPopUpContent
+} from '../../auth';
+import {
+    trim
+} from '_platform/auth';
 import './TrackTree.less';
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
@@ -198,6 +206,7 @@ export default class TrackTree extends Component {
             searchDateData
         } = this.state;
         // 如果没有搜索数据，则展示全部数据，并将地图上的图层清空
+        value = trim(value);
         if (!value) {
             this.setState({
                 searchNameData: [],
@@ -334,9 +343,9 @@ export default class TrackTree extends Component {
             for (let i = 0; i < ckeckedData.length; i++) {
                 let child = ckeckedData[i];
                 if (i === ckeckedData.length - 1) {
-                    this.handleTrackAddLayer(child, true);
+                    await this.handleTrackAddLayer(child, true);
                 } else {
-                    this.handleTrackAddLayer(child, false);
+                    await this.handleTrackAddLayer(child, false);
                 }
             }
         } catch (e) {
@@ -353,11 +362,14 @@ export default class TrackTree extends Component {
         const {
             actions: {
                 getMapList,
-                getUserDetail
+                getUserDetail,
+                getTrackTreeLoading
             },
+            platform: {tree = {}},
             map
         } = this.props;
         try {
+            await getTrackTreeLoading(true);
             let selectKey = data.ID;
             if (trackLayerList[selectKey]) {
                 trackLayerList[selectKey].addTo(map);
@@ -365,6 +377,7 @@ export default class TrackTree extends Component {
                     trackMarkerLayerList[selectKey].addTo(map);
                 }
                 if (isFocus) {
+                    await getTrackTreeLoading(false);
                     map.fitBounds(trackLayerList[selectKey].getBounds());
                 }
             } else {
@@ -386,8 +399,9 @@ export default class TrackTree extends Component {
                     };
                     let sectionName = '';
                     if (user && user.Section) {
+                        let bigTreeList = (tree && tree.bigTreeList) || [];
                         let section = user.Section;
-                        sectionName = getSectionName(section);
+                        sectionName = getSectionName(section, bigTreeList);
                     }
 
                     let iconData = {
@@ -412,6 +426,7 @@ export default class TrackTree extends Component {
                 );
                 trackLayerList[selectKey] = polyline;
                 if (isFocus) {
+                    await getTrackTreeLoading(false);
                     map.fitBounds(polyline.getBounds());
                 }
                 this.setState({

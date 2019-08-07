@@ -60,8 +60,11 @@ export default class WeekPlanModal extends Component {
         let sectionData = (tree && tree.bigTreeList) || [];
         let sectionName = '';
         let projectName = '';
-
-        let code = param.Section.split('-');
+        let currentSection = '';
+        if (param && param.Section) {
+            currentSection = param.Section;
+        }
+        let code = currentSection.split('-');
         if (code && code.length === 3) {
             // 获取当前标段所在的项目
             sectionData.map(project => {

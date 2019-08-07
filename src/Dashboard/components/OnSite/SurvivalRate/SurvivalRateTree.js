@@ -43,37 +43,37 @@ export default class SurvivalRateTree extends Component {
     survivalRateOptions = [
         {
             id: 'survivalRateHundred',
-            label: '90~100',
+            label: '90%~100%',
             img: hundredImg
         },
         {
             id: 'survivalRateNinety',
-            label: '80~90',
+            label: '80%~90%',
             img: ninetyImg
         },
         {
             id: 'survivalRateEighty',
-            label: '70~80',
+            label: '70%~80%',
             img: eightyImg
         },
         {
             id: 'survivalRateSeventy',
-            label: '60~70',
+            label: '60%~70%',
             img: seventyImg
         },
         {
             id: 'survivalRateSixty',
-            label: '50~60',
+            label: '50%~60%',
             img: sixtyImg
         },
         {
             id: 'survivalRateFifty',
-            label: '40~50',
+            label: '40%~50%',
             img: fiftyImg
         },
         {
             id: 'survivalRateFourty',
-            label: '0~40',
+            label: '0%~40%',
             img: foutyImg
         }
     ]
@@ -445,7 +445,7 @@ export default class SurvivalRateTree extends Component {
                         smallClassName: areaData.SmallName ? areaData.SmallName : '',
                         thinClassName: areaData.ThinName ? areaData.ThinName : '',
                         treetype: properties.treetype,
-                        SurvivalRate: properties.SurvivalRate,
+                        SurvivalRate: `${(properties && properties.SurvivalRate) || 0}%`,
                         type: 'survivalRate'
                     },
                     type: 'survivalRate'

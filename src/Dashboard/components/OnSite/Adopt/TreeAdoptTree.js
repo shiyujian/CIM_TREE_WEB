@@ -14,6 +14,9 @@ import {
     handleGetAddressByCoordinate,
     getIconType
 } from '../../auth';
+import {
+    trim
+} from '_platform/auth';
 import AdoptTreeMessModal from './AdoptTreeMessModal';
 const TreeNode = Tree.TreeNode;
 const Search = Input.Search;
@@ -185,6 +188,7 @@ export default class TreeAdoptTree extends Component {
         } = this.props;
         try {
             if (value) {
+                value = trim(value);
                 let postdata = {
                     aadopter: value
                 };

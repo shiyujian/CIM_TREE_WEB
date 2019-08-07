@@ -176,7 +176,7 @@ export default class MenuSwitch extends Component {
             await switchDashboardTreeMess('');
             await switchDashboardRightMenu('');
         }
-        // 选择成活率，树种筛选，辅助验收，苗木结缘时，不能够点击图层控制开关
+        // 选择成活率，树种筛选，辅助验收，苗木结缘, 灌溉管网时，不能够点击图层控制开关
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
             dashboardCompomentMenu === 'geojsonFeature_treetype' ||

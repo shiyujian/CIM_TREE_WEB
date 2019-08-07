@@ -588,7 +588,7 @@ class WeekPlanNew extends Component {
                     dataSource={workDataList}
                     className='foresttable'
                     bordered
-                    rowKey='ID'
+                    // rowKey='ID'
                 />
                 <Modal
                     title='新增每周计划进度'

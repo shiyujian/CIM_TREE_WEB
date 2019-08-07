@@ -264,7 +264,7 @@ class NewsTable extends Component {
                         /> : ''
                 }
                 <Modal
-                    title='新闻预览'
+                    title={newsTitle}
                     width='800px'
                     visible={detailVisible}
                     onCancel={this.handleCancel.bind(this)}

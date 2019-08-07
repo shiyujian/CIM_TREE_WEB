@@ -5,6 +5,10 @@ export default () => {
     return !!cookie.get('id');
 };
 
+export const trim = (str) => {
+    return str.replace(/(^\s*)|(\s*$)/g, '');
+};
+
 export const getUser = () => {
     try {
         let user = window.localStorage.getItem('LOGIN_USER_DATA');

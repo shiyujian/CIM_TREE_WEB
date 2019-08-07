@@ -103,25 +103,6 @@ class NoticeEditModal extends Component {
                 'mergency': rep.Notice_Type + '' || ''
             });
         });
-
-        // const {
-        //     noticeDetail,
-        //     form: { setFieldsValue }
-        // } = this.props;
-        // this.setState({
-        //     content: noticeDetail.raw
-        // });
-        // editor.txt.html(noticeDetail.raw);
-        // let annexFile = noticeDetail.attachment && noticeDetail.attachment.fileList
-        //     ? noticeDetail.attachment.fileList : [];
-        // setFieldsValue({
-        //     'title': noticeDetail.title || '',
-        //     'mergency': noticeDetail.degree + '' || '',
-        //     'annexFile': annexFile
-        // });
-        // this.setState({
-        //     annexFileList: annexFile
-        // });
     }
 
     // modal显示与影藏
@@ -135,9 +116,20 @@ class NoticeEditModal extends Component {
             actions: { putNotice, getNoticeList },
             form: { validateFields }
         } = this.props;
+        const {
+            noticeID,
+            fileListNew,
+            content
+        } = this.state;
         validateFields(async (err, values) => {
             if (!err) {
-                const { noticeID, fileListNew, content } = this.state;
+                if (!content) {
+                    Notification.warning({
+                        message: '请输入通知详情',
+                        duration: 3
+                    });
+                    return;
+                }
                 let fileList = [];
                 fileListNew.map(item => {
                     if (item) {
@@ -181,50 +173,6 @@ class NoticeEditModal extends Component {
                 }
             }
         });
-        // validateFields((err, values) => {
-        //     if (!err) {
-        //         let fileList = [];
-        //         if (values && values.annexFile) {
-        //             if (values.annexFile.fileList &&
-        //                 values.annexFile.fileList instanceof Array &&
-        //                 values.annexFile.fileList.length > 0) {
-        //                 fileList = values.annexFile.fileList;
-        //             } else {
-        //                 fileList = values.annexFile;
-        //             }
-        //         }
-        //         let newData = {
-        //             'title': values['title'] || '',
-        //             'raw': this.state.content,
-        //             'degree': values['mergency'],
-        //             'attachment': {
-        //                 'fileList': fileList
-        //             },
-        //             'categories': [],
-        //             'update_time': moment().format('YYYY-MM-DD HH:mm:ss'),
-        //             'is_draft': false
-        //         };
-        //         patchData({ pk: noticeDetail.id }, newData)
-        //             .then(rst => {
-        //                 if (rst.id) {
-        //                     this.modalClick();
-        //                     Notification.success({
-        //                         message: '编辑通知成功',
-        //                         duration: 3
-        //                     });
-        //                     // 更新通知列表数据
-        //                     getTipsList({}, {
-        //                         tag: '公告',
-        //                         is_draft: false
-        //                     });
-        //                     getDraftTipsList({}, {
-        //                         tag: '公告',
-        //                         is_draft: true
-        //                     });
-        //                 }
-        //             });
-        //     }
-        // });
     }
     checkTitle = async (rule, value, callback) => {
         if (value) {
@@ -242,8 +190,16 @@ class NoticeEditModal extends Component {
         showUploadList: true,
         action: '',
         beforeUpload: (file, fileList) => {
-            let { fileListNew } = this.state;
-            const { uploadFileHandler } = this.props.actions;
+            this.setState({
+                progress: 0,
+                loading: true
+            });
+            let {
+                fileListNew = []
+            } = this.state;
+            const {
+                uploadFileHandler
+            } = this.props.actions;
             const formdata = new FormData();
             formdata.append('file', fileList[0]);
             uploadFileHandler({}, formdata).then(rep => {
@@ -251,6 +207,8 @@ class NoticeEditModal extends Component {
                 fileListNew.push(file);
                 console.log(fileListNew, '附件');
                 this.setState({
+                    progress: 1,
+                    loading: false,
                     fileListNew
                 });
             });
@@ -293,6 +251,7 @@ class NoticeEditModal extends Component {
         };
         return (
             <Modal
+                title={'编辑通知'}
                 visible
                 onOk={this.modalClick.bind(this)}
                 onCancel={this.modalClick.bind(this)}

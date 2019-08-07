@@ -181,9 +181,9 @@ class NoticeTable extends Component {
     // 清除
     clearPublish () {
         this.props.form.setFieldsValue({
-            theme: '',
-            worktime: '',
-            degree: ''
+            theme: undefined,
+            worktime: undefined,
+            degree: undefined
         });
         this.queryPublish();
     }
@@ -245,7 +245,7 @@ class NoticeTable extends Component {
                         /> : ''
                 }
                 <Modal
-                    title='通知预览'
+                    title={noticeTitle}
                     width='800px'
                     visible={this.state.detailVisible}
                     onCancel={this.handleCancel.bind(this)}

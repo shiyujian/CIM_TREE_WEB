@@ -79,6 +79,7 @@ class Tablelevel extends Component {
         // 基础设置
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
+        mapInitialization.attributionControl = false;
         this.map = L.map('mapid', mapInitialization);
         // 基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {

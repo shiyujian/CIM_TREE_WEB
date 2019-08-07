@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { Input, Modal, Form, Notification } from 'antd';
 import { PROJECTPOSITIONCENTER } from '_platform/api';
 import './SaveUserMapCustomPositionModal.less';
-import {getUser} from '_platform/auth';
+import {
+    getUser,
+    trim
+} from '_platform/auth';
 
 class SaveUserMapCustomPositionModal extends Component {
     constructor (props) {
@@ -32,6 +35,15 @@ class SaveUserMapCustomPositionModal extends Component {
                     duration: 3
                 });
                 return;
+            } else {
+                if (name.length >= 4 && name.length <= 20) {
+                    console.log('name', name);
+                } else {
+                    Notification.warning({
+                        message: '请输入4到20个字符'
+                    });
+                    return;
+                }
             }
             let repeat = false;
             PROJECTPOSITIONCENTER.map((view) => {
@@ -89,6 +101,9 @@ class SaveUserMapCustomPositionModal extends Component {
     }
 
     render () {
+        const {
+            name
+        } = this.state;
         return (
             <Modal
                 title={'新建视图命名'}
@@ -100,15 +115,19 @@ class SaveUserMapCustomPositionModal extends Component {
                 onOk={this.handleSaveCustomPositionOk.bind(this)}
                 onCancel={this.handleSaveCustomPositionCancel.bind(this)}
             >
-                <Input placeholder='请输入名称' onChange={this.handleNameChange.bind(this)} />
+                <Input
+                    placeholder='请输入名称（4到20个字符，支持中英文，数字和特殊字符）'
+                    onChange={this.handleNameChange.bind(this)} />
             </Modal>
 
         );
     }
 
     handleNameChange = async (e) => {
+        let value = e.target.value;
+        value = trim(value);
         this.setState({
-            name: e.target.value
+            name: value
         });
     }
 }

@@ -136,6 +136,17 @@ class NewsEditModal extends Component {
             callback();
         }
     }
+    checkSource = async (rule, value, callback) => {
+        if (value) {
+            if (value.length <= 30) {
+                callback();
+            } else {
+                callback(`新闻来源须少于30个字，请重新输入`);
+            };
+        } else {
+            callback();
+        }
+    }
     uploadPropsCover = {
         name: 'file',
         action: '',
@@ -240,7 +251,6 @@ class NewsEditModal extends Component {
             form: { getFieldDecorator }
         } = this.props;
         const {
-            publishTime,
             loading
         } = this.state;
         const formItemLayout = {
@@ -264,36 +274,17 @@ class NewsEditModal extends Component {
                                         rules: [
                                             {
                                                 required: true,
-                                                message: '请填写新闻名称！'
+                                                message: '请输入新闻名称'
                                             },
                                             {
                                                 validator: this.checkTitle
                                             }
                                         ]
                                     })(
-                                        <Input type='text' placeholder='新闻名称' />
+                                        <Input type='text' placeholder='请输入新闻名称' />
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8} offset={1}>
-                                <FormItem {...formItemLayout} label='发布时间'>
-                                    {getFieldDecorator('publishTime', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请选择日期'
-                                            }
-                                        ],
-                                        initialValue: moment(publishTime, dateTimeFormat)
-                                    })(
-                                        <DatePicker
-                                            showTime
-                                        />
-                                    )}
-                                </FormItem>
-                            </Col>
-                        </Row>
-                        <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='封面'>
                                     {getFieldDecorator('thumbnailFile', {
@@ -313,21 +304,25 @@ class NewsEditModal extends Component {
                                     )}
                                 </FormItem>
                             </Col>
+                        </Row>
+                        <Row>
+
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='新闻来源'>
                                     {getFieldDecorator('source', {
                                         rules: [
                                             {
                                                 required: false
+                                            },
+                                            {
+                                                validator: this.checkSource
                                             }
                                         ]
                                     })(
-                                        <Input />
+                                        <Input placeholder='请输入新闻来源' />
                                     )}
                                 </FormItem>
                             </Col>
-                        </Row>
-                        <Row>
                             <Col span={8} offset={1}>
                                 <FormItem {...formItemLayout} label='附件'>
                                     <Upload {...this.uploadPropsFile} fileList={this.state.fileListNew}
@@ -361,9 +356,22 @@ class NewsEditModal extends Component {
             actions: { putNews, getNewsListNew },
             form: { validateFields }
         } = this.props;
+        const {
+            newsID,
+            fileListNew,
+            ThumbnailUrl,
+            content,
+            publishTime
+        } = this.state;
         validateFields(async (err, values) => {
             if (!err) {
-                const { newsID, fileListNew, ThumbnailUrl, content } = this.state;
+                if (!content) {
+                    Notification.warning({
+                        message: '请输入新闻详情',
+                        duration: 3
+                    });
+                    return;
+                }
                 let fileList = [];
                 fileListNew.map(item => {
                     if (item) {
@@ -384,7 +392,7 @@ class NewsEditModal extends Component {
                     Source: values.source, // 来源
                     SubTitle: '', // 副标题
                     Summary: '', // 摘要
-                    Publish_Time: values.publishTime ? moment(values.publishTime).format(dateTimeFormat) : '', // 发布时间
+                    Publish_Time: publishTime, // 发布时间
                     Title: values.title, // 新闻标题
                     Thumbnail: ThumbnailUrl, // 缩略图
                     Files: fileList // 附件

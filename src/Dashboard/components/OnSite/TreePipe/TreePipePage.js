@@ -862,25 +862,25 @@ export default class TreePipePage extends Component {
                     contentMessage = {
                         type: 'treePipe',
                         typeName: '管线',
-                        CreateTime: content.CreateTime,
-                        DN: content.DN,
-                        Depth: content.Depth,
-                        Material: content.Material,
-                        Altitude: content.Altitude,
-                        Section: content.Section,
-                        ThinClass: content.ThinClass
+                        CreateTime: (content && content.CreateTime) || '',
+                        DN: (content && content.DN) || '',
+                        Depth: (content && content.Depth) || '',
+                        Material: (content && content.Material) || '',
+                        Altitude: (content && content.Altitude) || '',
+                        Section: (content && content.Section) || '',
+                        ThinClass: (content && content.ThinClass) || ''
                     };
                 } else if (treePipeNode) {
                     contentMessage = {
                         type: 'treePipeNode',
                         typeName: '管点',
-                        CreateTime: content.CreateTime,
-                        PipeType: content.PipeType,
-                        Depth: content.Depth,
-                        Altitude: content.Altitude,
-                        Model: content.Model,
-                        Section: content.Section,
-                        ThinClass: content.ThinClass
+                        CreateTime: (content && content.CreateTime) || '',
+                        PipeType: (content && content.PipeType) || '',
+                        Depth: (content && content.Depth) || '',
+                        Altitude: (content && content.Altitude) || '',
+                        Model: (content && content.Model) || '',
+                        Section: (content && content.Section) || '',
+                        ThinClass: (content && content.ThinClass) || ''
                     };
                 }
                 let treePipePopLayer = L.popup()

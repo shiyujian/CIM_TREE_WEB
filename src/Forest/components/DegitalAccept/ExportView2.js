@@ -54,6 +54,7 @@ export default class ExportView1 extends Component {
         try {
             let mapInitialization = INITLEAFLET_API;
             mapInitialization.crs = L.CRS.EPSG4326;
+            mapInitialization.attributionControl = false;
             this.map = L.map('mapid', mapInitialization);
             // 加载基础图层
             this.tileLayer = L.tileLayer(TILEURLS[1], {
@@ -269,19 +270,19 @@ export default class ExportView1 extends Component {
                         />
                         <Row style={{ marginTop: 10 }}>
                             <Button
-                                    onClick={this.handleExport.bind(this)}
-                                    style={{ float: 'right', marginLeft: 10 }}
-                                    type='primary'
+                                onClick={this.handleExport.bind(this)}
+                                style={{ float: 'right', marginLeft: 10 }}
+                                type='primary'
                             >
                                 导出
-                                </Button>
+                            </Button>
                             <Button
-                                    onClick={this.handleCancel.bind(this)}
-                                    style={{ float: 'right' }}
-                                    type='primary'
+                                onClick={this.handleCancel.bind(this)}
+                                style={{ float: 'right' }}
+                                type='primary'
                             >
                                 关闭
-                                </Button>
+                            </Button>
                         </Row>
                     </div>
                 </Spin>

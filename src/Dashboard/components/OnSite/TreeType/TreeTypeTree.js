@@ -7,6 +7,9 @@ import {
 import {
     FOREST_GIS_API
 } from '_platform/api';
+import {
+    trim
+} from '_platform/auth';
 const TreeNode = Tree.TreeNode;
 const Search = Input.Search;
 export default class TreeTypeTree extends Component {
@@ -64,7 +67,7 @@ export default class TreeTypeTree extends Component {
                 <Spin spinning={treetypesTreeLoading}>
                     <Search
                         placeholder='请输入树种名称或顺序码'
-                        onSearch={this.searchTree.bind(this)}
+                        onSearch={this.handleSearchTree.bind(this)}
                         style={{ width: '100%', marginBotton: 10, paddingRight: 5 }}
                     />
                     <div className={this.genIconClass()}>
@@ -173,7 +176,7 @@ export default class TreeTypeTree extends Component {
         }
     }
 
-    searchTree = async (value) => {
+    handleSearchTree = async (value) => {
         const {
             treetypes = [],
             actions: {
@@ -181,6 +184,7 @@ export default class TreeTypeTree extends Component {
             }
         } = this.props;
         try {
+            value = trim(value);
             if (value) {
                 let searchTree = [];
                 let keys = [];
@@ -229,7 +233,7 @@ export default class TreeTypeTree extends Component {
                 });
             }
         } catch (e) {
-            console.log('searchTree', e);
+            console.log('handleSearchTree', e);
         }
     }
 

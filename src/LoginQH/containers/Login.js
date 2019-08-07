@@ -83,6 +83,44 @@ class Login extends Component {
             });
         }
     }
+    checkUserName = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[a-zA-Z0-9_]{4,16}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    callback();
+                } else {
+                    callback(`请输入4到16位（字母，数字，下划线）用户名`);
+                }
+            } else {
+                callback(`请输入4到16位（字母，数字，下划线）用户名`);
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPassWord = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[a-zA-Z0-9_-]{4,16}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    callback();
+                } else {
+                    callback(`请输入4到16位（字母，数字，下划线，减号）密码`);
+                }
+            } else {
+                callback(`请输入4到16位（字母，数字，下划线，减号）密码`);
+            }
+        } else {
+            callback();
+        }
+    }
 
     render () {
         const { getFieldDecorator } = this.props.form;
@@ -149,6 +187,9 @@ class Login extends Component {
                                                     {
                                                         required: true,
                                                         message: '请输入用户名'
+                                                    },
+                                                    {
+                                                        validator: this.checkUserName
                                                     }
                                                 ]
                                             })(
@@ -160,7 +201,7 @@ class Login extends Component {
                                                     }}
                                                     ref={(input) => { this.nameInput = input; }}
                                                     id='username'
-                                                    placeholder='用户名/手机号'
+                                                    placeholder='用户名'
                                                 />
                                             )}
                                         </FormItem>
@@ -175,6 +216,9 @@ class Login extends Component {
                                                     {
                                                         required: true,
                                                         message: '请输入密码'
+                                                    },
+                                                    {
+                                                        validator: this.checkPassWord
                                                     }
                                                 ]
                                             })(

@@ -35,6 +35,10 @@ export default class News extends Component {
         };
     }
     async componentDidMount () {
+        const {
+            actions: { setTabActive }
+        } = this.props;
+        setTabActive('1');
     }
 
     // 新闻和通知的切换
