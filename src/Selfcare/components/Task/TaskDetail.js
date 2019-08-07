@@ -95,7 +95,6 @@ class TaskDetail extends Component {
                 supervisorID = role.ID;
             }
         });
-        console.log('业主文书列表.ID', ownerID, supervisorID);
         let ownerList = [], auditorList = [];
         getUsers({}, {
             keyword: '',
@@ -105,7 +104,6 @@ class TaskDetail extends Component {
             page_size: 20
         }).then(rep => {
             ownerList = rep.content;
-            console.log('业主文书列表', rep);
             this.setState({
                 ownerList
             });
@@ -118,7 +116,6 @@ class TaskDetail extends Component {
             size: ''
         }).then(rep => {
             auditorList = rep.content;
-            console.log('监理文书列表', rep);
             this.setState({
                 auditorList
             });
@@ -202,7 +199,6 @@ class TaskDetail extends Component {
                 }
             });
             this.props.actions.setTaskDetailLoading(false);
-            console.log('流程详情', rep.WFState);
             this.setState({
                 startDate: param.StartDate || '',
                 endDate: param.EndDate || '',
@@ -260,7 +256,6 @@ class TaskDetail extends Component {
                 planTreeNum: 0
             });
         }
-        console.log('表格数据', TableList, startDate, endDate);
         this.setState({
             TableList,
             startDate,
@@ -279,7 +274,6 @@ class TaskDetail extends Component {
     getFormDetails () {
         let node = '';
         const { FlowName, TableList, param, WFState } = this.state;
-        console.log('流程列表', FlowName);
         if (FlowName === '总计划进度填报流程') {
             node = <TotalDetail
                 {...this.props} {...this.state}
@@ -505,7 +499,10 @@ class TaskDetail extends Component {
         );
     }
     onBack () {
-        let to = `/selfcare/task`;
+        let to = `/`;
+        if (this.props.location && this.props.location.search.indexOf('selfcare') > -1) {
+            to = `/selfcare/task`;
+        }
         this.props.history.push(to);
     }
 }
