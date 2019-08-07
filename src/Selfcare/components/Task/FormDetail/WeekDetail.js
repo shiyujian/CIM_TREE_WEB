@@ -13,16 +13,7 @@ import {
 } from 'antd';
 const dateFormat = 'YYYY-MM-DD';
 const FormItem = Form.Item;
-const formItemLayout = {
-    labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 }
-    },
-    wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 }
-    }
-};
+
 class WeekDetail extends Component {
     constructor (props) {
         super(props);
@@ -50,27 +41,72 @@ class WeekDetail extends Component {
             disabled
         });
     }
+    getSectionName = (currentSection) => {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionName = '';
+        let projectName = '';
+        console.log('currentSection', currentSection);
+
+        if (currentSection) {
+            let sectionData = (tree && tree.bigTreeList) || [];
+            console.log('sectionData', sectionData);
+            let code = currentSection.split('-');
+            console.log('code', code);
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map(project => {
+                    if (code[0] === project.No) {
+                        console.log('');
+                        projectName = project.Name;
+                        project.children.map(section => {
+                            // 获取当前标段的名字
+                            if (section.No === currentSection) {
+                                sectionName = section.Name;
+                            }
+                        });
+                    }
+                });
+            }
+        }
+        return sectionName;
+    }
     render () {
         const {
             TableList,
-            param
+            param,
+            form: {
+                getFieldDecorator
+            }
         } = this.props;
         const { startDate, endDate, disabled } = this.state;
-        
+        const formItemLayout = {
+            labelCol: { span: 8 },
+            wrapperCol: { span: 16 }
+        };
+        let sectionName = this.getSectionName(param.Section);
         return (<div>
-            <Form {...formItemLayout} layout='inline'>
+            <Form>
                 <Row>
-                    <Col span={24}>
+                    <Col span={12}>
                         <FormItem
+                            {...formItemLayout}
                             label='标段:'
                         >
-                            <Input value={param.Section} disabled style={{width: 220}} />
+                            <Input
+                                value={sectionName}
+                                disabled
+                                style={{width: 220}}
+                            />
                         </FormItem>
                     </Col>
+                    <Col span={12} />
                 </Row>
                 <Row>
                     <Col span={12}>
                         <FormItem
+                            {...formItemLayout}
                             label='开始日期'
                         >
                             <DatePicker
@@ -81,10 +117,12 @@ class WeekDetail extends Component {
                                 format={dateFormat}
                                 onChange={this.handleStartDate.bind(this)}
                             />
+
                         </FormItem>
                     </Col>
                     <Col span={12}>
                         <FormItem
+                            {...formItemLayout}
                             label='结束日期'
                         >
                             <DatePicker
@@ -95,6 +133,7 @@ class WeekDetail extends Component {
                                 format={dateFormat}
                                 onChange={this.handleEndDate.bind(this)}
                             />
+
                         </FormItem>
                     </Col>
                 </Row>

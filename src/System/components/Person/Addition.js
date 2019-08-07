@@ -207,6 +207,44 @@ class Addition extends Component {
         return objs;
     }
 
+    checkPassWord = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[a-zA-Z0-9_-]{4,16}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    callback();
+                } else {
+                    callback(`请输入4到16位（字母，数字，下划线，减号）密码`);
+                }
+            } else {
+                callback(`请输入4到16位（字母，数字，下划线，减号）密码`);
+            }
+        } else {
+            callback();
+        }
+    }
+    checkUserName = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[a-zA-Z0-9_]{4,16}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    callback();
+                } else {
+                    callback(`请输入4到16位（字母，数字，下划线）用户名`);
+                }
+            } else {
+                callback(`请输入4到16位（字母，数字，下划线）用户名`);
+            }
+        } else {
+            callback();
+        }
+    }
     render () {
         const {
             form: {
@@ -242,8 +280,11 @@ class Addition extends Component {
                                         rules: [
                                             {
                                                 required: true,
-                                                message: '请输入用户名，且不超过15位',
+                                                message: '请输入4到16位（字母，数字，下划线）用户名',
                                                 max: 15
+                                            },
+                                            {
+                                                validator: this.checkUserName
                                             }
                                         ]
                                     })(
@@ -315,13 +356,16 @@ class Addition extends Component {
                                         rules: [
                                             {
                                                 required: true,
-                                                message: '请输入密码，且不超过15位',
+                                                message: '请输入4到16位（字母，数字，下划线，减号）密码',
                                                 max: 15
+                                            },
+                                            {
+                                                validator: this.checkPassWord
                                             }
                                         ]
                                     })(
                                         <Input
-                                            placeholder='请输入密码'
+                                            placeholder='请输入4到16位（字母，数字，下划线，减号）密码'
                                         />
                                     )}
                                 </FormItem>
@@ -499,6 +543,10 @@ class Addition extends Component {
             if (!err) {
                 if (!/^[\w@\.\+\-_]+$/.test(values.UserName)) {
                     message.warn('请输入英文字符、数字');
+                    return;
+                }
+                if (!/^[a-zA-Z0-9_-]{4,16}$/.test(values.UserName)) {
+                    message.warn('请输入4到16位（字母，数字，下划线，减号）');
                     return;
                 }
                 let orgID = '';

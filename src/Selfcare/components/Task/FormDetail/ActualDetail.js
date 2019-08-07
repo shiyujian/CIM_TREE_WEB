@@ -43,12 +43,47 @@ class ActualDetail extends Component {
             disabled
         });
     }
+    getSectionName = (currentSection) => {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionName = '';
+        let projectName = '';
+        console.log('currentSection', currentSection);
+
+        if (currentSection) {
+            let sectionData = (tree && tree.bigTreeList) || [];
+            console.log('sectionData', sectionData);
+            let code = currentSection.split('-');
+            console.log('code', code);
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map(project => {
+                    if (code[0] === project.No) {
+                        console.log('');
+                        projectName = project.Name;
+                        project.children.map(section => {
+                            // 获取当前标段的名字
+                            if (section.No === currentSection) {
+                                sectionName = section.Name;
+                            }
+                        });
+                    }
+                });
+            }
+        }
+        return sectionName;
+    }
     render () {
         const {
             param,
             TableList
         } = this.props;
-        const { disabled } = this.state;
+        const {
+            disabled
+        } = this.state;
+
+        let sectionName = this.getSectionName(param.Section);
         return (<div>
             <Form {...formItemLayout} layout='inline'>
                 <Row gutter={15}>
@@ -56,7 +91,10 @@ class ActualDetail extends Component {
                         <FormItem
                             label='标段:'
                         >
-                            <Input value={param.Section} disabled style={{width: 220}} />
+                            <Input
+                                value={sectionName}
+                                disabled
+                                style={{width: 220}} />
                         </FormItem>
                     </Col>
                     <Col span={12}>
@@ -129,8 +167,10 @@ class ActualDetail extends Component {
             dataIndex: 'actualNum',
             key: 'actualNum',
             render: (text, record, index) => {
+                const {disabled} = this.state;
                 return (
                     <InputNumber
+                        disabled={disabled}
                         value={record.actualNum || 0}
                         onChange={this.props.handleActualNumChange.bind(this, index)}
                     />

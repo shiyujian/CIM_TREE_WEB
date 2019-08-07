@@ -178,7 +178,7 @@ export default class WeekPlanModal extends Component {
                                     if (item.ExecuteState === 1) {
                                         // 已执行
                                         if (item.CurrentNodeName === '结束') {
-                                            return <Step title={
+                                            return <Step key={item.ID} title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
                                                     <span style={{marginLeft: 10}}>-({
@@ -191,7 +191,7 @@ export default class WeekPlanModal extends Component {
                                                 </div>
                                             } />;
                                         } else {
-                                            return <Step title={
+                                            return <Step key={item.ID} title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
                                                     <span style={{marginLeft: 10}}>-({
@@ -226,7 +226,7 @@ export default class WeekPlanModal extends Component {
                                         }
                                     } else if (item.ExecuteState === 2) {
                                         // 退回
-                                        return <Step title={
+                                        return <Step key={item.ID} title={
                                             <div>
                                                 <span>{item.CurrentNodeName}</span>
                                                 <span style={{marginLeft: 10}}>-({
@@ -262,7 +262,7 @@ export default class WeekPlanModal extends Component {
                                         // 未执行
                                         if (item.ExecutorObj) {
                                             // 未结束
-                                            return <Step title={
+                                            return <Step key={item.ID} title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
                                                     <span style={{marginLeft: 10}}>-({
@@ -282,7 +282,7 @@ export default class WeekPlanModal extends Component {
                                             } />;
                                         } else {
                                             // 已结束
-                                            return <Step title={
+                                            return <Step key={item.ID} title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
                                                     <span style={{marginLeft: 10}}>-({

@@ -128,44 +128,48 @@ class WeekFormOrigin extends Component {
                     NextExecutor: values.NextPeople || 0, // 下一节点执行人
                     Executor // 当前节点执行人
                 };
-                console.log('入库数据', CurrentNodeName, Section, TableList);
-                postSendwork({}, params).then(rep => {
-                    if (rep.code === 1) {
-                        if (CurrentNodeName === '业主查看') {
-                            // 入库数据
-                            let paramsArr = [];
-                            TableList.map(item => {
-                                paramsArr.push({
-                                    PlanDate: item.date,
-                                    Section,
-                                    Num: item.planTreeNum
-                                });
-                            });
-                            console.log('入库数据', paramsArr);
-                            postWeekPlanSchedule({}, paramsArr).then(rep => {
-                                if (rep.code === 1) {
-                                    notification.success({
-                                        message: '提交成功，计划栽植量已入库'
-                                    });
-                                    this.props.onBack();
-                                } else {
-                                    notification.error({
-                                        message: '提交成功，计划栽植量未入库'
-                                    });
-                                }
-                            });
-                        } else {
-                            notification.success({
-                                message: '提交成功'
-                            });
-                            this.props.onBack();
-                        }
-                    } else {
-                        notification.error({
-                            message: '提交失败'
-                        });
-                    }
-                });
+                console.log('FormParams', FormParams);
+                console.log('CurrentNodeName', CurrentNodeName);
+                console.log('Section', Section);
+                console.log('TableList', TableList);
+                console.log('params', params);
+                // postSendwork({}, params).then(rep => {
+                //     if (rep.code === 1) {
+                //         if (CurrentNodeName === '业主查看') {
+                //             // 入库数据
+                //             let paramsArr = [];
+                //             TableList.map(item => {
+                //                 paramsArr.push({
+                //                     PlanDate: item.date,
+                //                     Section,
+                //                     Num: item.planTreeNum
+                //                 });
+                //             });
+                //             console.log('入库数据', paramsArr);
+                //             postWeekPlanSchedule({}, paramsArr).then(rep => {
+                //                 if (rep.code === 1) {
+                //                     notification.success({
+                //                         message: '提交成功，计划栽植量已入库'
+                //                     });
+                //                     this.props.onBack();
+                //                 } else {
+                //                     notification.error({
+                //                         message: '提交成功，计划栽植量未入库'
+                //                     });
+                //                 }
+                //             });
+                //         } else {
+                //             notification.success({
+                //                 message: '提交成功'
+                //             });
+                //             this.props.onBack();
+                //         }
+                //     } else {
+                //         notification.error({
+                //             message: '提交失败'
+                //         });
+                //     }
+                // });
             }
         });
     }

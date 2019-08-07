@@ -158,7 +158,7 @@ export default class ActualModal extends Component {
                                 {workFlow.map(item => {
                                     if (item.ExecuteState === 1) {
                                         if (item.CurrentNodeName === '结束') {
-                                            return <Step title={
+                                            return <Step key={item.ID} title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
                                                     <span style={{marginLeft: 10}}>-({
@@ -171,7 +171,7 @@ export default class ActualModal extends Component {
                                                 </div>
                                             } />;
                                         } else {
-                                            return <Step title={
+                                            return <Step key={item.ID} title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
                                                     <span style={{marginLeft: 10}}>-({
@@ -197,7 +197,7 @@ export default class ActualModal extends Component {
                                         }
                                     } else if (item.ExecuteState === 2) {
                                         // 退回
-                                        return <Step title={
+                                        return <Step key={item.ID} title={
                                             <div>
                                                 <span>{item.CurrentNodeName}</span>
                                                 <span style={{marginLeft: 10}}>-({
@@ -232,7 +232,7 @@ export default class ActualModal extends Component {
                                     } else {
                                         if (item.ExecutorObj) {
                                             // 未结束
-                                            return <Step title={
+                                            return <Step key={item.ID} title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
                                                     <span style={{marginLeft: 10}}>-({
@@ -252,7 +252,7 @@ export default class ActualModal extends Component {
                                             } />;
                                         } else {
                                             // 已结束
-                                            return <Step title={
+                                            return <Step key={item.ID} title={
                                                 <div>
                                                     <span>{item.CurrentNodeName}</span>
                                                     <span style={{marginLeft: 10}}>-({

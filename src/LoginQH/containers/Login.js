@@ -49,6 +49,8 @@ class Login extends Component {
     }
 
     componentDidMount () {
+        // 页面加载后自动聚焦
+        this.nameInput.focus();
         let LOGIN_USER_PASSDATA = window.localStorage.getItem('LOGIN_USER_PASSDATA');
         if (LOGIN_USER_PASSDATA) {
             LOGIN_USER_PASSDATA = JSON.parse(LOGIN_USER_PASSDATA) || {};
@@ -156,6 +158,7 @@ class Login extends Component {
                                                         borderBottom:
                                                             '1px solid #cccccc'
                                                     }}
+                                                    ref={(input) => { this.nameInput = input; }}
                                                     id='username'
                                                     placeholder='用户名/手机号'
                                                 />
@@ -457,7 +460,8 @@ class Login extends Component {
             actions: {
                 getTasks,
                 loginForest,
-                getRolePermission
+                getRolePermission,
+                getUsers
             },
             history: { replace }
         } = this.props;
@@ -547,10 +551,19 @@ class Login extends Component {
                 replace('/');
             }, 500);
         } else {
-            Notification.error({
-                message: '用户名或密码错误！',
-                duration: 2
-            });
+            let userData = await getUsers({}, {username: data.username});
+            console.log('nickname', userData);
+            if (userData && userData.content && userData.content instanceof Array && userData.content.length > 0) {
+                Notification.error({
+                    message: '密码错误！',
+                    duration: 2
+                });
+            } else {
+                Notification.error({
+                    message: '用户名不存在！',
+                    duration: 2
+                });
+            }
         }
     }
 
@@ -566,10 +579,26 @@ class Login extends Component {
             }
         } = this.props;
         try {
+            let phone = getFieldValue('phone');
             let username = getFieldValue('nickname');
             if (!username) {
                 Notification.error({
                     message: '请输入用户名',
+                    duration: 2
+                });
+                return;
+            }
+            if (!phone) {
+                Notification.error({
+                    message: '请输入手机号',
+                    duration: 2
+                });
+                return;
+            }
+            let partn = /^1[0-9]{10}$/;
+            if (!partn.exec(phone)) {
+                Notification.error({
+                    message: '手机号格式输入错误！',
                     duration: 2
                 });
                 return;
@@ -585,13 +614,26 @@ class Login extends Component {
                             message: '该用户未关联手机号，请联系管理员修改',
                             duration: 2
                         });
+                        this.handleSecurityCodeStatus();
+                        return;
                     }
-                    let partn = /^1[0-9]{10}$/;
-                    if (!partn.exec(phonenumber)) {
+
+                    if (phone !== phonenumber) {
                         Notification.error({
-                            message: '手机号输入错误！',
+                            message: '填写手机号错误，请确认后重新输入',
                             duration: 2
                         });
+                        this.handleSecurityCodeStatus();
+                        return;
+                    }
+                    let partn = /^1[0-9]{10}$/;
+                    if (!partn.exec(phone)) {
+                        Notification.error({
+                            message: '手机号格式输入错误！',
+                            duration: 2
+                        });
+                        this.handleSecurityCodeStatus();
+                        return;
                     } else {
                         this.setState({
                             getSecurityCodeStatus: true

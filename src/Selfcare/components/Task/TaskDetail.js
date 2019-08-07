@@ -256,7 +256,8 @@ class TaskDetail extends Component {
             let tmp = new Date(start);
             TableList.push({
                 ID: id,
-                date: moment(tmp).format('YYYY-MM-DD')
+                date: moment(tmp).format('YYYY-MM-DD'),
+                planTreeNum: 0
             });
         }
         console.log('表格数据', TableList, startDate, endDate);
@@ -281,11 +282,13 @@ class TaskDetail extends Component {
         console.log('流程列表', FlowName);
         if (FlowName === '总计划进度填报流程') {
             node = <TotalDetail
+                {...this.props} {...this.state}
                 param={param}
                 TableList={TableList}
             />;
         } else if (FlowName === '每周进度填报流程') {
             node = <WeekDetail
+                {...this.props} {...this.state}
                 param={param}
                 setTableDate={this.setTableDate.bind(this)}
                 handlePlanTreeNumChage={this.handlePlanTreeNumChage.bind(this)}
@@ -294,6 +297,7 @@ class TaskDetail extends Component {
             />;
         } else if (FlowName === '每日进度填报流程') {
             node = <ActualDetail
+                {...this.props} {...this.state}
                 param={param}
                 handleTodayDate={this.handleTodayDate.bind(this)}
                 handleActualNumChange={this.handleActualNumChange.bind(this)}

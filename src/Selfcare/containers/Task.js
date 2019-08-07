@@ -13,23 +13,22 @@ import { Spin, Form } from 'antd';
         return { ...task, platform };
     },
     dispatch => ({
-        actions: bindActionCreators({ ...actions, ...platformActions }, dispatch),
-    }),
+        actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
+    })
 )
 class Task extends Component {
     static propTypes = {};
 
     componentDidMount = async () => {
-        console.log('跳转');
-        // const {
-        //     actions: {
-        //         getTreeNodeList
-        //     },
-        //     platform: { tree = {} }
-        // } = this.props;
-        // if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
-        //     await getTreeNodeList();
-        // }
+        const {
+            actions: {
+                getTreeNodeList
+            },
+            platform: { tree = {} }
+        } = this.props;
+        if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+            await getTreeNodeList();
+        }
     }
 
     render () {
@@ -40,7 +39,7 @@ class Task extends Component {
                     {/* <Info {...this.props} />
                     <Detail {...this.props} />
                     <Step {...this.props} /> */}
-                    <TaskDetail {...this.props} />
+                    <TaskDetail {...this.props} {...this.state} />
                 </Spin>
                 {/* <Docs {...this.props}/> */}
             </Content>
