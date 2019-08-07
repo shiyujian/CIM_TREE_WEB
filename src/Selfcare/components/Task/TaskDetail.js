@@ -125,8 +125,16 @@ class TaskDetail extends Component {
             ID: task_id
         }, {}).then(rep => {
             let FormParams = [];
-            if (rep.FormValues && rep.FormValues.length > 0 && rep.FormValues[0].FormParams) {
-                FormParams = rep.FormValues[0].FormParams;
+            if (rep && rep.Works && rep.Works.length > 0) {
+                rep.Works.map(item => {
+                    if (item.CurrentNodeName === '施工填报'
+                        && item.FormValues
+                        && item.FormValues.length > 0
+                        && item.FormValues[0].FormParams
+                    ) {
+                        FormParams = item.FormValues[0].FormParams;
+                    }
+                });
             }
             let param = {};
             let TableList = [];
