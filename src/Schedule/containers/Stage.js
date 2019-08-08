@@ -71,6 +71,9 @@ export default class Stage extends Component {
             }
         } = this.props;
         let user = await getUser();
+        if (!(user && user.section)) {
+            return;
+        }
         let roles = await getRoles();
         let postRoleData = ''; // 监理文书ID
         roles.map((role) => {

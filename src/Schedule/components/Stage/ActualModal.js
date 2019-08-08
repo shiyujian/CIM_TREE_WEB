@@ -47,15 +47,16 @@ export default class ActualModal extends Component {
         let FormParams = [];
         if (rep && rep.Works && rep.Works.length > 0) {
             rep.Works.map(item => {
-                if (item.CurrentNodeName === '施工填报'
-                    && item.FormValues
-                    && item.FormValues.length > 0
-                    && item.FormValues[0].FormParams
+                if (item.CurrentNodeName === '施工填报' &&
+                    item.FormValues &&
+                    item.FormValues.length > 0 &&
+                    item.FormValues[0].FormParams
                 ) {
                     FormParams = item.FormValues[0].FormParams;
                 }
             });
         }
+        console.log('123', FormParams);
         console.log('123', FormParams);
         let param = {};
         let TableList = [];

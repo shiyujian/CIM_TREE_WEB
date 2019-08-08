@@ -41,7 +41,10 @@ export default class SearchFilter extends Component {
     async getSection () {
         const {
             platform: { tree = {} },
-            leftkeycode
+            leftkeycode,
+            form: {
+                setFieldsValue
+            }
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
@@ -67,8 +70,8 @@ export default class SearchFilter extends Component {
                                         {currentSectionName}
                                     </Option>
                                 );
-                                this.props.form.setFieldsValue({
-                                    sunitproject: unit.No
+                                setFieldsValue({
+                                    section: unit.No
                                 });
                             }
                         });
@@ -190,14 +193,29 @@ export default class SearchFilter extends Component {
     }
 
     query () {
-        this.onSearch();
+        let user = getUser();
+        let section = user && user.section;
+        let permission = getUserIsManager();
+        if (permission || section) {
+            this.onSearch();
+        }
     }
 
     clear () {
+        let user = getUser();
+        let section = user && user.section;
+        if (section) {
+            this.props.form.setFieldsValue({
+                section: section
+            });
+        } else {
+            this.props.form.setFieldsValue({
+                section: undefined
+            });
+        }
         this.props.form.setFieldsValue({
             status: undefined,
-            submitDate: undefined,
-            section: undefined
+            submitDate: undefined
         });
         this.onSearch();
     }

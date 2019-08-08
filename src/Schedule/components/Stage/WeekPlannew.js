@@ -233,7 +233,18 @@ class WeekPlanNew extends Component {
                     flowID,
                     flowName
                 }, () => {
-                    this.getWorkList(); // 获取任务列表
+                    let user = getUser();
+                    let section = user && user.section;
+                    let permission = getUserIsManager();
+                    if (permission) {
+                        this.getWorkList(); // 获取任务列表
+                    } else if (section) {
+                        let pro = {
+                            keys: 'Section',
+                            values: section
+                        };
+                        this.getWorkList(pro); // 获取任务列表
+                    }
                     this.getOriginNode(); // 获取流程起点ID
                 });
             }
@@ -271,6 +282,7 @@ class WeekPlanNew extends Component {
             page: '', // 页码
             size: '' // 页数
         };
+        console.log('params', params);
         let rep = await getWorkList({}, params);
         if (rep && rep.code && rep.code === 200) {
             let workDataList = [];
@@ -278,26 +290,28 @@ class WeekPlanNew extends Component {
             rep.content.map(item => {
                 let sectionName = '';
                 let projectName = '';
-
-                let code = item.Section.split('-');
-                if (code && code.length === 3) {
-                    // 获取当前标段所在的项目
-                    sectionData.map(project => {
-                        if (code[0] === project.No) {
-                            projectName = project.Name;
-                            project.children.map(section => {
-                                // 获取当前标段的名字
-                                if (section.No === item.Section) {
-                                    sectionName = section.Name;
-                                }
-                            });
-                        }
-                    });
-                    item.sectionName = sectionName;
-                    item.projectName = projectName;
+                if (item && item.Section) {
+                    let code = item.Section.split('-');
+                    if (code && code.length === 3) {
+                        // 获取当前标段所在的项目
+                        sectionData.map(project => {
+                            if (code[0] === project.No) {
+                                projectName = project.Name;
+                                project.children.map(section => {
+                                    // 获取当前标段的名字
+                                    if (section.No === item.Section) {
+                                        sectionName = section.Name;
+                                    }
+                                });
+                            }
+                        });
+                        item.sectionName = sectionName;
+                        item.projectName = projectName;
+                    }
                 }
                 workDataList.push(item);
             });
+            console.log('workDataList', workDataList);
             this.setState({
                 workDataList
             });
