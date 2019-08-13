@@ -91,7 +91,11 @@ class Login extends Component {
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
-                    callback();
+                    if (value.length >= 4 && value.length <= 16) {
+                        callback();
+                    } else {
+                        callback('请输入用户名(4到16位)');
+                    }
                 } else {
                     callback(`请输入正确的用户名`);
                 }
@@ -109,7 +113,11 @@ class Login extends Component {
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
-                    callback();
+                    if (value.length >= 6 && value.length <= 16) {
+                        callback();
+                    } else {
+                        callback('请输入密码(6到16位)');
+                    }
                 } else {
                     callback(`请输入正确的密码`);
                 }
@@ -185,7 +193,7 @@ class Login extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入用户名'
+                                                        message: '请输入用户名(4到16位)'
                                                     },
                                                     {
                                                         validator: this.checkUserName
@@ -200,7 +208,7 @@ class Login extends Component {
                                                     }}
                                                     ref={(input) => { this.nameInput = input; }}
                                                     id='username'
-                                                    placeholder='用户名'
+                                                    placeholder='请输入用户名(4到16位)'
                                                 />
                                             )}
                                         </FormItem>
@@ -214,7 +222,7 @@ class Login extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入密码'
+                                                        message: '请输入密码(6到16位)'
                                                     },
                                                     {
                                                         validator: this.checkPassWord
@@ -230,7 +238,7 @@ class Login extends Component {
                                                         }}
                                                         id='pwdInp'
                                                         type={pwdType}
-                                                        placeholder='密码'
+                                                        placeholder='请输入密码(6到16位)'
                                                     />
                                                     <a
                                                         className='btn-change-type'

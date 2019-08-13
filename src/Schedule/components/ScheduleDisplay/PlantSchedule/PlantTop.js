@@ -244,17 +244,33 @@ export default class PlantTop extends Component {
         let yPlantData = [];
         let yRealData = [];
         let yRatioData = [];
-        dataList.map(item => {
+        if (dataList.length === 0 && dataListReal.length > 0) {
             dataListReal.map(row => {
-                if (item.Section === row.Section) {
-                    xAxisData.push(item.Section);
-                    yPlantData.push(item.Num);
-                    yRealData.push(row.Num);
-                    let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    yRatioData.push(ratio);
-                }
+                xAxisData.push(row.Section);
+                yPlantData.push(0);
+                yRealData.push(row.Num);
+                yRatioData.push(100);
             });
-        });
+        } else if (dataList.length > 0 && dataListReal.length === 0) {
+            dataList.map(item => {
+                xAxisData.push(item.Section);
+                yPlantData.push(item.Num);
+                yRealData.push(0);
+                yRatioData.push(0);
+            });
+        } else if (dataList.length > 0 && dataListReal.length > 0) {
+            dataList.map(item => {
+                dataListReal.map(row => {
+                    if (item.Section === row.Section) {
+                        xAxisData.push(item.Section);
+                        yPlantData.push(item.Num);
+                        yRealData.push(row.Num);
+                        let ratio = (row.Num / item.Num * 100).toFixed(2);
+                        yRatioData.push(ratio);
+                    }
+                });
+            });
+        }
         legendList.map(item => {
             let obj = {};
             xAxisData.map((row, col) => {
