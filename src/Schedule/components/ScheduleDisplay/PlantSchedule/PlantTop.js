@@ -57,9 +57,11 @@ export default class PlantTop extends Component {
         });
     }
     async query (dateString) {
-        let { dataList, dataListReal } = this.state;
         const { leftkeycode } = this.props;
-        const { getTreedayplans, getTreetotalstatbyday } = this.props.actions;
+        const {
+            getTreedayplans,
+            getTreetotalstatbyday
+        } = this.props.actions;
         try {
             if (!leftkeycode) {
                 return;
@@ -67,24 +69,27 @@ export default class PlantTop extends Component {
             this.setState({
                 loading: true
             });
+            let dataList = [];
+            let dataListReal = [];
             // 获取计划栽植量
-            await getTreedayplans({}, {
+            let rep = await getTreedayplans({}, {
                 section: leftkeycode,
                 stime: dateString + ' 00:00:00',
                 etime: dateString + ' 23:59:59'
-            }).then(rep => {
-                if (rep && rep.code && rep.code === 200) {
-                    dataList = rep.content;
-                }
             });
+
+            if (rep && rep.code && rep.code === 200) {
+                dataList = rep.content;
+            }
             // 获取实际栽植量
-            await getTreetotalstatbyday({}, {
+            let totalList = await getTreetotalstatbyday({}, {
                 section: leftkeycode,
                 stime: dateString + ' 00:00:00',
                 etime: dateString + ' 23:59:59'
-            }).then(rep => {
-                dataListReal = rep;
             });
+            if (totalList instanceof Array) {
+                dataListReal = totalList;
+            }
             this.setState({
                 dataList: dataList,
                 dataListReal: dataListReal,
@@ -113,25 +118,50 @@ export default class PlantTop extends Component {
         let yPlantData = [];
         let yRealData = [];
         let yRatioData = [];
-        dataList.map(item => {
+        if (dataList.length === 0 && dataListReal.length > 0) {
             dataListReal.map(row => {
-                if (item.Section === row.Section) {
-                    sectionsData.map((sectionData) => {
-                        if (item.Section === sectionData.No) {
-                            xAxisData.push(sectionData.Name);
-                        }
-                    });
-                    yPlantData.push(item.Num);
-                    yRealData.push(row.Num);
-                    let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    if (isNaN(ratio) || ratio === 'Infinity') {
-                        yRatioData.push(0);
-                    } else {
-                        yRatioData.push(ratio);
+                sectionsData.map((sectionData) => {
+                    if (row.Section === sectionData.No) {
+                        xAxisData.push(sectionData.Name);
                     }
-                }
+                });
+                yPlantData.push(0);
+                yRealData.push(row.Num);
+                yRatioData.push(100);
             });
-        });
+        } else if (dataList.length > 0 && dataListReal.length === 0) {
+            dataList.map(item => {
+                sectionsData.map((sectionData) => {
+                    if (item.Section === sectionData.No) {
+                        xAxisData.push(sectionData.Name);
+                        console.log('xAxisData', xAxisData);
+                    }
+                });
+                yPlantData.push(item.Num);
+                yRealData.push(0);
+                yRatioData.push(0);
+            });
+        } else if (dataList.length > 0 && dataListReal.length > 0) {
+            dataList.map(item => {
+                dataListReal.map(row => {
+                    if (item.Section === row.Section) {
+                        sectionsData.map((sectionData) => {
+                            if (item.Section === sectionData.No) {
+                                xAxisData.push(sectionData.Name);
+                            }
+                        });
+                        yPlantData.push(item.Num);
+                        yRealData.push(row.Num);
+                        let ratio = (row.Num / item.Num * 100).toFixed(2);
+                        if (isNaN(ratio) || ratio === 'Infinity') {
+                            yRatioData.push(0);
+                        } else {
+                            yRatioData.push(ratio);
+                        }
+                    }
+                });
+            });
+        }
 
         let myChart = echarts.init(document.getElementById('PlantTop'));
         let optionLine = {
