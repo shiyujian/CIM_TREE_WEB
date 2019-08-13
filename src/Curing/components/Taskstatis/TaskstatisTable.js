@@ -1119,6 +1119,7 @@ export default class TaskStatisTable extends Component {
                                 value={taskStatusSelect}
                                 onChange={this.handleTaskStatusChange.bind(this)}
                             >
+                                <Option key='全部' value={''} title='全部'>全部</Option>
                                 <Option key='已上报' value={2} title='已上报'>已上报</Option>
                             </Select>
                         </div>
@@ -1128,10 +1129,12 @@ export default class TaskStatisTable extends Component {
                             <Button style={{marginRight: 20}} onClick={this.handleResetSearch.bind(this)}>重置</Button>
                         </div>
                     </div>
+                    <div className='echartsClass'>
+                        <TaskStatisEcharts
+                            {...this.props}
+                            {...this.state} />
+                    </div>
 
-                    <TaskStatisEcharts
-                        {...this.props}
-                        {...this.state} />
                     <Table
                         columns={this.columns}
                         dataSource={taskSearchData}

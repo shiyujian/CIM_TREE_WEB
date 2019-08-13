@@ -159,8 +159,6 @@ class AddMember extends Component {
                 roles = []
             }
         } = this.props;
-        const user = getUser();
-        let userRoles = user.roles || '';
         var systemRoles = [];
         let parentRoleType = [];
         roles.map((role) => {
@@ -168,25 +166,12 @@ class AddMember extends Component {
                 parentRoleType.push(role);
             }
         });
-        console.log('parentRoleType', parentRoleType);
-        if (user.username && user.username === 'admin') {
-            parentRoleType.map((type) => {
-                systemRoles.push({
-                    name: type && type.RoleName,
-                    value: roles.filter(role => role.ParentID === type.ID)
-                });
+        parentRoleType.map((type) => {
+            systemRoles.push({
+                name: type && type.RoleName,
+                value: roles.filter(role => role.ParentID === type.ID)
             });
-        } else {
-            const rolea = userRoles.ParentID;
-            parentRoleType.map((type) => {
-                if (rolea === type.ID) {
-                    systemRoles.push({
-                        name: type && type.RoleName,
-                        value: roles.filter(role => role.ParentID === type.ID)
-                    });
-                }
-            });
-        }
+        });
         const objs = systemRoles.map(roless => {
             return (
                 <OptGroup label={roless.name} key={roless.name}>

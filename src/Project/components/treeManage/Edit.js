@@ -132,242 +132,6 @@ class Edite extends Component {
         }
     }
 
-    render () {
-        const {
-            form: { getFieldDecorator, getFieldValue },
-            editVisible
-        } = this.props;
-        // 当现场测量信息只有密度和面积时，其他两项为非必填，并且设置为不可选择，清空信息
-        let treeParamValue = getFieldValue('TreeParam');
-        let paramRequired = true;
-        if (treeParamValue && treeParamValue instanceof Array && treeParamValue.length === 2) {
-            if ((treeParamValue[0] === '密度' && treeParamValue[1] === '面积') || (treeParamValue[0] === '面积' && treeParamValue[1] === '密度')) {
-                paramRequired = false;
-            }
-        }
-        return (
-            <div>
-                <Modal
-                    title='修改树种信息'
-                    width={920}
-                    visible={editVisible}
-                    maskClosable={false}
-                    onOk={this.save.bind(this)}
-                    onCancel={this.cancel.bind(this)}
-                >
-                    <Form>
-                        <Row>
-                            <Col span={24}>
-                                <Row>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='名称:'
-                                        >
-                                            {getFieldDecorator('TreeName', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请输入树种名称'
-                                                    }
-                                                ]
-                                            })(
-                                                <Input placeholder='请输入树种名称' />
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='类别:'
-                                        >
-                                            {getFieldDecorator('TreeType', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            '请选择树种类别'
-                                                    }
-                                                ]
-                                            })(
-                                                <Select>
-                                                    {
-                                                        TREETYPENO.map((type) => {
-                                                            return <Option value={type.id} key={type.name}>{type.name}</Option>;
-                                                        })
-                                                    }
-                                                </Select>
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='科属:'
-                                        >
-                                            {getFieldDecorator('TreeSpecies', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            '请输入树种科属'
-                                                    }
-                                                ]
-                                            })(
-                                                <Input placeholder='请输入树种科属' />
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='形态特征:'
-                                        >
-                                            {getFieldDecorator('TreeMorphologicalCharacter', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请输入树种形态特征'
-                                                    }
-                                                ]
-                                            })(
-                                                <Input placeholder='请输入树种形态特征' />
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='习性:'
-                                        >
-                                            {getFieldDecorator('TreeHabit', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请输入树种习性'
-                                                    }
-                                                ]
-                                            })(
-                                                <Input placeholder='请输入树种习性' />
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='苗圃测量项:'
-                                        >
-                                            {getFieldDecorator('NurseryParam', {
-                                                rules: [
-                                                    {
-                                                        required: paramRequired,
-                                                        message: '请选择苗圃测量项'
-                                                    }
-                                                ]
-                                            })(
-                                                <Select mode='multiple' disabled={!paramRequired} onChange={this.handleNurseryParamChange.bind(this)}>
-                                                    {
-                                                        NURSERYPARAM.map((param) => {
-                                                            return <Option value={param} key={param}>{param}</Option>;
-                                                        })
-                                                    }
-                                                </Select>
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='现场测量项:'
-                                        >
-                                            {getFieldDecorator('TreeParam', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请选择现场测量项'
-                                                    }
-                                                ]
-                                            })(
-                                                <Select mode='multiple' onChange={this.handleTreeParamChange.bind(this)}>
-                                                    {
-                                                        TREEPARAM.map((param) => {
-                                                            return <Option value={param} key={param}>{param}</Option>;
-                                                        })
-                                                    }
-                                                </Select>
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='抽检测量项:'
-                                        >
-                                            {getFieldDecorator('SamplingParamText', {
-                                                rules: [
-                                                    {
-                                                        required: paramRequired,
-                                                        message: '请选择苗圃测量项和现场测量项'
-                                                    }
-                                                ]
-                                            })(
-                                                <Input placeholder='请选择苗圃测量项和现场测量项' readOnly />
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='是否需要挂牌:'
-                                        >
-                                            {getFieldDecorator('IsLocation', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请选择是否需要挂牌'
-                                                    }
-                                                ]
-                                            })(
-                                                <RadioGroup>
-                                                    <Radio value={1} key={'是'}>是(即需要定位)</Radio>
-                                                    <Radio value={0} key={'否'}>否(即不需要定位)</Radio>
-                                                </RadioGroup>
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                    <Col span={24}>
-                                        <FormItem
-                                            {...Edite.layout}
-                                            label='树种图片:'
-                                        >
-                                            {getFieldDecorator('TreePics', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请上传图片'
-                                                    }
-                                                ]
-                                            })(
-                                                <Upload {...this.uploadProps}
-                                                    onRemove={this.onRemove.bind(this)}
-                                                    fileList={this.state.fileList}>
-                                                    <Button>
-                                                        <Icon type='upload' />
-                                                        上传图片
-                                                    </Button>
-                                                </Upload>
-                                            )}
-                                        </FormItem>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Form>
-                </Modal>
-            </div>
-        );
-    }
-
     // 选择苗圃测量项
     handleNurseryParamChange = (values) => {
         const {
@@ -671,6 +435,332 @@ class Edite extends Component {
             });
         }
         return stringData;
+    }
+    // 树种校验
+    checkTreeName = async (rule, value, callback) => {
+        if (value) {
+            // 匹配中文，英文字母和数字及下划线
+            let reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
+            if (reg.test(value)) {
+                if (value.length > 10) {
+                    callback(`请输入10个字以下`);
+                } else {
+                    callback();
+                }
+            } else {
+                callback(`请输入正确的树种名称`);
+            }
+        } else {
+            callback();
+        }
+    }
+    // 科属校验
+    checkTreeSpecies = async (rule, value, callback) => {
+        if (value) {
+            // 匹配中文，英文字母和数字及下划线
+            let reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
+            if (reg.test(value)) {
+                if (value.length > 10) {
+                    callback(`请输入10个字以下`);
+                } else {
+                    callback();
+                }
+            } else {
+                callback(`请输入正确的科属信息`);
+            }
+        } else {
+            callback();
+        }
+    }
+    // 形态特征校验
+    checkTreeMorphologicalCharacter = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 200) {
+                callback(`请输入200个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
+    // 习性校验
+    checkTreeHabit = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 200) {
+                callback(`请输入200个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
+    render () {
+        const {
+            form: { getFieldDecorator, getFieldValue },
+            editVisible
+        } = this.props;
+            // 当现场测量信息只有密度和面积时，其他两项为非必填，并且设置为不可选择，清空信息
+        let treeParamValue = getFieldValue('TreeParam');
+        let paramRequired = true;
+        if (treeParamValue && treeParamValue instanceof Array && treeParamValue.length === 2) {
+            if ((treeParamValue[0] === '密度' && treeParamValue[1] === '面积') || (treeParamValue[0] === '面积' && treeParamValue[1] === '密度')) {
+                paramRequired = false;
+            }
+        }
+        return (
+            <div>
+                <Modal
+                    title='修改树种信息'
+                    width={920}
+                    visible={editVisible}
+                    maskClosable={false}
+                    onOk={this.save.bind(this)}
+                    onCancel={this.cancel.bind(this)}
+                >
+                    <Form>
+                        <Row>
+                            <Col span={24}>
+                                <Row>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='树种名称:'
+                                        >
+                                            {getFieldDecorator('TreeName', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请输入树种名称(10个字以下)'
+                                                    },
+                                                    {
+                                                        validator: this.checkTreeName
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请输入树种名称(10个字以下)' />
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='类别:'
+                                        >
+                                            {getFieldDecorator('TreeType', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message:
+                                                                '请选择树种类别'
+                                                    }
+                                                ]
+                                            })(
+                                                <Select placeholder='请选择树种类别'>
+                                                    {
+                                                        TREETYPENO.map((type) => {
+                                                            return <Option
+                                                                value={type.id}
+                                                                key={type.name}>
+                                                                {type.name}
+                                                            </Option>;
+                                                        })
+                                                    }
+                                                </Select>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='科属:'
+                                        >
+                                            {getFieldDecorator('TreeSpecies', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message:
+                                                                '请输入树种科属(10个字以下)'
+                                                    },
+                                                    {
+                                                        validator: this.checkTreeSpecies
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请输入树种科属(10个字以下)' />
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='形态特征:'
+                                        >
+                                            {getFieldDecorator('TreeMorphologicalCharacter', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请输入树种形态特征(200个字以下)'
+                                                    },
+                                                    {
+                                                        validator: this.checkTreeMorphologicalCharacter
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请输入树种形态特征(200个字以下)' />
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='习性:'
+                                        >
+                                            {getFieldDecorator('TreeHabit', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请输入树种习性(200个字以下)'
+                                                    },
+                                                    {
+                                                        validator: this.checkTreeHabit
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请输入树种习性(200个字以下)' />
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='苗圃测量项:'
+                                        >
+                                            {getFieldDecorator('NurseryParam', {
+                                                rules: [
+                                                    {
+                                                        required: paramRequired,
+                                                        message: '请选择苗圃测量项'
+                                                    }
+                                                ]
+                                            })(
+                                                <Select
+                                                    placeholder='请选择苗圃测量项'
+                                                    mode='multiple'
+                                                    disabled={!paramRequired}
+                                                    onChange={this.handleNurseryParamChange.bind(this)}>
+                                                    {
+                                                        NURSERYPARAM.map((param) => {
+                                                            return <Option
+                                                                value={param}
+                                                                key={param}>
+                                                                {param}
+                                                            </Option>;
+                                                        })
+                                                    }
+                                                </Select>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='现场测量项:'
+                                        >
+                                            {getFieldDecorator('TreeParam', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请选择现场测量项'
+                                                    }
+                                                ]
+                                            })(
+                                                <Select
+                                                    placeholder='请选择现场测量项'
+                                                    mode='multiple'
+                                                    onChange={this.handleTreeParamChange.bind(this)}>
+                                                    {
+                                                        TREEPARAM.map((param) => {
+                                                            return <Option
+                                                                value={param}
+                                                                key={param}>
+                                                                {param}
+                                                            </Option>;
+                                                        })
+                                                    }
+                                                </Select>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='抽检测量项:'
+                                        >
+                                            {getFieldDecorator('SamplingParamText', {
+                                                rules: [
+                                                    {
+                                                        required: paramRequired,
+                                                        message: '请选择苗圃测量项和现场测量项'
+                                                    }
+                                                ]
+                                            })(
+                                                <Input placeholder='请选择苗圃测量项和现场测量项' readOnly />
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='是否需要挂牌:'
+                                        >
+                                            {getFieldDecorator('IsLocation', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请选择是否需要挂牌'
+                                                    }
+                                                ]
+                                            })(
+                                                <RadioGroup>
+                                                    <Radio value={1} key={'是'}>是(即需要定位)</Radio>
+                                                    <Radio value={0} key={'否'}>否(即不需要定位)</Radio>
+                                                </RadioGroup>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={24}>
+                                        <FormItem
+                                            {...Edite.layout}
+                                            label='树种图片:'
+                                        >
+                                            {getFieldDecorator('TreePics', {
+                                                rules: [
+                                                    {
+                                                        required: true,
+                                                        message: '请上传图片'
+                                                    }
+                                                ]
+                                            })(
+                                                <Upload {...this.uploadProps}
+                                                    onRemove={this.onRemove.bind(this)}
+                                                    fileList={this.state.fileList}>
+                                                    <Button>
+                                                        <Icon type='upload' />
+                                                            上传图片
+                                                    </Button>
+                                                </Upload>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                    </Form>
+                </Modal>
+            </div>
+        );
     }
 }
 

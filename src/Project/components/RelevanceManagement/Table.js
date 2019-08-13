@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Select, Table, Modal, Form, Button, Row, Col, Spin, message, Pagination } from 'antd';
+import { Select, Table, Modal, Form, Button, Row, Col, Spin, message } from 'antd';
 import { formItemLayout, getUser } from '_platform/auth';
 
 const Option = Select.Option;
@@ -140,12 +140,28 @@ class Tablelevel extends Component {
         });
     }
     handleCancel () {
+        const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        setFieldsValue({
+            supplier: undefined,
+            nursery: undefined
+        });
         this.setState({
             showModal: false
         });
     }
     handleOk () {
-        const { postNb22s } = this.props.actions;
+        const {
+            actions: {
+                postNb22s
+            },
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
         this.props.form.validateFields((err, values) => {
             if (err) {
                 return;
@@ -163,6 +179,10 @@ class Tablelevel extends Component {
                 if (rep && rep.code && rep.code === 1) {
                     message.success('绑定成功');
                     this.toSearch();
+                    setFieldsValue({
+                        supplier: undefined,
+                        nursery: undefined
+                    });
                     this.setState({
                         showModal: false
                     });
@@ -253,7 +273,9 @@ class Tablelevel extends Component {
                         rowKey='ID'
                     />
                 </Spin>
-                <Modal title='新增绑定' visible={showModal}
+                <Modal
+                    title='新增绑定'
+                    visible={showModal}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                 >
@@ -263,7 +285,10 @@ class Tablelevel extends Component {
                             label='供应商'
                         >
                             {getFieldDecorator('supplier', {
-                                rules: [{required: true, message: '必填项'}]
+                                rules: [{
+                                    required: true,
+                                    message: '必填项'
+                                }]
                             })(
                                 <Select style={{ width: 200 }}
                                     allowClear
@@ -283,7 +308,10 @@ class Tablelevel extends Component {
                             label='苗圃基地'
                         >
                             {getFieldDecorator('nursery', {
-                                rules: [{required: true, message: '必填项'}]
+                                rules: [{
+                                    required: true,
+                                    message: '必填项'
+                                }]
                             })(
                                 <Select
                                     style={{ width: 200 }}

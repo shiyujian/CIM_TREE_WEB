@@ -255,7 +255,7 @@ export default class Tree extends Component {
                                 ? (
                                     !deleteProjectDisabled
                                         ? <Popconfirm
-                                            title='是否真的要删除选中项目?'
+                                            title='是否要删除选中项目?'
                                             onConfirm={this.handleRemoveProject.bind(this)}
                                             okText='是'
                                             cancelText='否'

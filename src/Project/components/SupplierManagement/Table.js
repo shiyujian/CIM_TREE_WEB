@@ -1,6 +1,17 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, Notification } from 'antd';
+import {
+    Row,
+    Col,
+    Input,
+    Button,
+    Select,
+    Table,
+    Modal,
+    Form,
+    Spin,
+    Notification
+} from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
 import Addition from './Addition';
 import Edit from './Edit';
@@ -16,8 +27,6 @@ class Tablelevel extends Component {
         this.state = {
             status: '', // 审核状态
             suppliername: '', // 供应商名称
-            total: 0,
-            page: 1,
             loading: true,
             supplierList: [], // 供应商列表
             visibleTitle: '', // 弹框标题
@@ -34,12 +43,16 @@ class Tablelevel extends Component {
             blackRecord: '',
             blackVisible: false,
             addVisible: false,
-            editVisible: false
+            editVisible: false,
+            pagination: {
+                current: 1,
+                showQuickJumper: true
+            }
         };
         this.Checker = '';
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
-        this.handlePage = this.handlePage.bind(this); // 换页
+        this.handleTableChange = this.handleTableChange.bind(this); // 换页
         this.handleStatus = this.handleStatus.bind(this); // 状态
         this.handleName = this.handleName.bind(this); // 查询供应商名称
         this.toAdd = this.toAdd.bind(this); // 新增供应商弹框
@@ -266,9 +279,11 @@ class Tablelevel extends Component {
         }
         await this.onSearch();
     }
-    handlePage (page) {
+    handleTableChange (pagination) {
+        const pager = { ...this.state.pagination };
+        pager.current = pagination.current;
         this.setState({
-            page
+            pagination: pager
         }, () => {
             this.onSearch();
         });
@@ -300,7 +315,10 @@ class Tablelevel extends Component {
         });
     }
     onClear () {
+        const pagination = { ...this.state.pagination };
+        pagination.current = 1;
         this.setState({
+            pagination,
             suppliername: ''
         }, () => {
             this.onSearch();
@@ -343,6 +361,10 @@ class Tablelevel extends Component {
     toDelete (record, e) {
         e.preventDefault();
         const { deleteSupplier } = this.props.actions;
+        const {
+            supplierList
+        } = this.state;
+        const pagination = { ...this.state.pagination };
         const self = this;
         confirm({
             title: '此操作会删除该供应商下 所有的绑定关系，你确定继续吗?',
@@ -354,6 +376,16 @@ class Tablelevel extends Component {
                         Notification.warning({
                             message: '如未删除成功，请确认该组织机构下无用户',
                             duration: 2
+                        });
+                        if (supplierList instanceof Array && supplierList.length === 1) {
+                            if (pagination.current > 1) {
+                                pagination.current = pagination.current - 1;
+                            }
+                        }
+                        self.setState({
+                            pagination
+                        }, () => {
+                            self.onSearch();
                         });
                         self.onSearch();
                     } else {
@@ -492,8 +524,15 @@ class Tablelevel extends Component {
         }
     }
     onSearch () {
-        const { page, status, suppliername } = this.state;
-        const { getSupplierList } = this.props.actions;
+        const {
+            status,
+            suppliername
+        } = this.state;
+        const {
+            getSupplierList
+        } = this.props.actions;
+        const pagination = { ...this.state.pagination };
+        const page = pagination.current;
         const param = {
             status: status === undefined ? '' : status,
             suppliername,
@@ -504,11 +543,14 @@ class Tablelevel extends Component {
             loading: true
         });
         getSupplierList({}, param).then((rep) => {
-            if (rep.code === 200) {
+            if (rep && rep.code && rep.code === 200) {
+                let pageinfo = (rep && rep.pageinfo) || '';
+                pagination.total = (pageinfo && pageinfo.total) || 0;
+                pagination.current = (pageinfo && pageinfo.page) || 1;
+                pagination.pageSize = 10;
                 this.setState({
-                    total: rep.pageinfo.total,
                     supplierList: rep.content,
-                    page: rep.pageinfo.page,
+                    pagination,
                     loading: false
                 });
             }
@@ -530,12 +572,19 @@ class Tablelevel extends Component {
             record: null
         });
     }
+    handleQuery = () => {
+        const pagination = { ...this.state.pagination };
+        pagination.current = 1;
+        this.setState({
+            pagination
+        }, () => {
+            this.onSearch();
+        });
+    }
     render () {
         const { getFieldDecorator } = this.props.form;
         const {
             supplierList,
-            page,
-            total,
             addVisible,
             editVisible,
             seeVisible,
@@ -545,7 +594,8 @@ class Tablelevel extends Component {
             status,
             textCord,
             LegalPerson,
-            blackVisible
+            blackVisible,
+            pagination
         } = this.state;
 
         let img = getForestImgUrl(imageUrl);
@@ -561,10 +611,13 @@ class Tablelevel extends Component {
                         >
                             供应商名称:
                         </label>
-                        <Input className='search_input' value={suppliername} onChange={this.handleName} />
+                        <Input
+                            className='search_input'
+                            value={suppliername}
+                            onChange={this.handleName} />
                         <Button
                             type='primary'
-                            onClick={this.onSearch}
+                            onClick={this.handleQuery.bind(this)}
                             style={{minWidth: 30, marginRight: 20}}
                         >
                             查询
@@ -582,7 +635,7 @@ class Tablelevel extends Component {
                             style={{ float: 'right' }}
                             onClick={this.toAdd}
                         >
-                            添加供应商
+                            新增供应商
                         </Button>
                     </Col>
                 </Row>
@@ -614,9 +667,9 @@ class Tablelevel extends Component {
                                 rowClassName={this.setBlackListColor.bind(this)}
                                 dataSource={supplierList}
                                 scroll={{ x: 1550 }}
-                                pagination={false} rowKey='ID' />
-                            <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
-                                showQuickJumper onChange={this.handlePage} />
+                                pagination={pagination}
+                                onChange={this.handleTableChange.bind(this)}
+                                rowKey='ID' />
                         </Spin>
                     </Col>
                 </Row>

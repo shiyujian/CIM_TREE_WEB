@@ -96,106 +96,6 @@ export default class TrackTree extends Component {
         await this.handleRemoveAllTrackLayer();
     }
 
-    render () {
-        let {
-            trackTree = [],
-            trackTreeLoading
-        } = this.props;
-        const {
-            timeType,
-            stime,
-            etime,
-            searchDateData,
-            searchNameData,
-            searchName
-        } = this.state;
-        let contents = [];
-        if (searchName) {
-            contents = searchNameData;
-        } else if (etime && stime) {
-            for (let j = 0; j < searchDateData.length; j++) {
-                const element = searchDateData[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        } else {
-            for (let j = 0; j < trackTree.length; j++) {
-                const element = trackTree[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        };
-        return (
-            <div>
-                <Spin spinning={trackTreeLoading}>
-                    <Search
-                        className='TrackTree-search'
-                        placeholder='人名搜索'
-                        onSearch={this.searchUserName.bind(this)}
-                    />
-                    <div className='TrackTree-button'>
-                        <Button className='TrackTree-button-layout' style={{marginRight: 10}}
-                            type={timeType === 'all' ? 'primary' : 'default'}
-                            id='all' onClick={this.handleTimeChange.bind(this)}>
-                            全部
-                        </Button>
-                        <Button className='TrackTree-button-layout' id='today'
-                            type={timeType === 'today' ? 'primary' : 'default'}
-                            onClick={this.handleTimeChange.bind(this)}>
-                            今天
-                        </Button>
-                    </div>
-                    <div className='TrackTree-button'>
-                        <Button className='TrackTree-button-layout' style={{marginRight: 10}}
-                            type={timeType === 'week' ? 'primary' : 'default'}
-                            id='week' onClick={this.handleTimeChange.bind(this)}>
-                            一周内
-                        </Button>
-                        <Button className='TrackTree-button-layout' id='custom'
-                            type={timeType === 'custom' ? 'primary' : 'default'}
-                            onClick={this.handleTimeChange.bind(this)}>
-                            自定义
-                        </Button>
-                    </div>
-                    {
-                        timeType === 'custom'
-                            ? <RangePicker
-                                style={{width: 220, marginBottom: 10}}
-                                showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
-                                format='YYYY-MM-DD HH:mm:ss'
-                                placeholder={['Start Time', 'End Time']}
-                                onChange={this.handleDateChange.bind(this)}
-                            />
-                            : ''
-                    }
-                    <div className='TrackTree-statis-layout'>
-                        <span style={{verticalAlign: 'middle'}}>人名</span>
-                        <span className='TrackTree-data-text'>
-                            次数
-                        </span>
-                    </div>
-                    <div>
-                        {
-                            contents.map((content) => {
-                                return (
-                                    <div className='TrackTree-mrg10' key={content.ID}>
-                                        <span style={{verticalAlign: 'middle'}}>{content.Full_Name}</span>
-                                        <span className='TrackTree-data-text'>
-                                            {content.children.length}
-                                        </span>
-                                    </div>
-                                );
-                            })
-                        }
-                    </div>
-                </Spin>
-            </div>
-
-        );
-    }
-
     searchUserName = (value) => {
         let {
             trackTree = []
@@ -253,6 +153,9 @@ export default class TrackTree extends Component {
         let {
             trackTree = []
         } = this.props;
+        const {
+            searchName
+        } = this.state;
         try {
             let target = e.target;
             let timeType = target.getAttribute('id');
@@ -271,6 +174,30 @@ export default class TrackTree extends Component {
                 }, () => {
                     if (trackTree.length === 0) {
                         this.query();
+                    } else {
+                        if (searchName) {
+                            let contents = [];
+                            for (let j = 0; j < trackTree.length; j++) {
+                                const element = trackTree[j];
+                                if (element !== undefined) {
+                                    contents.push(element);
+                                }
+                            }
+                            let ckeckedData = [];
+                            let searchNameData = [];
+                            contents.map((content) => {
+                                let name = content.Full_Name;
+                                if (name.indexOf(searchName) !== -1) {
+                                    searchNameData.push(content);
+                                    if (content && content.children) {
+                                        ckeckedData = ckeckedData.concat(content.children);
+                                    }
+                                }
+                            });
+                            this.setState({
+                                searchNameData
+                            });
+                        }
                     }
                 });
                 return;
@@ -307,12 +234,14 @@ export default class TrackTree extends Component {
                 getInspectRouter,
                 getTrackTree,
                 getTrackTreeLoading
-            }
+            },
+            trackTree = []
         } = this.props;
         const {
             stime,
             etime,
-            timeType
+            timeType,
+            searchName
         } = this.state;
         try {
             this.handleRemoveAllTrackLayer();
@@ -328,6 +257,29 @@ export default class TrackTree extends Component {
                 await getTrackTree(searchDateData);
             }
             await getTrackTreeLoading(false);
+            if (searchName) {
+                let contents = [];
+                for (let j = 0; j < searchDateData.length; j++) {
+                    const element = searchDateData[j];
+                    if (element !== undefined) {
+                        contents.push(element);
+                    }
+                }
+                let ckeckedData = [];
+                let searchNameData = [];
+                contents.map((content) => {
+                    let name = content.Full_Name;
+                    if (name.indexOf(searchName) !== -1) {
+                        searchNameData.push(content);
+                        if (content && content.children) {
+                            ckeckedData = ckeckedData.concat(content.children);
+                        }
+                    }
+                });
+                this.setState({
+                    searchNameData
+                });
+            }
             this.setState({
                 searchDateData
             });
@@ -485,5 +437,105 @@ export default class TrackTree extends Component {
         for (let v in trackMarkerLayerList) {
             map.removeLayer(trackMarkerLayerList[v]);
         }
+    }
+
+    render () {
+        let {
+            trackTree = [],
+            trackTreeLoading
+        } = this.props;
+        const {
+            timeType,
+            stime,
+            etime,
+            searchDateData,
+            searchNameData,
+            searchName
+        } = this.state;
+        let contents = [];
+        if (searchName) {
+            contents = searchNameData;
+        } else if (etime && stime) {
+            for (let j = 0; j < searchDateData.length; j++) {
+                const element = searchDateData[j];
+                if (element !== undefined) {
+                    contents.push(element);
+                }
+            }
+        } else {
+            for (let j = 0; j < trackTree.length; j++) {
+                const element = trackTree[j];
+                if (element !== undefined) {
+                    contents.push(element);
+                }
+            }
+        };
+        return (
+            <div>
+                <Spin spinning={trackTreeLoading}>
+                    <Search
+                        className='TrackTree-search'
+                        placeholder='人名搜索'
+                        onSearch={this.searchUserName.bind(this)}
+                    />
+                    <div className='TrackTree-button'>
+                        <Button className='TrackTree-button-layout' style={{marginRight: 10}}
+                            type={timeType === 'all' ? 'primary' : 'default'}
+                            id='all' onClick={this.handleTimeChange.bind(this)}>
+                            全部
+                        </Button>
+                        <Button className='TrackTree-button-layout' id='today'
+                            type={timeType === 'today' ? 'primary' : 'default'}
+                            onClick={this.handleTimeChange.bind(this)}>
+                            今天
+                        </Button>
+                    </div>
+                    <div className='TrackTree-button'>
+                        <Button className='TrackTree-button-layout' style={{marginRight: 10}}
+                            type={timeType === 'week' ? 'primary' : 'default'}
+                            id='week' onClick={this.handleTimeChange.bind(this)}>
+                            一周内
+                        </Button>
+                        <Button className='TrackTree-button-layout' id='custom'
+                            type={timeType === 'custom' ? 'primary' : 'default'}
+                            onClick={this.handleTimeChange.bind(this)}>
+                            自定义
+                        </Button>
+                    </div>
+                    {
+                        timeType === 'custom'
+                            ? <RangePicker
+                                style={{width: 220, marginBottom: 10}}
+                                showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
+                                format='YYYY-MM-DD HH:mm:ss'
+                                placeholder={['Start Time', 'End Time']}
+                                onChange={this.handleDateChange.bind(this)}
+                            />
+                            : ''
+                    }
+                    <div className='TrackTree-statis-layout'>
+                        <span style={{verticalAlign: 'middle'}}>人名</span>
+                        <span className='TrackTree-data-text'>
+                            次数
+                        </span>
+                    </div>
+                    <div>
+                        {
+                            contents.map((content) => {
+                                return (
+                                    <div className='TrackTree-mrg10' key={content.ID}>
+                                        <span style={{verticalAlign: 'middle'}}>{content.Full_Name}</span>
+                                        <span className='TrackTree-data-text'>
+                                            {content.children.length}
+                                        </span>
+                                    </div>
+                                );
+                            })
+                        }
+                    </div>
+                </Spin>
+            </div>
+
+        );
     }
 }

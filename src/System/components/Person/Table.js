@@ -11,7 +11,8 @@ import {
     Input,
     Modal,
     Form,
-    Spin
+    Spin,
+    Notification
 } from 'antd';
 import Addition from './Addition';
 import Edit from './Edit';
@@ -194,7 +195,7 @@ class Users extends Component {
                     }
                     arr.push(
                         <Popconfirm
-                            title='是否真的要删除用户?'
+                            title='是否要删除用户?'
                             key={2}
                             onConfirm={this.del.bind(this, record)}
                             okText='是'
@@ -277,7 +278,7 @@ class Users extends Component {
                 roles = []
             }
         } = this.props;
-        var systemRoles = [];
+        let systemRoles = [];
         let parentRoleType = [];
         roles.map((role) => {
             if (role && role.ID && role.ParentID === 0) {
@@ -352,7 +353,7 @@ class Users extends Component {
                         onClick={this.append.bind(this)}>
                             添加用户
                     </Button>
-                </Col>,
+                </Col>
                 <Col span={3}>
                     {
                         selectedRowKeys.length > 0
@@ -395,7 +396,6 @@ class Users extends Component {
     }
     render () {
         const {
-            platform: { roles = [] },
             sidebar: {
                 node = {}
             } = {}
@@ -444,7 +444,7 @@ class Users extends Component {
                             <div className='system-person-mrg20'>
                                 <Select
                                     placeholder='请选择角色'
-                                    value={this.state.searchRoles || ''}
+                                    value={this.state.searchRoles || undefined}
                                     onChange={this.changeRoles.bind(this)}
                                     style={{ width: '100%' }}
                                 >
@@ -454,7 +454,7 @@ class Users extends Component {
                             <div className='system-person-mrg20'>
                                 <Select
                                     placeholder='请选择状态'
-                                    value={this.state.searchUserStatus || []}
+                                    value={this.state.searchUserStatus || undefined}
                                     onChange={this.changeUserStatus.bind(this)}
                                     style={{ width: '100%' }}
                                 >
@@ -649,10 +649,15 @@ class Users extends Component {
                 role: searchRoles,
                 Status: searchUserStatus
             };
-            const user = getUser();
-            let username = user.username;
-            if (!searchOveralSituation || username !== 'admin') {
-                postData.org = node.ID;
+            if (!searchOveralSituation) {
+                if (node && node.ID) {
+                    postData.org = (node && node.ID) || '';
+                } else {
+                    Notification.error({
+                        message: '请先选择部门'
+                    });
+                    return;
+                }
             }
             console.log('postData', postData);
             this.setState({ loading: true });
@@ -683,13 +688,6 @@ class Users extends Component {
     }
     // 清空查询条件
     clear = async () => {
-        document.getElementById('NurseryData').value = '';
-        this.setState({
-            searchKeyword: '',
-            searchRoles: '',
-            searchUserStatus: '',
-            searchOveralSituation: ''
-        });
         const {
             actions: {
                 getUsers,
@@ -700,10 +698,29 @@ class Users extends Component {
                 node = {}
             }
         } = this.props;
+        const {
+            searchOveralSituation
+        } = this.state;
         try {
+            if (!searchOveralSituation) {
+                if (!(node && node.ID)) {
+                    Notification.error({
+                        message: '请先选择部门'
+                    });
+                    return;
+                }
+            }
+            document.getElementById('NurseryData').value = '';
+            this.setState({
+                searchKeyword: '',
+                searchRoles: '',
+                searchUserStatus: '',
+                searchOveralSituation: ''
+            });
             this.setState({
                 loading: true
             });
+
             const pager = { ...getTablePages };
             let postData = {
                 org: (node && node.ID) || '',

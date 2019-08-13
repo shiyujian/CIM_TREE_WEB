@@ -180,6 +180,8 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
     let regionSectionName = '';
     // 标段是否是登陆用户所在标段
     let sectionBool = true;
+    // 小班细班名称
+    let regionSmallThinClassName = '';
 
     // 细班数组，查看细班是否重复，重复不再查询
     let thinNoList = [];
@@ -249,9 +251,11 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
                                     if (index === 0) {
                                         regionThinName = regionThinName + thinClassName;
                                         regionThinNo = regionThinNo + thinNo;
+                                        regionSmallThinClassName = regionSmallThinClassName + smallClass.Name + thinClassName;
                                     } else {
                                         regionThinName = regionThinName + ' ,' + thinClassName;
                                         regionThinNo = regionThinNo + ' ,' + thinNo;
+                                        regionSmallThinClassName = regionSmallThinClassName + ' ,' + smallClass.Name + thinClassName;
                                     }
                                 }
                             });
@@ -270,7 +274,8 @@ export const getThinClassName = (regionThinClass, totalThinClass, signSection, b
         regionSectionName: regionSectionName,
         sectionBool: sectionBool,
         regionSmallName: regionSmallName,
-        regionSmallNo: regionSmallNo
+        regionSmallNo: regionSmallNo,
+        regionSmallThinClassName: regionSmallThinClassName
     };
     return regionData;
 };

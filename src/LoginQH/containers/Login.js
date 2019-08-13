@@ -86,17 +86,17 @@ class Login extends Component {
     checkUserName = async (rule, value, callback) => {
         if (value) {
             // 手机号正则
-            let reg = /^[a-zA-Z0-9_]{4,16}$/;
+            let reg = /^[^\s]*$/;
             console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
                     callback();
                 } else {
-                    callback(`请输入4到16位（字母，数字，下划线）用户名`);
+                    callback(`请输入正确的用户名`);
                 }
             } else {
-                callback(`请输入4到16位（字母，数字，下划线）用户名`);
+                callback(`请输入正确的用户名`);
             }
         } else {
             callback();
@@ -104,18 +104,17 @@ class Login extends Component {
     }
     checkPassWord = async (rule, value, callback) => {
         if (value) {
-            // 手机号正则
-            let reg = /^[a-zA-Z0-9_-]{4,16}$/;
+            let reg = /^[^\s]*$/;
             console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
                     callback();
                 } else {
-                    callback(`请输入4到16位（字母，数字，下划线，减号）密码`);
+                    callback(`请输入正确的密码`);
                 }
             } else {
-                callback(`请输入4到16位（字母，数字，下划线，减号）密码`);
+                callback(`请输入正确的密码`);
             }
         } else {
             callback();
@@ -517,7 +516,8 @@ class Login extends Component {
         let postData = {};
         postData = {
             phone: data.username,
-            pwd: data.password
+            pwd: data.password,
+            imei: ''
         };
         // }
         let forestUserData = await loginForest({}, postData);

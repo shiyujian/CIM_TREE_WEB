@@ -69,7 +69,7 @@ class TaskCreateModal extends Component {
             treeNum = 0,
             regionArea = 0,
             regionSectionName,
-            regionThinName
+            regionSmallThinClassName
         } = this.props;
         const {
             typeOptionArr,
@@ -177,7 +177,7 @@ class TaskCreateModal extends Component {
                         <Row>
                             <FormItem {...FormItemLayout} label='细班'>
                                 {getFieldDecorator('taskThinClass', {
-                                    initialValue: `${regionThinName}`,
+                                    initialValue: `${regionSmallThinClassName}`,
                                     rules: [
                                         { required: true, message: '请输入细班名称' }
                                     ]

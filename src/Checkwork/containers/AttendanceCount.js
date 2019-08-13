@@ -24,8 +24,16 @@ export default class AttendanceCount extends Component {
         };
     }
 
-    componentDidMount () {
-
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getRoles
+            },
+            platform: { roles = [] }
+        } = this.props;
+        if (!(roles && roles.length > 0)) {
+            await getRoles();
+        }
     }
 
     render () {

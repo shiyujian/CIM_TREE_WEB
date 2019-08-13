@@ -109,54 +109,54 @@ class TablePerson extends Component {
         } = this.state;
         let searchList = [];
         this.props.form.validateFields(async (err, values) => {
-            console.log('err', err);
-            console.log('values', values);
-            tempData.map(item => {
-                let isName = false;
-                let isTitle = false;
-                let iscc = false;
-                if (!values.names) {
-                    isName = true;
-                } else {
-                    if (item.Full_Name) {
-                        if (
-                            values.names &&
-                            item.Full_Name.indexOf(values.names) > -1
-                        ) {
-                            isName = true;
+            if (!err) {
+                tempData.map(item => {
+                    let isName = false;
+                    let isTitle = false;
+                    let iscc = false;
+                    if (!values.names) {
+                        isName = true;
+                    } else {
+                        if (item.Full_Name) {
+                            if (
+                                values.names &&
+                                item.Full_Name.indexOf(values.names) > -1
+                            ) {
+                                isName = true;
+                            }
                         }
                     }
-                }
-                if (!values.is_num) {
-                    iscc = true;
-                } else {
-                    if (item.Number) {
-                        if (
-                            values.is_num &&
-                            item.Number.indexOf(values.is_num) > -1
-                        ) {
-                            iscc = true;
+                    if (!values.is_num) {
+                        iscc = true;
+                    } else {
+                        if (item.Number) {
+                            if (
+                                values.is_num &&
+                                item.Number.indexOf(values.is_num) > -1
+                            ) {
+                                iscc = true;
+                            }
                         }
                     }
-                }
-                if (!values.usernamet) {
-                    isTitle = true;
-                } else {
-                    if (
-                        values.usernamet &&
-                        item.User_Name.indexOf(values.usernamet) > -1
-                    ) {
+                    if (!values.usernamet) {
                         isTitle = true;
+                    } else {
+                        if (
+                            values.usernamet &&
+                            item.User_Name.indexOf(values.usernamet) > -1
+                        ) {
+                            isTitle = true;
+                        }
                     }
-                }
-                if (isName && isTitle && iscc) {
-                    searchList.push(item);
-                }
-            });
-            this.setState({
-                tempDatas: searchList,
-                isUpdate: true
-            });
+                    if (isName && isTitle && iscc) {
+                        searchList.push(item);
+                    }
+                });
+                this.setState({
+                    tempDatas: searchList,
+                    isUpdate: true
+                });
+            }
         });
     }
     clears () {
@@ -183,6 +183,28 @@ class TablePerson extends Component {
             }
         });
         return numArr;
+    }
+    checkIDNumber = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg18 = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
+            let reg15 = /^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{2}$/;
+            console.log('reg18.test(value)', reg18.test(value));
+            console.log('reg15.test(value)', reg15.test(value));
+
+            // isNaN(value);
+            if (reg18.test(value) || reg15.test(value)) {
+                if (value) {
+                    callback();
+                } else {
+                    callback(`请输入正确的身份证号`);
+                }
+            } else {
+                callback(`请输入正确的身份证号`);
+            }
+        } else {
+            callback();
+        }
     }
     render () {
         const {
@@ -323,7 +345,7 @@ class TablePerson extends Component {
                         return (
                             <span>
                                 <Popconfirm
-                                    title='是否真的要移除黑名单?'
+                                    title='是否要移除黑名单?'
                                     onConfirm={this.confirm.bind(this, record)}
                                     okText='Yes'
                                     cancelText='No'
@@ -359,7 +381,17 @@ class TablePerson extends Component {
                             </Col>
                             <Col span={8}>
                                 <FormItem {...formItemLayout} label='身份证号'>
-                                    {getFieldDecorator('is_num', {})(
+                                    {getFieldDecorator('is_num', {
+                                        rules: [
+                                            {
+                                                required: false,
+                                                message: '请输入身份证号'
+                                            },
+                                            {
+                                                validator: this.checkIDNumber
+                                            }
+                                        ]
+                                    })(
                                         <Input placeholder='请输入身份证号' />
                                     )}
                                 </FormItem>

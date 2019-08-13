@@ -173,21 +173,21 @@ class AddProject extends Component {
             >
                 <Spin spinning={loading}>
                     <div>
-                        <FormItem {...AddProject.layout} label={`名称`}>
+                        <FormItem {...AddProject.layout} label={`项目名称`}>
                             {getFieldDecorator('name', {
                                 rules: [
                                     {
                                         required: true,
-                                        message: '请输入名称'
+                                        message: '请输入项目名称'
                                     }
                                 ]
                             })(
                                 <Input
-                                    placeholder='请输入名称'
+                                    placeholder='请输入项目名称'
                                 />
                             )}
                         </FormItem>
-                        <FormItem {...AddProject.layout} label={`编码`}>
+                        <FormItem {...AddProject.layout} label={`项目编码`}>
                             {getFieldDecorator('code', {
                                 rules: [
                                     {
@@ -198,11 +198,11 @@ class AddProject extends Component {
                                 ]
                             })(
                                 <Input
-                                    placeholder='请输入编码'
+                                    placeholder='请输入项目编码'
                                 />
                             )}
                         </FormItem>
-                        <FormItem {...AddProject.layout} label={`行政编码`}>
+                        <FormItem {...AddProject.layout} label={`所在地区`}>
                             {getFieldDecorator('RegionCode', {
                                 rules: [{
                                     required: true,

@@ -36,7 +36,6 @@ class ScopeCreateModal extends Component {
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
                 try {
-                    console.log('coordinates', coordinates);
                     let wkt = '';
                     wkt = 'POLYGON(';
                     // 获取手动框选坐标wkt
@@ -48,7 +47,7 @@ class ScopeCreateModal extends Component {
                             AreaGeom: wkt
                         };
                         let scopeData = await postCheckScope({}, postData);
-                        console.log('scopeData', scopeData);
+
                         if (scopeData && scopeData.code && scopeData.code === 1) {
                             Notification.success({
                                 message: '电子围栏创建成功',

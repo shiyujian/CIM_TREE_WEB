@@ -38,8 +38,16 @@ export default class TaskStatisEcharts extends Component {
             },
             toolbox: {
                 feature: {
-                    saveAsImage: {show: true}
-                }
+                    saveAsImage: {
+                        show: true,
+                        iconStyle: {
+                            textPosition: 'bottom',
+                            shadowOffsetX: 10
+                        }
+                        // title: '保存图片'
+                    }
+                },
+                right: 20
             },
             grid: {
                 left: '3%',

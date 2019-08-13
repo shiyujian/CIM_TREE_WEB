@@ -252,6 +252,69 @@ class Edit extends Component {
             RegionCode
         });
     }
+    checkPersonTelephone = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[1]([3-9])[0-9]{9}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (!isNaN(value) && reg.test(value)) {
+                if (value > 0) {
+                    callback();
+                } else {
+                    callback(`请输入正确的手机号`);
+                }
+            } else {
+                callback(`请输入正确的手机号`);
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPersonName = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 15) {
+                callback(`请输入15个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPersonAddress = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 30) {
+                callback(`请输入30个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPersonTreePlace = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 30) {
+                callback(`请输入30个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPersonNurseryName = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 30) {
+                callback(`请输入30个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
     render () {
         const {
             fileList,
@@ -343,12 +406,19 @@ class Edit extends Component {
                                         label='苗圃名称'
                                     >
                                         {getFieldDecorator('NurseryName', {
-                                            rules: [{
-                                                required: true,
-                                                message: '请输入苗圃名称'
-                                            }]
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '请输入苗圃名称（30个字以下）'
+                                                },
+                                                {
+                                                    validator: this.checkPersonNurseryName
+                                                }
+                                            ]
                                         })(
-                                            <Input placeholder='请输入苗圃名称' disabled={isAmend} />
+                                            <Input
+                                                placeholder='请输入苗圃名称（30个字以下）'
+                                                disabled={isAmend} />
                                         )}
                                     </FormItem>
                                 </Col>
@@ -358,12 +428,17 @@ class Edit extends Component {
                                         label='产地'
                                     >
                                         {getFieldDecorator('TreePlace', {
-                                            rules: [{
-                                                required: true,
-                                                message: '请输入产地'
-                                            }]
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '请输入产地（30个字以下）'
+                                                },
+                                                {
+                                                    validator: this.checkPersonTreePlace
+                                                }
+                                            ]
                                         })(
-                                            <Input placeholder='请输入产地' />
+                                            <Input placeholder='请输入产地（30个字以下）' />
                                         )}
                                     </FormItem>
                                 </Col>
@@ -391,26 +466,37 @@ class Edit extends Component {
                                         label='地址'
                                     >
                                         {getFieldDecorator('Address', {
-                                            rules: [{
-                                                required: false
-                                            }]
+                                            rules: [
+                                                {
+                                                    required: false,
+                                                    message: '请输入地址（30个字以下）'
+                                                },
+                                                {
+                                                    validator: this.checkPersonAddress
+                                                }
+                                            ]
                                         })(
-                                            <Input placeholder='请输入地址' />
+                                            <Input placeholder='请输入地址（30个字以下）' />
                                         )}
                                     </FormItem>
                                 </Col>
                                 <Col span={12}>
                                     <FormItem
                                         {...layoutT}
-                                        label='负责人'
+                                        label='负责人姓名'
                                     >
                                         {getFieldDecorator('Leader', {
-                                            rules: [{
-                                                required: true,
-                                                message: '请输入负责人姓名'
-                                            }]
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '请输入负责人姓名（15个字以下）'
+                                                },
+                                                {
+                                                    validator: this.checkPersonName
+                                                }
+                                            ]
                                         })(
-                                            <Input placeholder='请输入负责人姓名' />
+                                            <Input placeholder='请输入负责人姓名（15个字以下）' />
                                         )}
                                     </FormItem>
                                 </Col>
@@ -420,10 +506,15 @@ class Edit extends Component {
                                         label='负责人手机号'
                                     >
                                         {getFieldDecorator('LeaderPhone', {
-                                            rules: [{
-                                                required: true,
-                                                message: '请输入负责人手机号'
-                                            }]
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '请输入负责人手机号'
+                                                },
+                                                {
+                                                    validator: this.checkPersonTelephone
+                                                }
+                                            ]
                                         })(
                                             <Input placeholder='请输入负责人手机号' maxLength='11' onBlur={this.checkPhone} />
                                         )}

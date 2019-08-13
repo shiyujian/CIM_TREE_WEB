@@ -69,6 +69,7 @@ export default class TaskCreateTable extends Component {
             regionThinNo: '', // 圈选区域内的细班code
             regionSectionNo: '', // 圈选区域内的标段code
             regionSectionName: '', // 圈选区域内的标段名称
+            regionSmallThinClassName: '', // 圈选区域内的小班细班名称
             regionArea: 0, // 圈选区域内面积
             // 直接选择细班坐标数据
             treeCoords: {},
@@ -513,17 +514,21 @@ export default class TaskCreateTable extends Component {
         const {
             areaLayerList
         } = this.state;
+        const {
+            selectMap
+        } = this.props;
         let me = this;
         try {
             // 当前选中的节点
             let eventKey = info.node.props.eventKey;
             // 当前的选中状态
             let checked = info.checked;
-            if (keys && keys.length === 0) {
+            if (selectMap === '细班选择' && keys && keys.length === 0) {
                 this.setState({
                     createBtnVisible: false
                 });
             }
+
             // 选中节点对key进行处理
             let handleKey = eventKey.split('-');
             // 如果选中的是细班，则直接添加图层
@@ -535,9 +540,11 @@ export default class TaskCreateTable extends Component {
                             layer.addTo(me.map);
                             me.map.fitBounds(layer.getBounds());
                         });
-                        this.setState({
-                            createBtnVisible: true
-                        });
+                        if (selectMap === '细班选择') {
+                            this.setState({
+                                createBtnVisible: true
+                            });
+                        }
                     } else {
                         console.log('_addAreaLayer_addAreaLayer');
                         // 如果不是添加过，需要请求数据
@@ -617,7 +624,7 @@ export default class TaskCreateTable extends Component {
     _handleTaskWkt = async (wkt, eventKey, task, type, isFocus) => {
         let str = '';
         try {
-            if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+            if (wkt && wkt.indexOf('MULTIPOLYGON') !== -1) {
                 let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
                 let arr = data.split('),(');
                 arr.map((a, index) => {
@@ -644,7 +651,7 @@ export default class TaskCreateTable extends Component {
                         }
                     }
                 });
-            } else if (wkt.indexOf('POLYGON') !== -1) {
+            } else if (wkt && wkt.indexOf('POLYGON') !== -1) {
                 str = handlePOLYGONWktData(wkt);
                 if (type === 'plan') {
                     // 只有一个图形，必须要设置图标
@@ -655,6 +662,7 @@ export default class TaskCreateTable extends Component {
             }
         } catch (e) {
             console.log('处理wkt', e);
+            console.log('wktwktwktwkt', wkt);
         }
     }
     // 处理任务数据
@@ -957,10 +965,12 @@ export default class TaskCreateTable extends Component {
             //     this.resetButState();
             //     return;
             // }
+            console.log('regionData', regionData);
             let regionThinName = regionData.regionThinName;
             let regionThinNo = regionData.regionThinNo;
             let regionSectionNo = regionData.regionSectionNo;
             let regionSectionName = regionData.regionSectionName;
+            let regionSmallThinClassName = regionData.regionSmallThinClassName;
             // 区域内树木数量
             // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
             this.setState({
@@ -969,6 +979,7 @@ export default class TaskCreateTable extends Component {
                 // treeNum,
                 regionData,
                 regionThinName,
+                regionSmallThinClassName,
                 regionThinNo,
                 regionSectionNo,
                 regionSectionName,
@@ -1050,6 +1061,7 @@ export default class TaskCreateTable extends Component {
             regionThinNo: '',
             regionSectionNo: '',
             regionSectionName: '',
+            regionSmallThinClassName: '',
             regionArea: 0,
             wkt: ''
         });

@@ -11,7 +11,7 @@ import {
     Popconfirm,
     Divider
 } from 'antd';
-import { getForestImgUrl, getUser } from '_platform/auth';
+import { getForestImgUrl, getUser, trim } from '_platform/auth';
 import { TREETYPENO } from '_platform/api';
 import Addition from './Addition';
 import Edit from './Edit';
@@ -185,6 +185,7 @@ export default class Tablelevel extends Component {
         if (text && text.value) {
             value = text.value;
         }
+        value = trim(value);
         let searchList = [];
         const { treeTypeList = [] } = this.props;
         if (value) {
@@ -305,7 +306,7 @@ export default class Tablelevel extends Component {
             width: '5%'
         },
         {
-            title: '树种学名',
+            title: '树种名称',
             key: '2',
             dataIndex: 'TreeTypeName',
             width: '10%'
@@ -398,7 +399,7 @@ export default class Tablelevel extends Component {
                         <a onClick={this.edite.bind(this, record)}>修改</a>
                         <Divider type='vertical' />
                         <Popconfirm
-                            title='是否真的要删除该树种?'
+                            title='是否要删除该树种?'
                             onConfirm={this.delet.bind(this, record)}
                             okText='是'
                             cancelText='否'
@@ -419,7 +420,7 @@ export default class Tablelevel extends Component {
             width: '5%'
         },
         {
-            title: '树种学名',
+            title: '树种名称',
             key: '2',
             dataIndex: 'TreeTypeName',
             width: '10%'
@@ -515,7 +516,7 @@ export default class Tablelevel extends Component {
             width: '5%'
         },
         {
-            title: '树种学名',
+            title: '树种名称',
             key: '2',
             dataIndex: 'TreeTypeName',
             width: '10%'

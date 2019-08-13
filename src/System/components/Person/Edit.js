@@ -47,7 +47,7 @@ class Edit extends Component {
             idImgF: true,
             idImgZ: true,
             isBlackChecked: null, // 黑名单按键
-            black_remarkValue: null,
+            blackRemarkValue: null,
             orgSelect: ''
         };
     }
@@ -284,7 +284,7 @@ class Edit extends Component {
                     });
                 }
             } else {
-                message.warning('请重新选择部门，');
+                message.warning('请重新选择部门');
             }
         } catch (e) {
             console.log('e', e);
@@ -340,9 +340,9 @@ class Edit extends Component {
             isBlackChecked: checked
         });
     }
-    changeBlack_remark (value) {
+    changeBlackRemark (e) {
         this.setState({
-            black_remarkValue: value
+            blackRemarkValue: e.target.value
         });
     }
     save = async () => {
@@ -357,7 +357,7 @@ class Edit extends Component {
         } = this.props;
         const {
             isBlackChecked,
-            black_remarkValue,
+            blackRemarkValue,
             orgSelect
         } = this.state;
         if (editUserRecord && editUserRecord.ID) {
@@ -370,7 +370,7 @@ class Edit extends Component {
                         let blackPostData = {
                             id: editUserRecord.ID + '',
                             is_black: 1,
-                            black_remark: black_remarkValue
+                            black_remark: blackRemarkValue
                         };
                         let blackData = await postForestUserBlackList({}, blackPostData);
                         if (blackData && blackData.code && blackData.code === 1) {
@@ -438,7 +438,7 @@ class Edit extends Component {
         } = this.props;
         const {
             isBlackChecked,
-            black_remarkValue
+            blackRemarkValue
         } = this.state;
         const user = getUser();
         console.log('companyOrgTree', companyOrgTree);
@@ -706,8 +706,8 @@ class Edit extends Component {
                                                 label='原因'
                                             >
                                                 <Input
-                                                    value={black_remarkValue}
-                                                    onChange={this.changeBlack_remark.bind(
+                                                    value={blackRemarkValue}
+                                                    onChange={this.changeBlackRemark.bind(
                                                         this
                                                     )}
                                                 />

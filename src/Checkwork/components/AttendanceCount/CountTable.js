@@ -70,7 +70,27 @@ export default class CountTable extends Component {
         {
             title: '角色',
             dataIndex: 'Role',
-            key: 'Role'
+            key: 'Role',
+            render: (text, record, index) => {
+                const {
+                    platform: { roles = [] }
+                } = this.props;
+                if (text && text.ID && text.RoleName) {
+                    return text.RoleName;
+                } else {
+                    let roleName = '';
+                    if (text) {
+                        roles.map((role) => {
+                            if (role && role.ID && role.ID === Number(text)) {
+                                roleName = role.RoleName;
+                            }
+                        });
+                    }
+
+                    return roleName;
+                }
+            }
+
         },
         {
             title: '职务',
@@ -227,10 +247,10 @@ export default class CountTable extends Component {
             if (data && data.code && data.code === 1) {
                 let results = (data && data.content) || [];
                 const pagination = { ...this.state.pagination };
-                pagination.total = data.count;
+                pagination.total = data.pageinfo && data.pageinfo.total;
                 pagination.pageSize = 10;
                 pagination.current = current;
-                let totalNum = data.count;
+                let totalNum = data.pageinfo && data.pageinfo.total;
                 this.setState({
                     allcheckrecord: results,
                     loading: false,
@@ -312,13 +332,13 @@ export default class CountTable extends Component {
         } = this.state;
         return (
             <div>
-                <CountFilter
-                    {...this.props}
-                    {...this.state}
-                    getCompanyDataList={this.getCompanyDataList.bind(this)}
-                    query={this.query.bind(this)} />
                 <Spin spinning={this.state.loading} tip='数据加载中，请稍等...'>
-                    <div>此次查询人数:  {this.state.totalNum} 人</div>
+                    <CountFilter
+                        {...this.props}
+                        {...this.state}
+                        getCompanyDataList={this.getCompanyDataList.bind(this)}
+                        query={this.query.bind(this)} />
+                    <div>此次查询数据:  {this.state.totalNum} 条</div>
                     <Table
                         dataSource={allcheckrecord}
                         columns={this.columns}

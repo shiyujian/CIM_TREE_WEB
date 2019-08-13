@@ -4,6 +4,39 @@ import { Modal, Form, Input, Notification } from 'antd';
 const FormItem = Form.Item;
 
 class Addition extends Component {
+    checkRoleName = async (rule, value, callback) => {
+        if (value) {
+            let reg = /^[\u4e00-\u9fa5]+$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    if (value.length >= 2 && value.length <= 10) {
+                        callback();
+                    } else {
+                        callback(`请输入2到10位角色名称`);
+                    }
+                } else {
+                    callback(`请输入中文`);
+                }
+            } else {
+                callback(`请输入中文`);
+            }
+        } else {
+            callback();
+        }
+    }
+    checkDescription = async (rule, value, callback) => {
+        if (value) {
+            if (value.length <= 20) {
+                callback();
+            } else {
+                callback(`请输入20个字以下的描述`);
+            }
+        } else {
+            callback();
+        }
+    }
     render () {
         const {
             form: {
@@ -23,12 +56,15 @@ class Addition extends Component {
                         rules: [
                             {
                                 required: true,
-                                message: '请输入角色名称'
+                                message: '请输入2到10位角色名称（仅支持中文）'
+                            },
+                            {
+                                validator: this.checkRoleName
                             }
                         ]
                     })(
                         <Input
-                            placeholder='请输入角色名称'
+                            placeholder='请输入2到10位角色名称（仅支持中文）'
                         />
                     )}
                 </FormItem>
@@ -38,6 +74,9 @@ class Addition extends Component {
                             {
                                 required: false,
                                 message: '请输入描述'
+                            },
+                            {
+                                validator: this.checkDescription
                             }
                         ]
                     })(

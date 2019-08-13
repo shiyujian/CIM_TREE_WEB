@@ -209,7 +209,7 @@ class EditProject extends Component {
             >
                 <Spin spinning={loading}>
                     <div>
-                        <FormItem {...EditProject.layout} label={`编码`}>
+                        <FormItem {...EditProject.layout} label={`项目编码`}>
                             {getFieldDecorator('code', {
                                 rules: [
                                     {
@@ -220,11 +220,11 @@ class EditProject extends Component {
                                 ]
                             })(
                                 <Input
-                                    placeholder='请输入编码'
+                                    placeholder='请输入项目编码'
                                 />
                             )}
                         </FormItem>
-                        <FormItem {...EditProject.layout} label={`行政编码`}>
+                        <FormItem {...EditProject.layout} label={`所在地区`}>
                             {getFieldDecorator('RegionCode', {
                                 rules: [{
                                     required: true,

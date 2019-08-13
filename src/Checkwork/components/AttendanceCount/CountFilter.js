@@ -94,16 +94,32 @@ class CountFilter extends Component {
                 let orgID = user.org;
                 parentData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
                 console.log('parentData', parentData);
-                let companyOrgID = parentData.ID;
-                await setFieldsValue({
-                    orgID: companyOrgID
-                });
-                this.setState({
-                    userCompany: companyOrgID
-                });
-                // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
-                await this.getCheckGroupList(companyOrgID);
-                await this.query();
+                if (parentData && parentData.ID) {
+                    let companyOrgID = parentData.ID;
+                    await setFieldsValue({
+                        orgID: companyOrgID
+                    });
+                    this.setState({
+                        userCompany: companyOrgID
+                    });
+                    // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
+                    await this.getCheckGroupList(companyOrgID);
+                    await this.query();
+                }
+            } else {
+                if (this.companyList && this.companyList instanceof Array && this.companyList.length > 0) {
+                    let companyData = this.companyList[0];
+                    let companyOrgID = companyData.ID;
+                    await setFieldsValue({
+                        orgID: companyOrgID
+                    });
+                    this.setState({
+                        userCompany: companyOrgID
+                    });
+                    // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
+                    await this.getCheckGroupList(companyOrgID);
+                    await this.query();
+                }
             }
             return parentData;
         } catch (e) {
@@ -155,98 +171,31 @@ class CountFilter extends Component {
     }
 
     renderContent () {
-        let user = getUser();
-        let userRoles = user.roles || '';
         const {
             platform: { roles = [] }
         } = this.props;
-        const {
-            permission
-        } = this.state;
-        var systemRoles = [];
-        if (permission) {
-            systemRoles.push({
-                name: '苗圃角色',
-                value: roles.filter(role => role.grouptype === 0)
-            });
-            systemRoles.push({
-                name: '施工角色',
-                value: roles.filter(role => role.grouptype === 1)
-            });
-            systemRoles.push({
-                name: '监理角色',
-                value: roles.filter(role => role.grouptype === 2)
-            });
-            systemRoles.push({
-                name: '业主角色',
-                value: roles.filter(role => role.grouptype === 3)
-            });
-            systemRoles.push({
-                name: '养护角色',
-                value: roles.filter(role => role.grouptype === 4)
-            });
-            systemRoles.push({
-                name: '供应商角色',
-                value: roles.filter(role => role.grouptype === 6)
-            });
-        } else {
-            const rolea = userRoles.ParentID;
-            switch (rolea) {
-                case 0:
-                    systemRoles.push({
-                        name: '苗圃角色',
-                        value: roles.filter(role => role.grouptype === 0)
-                    });
-                    break;
-                case 1:
-                    systemRoles.push({
-                        name: '苗圃角色',
-                        value: roles.filter(role => role.grouptype === 0)
-                    });
-                    systemRoles.push({
-                        name: '施工角色',
-                        value: roles.filter(role => role.grouptype === 1)
-                    });
-                    systemRoles.push({
-                        name: '养护角色',
-                        value: roles.filter(role => role.grouptype === 4)
-                    });
-                    break;
-                case 2:
-                    systemRoles.push({
-                        name: '监理角色',
-                        value: roles.filter(role => role.grouptype === 2)
-                    });
-                    break;
-                case 3:
-                    systemRoles.push({
-                        name: '业主角色',
-                        value: roles.filter(role => role.grouptype === 3)
-                    });
-                    break;
-                case 4:
-                    systemRoles.push({
-                        name: '养护角色',
-                        value: roles.filter(role => role.grouptype === 4)
-                    });
-                    break;
-                case 6:
-                    systemRoles.push({
-                        name: '供应商角色',
-                        value: roles.filter(role => role.grouptype === 4)
-                    });
-                    break;
-                default:
-                    break;
+        let systemRoles = [];
+        let parentRoleType = [];
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID === 0) {
+                parentRoleType.push(role);
             }
-        }
+        });
+        console.log('parentRoleType', parentRoleType);
+        parentRoleType.map((type) => {
+            systemRoles.push({
+                name: type && type.RoleName,
+                value: roles.filter(role => role.ParentID === type.ID)
+            });
+        });
+
         const objs = systemRoles.map(roless => {
             return (
                 <OptGroup label={roless.name} key={roless.name}>
                     {roless.value.map(role => {
                         return (
-                            <Option key={role.id} value={String(role.id)}>
-                                {role.name}
+                            <Option key={role.ID} value={String(role.ID)}>
+                                {role.RoleName}
                             </Option>
                         );
                     })}
@@ -257,125 +206,42 @@ class CountFilter extends Component {
         return objs;
     }
     renderTitle () {
-        let user = getUser();
-        let userRoles = user.roles || '';
-        const {
-            platform: { roles = [] }
-        } = this.props;
-        const {
-            permission
-        } = this.state;
         var systemRoles = [];
-        if (permission) {
-            systemRoles.push({
-                name: '苗圃职务',
-                children: ['苗圃'],
-                value: roles.filter(role => role.grouptype === 0)
-            });
-            systemRoles.push({
-                name: '施工职务',
-                children: [
-                    '施工领导',
-                    '协调调度人',
-                    '质量负责人',
-                    '安全负责人',
-                    '文明负责人',
-                    '普通员工',
-                    '施工文书',
-                    '测量员',
-                    '施工整改人'
-                ],
-                value: roles.filter(role => role.grouptype === 1)
-            });
-            systemRoles.push({
-                name: '监理职务',
-                children: ['总监', '监理组长', '普通监理', '监理文书'],
-                value: roles.filter(role => role.grouptype === 2)
-            });
-            systemRoles.push({
-                name: '业主职务',
-                children: ['业主', '业主文书', '业主领导'],
-                value: roles.filter(role => role.grouptype === 3)
-            });
-            systemRoles.push({
-                name: '苗圃基地职务',
-                children: ['苗圃基地'],
-                value: roles.filter(role => role.grouptype === 5)
-            });
-            systemRoles.push({
-                name: '供应商职务',
-                children: ['供应商'],
-                value: roles.filter(role => role.grouptype === 6)
-            });
-        } else {
-            const rolea = userRoles.ParentID;
-            switch (rolea) {
-                case 0:
-                    systemRoles.push({
-                        name: '苗圃职务',
-                        children: ['苗圃'],
-                        value: roles.filter(role => role.grouptype === 0)
-                    });
-                    break;
-                case 1:
-                    systemRoles.push({
-                        name: '苗圃职务',
-                        children: ['苗圃'],
-                        value: roles.filter(role => role.grouptype === 0)
-                    });
-                    systemRoles.push({
-                        name: '施工职务',
-                        children: [
-                            '施工领导',
-                            '协调调度人',
-                            '质量负责人',
-                            '安全负责人',
-                            '文明负责人',
-                            '普通员工',
-                            '施工文书',
-                            '测量员',
-                            '施工整改人'
-                        ],
-                        value: roles.filter(role => role.grouptype === 1)
-                    });
-                    break;
-                case 2:
-                    systemRoles.push({
-                        name: '监理职务',
-                        children: [
-                            '总监',
-                            '监理组长',
-                            '普通监理',
-                            '监理文书'
-                        ],
-                        value: roles.filter(role => role.grouptype === 2)
-                    });
-                    break;
-                case 3:
-                    systemRoles.push({
-                        name: '业主职务',
-                        children: ['业主', '业主文书', '业主领导'],
-                        value: roles.filter(role => role.grouptype === 3)
-                    });
-                    break;
-                case 5:
-                    systemRoles.push({
-                        name: '苗圃基地职务',
-                        children: ['苗圃基地'],
-                        value: roles.filter(role => role.grouptype === 5)
-                    });
-                    break;
-                case 6:
-                    systemRoles.push({
-                        name: '供应商职务',
-                        children: ['供应商'],
-                        value: roles.filter(role => role.grouptype === 6)
-                    });
-                    break;
-                default:
-                    break;
-            }
-        }
+        systemRoles.push({
+            name: '苗圃职务',
+            children: ['苗圃']
+        });
+        systemRoles.push({
+            name: '施工职务',
+            children: [
+                '施工领导',
+                '协调调度人',
+                '质量负责人',
+                '安全负责人',
+                '文明负责人',
+                '普通员工',
+                '施工文书',
+                '测量员',
+                '施工整改人'
+            ]
+        });
+        systemRoles.push({
+            name: '监理职务',
+            children: ['总监', '监理组长', '普通监理', '监理文书']
+        });
+        systemRoles.push({
+            name: '业主职务',
+            children: ['业主', '业主文书', '业主领导']
+        });
+        systemRoles.push({
+            name: '苗圃基地职务',
+            children: ['苗圃基地']
+        });
+        systemRoles.push({
+            name: '供应商职务',
+            children: ['供应商']
+        });
+
         const objs = systemRoles.map(roless => {
             return (
                 <OptGroup label={roless.name} key={roless.name} >
@@ -415,7 +281,10 @@ class CountFilter extends Component {
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='公司'>
                                     {getFieldDecorator('orgID', {
-
+                                        rules: [{
+                                            required: true,
+                                            message: '请选择公司'
+                                        }]
                                     })(
                                         <Select
                                             allowClear
@@ -580,12 +449,12 @@ class CountFilter extends Component {
             end
         } = this.state;
         validateFields((err, values) => {
-            console.log('err', err);
-            console.log('values', values);
-            let params = handleFilterData(values, start, end);
-            console.log('params', params);
-            changeFilterData(params);
-            this.props.query(1, params);
+            if (!err) {
+                let params = handleFilterData(values, start, end);
+                console.log('params', params);
+                changeFilterData(params);
+                this.props.query(1, params);
+            }
         });
     }
     clear () {
@@ -608,14 +477,22 @@ class CountFilter extends Component {
             searchDate: undefined,
             status: undefined
         });
-        validateFields((err, values) => {
-            console.log('err', err);
-            console.log('values', values);
-            let params = handleFilterData(values, start, end);
-            console.log('params', params);
-            changeFilterData(params);
-            this.props.query(1, params);
+        this.setState({
+            start: '',
+            end: ''
+        }, () => {
+            this.query();
         });
+        // validateFields((err, values) => {
+        //     console.log('err', err);
+        //     console.log('values', values);
+        //     if (!err) {
+        //         let params = handleFilterData(values, start, end);
+        //         console.log('params', params);
+        //         changeFilterData(params);
+        //         this.props.query(1, params);
+        //     }
+        // });
     }
 }
 export default Form.create()(CountFilter);

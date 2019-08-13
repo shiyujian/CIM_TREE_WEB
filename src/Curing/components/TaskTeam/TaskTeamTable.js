@@ -30,7 +30,11 @@ export default class TaskTeamTable extends Component {
     componentDidUpdate = async (prevProps, prevState) => {
         const {
             selectMemTeam,
-            addMemVisible
+            addMemVisible,
+            selectState,
+            actions: {
+                getCuringGroupMansOk
+            }
         } = this.props;
         let selectMemTeamID = (selectMemTeam && selectMemTeam.ID) || '';
         let prevMemTeamID = (prevProps.selectMemTeam && prevProps.selectMemTeam.ID) || '';
@@ -38,7 +42,11 @@ export default class TaskTeamTable extends Component {
             await this.getGetTaskTeamData();
         }
         if (!addMemVisible && addMemVisible !== prevProps.addMemVisible) {
-            this.getGetTaskTeamData();
+            await this.getGetTaskTeamData();
+        }
+        if (!selectState && prevProps.selectState) {
+            await getCuringGroupMansOk([]);
+            await this.getGetTaskTeamData();
         }
     }
 
@@ -92,13 +100,19 @@ export default class TaskTeamTable extends Component {
         }
         return (
             <div>
-                <Button style={{marginBottom: 10}} type='primary' disabled={disabled} onClick={this._addMemberModal.bind(this)}>关联用户</Button>
+                <Button
+                    style={{marginBottom: 10}}
+                    type='primary'
+                    disabled={disabled}
+                    onClick={this._addMemberModal.bind(this)}>
+                        关联用户
+                </Button>
                 <Table
                     style={{width: '100%'}}
                     columns={this.columns}
                     bordered
                     // rowKey='id'
-                    dataSource={dataSource}
+                    dataSource={disabled ? [] : dataSource}
                 />
                 <AddMember {...this.props} />
             </div>

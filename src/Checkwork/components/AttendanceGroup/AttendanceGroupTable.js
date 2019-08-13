@@ -17,6 +17,7 @@ export default class AttendanceGroupTable extends Component {
             title: '序号',
             dataIndex: 'index',
             render: (text, record, index) => {
+                console.log('record', record);
                 return index + 1;
             }
         },

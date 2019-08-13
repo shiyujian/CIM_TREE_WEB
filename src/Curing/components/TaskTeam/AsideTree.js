@@ -379,7 +379,7 @@ class AsideTree extends Component {
                             ) : (
                                 <Popconfirm
                                     onConfirm={this._handleDelDoc.bind(this)}
-                                    title='确定要删除该班组么'
+                                    title='确定要删除该班组吗'
                                     okText='确定'
                                     disabled={!selected}
                                     cancelText='取消' >

@@ -66,7 +66,6 @@ class Addition extends Component {
                 parentRoleType.push(role);
             }
         });
-        console.log('parentRoleType', parentRoleType);
         if (user.username && user.username === 'admin') {
             parentRoleType.map((type) => {
                 systemRoles.push({
@@ -210,17 +209,17 @@ class Addition extends Component {
     checkPassWord = async (rule, value, callback) => {
         if (value) {
             // 手机号正则
-            let reg = /^[a-zA-Z0-9_-]{4,16}$/;
+            let reg = /^[a-zA-Z0-9_]{6,16}$/;
             console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
                     callback();
                 } else {
-                    callback(`请输入4到16位（字母，数字，下划线，减号）密码`);
+                    callback(` 请输入6到16位（字母，数字，下划线）密码`);
                 }
             } else {
-                callback(`请输入4到16位（字母，数字，下划线，减号）密码`);
+                callback(` 请输入6到16位（字母，数字，下划线）密码`);
             }
         } else {
             callback();
@@ -229,279 +228,55 @@ class Addition extends Component {
     checkUserName = async (rule, value, callback) => {
         if (value) {
             // 手机号正则
-            let reg = /^[a-zA-Z0-9_]{4,16}$/;
+            let reg = /^[a-zA-Z0-9]{4,16}$/;
             console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
                     callback();
                 } else {
-                    callback(`请输入4到16位（字母，数字，下划线）用户名`);
+                    callback(`请输入4到16位（字母，数字）用户名`);
                 }
             } else {
-                callback(`请输入4到16位（字母，数字，下划线）用户名`);
+                callback(`请输入4到16位（字母，数字）用户名`);
             }
         } else {
             callback();
         }
     }
-    render () {
-        const {
-            form: {
-                getFieldDecorator
-            },
-            sidebar: {
-                node = {}
+    checkPersonEmail = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+            // isNaN(value);
+            if (reg.test(value)) {
+                callback();
+            } else {
+                callback(`请输入正确的邮箱`);
             }
-        } = this.props;
-        const user = getUser();
-        // 用户是否为文书
-        let userIsDocument = getUserIsDocument();
-        let units = this.getUnits();
-        return (
-            <div>
-                <Modal
-                    title={'新增人员'}
-                    visible
-                    className='large-modal'
-                    width='80%'
-                    maskClosable={false}
-                    onOk={this.save.bind(this)}
-                    onCancel={this.cancel.bind(this)}
-                >
-                    <Form>
-                        <Row gutter={24}>
-                            <Col span={12}>
-                                <FormItem
-                                    {...Addition.layout}
-                                    label='用户名:'
-                                >
-                                    {getFieldDecorator('UserName', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请输入4到16位（字母，数字，下划线）用户名',
-                                                max: 15
-                                            },
-                                            {
-                                                validator: this.checkUserName
-                                            }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入用户名'
-                                        />
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    {...Addition.layout}
-                                    label='姓名:'
-                                >
-                                    {getFieldDecorator('FullName', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请输入姓名'
-                                            }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入姓名'
-                                        />
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    {...Addition.layout}
-                                    label='性别:'
-                                >
-                                    {getFieldDecorator('sex', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请选择性别'
-                                            }
-                                        ]
-                                    })(
-                                        <Select
-                                            placeholder='请选择性别'
-                                            style={{ width: '100%' }}
-                                        >
-                                            <Option key='女' value={1}>女</Option>
-                                            <Option key='男' value={0}>男</Option>
-                                        </Select>
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    {...Addition.layout}
-                                    label='身份证号码:'
-                                >
-                                    {getFieldDecorator('idNum', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请输入身份证号码'
-                                            }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入身份证号码'
-                                        />
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    {...Addition.layout}
-                                    label='密码:'
-                                >
-                                    {getFieldDecorator('PassWord', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请输入4到16位（字母，数字，下划线，减号）密码',
-                                                max: 15
-                                            },
-                                            {
-                                                validator: this.checkPassWord
-                                            }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入4到16位（字母，数字，下划线，减号）密码'
-                                        />
-                                    )}
-                                </FormItem>
-
-                                <FormItem {...Addition.layout} label='标段'>
-                                    {getFieldDecorator('section', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请选择标段'
-                                            }
-                                        ]
-                                    })(
-                                        <Select
-                                            placeholder='标段'
-                                            style={{ width: '100%' }}
-                                        >
-                                            {units
-                                                ? units.map(item => {
-                                                    return (
-                                                        <Option
-                                                            key={item.code}
-                                                            value={item.code}
-                                                        >
-                                                            {item.name}
-                                                        </Option>
-                                                    );
-                                                })
-                                                : ''}
-                                        </Select>
-                                    )}
-
-                                </FormItem>
-                            </Col>
-                            <Col span={12}>
-                                <FormItem {...Addition.layout} label='邮箱'>
-                                    {getFieldDecorator('email', {
-                                        rules: [
-                                            {
-                                                required: false,
-                                                message: '请输入邮箱'
-                                            }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入邮箱'
-                                        />
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    {...Addition.layout}
-                                    label='手机号码:'
-                                >
-                                    {getFieldDecorator('telephone', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请输入手机号码'
-                                            }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入手机号码'
-                                        />
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    {...Addition.layout}
-                                    label='职务:'
-                                >
-                                    {getFieldDecorator('titles', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请选择职务'
-                                            }
-                                        ]
-                                    })(
-                                        <Select
-                                            placeholder='请选择职务'
-                                            style={{ width: '100%' }}
-                                        >
-                                            {this.renderTitle()}
-                                        </Select>
-                                    )}
-                                </FormItem>
-                                <FormItem
-                                    {...Addition.layout}
-                                    label='角色:'
-                                >
-                                    {getFieldDecorator('roles', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: '请选择角色'
-                                            }
-                                        ]
-                                    })(
-                                        <Select
-                                            placeholder='请选择角色'
-                                            optionFilterProp='children'
-                                            filterOption={(input, option) =>
-                                                option.props.children
-                                                    .toLowerCase()
-                                                    .indexOf(
-                                                        input.toLowerCase()
-                                                    ) >= 0
-                                            }
-                                            style={{ width: '100%' }}
-                                        >
-                                            {this.renderContent()}
-                                        </Select>
-                                    )}
-                                </FormItem>
-                                {(userIsDocument) ? (
-                                    <FormItem
-                                        {...Addition.layout}
-                                        label='部门名称'
-                                    >
-                                        <Input
-                                            placeholder='部门名称'
-                                            value={(node && node.OrgName) || ''}
-                                            readOnly
-                                        />
-                                    </FormItem>
-                                ) : (
-                                    ''
-                                )}
-                            </Col>
-                        </Row>
-                    </Form>
-                </Modal>
-            </div>
-        );
+        } else {
+            callback();
+        }
     }
-
+    checkPersonTelephone = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[1]([3-9])[0-9]{9}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (!isNaN(value) && reg.test(value)) {
+                if (value > 0) {
+                    callback();
+                } else {
+                    callback(`请输入正确的手机号`);
+                }
+            } else {
+                callback(`请输入正确的手机号`);
+            }
+        } else {
+            callback();
+        }
+    }
     // 获取项目的标段
     getUnits () {
         const {
@@ -639,6 +414,269 @@ class Addition extends Component {
 
     cancel () {
         this.props.handleCloseAdditionModal();
+    }
+
+    render () {
+        const {
+            form: {
+                getFieldDecorator
+            },
+            sidebar: {
+                node = {}
+            }
+        } = this.props;
+        const user = getUser();
+        // 用户是否为文书
+        let userIsDocument = getUserIsDocument();
+        let units = this.getUnits();
+        return (
+            <div>
+                <Modal
+                    title={'新增人员'}
+                    visible
+                    className='large-modal'
+                    width='80%'
+                    maskClosable={false}
+                    onOk={this.save.bind(this)}
+                    onCancel={this.cancel.bind(this)}
+                >
+                    <Form>
+                        <Row gutter={24}>
+                            <Col span={12}>
+                                <FormItem
+                                    {...Addition.layout}
+                                    label='用户名:'
+                                >
+                                    {getFieldDecorator('UserName', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请输入4到16位（字母，数字）用户名',
+                                                max: 15
+                                            },
+                                            {
+                                                validator: this.checkUserName
+                                            }
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder='请输入用户名（不区分大小写）'
+                                        />
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    {...Addition.layout}
+                                    label='姓名:'
+                                >
+                                    {getFieldDecorator('FullName', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请输入姓名'
+                                            }
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder='请输入姓名'
+                                        />
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    {...Addition.layout}
+                                    label='性别:'
+                                >
+                                    {getFieldDecorator('sex', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请选择性别'
+                                            }
+                                        ]
+                                    })(
+                                        <Select
+                                            placeholder='请选择性别'
+                                            style={{ width: '100%' }}
+                                        >
+                                            <Option key='女' value={1}>女</Option>
+                                            <Option key='男' value={0}>男</Option>
+                                        </Select>
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    {...Addition.layout}
+                                    label='身份证号码:'
+                                >
+                                    {getFieldDecorator('idNum', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请输入身份证号码'
+                                            }
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder='请输入身份证号码'
+                                        />
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    {...Addition.layout}
+                                    label='密码:'
+                                >
+                                    {getFieldDecorator('PassWord', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请输入6到16位（字母，数字，下划线）密码',
+                                                max: 15
+                                            },
+                                            {
+                                                validator: this.checkPassWord
+                                            }
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder='请输入6到16位（字母，数字，下划线）密码'
+                                        />
+                                    )}
+                                </FormItem>
+
+                                <FormItem {...Addition.layout} label='标段'>
+                                    {getFieldDecorator('section', {
+                                        rules: [
+                                            {
+                                                required: false,
+                                                message: '请选择标段'
+                                            }
+                                        ]
+                                    })(
+                                        <Select
+                                            placeholder='标段'
+                                            style={{ width: '100%' }}
+                                        >
+                                            {units
+                                                ? units.map(item => {
+                                                    return (
+                                                        <Option
+                                                            key={item.code}
+                                                            value={item.code}
+                                                        >
+                                                            {item.name}
+                                                        </Option>
+                                                    );
+                                                })
+                                                : ''}
+                                        </Select>
+                                    )}
+
+                                </FormItem>
+                            </Col>
+                            <Col span={12}>
+                                <FormItem {...Addition.layout} label='邮箱'>
+                                    {getFieldDecorator('email', {
+                                        rules: [
+                                            {
+                                                required: false,
+                                                message: '请输入邮箱'
+                                            },
+                                            {
+                                                validator: this.checkPersonEmail
+                                            }
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder='请输入邮箱'
+                                        />
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    {...Addition.layout}
+                                    label='手机号码:'
+                                >
+                                    {getFieldDecorator('telephone', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请输入手机号码'
+                                            },
+                                            {
+                                                validator: this.checkPersonTelephone
+                                            }
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder='请输入手机号码'
+                                        />
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    {...Addition.layout}
+                                    label='职务:'
+                                >
+                                    {getFieldDecorator('titles', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请选择职务'
+                                            }
+                                        ]
+                                    })(
+                                        <Select
+                                            placeholder='请选择职务'
+                                            style={{ width: '100%' }}
+                                        >
+                                            {this.renderTitle()}
+                                        </Select>
+                                    )}
+                                </FormItem>
+                                <FormItem
+                                    {...Addition.layout}
+                                    label='角色:'
+                                >
+                                    {getFieldDecorator('roles', {
+                                        rules: [
+                                            {
+                                                required: true,
+                                                message: '请选择角色'
+                                            }
+                                        ]
+                                    })(
+                                        <Select
+                                            placeholder='请选择角色'
+                                            optionFilterProp='children'
+                                            filterOption={(input, option) =>
+                                                option.props.children
+                                                    .toLowerCase()
+                                                    .indexOf(
+                                                        input.toLowerCase()
+                                                    ) >= 0
+                                            }
+                                            style={{ width: '100%' }}
+                                        >
+                                            {this.renderContent()}
+                                        </Select>
+                                    )}
+                                </FormItem>
+                                {(userIsDocument) ? (
+                                    <FormItem
+                                        {...Addition.layout}
+                                        label='部门名称'
+                                    >
+                                        <Input
+                                            placeholder='部门名称'
+                                            value={(node && node.OrgName) || ''}
+                                            readOnly
+                                        />
+                                    </FormItem>
+                                ) : (
+                                    ''
+                                )}
+                            </Col>
+                        </Row>
+                    </Form>
+                </Modal>
+            </div>
+        );
     }
 }
 export default Form.create()(Addition);
