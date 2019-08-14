@@ -115,9 +115,9 @@ export default class WordView1 extends Component {
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
-        handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
-        handleDetail.shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ConstructerObj.Full_Name) || '';
-        handleDetail.checker = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
+        handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
+        handleDetail.shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ConstructerObj && detail.AcceptanceObj.ConstructerObj.Full_Name) || '';
+        handleDetail.checker = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
         handleDetail.designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || '';
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
@@ -185,11 +185,11 @@ export default class WordView1 extends Component {
                                     <td colSpan='1'>{handleDetail.shigong}</td>
                                     <td>设计数量</td>
                                     <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
-                                    <td>抽检数量</td>
+                                    <td>问题上报数量</td>
                                     <td >{`${handleDetail.checkNum} (个)`}</td>
                                 </tr>
                                 <tr>
-                                    <td height='60;' align='center'>抽检不合格数量</td>
+                                    <td height='60;' align='center'>整改不合格数量</td>
                                     <td colSpan='3'>{`${handleDetail.failedNum} (个)`}</td>
                                     <td>合格率</td>
                                     <td colSpan='2'>{`${handleDetail.score}%`}</td>
@@ -204,7 +204,7 @@ export default class WordView1 extends Component {
                                             <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对苗木支架进行验收。按照不低于设计数量的5%进行抽检，对苗木支架情况进行打分。要求高于3米高的常绿树种或胸径大于5厘米的落叶树需要支架维护。落叶树种胸径低于5厘米的原则上不用支架，若冠高比失常、树干易发生倾斜，须采取竹竿捆绑固定后用支架维护。支架优先采用杉木、松木等比较坚固结实的材料。支架材料结实耐用，规格合理；绑扎必须牢固美观。</span>
                                             <span style={{display: 'block'}}>①支架固定结实，绑扎美观，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</span>
                                             <span style={{display: 'block'}}>②支架质量差且绑扎支架不牢固，即为不合格，须整改。</span>
-                                            <span style={{display: 'block'}}> 苗木支架合格率=抽检合格数量/抽检数量。</span>
+                                            <span style={{display: 'block'}}> 苗木支架合格率=整改合格数量/问题上报数量。</span>
                                         </div>
                                     </td>
                                 </tr>

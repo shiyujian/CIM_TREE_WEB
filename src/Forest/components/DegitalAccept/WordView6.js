@@ -126,9 +126,9 @@ export default class WordView1 extends Component {
     handleDetailData = (detail) => {
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
-        handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
-        handleDetail.shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ConstructerObj.Full_Name) || '';
-        handleDetail.checker = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
+        handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
+        handleDetail.shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ConstructerObj && detail.AcceptanceObj.ConstructerObj.Full_Name) || '';
+        handleDetail.checker = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
         handleDetail.designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || '';
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
@@ -212,11 +212,11 @@ export default class WordView1 extends Component {
                                                         <td colSpan='1'>{`${handleDetail.designNum} (个)`}</td>
                                                         <td>实际数量</td>
                                                         <td colSpan='1'>{`${handleDetail.actualNum} (个)`}</td>
-                                                        <td>抽检数量</td>
+                                                        <td>问题上报数量</td>
                                                         <td >{`${handleDetail.checkNum} (个)`}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td height='60;' align='center'>抽检不合格数量</td>
+                                                        <td height='60;' align='center'>整改不合格数量</td>
                                                         <td colSpan='3'>{`${handleDetail.failedNum} (个)`}</td>
                                                         <td >合格率</td>
                                                         <td colSpan='2'>{`${handleDetail.score}%`}</td>
@@ -231,7 +231,7 @@ export default class WordView1 extends Component {
                                                                 <span style={{display: 'block'}}>验收要点：以细班或小班为单位，对苗木栽植进行验收。按照不低于设计数量的5%进行抽检，对苗木栽植情况进行打分。要求轻吊轻放，不损伤土球；栽植深度适宜，超过土球3～5厘米；苗木保持直立，栽紧踏实，不松动；不可降解的包装材料全部解除。</span>
                                                                 <span style={{display: 'block'}}>①按照上述要求植苗，达到标准，即为合格，抽检合格率达到90%以上，计90分以上，通过检验；</span>
                                                                 <span style={{display: 'block'}}>②以上标准中，有一项不符合要求，即为不合格，须整改。</span>
-                                                                <span style={{display: 'block'}}>苗木栽植合格率=抽检合格数量/抽检数量。</span>
+                                                                <span style={{display: 'block'}}>苗木栽植合格率=整改合格数量/问题上报数量。</span>
                                                             </div>
                                                         </td>
                                                     </tr>

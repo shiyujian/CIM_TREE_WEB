@@ -535,10 +535,10 @@ export default class DegitalAcceptTable extends Component {
             ystype = '',
             treetypename = ''
         } = this.state;
-        // if (thinclass === '') {
-        //     message.info('请选择项目，标段，小班及细班信息');
-        //     return;
-        // }
+        if (thinclass === '') {
+            message.info('请选择项目，标段，小班及细班信息');
+            return;
+        }
 
         const {
             actions: {
@@ -557,13 +557,13 @@ export default class DegitalAcceptTable extends Component {
             }
         });
         let postdata = {
-            // section,
-            section: 'P191-03-04',
+            section,
+            // section: 'P191-03-04',
             treetype: treetypename,
             stime: stime1 && moment(stime1).format('YYYY-MM-DD HH:mm:ss'),
             etime: etime1 && moment(etime1).format('YYYY-MM-DD HH:mm:ss'),
-            // thinclass: array1.join('-'),
-            thinclass: 'P191-03-209-001',
+            thinclass: array1.join('-'),
+            // thinclass: 'P191-03-209-001',
             page,
             size: size,
             status: zt,
