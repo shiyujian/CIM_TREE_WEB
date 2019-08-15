@@ -298,7 +298,7 @@ class NewsEditModal extends Component {
                                         <Upload {...this.uploadPropsCover} fileList={this.state.ThumbnailFile}
                                         >
                                             <Button>
-                                                <Icon type='upload' />添加文件
+                                                <Icon type='upload' />请上传封面
                                             </Button>
                                         </Upload>
                                     )}

@@ -335,6 +335,9 @@ export default class TrackTree extends Component {
             } else {
                 let routes = await getMapList({ routeID: selectKey });
                 if (!(routes && routes instanceof Array && routes.length > 0)) {
+                    if (isFocus) {
+                        await getTrackTreeLoading(false);
+                    }
                     return;
                 }
                 let latlngs = [];

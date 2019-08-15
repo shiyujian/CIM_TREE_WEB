@@ -35,7 +35,7 @@ class WeekFormOrigin extends Component {
             form: { getFieldDecorator }
         } = this.props;
         return (<div>
-            <Form layout='inline'>
+            <Form>
                 <Row style={{marginTop: 20}}>
                     <Col span={24}>
                         <Form.Item
@@ -94,10 +94,8 @@ class WeekFormOrigin extends Component {
             actions: {postSendwork},
             form: { validateFields }
         } = this.props;
-        console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
-                console.log('下一执行人', Section, TableList, startDate, endDate, values.NextPeople);
                 let FormParams = [{
                     Key: 'Section', // 标段
                     FieldType: 0,
@@ -128,11 +126,6 @@ class WeekFormOrigin extends Component {
                     NextExecutor: values.NextPeople || 0, // 下一节点执行人
                     Executor // 当前节点执行人
                 };
-                console.log('FormParams', FormParams);
-                console.log('CurrentNodeName', CurrentNodeName);
-                console.log('Section', Section);
-                console.log('TableList', TableList);
-                console.log('params', params);
                 postSendwork({}, params).then(rep => {
                     if (rep && rep.code && rep.code === 1) {
                         notification.success({

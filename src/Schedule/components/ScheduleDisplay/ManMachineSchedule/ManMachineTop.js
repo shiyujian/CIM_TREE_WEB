@@ -204,8 +204,15 @@ export default class ManMachineTop extends Component {
                 },
                 toolbox: {
                     feature: {
-                        saveAsImage: { show: true }
-                    }
+                        saveAsImage: {
+                            show: true,
+                            iconStyle: {
+                                textPosition: 'bottom',
+                                shadowOffsetX: 10
+                            }
+                        }
+                    },
+                    right: 20
                 },
                 legend: {
                     bottom: 5,

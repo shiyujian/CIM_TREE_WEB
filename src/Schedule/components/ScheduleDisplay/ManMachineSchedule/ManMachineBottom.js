@@ -150,9 +150,9 @@ export default class ManMachineBottom extends Component {
             }
             // 将获取的数据按照 ProgressTime 时间排序
             dataList.sort(function (a, b) {
-                if (a.ProgressTime < b.ProgressTime) {
+                if (moment(a.ProgressTime).unix() < moment(b.ProgressTime).unix()) {
                     return -1;
-                } else if (a.ProgressTime > b.ProgressTime) {
+                } else if (moment(a.ProgressTime).unix() > moment(b.ProgressTime).unix()) {
                     return 1;
                 } else {
                     return 0;
@@ -237,8 +237,15 @@ export default class ManMachineBottom extends Component {
                 },
                 toolbox: {
                     feature: {
-                        saveAsImage: { show: true }
-                    }
+                        saveAsImage: {
+                            show: true,
+                            iconStyle: {
+                                textPosition: 'bottom',
+                                shadowOffsetX: 10
+                            }
+                        }
+                    },
+                    right: 20
                 },
                 legend: {
                     bottom: 5,

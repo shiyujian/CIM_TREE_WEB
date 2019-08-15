@@ -126,7 +126,7 @@ export default class SearchFilter extends Component {
                                 </FormItem>
                             </Col>
                             <Col span={12}>
-                                <FormItem {...SearchFilter.layout} label='提交日期'>
+                                <FormItem {...SearchFilter.layout} label='提交时间'>
                                     {
                                         getFieldDecorator('submitDate')(
                                             <RangePicker

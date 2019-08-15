@@ -163,6 +163,7 @@ class WeekPlanNew extends Component {
             render: (text, record, index) => {
                 return (
                     <InputNumber
+                        min={0}
                         value={record.planTreeNum || 0}
                         onChange={this.handlePlanTreeNumChage.bind(this, index)}
                     />
@@ -182,7 +183,7 @@ class WeekPlanNew extends Component {
         let user = getUser();
 
         let section = user.section;
-        let currentSectionName = '';
+        let currentSectionName = section;
         let projectName = '';
         let sectionArray = [];
 
@@ -345,24 +346,31 @@ class WeekPlanNew extends Component {
             currentSectionName
         } = this.state;
         setFieldsValue({
-            Section: currentSectionName
+            Section: currentSectionName,
+            Title: undefined,
+            weekTimeDate: undefined,
+            TdataReview: undefined
         });
         this.setState({
-            visible: true
+            visible: true,
+            stime: null,
+            etime: null,
+            TableList: []
         });
     };
     // 关闭新增计划的弹窗
     handleCancel () {
         this.props.form.setFieldsValue({
-            weekSection: undefined,
-            weekSupervisorReview: undefined,
-            weekTimeDate: undefined
+            Section: undefined,
+            Title: undefined,
+            weekTimeDate: undefined,
+            TdataReview: undefined
         });
         this.setState({
             visible: false,
             stime: null,
             etime: null,
-            weekPlanDataSource: []
+            TableList: []
         });
     }
     // 设置开始时间
@@ -561,6 +569,29 @@ class WeekPlanNew extends Component {
             console.log('e', e);
         }
     }
+    checkAdditionTitle = async (rule, value, callback) => {
+        if (value) {
+            // 不允许空格
+            let reg = /^[^\s]*$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    if (value.length >= 2 && value.length <= 10) {
+                        callback();
+                    } else {
+                        callback('请输入任务名称(2到10位)');
+                    }
+                } else {
+                    callback(`请输入正确的任务名称`);
+                }
+            } else {
+                callback(`请输入正确的任务名称`);
+            }
+        } else {
+            callback();
+        }
+    }
     render () {
         const {
             stime,
@@ -628,14 +659,16 @@ class WeekPlanNew extends Component {
                                                             {
                                                                 required: true,
                                                                 message:
-                                                                    '请输入任务名称'
+                                                                    '请输入任务名称(2到10位)'
+                                                            },
+                                                            {
+                                                                validator: this.checkAdditionTitle
                                                             }
                                                         ]
                                                     }
                                                 )(
                                                     <Input
-                                                        style={{width: 220}}
-                                                        placeholder='请输入任务名称'
+                                                        placeholder='请输入任务名称(2到10位)'
                                                     />
                                                 )}
                                             </FormItem>

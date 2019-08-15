@@ -36,7 +36,7 @@ class ActualFormOrigin extends Component {
             form: { getFieldDecorator }
         } = this.props;
         return (<div>
-            <Form layout='inline'>
+            <Form>
                 <Row style={{marginTop: 20}}>
                     <Col span={24}>
                         <Form.Item
@@ -97,7 +97,6 @@ class ActualFormOrigin extends Component {
             },
             form: { validateFields }
         } = this.props;
-        console.log('提交', Section, param, TableList);
         validateFields((err, values) => {
             if (!err) {
                 let FormParams = [{
@@ -113,7 +112,6 @@ class ActualFormOrigin extends Component {
                     FieldType: 0,
                     Val: JSON.stringify(TableList)
                 }];
-                console.log('下一执行人', values.NextPeople);
                 let params = {
                     FlowID, // 流程ID
                     FlowName, // 流程名称

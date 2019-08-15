@@ -39,18 +39,14 @@ class ActualDetail extends Component {
         } = this.props;
         let sectionName = '';
         let projectName = '';
-        console.log('currentSection', currentSection);
 
         if (currentSection) {
             let sectionData = (tree && tree.bigTreeList) || [];
-            console.log('sectionData', sectionData);
             let code = currentSection.split('-');
-            console.log('code', code);
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
                 sectionData.map(project => {
                     if (code[0] === project.No) {
-                        console.log('');
                         projectName = project.Name;
                         project.children.map(section => {
                             // 获取当前标段的名字

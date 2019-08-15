@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-07 14:50:55
+ * @Last Modified time: 2019-08-15 09:10:26
  */
 /**
  *
@@ -309,25 +309,32 @@ export const SCHEDULRPROJECT = [
     }
 ];
 // 流程状态
-export const WFStatusList = [{
-    value: 0,
-    label: '草稿中'
-}, {
-    value: 1,
-    label: '运行中'
-}, {
-    value: 2,
-    label: '已完成'
-}, {
-    value: 3,
-    label: '挂起'
-}, {
-    value: 4,
-    label: '退回'
-}, {
-    value: 5,
-    label: '转发'
-}];
+export const WFStatusList = [
+    // {
+    //     value: 0,
+    //     label: '草稿中'
+    // },
+    {
+        value: 1,
+        label: '运行中'
+    },
+    {
+        value: 2,
+        label: '已完成'
+    },
+    // {
+    //     value: 3,
+    //     label: '挂起'
+    // },
+    {
+        value: 4,
+        label: '退回'
+    }
+    // {
+    //     value: 5,
+    //     label: '转发'
+    // }
+];
 // 执行状态
 export const ExecuteStateList = [{
     value: 0,

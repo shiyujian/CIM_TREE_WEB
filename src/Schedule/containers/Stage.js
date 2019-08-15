@@ -61,6 +61,16 @@ export default class Stage extends Component {
             });
         }
         this.getAuditor();
+        let user = getUser();
+        let section = user.section;
+        if (section) {
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                this.setState({
+                    leftkeycode: code[0]
+                });
+            }
+        }
     }
 
     getAuditor = async () => {

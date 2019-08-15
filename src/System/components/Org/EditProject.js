@@ -237,7 +237,7 @@ class EditProject extends Component {
                                 />
                             )}
                         </FormItem>
-                        <FormItem {...EditProject.layout} label={`项目类型`}>
+                        {/* <FormItem {...EditProject.layout} label={`项目类型`}>
                             {getFieldDecorator('projectType', {
                                 rules: [
                                     {
@@ -266,7 +266,7 @@ class EditProject extends Component {
                                     placeholder='请输入项目说明'
                                 />
                             )}
-                        </FormItem>
+                        </FormItem> */}
 
                         <Row style={{ marginTop: 10 }}>
                             <Button

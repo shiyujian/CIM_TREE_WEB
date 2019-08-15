@@ -85,7 +85,7 @@ class Login extends Component {
     }
     checkUserName = async (rule, value, callback) => {
         if (value) {
-            // 手机号正则
+            // 不允许空格
             let reg = /^[^\s]*$/;
             console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
@@ -675,7 +675,7 @@ class Login extends Component {
                             message: '填写手机号错误，请确认后重新输入',
                             duration: 2
                         });
-                        this.handleSecurityCodeStatus();
+                        // this.handleSecurityCodeStatus();
                         return;
                     }
                     let partn = /^1[0-9]{10}$/;

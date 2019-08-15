@@ -29,7 +29,6 @@ class WeekDetail extends Component {
             param,
             TableList
         } = this.props;
-        console.log('componentDidMount', WFState, param, TableList);
         let disabled = true;
         if (WFState === 4) {
             // 需要重新填报
@@ -47,18 +46,14 @@ class WeekDetail extends Component {
         } = this.props;
         let sectionName = '';
         let projectName = '';
-        console.log('currentSection', currentSection);
 
         if (currentSection) {
             let sectionData = (tree && tree.bigTreeList) || [];
-            console.log('sectionData', sectionData);
             let code = currentSection.split('-');
-            console.log('code', code);
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
                 sectionData.map(project => {
                     if (code[0] === project.No) {
-                        console.log('');
                         projectName = project.Name;
                         project.children.map(section => {
                             // 获取当前标段的名字
@@ -207,7 +202,7 @@ class WeekDetail extends Component {
                 const {disabled} = this.state;
                 return (<InputNumber
                     disabled={disabled}
-                    value={record.planTreeNum}
+                    value={record.planTreeNum || 0}
                     onChange={this.props.handlePlanTreeNumChage.bind(this, index)}
                 />);
             }

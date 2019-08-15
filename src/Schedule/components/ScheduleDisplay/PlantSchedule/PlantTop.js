@@ -34,12 +34,15 @@ export default class PlantTop extends Component {
             <div>
                 <Spin spinning={this.state.loading}>
                     <Card>
-                        选择日期：
-                        <DatePicker
-                            defaultValue={moment(stime, DATE_FORMAT)}
-                            onChange={this.handleChangeDate.bind(this)}
-                        />
-                        <Button type='primary' style={{ marginLeft: 50 }} onClick={this.toExport.bind(this)}>导出<Icon type='download' /></Button>
+                        <div className='ScheduleDisplay-search-layout' >
+                            选择日期：
+                            <DatePicker
+                                defaultValue={moment(stime, DATE_FORMAT)}
+                                onChange={this.handleChangeDate.bind(this)}
+                            />
+                            <Button type='primary' style={{ marginLeft: 50 }} onClick={this.toExport.bind(this)}>导出<Icon type='download' /></Button>
+                        </div>
+
                         <div
                             id='PlantTop'
                             style={{ width: '100%', height: '340px' }}
@@ -176,8 +179,15 @@ export default class PlantTop extends Component {
             },
             toolbox: {
                 feature: {
-                    saveAsImage: { show: true }
-                }
+                    saveAsImage: {
+                        show: true,
+                        iconStyle: {
+                            textPosition: 'bottom',
+                            shadowOffsetX: 10
+                        }
+                    }
+                },
+                right: 20
             },
             legend: {
                 bottom: 10,
@@ -195,7 +205,7 @@ export default class PlantTop extends Component {
             yAxis: [
                 {
                     type: 'value',
-                    name: '颗',
+                    name: '棵',
                     axisLabel: {
                         formatter: '{value} '
                     }

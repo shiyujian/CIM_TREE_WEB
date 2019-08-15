@@ -76,7 +76,7 @@ class WeekForm extends Component {
             form: { getFieldDecorator }
         } = this.props;
         return (<div>
-            <Form layout='inline'>
+            <Form>
                 <Row style={{marginTop: 20}}>
                     <Col span={24}>
                         <Form.Item
@@ -123,7 +123,6 @@ class WeekForm extends Component {
             actions: {postSendwork, postWeekPlanSchedule},
             form: { validateFields }
         } = this.props;
-        console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
                 let FormParams = [{
@@ -131,7 +130,6 @@ class WeekForm extends Component {
                     FieldType: 0,
                     Val: values.Opinion || ''
                 }];
-                console.log('下一执行人', values.NextPeople);
                 let params = {
                     FlowID, // 流程ID
                     FlowName, // 流程名称
@@ -145,7 +143,6 @@ class WeekForm extends Component {
                     NextExecutor: values.NextPeople || 0, // 下一节点执行人
                     Executor // 当前节点执行人
                 };
-                console.log('入库数据', CurrentNodeName, Section, TableList);
                 postSendwork({}, params).then(rep => {
                     if (rep && rep.code && rep.code === 1) {
                         if (CurrentNodeName === '业主查看') {
@@ -158,7 +155,6 @@ class WeekForm extends Component {
                                     Num: item.planTreeNum
                                 });
                             });
-                            console.log('入库数据', paramsArr);
                             postWeekPlanSchedule({}, paramsArr).then(rst => {
                                 if (rst && rst.code && rst.code === 1) {
                                     notification.success({
@@ -199,7 +195,6 @@ class WeekForm extends Component {
             actions: {postBackwork},
             form: { validateFields }
         } = this.props;
-        console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
 

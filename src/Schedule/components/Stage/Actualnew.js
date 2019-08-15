@@ -48,7 +48,6 @@ class ActualNew extends Component {
             // 多选
             selectedRowKeys: [],
             dataSourceSelected: [],
-            sectionArray: [], // 标段列表
             // 项目信息
             section: '', // 用户所在标段
             projectName: '',
@@ -62,13 +61,6 @@ class ActualNew extends Component {
             actualModalVisible: false,
             actualModaldata: []
         };
-        this.getOriginNode = this.getOriginNode.bind(this); // 获取流程起点ID
-        this.onAdd = this.onAdd.bind(this); // 新增
-        this.onDelete = this.onDelete.bind(this); // 删除
-        this.onLook = this.onLook.bind(this); // 查看
-        this.handleCancel = this.handleCancel.bind(this); // 取消新增
-        this.handleOK = this.handleOK.bind(this); // 新增任务
-        this.getWorkList = this.getWorkList.bind(this); // 获取任务
     }
     columns = [
         {
@@ -196,6 +188,7 @@ class ActualNew extends Component {
             render: (text, record, index) => {
                 return (
                     <InputNumber
+                        min={0}
                         value={record.actualNum || 0}
                         onChange={this.handleActualNumChange.bind(this, index)}
                     />
@@ -208,8 +201,42 @@ class ActualNew extends Component {
         wrapperCol: { span: 18 }
     };
     async componentDidMount () {
-        this.getSection(); // 获取当前登陆用户的标段
-        this.getFlowList(); // 获取流程
+        await this.getSection(); // 获取当前登陆用户的标段
+        await this.getFlowList(); // 获取流程
+    }
+    getSection () {
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let user = getUser();
+
+        let section = user.section;
+        let currentSectionName = section;
+        let projectName = '';
+
+        if (section) {
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                // 获取当前标段所在的项目
+                sectionData.map(item => {
+                    if (code[0] === item.No) {
+                        projectName = item.Name;
+                        item.children.map(item => {
+                            // 获取当前标段的名字
+                            if (item.No === section) {
+                                currentSectionName = item.Name;
+                            }
+                        });
+                    }
+                });
+            }
+            this.setState({
+                currentSection: section,
+                currentSectionName: currentSectionName,
+                projectName: projectName
+            });
+        }
     }
     getFlowList () {
         const { getFlowList } = this.props.actions;
@@ -332,43 +359,6 @@ class ActualNew extends Component {
             }
         });
     }
-    getSection () {
-        const {
-            platform: { tree = {} }
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let user = getUser();
-
-        let section = user.section;
-        let currentSectionName = '';
-        let projectName = '';
-        let sectionArray = [];
-
-        if (section) {
-            let code = section.split('-');
-            if (code && code.length === 3) {
-                // 获取当前标段所在的项目
-                sectionData.map(item => {
-                    if (code[0] === item.No) {
-                        projectName = item.Name;
-                        item.children.map(item => {
-                            // 获取当前标段的名字
-                            if (item.No === section) {
-                                currentSectionName = item.Name;
-                                sectionArray.push(item);
-                            }
-                        });
-                    }
-                });
-            }
-            this.setState({
-                sectionArray,
-                currentSection: section,
-                currentSectionName: currentSectionName,
-                projectName: projectName
-            });
-        }
-    }
     // 发起填报
     handleOK () {
         const {
@@ -451,7 +441,10 @@ class ActualNew extends Component {
             currentSectionName
         } = this.state;
         setFieldsValue({
-            Section: currentSectionName
+            Section: currentSectionName,
+            Title: undefined,
+            TodayDate: undefined,
+            Auditor: undefined
         });
         let TableList = [];
         SCHEDULRPROJECT.map((item) => {
@@ -472,9 +465,10 @@ class ActualNew extends Component {
     // 关闭弹框
     handleCancel () {
         this.props.form.setFieldsValue({
-            actualSection: undefined,
-            actualSupervisorReview: undefined,
-            actualTimeDate: undefined
+            Section: undefined,
+            Title: undefined,
+            TodayDate: undefined,
+            Auditor: undefined
         });
         this.setState({
             visible: false,
@@ -522,10 +516,32 @@ class ActualNew extends Component {
             console.log('e', e);
         }
     }
+    checkAdditionTitle = async (rule, value, callback) => {
+        if (value) {
+            // 不允许空格
+            let reg = /^[^\s]*$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    if (value.length >= 2 && value.length <= 10) {
+                        callback();
+                    } else {
+                        callback('请输入任务名称(2到10位)');
+                    }
+                } else {
+                    callback(`请输入正确的任务名称`);
+                }
+            } else {
+                callback(`请输入正确的任务名称`);
+            }
+        } else {
+            callback();
+        }
+    }
     render () {
         const {
-            TableList,
-            sectionArray
+            TableList
         } = this.state;
         const {
             auditorList,
@@ -586,14 +602,17 @@ class ActualNew extends Component {
                                                     {
                                                         required: true,
                                                         message:
-                                                            '请输入任务名称'
+                                                            '请输入任务名称(2到10位)'
+                                                    },
+                                                    {
+                                                        validator: this.checkAdditionTitle
                                                     }
                                                 ]
                                             }
                                         )(
                                             <Input
-                                                style={{width: 220}}
-                                                placeholder='请输入任务名称'
+                                                // style={{width: 220}}
+                                                placeholder='请输入任务名称(2到10位)'
                                             />
                                         )}
                                     </FormItem>

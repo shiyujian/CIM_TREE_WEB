@@ -77,7 +77,7 @@ class ActualForm extends Component {
             form: { getFieldDecorator }
         } = this.props;
         return (<div>
-            <Form layout='inline'>
+            <Form >
                 <Row style={{marginTop: 20}}>
                     <Col>
                         <Form.Item
@@ -129,7 +129,6 @@ class ActualForm extends Component {
             },
             form: { validateFields }
         } = this.props;
-        console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
                 let FormParams = [{
@@ -137,7 +136,6 @@ class ActualForm extends Component {
                     FieldType: 0,
                     Val: values.Opinion
                 }];
-                console.log('下一执行人', values.NextPeople);
                 let params = {
                     FlowID, // 流程ID
                     FlowName, // 流程名称
@@ -212,7 +210,6 @@ class ActualForm extends Component {
             actions: {postBackwork},
             form: { validateFields }
         } = this.props;
-        console.log('提交', FlowID, FlowName, WorkID, CurrentNode, CurrentNodeName);
         validateFields((err, values) => {
             if (!err) {
             }
