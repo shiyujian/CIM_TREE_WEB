@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-06-25 10:12:20
+ * @Last Modified time: 2019-08-15 10:32:56
  */
 import React, { Component } from 'react';
 import {
@@ -30,6 +30,7 @@ import GetMenuTree from './GetMenuTree';
 import TreePipePage from './TreePipe/TreePipePage';
 import AreaDistanceMeasure from './AreaDistanceMeasure/AreaDistanceMeasure';
 import ViewPositionManage from './MapCustom/ViewPositionManage';
+import TreeAccept from './TreeAccept/TreeAccept';
 import {
     fillAreaColor,
     handleAreaLayerData,
@@ -37,14 +38,13 @@ import {
 } from '../auth';
 import {
     FOREST_GIS_API,
-    FOREST_GIS_TREETYPE_API,
     WMSTILELAYERURL,
     TILEURLS,
     INITLEAFLET_API
 } from '_platform/api';
+import {getUser} from '_platform/auth';
 import MenuSwitch from '../MenuSwitch';
 
-window.config = window.config || {};
 class OnSite extends Component {
     // export default class OnSite extends Component {
     constructor (props) {
@@ -105,9 +105,36 @@ class OnSite extends Component {
                 getCustomViewByUserID
             }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        await getCustomViewByUserID({id: user.id});
+        let user = getUser();
+        await getCustomViewByUserID({id: user.ID});
         await this.initMap();
+        window.addEventListener('keydown', this.keydownHandler);
+    }
+    // 监听键盘点击esc的事件
+    keydownHandler = ({ key }) => {
+        console.log('key', key);
+        const {
+            platform: {
+                tabs = {}
+            },
+            actions: {
+                switchFullScreenState
+            }
+        } = this.props;
+        switch (key) {
+            case 'Escape':
+                // 切换全屏
+                let fullScreenState = '';
+                if (tabs && tabs.fullScreenState) {
+                    fullScreenState = tabs.fullScreenState;
+                }
+                // 进入全屏
+                if (fullScreenState && fullScreenState === 'fullScreen') {
+                    switchFullScreenState('unFullScreen');
+                }
+                break;
+            default:
+        }
     }
     /* 初始化地图 */
     initMap () {
@@ -119,12 +146,13 @@ class OnSite extends Component {
             // 根据用户的自定义视图来查看聚焦点
             if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {
                 let view = customViewByUserID[0];
-                let center = [view.center[0].lat, view.center[0].lng];
-                let zoom = view.zoom;
+                let center = [view.Lat, view.Lng];
+                let zoom = view.Zoom;
                 mapInitialization.center = center;
                 mapInitialization.zoom = zoom;
             };
             mapInitialization.crs = L.CRS.EPSG4326;
+            mapInitialization.attributionControl = false;
             this.map = L.map('mapid', mapInitialization);
             this.tileLayer = L.tileLayer(TILEURLS[1], {
                 subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
@@ -164,7 +192,10 @@ class OnSite extends Component {
         // 在各个菜单之间切换时需要处理的图层
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             // 去除各个模块切换的图层，其他模块的图层在退出模块时自动去除，辅助管理的图层在主文件中
-            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement') {
+            if (dashboardCompomentMenu &&
+                dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
+                dashboardCompomentMenu !== 'geojsonFeature_accept'
+            ) {
                 await this.handleRemoveRealThinClassLayer();
             }
             // 选择苗木结缘  成活率  灌溉管网时 需要将基本树木图层去除
@@ -195,7 +226,8 @@ class OnSite extends Component {
             dashboardCompomentMenu !== 'geojsonFeature_survivalRate' &&
             dashboardCompomentMenu !== 'geojsonFeature_treetype' &&
             dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
-            dashboardCompomentMenu !== 'geojsonFeature_treeAdopt'
+            dashboardCompomentMenu !== 'geojsonFeature_treeAdopt' &&
+            dashboardCompomentMenu !== 'geojsonFeature_accept'
         ) {
             await this.getTileLayerTreeBasic();
         }
@@ -205,42 +237,65 @@ class OnSite extends Component {
             fullScreenState = tabs.fullScreenState;
         }
         // 进入全屏
-        if (fullScreenState && fullScreenState === 'fullScreen' && fullScreenState !== prevProps.fullScreenState) {
-            this.startFullScreen();
+        if (fullScreenState && fullScreenState === 'fullScreen') {
+            if (fullScreenState !== prevProps.fullScreenState) {
+                this.startFullScreen();
+            }
         }
         // 退出全屏
         if (fullScreenState && fullScreenState === 'unFullScreen' && fullScreenState !== prevProps.fullScreenState) {
             this.exitFullScreen();
         }
     }
+
     // 进入全屏
     startFullScreen () {
-        let docElm = document.documentElement;
-        // W3C
-        if (docElm.requestFullscreen) {
-            docElm.requestFullscreen();
-        } else if (docElm.mozRequestFullScreen) {
-            // FireFox
-            docElm.mozRequestFullScreen();
-        } else if (docElm.webkitRequestFullScreen) {
-            // Chrome等
-            docElm.webkitRequestFullScreen();
-        } else if (docElm.msRequestFullscreen) {
-            // IE11
-            docElm.msRequestFullscreen();
+        try {
+            if (document && document.documentElement) {
+                let docElm = document.documentElement;
+                // W3C
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen();
+                } else if (docElm.mozRequestFullScreen) {
+                    // FireFox
+                    docElm.mozRequestFullScreen();
+                } else if (docElm.webkitRequestFullScreen) {
+                    // Chrome等
+                    docElm.webkitRequestFullScreen();
+                } else if (docElm.msRequestFullscreen) {
+                    // IE11
+                    docElm.msRequestFullscreen();
+                }
+            }
+        } catch (e) {
+            console.log('startFullScreen', e);
         }
     }
     // 退出全屏
     exitFullScreen () {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
+        try {
+            let data = this.checkFull();
+            console.log('data', data);
+            if (data) {
+                if (document) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitCancelFullScreen) {
+                        document.webkitCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('exitFullScreen', e);
         }
+    }
+    checkFull () {
+        var isFullScreen = document.mozFullScreen || document.webkitIsFullScreen;
+        return isFullScreen;
     }
     // 获取初始化数据的树木瓦片图层
     getTileLayerTreeBasic = () => {
@@ -517,6 +572,16 @@ class OnSite extends Component {
                                 />
                             ) : ''
                     }
+                    { // 辅助验收
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_accept'
+                            ? (
+                                <TreeAccept
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                />
+                            ) : ''
+                    }
                     <div className='dashboard-gisTypeBut'>
                         <div>
                             <Button
@@ -598,7 +663,7 @@ class OnSite extends Component {
                         await this._addAreaLayer(eventKey);
                     }
                 }
-                if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement') {
+                if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement' || dashboardCompomentMenu === 'geojsonFeature_accept') {
                     let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
                     let selectSectionNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
                     if (this.tileTreeLayerBasic) {
@@ -608,7 +673,7 @@ class OnSite extends Component {
                     if (realThinClassLayerList[eventKey]) {
                         realThinClassLayerList[eventKey].addTo(this.map);
                     } else {
-                        var url = FOREST_GIS_TREETYPE_API +
+                        var url = FOREST_GIS_API +
                         `/geoserver/xatree/wms?cql_filter=No+LIKE+%27%25${selectNo}%25%27%20and%20Section+LIKE+%27%25${selectSectionNo}%25%27`;
                         let thinClassLayer = L.tileLayer.wms(url,
                             {
