@@ -483,12 +483,12 @@ class TreeAccept extends Component {
                                 <Button type='primary' style={{marginRight: 10}}
                                     disabled={AddCreateAreaDisplay}
                                     onClick={this._handleAddCreateArea.bind(this)}>
-                        新增
+                                    暂存
                                 </Button>
                                 <Button type='primary' style={{marginRight: 10}}
                                     disabled={deleteCreateAreaDisplay}
                                     onClick={this._handleDeleteCreateArea.bind(this)}>
-                        删除
+                                    删除
                                 </Button>
                             </div>
                         </div> : ''
