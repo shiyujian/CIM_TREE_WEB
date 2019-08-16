@@ -47,6 +47,8 @@ class TreeAccept extends Component {
         try {
             await map.off('click', this.handleTreeAcceptClickFunction);
             await this.handleCloseMeasureMenu();
+            await this.handleDeleteModalData();
+            await this.handleDeleteMapData();
         } catch (e) {
             console.log('componentWillUnmount', e);
         }
