@@ -53,13 +53,15 @@ export const postUserCustomView = createFetchAction(`${USER_API}/custom-view/`, 
 // 用户删除自定义视图
 export const deleteUserCustomView = createFetchAction(`${USER_API}/custom-view/{{id}}/`, [], 'DELETE');
 
+// 辅助验收模块
 export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`);
 export const getSupervisorUsers = createFetchAction(`${USER_API}/users/`, [getSupervisorUsersOK]);
-
-// 获取标段对应的公司名称和项目经理
+// 面积验收施工提交
 export const postAreaAccept = forestFetchAction(`${FOREST_API}/route/acceptancethinclass`, [], 'POST', []);
 // 获取人员的具体详情
 export const getForestUserUsername = createFetchAction(`${FOREST_API}/system/users`, []);
+// 查询细班验收施工是否提交，是否还需要反复提交
+export const getAreaAcceptByThinClass = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET');
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -119,6 +121,7 @@ export const actions = {
     getSupervisorUsers,
     postAreaAccept,
     getForestUserUsername,
+    getAreaAcceptByThinClass,
 
     switchDashboardCompoment,
     getAreaTree,

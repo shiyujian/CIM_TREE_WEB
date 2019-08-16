@@ -289,7 +289,8 @@ class TreeAccept extends Component {
         const {
             actions: {
                 postAreaAccept,
-                getForestUserUsername
+                getForestUserUsername,
+                getAreaAcceptByThinClass
             },
             form: {
                 validateFields
@@ -301,10 +302,26 @@ class TreeAccept extends Component {
             validateFields(async (err, values) => {
                 console.log('err', err);
                 if (!err) {
+                    // 查询该细班的面积验收是否已经审核
+                    let queryPostData = {
+                        section: selectSectionNo,
+                        thinclass: selectThinClassNo,
+                        page: 1,
+                        size: 5
+                    };
+                    let queryData = await getAreaAcceptByThinClass({}, queryPostData);
+                    console.log('queryData', queryData);
+                    if (queryData && queryData.content &&
+                        queryData.content instanceof Array && queryData.content.length > 0) {
+                        Notification.error({
+                            message: '该细班已经完成面积验收，请确认后再次提交'
+                        });
+                        return;
+                    }
                     let forestLoginUserData = window.localStorage.getItem('FOREST_LOGIN_USER_DATA');
                     forestLoginUserData = JSON.parse(forestLoginUserData) || {};
+                    // 根据院内的用户名获取林总库内用户的ID
                     let userData = await getForestUserUsername({}, {username: values.Supervisor});
-                    console.log('userData', userData);
                     let supervisorID = '';
                     if (userData && userData.content && userData.content instanceof Array && userData.content.length > 0) {
                         supervisorID = userData.content[0].ID;
@@ -312,7 +329,6 @@ class TreeAccept extends Component {
                         Notification.error({
                             message: '获取用户信息失败，请重新确认'
                         });
-                        return;
                     }
                     let designArea = 0;
                     if (areaDataList[areaEventKey] && areaDataList[areaEventKey].area) {
