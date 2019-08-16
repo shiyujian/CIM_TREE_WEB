@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-07-18 09:44:52
+ * @Last Modified time: 2019-08-16 11:20:26
  */
 /**
  *
@@ -93,7 +93,8 @@ export default class ForestContainer extends Component {
             EnterStrengthAnalysi = null,
             PlantStrengthAnalysi = null,
             DegitalAccept = null,
-            TreeDataClear = null
+            TreeDataClear = null,
+            DieTrees = null
         } = this.state || {};
         return (
             <Body>
@@ -252,6 +253,12 @@ export default class ForestContainer extends Component {
                             component={TreeDataClear}
                         />
                     )}
+                    {DieTrees && (
+                        <Route
+                            path='/forest/dietrees'
+                            component={DieTrees}
+                        />
+                    )}
                 </Main>
             </Body>
         );
@@ -337,7 +344,7 @@ export default class ForestContainer extends Component {
                     name: '监理抽查信息'
                 },
                 {
-                    key: 'ownerinfo',
+                    key: 'checkerinfo',
                     id: 'FOREST.OWNERINFO',
                     path: '/forest/checkerinfo',
                     name: '业主抽查信息'
@@ -360,6 +367,12 @@ export default class ForestContainer extends Component {
                     id: 'FOREST.TREEADOPTINFO',
                     path: '/forest/treeadoptinfo',
                     name: '苗木死亡调查'
+                },
+                {
+                    key: 'dietrees',
+                    id: 'FOREST.DIETREES',
+                    path: '/forest/dietrees',
+                    name: '苗木死亡信息'
                 }
             ]
         },
