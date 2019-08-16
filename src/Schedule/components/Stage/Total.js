@@ -328,8 +328,12 @@ class Total extends Component {
                     {...this.state}
                     gettaskSchedule={this.gettaskSchedule.bind(this)}
                 />
-                <Button onClick={this.addClick.bind(this)}>新增</Button>
-                {username === 'admin' ? (
+                <Button
+                    disabled
+                    onClick={this.addClick.bind(this)}>
+                    新增
+                </Button>
+                {/* {username === 'admin' ? (
                     <Popconfirm
                         placement='leftTop'
                         title='确定删除吗？'
@@ -341,7 +345,7 @@ class Total extends Component {
                     </Popconfirm>
                 ) : (
                     ''
-                )}
+                )} */}
                 <Table
                     columns={this.columns}
                     rowSelection={username === 'admin' ? rowSelection : null}

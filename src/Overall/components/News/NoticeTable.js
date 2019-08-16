@@ -106,6 +106,7 @@ class NoticeTable extends Component {
             title: '操作',
             width: '15%',
             render: record => {
+                return '/';
                 return (
                     <span>
                         <a onClick={this.handleNoticeView.bind(this, record)}>
@@ -185,6 +186,7 @@ class NoticeTable extends Component {
             title: '操作',
             width: '20%',
             render: record => {
+                return '/';
                 return (
                     <span>
                         <a onClick={this.handleNoticeView.bind(this, record)}>
@@ -455,8 +457,8 @@ class NoticeTable extends Component {
                                         return (
                                             <p>
                                             附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
-                                                    {file.name}
-                                                </a>
+                                                {file.name}
+                                            </a>
                                             </p>
                                         );
                                     } else {
@@ -483,6 +485,7 @@ class NoticeTable extends Component {
                             <div style={{ marginBottom: '10px' }}>
                                 <Button
                                     type='primary'
+                                    disabled
                                     onClick={this.handlePublishNotice.bind(this)}
                                 >
                                     通知发布

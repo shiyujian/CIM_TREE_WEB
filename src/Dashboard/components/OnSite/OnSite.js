@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-15 10:32:56
+ * @Last Modified time: 2019-08-15 21:56:43
  */
 import React, { Component } from 'react';
 import {
@@ -56,7 +56,8 @@ class OnSite extends Component {
             areaEventTitle: '', // 区域地块选中节点的name
             // 图层数据List
             areaLayerList: {}, // 区域地块图层list
-            realThinClassLayerList: {} // 实际细班种植图层
+            realThinClassLayerList: {}, // 实际细班种植图层
+            areaDataList: {} // 细班的数据获取
         };
         this.tileLayer = null; // 最底部基础图层
         this.tileTreeLayerBasic = null; // 树木区域图层
@@ -106,7 +107,8 @@ class OnSite extends Component {
             }
         } = this.props;
         let user = getUser();
-        await getCustomViewByUserID({id: user.ID});
+        console.log('user', user);
+        await getCustomViewByUserID({id: user.id});
         await this.initMap();
         window.addEventListener('keydown', this.keydownHandler);
     }
@@ -698,14 +700,24 @@ class OnSite extends Component {
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey) => {
         const {
-            areaLayerList
+            areaLayerList,
+            areaDataList
         } = this.state;
         const {
             actions: { getTreearea }
         } = this.props;
         try {
             let coords = await handleAreaLayerData(eventKey, getTreearea);
-            console.log('coords', coords);
+            if (!areaDataList[eventKey]) {
+                let handleKey = eventKey.split('-');
+                let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+                let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                let rst = await getTreearea({}, { no: no });
+                if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
+                    let data = rst.content.find(content => content.Section === section);
+                    areaDataList[eventKey] = data;
+                }
+            }
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
@@ -727,7 +739,8 @@ class OnSite extends Component {
                     }
                 }
                 this.setState({
-                    areaLayerList
+                    areaLayerList,
+                    areaDataList
                 });
             };
         } catch (e) {

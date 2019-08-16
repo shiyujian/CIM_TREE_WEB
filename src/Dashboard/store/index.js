@@ -53,6 +53,14 @@ export const postUserCustomView = createFetchAction(`${USER_API}/custom-view/`, 
 // 用户删除自定义视图
 export const deleteUserCustomView = createFetchAction(`${USER_API}/custom-view/{{id}}/`, [], 'DELETE');
 
+export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`);
+export const getSupervisorUsers = createFetchAction(`${USER_API}/users/`, [getSupervisorUsersOK]);
+
+// 获取标段对应的公司名称和项目经理
+export const postAreaAccept = forestFetchAction(`${FOREST_API}/route/acceptancethinclass`, [], 'POST', []);
+// 获取人员的具体详情
+export const getForestUserUsername = createFetchAction(`${FOREST_API}/system/users`, []);
+
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
 export const getAreaTree = createAction(`${ID}区域地块树`);
@@ -106,6 +114,11 @@ export const actions = {
     postUserCustomView,
     deleteUserCustomView,
     getQueryTreePipe,
+
+    getSupervisorUsersOK,
+    getSupervisorUsers,
+    postAreaAccept,
+    getForestUserUsername,
 
     switchDashboardCompoment,
     getAreaTree,
@@ -316,6 +329,12 @@ export default handleActions(
             return {
                 ...state,
                 areaDistanceMeasureMenu: payload
+            };
+        },
+        [getSupervisorUsersOK]: (state, { payload }) => {
+            return {
+                ...state,
+                supervisorUsersList: payload
             };
         }
     },

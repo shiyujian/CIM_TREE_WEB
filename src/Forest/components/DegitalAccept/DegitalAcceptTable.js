@@ -91,7 +91,9 @@ export default class DegitalAcceptTable extends Component {
             unitMessage: [],
             exportModalVisible1: false,
             exportModalVisible2: false,
-            exportModalVisible3: false
+            exportModalVisible3: false,
+            record: '',
+            itemDetail: ''
         };
         this.columns = [
             {
@@ -425,14 +427,41 @@ export default class DegitalAcceptTable extends Component {
     viewWord = async (record) => {
         const {
             actions: {
-                getDigitalAcceptDetail
+                getDigitalAcceptDetail,
+                getAcceptanceThinclasses
             }
         } = this.props;
         const {
             stime1 = '',
-            etime1 = ''
+            etime1 = '',
+            thinclass,
+            section
         } = this.state;
         let checktype = record.CheckType;
+        if (checktype === 10) {
+            let array = thinclass.split('-');
+            let array1 = [];
+            array.map((item, i) => {
+                if (i !== 2) {
+                    array1.push(item);
+                }
+            });
+            const postdata = {
+                section: section,
+                thinclass: array1.join('-')
+            };
+            let rst = await getAcceptanceThinclasses({}, postdata);
+            if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
+                this.setState({
+                    visible10: true,
+                    itemDetail: rst.content[0],
+                    record
+                });
+            } else {
+                message.info('移动端详情尚未提交');
+                return;
+            }
+        }
         const postdata = {
             acceptanceid: record.ID,
             status: record.Status, // 用当前条目的状态去查询
@@ -440,10 +469,10 @@ export default class DegitalAcceptTable extends Component {
             etime: etime1
         };
         let rst = await getDigitalAcceptDetail({}, postdata);
-        if (!(rst instanceof Array) || rst.length === 0) {
-            message.info('移动端详情尚未提交');
-            return;
-        }
+        // if (!(rst instanceof Array) || rst.length === 0) {
+        //     message.info('移动端详情尚未提交');
+        //     return;
+        // }
         this.setState({
             itemDetailList: rst
         });
@@ -535,10 +564,10 @@ export default class DegitalAcceptTable extends Component {
             ystype = '',
             treetypename = ''
         } = this.state;
-        if (thinclass === '') {
-            message.info('请选择项目，标段，小班及细班信息');
-            return;
-        }
+        // if (thinclass === '') {
+        //     message.info('请选择项目，标段，小班及细班信息');
+        //     return;
+        // }
 
         const {
             actions: {
@@ -633,13 +662,14 @@ export default class DegitalAcceptTable extends Component {
                 etime1 = ''
             } = this.state;
             console.log('record', record);
+            let checktype = record.CheckType;
             if (record && record.ystype) {
                 if (record.ystype === '土地整理' || record.ystype === '放样点穴' || record.ystype === '挖穴') {
                     const {
                         stime1 = '',
                         etime1 = ''
                     } = this.state;
-                    let checktype = record.CheckType;
+
                     const postdata = {
                         acceptanceid: record.ID,
                         status: record.Status, // 用当前条目的状态去查询
@@ -669,6 +699,10 @@ export default class DegitalAcceptTable extends Component {
                             exportModalVisible3: true
                         });
                     }
+                } else if (checktype === 10) {
+                    let ID = record.ID;
+                    let downloadUrl = `${FOREST_API}/DocExport.ashx?action=areaacceptance&id=${ID}`;
+                    await this.createLink(this, downloadUrl);
                 } else {
                     const postdata = {
                         acceptanceid: record.ID,

@@ -102,6 +102,7 @@ class NewsTable extends Component {
             title: '操作',
             width: '15%',
             render: record => {
+                return '/';
                 return (
                     <span>
                         <a onClick={this.handleNewsView.bind(this, record)}>
@@ -181,6 +182,7 @@ class NewsTable extends Component {
             title: '操作',
             width: '15%',
             render: record => {
+                return '/';
                 return (
                     <span>
                         <a onClick={this.handleNewsView.bind(this, record)}>
@@ -542,6 +544,7 @@ class NewsTable extends Component {
                         tabBarExtraContent={
                             <div style={{ marginBottom: '10px' }}>
                                 <Button
+                                    disabled
                                     type='primary'
                                     onClick={this.handlePublishNews.bind(this)}
                                 >

@@ -104,6 +104,7 @@ class Tablelevel extends Component {
             width: 160,
             dataIndex: 'action',
             render: (text, record) => {
+                return '/';
                 const {
                     permission
                 } = this.state;
@@ -558,6 +559,7 @@ class Tablelevel extends Component {
                             type='primary'
                             style={{ float: 'right' }}
                             onClick={this.toAdd}
+                            disabled
                         >
                             新增苗圃
                         </Button>

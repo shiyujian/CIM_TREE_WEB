@@ -382,6 +382,7 @@ class TablePerson extends Component {
                 // dataIndex: "edit",
                 key: 'Edit',
                 render: record => {
+                    return '/';
                     if (record.id) {
                         // return (
                         //     <a onClick={this.edits.bind(this, record)}>查看</a>

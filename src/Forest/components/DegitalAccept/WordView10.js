@@ -1,6 +1,18 @@
 import React, { Component } from 'react';
 import { Spin, Modal } from 'antd';
+import {
+    WMSTILELAYERURL,
+    TILEURLS,
+    INITLEAFLET_API
+} from '_platform/api';
+import L from 'leaflet';
 import './index.less';
+import {
+    fillAreaColor,
+    handleAreaLayerData,
+    handleCoordinates,
+    wktToJson
+} from './auth';
 import moment from 'moment';
 export default class WordView1 extends Component {
     static propTypes = {};
@@ -10,21 +22,101 @@ export default class WordView1 extends Component {
             loading: false,
             leader: '',
             unitName: '',
-            detail: ''
+            coords: [],
+            tableData: []
         };
     }
 
     componentDidMount = async () => {
         const {
-            itemDetailList = [],
-            unQualifiedList = []
+            itemDetail = {}
         } = this.props;
-        if (itemDetailList.length > 0) {
-            let detail = itemDetailList[0];
-            await this.getUnitMessage(detail);
+        await this.initMap();
+        if (itemDetail && itemDetail.ID) {
+            await this._addAreaLayer(itemDetail);
+            await this.getUnitMessage(itemDetail);
+        }
+    }
+
+    /* 初始化地图 */
+    initMap () {
+        try {
+            let mapInitialization = INITLEAFLET_API;
+            mapInitialization.crs = L.CRS.EPSG4326;
+            this.map = L.map('mapid', mapInitialization);
+            // 加载基础图层
+            this.tileLayer = L.tileLayer(TILEURLS[1], {
+                subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
+                minZoom: 10,
+                maxZoom: 17,
+                zoomOffset: 1
+            }).addTo(this.map);
+            // 地图上边的地点的名称
+            L.tileLayer(WMSTILELAYERURL, {
+                subdomains: [1, 2, 3],
+                minZoom: 10,
+                maxZoom: 17,
+                zoomOffset: 1
+            }).addTo(this.map);
+        } catch (e) {
+            console.log('initMap', e);
+        }
+    }
+    // 选中细班，则在地图上加载细班图层
+    _addAreaLayer = async (itemDetail) => {
+        try {
+            let str = '';
+            let coords = [];
+            let wkt = itemDetail.Coords;
+            if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+                let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
+                let arr = datas.split('),(');
+                arr.map((a, index) => {
+                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                    coords.push(str);
+                });
+            } else if (wkt.indexOf('POLYGON') !== -1) {
+                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                coords.push(str);
+            }
             this.setState({
-                detail
+                coords
             });
+            if (coords && coords instanceof Array && coords.length > 0) {
+                for (let i = 0; i < coords.length; i++) {
+                    let str = coords[i];
+                    let treearea = handleCoordinates(str);
+                    let message = {
+                        key: 3,
+                        type: 'Feature',
+                        properties: {name: '', type: 'area'},
+                        geometry: { type: 'Polygon', coordinates: treearea }
+                    };
+                    let layer = this._createMarker(message);
+                    if (i === coords.length - 1) {
+                        this.map.fitBounds(layer.getBounds());
+                    }
+                }
+            };
+            this.setTableData(coords);
+        } catch (e) {
+            console.log('加载细班图层', e);
+        }
+    }
+    /* 在地图上添加marker和polygan */
+    _createMarker (geo) {
+        try {
+            if (geo.properties.type === 'area') {
+                // 创建区域图形
+                let layer = L.polygon(geo.geometry.coordinates, {
+                    color: '#201ffd',
+                    fillColor: fillAreaColor(geo.key),
+                    fillOpacity: 0.3
+                }).addTo(this.map);
+                return layer;
+            }
+        } catch (e) {
+            console.log('_createMarker', e);
         }
     }
 
@@ -50,30 +142,61 @@ export default class WordView1 extends Component {
             unitName
         });
     }
-    handleDetailData = (detail) => {
+    setTableData = (corrds) => {
+        console.log('corrds', corrds);
+        let tableData = [];
+        if (corrds.length > 0) {
+            for (let i = 0; i < corrds.length; i++) {
+                let str = corrds[i];
+                let data = handleCoordinates(str);
+                console.log('data', data);
+                let treearea = data[0];
+                console.log('treearea', treearea);
+
+                for (let i = 0; i < treearea.length; i = i + 2) {
+                    let a = i;
+                    let b = i + 1;
+                    if (a !== treearea.length - 1) {
+                        tableData.push(
+                            <tr>
+                                <td>{a + 1}</td>
+                                <td>{treearea[a][1] || ''}</td>
+                                <td >{treearea[a][0] || ''}</td>
+                                <td>{b + 1}</td>
+                                <td>{treearea[b][1] || ''}</td>
+                                <td >{treearea[b][0] || ''}</td>
+                            </tr>
+                        );
+                    } else {
+                        tableData.push(
+                            <tr>
+                                <td>{a + 1}</td>
+                                <td>{treearea[a][1] || ''}</td>
+                                <td>{treearea[a][0] || ''}</td>
+                                <td />
+                                <td />
+                                <td />
+                            </tr>
+                        );
+                    }
+                }
+            }
+        }
+        this.setState({
+            tableData
+        });
+    }
+    handleDetailData = (detail, record) => {
         let handleDetail = {};
-        handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
-        handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
-        handleDetail.shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ConstructerObj && detail.AcceptanceObj.ConstructerObj.Full_Name) || '';
-        handleDetail.checker = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
+        handleDetail.unit = (record && record.Land) || '';
+        handleDetail.jianli = (record && record.SupervisorObj && record.SupervisorObj.Full_Name) || '';
+        handleDetail.shigong = (record && record.ConstructerObj && record.ConstructerObj.Full_Name) || '';
+        handleDetail.checker = (record && record.ApplierObj && record.ApplierObj.Full_Name) || '';
         handleDetail.designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || '';
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
-        handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
-        handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
-        handleDetail.createTime = (detail && detail.CreateTime && moment(detail.CreateTime).format('YYYY年MM月DD日')) || ''; handleDetail.designNum = (detail && detail.DesignNum) || 0;
-        handleDetail.actualNum = (detail && detail.ActualNum) || 0;
-        handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
-        handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
-        handleDetail.checkNum = (detail && detail.CheckNum) || 0;
-        handleDetail.failedNum = (detail && detail.FailedNum) || 0;
-        handleDetail.treetypename = (detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName) || '';
+        handleDetail.applyTime = (record && record.ApplyTime && moment(record.ApplyTime).format('YYYY年MM月DD日')) || '';
+        handleDetail.createTime = (record && record.CheckTime && moment(record.CheckTime).format('YYYY年MM月DD日')) || '';
 
-        let hgl = handleDetail.checkNum - handleDetail.failedNum; // 合格量
-        let qulityok = 0; // 默认全部不合格
-        if (handleDetail.checkNum !== 0) {
-            qulityok = hgl / handleDetail.checkNum;
-        }
-        handleDetail.qulityok = qulityok;
         return handleDetail;
     }
     render () {
@@ -81,14 +204,17 @@ export default class WordView1 extends Component {
             leader,
             unitName,
             loading,
-            detail
+            tableData
         } = this.state;
+        const {
+            itemDetail,
+            record
+        } = this.props;
         let array = ['', '', '', ''];
-        if (detail && detail.ThinClass) {
-            array = detail.ThinClass.split('-');
+        if (itemDetail && itemDetail.ThinClass) {
+            array = itemDetail.ThinClass.split('-');
         }
-        let handleDetail = this.handleDetailData(detail);
-        console.log('handleDetail', handleDetail);
+        let handleDetail = this.handleDetailData(itemDetail, record);
         return (
             <Spin spinning={loading}>
                 <Modal
@@ -104,19 +230,19 @@ export default class WordView1 extends Component {
                         <table style={{ border: 1 }}>
                             <tbody>
                                 <tr>
-                                    <td height='60;' colSpan='1' width='118px'>单位工程名称</td>
+                                    <td style={{ height: 60, width: 118 }} >单位工程名称</td>
                                     <td colSpan='3'> {handleDetail.unit}</td>
-                                    <td colSpan='1' width='118px'>细班（小班）</td>
-                                    <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
+                                    <td style={{ width: 118 }}>细班（小班）</td>
+                                    <td colSpan='3'>{`${array[2]}小班${array[3]}细班`}</td>
                                 </tr>
                                 <tr>
-                                    <td height='60;' align='center'>施工单位</td>
+                                    <td style={{ height: 60, align: 'center' }}>施工单位</td>
                                     <td colSpan='3'>{unitName}</td>
                                     <td >项目经理</td>
                                     <td >{leader}</td>
                                 </tr>
                                 <tr>
-                                    <td height='60;' align='center'>施工员</td>
+                                    <td style={{ height: 60, align: 'center' }}>施工员</td>
                                     <td colSpan='1'>{handleDetail.shigong}</td>
                                     <td>测量员</td>
                                     <td colSpan='1'> / </td>
@@ -124,29 +250,44 @@ export default class WordView1 extends Component {
                                     <td >{`${handleDetail.designArea} (亩)`}</td>
                                 </tr>
                                 <tr>
-                                    <td height='60;' align='center'>实际面积</td>
-                                    <td>{`${detail.actualArea} (亩)`}</td>
+                                    <td style={{ height: 60, align: 'center' }}>实际面积</td>
+                                    <td>{`${handleDetail.actualArea} (亩)`}</td>
                                     <td >误差值及备注</td>
                                     <td colSpan='3'>/</td>
                                 </tr>
                                 <tr>
-                                    <td className='hei60' >施工执行标准名称及编号</td>
+                                    <td style={{ height: 60 }} >施工执行标准名称及编号</td>
                                     <td colSpan='5'> 《雄安新区造林工作手册》</td>
                                 </tr>
                                 <tr>
-                                    <td colSpan='3'>序号</td>
-                                    <tr>
-                                        <td colSpan='5'>
-                                            测量坐标
-                                        </td>
-                                        <tr>
-                                            <td colSpan='2'>X</td>
-                                            <td colSpan='3'>Y</td>
-                                        </tr>
-                                    </tr>
+                                    <td style={{ height: 300 }} colSpan='6'>
+                                        <div
+                                            id='mapid'
+                                            style={{
+                                                height: 300,
+                                                borderLeft: '1px solid #ccc'
+                                            }}
+                                        />
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td className='hei110' >施工单位质量专检结果</td>
+                                    <td rowSpan={2}>序号</td>
+                                    <td colSpan='2'>测量坐标</td>
+                                    <td rowSpan={2}>序号</td>
+                                    <td colSpan='2'>测量坐标</td>
+
+                                </tr>
+                                <tr>
+                                    <td>X</td>
+                                    <td>Y</td>
+                                    <td>X</td>
+                                    <td>Y</td>
+                                </tr>
+                                {
+                                    tableData
+                                }
+                                <tr>
+                                    <td style={{ height: 110 }} >施工单位质量专检结果</td>
                                     <td colSpan='5'>
                                         <div>
                                             <div style={{ float: 'left', marginLeft: 10 }}>
@@ -157,7 +298,7 @@ export default class WordView1 extends Component {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td className='hei110' >监理（建设）单位验收记录</td>
+                                    <td style={{ height: 110 }} >监理（建设）单位验收记录</td>
                                     <td colSpan='5'>
                                         <div>
                                             <div style={{ float: 'left', marginLeft: 10 }}>

@@ -231,12 +231,25 @@ export default class MenuSwitch extends Component {
                             <div className='menuSwitch-secondMenuLayout'>
                                 {
                                     this.options.map((option) => {
-                                        const user = getUser();
-                                        let userRoles = user.roles || '';
+                                        // const user = getUser();
+                                        // let userRoles = user.roles || '';
+                                        // let permission = false;
+                                        // if (userRoles && userRoles.RoleName && userRoles.RoleName === '施工文书') {
+                                        //     permission = true;
+                                        // } else if (user.username === 'admin') {
+                                        //     permission = true;
+                                        // }
+                                        const user = JSON.parse(
+                                            window.localStorage.getItem('QH_USER_DATA')
+                                        );
+                                        let groups = user.groups || [];
                                         let permission = false;
-                                        if (userRoles && userRoles.RoleName && userRoles.RoleName === '施工文书') {
-                                            permission = true;
-                                        } else if (user.username === 'admin') {
+                                        groups.map((group) => {
+                                            if (group.name === '施工文书') {
+                                                permission = true;
+                                            }
+                                        });
+                                        if (user.username === 'admin') {
                                             permission = true;
                                         }
                                         if (option.value === 'geojsonFeature_accept') {

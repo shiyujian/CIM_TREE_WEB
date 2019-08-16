@@ -77,11 +77,12 @@ export default class Tree extends Component {
                             style={{ float: 'left' }}
                             type='primary'
                             ghost
+                            disabled
                             onClick={this.addOrg.bind(this)}
                         >
                         新建组织机构
                         </Button>
-                        <Popconfirm
+                        {/* <Popconfirm
                             title='是否真的要删除选中项目?'
                             onConfirm={this.remove.bind(this)}
                             okText='是'
@@ -90,7 +91,10 @@ export default class Tree extends Component {
                             <Button style={{ float: 'right' }} type='danger' ghost>
                             删除
                             </Button>
-                        </Popconfirm>
+                        </Popconfirm> */}
+                        <Button style={{ float: 'right' }} disabled type='danger' ghost>
+                            删除
+                        </Button>
                     </div>
                     <SimpleTree
                         dataSource={dataList}

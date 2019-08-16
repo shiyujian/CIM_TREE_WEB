@@ -74,6 +74,7 @@ class Tablelevel extends Component {
             dataIndex: 'actions',
             key: '4',
             render: (text, record) => {
+                return '/';
                 return <a onClick={this.toDelete.bind(this, record)}>解 除</a>;
             }
         }
@@ -113,13 +114,27 @@ class Tablelevel extends Component {
                         </Select>
                     </FormItem>
                     <FormItem style={{marginLeft: 50}}>
-                        <Button type='primary' onClick={this.toSearch.bind(this)}>查询</Button>
-                        <Button onClick={this.toEmpty.bind(this)} style={{marginLeft: 20}}>清空</Button>
+                        <Button
+                            type='primary'
+                            onClick={this.toSearch.bind(this)}>
+                                查询
+                        </Button>
+                        <Button
+                            onClick={this.toEmpty.bind(this)}
+                            style={{marginLeft: 20}}>
+                            清空
+                        </Button>
                     </FormItem>
                 </Form >
                 <Row style={{marginBottom: 10}}>
                     <Col span={24}>
-                        <Button style={{float: 'right'}} type='primary' onClick={this.addRelevance.bind(this)}>新增绑定</Button>
+                        <Button
+                            style={{float: 'right'}}
+                            type='primary'
+                            disabled
+                            onClick={this.addRelevance.bind(this)}>
+                            新增绑定
+                        </Button>
                     </Col>
                 </Row>
                 <Spin tip='Loading...' spinning={this.state.loading}>

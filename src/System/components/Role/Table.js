@@ -83,6 +83,7 @@ export default class Roles extends Component {
         {
             title: '操作',
             render: role => {
+                return '/';
                 return [
                     <a
                         key='0'
@@ -102,15 +103,15 @@ export default class Roles extends Component {
                     </Popconfirm>
                 ];
             }
-        },
-        {
-            title: '关联用户',
-            render: role => {
-                return (
-                    <a onClick={this.associate.bind(this, role)}>关联用户</a>
-                );
-            }
         }
+        // {
+        //     title: '关联用户',
+        //     render: role => {
+        //         return (
+        //             <a onClick={this.associate.bind(this, role)}>关联用户</a>
+        //         );
+        //     }
+        // }
     ];
 
     associate = async (role, event) => {
@@ -155,6 +156,7 @@ export default class Roles extends Component {
                                 <Button
                                     type='primary'
                                     ghost
+                                    disabled
                                     onClick={this.append.bind(this, 0)}
                                 >
                                     添加苗圃角色
@@ -181,6 +183,7 @@ export default class Roles extends Component {
                                 <Button
                                     type='primary'
                                     ghost
+                                    disabled
                                     onClick={this.append.bind(this, 1)}
                                 >
                                     添加施工角色
@@ -207,6 +210,7 @@ export default class Roles extends Component {
                                 <Button
                                     type='primary'
                                     ghost
+                                    disabled
                                     onClick={this.append.bind(this, 2)}
                                 >
                                     添加监理角色
@@ -233,6 +237,7 @@ export default class Roles extends Component {
                                 <Button
                                     type='primary'
                                     ghost
+                                    disabled
                                     onClick={this.append.bind(this, 3)}
                                 >
                                     添加业主角色
@@ -259,6 +264,7 @@ export default class Roles extends Component {
                                 <Button
                                     type='primary'
                                     ghost
+                                    disabled
                                     onClick={this.append.bind(this, 4)}
                                 >
                                     添加养护角色
@@ -285,6 +291,7 @@ export default class Roles extends Component {
                                 <Button
                                     type='primary'
                                     ghost
+                                    disabled
                                     onClick={this.append.bind(this, 6)}
                                 >
                                     添加供应商角色

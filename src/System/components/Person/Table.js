@@ -141,6 +141,7 @@ class Users extends Component {
             title: '操作',
             key: '10',
             render: (text, record) => {
+                return '/';
                 const userc = JSON.parse(
                     window.localStorage.getItem('QH_USER_DATA')
                 );
@@ -298,13 +299,14 @@ class Users extends Component {
                 <Col span={3}>
                     <Button
                         type='primary'
-                        disabled={!node}
+                        // disabled={!node}
+                        disabled
                         onClick={this.append.bind(this)}>
                             添加用户
                     </Button>
                 </Col>,
                 <Col span={3}>
-                    {
+                    {/* {
                         selectedRowKeys.length > 0
                             ? <Popconfirm
                                 title='是否真的要删除选中用户?'
@@ -319,7 +321,10 @@ class Users extends Component {
                             : <Button type='danger' disabled>
                                 批量删除
                             </Button>
-                    }
+                    } */}
+                    <Button type='danger' disabled>
+                                批量删除
+                    </Button>
                 </Col>
             </div>);
         } else {
@@ -327,7 +332,8 @@ class Users extends Component {
                 <Col span={3}>
                     <Button
                         onClick={this.append.bind(this)}
-                        disabled={!node}
+                        // disabled={!node}
+                        disabled
                     >
                         添加用户
                     </Button>

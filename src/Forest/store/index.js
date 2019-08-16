@@ -434,6 +434,9 @@ export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sec
 // 获取标段对应的公司名称和项目经理
 export const postMapImage = forestFetchAction(`${FOREST_API}/route/mapimage`, [], 'POST', []);
 
+// 获取第十项
+export const getAcceptanceThinclasses = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET', []);
+
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -540,7 +543,8 @@ export const actions = {
     getExportAcceptList,
     getExportAcceptReport,
     getBigDataCheckList,
-    postMapImage
+    postMapImage,
+    getAcceptanceThinclasses
 };
 export default handleActions({
     [getTreeOK]: (state, {
