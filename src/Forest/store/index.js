@@ -435,6 +435,16 @@ export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sec
 export const postMapImage = forestFetchAction(`${FOREST_API}/route/mapimage`, [], 'POST', []);
 // 获取第十项信息
 export const getAcceptanceThinclasses = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET', []);
+// 查询细班验收施工是否提交，是否还需要反复提交
+export const getAreaAcceptByThinClass = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET');
+// 辅助验收模块
+export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`);
+export const getSupervisorUsers = createFetchAction(`${USER_API}/users/`, [getSupervisorUsersOK]);
+// 面积验收施工提交
+export const postAreaAccept = forestFetchAction(`${FOREST_API}/route/acceptancethinclass`, [], 'POST', []);
+// 获取人员的具体详情
+export const getForestUserUsername = createFetchAction(`${FOREST_API}/system/users`, []);
+
 // 死亡苗木信息
 // 获取死亡苗木信息
 export const getDieTreesData = forestFetchAction(
@@ -446,6 +456,7 @@ export const getExportDieTree = forestFetchAction(
     `${FOREST_API}/tree/exportDieTree`,
     []
 );
+
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -555,7 +566,12 @@ export const actions = {
     postMapImage,
     getAcceptanceThinclasses,
     getDieTreesData,
-    getExportDieTree
+    getExportDieTree,
+    getAreaAcceptByThinClass,
+    getSupervisorUsersOK,
+    getSupervisorUsers,
+    postAreaAccept,
+    getForestUserUsername
 };
 export default handleActions({
     [getTreeOK]: (state, {
@@ -635,6 +651,12 @@ export default handleActions({
         return {
             ...state,
             supplierList: payload
+        };
+    },
+    [getSupervisorUsersOK]: (state, { payload }) => {
+        return {
+            ...state,
+            supervisorUsersList: payload
         };
     }
 }, {});

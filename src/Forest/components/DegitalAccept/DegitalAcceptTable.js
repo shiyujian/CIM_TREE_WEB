@@ -30,6 +30,7 @@ import WordView11 from './WordView11';
 import ExportView1 from './ExportView1';
 import ExportView2 from './ExportView2';
 import ExportView3 from './ExportView3';
+import DrawAreaAcceptModal from './DrawAreaAcceptModal';
 import '../index.less';
 import {
     getSectionNameBySection,
@@ -93,7 +94,9 @@ export default class DegitalAcceptTable extends Component {
             exportModalVisible2: false,
             exportModalVisible3: false,
             record: '',
-            itemDetail: ''
+            itemDetail: '',
+            drawAreaVisible: false,
+            reDrawAreaVisible: false
         };
         this.columns = [
             {
@@ -153,23 +156,50 @@ export default class DegitalAcceptTable extends Component {
             {
                 title: '操作',
                 render: (text, record) => {
-                    if (record.status === '未申请' || record.status === '待验收') {
-                        return <span > 暂无 </span>;
-                    } else if (record.status === '完成') {
-                        return (<div >
-                            <a onClick={this.viewWord.bind(this, record)} >
-                                查看
-                            </a>
-                            <Divider type='vertical' />
-                            <a onClick={this.exportFile.bind(this, record)}>导出</a>
-                        </div>
-                        );
+                    if (record.CheckType && record.CheckType === 10) {
+                        if (record.status === '未申请') {
+                            return (<div >
+                                <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
+                                    申请验收
+                                </a>
+                            </div>
+                            );
+                        } else if (record.status === '退回') {
+                            return (<div >
+                                <a onClick={this.handleReDrawAreaAccept.bind(this, record)} >
+                                    重新申请
+                                </a>
+                            </div>
+                            );
+                        } else if (record.status === '完成') {
+                            return (<div >
+                                <a onClick={this.viewWord.bind(this, record)} >
+                                    查看
+                                </a>
+                                <Divider type='vertical' />
+                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                            </div>
+                            );
+                        }
                     } else {
-                        return (<div >
-                            <a onClick={this.viewWord.bind(this, record)} >
-                                查看
-                            </a>
-                        </div>);
+                        if (record.status === '未申请' || record.status === '待验收') {
+                            return <span > 暂无 </span>;
+                        } else if (record.status === '完成') {
+                            return (<div >
+                                <a onClick={this.viewWord.bind(this, record)} >
+                                    查看
+                                </a>
+                                <Divider type='vertical' />
+                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                            </div>
+                            );
+                        } else {
+                            return (<div >
+                                <a onClick={this.viewWord.bind(this, record)} >
+                                    查看
+                                </a>
+                            </div>);
+                        }
                     }
                 }
             }
@@ -536,6 +566,28 @@ export default class DegitalAcceptTable extends Component {
                 return '';
         }
     }
+    // 面积验收施工提交
+    handleDrawAreaAccept = async (record) => {
+        this.setState({
+            drawAreaVisible: true
+        });
+    }
+    handleCloseDrawAreaModal = async () => {
+        this.setState({
+            drawAreaVisible: false
+        });
+    }
+    // 面积验收施工重新提交
+    handleReDrawAreaAccept = async (record) => {
+        this.setState({
+            reDrawAreaVisible: true
+        });
+    }
+    handleCloseReDrawAreaModal = async () => {
+        this.setState({
+            reDrawAreaVisible: false
+        });
+    }
     // 翻页
     handleTableChange (pagination) {
         const pager = {
@@ -564,10 +616,10 @@ export default class DegitalAcceptTable extends Component {
             ystype = '',
             treetypename = ''
         } = this.state;
-        // if (thinclass === '') {
-        //     message.info('请选择项目，标段，小班及细班信息');
-        //     return;
-        // }
+        if (thinclass === '') {
+            message.info('请选择项目，标段，小班及细班信息');
+            return;
+        }
 
         const {
             actions: {
@@ -1001,7 +1053,8 @@ export default class DegitalAcceptTable extends Component {
             visible11,
             exportModalVisible1,
             exportModalVisible2,
-            exportModalVisible3
+            exportModalVisible3,
+            drawAreaVisible
         } = this.state;
         return (
             <div>
@@ -1116,6 +1169,14 @@ export default class DegitalAcceptTable extends Component {
                     exportModalVisible3
                         ? <ExportView3
                             onPressOk={this.handleExportModalClose.bind(this)}
+                            {...this.props}
+                            {...this.state}
+                        /> : ''
+                }
+                {
+                    drawAreaVisible
+                        ? <DrawAreaAcceptModal
+                            handleCloseDrawAreaModal={this.handleCloseDrawAreaModal.bind(this)}
                             {...this.props}
                             {...this.state}
                         /> : ''

@@ -56,7 +56,8 @@ export default class DegitalAccept extends Component {
                 getThinClassTree
             },
             users,
-            platform: { tree = {} }
+            platform: { tree = {} },
+            supervisorUsersList
         } = this.props;
         // 避免反复获取森林用户数据，提高效率
         if (!users) {
@@ -70,6 +71,9 @@ export default class DegitalAccept extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+        }
+        if (!(supervisorUsersList && supervisorUsersList.length > 0)) {
+            await this.getSupervisorUsersList();
         }
         let defaultProject = await getDefaultProject();
         if (defaultProject) {
@@ -157,6 +161,38 @@ export default class DegitalAccept extends Component {
             </Option>
         ];
         this.setState({ typeoption, zttypeoption, ystypeoption });
+    }
+
+    // 获取监理列表
+    getSupervisorUsersList = async () => {
+        const {
+            actions: {
+                getSupervisorUsers,
+                getRoles
+            }
+        } = this.props;
+        const user = getUser();
+        let sections = user.sections;
+        sections = JSON.parse(sections);
+        // 首先查看有没有关联标段，没有关联的人无法获取人员
+        if (sections && sections instanceof Array && sections.length > 0) {
+            let roles = await getRoles();
+            console.log();
+            let roleID = [];
+            if (roles && roles instanceof Array && roles.length > 0) {
+                roles.map((role) => {
+                    if (role && role.name && role.name === '监理文书') {
+                        roleID.push(role.id);
+                    }
+                });
+                let postData = {
+                    roles: roleID,
+                    sections: sections,
+                    is_active: true
+                };
+                await getSupervisorUsers({}, postData);
+            }
+        }
     }
 
     render () {
