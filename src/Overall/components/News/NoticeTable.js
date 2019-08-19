@@ -283,6 +283,7 @@ class NoticeTable extends Component {
                             <div style={{ marginBottom: '10px' }}>
                                 <Button
                                     type='primary'
+                                    disabled
                                     onClick={this.handlePublishNotice.bind(this)}
                                 >
                                     通知发布

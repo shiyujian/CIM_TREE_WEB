@@ -41,6 +41,7 @@ class Tablelevel extends Component {
             dataIndex: 'actions',
             key: '4',
             render: (text, record) => {
+                return '/';
                 return <a onClick={this.toDelete.bind(this, record)}>解 除</a>;
             }
         }

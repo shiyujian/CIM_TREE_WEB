@@ -901,12 +901,17 @@ export default class TaskCreateTable extends Component {
             checkedKeys.map((key) => {
                 if (treeCoords[key]) {
                     let arrData = treeCoords[key];
+                    console.log('arrData', arrData);
                     arrData.map((arr) => {
+                        console.log('arr', arr);
+
                         thinAreaNum = thinAreaNum + 1;
                         thinClassCoords = thinClassCoords.concat(arr);
                     });
                 }
             });
+            console.log('thinClassCoords', thinClassCoords);
+
             if (thinClassCoords.length === 1) {
                 coords = thinClassCoords[0];
             } else {

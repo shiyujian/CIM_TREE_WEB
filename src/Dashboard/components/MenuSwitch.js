@@ -4,6 +4,7 @@ import buildImg from './MenuImg/build.png';
 import buildImgSel from './MenuImg/buildSelect.png';
 import operateImg from './MenuImg/operate.png';
 import operateImgSel from './MenuImg/operateSelect.png';
+import {getUser} from '_platform/auth';
 // window = window || {};
 export default class MenuSwitch extends Component {
     constructor (props) {
@@ -32,6 +33,10 @@ export default class MenuSwitch extends Component {
         {
             label: '巡检路线',
             value: 'geojsonFeature_track'
+        },
+        {
+            label: '辅助验收',
+            value: 'geojsonFeature_accept'
         }
     ];
     options1 = [
@@ -138,7 +143,8 @@ export default class MenuSwitch extends Component {
             }
         } = this.props;
         // 选择成活率，苗木结缘时，不能够点击树木信息开关
-        if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
+        if (dashboardCompomentMenu &&
+            dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
                 dashboardCompomentMenu === 'geojsonFeature_treePipe' ||
                 dashboardCompomentMenu === 'geojsonFeature_treeAdopt') {
@@ -146,7 +152,8 @@ export default class MenuSwitch extends Component {
             }
         }
         // 选择了数据测量，就需要取消树木信息和区域地块，视图管理
-        if (dashboardDataMeasurement && dashboardDataMeasurement === 'dataMeasurement' &&
+        if (dashboardDataMeasurement &&
+            dashboardDataMeasurement === 'dataMeasurement' &&
             dashboardDataMeasurement !== prevProps.dashboardDataMeasurement) {
             await switchDashboardTreeMess('');
             await switchDashboardRightMenu('');
@@ -177,12 +184,14 @@ export default class MenuSwitch extends Component {
             await switchDashboardRightMenu('');
         }
         // 选择成活率，树种筛选，辅助验收，苗木结缘, 灌溉管网时，不能够点击图层控制开关
-        if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
+        if (dashboardCompomentMenu &&
+            dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             if (dashboardCompomentMenu === 'geojsonFeature_survivalRate' ||
             dashboardCompomentMenu === 'geojsonFeature_treetype' ||
             dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement' ||
             dashboardCompomentMenu === 'geojsonFeature_treePipe' ||
-            dashboardCompomentMenu === 'geojsonFeature_treeAdopt'
+            dashboardCompomentMenu === 'geojsonFeature_treeAdopt' ||
+            dashboardCompomentMenu === 'geojsonFeature_accept'
             ) {
                 await switchDashboardAreaTreeLayer('tileTreeLayerBasic');
             }
@@ -222,6 +231,41 @@ export default class MenuSwitch extends Component {
                             <div className='menuSwitch-secondMenuLayout'>
                                 {
                                     this.options.map((option) => {
+                                        // const user = getUser();
+                                        // let userRoles = user.roles || '';
+                                        // let permission = false;
+                                        // if (userRoles && userRoles.RoleName && userRoles.RoleName === '施工文书') {
+                                        //     permission = true;
+                                        // } else if (user.username === 'admin') {
+                                        //     permission = true;
+                                        // }
+                                        const user = JSON.parse(
+                                            window.localStorage.getItem('QH_USER_DATA')
+                                        );
+                                        let groups = user.groups || [];
+                                        let permission = false;
+                                        groups.map((group) => {
+                                            if (group.name === '施工文书') {
+                                                permission = true;
+                                            }
+                                        });
+                                        if (user.username === 'admin') {
+                                            permission = true;
+                                        }
+                                        if (option.value === 'geojsonFeature_accept') {
+                                            if (permission) {
+                                                return (
+                                                    <a className={dashboardCompomentMenu === option.value ? 'menuSwitch-secondMenuButtonSelLayout' : 'menuSwitch-secondMenuButtonUnSelLayout'}
+                                                        id={option.value}
+                                                        key={option.value}
+                                                        onClick={this.handleLeftMenuButton.bind(this)}>
+                                                        {option.label}
+                                                    </a>
+                                                );
+                                            } else {
+                                                return null;
+                                            }
+                                        }
                                         return (
                                             <a className={dashboardCompomentMenu === option.value ? 'menuSwitch-secondMenuButtonSelLayout' : 'menuSwitch-secondMenuButtonUnSelLayout'}
                                                 id={option.value}
@@ -379,7 +423,8 @@ export default class MenuSwitch extends Component {
             dashboardCompomentMenu === 'geojsonFeature_treetype' ||
             dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement' ||
             dashboardCompomentMenu === 'geojsonFeature_treePipe' ||
-            dashboardCompomentMenu === 'geojsonFeature_treeAdopt'
+            dashboardCompomentMenu === 'geojsonFeature_treeAdopt' ||
+            dashboardCompomentMenu === 'geojsonFeature_accept'
         ) {
             return;
         }

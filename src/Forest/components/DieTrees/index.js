@@ -1,0 +1,1 @@
+export DieTreesTable from './DieTreesTable';

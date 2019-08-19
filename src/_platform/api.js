@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-15 09:10:26
+ * @Last Modified time: 2019-08-19 09:38:49
  */
 /**
  *
@@ -562,6 +562,10 @@ export const MODULES = [
                     {
                         id: 'FOREST.TREEADOPTINFO',
                         name: '苗木死亡调查'
+                    },
+                    {
+                        id: 'FOREST.DIETREES',
+                        name: '苗木死亡信息'
                     }
                 ]
             },

@@ -418,7 +418,19 @@ export const getExportAcceptReport = forestFetchAction(`${FOREST_API}/DocExport.
 export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sections`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
 export const postMapImage = forestFetchAction(`${FOREST_API}/route/mapimage`, [], 'POST', []);
-
+// 获取第十项信息
+export const getAcceptanceThinclasses = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET', []);
+// 死亡苗木信息
+// 获取死亡苗木信息
+export const getDieTreesData = forestFetchAction(
+    `${FOREST_API}/tree/dietrees`,
+    []
+);
+// 导出死亡苗木列表
+export const getExportDieTree = forestFetchAction(
+    `${FOREST_API}/tree/exportDieTree`,
+    []
+);
 export const actions = {
     exportEcporttreestatuss,
     getTotalSat,
@@ -521,7 +533,10 @@ export const actions = {
     getExportAcceptList,
     getExportAcceptReport,
     getBigDataCheckList,
-    postMapImage
+    postMapImage,
+    getAcceptanceThinclasses,
+    getDieTreesData,
+    getExportDieTree
 };
 export default handleActions({
     [getTreeOK]: (state, {

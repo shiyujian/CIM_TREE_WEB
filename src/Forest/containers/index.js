@@ -19,3 +19,4 @@ export EnterStrengthAnalysi from './EnterStrengthAnalysi';
 export PlantStrengthAnalysi from './PlantStrengthAnalysi';
 export DegitalAccept from './DegitalAccept';
 export TreeDataClear from './TreeDataClear';
+export DieTrees from './DieTrees';

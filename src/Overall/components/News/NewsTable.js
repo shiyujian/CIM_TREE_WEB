@@ -322,6 +322,7 @@ class NewsTable extends Component {
                         tabBarExtraContent={
                             <div style={{ marginBottom: '10px' }}>
                                 <Button
+                                    disabled
                                     type='primary'
                                     onClick={this.handlePublishNews.bind(this)}
                                 >

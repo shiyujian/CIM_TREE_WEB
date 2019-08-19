@@ -33,6 +33,7 @@ export default class Roles extends Component {
         {
             title: '操作',
             render: role => {
+                return '/';
                 return [
                     <a
                         key='0'

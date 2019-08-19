@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-07 16:57:50
+ * @Last Modified time: 2019-08-19 09:21:01
  */
 import React, { Component } from 'react';
 import {
@@ -30,6 +30,7 @@ import GetMenuTree from './GetMenuTree';
 import TreePipePage from './TreePipe/TreePipePage';
 import AreaDistanceMeasure from './AreaDistanceMeasure/AreaDistanceMeasure';
 import ViewPositionManage from './MapCustom/ViewPositionManage';
+import TreeAccept from './TreeAccept/TreeAccept';
 import {
     fillAreaColor,
     handleAreaLayerData,
@@ -55,7 +56,8 @@ class OnSite extends Component {
             areaEventTitle: '', // 区域地块选中节点的name
             // 图层数据List
             areaLayerList: {}, // 区域地块图层list
-            realThinClassLayerList: {} // 实际细班种植图层
+            realThinClassLayerList: {}, // 实际细班种植图层
+            areaDataList: {} // 细班的数据获取
         };
         this.tileLayer = null; // 最底部基础图层
         this.tileTreeLayerBasic = null; // 树木区域图层
@@ -191,7 +193,10 @@ class OnSite extends Component {
         // 在各个菜单之间切换时需要处理的图层
         if (dashboardCompomentMenu && dashboardCompomentMenu !== prevProps.dashboardCompomentMenu) {
             // 去除各个模块切换的图层，其他模块的图层在退出模块时自动去除，辅助管理的图层在主文件中
-            if (dashboardCompomentMenu && dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement') {
+            if (dashboardCompomentMenu &&
+                dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
+                dashboardCompomentMenu !== 'geojsonFeature_accept'
+            ) {
                 await this.handleRemoveRealThinClassLayer();
             }
             // 选择苗木结缘  成活率  灌溉管网时 需要将基本树木图层去除
@@ -222,7 +227,8 @@ class OnSite extends Component {
             dashboardCompomentMenu !== 'geojsonFeature_survivalRate' &&
             dashboardCompomentMenu !== 'geojsonFeature_treetype' &&
             dashboardCompomentMenu !== 'geojsonFeature_auxiliaryManagement' &&
-            dashboardCompomentMenu !== 'geojsonFeature_treeAdopt'
+            dashboardCompomentMenu !== 'geojsonFeature_treeAdopt' &&
+            dashboardCompomentMenu !== 'geojsonFeature_accept'
         ) {
             await this.getTileLayerTreeBasic();
         }
@@ -567,6 +573,16 @@ class OnSite extends Component {
                                 />
                             ) : ''
                     }
+                    { // 辅助验收
+                        dashboardCompomentMenu && dashboardCompomentMenu === 'geojsonFeature_accept'
+                            ? (
+                                <TreeAccept
+                                    {...this.props}
+                                    {...this.state}
+                                    map={this.map}
+                                />
+                            ) : ''
+                    }
                     <div className='dashboard-gisTypeBut'>
                         <div>
                             <Button
@@ -648,7 +664,7 @@ class OnSite extends Component {
                         await this._addAreaLayer(eventKey);
                     }
                 }
-                if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement') {
+                if (dashboardCompomentMenu === 'geojsonFeature_auxiliaryManagement' || dashboardCompomentMenu === 'geojsonFeature_accept') {
                     let selectNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
                     let selectSectionNo = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
                     if (this.tileTreeLayerBasic) {
@@ -683,14 +699,24 @@ class OnSite extends Component {
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey) => {
         const {
-            areaLayerList
+            areaLayerList,
+            areaDataList
         } = this.state;
         const {
             actions: { getTreearea }
         } = this.props;
         try {
             let coords = await handleAreaLayerData(eventKey, getTreearea);
-            console.log('coords', coords);
+            if (!areaDataList[eventKey]) {
+                let handleKey = eventKey.split('-');
+                let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+                let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+                let rst = await getTreearea({}, { no: no });
+                if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
+                    let data = rst.content.find(content => content.Section === section);
+                    areaDataList[eventKey] = data;
+                }
+            }
             if (coords && coords instanceof Array && coords.length > 0) {
                 for (let i = 0; i < coords.length; i++) {
                     let str = coords[i];
@@ -712,7 +738,8 @@ class OnSite extends Component {
                     }
                 }
                 this.setState({
-                    areaLayerList
+                    areaLayerList,
+                    areaDataList
                 });
             };
         } catch (e) {

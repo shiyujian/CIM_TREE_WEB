@@ -44,7 +44,7 @@ class Tablelevel extends Component {
             treetype: '', // 表单树种
             num: '', // 表单栽植量
             area: '', // 栽植面积
-            permissionOperate: false
+            permissionOperate: false // 管理员，业主，施工设计
         };
         this.treeTypeList = []; // 所有树种类型
         this.dataList = []; // 暂存数据
@@ -870,9 +870,7 @@ class Tablelevel extends Component {
                                         : this.noPermissionExpandedRowRender
                                 }
                                 rowSelection={rowSelection}
-                                columns={permissionOperate
-                                    ? this.permissionColumns
-                                    : this.noPermissionColumns
+                                columns={this.noPermissionColumns
                                 }
                                 dataSource={dataList}
                                 pagination={false}

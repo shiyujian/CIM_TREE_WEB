@@ -355,7 +355,7 @@ class Users extends Component {
                     </Button>
                 </Col>
                 <Col span={3}>
-                    {
+                    {/* {
                         selectedRowKeys.length > 0
                             ? <Popconfirm
                                 title='是否真的要删除选中用户?'
@@ -370,7 +370,10 @@ class Users extends Component {
                             : <Button type='danger' disabled>
                                 批量删除
                             </Button>
-                    }
+                    } */}
+                    <Button type='danger' disabled>
+                                批量删除
+                    </Button>
                 </Col>
             </div>);
         } else {
