@@ -37,6 +37,9 @@ import {
     getProjectNameBySection
 } from '_platform/gisAuth';
 import {
+    getUser
+} from '_platform/auth';
+import {
     getYsTypeByID,
     getStatusByID
 } from './auth';
@@ -156,21 +159,30 @@ export default class DegitalAcceptTable extends Component {
             {
                 title: '操作',
                 render: (text, record) => {
+                    const user = getUser();
+                    let duty = user.duty || '';
+                    let permission = false;
+                    if (duty && duty === '施工整改人') {
+                        permission = true;
+                    } else if (user.username === 'admin') {
+                        permission = true;
+                    }
                     if (record.CheckType && record.CheckType === 10) {
-                        if (record.status === '未申请') {
-                            return (<div >
-                                <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
-                                    申请验收
-                                </a>
-                            </div>
-                            );
-                        } else if (record.status === '退回') {
-                            return (<div >
-                                <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
-                                    重新申请
-                                </a>
-                            </div>
-                            );
+                        if (record.status === '未申请' || record.status === '退回') {
+                            let textData = '申请验收';
+                            if (record.status === '退回') {
+                                textData = '重新申请';
+                            }
+                            if (permission) {
+                                return (<div >
+                                    <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
+                                        {textData}
+                                    </a>
+                                </div>
+                                );
+                            } else {
+                                return <span > 暂无 </span>;
+                            }
                         } else if (record.status === '完成') {
                             return (<div >
                                 <a onClick={this.viewWord.bind(this, record)} >

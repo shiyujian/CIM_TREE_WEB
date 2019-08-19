@@ -9,14 +9,12 @@ import {
 } from './fetchAction';
 import {
     FOREST_API,
-    TENCENTANALYSIS_API
+    TENCENTANALYSIS_API,
+    SYSTEM_API
 } from '_platform/api';
 import {
     forestFetchAction
 } from '_platform/store/fetchAction';
-import {
-    actionsMap
-} from '_platform/store/util';
 const ID = 'forest';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
@@ -352,11 +350,11 @@ export const getSupplierBackStat = forestFetchAction(
 );
 // 获取苗圃列表
 export const getNurseryListOK = createAction(`${ID}_getNurseryList`);
-export const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybases`, [], 'GET', []);
+export const getNurseryList = forestFetchAction(`${SYSTEM_API}/nurserybases`, [], 'GET', []);
 
 // 获取供应商列表
 export const getSupplierListOK = createAction(`${ID}_getSupplierList`);
-export const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers`, [], 'GET', []);
+export const getSupplierList = forestFetchAction(`${SYSTEM_API}/suppliers`, [], 'GET', []);
 // 数据维护
 // 修改苗圃信息
 export const putChangeNurseryInfoInCar = forestFetchAction(`${FOREST_API}/tree/batchnursery`, [], 'PUT', []);
@@ -421,11 +419,9 @@ export const getAcceptanceThinclasses = forestFetchAction(`${FOREST_API}/route/a
 export const getAreaAcceptByThinClass = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET');
 // 辅助验收模块
 export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`);
-export const getSupervisorUsers = createFetchAction(`${USER_API}/users/`, [getSupervisorUsersOK]);
+export const getSupervisorUsers = createFetchAction(`${SYSTEM_API}/users`, [getSupervisorUsersOK], 'GET');
 // 面积验收施工提交
 export const postAreaAccept = forestFetchAction(`${FOREST_API}/route/acceptancethinclass`, [], 'POST', []);
-// 获取人员的具体详情
-export const getForestUserUsername = createFetchAction(`${FOREST_API}/system/users`, []);
 
 // 死亡苗木信息
 // 获取死亡苗木信息
@@ -548,8 +544,7 @@ export const actions = {
     getAreaAcceptByThinClass,
     getSupervisorUsersOK,
     getSupervisorUsers,
-    postAreaAccept,
-    getForestUserUsername
+    postAreaAccept
 };
 export default handleActions({
     [getTreeOK]: (state, {

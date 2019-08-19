@@ -140,6 +140,7 @@ class Users extends Component {
             title: '操作',
             key: '10',
             render: (text, record) => {
+                return '/';
                 const user = getUser();
                 let userRoles = user.roles || '';
                 // 是否为供应商文书
@@ -348,7 +349,8 @@ class Users extends Component {
                 <Col span={3}>
                     <Button
                         type='primary'
-                        disabled={!(node && node.ID)}
+                        disabled
+                        // disabled={!(node && node.ID)}
                         onClick={this.append.bind(this)}>
                             添加用户
                     </Button>
@@ -380,7 +382,8 @@ class Users extends Component {
                 <Col span={3}>
                     <Button
                         onClick={this.append.bind(this)}
-                        disabled={!(node && node.ID)}
+                        // disabled={!(node && node.ID)}
+                        disabled
                     >
                         添加用户
                     </Button>

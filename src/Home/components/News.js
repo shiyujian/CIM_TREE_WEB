@@ -236,7 +236,7 @@ export default class News extends Component {
                         <p>封面 ：{newThumbnail ? <a href={newThumbnail} target='_blank'>微信图片.jpg</a> : '暂无'}</p>
                         <p>
                             {newsFileList.length ? newsFileList.map(item => {
-                                return (<p>
+                                return (<p key={item.FilePath}>
                                     附件 ：<a
                                         href={item.FilePath}
                                         target='_blank'
@@ -265,7 +265,7 @@ export default class News extends Component {
                             <p>紧急程度 ：{noticeDetailDegree ? <span>{noticeDetailDegree}</span> : <span>暂无</span>}</p>
                             <p>
                                 {noticeFileList.length ? noticeFileList.map(item => {
-                                    return (<p>
+                                    return (<p key={item.FilePath}>
                                         附件 ：<a href={item.FilePath}
                                             target='_blank'
                                         >{item.FileName}</a>

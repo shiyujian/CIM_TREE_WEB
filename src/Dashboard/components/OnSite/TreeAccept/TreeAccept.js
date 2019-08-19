@@ -294,7 +294,6 @@ class TreeAccept extends Component {
         const {
             actions: {
                 postAreaAccept,
-                getForestUserUsername,
                 getAreaAcceptByThinClass
             },
             form: {

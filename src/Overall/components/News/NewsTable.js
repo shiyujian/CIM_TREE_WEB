@@ -281,7 +281,7 @@ class NewsTable extends Component {
                         </p>
                         <p>
                             {fileList.length ? fileList.map(item => {
-                                return (<p>
+                                return (<p key={item.FilePath}>
                                     附件 ：<a href={item.FilePath}
                                         target='_blank'
                                     >{item.FileName}</a>

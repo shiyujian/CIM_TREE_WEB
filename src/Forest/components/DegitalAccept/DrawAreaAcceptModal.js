@@ -29,7 +29,7 @@ import {
     fillAreaColor,
     handleAreaLayerData,
     handleCoordinates,
-    wktToJson
+    getUser
 } from './auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -47,7 +47,8 @@ class DrawAreaAcceptModal extends Component {
             loading: false,
             selectThinClassNo: '',
             wkt: '',
-            areaLayerList: {}
+            areaLayerList: {},
+            actualRegionArea: 0
         };
     }
     // 初始化地图，获取目录树数据
@@ -367,7 +368,7 @@ class DrawAreaAcceptModal extends Component {
                 loading: true
             });
             let wkt = '';
-            let regionArea = 0;
+            let actualRegionArea = 0;
             let coords = [];
             let thinAreaNum = 0;
             let thinClassCoords = [];
@@ -381,7 +382,6 @@ class DrawAreaAcceptModal extends Component {
                     thinClassCoords.push(arr);
                 });
             }
-            console.log('thinClassCoords', thinClassCoords);
             if (thinClassCoords.length === 1) {
                 coords = thinClassCoords[0];
             } else {
@@ -391,7 +391,7 @@ class DrawAreaAcceptModal extends Component {
                 wkt = 'MULTIPOLYGON((';
                 coords.map((coord, index) => {
                     let num = computeSignedArea(coord, 1);
-                    regionArea = regionArea + num;
+                    actualRegionArea = actualRegionArea + num;
                     if (index === 0) {
                         // 获取细班选择坐标wkt
                         wkt = wkt + getWktData(coord);
@@ -405,20 +405,21 @@ class DrawAreaAcceptModal extends Component {
                 // 获取手动框选坐标wkt
                 wkt = wkt + getHandleWktData(coords);
                 wkt = wkt + ')';
-                regionArea = computeSignedArea(coords, 2);
+                actualRegionArea = computeSignedArea(coords, 2);
             }
+            let viewRegionArea = actualRegionArea * 0.0015;
 
             let UserOptionList = [];
             if (supervisorUsersList && supervisorUsersList instanceof Array && supervisorUsersList.length > 0) {
                 supervisorUsersList.map((user) => {
-                    if (user && user.id) {
+                    if (user && user.ID) {
                         UserOptionList.push(
                             <Option
-                                title={`${(user.account && user.account.person_name) || ''}(${(user.username) || ''})`}
-                                value={user.username}
-                                key={user.id}
+                                title={`${(user.Full_Name) || ''}(${(user.User_Name) || ''})`}
+                                value={user.ID}
+                                key={user.ID}
                             >
-                                {`${(user.account && user.account.person_name) || ''}(${(user.username) || ''})`}
+                                {`${(user.Full_Name) || ''}(${(user.User_Name) || ''})`}
                             </Option>
                         );
                     }
@@ -440,13 +441,14 @@ class DrawAreaAcceptModal extends Component {
                 Project: projectName,
                 Section: sectionName,
                 ThinClass: thinClassName,
-                Area: regionArea
+                Area: viewRegionArea
             });
             this.setState({
                 UserOptionList,
                 loading: false,
                 selectThinClassNo,
-                wkt
+                wkt,
+                actualRegionArea
             });
         } catch (e) {
             console.log('e', e);
@@ -456,12 +458,12 @@ class DrawAreaAcceptModal extends Component {
     save = async () => {
         const {
             selectThinClassNo,
-            wkt
+            wkt,
+            actualRegionArea
         } = this.state;
         const {
             actions: {
-                postAreaAccept,
-                getForestUserUsername
+                postAreaAccept
             },
             form: {
                 validateFields
@@ -474,18 +476,7 @@ class DrawAreaAcceptModal extends Component {
             validateFields(async (err, values) => {
                 console.log('err', err);
                 if (!err) {
-                    let forestLoginUserData = window.localStorage.getItem('FOREST_LOGIN_USER_DATA');
-                    forestLoginUserData = JSON.parse(forestLoginUserData) || {};
-                    // 根据院内的用户名获取林总库内用户的ID
-                    let userData = await getForestUserUsername({}, {username: values.Supervisor});
-                    let supervisorID = '';
-                    if (userData && userData.content && userData.content instanceof Array && userData.content.length > 0) {
-                        supervisorID = userData.content[0].ID;
-                    } else {
-                        Notification.error({
-                            message: '获取用户信息失败，请重新确认'
-                        });
-                    }
+                    let user = getUser();
                     let designArea = 0;
                     if (areaDataList[thinclass] && areaDataList[thinclass].area) {
                         designArea = areaDataList[thinclass].area;
@@ -494,9 +485,9 @@ class DrawAreaAcceptModal extends Component {
                         Section: section,
                         ThinClass: selectThinClassNo,
                         DesignArea: designArea,
-                        ActualArea: values.Area,
-                        Creater: forestLoginUserData.ID,
-                        Supervisor: supervisorID,
+                        ActualArea: actualRegionArea,
+                        Creater: user.ID,
+                        Supervisor: values.Supervisor,
                         Coords: wkt
                     };
                     this.setState({

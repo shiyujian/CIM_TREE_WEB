@@ -320,7 +320,6 @@ export default class PermissionTable extends Component {
                                         type='primary'
                                         ghost
                                         // disabled={disabled}
-
                                         disabled
                                         onClick={this.handleChangeEditStatus.bind(this)}
                                     >
@@ -329,7 +328,8 @@ export default class PermissionTable extends Component {
                                 )}
                                 {editing && (
                                     <Button
-                                        disabled={disabled}
+                                        // disabled={disabled}
+                                        disabled
                                         type='primary'
                                         onClick={this.save.bind(this)}
                                     >

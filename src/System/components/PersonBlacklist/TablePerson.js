@@ -11,7 +11,6 @@ import {
     Form,
     message
 } from 'antd';
-import './TableOrg.css';
 const { Option } = Select;
 const FormItem = Form.Item;
 class TablePerson extends Component {
@@ -337,6 +336,7 @@ class TablePerson extends Component {
                 title: '移除黑名单',
                 key: 'Edit',
                 render: record => {
+                    return '/';
                     if (record.ID) {
                         return (
                             '/'

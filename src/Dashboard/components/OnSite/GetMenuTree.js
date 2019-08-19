@@ -27,7 +27,6 @@ export default class GetMenuTree extends Component {
             treetypesTree,
             curingTaskTree,
             // survivalRateTree,
-            supervisorUsersList,
             platform: {
                 tree = {}
             },
@@ -68,9 +67,6 @@ export default class GetMenuTree extends Component {
             await getCuringTaskTreeLoading(false);
         } else {
             await this.getCuringTasks();
-        }
-        if (!(supervisorUsersList && supervisorUsersList.length > 0)) {
-            await this.getSupervisorUsersList();
         }
     }
     // 获取地块树数据
@@ -299,36 +295,6 @@ export default class GetMenuTree extends Component {
             await getCuringTaskTreeLoading(false);
         } catch (e) {
 
-        }
-    }
-    // 获取监理列表
-    getSupervisorUsersList = async () => {
-        const {
-            actions: {
-                getSupervisorUsers,
-                getRoles
-            }
-        } = this.props;
-        const user = getUser();
-        let section = user.section;
-        // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (section) {
-            let roles = await getRoles();
-            console.log();
-            let roleID = '';
-            if (roles && roles instanceof Array && roles.length > 0) {
-                roles.map((role) => {
-                    if (role && role.RoleName && role.RoleName === '监理文书') {
-                        roleID = role.ID;
-                    }
-                });
-                let postData = {
-                    role: roleID,
-                    section: section,
-                    status: 1
-                };
-                await getSupervisorUsers({}, postData);
-            }
         }
     }
 

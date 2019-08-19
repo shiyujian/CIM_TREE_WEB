@@ -33,11 +33,11 @@ export default class MenuSwitch extends Component {
         {
             label: '巡检路线',
             value: 'geojsonFeature_track'
-        },
-        {
-            label: '辅助验收',
-            value: 'geojsonFeature_accept'
         }
+        // {
+        //     label: '辅助验收',
+        //     value: 'geojsonFeature_accept'
+        // }
     ];
     options1 = [
         {

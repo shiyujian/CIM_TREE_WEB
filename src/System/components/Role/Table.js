@@ -147,6 +147,7 @@ export default class Roles extends Component {
                                             <Button
                                                 type='primary'
                                                 ghost
+                                                disabled
                                                 onClick={this.append.bind(this, type.ID)}
                                             >
                                                 {`添加${type.RoleName}角色`}
