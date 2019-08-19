@@ -55,6 +55,8 @@ class DrawAreaAcceptModal extends Component {
         const {
             thinclass,
             section,
+            itemDetail,
+            record,
             actions: {
                 getAreaAcceptByThinClass
             }
@@ -79,6 +81,11 @@ class DrawAreaAcceptModal extends Component {
             // }
             await this.initMap();
             await this._addAreaLayer(thinclass, section);
+            if (record && record.status && record.status === '退回') {
+                if (itemDetail && itemDetail.Coords) {
+                    await this.addAreaDarwBack(itemDetail);
+                }
+            }
             await this.addThinClassLayer(thinclass, section);
             this.setState({
                 selectThinClassNo
@@ -158,6 +165,43 @@ class DrawAreaAcceptModal extends Component {
             console.log('加载细班图层', e);
         }
     }
+    // 加载上次退回的数据
+    addAreaDarwBack = async (itemDetail) => {
+        try {
+            let str = '';
+            let coords = [];
+            let wkt = itemDetail.Coords;
+            if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+                let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
+                let arr = datas.split('),(');
+                arr.map((a, index) => {
+                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                    coords.push(str);
+                });
+            } else if (wkt.indexOf('POLYGON') !== -1) {
+                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                coords.push(str);
+            }
+            if (coords && coords instanceof Array && coords.length > 0) {
+                for (let i = 0; i < coords.length; i++) {
+                    let str = coords[i];
+                    let treearea = handleCoordinates(str);
+                    let message = {
+                        key: 3,
+                        type: 'Feature',
+                        properties: {name: '', type: 'back'},
+                        geometry: { type: 'Polygon', coordinates: treearea }
+                    };
+                    let layer = this._createMarker(message);
+                    if (i === coords.length - 1) {
+                        this.map.fitBounds(layer.getBounds());
+                    }
+                }
+            };
+        } catch (e) {
+            console.log('加载细班图层', e);
+        }
+    }
     /* 在地图上添加marker和polygan */
     _createMarker (geo) {
         try {
@@ -166,6 +210,14 @@ class DrawAreaAcceptModal extends Component {
                 let layer = L.polygon(geo.geometry.coordinates, {
                     color: '#201ffd',
                     fillColor: fillAreaColor(geo.key),
+                    fillOpacity: 0.3
+                }).addTo(this.map);
+                return layer;
+            } else if (geo.properties.type === 'back') {
+                // 创建区域图形
+                let layer = L.polygon(geo.geometry.coordinates, {
+                    color: 'grey',
+                    fillColor: 'grey',
                     fillOpacity: 0.3
                 }).addTo(this.map);
                 return layer;

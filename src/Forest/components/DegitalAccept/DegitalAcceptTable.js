@@ -166,7 +166,7 @@ export default class DegitalAcceptTable extends Component {
                             );
                         } else if (record.status === '退回') {
                             return (<div >
-                                <a onClick={this.handleReDrawAreaAccept.bind(this, record)} >
+                                <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
                                     重新申请
                                 </a>
                             </div>
@@ -568,24 +568,44 @@ export default class DegitalAcceptTable extends Component {
     }
     // 面积验收施工提交
     handleDrawAreaAccept = async (record) => {
+        const {
+            thinclass,
+            section
+        } = this.state;
+        const {
+            actions: {
+                getAcceptanceThinclasses
+            }
+        } = this.props;
+        if (record.status === '退回') {
+            let array = thinclass.split('-');
+            let array1 = [];
+            array.map((item, i) => {
+                if (i !== 2) {
+                    array1.push(item);
+                }
+            });
+            const postdata = {
+                section: section,
+                thinclass: array1.join('-')
+            };
+            let rst = await getAcceptanceThinclasses({}, postdata);
+            if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
+                this.setState({
+                    itemDetail: rst.content[0],
+                    record
+                });
+            }
+        }
         this.setState({
             drawAreaVisible: true
         });
     }
     handleCloseDrawAreaModal = async () => {
         this.setState({
-            drawAreaVisible: false
-        });
-    }
-    // 面积验收施工重新提交
-    handleReDrawAreaAccept = async (record) => {
-        this.setState({
-            reDrawAreaVisible: true
-        });
-    }
-    handleCloseReDrawAreaModal = async () => {
-        this.setState({
-            reDrawAreaVisible: false
+            drawAreaVisible: false,
+            itemDetail: '',
+            record: ''
         });
     }
     // 翻页
