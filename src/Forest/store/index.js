@@ -7,9 +7,6 @@ import createFetchAction from './fetchAction';
 import {
     createFetchActionWithHeaders as myFetch
 } from './fetchAction';
-import faithInfoReducer, {
-    actions as faithActions
-} from './faithInfo';
 import {
     FOREST_API,
     TENCENTANALYSIS_API
@@ -555,13 +552,6 @@ export default handleActions({
             keycode: payload
         };
     },
-    [combineActions(...actionsMap(faithActions))]: (
-        state = {},
-        action
-    ) => ({
-        ...state,
-        faith: faithInfoReducer(state.faith, action)
-    }),
     [getTreeListOK]: (state, {
         payload
     }) => ({

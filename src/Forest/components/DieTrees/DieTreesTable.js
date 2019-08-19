@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -117,19 +117,15 @@ export default class DieTreesTable extends Component {
             },
             {
                 title: '测量人',
-                dataIndex: 'Inputer',
+                dataIndex: 'InputerName',
                 render: (text, record) => {
-                    const { users } = this.props;
-                    return (
-                        <span>
-                            {users && users[text]
-                                ? users[text].Full_Name +
-                                  '(' +
-                                  users[text].User_Name +
-                                  ')'
-                                : ''}
-                        </span>
-                    );
+                    if (record.InputerUserName && record.InputerName) {
+                        return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                    } else if (record.InputerName && !record.InputerUserName) {
+                        return <p>{record.InputerName}</p>;
+                    } else {
+                        return <p> / </p>;
+                    }
                 }
             },
             {
@@ -298,10 +294,6 @@ export default class DieTreesTable extends Component {
             }
         ];
     }
-    componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
-    }
 
     emitEmpty1 = () => {
         this.setState({ sxm: '' });
@@ -468,7 +460,6 @@ export default class DieTreesTable extends Component {
             },
             platform: { tree = {} }
         } = this.props;
-        let thinClassTree = tree.thinClassTree;
         let postData = {
             sxm,
             // no: keycode,
@@ -531,7 +522,8 @@ export default class DieTreesTable extends Component {
         }
         const {
             actions: {
-                getDieTreesData
+                getDieTreesData,
+                getUserDetail
             },
             platform: { tree = {} }
         } = this.props;
@@ -566,7 +558,10 @@ export default class DieTreesTable extends Component {
 
         let tblData = rst.content;
         if (tblData instanceof Array) {
-            tblData.forEach((plan, i) => {
+            let userIDList = [];
+            let userDataList = {};
+            for (let i = 0; i < tblData.length; i++) {
+                let plan = tblData[i];
                 plan.order = (page - 1) * size + i + 1;
                 plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
                 plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
@@ -594,7 +589,19 @@ export default class DieTreesTable extends Component {
                 plan.createtime2 = createtime2;
                 plan.createtime3 = createtime3;
                 plan.createtime4 = createtime4;
-            });
+                let userData = '';
+                if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
+                    userData = await getUserDetail({id: plan.Inputer});
+                } else {
+                    userData = userDataList[Number(plan.Inputer)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
+                plan.InputerName = (userData && userData.Full_Name) || '';
+                plan.InputerUserName = (userData && userData.User_Name) || '';
+            }
 
             let messageTotalNum = rst.pageinfo.total;
             const pagination = { ...this.state.pagination };

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-19 09:22:09
+ * @Last Modified time: 2019-08-19 10:43:55
  */
 /**
  *
@@ -74,7 +74,6 @@ export default class ForestContainer extends Component {
             Locmeasureinfo = null,
             Supervisorinfo = null,
             Checkerinfo = null,
-            Faithinfo = null,
             Faithanalyze = null,
             Qualityanalyze = null,
             Enteranalyze = null,
@@ -140,9 +139,6 @@ export default class ForestContainer extends Component {
                             path='/forest/checkerinfo'
                             component={Checkerinfo}
                         />
-                    )}
-                    {Faithinfo && (
-                        <Route path='/forest/faithinfo' component={Faithinfo} />
                     )}
                     {Faithanalyze && (
                         <Route

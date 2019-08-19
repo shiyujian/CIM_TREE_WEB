@@ -37,7 +37,7 @@ class Users extends Component {
             showModal: false,
             dataList: [], // 表格数据用户
             searchKeyword: '', // 用户名称
-            searchUserStatus: '', // 状态
+            searchUserStatus: 1, // 状态
             searchOveralSituation: '', // 是否全局搜索，默认不
             additionVisible: false,
             editVisible: false,
@@ -260,11 +260,10 @@ class Users extends Component {
             // 在重新选择树节点之后，将页数进行修改
             this.setState({
                 searchRoles: '',
-                searchUserStatus: '',
+                searchUserStatus: 1,
                 searchOveralSituation: '',
                 searchKeyword: ''
             });
-            document.getElementById('NurseryData').value = '';
         }
         if (nextProps.platform.users) {
             this.setState({
@@ -437,7 +436,6 @@ class Users extends Component {
                         <Row className='system-person-search-layout'>
                             <div className='system-person-mrg20'>
                                 <Input
-                                    id='NurseryData'
                                     placeholder='请输入关键字'
                                     style={{ width: '100%' }}
                                     value={searchKeyword}
@@ -457,12 +455,12 @@ class Users extends Component {
                             <div className='system-person-mrg20'>
                                 <Select
                                     placeholder='请选择状态'
-                                    value={this.state.searchUserStatus || undefined}
+                                    value={this.state.searchUserStatus}
                                     onChange={this.changeUserStatus.bind(this)}
                                     style={{ width: '100%' }}
                                 >
-                                    <Option key='已审核' title='已审核' value='true' >已审核</Option>
-                                    <Option key='未审核' title='未审核' value='false' >未审核</Option>
+                                    <Option key='已审核' title='已审核' value={1} >已审核</Option>
+                                    <Option key='未审核' title='未审核' value={0} >未审核</Option>
                                 </Select>
                             </div>
                             {
@@ -641,16 +639,16 @@ class Users extends Component {
         const {
             searchRoles,
             searchUserStatus,
-            searchOveralSituation
+            searchOveralSituation,
+            searchKeyword
         } = this.state;
         try {
-            let text = document.getElementById('NurseryData').value;
             let postData = {
                 page: page,
                 size: 10,
-                keyword: text,
+                keyword: searchKeyword,
                 role: searchRoles,
-                Status: searchUserStatus
+                status: searchUserStatus
             };
             if (!searchOveralSituation) {
                 if (node && node.ID) {
@@ -713,11 +711,10 @@ class Users extends Component {
                     return;
                 }
             }
-            document.getElementById('NurseryData').value = '';
             this.setState({
                 searchKeyword: '',
                 searchRoles: '',
-                searchUserStatus: '',
+                searchUserStatus: 1,
                 searchOveralSituation: ''
             });
             this.setState({

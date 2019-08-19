@@ -310,23 +310,22 @@ export default class GetMenuTree extends Component {
             }
         } = this.props;
         const user = getUser();
-        let sections = user.sections;
-        sections = JSON.parse(sections);
+        let section = user.section;
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (sections && sections instanceof Array && sections.length > 0) {
+        if (section) {
             let roles = await getRoles();
             console.log();
-            let roleID = [];
+            let roleID = '';
             if (roles && roles instanceof Array && roles.length > 0) {
                 roles.map((role) => {
-                    if (role && role.name && role.name === '监理文书') {
-                        roleID.push(role.id);
+                    if (role && role.RoleName && role.RoleName === '监理文书') {
+                        roleID = role.ID;
                     }
                 });
                 let postData = {
-                    roles: roleID,
-                    sections: sections,
-                    is_active: true
+                    role: roleID,
+                    section: section,
+                    status: 1
                 };
                 await getSupervisorUsers({}, postData);
             }

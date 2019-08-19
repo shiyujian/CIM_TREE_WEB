@@ -53,11 +53,9 @@ export const deleteUserCustomView = createFetchAction(`${SYSTEM_API}/userview/{{
 
 // 辅助验收模块
 export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`);
-export const getSupervisorUsers = createFetchAction(`${USER_API}/users/`, [getSupervisorUsersOK]);
+export const getSupervisorUsers = createFetchAction(`${SYSTEM_API}/users`, [getSupervisorUsersOK]);
 // 面积验收施工提交
 export const postAreaAccept = forestFetchAction(`${FOREST_API}/route/acceptancethinclass`, [], 'POST', []);
-// 获取人员的具体详情
-export const getForestUserUsername = createFetchAction(`${FOREST_API}/system/users`, []);
 // 查询细班验收施工是否提交，是否还需要反复提交
 export const getAreaAcceptByThinClass = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET');
 
@@ -117,7 +115,6 @@ export const actions = {
     getSupervisorUsersOK,
     getSupervisorUsers,
     postAreaAccept,
-    getForestUserUsername,
     getAreaAcceptByThinClass,
 
     switchDashboardCompoment,
@@ -332,10 +329,17 @@ export default handleActions(
             };
         },
         [getSupervisorUsersOK]: (state, { payload }) => {
-            return {
-                ...state,
-                supervisorUsersList: payload
-            };
+            if (payload && payload.content && payload.content instanceof Array) {
+                return {
+                    ...state,
+                    supervisorUsersList: payload.content
+                };
+            } else {
+                return {
+                    ...state,
+                    supervisorUsersList: ''
+                };
+            }
         }
     },
     {}

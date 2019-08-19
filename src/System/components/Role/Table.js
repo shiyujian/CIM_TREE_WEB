@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Button, Popconfirm, Tabs, Notification } from 'antd';
 import Card from '_platform/components/panels/Card';
-import Member from './Member';
 import Addition from './Addition';
 import Edit from './Edit';
 const TabPane = Tabs.TabPane;
@@ -54,14 +53,6 @@ export default class Roles extends Component {
                 ];
             }
         }
-        // {
-        //     title: '关联用户',
-        //     render: role => {
-        //         return (
-        //             <a onClick={this.associate.bind(this, role)}>关联用户</a>
-        //         );
-        //     }
-        // }
     ];
     componentDidMount = async () => {
         const {
@@ -112,16 +103,7 @@ export default class Roles extends Component {
             });
         }
     }
-    associate = async (role, event) => {
-        event.preventDefault();
-        const {
-            actions: {
-                changeMemberField
-            }
-        } = this.props;
-        await changeMemberField('role', role);
-        await changeMemberField('visible', true);
-    }
+
     // 新增窗口
     append (type) {
         this.setState({
@@ -139,8 +121,7 @@ export default class Roles extends Component {
 
     render () {
         const {
-            platform: { roles = [] },
-            member: { visible = false } = {}
+            platform: { roles = [] }
         } = this.props;
         const {
             additionVisible,
@@ -189,11 +170,6 @@ export default class Roles extends Component {
                         })
                     }
                 </Tabs>
-                {
-                    visible
-                        ? <Member {...this.props} />
-                        : ''
-                }
                 {
                     additionVisible
                         ? <Addition
