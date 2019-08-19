@@ -472,6 +472,7 @@ class NewsTable extends Component {
             title: '操作',
             width: '15%',
             render: (text, record) => {
+                return '/';
                 return (
                     <span>
                         <a onClick={this.handleNewsView.bind(this, record.ID)}>
