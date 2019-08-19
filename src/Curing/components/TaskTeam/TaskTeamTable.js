@@ -20,7 +20,7 @@ export default class TaskTeamTable extends Component {
         const user = getUser();
         let section = user.section;
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (section) {
+        if (section || user.username === 'admin') {
             this.setState({
                 relateDisabled: false
             });

@@ -37,7 +37,7 @@ class Users extends Component {
             showModal: false,
             dataList: [], // 表格数据用户
             searchKeyword: '', // 用户名称
-            searchUserStatus: 1, // 状态
+            searchUserStatus: undefined, // 状态
             searchOveralSituation: '', // 是否全局搜索，默认不
             additionVisible: false,
             editVisible: false,
@@ -261,7 +261,7 @@ class Users extends Component {
             // 在重新选择树节点之后，将页数进行修改
             this.setState({
                 searchRoles: '',
-                searchUserStatus: 1,
+                searchUserStatus: undefined,
                 searchOveralSituation: '',
                 searchKeyword: ''
             });
@@ -651,7 +651,7 @@ class Users extends Component {
                 size: 10,
                 keyword: searchKeyword,
                 role: searchRoles,
-                status: searchUserStatus
+                status: searchUserStatus === undefined ? '' : searchUserStatus
             };
             if (!searchOveralSituation) {
                 if (node && node.ID) {
@@ -717,7 +717,7 @@ class Users extends Component {
             this.setState({
                 searchKeyword: '',
                 searchRoles: '',
-                searchUserStatus: 1,
+                searchUserStatus: undefined,
                 searchOveralSituation: ''
             });
             this.setState({
