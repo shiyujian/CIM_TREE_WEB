@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-16 14:54:09
+ * @Last Modified time: 2019-08-19 09:38:49
  */
 /**
  *
@@ -47,26 +47,39 @@ import 'whatwg-fetch';
 require('es6-promise').polyfill();
 
 window.config = window.config || {};
-let DOMAIN, SDOMAIN, USER, PASSWORD, TREE_CODE, STATIC_FILE_IP;
+let DOMAIN, STATIC_FILE_IP;
 
 DOMAIN = window.config.DOMAIN;
-SDOMAIN = window.config.SDOMAIN;
-USER = window.config.STATIC_FILE_USER;
-PASSWORD = window.config.STATIC_FILE_PASSWORD;
 STATIC_FILE_IP = window.config.STATIC_FILE_IP;
 
 /** *********************公共资源服务**************************/
-export { DOMAIN, USER, PASSWORD, TREE_CODE };
+export { DOMAIN };
 export const CODE_PROJECT = '森林大数据';
 export const base = `${DOMAIN}`;
-export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
-export const USER_API = `${base}/accounts/api`;
 export const SERVICE_API = `${base}/service/construction/api`;
-export const FILE_API = `${base}/service/fileserver`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
-export const MAIN_API = `${base}/main/api`;
-export const CODE_API = window.config.DOC_EXCHANGE_URL;
-export const UPLOAD_API = `${base}/service/fileserver/api/user/files/`;
+// 文件预览的接口
+export const previewWord_API = window.config.previewWord_API;
+// 静态资源文件服务==========STATIC_FILE_IP
+
+export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
+    window.config.STATIC_PREVIEW_PORT
+}`;
+
+/**
+ * 资料管理接口（使用原院内接口）
+ */
+export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
+export const FILE_API = `${base}/service/fileserver`;
+export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
+    window.config.STATIC_DOWNLOAD_PORT
+}`;
+
+/**
+ * 资料管理接口（使用原院内接口）
+ */
+
+export const MAIN_API = `${base}/cms`;
 // 高德地图逆坐标查询
 export const LBSAMAP_API = window.config.LBSAMAP;
 export const LBSAMAP_KEY = '8325164e247e15eea68b59e89200988b';
@@ -78,109 +91,74 @@ export const TILEURLS = {
     1: window.config.IMG_W,
     2: window.config.VEC_W
 };
-// 文件预览的接口
-export const previewWord_API = window.config.previewWord_API;
-// 静态资源文件服务==========STATIC_FILE_IP
-export const STATIC_UPLOAD_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_UPLOAD_PORT
-}`;
-export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_DOWNLOAD_PORT
-}`;
-export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_PREVIEW_PORT
-}`;
+
 export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
 // 智慧森林
-export const SUSER_API = `${SDOMAIN}`;
-export const FOREST_API = `${SDOMAIN}`;
+export const FOREST_API = `${DOMAIN}`;
+export const SYSTEM_API = `${DOMAIN}/system`;
 export const SEEDLING_API = `${window.config.SEEDLING}`;
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
-export const FOREST_GIS_TREETYPE_API = `${window.config.DASHBOARD_TREETYPE}`;
 export const INITLEAFLET_API = window.config.initLeaflet;
 export const TREEPIPE_API = `${window.config.PIPE}`;
+export const UPLOADFOREST_API = `${base}/OSSUploadHandler.ashx`;
 
 // 考勤打卡
 export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
 
-// 现场收发文
-export const DISPATCH_MSG_API = window.config.DISPATCH_MSG;
-
 /** *********************静态常量**************************/
 export const WORKFLOW_CODE = {
     总进度计划报批流程: 'TEMPLATE_001',
-    表单管理流程: 'TEMPLATE_002',
     每日进度填报流程: 'TEMPLATE_003',
-    机械设备报批流程: 'TEMPLATE_004',
-    工程材料报批流程: 'TEMPLATE_005',
-    苗木资料报批流程: 'TEMPLATE_006',
-    每日进度计划填报流程: 'TEMPLATE_007',
-    检验批验收审批流程: 'TEMPLATE_008',
-    安全体系报批流程: 'TEMPLATE_009',
-    普通审查流程: 'TEMPLATE_010',
-    审查核定流程: 'TEMPLATE_011',
-    总监审查流程: 'TEMPLATE_012',
     每周进度填报流程: 'TEMPLATE_013'
+    // 每日进度计划填报流程: 'TEMPLATE_007',
+    // 表单管理流程: 'TEMPLATE_002',
+    // 机械设备报批流程: 'TEMPLATE_004',
+    // 工程材料报批流程: 'TEMPLATE_005',
+    // 苗木资料报批流程: 'TEMPLATE_006',
+    // 检验批验收审批流程: 'TEMPLATE_008',
+    // 安全体系报批流程: 'TEMPLATE_009',
+    // 普通审查流程: 'TEMPLATE_010',
+    // 审查核定流程: 'TEMPLATE_011',
+    // 总监审查流程: 'TEMPLATE_012'
 };
-// 为表单管理的每个文件夹绑定流程信息
-export const FORM_WORKFLOW = [
-    {
-        value: '普通审查流程',
-        code: 'TEMPLATE_010'
-    },
-    {
-        value: '审查核定流程',
-        code: 'TEMPLATE_011'
-    },
-    {
-        value: '总监审查流程',
-        code: 'TEMPLATE_012'
-    }
+
+export const ORGTYPE = [
+    '业主单位', '施工单位', '监理单位', '养护单位'
 ];
 // 当前执行的项目
 export const DEFAULT_PROJECT = 'P191';
-// admin登录林总接口所用的账号
-export const FOREST_LOGIN_DATA = {
-    phone: 'zhaozz99',
-    pwd: '666666'
-    // phone: 'zhaozz1010',
-    // pwd: '130718'
-};
 // 业主审核进度管理列表人员
 export const OWNERCHECKLIST = [
     '张亮', '陈津陵', '池铭炎', '李红宇', '张大伟', '郝晓飞', '黄雪晨', '李航'
 ];
 
-export const ORG_NURSERY_CODE = 'ORG_NURSERY';
-export const ORG_SUPPLIER_CODE = 'ORG_SUPPLIER';
-
 // 综合展示 各个项目的中心坐标
 export const PROJECTPOSITIONCENTER = [
     {
-        name: '九号地块',
+        Name: '九号地块',
         center: [38.99042701799772, 116.0396146774292],
-        zoom: 14
+        Zoom: 14
     },
     {
-        name: '苗景兼用林项目',
+        Name: '苗景兼用林项目',
         center: [39.02511978201801, 116.25842285575345],
-        zoom: 13
+        Zoom: 13
     },
     {
-        name: '市民中心景观项目',
+        Name: '市民中心景观项目',
         center: [39.04825544272171, 115.90770578315642],
-        zoom: 16
+        Zoom: 16
     },
     {
-        name: '2018秋季造林',
+        Name: '2018秋季造林',
         center: [38.784605024411576, 115.73293304652907],
-        zoom: 13
+        Zoom: 13
     },
     {
-        name: '2019春季造林',
+        Name: '2019春季造林',
         center: [39.068756148044486, 115.92073061387055],
-        zoom: 12
+        Zoom: 12
     }
 ];
 // 树种大类
@@ -289,7 +267,7 @@ export const SCHEDULRPROJECT = [
     {
         id: 8,
         name: '便道施工',
-        units: 'm',
+        units: '米',
         type: '其他',
         typeFirst: true,
         typeList: 6
@@ -297,21 +275,21 @@ export const SCHEDULRPROJECT = [
     {
         id: 9,
         name: '开挖排水沟槽',
-        units: 'm',
+        units: '米',
         type: '其他',
         typeFirst: false
     },
     {
         id: 10,
         name: '安装排水管道',
-        units: 'm',
+        units: '米',
         type: '其他',
         typeFirst: false
     },
     {
         id: 11,
         name: '回填排水',
-        units: 'm',
+        units: '米',
         type: '其他',
         typeFirst: false
     },
@@ -330,6 +308,101 @@ export const SCHEDULRPROJECT = [
         typeFirst: false
     }
 ];
+// 流程状态
+export const WFStatusList = [
+    // {
+    //     value: 0,
+    //     label: '草稿中'
+    // },
+    {
+        value: 1,
+        label: '运行中'
+    },
+    {
+        value: 2,
+        label: '已完成'
+    },
+    // {
+    //     value: 3,
+    //     label: '挂起'
+    // },
+    {
+        value: 4,
+        label: '退回'
+    }
+    // {
+    //     value: 5,
+    //     label: '转发'
+    // }
+];
+// 执行状态
+export const ExecuteStateList = [{
+    value: 0,
+    label: '待执行'
+}, {
+    value: 1,
+    label: '已执行'
+}, {
+    value: 2,
+    label: '退回'
+}, {
+    value: 3,
+    label: '挂起'
+}, {
+    value: 4,
+    label: '转发'
+}];
+// 节点类型
+export const NodeType = [{
+    value: 0,
+    label: '结束'
+}, {
+    value: 1,
+    label: '开始'
+}, {
+    value: 2,
+    label: '普通'
+}, {
+    value: 3,
+    label: '选择'
+}, {
+    value: 4,
+    label: '分流'
+}, {
+    value: 5,
+    label: '合流'
+}];
+// 流程信息
+export const TOTAL_NAME = '总进度计划报批流程';
+export const TOTAL_ID = 'c361b0af-a7ec-4181-acd0-39512ffd96b8';
+export const TOTAL_ONENODE_NAME = '施工填报';
+export const TOTAL_ONENODE_ID = '86299a5b-c073-456d-8707-cfc314691415';
+export const TOTAL_TWONODE_NAME = '监理审核';
+export const TOTAL_TWONODE_ID = '7d36a1a9-b5bd-4dde-82bc-8196e120824f';
+export const TOTAL_THREENODE_NAME = '结束';
+export const TOTAL_THREENODE_ID = 'c9e202a8-dce9-4603-9cf9-cf2c70d4181b';
+
+export const WEEK_NAME = '每周进度填报流程';
+export const WEEK_ID = 'b0eedc49-fe00-4754-a4fe-885e9177e663';
+export const WEEK_ONENODE_NAME = '施工填报';
+export const WEEK_ONENODE_ID = 'f227ba06-4a16-4f50-9313-0f0364db6a72';
+export const WEEK_TWONODE_NAME = '监理审核';
+export const WEEK_TWONODE_ID = '7cf6b0b7-a69c-4824-88fe-a8f5a0743417';
+export const WEEK_THREENODE_NAME = '业主查看';
+export const WEEK_THREENODE_ID = 'f180fd9d-cf9e-4703-85ea-84323ff776eb';
+export const WEEK_FOURNODE_NAME = '结束';
+export const WEEK_FOURNODE_ID = '1c0afbfa-7023-447e-ba7c-9e58ee6202f4';
+
+export const ACYUAL_NAME = '每日进度填报流程';
+export const ACYUAL_ID = '098dd731-d6fa-4076-8651-082470498a37';
+export const ACYUAL_ONENODE_NAME = '施工填报';
+export const ACYUAL_ONENODE_ID = '273f55b4-1163-4616-b7f9-db404ef0787e';
+export const ACYUAL_TWONODE_NAME = '监理审核';
+export const ACYUAL_TWONODE_ID = '3c6bed0c-6dcd-4c62-95b1-67d28900833a';
+export const ACYUAL_THREENODE_NAME = '业主查看';
+export const ACYUAL_THREENODE_ID = 'a81c5d75-60e6-4528-9c0a-3a0c9b2003cc';
+export const ACYUAL_FOURNODE_NAME = '结束';
+export const ACYUAL_FOURNODE_ID = '5abc1404-2728-4f5d-b816-e96e2568f1bb';
 // 项目管理  树种管理 苗圃测量
 export const NURSERYPARAM = [
     '土球直径', '土球厚度', '高度', '冠幅', '胸径', '地径', '分枝数量', '地径超过1cm分枝数量'
@@ -347,12 +420,6 @@ export const MODULES = [
     {
         id: 'DASHBOARD',
         name: '综合展示'
-        // children: [
-        //     {
-        //         id: 'DASHBOARD.ONSITE',
-        //         name: '二维展示'
-        //     }
-        // ]
     },
     {
         id: 'OVERALL',
@@ -361,43 +428,43 @@ export const MODULES = [
             {
                 id: 'OVERALL.NEWS',
                 name: '新闻通知'
-            },
-            {
-                id: 'OVERALL.DISPATCH',
-                name: '现场收发文'
-            },
-            {
-                id: 'OVERALL.MATERAIL',
-                name: '物资管理'
-            },
-            {
-                id: 'OVERALL.FORM',
-                name: '表单管理'
             }
+            // {
+            //     id: 'OVERALL.DISPATCH',
+            //     name: '现场收发文'
+            // },
+            // {
+            //     id: 'OVERALL.MATERAIL',
+            //     name: '物资管理'
+            // },
+            // {
+            //     id: 'OVERALL.FORM',
+            //     name: '表单管理'
+            // }
         ]
     },
-    {
-        id: 'DATUM',
-        name: '资料管理',
-        children: [
-            {
-                id: 'DATUM.STANDARD',
-                name: '制度标准'
-            },
-            {
-                id: 'DATUM.ENGINEERING',
-                name: '工程文档'
-            },
-            {
-                id: 'DATUM.REDIOS',
-                name: '工程影像'
-            },
-            {
-                id: 'DATUM.VIDEO',
-                name: '视频资料'
-            }
-        ]
-    },
+    // {
+    //     id: 'DATUM',
+    //     name: '资料管理',
+    //     children: [
+    //         {
+    //             id: 'DATUM.STANDARD',
+    //             name: '制度标准'
+    //         },
+    //         {
+    //             id: 'DATUM.ENGINEERING',
+    //             name: '工程文档'
+    //         },
+    //         {
+    //             id: 'DATUM.REDIOS',
+    //             name: '工程影像'
+    //         },
+    //         {
+    //             id: 'DATUM.VIDEO',
+    //             name: '视频资料'
+    //         }
+    //     ]
+    // },
     {
         id: 'SCHEDULE',
         name: '进度管理',
@@ -407,21 +474,17 @@ export const MODULES = [
                 name: '进度填报'
             },
             {
-                id: 'SCHEDULE.PROGRESS',
-                name: '项目进度'
-            },
-            {
                 id: 'SCHEDULE.SCHEDULEDISPLAY',
                 name: '进度展示'
-            },
-            {
-                id: 'SCHEDULE.ENTERANALYZE',
-                name: '苗木进场分析'
-            },
-            {
-                id: 'SCHEDULE.SCHEDULEANALYZE',
-                name: '种植进度分析'
             }
+            // {
+            //     id: 'SCHEDULE.ENTERANALYZE',
+            //     name: '苗木进场分析'
+            // },
+            // {
+            //     id: 'SCHEDULE.SCHEDULEANALYZE',
+            //     name: '种植进度分析'
+            // }
         ]
     },
     {
@@ -451,15 +514,15 @@ export const MODULES = [
                     {
                         id: 'FOREST.PLANTSTRENGTHANALYSI',
                         name: '栽植强度分析'
-                    },
-                    {
-                        id: 'FOREST.DATASTATIS',
-                        name: '数据统计'
-                    },
-                    {
-                        id: 'FOREST.USERANALYSIS',
-                        name: '用户行为统计'
                     }
+                    // {
+                    //     id: 'FOREST.DATASTATIS',
+                    //     name: '数据统计'
+                    // },
+                    // {
+                    //     id: 'FOREST.USERANALYSIS',
+                    //     name: '用户行为统计'
+                    // }
                 ]
             },
             {
@@ -552,38 +615,38 @@ export const MODULES = [
             }
         ]
     },
-    {
-        id: 'MARKET',
-        name: '苗木市场',
-        children: [
-            {
-                id: 'MARKET.SUPERMARKET.NONE',
-                name: '苗木超市',
-                children: [
-                    {
-                        id: 'MARKET.SEEDLINGSUPPLY',
-                        name: '苗木供应'
-                    },
-                    {
-                        id: 'MARKET.SEEDLINGPURCHASE',
-                        name: '苗木求购'
-                    }
-                ]
-            },
-            {
-                id: 'MARKET.SUPPLYRELEASE',
-                name: '供应发布'
-            },
-            {
-                id: 'MARKET.DEMANDRELEASE',
-                name: '需求发布'
-            },
-            {
-                id: 'MARKET.OFFERMANAGE',
-                name: '报价管理'
-            }
-        ]
-    },
+    // {
+    //     id: 'MARKET',
+    //     name: '苗木市场',
+    //     children: [
+    //         {
+    //             id: 'MARKET.SUPERMARKET.NONE',
+    //             name: '苗木超市',
+    //             children: [
+    //                 {
+    //                     id: 'MARKET.SEEDLINGSUPPLY',
+    //                     name: '苗木供应'
+    //                 },
+    //                 {
+    //                     id: 'MARKET.SEEDLINGPURCHASE',
+    //                     name: '苗木求购'
+    //                 }
+    //             ]
+    //         },
+    //         {
+    //             id: 'MARKET.SUPPLYRELEASE',
+    //             name: '供应发布'
+    //         },
+    //         {
+    //             id: 'MARKET.DEMANDRELEASE',
+    //             name: '需求发布'
+    //         },
+    //         {
+    //             id: 'MARKET.OFFERMANAGE',
+    //             name: '报价管理'
+    //         }
+    //     ]
+    // },
     {
         id: 'CHECKWORK',
         name: '考勤管理',
@@ -593,7 +656,7 @@ export const MODULES = [
                 name: '考勤统计'
             },
             {
-                id: 'CHECKWORK.SETUP',
+                id: 'CHECKWORK.SETUP.NONE',
                 name: '考勤设置',
                 children: [
                     {
@@ -616,15 +679,15 @@ export const MODULES = [
             {
                 id: 'SELFCARE.TASK',
                 name: '个人任务'
-            },
-            {
-                id: 'SELFCARE.QUERY',
-                name: '个人考勤'
-            },
-            {
-                id: 'SELFCARE.LEAVE',
-                name: '个人请假'
             }
+            // {
+            //     id: 'SELFCARE.QUERY',
+            //     name: '个人考勤'
+            // },
+            // {
+            //     id: 'SELFCARE.LEAVE',
+            //     name: '个人请假'
+            // }
         ]
     },
     {
@@ -652,8 +715,14 @@ export const MODULES = [
                 name: '组织机构'
             },
             {
-                id: 'SYSTEM.BLACKLIST',
-                name: '黑名单'
+                id: 'SYSTEM.BLACKLIST.NONE',
+                name: '黑名单',
+                children: [
+                    {
+                        id: 'SYSTEM.PERSONBLACKLIST',
+                        name: '人员黑名单'
+                    }
+                ]
             }
         ]
     },
@@ -662,33 +731,6 @@ export const MODULES = [
         name: '项目管理',
         children: [
             {
-                id: 'PROJECT.DATAMANAGE.NONE',
-                name: '资料管理',
-                children: [
-                    {
-                        id: 'PROJECT.STANDARD',
-                        name: '制度标准'
-                    },
-                    {
-                        id: 'PROJECT.ENGINEERINGIMAGE',
-                        name: '工程影像'
-                    },
-                    {
-                        id: 'PROJECT.PRODOC',
-                        name: '工程文档'
-                    }
-                ]
-            },
-            {
-                id: 'PROJECT.OVERALLMANAGE.NONE',
-                name: '综合管理',
-                children: [
-                    {
-                        id: 'PROJECT.FORM',
-                        name: '表单管理'
-                    }
-                ]
-            }, {
                 id: 'PROJECT.PLOTMANAGE.NONE',
                 name: '数据管理',
                 children: [
@@ -730,43 +772,11 @@ export const MODULES = [
                         name: '绑定管理'
                     }
                 ]
-            },
-            {
-                id: 'PROJECT.PROJECTIMAGE',
-                name: '工程影像'
             }
+            // {
+            //     id: 'PROJECT.PROJECTIMAGE',
+            //     name: '工程影像'
+            // }
         ]
-    }
-];
-
-// 获取新闻发布单位
-export const DEPARTMENT = [
-    {
-        code: 'ORG_01_19',
-        name: '雄安新区造林指挥部'
-    },
-    {
-        code: 'ORG_03_32',
-        name: '河北远大工程咨询有限公司'
-    },
-    {
-        code: 'ORG_P010_01_02_02',
-        name: '北京政泰隆工程管理有限公司'
-    },
-    {
-        code: 'ORG_P010_01_02_03',
-        name: '北京中城建建设监理有限公司'
-    },
-    {
-        code: 'ORG_P010_01_02_04',
-        name: '浙江江南工程管理股份有限公司'
-    },
-    {
-        code: 'ORG_P010_02_02_01',
-        name: '北京中林华联建设工程监理有限公司'
-    },
-    {
-        code: 'ORG_P010_03_02_01',
-        name: '天津市源天工程咨询有限公司'
     }
 ];

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import TaskStatisGis from './TaskStatisGis';
 import TaskStatisTable from './TaskStatisTable';
 import '../Curing.less';
-window.config = window.config || {};
 
 export default class TaskStatisPage extends Component {
     constructor (props) {

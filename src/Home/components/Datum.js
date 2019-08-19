@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Table, Card } from 'antd';
-import Blade from '_platform/components/panels/Blade';
+import Blade from './Blade';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import './styles.less';
 import { getUser } from '_platform/auth';
 import 'moment/locale/zh-cn';
+import { getWorkList } from '../../Selfcare/store/tasks';
 moment.locale('zh-cn');
 
 export default class Datum extends Component {
@@ -14,64 +15,53 @@ export default class Datum extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            visible: false,
-            container: null,
-            workflowData: []
+            workList: []
         };
+        this.getWorkList = this.getWorkList.bind(this);
     }
 
     async componentDidMount () {
-        const {
-            actions: { getTaskPerson }
-        } = this.props;
-        let user = getUser();
-        let datas = [];
-        datas = await getTaskPerson({ userid: user.id }, {pagination: true, page: 1});
-        let workflowData = [];
-        if (datas && datas instanceof Array && datas.length > 0) {
-            datas.map(data => {
-                let workflowactivity = data.workflowactivity;
-                let state = data.state;
-                workflowData.push({
-                    state_id: state.id,
-                    task_id: workflowactivity.id,
-                    name: workflowactivity.name,
-                    pub_time: workflowactivity.real_start_time
+        this.getWorkList();
+    }
+    getWorkList () {
+        const { getWorkList } = this.props.actions;
+        let params = {
+            workid: '', // 任务ID
+            title: '', // 任务名称
+            flowid: '', // 流程类型或名称
+            starter: '', // 发起人
+            currentnode: '', // 节点ID
+            prevnode: '', // 上一结点ID
+            executor: getUser().ID || '', // 执行人
+            wfstate: '0,1,4', // 待办
+            stime: '', // 开始时间
+            etime: '', // 结束时间
+            page: '', // 页码
+            size: '' // 页数
+        };
+        getWorkList({}, params).then(rep => {
+            if (rep.code === 200) {
+                let workList = []; // 待办列表
+                rep.content.map(item => {
+                    workList.push(item);
                 });
-            });
-        }
-        this.setState({
-            workflowData: workflowData
+                this.setState({
+                    workList
+                });
+            }
         });
     }
 
     columns = [
         {
             title: '任务标题',
-            dataIndex: 'name',
-            key: 'name',
-            width: 400,
-            render (text, record) {
-                if (text.length > 30) {
-                    text = text.slice(0, 30);
-                }
-                return <p>{text}</p>;
-            }
+            dataIndex: 'Title'
         },
 
         {
             title: '提交时间',
-            dataIndex: 'pub_time',
-            key: 'pub_time',
-            width: 200,
-            render: (text, record) => {
-                return moment(record.pub_time)
-                    .utc()
-                    .zone(-8)
-                    .format('YYYY-MM-DD HH:mm:ss'); // 转换为东八区时间
-            }
+            dataIndex: 'CreateTime'
         },
-
         {
             title: '操作',
             width: 100,
@@ -79,10 +69,7 @@ export default class Datum extends Component {
                 return (
                     <span>
                         <Link
-                            to={
-                                `/selfcare/task/${record.task_id}?state_id=` +
-                                record.state_id
-                            }
+                            to={`/selfcare/task/${record.ID}`}
                         >
                             <span>查看</span>
                         </Link>
@@ -93,9 +80,7 @@ export default class Datum extends Component {
     ];
 
     render () {
-        // const { tasks=[] } = this.props;
-        const { home: { datum: { usertasks = [] } = {} } = {} } = this.props;
-        const { workflowData } = this.state;
+        const { workList } = this.state;
 
         return (
             <Blade title='待办任务' >
@@ -110,10 +95,10 @@ export default class Datum extends Component {
                 <div className='tableContainer'>
                     <Table
                         bordered
-                        dataSource={workflowData}
+                        dataSource={workList}
                         columns={this.columns}
                         pagination={{ showQuickJumper: true, pageSize: 5 }}
-                        rowKey='pk'
+                        rowKey='ID'
                     />
                 </div>
             </Blade>

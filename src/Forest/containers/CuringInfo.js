@@ -49,7 +49,6 @@ export default class CuringInfo extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getForestUsers,
                 getTreeNodeList,
                 setkeycode,
                 getCuringTypes,
@@ -57,13 +56,8 @@ export default class CuringInfo extends Component {
                 getTotalThinClass,
                 getThinClassTree
             },
-            users,
             platform: { tree = {} }
         } = this.props;
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
         getCuringTypes().then((curingTypesData) => {
             let curingTypes = curingTypesData && curingTypesData.content;
             let curingTypesOption = [];
@@ -112,13 +106,13 @@ export default class CuringInfo extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='养护信息' {...this.props} />
-                    <Sidebar width={190}>
+                    {/* <Sidebar width={190}>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}
                             onSelect={this.onSelect.bind(this)}
                         />
-                    </Sidebar>
+                    </Sidebar> */}
                     <Content>
                         <CuringTable
                             key={resetkey}
@@ -146,7 +140,6 @@ export default class CuringInfo extends Component {
         } = this.props;
         let treeList = tree.thinClassTree;
 
-        let user = getUser();
         let keycode = keys[0] || '';
         const {
             actions: { setkeycode }
@@ -170,14 +163,15 @@ export default class CuringInfo extends Component {
         });
 
         // 标段
-        let sections = JSON.parse(user.sections);
+        let user = getUser();
+        let section = user.section;
         let permission = getUserIsManager();
         if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
         } else {
             sectionsData.map((sectionData) => {
-                if (sections[0] === sectionData.No) {
+                if (section && section === sectionData.No) {
                     this.setSectionOption(sectionData);
                 }
             });

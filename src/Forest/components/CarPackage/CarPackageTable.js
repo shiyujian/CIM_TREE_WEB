@@ -15,7 +15,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getUserIsManager } from '_platform/auth';
+import { getUserIsManager } from '_platform/auth';
 import CarPackDetailModal from './CarPackDetailModal'; // 查看车内苗木信息
 import HandleChangeDetailModal from './HandleChangeDetailModal'; // 移动或修改车内苗木
 import ChangeCarInfoModal from './ChangeCarInfoModal'; // 修改车辆信息
@@ -240,8 +240,6 @@ export default class CarPackageTable extends Component {
         }
     ];
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.leftkeycode != this.state.leftkeycode) {
@@ -433,7 +431,7 @@ export default class CarPackageTable extends Component {
         const {
             actions: {
                 getcarpackage,
-                getForestUserDetail
+                getUserDetail
             },
             keycode = '',
             platform: { tree = {} }
@@ -457,10 +455,17 @@ export default class CarPackageTable extends Component {
             });
 
             let rst = await getcarpackage({}, postdata);
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
+            if (!(rst && rst.content)) {
+                this.setState({
+                    loading: false,
+                    percent: 100
+                });
+                return;
+            }
             let tblData = rst.content;
             if (tblData instanceof Array) {
+                let userIDList = [];
+                let userDataList = {};
                 for (let i = 0; i < tblData.length; i++) {
                     let plan = tblData[i];
                     plan.order = (page - 1) * size + i + 1;
@@ -472,7 +477,18 @@ export default class CarPackageTable extends Component {
                         : '/';
                     plan.Project = await getProjectNameBySection(plan.Section, thinClassTree);
                     plan.sectionName = await getSectionNameBySection(plan.Section, thinClassTree);
-                    let userData = await getForestUserDetail({id: plan.Constructioner});
+
+                    let userData = '';
+                    if (userIDList.indexOf(Number(plan.Constructioner)) === -1) {
+                        userData = await getUserDetail({id: plan.Constructioner});
+                    } else {
+                        userData = userDataList[Number(plan.Constructioner)];
+                    }
+
+                    if (userData && userData.ID) {
+                        userIDList.push(userData.ID);
+                        userDataList[userData.ID] = userData;
+                    }
                     plan.ConstructionerName = (userData && userData.Full_Name) || '';
                     plan.ConstructionerUserName = (userData && userData.User_Name) || '';
                     plan.SupervisorName = (plan.SupervisorUser && plan.SupervisorUser.Full_Name) || '';
@@ -481,7 +497,12 @@ export default class CarPackageTable extends Component {
                 const pagination = { ...this.state.pagination };
                 pagination.total = rst.pageinfo.total;
                 pagination.pageSize = size;
-                this.setState({ tblData, pagination });
+                this.setState({
+                    tblData,
+                    pagination,
+                    loading: false,
+                    percent: 100
+                });
             }
         } catch (e) {
             console.log('query', e);

@@ -14,7 +14,7 @@ import {
     Card
 } from 'antd';
 import moment from 'moment';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -48,7 +48,8 @@ export default class CuringTable extends Component {
             curingTypes: [],
             curingSXM: '',
             smallclassData: '',
-            thinclassData: ''
+            thinclassData: '',
+            curingMess: ''
         };
         this.columns = [
             {
@@ -98,14 +99,12 @@ export default class CuringTable extends Component {
             this.setState({
                 curingTypes
             });
-            let user = getUser();
-            this.sections = JSON.parse(user.sections);
         } catch (e) {
             console.log('getCuringTypes', e);
         }
     }
     render () {
-        const { curingTreeData, curingTreeModalData, curingSXM } = this.state;
+        const { curingTreeData, curingMess, curingSXM } = this.state;
         return (
             <div>
                 {this.treeTable(curingTreeData)}
@@ -128,68 +127,85 @@ export default class CuringTable extends Component {
                             addonBefore='顺序码'
                             value={curingSXM}
                         />
-                    </div>
-                    {
-                        curingTreeModalData && curingTreeModalData.length > 0
-                            ? (
-                                curingTreeModalData.map((curing, index) => {
+                        <Input
+                            readOnly
+                            style={{
+                                marginTop: '10px'
+                            }}
+                            size='large'
+                            addonBefore='项目'
+                            value={curingMess.Project}
+                        />
+                        <Input
+                            readOnly
+                            style={{
+                                marginTop: '10px'
+                            }}
+                            size='large'
+                            addonBefore='标段'
+                            value={curingMess.sectionName}
+                        />
+                        <Input
+                            readOnly
+                            style={{
+                                marginTop: '10px'
+                            }}
+                            size='large'
+                            addonBefore='位置'
+                            value={curingMess.place}
+                        />
+
+                        <Input
+                            readOnly
+                            style={{
+                                marginTop: '10px'
+                            }}
+                            size='large'
+                            addonBefore='养护类型'
+                            value={curingMess.typeName}
+                        />
+                        <Input
+                            readOnly
+                            style={{
+                                marginTop: '10px'
+                            }}
+                            size='large'
+                            addonBefore='起止时间'
+                            value={`${curingMess.StartTime} ~ ${curingMess.EndTime}`}
+                        />
+                        <Input
+                            readOnly
+                            style={{
+                                marginTop: '10px'
+                            }}
+                            size='large'
+                            addonBefore='养护人员'
+                            value={curingMess.CuringMans}
+                            title={curingMess.CuringMans}
+                        />
+                        {curingMess.Pics && curingMess.Pics.length > 0
+                            ? curingMess.Pics.map(
+                                src => {
                                     return (
-                                        <Card title={`任务${index + 1}`} style={{marginBottom: 10}} key={curing.ID}>
-                                            <Input
-                                                readOnly
+                                        <div>
+                                            <img
                                                 style={{
+                                                    width: '150px',
+                                                    height: '150px',
+                                                    display: 'block',
                                                     marginTop: '10px'
                                                 }}
-                                                size='large'
-                                                addonBefore='养护类型'
-                                                value={curing.typeName}
+                                                src={
+                                                    src
+                                                }
+                                                alt='图片'
                                             />
-                                            <Input
-                                                readOnly
-                                                style={{
-                                                    marginTop: '10px'
-                                                }}
-                                                size='large'
-                                                addonBefore='起止时间'
-                                                value={`${curing.StartTime} ~ ${curing.EndTime}`}
-                                            />
-                                            <Input
-                                                readOnly
-                                                style={{
-                                                    marginTop: '10px'
-                                                }}
-                                                size='large'
-                                                addonBefore='养护人员'
-                                                value={curing.CuringMans}
-                                                title={curing.CuringMans}
-                                            />
-                                            {curing.Pics && curing.Pics.length > 0
-                                                ? curing.Pics.map(
-                                                    src => {
-                                                        return (
-                                                            <div>
-                                                                <img
-                                                                    style={{
-                                                                        width: '150px',
-                                                                        height: '150px',
-                                                                        display: 'block',
-                                                                        marginTop: '10px'
-                                                                    }}
-                                                                    src={
-                                                                        src
-                                                                    }
-                                                                    alt='图片'
-                                                                />
-                                                            </div>
-                                                        );
-                                                    }
-                                                )
-                                                : ''}
-                                        </Card>
+                                        </div>
                                     );
-                                })
-                            ) : ''
-                    }
+                                }
+                            )
+                            : ''}
+                    </div>
                     <Row style={{ marginTop: 10 }}>
                         <Button
                             onClick={this.handleCancel.bind(this)}
@@ -234,7 +250,7 @@ export default class CuringTable extends Component {
                             onChange={this.sxmChange.bind(this)}
                         />
                     </div>
-                    <div className='forest-mrg10'>
+                    {/* <div className='forest-mrg10'>
                         <span className='forest-search-span'>标段：</span>
                         <Select
                             allowClear
@@ -287,7 +303,7 @@ export default class CuringTable extends Component {
                         >
                             {thinclassoption}
                         </Select>
-                    </div>
+                    </div> */}
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>类型：</span>
                         <Select
@@ -426,7 +442,7 @@ export default class CuringTable extends Component {
             let thinclassData = '';
             if (value) {
                 let arr = value.split('-');
-                thinclassData = arr[4];
+                thinclassData = arr[0] + '-' + arr[1] + '-' + arr[3] + '-' + arr[4];
             }
             this.setState({
                 thinclass: value,
@@ -508,8 +524,11 @@ export default class CuringTable extends Component {
         this.setState({ loading: true, percent: 0 });
         try {
             let rst = await getCuringTreeInfo({}, postdata);
-            if (!rst) {
-                this.setState({ loading: false, percent: 100 });
+            if (!(rst && rst.content)) {
+                this.setState({
+                    loading: false,
+                    percent: 100
+                });
                 return;
             };
             let curingTreeData = rst && rst.content;
@@ -542,33 +561,31 @@ export default class CuringTable extends Component {
     handleCuringTreeModalOk = async (record) => {
         const {
             actions: {
-                getCuringTreeInfo,
                 getCuringMessage
             }
         } = this.props;
         const {
             curingTypes
         } = this.state;
-        let SXM = record.SXM;
-        let rst = await getCuringTreeInfo({}, {sxm: SXM});
-        let curingTreeModalData = rst && rst.content;
-        for (let i = 0; i < curingTreeModalData.length; i++) {
-            let data = curingTreeModalData[i];
+        let curingMess = await getCuringMessage({id: record.CuringID});
+        if (curingMess && curingMess.ID) {
             curingTypes.map((type) => {
-                if (data.CuringType === type.ID) {
-                    data.typeName = type.Base_Name;
+                if (curingMess.CuringType === type.ID) {
+                    curingMess.typeName = type.Base_Name;
                 }
             });
-            let curingMess = await getCuringMessage({id: data.CuringID});
-            data.Pics = curingMess.Pics ? this.handleImg(curingMess.Pics) : '';
-            data.StartTime = curingMess.StartTime;
-            data.EndTime = curingMess.EndTime;
-            data.CuringMans = curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans + ',' + curingMess.CuringMans;
+            curingMess.Project = record.Project;
+            curingMess.sectionName = record.sectionName;
+            curingMess.place = record.place;
+            curingMess.Pics = curingMess.Pics ? this.handleImg(curingMess.Pics) : '';
+        } else {
+            curingMess = '';
         }
+
         this.setState({
-            curingTreeModalData,
+            curingMess,
             curingModalvisible: true,
-            curingSXM: SXM
+            curingSXM: record.SXM
         });
     }
 

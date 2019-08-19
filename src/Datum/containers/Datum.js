@@ -97,13 +97,11 @@ export default class Datum extends Component {
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
-        let sections = user.sections;
+        let section = user.section;
         let currentSectionName = '';
         let projectName = '';
 
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
+        if (section) {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目

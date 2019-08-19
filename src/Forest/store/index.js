@@ -7,13 +7,9 @@ import createFetchAction from './fetchAction';
 import {
     createFetchActionWithHeaders as myFetch
 } from './fetchAction';
-import faithInfoReducer, {
-    actions as faithActions
-} from './faithInfo';
 import {
     FOREST_API,
-    TENCENTANALYSIS_API,
-    USER_API
+    TENCENTANALYSIS_API
 } from '_platform/api';
 import {
     forestFetchAction
@@ -29,13 +25,7 @@ export const changeNursery = createAction(`${ID}传递nurseryName`);
 export const getHonestyNewDetailOk = createAction(`${ID}存储返回的详情`);
 export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供应商名字`);
-const getForestUsersOK = createAction('获取森林数据用户列表');
 const getTreeListOK = createAction('获取森林树种列表');
-
-/** ***************************院内************************/
-export const getForestUsers = forestFetchAction(`${FOREST_API}/system/users`, [
-    getForestUsersOK
-]);
 
 export const getTree = forestFetchAction(`${FOREST_API}/tree/wpunits`, [
     getTreeOK
@@ -333,9 +323,6 @@ export const getTreetypeByThinclass = forestFetchAction(
     []
 );
 
-export const getCustomViewByUserIDOk = createAction(`${ID}根据用户ID获取用户自定义视图`);
-// 根据用户ID获取用户自定义视图
-export const getCustomViewByUserID = createFetchAction(`${USER_API}/user/{{id}}/custom-view/`, [getCustomViewByUserIDOk], 'GET');
 export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET'); // 获取细班详情
 
 // 苗木来源地分析苗圃总览 苗圃基地、供应商数据统计
@@ -400,11 +387,6 @@ export const getDigitalAcceptDetail = forestFetchAction(
     []
 );
 
-// 获取数字化验收人员列表
-export const getDigitalAcceptUserList = createFetchAction(
-    `${USER_API}/users/?is_active=true`,
-    []
-);
 // 获取苗木质量验收结果列表
 export const getMQulityCheckList = forestFetchAction(
     `${FOREST_API}/tree/qualitytrees`,
@@ -462,7 +444,6 @@ export const actions = {
     getTotalSat,
     getTreeLocations,
     getExportTreeLocations,
-    getForestUsers,
     getTreeOK,
     getTree,
     setkeycode,
@@ -534,7 +515,6 @@ export const actions = {
     getNurseryFromData,
     getTreeEntrance,
     getDigitalAcceptList,
-    getDigitalAcceptUserList,
     getDigitalAcceptDetail,
     getUserStat,
     getNewUserStat,
@@ -542,8 +522,6 @@ export const actions = {
     getSectionUserStat,
     getTQulityCheckList,
     getZZJQulityCheckList,
-    getCustomViewByUserIDOk,
-    getCustomViewByUserID,
     getTreearea,
     getNurseryBaseStat,
     getNurseryEnterStat,
@@ -590,27 +568,6 @@ export default handleActions({
             keycode: payload
         };
     },
-    [combineActions(...actionsMap(faithActions))]: (
-        state = {},
-        action
-    ) => ({
-        ...state,
-        faith: faithInfoReducer(state.faith, action)
-    }),
-    [getForestUsersOK]: (state, {
-        payload: {
-            content
-        }
-    }) => {
-        let users = {};
-        if (content) {
-            content.forEach(user => (users[user.ID] = user));
-        }
-        return {
-            ...state,
-            users
-        };
-    },
     [getTreeListOK]: (state, {
         payload
     }) => ({
@@ -635,12 +592,6 @@ export default handleActions({
         ...state,
         nurseryName: payload
     }),
-    [getCustomViewByUserIDOk]: (state, { payload }) => {
-        return {
-            ...state,
-            customViewByUserID: payload
-        };
-    },
     [getNurseryListOK]: (state, { payload }) => {
         return {
             ...state,

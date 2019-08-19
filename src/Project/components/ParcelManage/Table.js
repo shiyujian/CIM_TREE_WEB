@@ -13,7 +13,6 @@ import {
 } from '_platform/api';
 const FormItem = Form.Item;
 const Option = Select.Option;
-window.config = window.config || {};
 class Tablelevel extends Component {
     constructor (props) {
         super(props);
@@ -96,6 +95,7 @@ class Tablelevel extends Component {
         // 基础设置
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
+        mapInitialization.attributionControl = false;
         this.map = L.map('mapid', mapInitialization);
         // 基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../store/login';
+import { actions } from '../store/login';
+import { actions as platformActions } from '_platform/store/global';
 import {
     Form,
     Input,
@@ -11,21 +12,24 @@ import {
     Notification
 } from 'antd';
 import {
-    setUser,
     clearUser,
     setPermissions,
-    removePermissions,
-    getUser
+    removePermissions
 } from '_platform/auth';
-import { FOREST_LOGIN_DATA } from '_platform/api';
 import './Login.less';
 
 const FormItem = Form.Item;
 
 @connect(
-    state => ({}),
+    state => {
+        const { login: { login = {} } = {}, platform } = state;
+        return { ...login, platform };
+    },
     dispatch => ({
-        actions: bindActionCreators(actions, dispatch)
+        actions: bindActionCreators(
+            { ...actions, ...platformActions },
+            dispatch
+        )
     })
 )
 class Login extends Component {
@@ -38,17 +42,15 @@ class Login extends Component {
             forgectState: false,
             checked: '',
             getSecurityCodeStatus: false,
-            countDown: 60
+            countDown: 60,
+            setUserStatus: false
         };
-        this.account = [];
-        this.code = [];
-        clearUser();
-        clearUser();
-        clearUser();
         clearUser();
     }
 
     componentDidMount () {
+        // 页面加载后自动聚焦
+        this.nameInput.focus();
         let LOGIN_USER_PASSDATA = window.localStorage.getItem('LOGIN_USER_PASSDATA');
         if (LOGIN_USER_PASSDATA) {
             LOGIN_USER_PASSDATA = JSON.parse(LOGIN_USER_PASSDATA) || {};
@@ -66,7 +68,64 @@ class Login extends Component {
                     LOGIN_USER_PASSDATA.password;
                 this.state.checked = LOGIN_USER_PASSDATA.remember;
             }
-            // this.loginFunc(LOGIN_USER_PASSDATA, 1);
+        }
+    }
+
+    handleChangeUser = (value) => {
+        console.log('value', value);
+        if (value) {
+            this.setState({
+                setUserStatus: true
+            });
+        } else {
+            this.setState({
+                setUserStatus: false
+            });
+        }
+    }
+    checkUserName = async (rule, value, callback) => {
+        if (value) {
+            // 不允许空格
+            let reg = /^[^\s]*$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    if (value.length >= 4 && value.length <= 16) {
+                        callback();
+                    } else {
+                        callback('请输入用户名(4到16位)');
+                    }
+                } else {
+                    callback(`请输入正确的用户名`);
+                }
+            } else {
+                callback(`请输入正确的用户名`);
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPassWord = async (rule, value, callback) => {
+        if (value) {
+            let reg = /^[^\s]*$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (reg.test(value)) {
+                if (value) {
+                    if (value.length >= 6 && value.length <= 16) {
+                        callback();
+                    } else {
+                        callback('请输入密码(6到16位)');
+                    }
+                } else {
+                    callback(`请输入正确的密码`);
+                }
+            } else {
+                callback(`请输入正确的密码`);
+            }
+        } else {
+            callback();
         }
     }
 
@@ -75,6 +134,7 @@ class Login extends Component {
         const {
             forgectState,
             getSecurityCodeStatus,
+            setUserStatus,
             countDown
         } = this.state;
         const loginTitle = require('./images/logo1.png');
@@ -133,7 +193,10 @@ class Login extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入用户名'
+                                                        message: '请输入用户名(4到16位)'
+                                                    },
+                                                    {
+                                                        validator: this.checkUserName
                                                     }
                                                 ]
                                             })(
@@ -143,8 +206,9 @@ class Login extends Component {
                                                         borderBottom:
                                                             '1px solid #cccccc'
                                                     }}
+                                                    ref={(input) => { this.nameInput = input; }}
                                                     id='username'
-                                                    placeholder='用户名/手机号'
+                                                    placeholder='请输入用户名(4到16位)'
                                                 />
                                             )}
                                         </FormItem>
@@ -158,7 +222,10 @@ class Login extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入密码'
+                                                        message: '请输入密码(6到16位)'
+                                                    },
+                                                    {
+                                                        validator: this.checkPassWord
                                                     }
                                                 ]
                                             })(
@@ -171,7 +238,7 @@ class Login extends Component {
                                                         }}
                                                         id='pwdInp'
                                                         type={pwdType}
-                                                        placeholder='密码'
+                                                        placeholder='请输入密码(6到16位)'
                                                     />
                                                     <a
                                                         className='btn-change-type'
@@ -266,6 +333,7 @@ class Login extends Component {
                                                         borderBottom:
                                                             '1px solid #cccccc'
                                                     }}
+                                                    onChange={this.handleChangeUser.bind(this)}
                                                     placeholder='请输入用户名'
                                                 />
                                             )}
@@ -296,7 +364,7 @@ class Login extends Component {
                                                         placeholder='请输入手机号'
                                                     />
                                                     {
-                                                        getSecurityCodeStatus
+                                                        getSecurityCodeStatus && setUserStatus
                                                             ? <a
                                                                 className='security-code-status'
                                                             >{`${countDown}秒后重发`}</a>
@@ -441,9 +509,10 @@ class Login extends Component {
     loginFunc = async (data, loginType, values) => {
         const {
             actions: {
-                login,
                 getTasks,
-                loginForest
+                loginForest,
+                getRolePermission,
+                getUsers
             },
             history: { replace }
         } = this.props;
@@ -452,101 +521,100 @@ class Login extends Component {
         await removePermissions();
         await removePermissions();
         console.log('loginFuncloginFuncdata', data);
-        let rst = await login({}, data);
-        if (rst.status === 'Nonactived') {
-            message.error('用户没有被激活');
-        } else {
-            if (rst && rst.id) {
-                let postData = {};
-                if (data.username === 'admin') {
-                    postData = FOREST_LOGIN_DATA;
-                } else {
-                    postData = {
-                        phone: data.username,
-                        pwd: data.password
-                    };
-                }
+        let postData = {};
+        postData = {
+            phone: data.username,
+            pwd: data.password,
+            imei: ''
+        };
+        // }
+        let forestUserData = await loginForest({}, postData);
+        console.log('forestUserData', forestUserData);
+        if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
+            let forestLoginUserData = forestUserData[0];
+            if (!forestLoginUserData.Number && forestLoginUserData.User_Name !== 'admin') {
+                Notification.error({
+                    message: '该用户未进行实名认证，不能登录',
+                    duration: 2
+                });
+                return;
+            }
+            if (forestLoginUserData.IsBlack === 1) {
+                Notification.error({
+                    message: '该用户已被拉黑，不能登录',
+                    duration: 2
+                });
+                return;
+            } else if (forestLoginUserData.IsForbidden === 1) {
+                Notification.error({
+                    message: '该用户已被禁用，不能登录',
+                    duration: 2
+                });
+                return;
+            } else if (forestLoginUserData.Status === 0) {
+                Notification.error({
+                    message: '该用户未经过审核，不能登录',
+                    duration: 2
+                });
+                return;
+            }
+            // let tasks = [];
+            // tasks = await getTasks(
+            //     {},
+            //     {
+            //         task: 'processing',
+            //         executor: forestLoginUserData.id,
+            //         pagination: true,
+            //         page: 1
+            //     });
+            let userRole = forestLoginUserData.Roles;
+            if (userRole && userRole instanceof Array && userRole.length > 0) {
+                let permissions = await getRolePermission({roleId: userRole[0].ID});
+                await setPermissions(permissions);
+            } else {
+                await setPermissions([]);
+            }
 
-                let forestUserData = await loginForest({}, postData);
-                console.log('forestUserData', forestUserData);
-                if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
-                    let forestLoginUserData = forestUserData[0];
+            Notification.open({
+                message: loginType
+                    ? '自动登录成功'
+                    : '登录成功',
+                description: forestLoginUserData.User_Name
+            });
+
+            window.localStorage.setItem(
+                'LOGIN_USER_DATA',
+                JSON.stringify(forestLoginUserData)
+            );
+
+            if (loginType === 0) {
+                if (values.remember) {
                     window.localStorage.setItem(
-                        'FOREST_LOGIN_USER_DATA',
-                        JSON.stringify(forestLoginUserData)
+                        'LOGIN_USER_PASSDATA',
+                        JSON.stringify(data)
+                    );
+                } else {
+                    window.localStorage.removeItem(
+                        'LOGIN_USER_PASSDATA'
                     );
                 }
-                let tasks = [];
-                tasks = await getTasks({}, { task: 'processing', executor: rst.id, pagination: true, page: 1 });
-                Notification.open({
-                    message: loginType
-                        ? '自动登录成功'
-                        : '登录成功',
-                    description: rst.username
+            }
+            setTimeout(() => {
+                replace('/');
+            }, 500);
+        } else {
+            let userData = await getUsers({}, {username: data.username});
+            console.log('nickname', userData);
+            if (userData && userData.content && userData.content instanceof Array && userData.content.length > 0) {
+                Notification.error({
+                    message: '密码错误！',
+                    duration: 2
                 });
-                let count = (tasks && tasks.count) || 0;
-                const {
-                    username,
-                    id,
-                    account = {},
-                    all_permissions: permissions = [],
-                    is_superuser = false,
-                    groups = []
-                } = rst;
-                let isOwnerClerk = false;
-                groups.forEach((role) => {
-                    if (role && role.name && role.name === '业主文书') {
-                        isOwnerClerk = true;
-                    }
-                });
-                rst.isOwnerClerk = isOwnerClerk;
-                window.localStorage.setItem(
-                    'QH_USER_DATA',
-                    JSON.stringify(rst)
-                );
-
-                const {
-                    person_name: name,
-                    organization: org,
-                    person_code: code,
-                    org_code,
-                    sections,
-                    person_telephone
-                } = account;
-                await setUser(
-                    username,
-                    id,
-                    name,
-                    org,
-                    count,
-                    data.password,
-                    code,
-                    is_superuser,
-                    org_code,
-                    sections,
-                    isOwnerClerk,
-                    person_telephone
-                );
-                console.log(getUser(), 'cookie存的信息2');
-
-                await setPermissions(permissions);
-                if (loginType === 0) {
-                    if (values.remember) {
-                        window.localStorage.setItem(
-                            'LOGIN_USER_PASSDATA',
-                            JSON.stringify(data)
-                        );
-                    } else {
-                        window.localStorage.removeItem(
-                            'LOGIN_USER_PASSDATA'
-                        );
-                    }
-                }
-                setTimeout(() => {
-                    replace('/');
-                }, 500);
             } else {
-                message.error('用户名或密码错误！');
+                Notification.error({
+                    message: '用户名不存在！',
+                    duration: 2
+                });
             }
         }
     }
@@ -555,51 +623,112 @@ class Login extends Component {
     handleGetSecurityCode = async () => {
         const {
             actions: {
-                getSecurityCode
+                getSecurityCode,
+                getUsers
+            },
+            form: {
+                getFieldValue
             }
         } = this.props;
         try {
-            let phonenumber = this.props.form.getFieldValue('phone');
-            let partn = /^1[0-9]{10}$/;
-            if (!partn.exec(phonenumber)) {
+            let phone = getFieldValue('phone');
+            let username = getFieldValue('nickname');
+            if (!username) {
                 Notification.error({
-                    message: '手机号输入错误！',
+                    message: '请输入用户名',
                     duration: 2
                 });
-            } else {
-                this.setState({
-                    getSecurityCodeStatus: true
+                return;
+            }
+            if (!phone) {
+                Notification.error({
+                    message: '请输入手机号',
+                    duration: 2
                 });
-                const data = {
-                    action: 'vcode',
-                    phone: phonenumber
-                };
-                let rst = await getSecurityCode({}, data);
-                let status = false;
-                if (rst.indexOf('code') !== -1) {
-                    let handleData = rst.substring(1, rst.length - 1);
-                    let handleDataArr = handleData.split(',');
-                    if (handleDataArr && handleDataArr instanceof Array && handleDataArr.length > 0) {
-                        let codeArr = handleDataArr[0].split(':');
-                        if (codeArr && codeArr instanceof Array && codeArr.length === 2) {
-                            if (codeArr[1] === '1') {
-                                status = true;
-                            }
+                return;
+            }
+            let partn = /^1[0-9]{10}$/;
+            if (!partn.exec(phone)) {
+                Notification.error({
+                    message: '手机号格式输入错误！',
+                    duration: 2
+                });
+                return;
+            }
+            let userData = await getUsers({}, {username: username});
+            console.log('nickname', userData);
+            if (userData && userData.content && userData.content instanceof Array) {
+                if (userData.content.length > 0) {
+                    let content = userData.content[0];
+                    let phonenumber = (content && content.Phone) || '';
+                    if (!phonenumber) {
+                        Notification.error({
+                            message: '该用户未关联手机号，请联系管理员修改',
+                            duration: 2
+                        });
+                        this.handleSecurityCodeStatus();
+                        return;
+                    }
+
+                    if (phone !== phonenumber) {
+                        Notification.error({
+                            message: '填写手机号错误，请确认后重新输入',
+                            duration: 2
+                        });
+                        // this.handleSecurityCodeStatus();
+                        return;
+                    }
+                    let partn = /^1[0-9]{10}$/;
+                    if (!partn.exec(phone)) {
+                        Notification.error({
+                            message: '手机号格式输入错误！',
+                            duration: 2
+                        });
+                        this.handleSecurityCodeStatus();
+                        return;
+                    } else {
+                        this.setState({
+                            getSecurityCodeStatus: true
+                        });
+                        const data = {
+                            action: 'vcode',
+                            phone: phonenumber
+                        };
+                        let rst = await getSecurityCode({}, data);
+                        let status = false;
+                        if (rst.indexOf('code') !== -1) {
+                            let handleData = rst.substring(1, rst.length - 1);
+                            let handleDataArr = handleData.split(',');
+                            if (handleDataArr && handleDataArr instanceof Array && handleDataArr.length > 0) {
+                                let codeArr = handleDataArr[0].split(':');
+                                if (codeArr && codeArr instanceof Array && codeArr.length === 2) {
+                                    if (codeArr[1] === '1') {
+                                        status = true;
+                                    }
+                                }
+                            };
                         }
-                    };
-                }
-                if (status) {
-                    Notification.success({
-                        message: '验证码发送成功',
-                        duration: 3
-                    });
+                        if (status) {
+                            Notification.success({
+                                message: '验证码发送成功',
+                                duration: 3
+                            });
+                        } else {
+                            Notification.error({
+                                message: '验证码发送失败',
+                                duration: 3
+                            });
+                        }
+                        this.handleSecurityCodeStatus();
+                    }
                 } else {
                     Notification.error({
-                        message: '验证码发送失败',
+                        message: '此用户名不存在，请重新确认',
                         duration: 3
                     });
+                    this.handleSecurityCodeStatus();
+                    return;
                 }
-                this.handleSecurityCodeStatus();
             }
         } catch (e) {
             console.log('handleGetSecurityCode', e);
@@ -634,7 +763,6 @@ class Login extends Component {
         try {
             this.props.form.validateFieldsAndScroll(async (err, values) => {
                 if (!err) {
-                    // let partn =/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|17[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
                     let partn = /^1[0-9]{10}$/;
                     let phonenumber = values.phone;
                     if (!partn.exec(phonenumber)) {
@@ -678,6 +806,7 @@ class Login extends Component {
                         this.setState({
                             forgectState: false,
                             getSecurityCodeStatus: false,
+                            setUserStatus: false,
                             countDown: 60
                         });
                     }
@@ -690,6 +819,9 @@ class Login extends Component {
     cancel () {
         this.setState({
             forgectState: false
+            // getSecurityCodeStatus: false,
+            // setUserStatus: false,
+            // countDown: 60
         });
     }
 }

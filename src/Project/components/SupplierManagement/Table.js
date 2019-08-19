@@ -1,8 +1,18 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, Notification } from 'antd';
+import {
+    Row,
+    Col,
+    Input,
+    Button,
+    Select,
+    Table,
+    Modal,
+    Form,
+    Spin,
+    Notification
+} from 'antd';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
-import AddEdit from './AddEdit';
 import Addition from './Addition';
 import Edit from './Edit';
 import './Table.less';
@@ -17,11 +27,8 @@ class Tablelevel extends Component {
         this.state = {
             status: '', // 审核状态
             suppliername: '', // 供应商名称
-            total: 0,
-            page: 1,
             loading: true,
             supplierList: [], // 供应商列表
-            visible: false, // 新增编辑供应商弹框
             visibleTitle: '', // 弹框标题
             seeVisible: false, // 查看弹框
             auditVisible: false, // 审核弹框
@@ -36,13 +43,16 @@ class Tablelevel extends Component {
             blackRecord: '',
             blackVisible: false,
             addVisible: false,
-            editVisible: false
+            editVisible: false,
+            pagination: {
+                current: 1,
+                showQuickJumper: true
+            }
         };
         this.Checker = '';
-        this.groupId = ''; // 用户分组ID
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
-        this.handlePage = this.handlePage.bind(this); // 换页
+        this.handleTableChange = this.handleTableChange.bind(this); // 换页
         this.handleStatus = this.handleStatus.bind(this); // 状态
         this.handleName = this.handleName.bind(this); // 查询供应商名称
         this.toAdd = this.toAdd.bind(this); // 新增供应商弹框
@@ -202,13 +212,14 @@ class Tablelevel extends Component {
             }
         }
     ];
-    componentDidMount () {
-        const { getRegionCodes, getNurseryList } = this.props.actions;
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getRegionCodes,
+                getNurseryList
+            }
+        } = this.props;
         // 获取当前组织机构的权限
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        if (user.groups && user.groups.length > 0) {
-            this.groupId = user.groups[0].id;
-        }
         let permission = getUserIsManager();
         console.log('permission', permission);
         this.setState({
@@ -221,59 +232,59 @@ class Tablelevel extends Component {
             });
         } else {
             // 获取行政区划编码
-            getRegionCodes().then(rep => {
-                let RegionCodeList = [];
-                rep.map(item => {
-                    if (item.LevelType === '1') {
-                        RegionCodeList.push({
-                            value: item.ID,
-                            label: item.Name
+            let rst = await getRegionCodes();
+            let RegionCodeList = [];
+            rst.map(item => {
+                if (item.LevelType === '1') {
+                    RegionCodeList.push({
+                        value: item.ID,
+                        label: item.Name
+                    });
+                }
+            });
+            RegionCodeList.map(item => {
+                let arrCity = [];
+                rst.map(row => {
+                    if (row.LevelType === '2' && item.value === row.ParentId) {
+                        arrCity.push({
+                            value: row.ID,
+                            label: row.Name
                         });
                     }
                 });
-                RegionCodeList.map(item => {
-                    let arrCity = [];
-                    rep.map(row => {
-                        if (row.LevelType === '2' && item.value === row.ParentId) {
-                            arrCity.push({
-                                value: row.ID,
-                                label: row.Name
+                arrCity.map(row => {
+                    let arrCounty = [];
+                    rst.map(record => {
+                        if (record.LevelType === '3' && row.value === record.ParentId) {
+                            arrCounty.push({
+                                value: record.ID,
+                                label: record.Name
                             });
                         }
                     });
-                    arrCity.map(row => {
-                        let arrCounty = [];
-                        rep.map(record => {
-                            if (record.LevelType === '3' && row.value === record.ParentId) {
-                                arrCounty.push({
-                                    value: record.ID,
-                                    label: record.Name
-                                });
-                            }
-                        });
-                        row.children = arrCounty;
-                    });
-                    item.children = arrCity;
+                    row.children = arrCounty;
                 });
-                window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
-                this.setState({
-                    RegionCodeList
-                });
+                item.children = arrCity;
+            });
+            window.localStorage.setItem('RegionCodeList', JSON.stringify(RegionCodeList));
+            this.setState({
+                RegionCodeList
             });
         }
         // 获取所有苗圃
-        getNurseryList({}, {
-            status: 1
-        }).then(rep => {
+        let rep = await getNurseryList({}, {status: 1});
+        if (rep && rep.code && rep.code === 200) {
             this.setState({
                 optionList: rep.content
             });
-        });
-        this.onSearch();
+        }
+        await this.onSearch();
     }
-    handlePage (page) {
+    handleTableChange (pagination) {
+        const pager = { ...this.state.pagination };
+        pager.current = pagination.current;
         this.setState({
-            page
+            pagination: pager
         }, () => {
             this.onSearch();
         });
@@ -284,10 +295,10 @@ class Tablelevel extends Component {
             if (err) {
                 return;
             }
-            const { id } = getUser();
+            const { ID } = getUser();
             const param = {
                 ID: this.state.record.ID,
-                Checker: id,
+                Checker: ID,
                 CheckStatus: values.CheckStatus,
                 CheckInfo: values.CheckInfo,
                 CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
@@ -305,7 +316,10 @@ class Tablelevel extends Component {
         });
     }
     onClear () {
+        const pagination = { ...this.state.pagination };
+        pagination.current = 1;
         this.setState({
+            pagination,
             suppliername: ''
         }, () => {
             this.onSearch();
@@ -348,6 +362,10 @@ class Tablelevel extends Component {
     toDelete (record, e) {
         e.preventDefault();
         const { deleteSupplier } = this.props.actions;
+        const {
+            supplierList
+        } = this.state;
+        const pagination = { ...this.state.pagination };
         const self = this;
         confirm({
             title: '此操作会删除该供应商下 所有的绑定关系，你确定继续吗?',
@@ -359,6 +377,16 @@ class Tablelevel extends Component {
                         Notification.warning({
                             message: '如未删除成功，请确认该组织机构下无用户',
                             duration: 2
+                        });
+                        if (supplierList instanceof Array && supplierList.length === 1) {
+                            if (pagination.current > 1) {
+                                pagination.current = pagination.current - 1;
+                            }
+                        }
+                        self.setState({
+                            pagination
+                        }, () => {
+                            self.onSearch();
                         });
                         self.onSearch();
                     } else {
@@ -422,45 +450,47 @@ class Tablelevel extends Component {
                     let supplier = supplierList[index];
                     // 当前被拉黑供应商下的人员
                     let userAllResults = [];
-                    let orgCode = supplier.OrgPK;
+                    let orgID = supplier.ID;
                     let postData = {
-                        org_code: orgCode,
+                        org: orgID,
                         page: 1,
-                        page_size: 20
+                        size: 20
                     };
                     let userList = await getUsers({}, postData);
-                    userAllResults = userAllResults.concat((userList && userList.results) || []);
-                    let total = userList.count;
-                    // 为了防止人员过多，对人员进行分页获取处理
-                    if (total > 20) {
-                        for (let i = 0; i < (total / 20) - 1; i++) {
-                            postData = {
-                                org_code: orgCode,
-                                page: i + 2,
-                                page_size: 20
-                            };
-                            let datas = await getUsers({}, postData);
-                            userAllResults = userAllResults.concat((datas && datas.results) || []);
+                    if (userList && userList.code && userList.code === 200) {
+                        userAllResults = userAllResults.concat((userList && userList.content) || []);
+                        let total = userList.pageinfo.total;
+                        // 为了防止人员过多，对人员进行分页获取处理
+                        if (total > 20) {
+                            for (let i = 0; i < (total / 20) - 1; i++) {
+                                postData = {
+                                    org: orgID,
+                                    page: i + 2,
+                                    size: 20
+                                };
+                                let datas = await getUsers({}, postData);
+                                if (datas && datas.code && datas.code === 200) {
+                                    userAllResults = userAllResults.concat((datas && datas.content) || []);
+                                }
+                            }
                         }
                     }
                     // 人员拉黑请求数组
                     let blackPostRequestList = [];
                     userAllResults.map((user) => {
                         // 之前没有对该身份证进行拉黑，则push进入拉黑请求数组中
-                        if (user && user.account && user.account.id_num && !(user.account.is_black === 1) && userIDNumList.indexOf(user.account.id_num) === -1) {
+                        if (user && user.ID && !user.IsBlack && user.Number && userIDNumList.indexOf(user.Number) === -1) {
                             let blackPostData = {
-                                id: user.id,
+                                id: user.ID + '',
                                 is_black: 1,
-                                black_remark: `供应商${supplier.SupplierName}: ${values.BlackInfo}`,
-                                change_all: true
+                                black_remark: `供应商${supplier.SupplierName}: ${values.BlackInfo}`
                             };
                             blackPostRequestList.push(postForestUserBlackList({}, blackPostData));
-                            userIDNumList.push(user.account.id_num);
+                            userIDNumList.push(user.Number);
                         }
                     });
                     let blackData = await Promise.all(blackPostRequestList);
-                    console.log('blackData', blackData);
-                    if (blackData && blackData.length > 0) {
+                    if (blackData && blackData instanceof Array && blackData.length > 0) {
                         Notification.success({
                             message: '供应商人员拉黑成功',
                             duration: 2
@@ -495,8 +525,15 @@ class Tablelevel extends Component {
         }
     }
     onSearch () {
-        const { page, status, suppliername } = this.state;
-        const { getSupplierList } = this.props.actions;
+        const {
+            status,
+            suppliername
+        } = this.state;
+        const {
+            getSupplierList
+        } = this.props.actions;
+        const pagination = { ...this.state.pagination };
+        const page = pagination.current;
         const param = {
             status: status === undefined ? '' : status,
             suppliername,
@@ -507,11 +544,14 @@ class Tablelevel extends Component {
             loading: true
         });
         getSupplierList({}, param).then((rep) => {
-            if (rep.code === 200) {
+            if (rep && rep.code && rep.code === 200) {
+                let pageinfo = (rep && rep.pageinfo) || '';
+                pagination.total = (pageinfo && pageinfo.total) || 0;
+                pagination.current = (pageinfo && pageinfo.page) || 1;
+                pagination.pageSize = 10;
                 this.setState({
-                    total: rep.pageinfo.total,
                     supplierList: rep.content,
-                    page: rep.pageinfo.page,
+                    pagination,
                     loading: false
                 });
             }
@@ -533,13 +573,19 @@ class Tablelevel extends Component {
             record: null
         });
     }
+    handleQuery = () => {
+        const pagination = { ...this.state.pagination };
+        pagination.current = 1;
+        this.setState({
+            pagination
+        }, () => {
+            this.onSearch();
+        });
+    }
     render () {
         const { getFieldDecorator } = this.props.form;
         const {
             supplierList,
-            page,
-            total,
-            visible,
             addVisible,
             editVisible,
             seeVisible,
@@ -549,7 +595,8 @@ class Tablelevel extends Component {
             status,
             textCord,
             LegalPerson,
-            blackVisible
+            blackVisible,
+            pagination
         } = this.state;
 
         let img = getForestImgUrl(imageUrl);
@@ -565,10 +612,13 @@ class Tablelevel extends Component {
                         >
                             供应商名称:
                         </label>
-                        <Input className='search_input' value={suppliername} onChange={this.handleName} />
+                        <Input
+                            className='search_input'
+                            value={suppliername}
+                            onChange={this.handleName} />
                         <Button
                             type='primary'
-                            onClick={this.onSearch}
+                            onClick={this.handleQuery.bind(this)}
                             style={{minWidth: 30, marginRight: 20}}
                         >
                             查询
@@ -587,7 +637,7 @@ class Tablelevel extends Component {
                             onClick={this.toAdd}
                             disabled
                         >
-                            添加供应商
+                            新增供应商
                         </Button>
                     </Col>
                 </Row>
@@ -619,9 +669,9 @@ class Tablelevel extends Component {
                                 rowClassName={this.setBlackListColor.bind(this)}
                                 dataSource={supplierList}
                                 scroll={{ x: 1550 }}
-                                pagination={false} rowKey='ID' />
-                            <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
-                                showQuickJumper onChange={this.handlePage} />
+                                pagination={pagination}
+                                onChange={this.handleTableChange.bind(this)}
+                                rowKey='ID' />
                         </Spin>
                     </Col>
                 </Row>
@@ -636,8 +686,11 @@ class Tablelevel extends Component {
                 {
                     auditVisible
                         ? (
-                            <Modal title='审核' visible
-                                onOk={this.handleAudit} onCancel={this.handleCancel}
+                            <Modal
+                                title='审核'
+                                visible
+                                onOk={this.handleAudit}
+                                onCancel={this.handleCancel}
                             >
                                 <Form>
                                     <FormItem
@@ -667,7 +720,9 @@ class Tablelevel extends Component {
                         )
                         : null
                 }
-                <Modal title='拉黑' visible={blackVisible}
+                <Modal
+                    title='拉黑'
+                    visible={blackVisible}
                     onCancel={this.handleBlackCancel.bind(this)}
                     onOk={this.handleBlackOk.bind(this)}
                 >
@@ -683,15 +738,6 @@ class Tablelevel extends Component {
                         </FormItem>
                     </Form>
                 </Modal>
-                {
-                    visible
-                        ? <AddEdit
-                            {...this.props}
-                            {...this.state}
-                            handleCancel={this.handleCancel}
-                            onSearch={this.onSearch}
-                        /> : null
-                }
                 {
                     addVisible
                         ? <Addition

@@ -53,27 +53,27 @@ export default class Overall extends Component {
             path: '/overall/news',
             name: '新闻通知',
             icon: <Icon name='calendar-check-o' />
-        },
-        {
-            key: 'dispatch',
-            id: 'OVERALL.DISPATCH',
-            path: '/overall/dispatch',
-            name: '现场收发文',
-            icon: <Icon name='newspaper-o' />
-        },
-        {
-            key: 'material',
-            id: 'OVERALL.MATERAIL',
-            path: '/overall/material',
-            name: '物资管理',
-            icon: <Icon name='bars' />
-        },
-        {
-            key: 'form',
-            id: 'OVERALL.FORM',
-            path: '/overall/formmanage',
-            name: '表单管理',
-            icon: <Icon name='file-text' />
         }
+        // {
+        //     key: 'dispatch',
+        //     id: 'OVERALL.DISPATCH',
+        //     path: '/overall/dispatch',
+        //     name: '现场收发文',
+        //     icon: <Icon name='newspaper-o' />
+        // },
+        // {
+        //     key: 'material',
+        //     id: 'OVERALL.MATERAIL',
+        //     path: '/overall/material',
+        //     name: '物资管理',
+        //     icon: <Icon name='bars' />
+        // },
+        // {
+        //     key: 'form',
+        //     id: 'OVERALL.FORM',
+        //     path: '/overall/formmanage',
+        //     name: '表单管理',
+        //     icon: <Icon name='file-text' />
+        // }
     ];
 }

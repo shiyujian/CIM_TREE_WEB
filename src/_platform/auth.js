@@ -5,52 +5,104 @@ export default () => {
     return !!cookie.get('id');
 };
 
-export const getUser = () => {
-    // const permissions = cookie.get('permissions') || '[]';
-    return {
-        username: cookie.get('username'),
-        id: +cookie.get('id'),
-        name: cookie.get('name'),
-        org: cookie.get('org'),
-        tasks: cookie.get('tasks'),
-        password: cookie.get('password'),
-        code: cookie.get('code'),
-        is_superuser: cookie.get('is_superuser') !== 'false',
-        org_code: cookie.get('org_code'),
-        sections: cookie.get('sections'),
-        isOwnerClerk: cookie.get('isOwnerClerk'),
-        phone: cookie.get('phone')
-    };
+export const trim = (str) => {
+    return str.replace(/(^\s*)|(\s*$)/g, '');
 };
 
-export const setUser = (username, id, name, org, tasks, password, code, is_superuser, org_code, sections, isOwnerClerk, phone) => {
+export const getUser = () => {
+    try {
+        let user = window.localStorage.getItem('LOGIN_USER_DATA');
+        if (!user) {
+            return {
+                username: '',
+                ID: '',
+                duty: '',
+                name: '',
+                org: '',
+                phone: '',
+                ssBlack: '',
+                number: '',
+                roles: '',
+                section: '',
+                status: '',
+                token: '',
+                tasks: 0,
+                password: ''
+            };
+        }
+        user = JSON.parse(user);
+        const {
+            User_Name = '',
+            ID = '',
+            Duty = '',
+            Full_Name = '',
+            Org = '',
+            OrgObj = '',
+            Phone = '',
+            IsBlack = 0,
+            Number = '',
+            Roles = '',
+            Section = '',
+            Status = 1,
+            Token = ''
+        } = user;
+        let roles = '';
+        if (Roles && Roles instanceof Array && Roles.length > 0) {
+            roles = Roles[0];
+        }
+        return {
+            username: User_Name,
+            ID: ID,
+            duty: Duty,
+            name: Full_Name,
+            org: Org,
+            orgObj: OrgObj,
+            phone: Phone,
+            isBlack: IsBlack,
+            number: Number,
+            roles: roles,
+            section: Section,
+            status: Status,
+            token: Token,
+            tasks: cookie.get('tasks'),
+            password: cookie.get('password')
+        };
+    } catch (e) {
+        console.log('getUser', e);
+    }
+};
+
+export const setUser = (username, ID, duty, name, org, phone, isBlack, number, roles, section, status, token, tasks, password) => {
     cookie.set('username', username);
-    cookie.set('id', id);
+    cookie.set('ID', ID);
+    cookie.set('duty', duty);
     cookie.set('name', name);
     cookie.set('org', org);
+    cookie.set('phone', phone);
+    cookie.set('isBlack', isBlack);
+    cookie.set('number', number);
+    cookie.set('roles', roles);
+    cookie.set('section', section);
+    cookie.set('status', status);
+    cookie.set('token', token);
     cookie.set('tasks', tasks);
     cookie.set('password', password);
-    cookie.set('code', code);
-    cookie.set('is_superuser', is_superuser);
-    cookie.set('org_code', org_code); // 所在组织机构code
-    cookie.set('sections', sections);
-    cookie.set('isOwnerClerk', isOwnerClerk);
-    cookie.set('phone', phone); // 用户手机号
 };
 
 export const clearUser = () => {
     cookie.remove('username');
-    cookie.remove('id');
+    cookie.remove('ID');
+    cookie.remove('duty');
     cookie.remove('name');
     cookie.remove('org');
+    cookie.remove('phone');
+    cookie.remove('number');
+    cookie.remove('roles');
+    cookie.remove('section');
+    cookie.remove('status');
+    cookie.remove('token');
     cookie.remove('tasks');
     cookie.remove('password');
-    cookie.remove('code');
-    cookie.remove('is_superuser');
-    cookie.remove('org_code');
-    cookie.remove('sections');
-    cookie.remove('isOwnerClerk');
-    cookie.remove('phone');
 };
 
 export const clearCookies = () => {
@@ -72,13 +124,15 @@ export const setPermissions = (permissions) => {
 export const getPermissions = () => {
     let permissions = [];
     const text = window.localStorage.getItem('permissions');
-    // var add= localStorage.getItem("TREE_LOGIN_USER")
-
     try {
-        permissions = JSON.parse(text);
-        // permissions = JSON.parse(add);
+        if (text) {
+            permissions = JSON.parse(text);
+            if (!(permissions && permissions instanceof Array)) {
+                permissions = [];
+            }
+        }
     } catch (e) {
-
+        console.log('getPermissions', e);
     }
     return permissions;
 };
@@ -130,30 +184,21 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
             rst[index].children = [];
         });
     }
-    let user = getUser();
-    let sections = user.sections;
-    let section = '';
-    sections = JSON.parse(sections);
-    if (sections && sections instanceof Array && sections.length > 0) {
-        section = sections[0];
-    }
     // 项目级
     let projectList = [];
     // 单位工程级
     let sectionList = [];
     // 业主和管理员
-    let userMess = window.localStorage.getItem('QH_USER_DATA');
-    userMess = JSON.parse(userMess);
+    let user = getUser();
+    let section = user.section;
     let permission = false;
-    if (userMess.username === 'admin') {
+    if (user.username === 'admin') {
         permission = true;
     }
-    let groups = userMess.groups || [];
-    groups.map((group) => {
-        if (group.name.indexOf('业主') !== -1) {
-            permission = true;
-        }
-    });
+    let userRoles = user.roles || '';
+    if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
+        permission = true;
+    }
     if (rst instanceof Array && rst.length > 0) {
         rst.map(node => {
             if (permission) {
@@ -221,12 +266,7 @@ export const getAreaTreeData = async (getTreeNodeList, getThinClassList) => {
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {
     let user = getUser();
-    let sections = user.sections;
-    let section = '';
-    sections = JSON.parse(sections);
-    if (sections && sections instanceof Array && sections.length > 0) {
-        section = sections[0];
-    }
+    let section = user.section;
     // 将小班的code获取到，进行去重
     let uniqueSmallClass = [];
     // 进行数组去重的数组
@@ -244,18 +284,14 @@ export const getSmallClass = (smallClassList) => {
             let sectionNo = noArr[0] + '-' + noArr[1] + '-' + noArr[4];
 
             // 管理员可以查看所有数据，其他人员只能查看符合自己标段的数据
-            let userMess = window.localStorage.getItem('QH_USER_DATA');
-            userMess = JSON.parse(userMess);
             let permission = false;
-            if (userMess.username === 'admin') {
+            if (user.username === 'admin') {
                 permission = true;
             }
-            let groups = userMess.groups || [];
-            groups.map((group) => {
-                if (group.name.indexOf('业主') !== -1) {
-                    permission = true;
-                }
-            });
+            let userRoles = user.roles || '';
+            if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
+                permission = true;
+            }
             // permission为true说明是管理员或者业主
             if (permission) {
                 // console.log('wwwww', sectionNo);
@@ -348,8 +384,8 @@ export const getThinClass = (smallClass, list) => {
     return thinClassList;
 };
 // 根据登录用户的部门code获取所在公司
-export const getCompanyDataByOrgCode = async (orgCode, getOrgTreeByCode) => {
-    let orgData = await getOrgTreeByCode({code: orgCode}, {reverse: true});
+export const getCompanyDataByOrgCode = async (orgID, getParentOrgTreeByID) => {
+    let orgData = await getParentOrgTreeByID({id: orgID});
     let parent = {};
     let loopData = loopOrgCompany(orgData);
     parent = loopArrayCompany(loopData);
@@ -359,12 +395,11 @@ export const getCompanyDataByOrgCode = async (orgCode, getOrgTreeByCode) => {
 // 对获取的组织机构树进行遍历，返回数组
 export const loopOrgCompany = (orgData) => {
     try {
-        let extra_params = orgData && orgData.extra_params;
-        let companyStatus = extra_params && extra_params.companyStatus;
-        if (companyStatus && (companyStatus === '公司' || companyStatus.indexOf('单位') !== -1)) {
+        let OrgType = (orgData && orgData.OrgType) || '';
+        if (OrgType && OrgType.indexOf('单位') !== -1) {
             return orgData;
         } else if (orgData && orgData.children && orgData.children.length > 0 &&
-            companyStatus && (companyStatus === '项目' || companyStatus === '非公司')) {
+            OrgType && OrgType === '非公司') {
             return orgData.children.map((child) => {
                 return loopOrgCompany(child);
             });
@@ -390,14 +425,12 @@ export const loopArrayCompany = (loopData) => {
 // 判断用户是否为文书
 export const getUserIsDocument = () => {
     try {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        let groups = user.groups;
+        const user = getUser();
         let userIsDocument = false;
-        groups.map((group) => {
-            if (group.name.indexOf('文书') !== -1) {
-                userIsDocument = true;
-            }
-        });
+        let userRoles = user.roles || '';
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('文书') !== -1) {
+            userIsDocument = true;
+        }
         return userIsDocument;
     } catch (e) {
         console.log('getUserIsDocument', e);
@@ -422,34 +455,16 @@ export const getForestImgUrl = (data) => {
 // 判断用户是否为业主和管理员
 export const getUserIsManager = () => {
     try {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        const user = getUser();
         let permission = false;
         if (user.username === 'admin') {
             permission = true;
         }
-        let groups = user.groups || [];
-        groups.map((group) => {
-            if (group.name.indexOf('业主') !== -1) {
-                permission = true;
-            }
-        });
-        return permission;
-    } catch (e) {
-        console.log('getUserIsManager', e);
-    }
-};
-
-// 判断用户的标段信息
-export const getUserSection = () => {
-    try {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        console.log('user', user);
-        let sections = (user && user.account && user.account.sections) || [];
-        let section = '';
-        if (sections && sections instanceof Array && sections.length > 0) {
-            section = sections[0];
+        let userRoles = user.roles || '';
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
+            permission = true;
         }
-        return section;
+        return permission;
     } catch (e) {
         console.log('getUserIsManager', e);
     }
@@ -462,7 +477,8 @@ export const getDefaultProject = async () => {
         if (permission) {
             return DEFAULT_PROJECT;
         } else {
-            let section = await getUserSection();
+            const user = getUser();
+            let section = user.section;
             if (section) {
                 let sectionArr = section.split('-');
                 if (sectionArr && sectionArr instanceof Array && sectionArr.length > 0) {
@@ -476,80 +492,4 @@ export const getDefaultProject = async () => {
     } catch (e) {
         console.log('getUserIsManager', e);
     }
-};
-// 对苗圃基地和供应商按照行政区划进行划分
-export const addGroup = (childrenList, str) => {
-    const nursery_regionCode = JSON.parse(window.sessionStorage.getItem('nursery_regionCode'));
-    const supplier_regionCode = JSON.parse(window.sessionStorage.getItem('supplier_regionCode'));
-    const regionCode_name = JSON.parse(window.sessionStorage.getItem('regionCode_name'));
-    if (str === '供应商') {
-        childrenList.map(item => {
-            item.RegionCode = supplier_regionCode[item.code];
-            if (regionCode_name[item.RegionCode]) {
-                const regionNameArr = regionCode_name[item.RegionCode].split(',');
-                item.province = regionNameArr[1];
-                item.city = regionNameArr[2];
-                item.county = regionNameArr[3];
-            }
-        });
-    } else {
-        childrenList.map(item => {
-            item.RegionCode = nursery_regionCode[item.code];
-            if (regionCode_name[item.RegionCode]) {
-                const regionNameArr = regionCode_name[item.RegionCode].split(',');
-                item.province = regionNameArr[1];
-                item.city = regionNameArr[2];
-                item.county = regionNameArr[3];
-            }
-        });
-    }
-    let provinceArr = [];
-    childrenList.map(item => {
-        if (!provinceArr.includes(item.province)) {
-            provinceArr.push(item.province);
-        }
-    });
-    let newChildren = [];
-    provinceArr.map((item) => {
-        let cityArr = [];
-        childrenList.map(row => {
-            if (item === row.province && !cityArr.includes(row.city)) {
-                cityArr.push(row.city);
-            }
-        });
-        let provinceChildren = [];
-        cityArr.map((row) => {
-            let cityChildren = [];
-            let countyArr = [];
-            childrenList.map(record => {
-                if (row === record.city && !countyArr.includes(record.county)) {
-                    countyArr.push(record.county);
-                }
-            });
-            countyArr.map(record => {
-                let countyChildren = [];
-                childrenList.map(ite => {
-                    if (row === ite.city && record === ite.county) {
-                        countyChildren.push(ite);
-                    }
-                });
-                cityChildren.push({
-                    name: record || '其他',
-                    code: str + item + row + record,
-                    children: countyChildren
-                });
-            });
-            provinceChildren.push({
-                name: row || '其他',
-                code: str + item + row,
-                children: cityChildren
-            });
-        });
-        newChildren.push({
-            name: item || '其他',
-            code: str + item,
-            children: provinceChildren
-        });
-    });
-    return newChildren;
 };

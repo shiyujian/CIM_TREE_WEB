@@ -11,7 +11,7 @@ import {
     genPopUpContent
 } from '../../auth';
 import {
-    FOREST_GIS_TREETYPE_API
+    FOREST_GIS_API
 } from '_platform/api';
 import './TreePipePage.less';
 
@@ -172,7 +172,7 @@ export default class TreePipePage extends Component {
         } = this.props;
         try {
             this.tileLayerTreeFilter = L.tileLayer(
-                FOREST_GIS_TREETYPE_API +
+                FOREST_GIS_API +
                 '/geoserver/gwc/service/wmts?layer=xatree%3Aland&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
@@ -194,7 +194,7 @@ export default class TreePipePage extends Component {
         } = this.props;
         try {
             this.tileLayerTreeThinClass = L.tileLayer(
-                FOREST_GIS_TREETYPE_API +
+                FOREST_GIS_API +
                 '/geoserver/gwc/service/wmts?layer=xatree%3Athinclass&style=&tilematrixset=My_EPSG%3A43261&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
@@ -216,7 +216,7 @@ export default class TreePipePage extends Component {
         } = this.props;
         try {
             this.tileTreePipeBasic = L.tileLayer(
-                FOREST_GIS_TREETYPE_API +
+                FOREST_GIS_API +
                 '/geoserver/gwc/service/wmts?layer=xatree%3Apipe&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
@@ -238,7 +238,7 @@ export default class TreePipePage extends Component {
         } = this.props;
         try {
             this.tileTreePipeNodeBasic = L.tileLayer(
-                FOREST_GIS_TREETYPE_API +
+                FOREST_GIS_API +
                 '/geoserver/gwc/service/wmts?layer=xatree%3Apipenode&style=&tilematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix=EPSG%3A4326%3A{z}&TileCol={x}&TileRow={y}',
                 {
                     opacity: 1.0,
@@ -862,25 +862,25 @@ export default class TreePipePage extends Component {
                     contentMessage = {
                         type: 'treePipe',
                         typeName: '管线',
-                        CreateTime: content.CreateTime,
-                        DN: content.DN,
-                        Depth: content.Depth,
-                        Material: content.Material,
-                        Altitude: content.Altitude,
-                        Section: content.Section,
-                        ThinClass: content.ThinClass
+                        CreateTime: (content && content.CreateTime) || '',
+                        DN: (content && content.DN) || '',
+                        Depth: (content && content.Depth) || '',
+                        Material: (content && content.Material) || '',
+                        Altitude: (content && content.Altitude) || '',
+                        Section: (content && content.Section) || '',
+                        ThinClass: (content && content.ThinClass) || ''
                     };
                 } else if (treePipeNode) {
                     contentMessage = {
                         type: 'treePipeNode',
                         typeName: '管点',
-                        CreateTime: content.CreateTime,
-                        PipeType: content.PipeType,
-                        Depth: content.Depth,
-                        Altitude: content.Altitude,
-                        Model: content.Model,
-                        Section: content.Section,
-                        ThinClass: content.ThinClass
+                        CreateTime: (content && content.CreateTime) || '',
+                        PipeType: (content && content.PipeType) || '',
+                        Depth: (content && content.Depth) || '',
+                        Altitude: (content && content.Altitude) || '',
+                        Model: (content && content.Model) || '',
+                        Section: (content && content.Section) || '',
+                        ThinClass: (content && content.ThinClass) || ''
                     };
                 }
                 let treePipePopLayer = L.popup()

@@ -20,12 +20,10 @@ export default class PersonTree extends Component {
             actions: { getCuringGroup }
         } = this.props;
         let user = getUser();
-        let sections = user.sections;
-        sections = JSON.parse(sections);
-        if (!(sections && sections instanceof Array && sections.length > 0)) {
+        let section = user.section;
+        if (!section) {
             return;
         }
-        let section = sections[0];
         let taskTeams = await getCuringGroup({}, {section: section});
         console.log('taskTeams', taskTeams);
         if (taskTeams && taskTeams instanceof Array && taskTeams.length > 0) {

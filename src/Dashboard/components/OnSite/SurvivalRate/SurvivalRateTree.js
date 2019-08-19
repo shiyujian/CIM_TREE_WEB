@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tree, Spin } from 'antd';
 import L from 'leaflet';
-import { FOREST_GIS_TREETYPE_API, FOREST_GIS_API } from '_platform/api';
+import { FOREST_GIS_API } from '_platform/api';
 import './SurvivalRateTree.less';
 // 存活率图片
 import hundredImg from '../../SurvivalRateImg/90~100.png';
@@ -43,37 +43,37 @@ export default class SurvivalRateTree extends Component {
     survivalRateOptions = [
         {
             id: 'survivalRateHundred',
-            label: '90~100',
+            label: '90%~100%',
             img: hundredImg
         },
         {
             id: 'survivalRateNinety',
-            label: '80~90',
+            label: '80%~90%',
             img: ninetyImg
         },
         {
             id: 'survivalRateEighty',
-            label: '70~80',
+            label: '70%~80%',
             img: eightyImg
         },
         {
             id: 'survivalRateSeventy',
-            label: '60~70',
+            label: '60%~70%',
             img: seventyImg
         },
         {
             id: 'survivalRateSixty',
-            label: '50~60',
+            label: '50%~60%',
             img: sixtyImg
         },
         {
             id: 'survivalRateFifty',
-            label: '40~50',
+            label: '40%~50%',
             img: fiftyImg
         },
         {
             id: 'survivalRateFourty',
-            label: '0~40',
+            label: '0%~40%',
             img: foutyImg
         }
     ]
@@ -333,11 +333,11 @@ export default class SurvivalRateTree extends Component {
             let url = '';
             // 初次进入成活率模块，没有对标段数据进行处理，选择了范围数据直接对图层进行更改
             if (switchSurvivalRateFirst) {
-                url = FOREST_GIS_TREETYPE_API +
+                url = FOREST_GIS_API +
                     `/geoserver/xatree/wms?cql_filter=${survivalRateRateData}`;
             } else if (survivalRateRateData && survivalRateSectionData) {
                 // 在点击过标段数据之后，只有两种状态都存在，才能进行搜索
-                url = FOREST_GIS_TREETYPE_API +
+                url = FOREST_GIS_API +
                     `/geoserver/xatree/wms?cql_filter=Section%20IN%20(${survivalRateSectionData})%20and%20${survivalRateRateData}`;
             }
             if (url) {
@@ -445,7 +445,7 @@ export default class SurvivalRateTree extends Component {
                         smallClassName: areaData.SmallName ? areaData.SmallName : '',
                         thinClassName: areaData.ThinName ? areaData.ThinName : '',
                         treetype: properties.treetype,
-                        SurvivalRate: properties.SurvivalRate,
+                        SurvivalRate: `${(properties && properties.SurvivalRate) || 0}%`,
                         type: 'survivalRate'
                     },
                     type: 'survivalRate'

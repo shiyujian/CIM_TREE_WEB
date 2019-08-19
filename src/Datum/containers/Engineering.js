@@ -50,7 +50,7 @@ export default class Engineering extends Component {
             currentSection: '',
             currentSectionName: ''
         };
-        this.orgCode = '';
+        this.orgID = '';
         this.user = '';
     }
 
@@ -102,7 +102,7 @@ export default class Engineering extends Component {
                 getTree,
                 searchEnginVisible,
                 setkeycode,
-                getOrgTreeByCode,
+                getParentOrgTreeByID,
                 getTreeNodeList
             }
         } = this.props;
@@ -112,12 +112,11 @@ export default class Engineering extends Component {
             }
             await this.getSection();
             this.setState({ loading: true });
-            this.user = localStorage.getItem('QH_USER_DATA');
-            this.user = JSON.parse(this.user);
+            this.user = getUser();
             if (this.user.username !== 'admin') {
-                let orgCode = this.user.account.org_code;
-                let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                this.orgCode = parent.code;
+                let orgID = this.user.org;
+                let parent = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                this.orgID = (parent && parent.ID) || '';
             }
             await setkeycode('');
             await searchEnginVisible(false);
@@ -135,13 +134,11 @@ export default class Engineering extends Component {
         } = this.props;
         let sectionData = (tree && tree.bigTreeList) || [];
         let user = getUser();
-        let sections = user.sections;
+        let section = user.section;
         let currentSectionName = '';
         let projectName = '';
 
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
+        if (section) {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目
@@ -178,9 +175,9 @@ export default class Engineering extends Component {
         } = this.props;
         if (e.selected) {
             let folder = JSON.parse(value);
-            let org_code = folder.extra_params.orgCode;
+            let orgID = folder.Org;
             let code = folder.code;
-            if ((this.user && this.user.username === 'admin') || this.orgCode === org_code) {
+            if ((this.user && this.user.username === 'admin') || this.orgID === orgID) {
                 searchEnginVisible(false);
                 setkeycode(value);
                 this.doc_type = e.node.props.title;

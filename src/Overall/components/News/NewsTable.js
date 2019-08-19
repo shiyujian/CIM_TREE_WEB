@@ -17,7 +17,6 @@ import NewsAddModal from './NewsAddModal';
 import NewsEditModal from './NewsEditModal';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import { STATIC_PREVIEW_API, STATIC_DOWNLOAD_API } from '_platform/api';
 import './index.less';
 moment.locale('zh-cn');
 
@@ -29,211 +28,42 @@ class NewsTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            content: '',
             detailVisible: false,
-            detailTitle: '',
-            container: null,
+            newsTitle: '', // 新闻标题
+            newsContent: '', // 新闻内容
+            newsThumbnail: '', // 新闻封面
+            newsSource: '', // 新闻来源
+            fileList: [], // 附件列表
             newsTabValue: 'publish',
             editNewsVisible: false,
             addNewsVisible: false,
-            newsDetail: '',
+            newsID: '',
             viewCoverVisible: false,
             coverArr: []
         };
     }
-    columns = [
-        {
-            title: '新闻查询ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: '10%'
-        },
-        {
-            title: '名称',
-            dataIndex: 'title',
-            key: 'title',
-            width: '40%'
-        },
-        {
-            title: '发布单位',
-            dataIndex: 'abstract',
-            key: 'abstract',
-            width: '10%',
-            render: (text, record) => {
-                if (record.abstract) {
-                    return record.abstract;
-                } else {
-                    if (record.pub_unit && record.pub_unit.name) {
-                        return record.pub_unit.name;
-                    } else {
-                        return '/';
-                    }
-                }
-            }
-        },
-        {
-            title: '创建时间',
-            key: 'pub_time',
-            width: '15%',
-            render: (text, record) => {
-                if (record.pub_time) {
-                    return moment(record.pub_time)
-                        .utc()
-                        .format('YYYY-MM-DD HH:mm:ss');
-                } else {
-                    return '/';
-                }
-            }
-        },
-        {
-            title: '封面',
-            dataIndex: 'cover',
-            key: 'cover',
-            width: '10%',
-            render: (text, record, index) => {
-                return (<a
-                    onClick={this.handleViewCover.bind(this, text)}
-                >
-                    查看
-                </a>);
-            }
-        },
-        {
-            title: '操作',
-            width: '15%',
-            render: record => {
-                return '/';
-                return (
-                    <span>
-                        <a onClick={this.handleNewsView.bind(this, record)}>
-                            查看
-                        </a>
-                        <Divider type='vertical' />
-                        {/* <a onClick={this.handleNewsEdit.bind(this, record)}>
-                            修改
-                        </a>
-                        <Divider type='vertical' /> */}
-                        <Popconfirm
-                            title='确定删除吗?'
-                            onConfirm={this.handleNewsDelete.bind(this, record)}
-                            okText='确定'
-                            cancelText='取消'
-                        >
-                            <a>删除</a>
-                        </Popconfirm>
-                    </span>
-                );
-            }
-        }
-    ];
-    draftColumns = [
-        {
-            title: '暂存新闻ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: '10%'
-        },
-        {
-            title: '名称',
-            dataIndex: 'title',
-            key: 'title',
-            width: '40%'
-        },
-        {
-            title: '发布单位',
-            dataIndex: 'abstract',
-            key: 'abstract',
-            width: '10%',
-            render: (text, record) => {
-                if (record.abstract) {
-                    return record.abstract;
-                } else {
-                    if (record.pub_unit && record.pub_unit.name) {
-                        return record.pub_unit.name;
-                    } else {
-                        return '/';
-                    }
-                }
-            }
-        },
-        {
-            title: '创建时间',
-            dataIndex: 'pub_time',
-            key: 'pub_time',
-            width: '15%',
-            render: pub_time => {
-                return moment(pub_time).utc().format('YYYY-MM-DD HH:mm:ss');
-            }
-        },
-        {
-            title: '封面',
-            dataIndex: 'cover',
-            key: 'cover',
-            width: '10%',
-            render: (text, record, index) => {
-                return (<a
-                    onClick={this.handleViewCover.bind(this, text)}
-                >
-                    查看
-                </a>);
-            }
-        },
-        {
-            title: '操作',
-            width: '15%',
-            render: record => {
-                return '/';
-                return (
-                    <span>
-                        <a onClick={this.handleNewsView.bind(this, record)}>
-                            查看
-                        </a>
-                        <Divider type='vertical' />
-                        <a
-                            onClick={this.handleNewsPublish.bind(this, record)}
-                        >
-                            发布
-                        </a>
-                        <Divider type='vertical' />
-                        <a onClick={this.handleNewsEdit.bind(this, record)}>
-                            修改
-                        </a>
-                        <Divider type='vertical' />
-                        <Popconfirm
-                            title='确定删除吗?'
-                            onConfirm={this.handleNewsDelete.bind(this, record)}
-                            okText='确定'
-                            cancelText='取消'
-                        >
-                            <a>删除</a>
-                        </Popconfirm>
-                    </span>
-                );
-            }
-        }
-    ];
 
     componentDidMount () {
         const {
-            actions: { getNewsList, getDraftNewsList }
+            actions: { getNewsListNew }
         } = this.props;
-        // 获取发布新闻
-        getNewsList({}, {
-            tag: '新闻',
-            is_draft: false
-        });
-        // 获取暂存新闻
-        getDraftNewsList({}, {
-            tag: '新闻',
-            is_draft: true
+        // 获取新闻
+        getNewsListNew({}, {
+            type: '',
+            name: '',
+            ishot: '',
+            sdate: '',
+            edate: '',
+            page: '',
+            size: ''
         });
     }
     // 查看封面
-    handleViewCover = async (cover) => {
+    handleViewCover = async (imgUrl) => {
         let coverArr = [];
-        if (cover && cover.a_file) {
+        if (imgUrl) {
             coverArr.push(
-                <img style={{ width: '490px' }} src={STATIC_PREVIEW_API + cover.a_file} alt='图片' />
+                <img style={{ width: '490px' }} src={imgUrl} alt='图片' />
             );
         }
         this.setState({
@@ -248,74 +78,64 @@ class NewsTable extends Component {
         });
     }
     // 查看新闻
-    handleNewsView = async (record) => {
-        this.setState({
-            detailVisible: true,
-            container: record.raw,
-            detailTitle: record.title,
-            source: record.source,
-            newsDetail: record
+    handleNewsView (ID) {
+        console.log(ID, '查看');
+        const { getNewsDetails } = this.props.actions;
+        getNewsDetails({ID}, {}).then(rep => {
+            console.log(rep, '详情信息');
+            this.setState({
+                detailVisible: true,
+                newsTitle: rep.Title,
+                newsSource: rep.Source,
+                newsThumbnail: rep.Thumbnail,
+                newsContent: rep.Content,
+                fileList: rep.Files
+            });
         });
     }
     // 关闭新闻预览弹窗
     handleCancel () {
         this.setState({
             detailVisible: false,
-            container: null,
-            detailTitle: '',
-            source: '',
-            newsDetail: ''
+            newsContent: '',
+            newsTitle: '',
+            newsSource: ''
         });
     }
     // 编辑新闻
-    handleNewsEdit = async (record) => {
+    handleNewsEdit = async (ID) => {
+        console.log(ID, '编辑');
         this.setState({
             editNewsVisible: true,
-            newsDetail: record
+            newsID: ID
         });
     }
     handleNewsEditModalCancel = async () => {
         this.setState({
-            editNewsVisible: false,
-            newsDetail: ''
+            editNewsVisible: false
         });
     }
     // 删除新闻
-    handleNewsDelete = async (record) => {
+    handleNewsDelete = async (ID) => {
         const {
             actions: {
-                deleteData,
-                getNewsList,
-                getDraftNewsList
+                deleteNews
             }
         } = this.props;
-        const {
-            newsTabValue
-        } = this.state;
-        let data = await deleteData({ pk: record.id });
-        console.log('data', data);
-        if (data) {
-            Notification.error({
-                message: '删除新闻失败！',
-                duration: 3
-            });
-        } else {
-            Notification.success({
-                message: '删除新闻成功！',
-                duration: 3
-            });
-            if (newsTabValue === 'publish') {
-                await getNewsList({}, {
-                    tag: '新闻',
-                    is_draft: false
+        deleteNews({ID}, {}).then(rep => {
+            if (rep.code === 1) {
+                Notification.success({
+                    message: '删除新闻成功！',
+                    duration: 3
                 });
+                this.queryPublish();
             } else {
-                await getDraftNewsList({}, {
-                    tag: '新闻',
-                    is_draft: true
+                Notification.error({
+                    message: '删除新闻失败！',
+                    duration: 3
                 });
             }
-        }
+        });
     }
     // 发布新闻
     handleNewsPublish = async (record) => {
@@ -358,59 +178,38 @@ class NewsTable extends Component {
             newsTabValue
         });
     }
-    // 发布的新闻搜索
+    // 发布的新闻查询
     queryPublish () {
         const {
-            actions: { getNewsList }
+            actions: { getNewsListNew }
         } = this.props;
-        this.props.form.validateFields(async (err, values) => {
-            console.log('values', values);
-            console.log('err', err);
-            await getNewsList({}, {
-                tag: '新闻',
-                is_draft: false,
-                pub_time_begin: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
-                    ? moment(values.worktime[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktime && values.worktime instanceof Array && values.worktime.length > 0
-                    ? moment(values.worktime[1]).add(1, 'days').format('YYYY-MM-DD') : '',
-                title: values.theme || ''
-            });
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                console.log(123, values);
+                let sdate = '', edate = '';
+                if (values.worktime && values.worktime.length) {
+                    sdate = moment(values.worktime[0]).format('YYYY-MM-DD 00:00:00');
+                    edate = moment(values.worktime[1]).format('YYYY-MM-DD 23:59:59');
+                }
+                getNewsListNew({}, {
+                    type: '',
+                    name: values.theme || '',
+                    ishot: '',
+                    sdate,
+                    edate,
+                    page: '',
+                    size: ''
+                });
+            }
         });
     }
     // 清除发布新闻的搜索条件
     clearPublish () {
         this.props.form.setFieldsValue({
-            theme: undefined,
-            worktime: undefined
+            theme: '',
+            worktime: ''
         });
         this.queryPublish();
-    }
-    // 暂存的新闻进行搜索
-    queryTemporary () {
-        const {
-            actions: { getDraftNewsList }
-        } = this.props;
-        this.props.form.validateFields(async (err, values) => {
-            console.log('values', values);
-            console.log('err', err);
-            await getDraftNewsList({}, {
-                tag: '新闻',
-                is_draft: true,
-                pub_time_begin: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
-                    ? moment(values.worktimes[0]).format('YYYY-MM-DD') : '',
-                pub_time_end: values.worktimes && values.worktimes instanceof Array && values.worktimes.length > 0
-                    ? moment(values.worktimes[1]).add(1, 'days').format('YYYY-MM-DD') : '',
-                title: values.title1 || ''
-            });
-        });
-    }
-    // 清除暂存的新闻的搜索条件
-    clearTemporary () {
-        this.props.form.setFieldsValue({
-            title1: undefined,
-            worktimes: undefined
-        });
-        this.queryTemporary();
     }
     // 发布新闻
     handlePublishNews () {
@@ -433,24 +232,19 @@ class NewsTable extends Component {
             newsTabValue,
             editNewsVisible,
             addNewsVisible,
-            source,
+            newsSource,
             detailVisible,
-            container,
-            detailTitle,
+            newsThumbnail,
+            newsContent,
+            fileList,
+            newsTitle,
             viewCoverVisible,
-            coverArr,
-            newsDetail
+            coverArr
         } = this.state;
         const formItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
-        let annexFileList = [];
-        if (newsDetail.attachment && newsDetail.attachment.fileList &&
-            newsDetail.attachment.fileList instanceof Array &&
-            newsDetail.attachment.fileList.length > 0) {
-            annexFileList = newsDetail.attachment.fileList;
-        }
         return (
             <Row>
                 {
@@ -470,50 +264,34 @@ class NewsTable extends Component {
                         /> : ''
                 }
                 <Modal
-                    title={detailTitle}
+                    title={newsTitle}
                     width='800px'
                     visible={detailVisible}
                     onCancel={this.handleCancel.bind(this)}
                     footer={null}
                 >
                     <div>
-                        <h1 style={{ textAlign: 'center' }}>{detailTitle}</h1>
-                        {
-                            source && source.name
-                                ? <p>{`来源 ：${source.name}`}</p> : (
-                                    <p>{`来源 ：暂无`}</p>
-                                )
-                        }
-                        {
-                            newsDetail && newsDetail.cover && newsDetail.cover.a_file
-                                ? (
-                                    <p>
-                                        封面 ：<a href={STATIC_PREVIEW_API + newsDetail.cover.a_file}
-                                            target='_blank'>
-                                            {newsDetail.cover.name}
-                                        </a>
-                                    </p>
-                                ) : <p>{`封面 ：暂无`}</p>
-                        }
-                        {
-                            annexFileList.map((file) => {
-                                if (file && file.response && file.response.download_url) {
-                                    return (
-                                        <p>
-                                            附件 ：<a href={STATIC_DOWNLOAD_API + file.response.download_url.replace(/^http(s)?:\/\/[\w\-\.:]+/, '')}>
-                                                {file.name}
-                                            </a>
-                                        </p>
-                                    );
-                                } else {
-                                    return (<p>{`附件 ：暂无`}</p>);
-                                }
-                            })
-                        }
+                        <h1 style={{ textAlign: 'center' }}>{newsTitle}</h1>
+                        <p>来源 ：{newsSource ? <span>{newsSource}</span> : '未知'}</p>
+                        <p>
+                            封面 ：{ newsThumbnail ? <a href={newsThumbnail}
+                                target='_blank'>
+                                微信图片.jpg
+                            </a> : '暂无'}
+                        </p>
+                        <p>
+                            {fileList.length ? fileList.map(item => {
+                                return (<p>
+                                    附件 ：<a href={item.FilePath}
+                                        target='_blank'
+                                    >{item.FileName}</a>
+                                </p>);
+                            }) : (<p>{`附件 ：暂无`}</p>)}
+                        </p>
                         <div
                             style={{ maxHeight: '800px', overflow: 'auto' }}
                             dangerouslySetInnerHTML={{
-                                __html: container
+                                __html: newsContent
                             }}
                         />
                     </div>
@@ -578,7 +356,7 @@ class NewsTable extends Component {
                                         <Col span={10}>
                                             <FormItem
                                                 {...formItemLayout}
-                                                label='发布日期'
+                                                label='发布时间'
                                             >
                                                 {getFieldDecorator('worktime', {
                                                     rules: [
@@ -639,98 +417,7 @@ class NewsTable extends Component {
                                 columns={this.columns}
                                 className='foresttables'
                                 bordered
-                                rowKey='id'
-                            />
-                        </TabPane>
-                        <TabPane tab='暂存的新闻' key='temporary'>
-                            <Row>
-                                <Col span={18}>
-                                    <Row>
-                                        <Col span={8}>
-                                            <FormItem
-                                                {...formItemLayout}
-                                                label='名称'
-                                            >
-                                                {getFieldDecorator('title1', {
-                                                    rules: [
-                                                        {
-                                                            required: false,
-                                                            message:
-                                                                '请输入名称'
-                                                        }
-                                                    ]
-                                                })(
-                                                    <Input placeholder='请输入名称' />
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={10}>
-                                            <FormItem
-                                                {...formItemLayout}
-                                                label='修改日期'
-                                            >
-                                                {getFieldDecorator(
-                                                    'worktimes',
-                                                    {
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请选择日期'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(
-                                                    <RangePicker
-                                                        style={{
-                                                            verticalAlign:
-                                                                'middle',
-                                                            width: '100%'
-                                                        }}
-                                                        format={
-                                                            'YYYY/MM/DD'
-                                                        }
-                                                    />
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                                <Col span={2} offset={1}>
-                                    <FormItem>
-                                        {getFieldDecorator('search', {
-                                            rules: [{ required: false, message: '请选择查询条件' }]
-                                        })(
-                                            <Button
-                                                icon='search'
-                                                onClick={this.queryTemporary.bind(this)}
-                                            >
-                                                查询
-                                            </Button>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                                <Col span={2}>
-                                    <FormItem>
-                                        {getFieldDecorator('reload', {
-                                            rules: [{ required: false, message: '请选择查询条件' }]
-                                        })(
-                                            <Button
-                                                icon='reload'
-                                                onClick={this.clearTemporary.bind(this)}
-                                            >
-                                            清除
-                                            </Button>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                            <Table
-                                dataSource={draftNewsLis}
-                                columns={this.draftColumns}
-                                className='foresttables'
-                                bordered
-                                rowKey='id'
+                                rowKey='ID'
                             />
                         </TabPane>
                     </Tabs>
@@ -738,5 +425,76 @@ class NewsTable extends Component {
             </Row>
         );
     }
+    columns = [
+        {
+            title: '新闻查询ID',
+            dataIndex: 'ID',
+            key: 'ID',
+            width: '10%'
+        },
+        {
+            title: '名称',
+            dataIndex: 'Title',
+            key: 'Title',
+            width: '40%'
+        },
+        {
+            title: '发布时间',
+            dataIndex: 'Publish_Time',
+            key: 'Publish_Time',
+            width: '15%',
+            render: (text, record) => {
+                let date = '/';
+                if (text) {
+                    date = moment(text).format('YYYY-MM-DD HH:mm:ss');
+                }
+                return date;
+            }
+        },
+        {
+            title: '封面',
+            dataIndex: 'Thumbnail',
+            key: 'Thumbnail',
+            width: '10%',
+            render: (text, record) => {
+                let node = '/';
+                if (text) {
+                    node = <a
+                        onClick={this.handleViewCover.bind(this, text)}
+                    >
+                        查看
+                    </a>;
+                }
+                return node;
+            }
+        },
+        {
+            title: '操作',
+            width: '15%',
+            render: (text, record) => {
+                return '/';
+                return (
+                    <span>
+                        <a onClick={this.handleNewsView.bind(this, record.ID)}>
+                            查看
+                        </a>
+                        <Divider type='vertical' />
+                        <a onClick={this.handleNewsEdit.bind(this, record.ID)}>
+                            修改
+                        </a>
+                        <Divider type='vertical' />
+                        <Popconfirm
+                            title='确定删除吗?'
+                            onConfirm={this.handleNewsDelete.bind(this, record.ID)}
+                            okText='确定'
+                            cancelText='取消'
+                        >
+                            <a>删除</a>
+                        </Popconfirm>
+                    </span>
+                );
+            }
+        }
+    ];
 }
 export default Form.create()(NewsTable);

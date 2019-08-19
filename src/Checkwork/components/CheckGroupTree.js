@@ -24,7 +24,7 @@ export default class CheckGroupTree extends Component {
                 return (
                     <TreeNode
                         key={p.id}
-                        title={p.name}
+                        title={p.Name}
                     >
                         {p.children &&
                             p.children.map(m => {
@@ -38,7 +38,7 @@ export default class CheckGroupTree extends Component {
                 return (
                     <TreeNode
                         key={p.id}
-                        title={p.name}
+                        title={p.Name}
                     />
                 );
             }
@@ -57,7 +57,6 @@ export default class CheckGroupTree extends Component {
                 contents.push(element);
             }
         }
-        console.log('groupSelectKey', groupSelectKey);
         return (
             <div>
                 <Tree

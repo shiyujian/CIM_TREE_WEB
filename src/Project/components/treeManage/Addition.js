@@ -323,7 +323,11 @@ class Addition extends Component {
             // 匹配中文，英文字母和数字及下划线
             let reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
             if (reg.test(value)) {
-                callback();
+                if (value.length > 10) {
+                    callback(`请输入10个字以下`);
+                } else {
+                    callback();
+                }
             } else {
                 callback(`请输入正确的树种名称`);
             }
@@ -337,7 +341,11 @@ class Addition extends Component {
             // 匹配中文，英文字母和数字及下划线
             let reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
             if (reg.test(value)) {
-                callback();
+                if (value.length > 10) {
+                    callback(`请输入10个字以下`);
+                } else {
+                    callback();
+                }
             } else {
                 callback(`请输入正确的科属信息`);
             }
@@ -348,12 +356,10 @@ class Addition extends Component {
     // 形态特征校验
     checkTreeMorphologicalCharacter = async (rule, value, callback) => {
         if (value) {
-            // 匹配中文，英文字母和数字及下划线
-            let reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
-            if (reg.test(value)) {
-                callback();
+            if (value.length > 200) {
+                callback(`请输入200个字以下`);
             } else {
-                callback(`请输入正确的形态特征`);
+                callback();
             }
         } else {
             callback();
@@ -362,12 +368,10 @@ class Addition extends Component {
     // 习性校验
     checkTreeHabit = async (rule, value, callback) => {
         if (value) {
-            // 匹配中文，英文字母和数字及下划线
-            let reg = /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/;
-            if (reg.test(value)) {
-                callback();
+            if (value.length > 200) {
+                callback(`请输入200个字以下`);
             } else {
-                callback(`请输入正确的习性`);
+                callback();
             }
         } else {
             callback();
@@ -408,20 +412,20 @@ class Addition extends Component {
                                     <Col span={24}>
                                         <FormItem
                                             {...Addition.layout}
-                                            label='名称:'
+                                            label='树种名称:'
                                         >
                                             {getFieldDecorator('TreeName', {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入树种名称'
+                                                        message: '请输入树种名称(10个字以下)'
                                                     },
                                                     {
                                                         validator: this.checkTreeName
                                                     }
                                                 ]
                                             })(
-                                                <Input placeholder='请输入树种名称' />
+                                                <Input placeholder='请输入树种名称(10个字以下)' />
                                             )}
                                         </FormItem>
                                     </Col>
@@ -439,10 +443,14 @@ class Addition extends Component {
                                                     }
                                                 ]
                                             })(
-                                                <Select>
+                                                <Select placeholder='请选择树种类别'>
                                                     {
                                                         TREETYPENO.map((type) => {
-                                                            return <Option value={type.id} key={type.name}>{type.name}</Option>;
+                                                            return <Option
+                                                                value={type.id}
+                                                                key={type.name}>
+                                                                {type.name}
+                                                            </Option>;
                                                         })
                                                     }
                                                 </Select>
@@ -459,14 +467,14 @@ class Addition extends Component {
                                                     {
                                                         required: true,
                                                         message:
-                                                            '请输入树种科属'
+                                                            '请输入树种科属(10个字以下)'
                                                     },
                                                     {
                                                         validator: this.checkTreeSpecies
                                                     }
                                                 ]
                                             })(
-                                                <Input placeholder='请输入树种科属' />
+                                                <Input placeholder='请输入树种科属(10个字以下)' />
                                             )}
                                         </FormItem>
                                     </Col>
@@ -479,14 +487,14 @@ class Addition extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入树种形态特征'
+                                                        message: '请输入树种形态特征(200个字以下)'
                                                     },
                                                     {
                                                         validator: this.checkTreeMorphologicalCharacter
                                                     }
                                                 ]
                                             })(
-                                                <Input placeholder='请输入树种形态特征' />
+                                                <Input placeholder='请输入树种形态特征(200个字以下)' />
                                             )}
                                         </FormItem>
                                     </Col>
@@ -499,14 +507,14 @@ class Addition extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入树种习性'
+                                                        message: '请输入树种习性(200个字以下)'
                                                     },
                                                     {
                                                         validator: this.checkTreeHabit
                                                     }
                                                 ]
                                             })(
-                                                <Input placeholder='请输入树种习性' />
+                                                <Input placeholder='请输入树种习性(200个字以下)' />
                                             )}
                                         </FormItem>
                                     </Col>
@@ -523,10 +531,18 @@ class Addition extends Component {
                                                     }
                                                 ]
                                             })(
-                                                <Select mode='multiple' disabled={!paramRequired} onChange={this.handleNurseryParamChange.bind(this)}>
+                                                <Select
+                                                    placeholder='请选择苗圃测量项'
+                                                    mode='multiple'
+                                                    disabled={!paramRequired}
+                                                    onChange={this.handleNurseryParamChange.bind(this)}>
                                                     {
                                                         NURSERYPARAM.map((param) => {
-                                                            return <Option value={param} key={param}>{param}</Option>;
+                                                            return <Option
+                                                                value={param}
+                                                                key={param}>
+                                                                {param}
+                                                            </Option>;
                                                         })
                                                     }
                                                 </Select>
@@ -546,10 +562,17 @@ class Addition extends Component {
                                                     }
                                                 ]
                                             })(
-                                                <Select mode='multiple' onChange={this.handleTreeParamChange.bind(this)}>
+                                                <Select
+                                                    placeholder='请选择现场测量项'
+                                                    mode='multiple'
+                                                    onChange={this.handleTreeParamChange.bind(this)}>
                                                     {
                                                         TREEPARAM.map((param) => {
-                                                            return <Option value={param} key={param}>{param}</Option>;
+                                                            return <Option
+                                                                value={param}
+                                                                key={param}>
+                                                                {param}
+                                                            </Option>;
                                                         })
                                                     }
                                                 </Select>

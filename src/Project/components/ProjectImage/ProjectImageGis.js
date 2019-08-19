@@ -64,6 +64,7 @@ export default class ProjectImageGis extends Component {
     initMap () {
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
+        mapInitialization.attributionControl = false;
         this.map = L.map('mapid', mapInitialization);
 
         this.imgTileLayer = L.tileLayer(TILEURLS[1], {
@@ -92,6 +93,7 @@ export default class ProjectImageGis extends Component {
     initMap2 () {
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
+        mapInitialization.attributionControl = false;
         this.map2 = L.map('mapid2', mapInitialization);
 
         this.imgTileLayer = L.tileLayer(TILEURLS[1], {
@@ -220,12 +222,10 @@ export default class ProjectImageGis extends Component {
     // 切换
     toggleTileLayer (e) {
         const index = e.target.value;
-        console.log('index', index);
         this.tileLayer.setUrl(this.tileUrls[index]);
     }
     toggleTileLayer2 (e) {
         const index = e.target.value;
-        console.log('index', index);
         this.tileTreeLayerBasic.setUrl(this.tileUrls[index]);
     }
 }

@@ -1,17 +1,17 @@
 import React from 'react';
 
 export const Main = ({children}) => {
-	return (
-		<div style={{
-			// overflow: 'hidden'
-		}}>
-			<div style={{
-				// overflow: 'hidden',
-			}}>
-				{children}
-			</div>
-		</div>
-	);
+    return (
+        <div style={{
+            // overflow: 'hidden'
+        }}>
+            <div style={{
+                // overflow: 'hidden',
+            }}>
+                {children}
+            </div>
+        </div>
+    );
 };
 
 Main.propTypes = {};

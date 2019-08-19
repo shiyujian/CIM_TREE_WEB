@@ -23,10 +23,14 @@ export default handleActions(
             return [];
         },
         [switchFullScreenState]: (state, { payload }) => {
-            return {
-                ...state,
-                fullScreenState: payload
-            };
+            if (payload === 'fullScreen') {
+                return {
+                    ...state,
+                    fullScreenState: payload
+                };
+            } else {
+                return [];
+            }
         }
     },
     []

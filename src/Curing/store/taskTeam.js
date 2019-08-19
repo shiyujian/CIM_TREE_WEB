@@ -2,25 +2,10 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import {
-    SERVICE_API,
     FOREST_API
 } from '_platform/api';
 
 export const ID = 'Forest_curing_taskteam';
-// 创建文档目录
-export const postDocDir = createFetchAction(`${SERVICE_API}/directories/`, [], 'POST');
-// 获取文档目录
-export const getDocDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?all=true`, [], 'GET');
-// 删除文档目录
-export const delDocDir = createFetchAction(`${SERVICE_API}/directories/code/{{code}}/?this=true`, [], 'DELETE');
-// 查看文档
-export const getDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/`, [], 'GET');
-// 创建文档
-export const postDocument = createFetchAction(`${SERVICE_API}/documents/`, [], 'POST');
-// 删除文档
-export const delDocument = createFetchAction(`${SERVICE_API}/documents/code/{{code}}/?this=true`, [], 'DELETE');
-// 获取文档列表
-export const getDocList = createFetchAction(`${SERVICE_API}/doc_searcher/dir_code/{{code}}/`, [], 'GET');
 
 // 修改关联用户Modal的visible
 export const changeAddMemVisible = createAction(`${ID}_changeAddMemVisible`);
@@ -46,13 +31,6 @@ export const getCuringGroupMans = forestFetchAction(`${FOREST_API}/curing/curing
 export const deleteCuringGroupMan = forestFetchAction(`${FOREST_API}/curing/curinggroupman/{{id}}`, [], 'DELETE');
 
 export const actions = {
-    delDocDir,
-    getDocList,
-    postDocDir,
-    getDocDir,
-    getDocument,
-    delDocument,
-    postDocument,
     changeAddMemVisible,
     changeSelectSection,
     changeSelectMemTeam,

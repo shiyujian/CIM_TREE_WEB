@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Tabs } from 'antd';
 import { actions } from '../store/dispatch';
-import { ReceivePage, SendPage } from '../components/Dispatch';
 import { getUser } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 
@@ -28,24 +27,25 @@ export default class Dispatch extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            datas: []
+            datas: [],
+            orgList: []
         };
     }
     static propTypes = {};
 
     componentDidMount () {
         const {
-            actions: { getReceiveInfoAc, getSentInfoAc, getOrgListAc }
+            actions: { getReceiveInfoAc, getSentInfoAc, getOrgTree }
         } = this.props;
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        let orgCode = getUser().org_code;
+        const user = getUser();
+        let orgCode = user.org;
         if (orgCode) {
             let orgListCodes = orgCode.split('_');
             orgListCodes.pop();
             let codeu = orgListCodes.join();
             let ucode = codeu.replace(/,/g, '_');
-            getOrgListAc().then(item => {
-                if (user.is_superuser) {
+            getOrgTree().then(item => {
+                if (user.username === 'admin') {
                     getReceiveInfoAc({
                         user: encodeURIComponent('admin')
                     });
@@ -54,7 +54,7 @@ export default class Dispatch extends Component {
                         user: encodeURIComponent(ucode)
                     });
                 }
-                if (user.is_superuser) {
+                if (user.username === 'admin') {
                     getSentInfoAc({
                         user: encodeURIComponent('admin')
                     });
@@ -63,6 +63,9 @@ export default class Dispatch extends Component {
                         user: encodeURIComponent(ucode)
                     });
                 }
+                this.setState({
+                    orgList: item
+                });
             });
         }
     }
@@ -78,14 +81,7 @@ export default class Dispatch extends Component {
         return (
             <div style={{ overflow: 'hidden', padding: 20 }}>
                 <DynamicTitle title='现场收发文' {...this.props} />
-                <Tabs activeKey={tabValue} onChange={this.tabChange.bind(this)}>
-                    <TabPane tab='收文管理' key='1'>
-                        <ReceivePage {...this.props} />
-                    </TabPane>
-                    <TabPane tab='发文管理' key='2'>
-                        <SendPage {...this.props} />
-                    </TabPane>
-                </Tabs>
+                现场收发文
             </div>
         );
     }

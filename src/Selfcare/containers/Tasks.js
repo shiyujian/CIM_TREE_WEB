@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Content, DynamicTitle } from '_platform/components/layout';
-import { Type, Filter, Table } from '../components/Tasks';
+import {TaskList } from '../components/Tasks';
 import { actions } from '../store/tasks';
 import { actions as platformActions } from '_platform/store/global';
 import { connect } from 'react-redux';
@@ -20,38 +20,37 @@ import { getUser } from '_platform/auth';
     })
 )
 export default class Tasks extends Component {
-    static propTypes = {};
-
     async componentDidMount () {
-        const {
-            filter = {},
-            platform = {},
-            actions: { getTasks, setLoadingStatus }
-        } = this.props;
-        const { type = 'processing' } = filter;
-        const user = getUser();
-        setLoadingStatus(true);
-        await getTasks(
-            {},
-            {
-                ...filter,
-                task: type,
-                executor: user.id,
-                order_by: '-real_start_time'
+    }
+    getDataList = (params) => {
+        console.log(params, '参数');
+        let { getWorkList } = this.props.actions;
+        getWorkList({}, params).then(rep => {
+            if (rep.code === 200) {
+                let backlogDataList = []; // 待办列表
+                let doneDataList = []; // 已办列表
+                rep.content.map(item => {
+                    if (item.WFState === 1) {
+                        backlogDataList.push(item);
+                    } else {
+                        doneDataList.push(item);
+                    }
+                });
+                console.log('待办列表', backlogDataList);
+                console.log('已办列表', doneDataList);
+                this.setState({
+                    backlogDataList,
+                    doneDataList
+                });
             }
-        );
-        setLoadingStatus(false);
-        // }
+        });
     }
 
     render () {
-        // console.log("****任务列表****", this.props)
         return (
             <Content>
                 <DynamicTitle title='个人任务' {...this.props} />
-                <Type {...this.props} />
-                <Filter {...this.props} />
-                <Table {...this.props} />
+                <TaskList {...this.props} />
             </Content>
         );
     }

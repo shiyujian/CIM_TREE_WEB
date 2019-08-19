@@ -57,6 +57,7 @@ export default class ExportView3 extends Component {
             }
             let mapInitialization = INITLEAFLET_API;
             mapInitialization.crs = L.CRS.EPSG4326;
+            mapInitialization.attributionControl = false;
             this.map = L.map(`${detail.ID}`, mapInitialization);
 
             this.tileLayer = L.tileLayer(TILEURLS[1], {

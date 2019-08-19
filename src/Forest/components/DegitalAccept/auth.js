@@ -1,3 +1,5 @@
+import {handlePOLYGONWktData} from '_platform/gisAuth';
+
 // 森林大数据-数字化验收 根据验收状态的ID获取验收状态名称
 export const getStatusByID = (ID) => {
     switch (ID) {
@@ -60,7 +62,7 @@ export const wktToJson = (wkt) => {
             coords.push(str);
         });
     } else if (wkt.indexOf('POLYGON') !== -1) {
-        let str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+        let str = handlePOLYGONWktData(wkt);
         coords.push(str);
     } else if (wkt.indexOf('LINESTRING') !== -1) {
         let wktStr = wkt.split('(')[1].split(')')[0];
@@ -103,7 +105,7 @@ export const handleAreaLayerData = async (eventKey, getTreearea, sectionn) => {
                 coords.push(str);
             });
         } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+            str = handlePOLYGONWktData(wkt);
             coords.push(str);
         }
         return coords;
@@ -124,7 +126,7 @@ export const handleCoordinates = (str) => {
     let treearea = [];
     let arr = [];
     target.map((data, index) => {
-        if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+        if (data && data instanceof Array && data[1] && data[0]) {
             arr.push([data[1], data[0]]);
         }
     });

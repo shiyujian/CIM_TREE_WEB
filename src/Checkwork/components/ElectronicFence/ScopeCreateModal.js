@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Button, Modal, Form, Row, Input, Notification, Spin } from 'antd';
 import 'moment/locale/zh-cn';
+import {
+    getHandleWktData
+} from '_platform/gisAuth';
 const FormItem = Form.Item;
 
 class ScopeCreateModal extends Component {
@@ -11,9 +14,84 @@ class ScopeCreateModal extends Component {
         };
     }
 
-    componentDidMount = async () => {
+    _handleScopeModalCancel = async () => {
+        await this.props.onCancel();
+        this.setState({
+            loading: false
+        });
+    }
 
-    };
+    // 下发任务
+    _handleScopeModalOk = async () => {
+        const {
+            groupSelectKey,
+            coordinates,
+            actions: {
+                postCheckScope,
+                putCheckScope
+            },
+            scopeAddStatus,
+            groupScopeDataList
+        } = this.props;
+        this.props.form.validateFields(async (err, values) => {
+            if (!err) {
+                try {
+                    let wkt = '';
+                    wkt = 'POLYGON(';
+                    // 获取手动框选坐标wkt
+                    wkt = wkt + getHandleWktData(coordinates);
+                    wkt = wkt + ')';
+                    if (scopeAddStatus === '创建') {
+                        let postData = {
+                            group_id: groupSelectKey,
+                            AreaGeom: wkt
+                        };
+                        let scopeData = await postCheckScope({}, postData);
+
+                        if (scopeData && scopeData.code && scopeData.code === 1) {
+                            Notification.success({
+                                message: '电子围栏创建成功',
+                                dutation: 3
+                            });
+                            await this.props.onOk();
+                            this.setState({
+                                loading: false
+                            });
+                        } else {
+                            Notification.error({
+                                message: '电子围栏创建失败',
+                                dutation: 3
+                            });
+                        }
+                    } else if (scopeAddStatus === '更新') {
+                        let postData = {
+                            id: groupScopeDataList[groupSelectKey].id,
+                            group_id: groupSelectKey,
+                            AreaGeom: wkt
+                        };
+                        let scopeData = await putCheckScope({}, postData);
+                        if (scopeData && scopeData.code && scopeData.code === 1) {
+                            Notification.success({
+                                message: '电子围栏更新成功',
+                                dutation: 3
+                            });
+                            await this.props.onOk();
+                            this.setState({
+                                loading: false
+                            });
+                        } else {
+                            Notification.error({
+                                message: '电子围栏更新失败',
+                                dutation: 3
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.log('e', e);
+                }
+            }
+        });
+    }
 
     render () {
         const {
@@ -58,7 +136,7 @@ class ScopeCreateModal extends Component {
                         <Row>
                             <FormItem {...FormItemLayout} label='公司名称'>
                                 {getFieldDecorator('checkCompany', {
-                                    initialValue: `${parentData && parentData.name}`,
+                                    initialValue: `${parentData && parentData.OrgName}`,
                                     rules: [
                                         { required: true, message: '请输入公司名称' }
                                     ]
@@ -96,76 +174,6 @@ class ScopeCreateModal extends Component {
             </Modal>
 
         );
-    }
-
-    _handleScopeModalCancel = async () => {
-        await this.props.onCancel();
-        this.setState({
-            loading: false
-        });
-    }
-
-    // 下发任务
-    _handleScopeModalOk = async () => {
-        const {
-            groupSelectKey,
-            coordinates,
-            actions: {
-                postCheckScope,
-                putCheckScope
-            },
-            scopeAddStatus,
-            groupScopeDataList
-        } = this.props;
-        this.props.form.validateFields(async (err, values) => {
-            if (!err) {
-                try {
-                    if (scopeAddStatus === '创建') {
-                        let postData = {
-                            'boundary': coordinates
-                        };
-                        let scopeData = await postCheckScope({id: groupSelectKey}, postData);
-                        if (scopeData && scopeData.id) {
-                            Notification.success({
-                                message: '电子围栏创建成功',
-                                dutation: 3
-                            });
-                            await this.props.onOk();
-                            this.setState({
-                                loading: false
-                            });
-                        } else {
-                            Notification.error({
-                                message: '电子围栏创建失败',
-                                dutation: 3
-                            });
-                        }
-                    } else if (scopeAddStatus === '更新') {
-                        let postData = {
-                            'boundary': coordinates
-                        };
-                        let scopeData = await putCheckScope({id: groupScopeDataList[groupSelectKey].id}, postData);
-                        if (scopeData && scopeData.id) {
-                            Notification.success({
-                                message: '电子围栏更新成功',
-                                dutation: 3
-                            });
-                            await this.props.onOk();
-                            this.setState({
-                                loading: false
-                            });
-                        } else {
-                            Notification.error({
-                                message: '电子围栏更新失败',
-                                dutation: 3
-                            });
-                        }
-                    }
-                } catch (e) {
-                    console.log('e', e);
-                }
-            }
-        });
     }
 }
 export default Form.create()(ScopeCreateModal);

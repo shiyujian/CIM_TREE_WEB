@@ -14,13 +14,14 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 export default class NursmeasureTable extends Component {
     constructor (props) {
@@ -48,12 +49,11 @@ export default class NursmeasureTable extends Component {
             supervisorcheck: '',
             checkstatus: '',
             ispack: '',
-            imgArr: []
+            imgArr: [],
+            userOptions: []
         };
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     render () {
         const { tblData, imgvisible } = this.state;
@@ -90,8 +90,7 @@ export default class NursmeasureTable extends Component {
             typeoption,
             mmtypeoption,
             keycode = '',
-            statusoption,
-            users
+            statusoption
         } = this.props;
         const {
             sxm,
@@ -103,11 +102,9 @@ export default class NursmeasureTable extends Component {
             bigType,
             treetypename,
             ispack,
-            mmtype = ''
+            mmtype = '',
+            userOptions = []
         } = this.state;
-        const suffix2 = rolename ? (
-            <Icon type='close-circle' onClick={this.emitEmpty2} />
-        ) : null;
         const suffix3 = factory ? (
             <Icon type='close-circle' onClick={this.emitEmpty3} />
         ) : null;
@@ -188,18 +185,15 @@ export default class NursmeasureTable extends Component {
         });
         columns.push({
             title: '填报人',
-            dataIndex: 'Inputer',
+            dataIndex: 'InputerName',
             render: (text, record) => {
-                return (
-                    <span>
-                        {users && users[text]
-                            ? users[text].Full_Name +
-                              '(' +
-                              users[text].User_Name +
-                              ')'
-                            : ''}
-                    </span>
-                );
+                if (record.InputerUserName && record.InputerName) {
+                    return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                } else if (record.InputerName && !record.InputerUserName) {
+                    return <p>{record.InputerName}</p>;
+                } else {
+                    return <p> / </p>;
+                }
             }
         });
         columns.push({
@@ -462,12 +456,20 @@ export default class NursmeasureTable extends Component {
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>填报人：</span>
-                        <Input
-                            suffix={suffix2}
-                            value={rolename}
+                        <Select
+                            allowClear
+                            showSearch
                             className='forest-forestcalcw4'
+                            placeholder={'请输入姓名搜索'}
+                            onSearch={this.handleUserSearch.bind(this)}
                             onChange={this.onRoleNameChange.bind(this)}
-                        />
+                            showArrow={false}
+                            filterOption={false}
+                            notFoundContent={null}
+                            value={rolename || undefined}
+                        >
+                            {userOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>状态：</span>
@@ -632,8 +634,42 @@ export default class NursmeasureTable extends Component {
         this.setState({ ispack: value });
     }
 
+    handleUserSearch = async (value) => {
+        const {
+            actions: {
+                getUsers
+            }
+        } = this.props;
+        let userList = [];
+        let userOptions = [];
+        if (value.length >= 2) {
+            let postData = {
+                fullname: value
+            };
+            let userData = await getUsers({}, postData);
+            if (userData && userData.content && userData.content instanceof Array) {
+                userList = userData.content;
+                userList.map((user) => {
+                    userOptions.push(
+                        <Option
+                            key={user.ID}
+                            title={`${user.Full_Name}(${user.User_Name})`}
+                            value={user.ID}>
+                            {`${user.Full_Name}(${user.User_Name})`}
+                        </Option>
+                    );
+                });
+            }
+            this.setState({
+                userOptions
+            });
+        }
+    }
     onRoleNameChange (value) {
-        this.setState({ rolename: value.target.value });
+        console.log('value', value);
+        this.setState({
+            rolename: value
+        });
     }
 
     factorychange (value) {
@@ -703,7 +739,7 @@ export default class NursmeasureTable extends Component {
         resetinput(leftkeycode);
     }
 
-    query (page) {
+    query = async (page) => {
         const {
             sxm = '',
             section = '',
@@ -727,7 +763,10 @@ export default class NursmeasureTable extends Component {
             return;
         }
         const {
-            actions: { getnurserys },
+            actions: {
+                getnurserys,
+                getUserDetail
+            },
             keycode = '',
             platform: { tree = {} }
         } = this.props;
@@ -754,30 +793,54 @@ export default class NursmeasureTable extends Component {
         }
         if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
-        getnurserys({}, postdata).then(rst => {
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
-            let tblData = rst.content;
-            if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
-                    plan.statusname =
-                        plan.IsPack === 0 ? '未打包' : '已打包';
-                    plan.order = (page - 1) * size + i + 1;
-                    plan.liftertime1 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('YYYY-MM-DD')
-                        : '/';
-                    plan.liftertime2 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('HH:mm:ss')
-                        : '/';
-                    plan.Project = getProjectNameBySection(plan.BD, thinClassTree);
-                    plan.sectionName = getSectionNameBySection(plan.BD, thinClassTree);
-                });
-                const pagination = { ...this.state.pagination };
-                pagination.total = rst.pageinfo.total;
-                pagination.pageSize = size;
-                this.setState({ tblData, pagination });
+        let rst = await getnurserys({}, postdata);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
+        let tblData = rst.content;
+        if (tblData instanceof Array) {
+            let userIDList = [];
+            let userDataList = {};
+            for (let i = 0; i < tblData.length; i++) {
+                let plan = tblData[i];
+                plan.statusname =
+                    plan.IsPack === 0 ? '未打包' : '已打包';
+                plan.order = (page - 1) * size + i + 1;
+                plan.liftertime1 = plan.CreateTime
+                    ? moment(plan.CreateTime).format('YYYY-MM-DD')
+                    : '/';
+                plan.liftertime2 = plan.CreateTime
+                    ? moment(plan.CreateTime).format('HH:mm:ss')
+                    : '/';
+                plan.Project = getProjectNameBySection(plan.BD, thinClassTree);
+                plan.sectionName = getSectionNameBySection(plan.BD, thinClassTree);
+                let userData = '';
+                if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
+                    userData = await getUserDetail({id: plan.Inputer});
+                } else {
+                    userData = userDataList[Number(plan.Inputer)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
+                plan.InputerName = (userData && userData.Full_Name) || '';
+                plan.InputerUserName = (userData && userData.User_Name) || '';
             }
-        });
+            const pagination = { ...this.state.pagination };
+            pagination.total = rst.pageinfo.total;
+            pagination.pageSize = size;
+            this.setState({
+                tblData,
+                pagination,
+                loading: false,
+                percent: 100
+            });
+        }
     }
 
     exportexcel () {

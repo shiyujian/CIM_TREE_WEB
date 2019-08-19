@@ -1,15 +1,11 @@
-import React, { PropTypes, Component } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
     Button,
-    Tree,
-    Input,
-    Switch,
-    Modal,
     Row,
     Col,
-    Form,
     message,
+    notification,
     Popconfirm
 } from 'antd';
 import { bindActionCreators } from 'redux';
@@ -18,17 +14,11 @@ import { Icon } from 'react-fa';
 import * as flowActions from '../store/workflow';
 
 import { base } from '../../../api';
+import { getUser } from '../../../auth';
 
 import NewTemplateModal from '../components/NewTemplateModal';
 import TemplateTree from '../components/TemplateTree';
-import DynamicTabs from '../components/DynamicTabs';
 import CloseEditConfirm from '../components/CloseEditConfirm';
-
-import styles from './styles.css';
-
-const TreeNode = Tree.TreeNode;
-const FormItem = Form.Item;
-const confirm = Modal.confirm;
 
 @connect(
     state => ({}),
@@ -42,8 +32,9 @@ class Flow extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            list: {},
-            select_id: '',
+            dataList: {}, // 流程列表对象
+            flowId: '', // 流程ID
+            flowName: '', // 流程名称
             isNewTemplateModalVisible: false,
             btn_loading: false,
             tabs: [],
@@ -68,62 +59,91 @@ class Flow extends Component {
         //               Workflow_API = System_API[i].value;
         //           }
         //       }
-
+        console.log('接口IP', base);
         return base;
     }
 
     getList () {
-        const { getTemplate } = this.props.flowActions;
-
-        const Workflow_API = this.getWorkflowAPI();
-
-        // 获取 可编辑的与不可编辑的 template
-        const requestArray = [];
-
-        requestArray.push(
-            getTemplate({
-                Workflow_API: Workflow_API,
-                status: 0
-            })
-        );
-
-        requestArray.push(
-            getTemplate({
-                Workflow_API: Workflow_API,
-                status: 1
-            })
-        );
-
-        return Promise.all(requestArray).then(resp => {
-            this.setState({
-                list: {
-                    editableTemplates: resp[0],
-                    uneditableTemplates: resp[1]
-                }
-            });
+        console.log(base);
+        const { getflowList }  = this.props.flowActions;
+        getflowList({
+            Workflow_API: base
+        }).then(rep => {
+            if (rep.code === 1) {
+                let editableTemplates = [];
+                let uneditableTemplates = [];
+                rep.content.map(item => {
+                    if (item.Status === 1) {
+                        uneditableTemplates.push(item);
+                    } else {
+                        editableTemplates.push(item);
+                    }
+                });
+                this.setState({
+                    dataList: {
+                        editableTemplates,
+                        uneditableTemplates
+                    }
+                });
+            } else {
+                message.info('获取流程列表失败');
+            }
         });
+
+
+        // const { getTemplate } = this.props.flowActions;
+
+        // const Workflow_API = this.getWorkflowAPI();
+
+        // // 获取 可编辑的与不可编辑的 template
+        // const requestArray = [];
+
+        // requestArray.push(
+        //     getTemplate({
+        //         Workflow_API: Workflow_API,
+        //         status: 0
+        //     })
+        // );
+
+        // requestArray.push(
+        //     getTemplate({
+        //         Workflow_API: Workflow_API,
+        //         status: 1
+        //     })
+        // );
+
+        // return Promise.all(requestArray).then(resp => {
+        //     this.setState({
+        //         list: {
+        //             editableTemplates: resp[0],
+        //             uneditableTemplates: resp[1]
+        //         }
+        //     });
+        // });
     }
 
     // 模板选择
     onSelect = ([id]) => {
-        if (id && id != 0) {
+        console.log('选择流程模板', id);
+        if (id) {
             const {
-                list: { editableTemplates = [], uneditableTemplates = [] },
-                tabs
+                dataList: { editableTemplates = [], uneditableTemplates = [] }
             } = this.state;
 
-            let currTemplate = editableTemplates.find(item => item.id == id);
+            let currTemplate = editableTemplates.find(item => item.id === id);
             if (!currTemplate) {
-                currTemplate = uneditableTemplates.find(item => item.id == id);
+                currTemplate = uneditableTemplates.find(item => item.ID === id);
+                console.log('选择流程模板', currTemplate);
                 this.setState({
-                    deletable: false,
-                    select_id: id,
+                    deletable: true,
+                    flowId: id,
+                    flowName: currTemplate.Name,
                     selectedKeys: [String(id)]
                 });
             } else {
                 this.setState({
                     deletable: true,
-                    select_id: id,
+                    flowId: id,
                     selectedKeys: [String(id)]
                 });
             }
@@ -133,7 +153,7 @@ class Flow extends Component {
 
             // if(alreadyExist !== -1) {
             // 	this.setState({
-            // 		select_id:id,
+            // 		flowId:id,
             // 		selectedKeys:
             // 		tabs,
             // 		activeKey: String(alreadyExist)
@@ -144,7 +164,7 @@ class Flow extends Component {
             // 		id: currTemplate.id
             // 	});
             // 	this.setState({
-            // 		select_id:id,
+            // 		flowId:id,
             // 		tabs,
             // 		activeKey:String(tabs.length -1)
             // 	});
@@ -159,47 +179,67 @@ class Flow extends Component {
         });
     };
 
-    // delete
+    // 删除流程模板
     handleDel = () => {
-        const { updateTemplate } = this.props.flowActions;
+        const { deleteflow } = this.props.flowActions;
 
-        const Workflow_API = this.getWorkflowAPI();
-
-        updateTemplate(
-            {
-                Workflow_API: Workflow_API,
-                pk: this.state.select_id
-            },
-            { status: 2 }
-        ).then(rep => {
-            message.success('删除模板成功');
-            this.getList();
-            this.setState({
-                select_id: ''
-            });
+        deleteflow({
+            ID: this.state.flowId
+        }, {}).then(rep => {
+            if (rep.code === 1) {
+                this.getList();
+                this.setState({
+                    flowId: ''
+                });
+                notification.success({
+                    message: '删除模板成功'
+                });
+            } else {
+                notification.error({
+                    message: rep.msg || '删除模板失败'
+                });
+            }
         });
     };
 
     // create new Template flow
     handleCreateTemplateOk = values => {
-        const { postTemplate } = this.props.flowActions;
-
-        const Workflow_API = this.getWorkflowAPI();
-
-        postTemplate(
-            {
-                Workflow_API: Workflow_API
-            },
-            { status: 0, remark: null, position: null, ...values }
-        ).then(rep => {
-            this.setState({ isNewTemplateModalVisible: false });
-
-            message.success('新增模板成功');
-
-            this.getList().then(list => {
-                this.onSelect([rep.id]);
-            });
+        console.log('流程模板', values);
+        const { postflow } = this.props.flowActions;
+        postflow({
+            Workflow_API: base
+        }, {
+            Creater: getUser().ID,
+            FlowDescribe: values.FlowDescribe || '',
+            Name: values.name || ''
+        }).then(rep => {
+            console.log(rep);
+            if (rep.code === 1) {
+                notification.success({
+                    message: '新增模板成功'
+                });
+                this.getList();
+                this.handleCancel();
+            } else {
+                notification.error({
+                    message: rep.msg
+                });
+            }
         });
+        // postTemplate(
+        //     {
+        //         Workflow_API: Workflow_API
+        //     },
+        //     { status: 0, remark: null, position: null, ...values }
+        // ).then(rep => {
+        //     this.setState({ isNewTemplateModalVisible: false });
+
+        //     message.success('新增模板成功');
+
+        //     this.getList().then(list => {
+        //         this.onSelect([rep.id]);
+        //     });
+        // });
     };
 
     // cancel create Template
@@ -215,7 +255,7 @@ class Flow extends Component {
         const selectId = list[targetKey].id;
         this.setState({
             activeKey: String(targetKey),
-            select_id: selectId
+            flowId: selectId
         });
     };
 
@@ -288,7 +328,7 @@ class Flow extends Component {
 
     //
     handleEdit = () => {
-        const { deletable, select_id } = this.state;
+        const { deletable, flowId } = this.state;
 
         const {
             flowActions: { putTemplate }
@@ -302,7 +342,7 @@ class Flow extends Component {
             putTemplate(
                 {
                     Workflow_API: Workflow_API,
-                    id: select_id
+                    id: flowId
                 },
                 {
                     status: 1
@@ -314,20 +354,20 @@ class Flow extends Component {
                     message.info('激活失败');
                 }
                 this.getList().then(result => {
-                    this.onSelect([select_id]);
+                    this.onSelect([flowId]);
                 });
             });
         } else {
             // 取消激活
             // putTemplate({
             // 	Workflow_API: Workflow_API,
-            // 	id: select_id
+            // 	id: flowId
             // }, {
             // 	status: 0
             // }).then(resp => {
             // 	message.info("已经取消激活");
             // 	this.getList().then(result => {
-            // 		this.onSelect([select_id]);
+            // 		this.onSelect([flowId]);
             // 	});
             // });
         }
@@ -336,8 +376,9 @@ class Flow extends Component {
     render () {
         const {
             isNewTemplateModalVisible,
-            select_id,
-            list = {},
+            flowId,
+            flowName,
+            dataList = {},
             tabs,
             activeKey,
             isCloseEditConfirmVisible,
@@ -369,7 +410,7 @@ class Flow extends Component {
                                     <Button
                                         type='danger'
                                         size='small'
-                                        disabled={!select_id}
+                                        disabled={!flowId}
                                         title='删除模板'
                                         className='btn'
                                     >
@@ -386,7 +427,7 @@ class Flow extends Component {
                                 >
                                     <Button
                                         size='small'
-                                        disabled={!select_id}
+                                        disabled={!flowId}
                                         title='激活模板'
                                         className='btn'
                                     >
@@ -397,21 +438,13 @@ class Flow extends Component {
                         </div>
                         <div style={{ height: 950, overflow: 'scroll' }}>
                             <TemplateTree
-                                data={list}
+                                dataList={dataList}
                                 selectedKeys={selectedKeys}
                                 onSelect={this.onSelect}
                             />
                         </div>
                     </Col>
                     <Col span={20}>
-                        {
-                            // <DynamicTabs
-                            // 	tabs={tabs}
-                            // 	activeKey={activeKey}
-                            // 	onChange={this.handleTabsChange}
-                            // 	removeTab={this.openCloseRemoveTabModal}
-                            // />
-                        }
                         <iframe
                             allowFullScreen
                             style={{
@@ -420,7 +453,7 @@ class Flow extends Component {
                                 flex: 1,
                                 overflow: 'hidden'
                             }}
-                            src={`/gooflow/index.html?id=${select_id}&serverURL=${encodeURIComponent(
+                            src={`/gooflow/index.html?id=${flowId}&name=${flowName}&userID=${getUser().ID}&serverURL=${encodeURIComponent(
                                 base
                             )}`}
                             frameBorder='0'

@@ -13,7 +13,7 @@ import { TreeProjectList } from '../components';
 import { actions as platformActions } from '_platform/store/global';
 import { actions } from '../store/thinClassTreeTypeManage';
 import { Table } from '../components/ThinClassTreeTypeManage';
-import { getAreaTreeData, getDefaultProject, getUser } from '_platform/auth';
+import { getAreaTreeData, getDefaultProject } from '_platform/auth';
 @connect(
     state => {
         const {
@@ -37,11 +37,8 @@ class ThinClassTreeTypeManage extends Component {
             leftkeycode: '', // 项目
             sectionList: [] // 标段列表
         };
-        this.userSection = ''; // 用户所属标段
     }
     componentDidMount = async () => {
-        let userData = getUser();
-        this.userSection = userData.sections.slice(2, -2);
         const {
             actions: {
                 getTreeNodeList,
@@ -75,10 +72,6 @@ class ThinClassTreeTypeManage extends Component {
         let treeList = [];
         if (tree.bigTreeList) {
             treeList = tree.bigTreeList;
-        }
-        if (this.userSection) {
-            console.log('userSection', this.userSection);
-            console.log('treeList', treeList);
         }
         return (
             <Body>

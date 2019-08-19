@@ -23,11 +23,14 @@
 window.config = {
     /** *********************公共资源服务**************************/
     // 基础服务域名
-    DOMAIN: 'http://39.105.221.187:6530',
+    // DOMAIN: 'http://39.105.221.187:6530',
+    DOMAIN: 'http://39.97.163.176:6510',
     // 林总用户接口地址
     // 测试库接口
     // SDOMAIN: 'http://39.97.163.176:6510',
     SDOMAIN: 'http://39.97.163.176',
+    // 二维展示根据坐标获取树木顺序码端口
+    DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
     // 灌溉接口
     PIPE: 'http://39.97.163.176:809',
     // 苗木市场
@@ -42,17 +45,6 @@ window.config = {
     STATIC_UPLOAD_PORT: '6511',
     // 静态文件存储服务下载端口
     STATIC_DOWNLOAD_PORT: '6512',
-    // 静态文件存储服务访问用户和密码
-    STATIC_FILE_USER: 'bimxan',
-    STATIC_FILE_PASSWORD: 'ecidibim',
-    // 二维展示根据坐标获取树木顺序码端口
-    DASHBOARD_ONSITE: 'http://39.105.221.187:8081',
-    // 二维展示获取树种筛选的geoserver服务端口
-    DASHBOARD_TREETYPE: 'http://39.96.47.88:8080',
-    // 现场收发文接口的端口
-    DOC_EXCHANGE_URL: 'http://39.105.221.187:6545',
-    // 现场收发文接口验证用的用户名和密码
-    DOC_EXCHANGE_USER_PASSWORD: 'bimtest:bimtest',
 
     // word在线预览地址
     previewWord_API: 'http://docs.ecidi.com:6500/view/url?url=',
@@ -83,20 +75,16 @@ window.config = {
     // 智慧森林
     // 苗圃定位模板
     nurseryLocation:
-        'http://39.105.221.187:6512/media/documents/meta/nurseryLocation.xlsx',
+        'https://xatree-1.oss-cn-qingdao.aliyuncs.com/nurseryLocation.xlsx',
 
     /** *********************临时资yu源服务**************************/
     initLeaflet: {
         center: [38.99042701799772, 116.0396146774292],
+        // center: [30.2528290000, 120.0177300000], // 华东院
         zoomControl: false,
         zoom: 13,
         minZoom: 10
     },
     // 个人考勤的上下班时间，如果当前的部门未配置的话拿此上下班时间，用[--]分开，此处必须配置
-    IN_OFF_DUTY: '08:30:00--18:00:00',
-    // 现场收发文的短信模板NAME和CODE
-    DISPATCH_MSG: {
-        NAME: 'BIM系统',
-        CODE: 'SMS_100920102'
-    }
+    IN_OFF_DUTY: '08:30:00--18:00:00'
 };

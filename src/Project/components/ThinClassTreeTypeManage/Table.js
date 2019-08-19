@@ -16,7 +16,6 @@ import {
 
 const FormItem = Form.Item;
 const Option = Select.Option;
-window.config = window.config || {};
 
 class Tablelevel extends Component {
     constructor (props) {
@@ -303,7 +302,7 @@ class Tablelevel extends Component {
         let userData = getUser();
         // 业主和管理员
         let permissionOperate = false;
-        this.userSection = userData.sections.slice(2, -2);
+        this.userSection = userData.section;
         if (userData.username === 'admin') {
             permissionOperate = true;
             this.setState({
@@ -315,14 +314,10 @@ class Tablelevel extends Component {
                 section: this.userSection || ''
             });
         }
-        let userMess = window.localStorage.getItem('QH_USER_DATA');
-        userMess = JSON.parse(userMess);
-        let groups = userMess.groups || [];
-        groups.map((group) => {
-            if (group.name.indexOf('施工设计') !== -1) {
-                permissionOperate = true;
-            }
-        });
+        let userRoles = userData.roles || '';
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('施工设计') !== -1) {
+            permissionOperate = true;
+        }
         this.setState({
             permissionOperate
         });
@@ -359,6 +354,7 @@ class Tablelevel extends Component {
         // 基础设置
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
+        mapInitialization.attributionControl = false;
         this.map = L.map('mapid', mapInitialization);
         // 基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {

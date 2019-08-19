@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { Tree } from 'antd';
-import {getUserIsManager} from '_platform/auth';
+import {getUserIsManager, getUser} from '_platform/auth';
 const TreeNode = Tree.TreeNode;
 
 export default class PkCodeTree extends Component {
     static propTypes = {};
 
     static loop (data = []) {
-        let user = localStorage.getItem('QH_USER_DATA');
-        user = JSON.parse(user);
+        let user = getUser();
         let component = [];
         // 是否为业主或管理员
         let permission = getUserIsManager();
@@ -18,9 +17,8 @@ export default class PkCodeTree extends Component {
                     title={item.Name} />;
             });
         } else {
-            let sections = user && user.account && user.account.sections;
-            if (sections && sections instanceof Array && sections.length > 0) {
-                let section = sections[0];
+            let section = user && user.section;
+            if (section) {
                 let code = section.split('-');
                 if (code && code.length === 3) {
                     data.map((item, index) => {

@@ -3,9 +3,9 @@ import {
     Button, Modal, Table, Checkbox, Notification, Row, Form, Col, Select, Input, TreeSelect, Spin
 } from 'antd';
 import 'moment/locale/zh-cn';
+import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
-window.config = window.config || {};
 
 class AddMember extends Component {
     static layout = {
@@ -37,35 +37,64 @@ class AddMember extends Component {
             }
         },
         {
-            title: '部门',
-            dataIndex: 'account.organization'
-        },
-        {
             title: '姓名',
-            dataIndex: 'account.person_name'
+            key: '1',
+            dataIndex: 'Full_Name'
         },
         {
-            title: '账号',
-            dataIndex: 'username'
+            title: '用户名',
+            key: '2',
+            dataIndex: 'User_Name'
+        },
+        {
+            title: '性别',
+            key: '3',
+            dataIndex: 'Sex',
+            render: (text, record) => {
+                return record.Sex ? '女' : '男';
+            }
         },
         {
             title: '角色',
-            dataIndex: 'groups[0].name'
+            width: '15%',
+            key: '4',
+            render: (text, record) => {
+                if (record.Roles && record.Roles instanceof Array && record.Roles.length > 0) {
+                    return record.Roles[0].RoleName;
+                } else {
+                    return '';
+                }
+            }
         },
         {
             title: '职务',
-            dataIndex: 'account.title'
+            key: '5',
+            dataIndex: 'Duty'
         },
         {
             title: '手机号码',
-            dataIndex: 'account.person_telephone'
+            key: '6',
+            dataIndex: 'Phone'
+        },
+        {
+            title: '所属部门',
+            key: '7',
+            dataIndex: 'OrgObj',
+            render: (text, record) => {
+                if (record.OrgObj && record.OrgObj.OrgName) {
+                    return record.OrgObj.OrgName;
+                }
+            }
         },
         {
             title: '关联',
             render: user => {
                 const { relationMem = [] } = this.state;
-                const checked = relationMem.some(memberID => Number(memberID) === user.id);
 
+                let checked = [];
+                if (user && user.ID && relationMem && relationMem instanceof Array) {
+                    checked = relationMem.some(memberID => Number(memberID) === user.ID);
+                }
                 return (
                     <Checkbox
                         checked={checked}
@@ -78,13 +107,13 @@ class AddMember extends Component {
 
     componentDidMount = async () => {
         const {
-            actions: {
-                getCheckGroupMansIDList
-            },
-            selectMemGroup
+            dataSource = []
         } = this.props;
         try {
-            let relationMem = await getCheckGroupMansIDList({id: selectMemGroup});
+            let relationMem = [];
+            dataSource.map((data) => {
+                relationMem.push(data && data.user_id);
+            });
             this.setState({
                 relationMem: relationMem || []
             }, async () => {
@@ -97,7 +126,7 @@ class AddMember extends Component {
     // 获取最开始的初始值，用于最开始获取人员数据，或清空搜索条件
     getInitialUserData = async () => {
         const {
-            userOrgCode,
+            userOrgID,
             actions: {
                 getUsers
             },
@@ -106,113 +135,50 @@ class AddMember extends Component {
             }
         } = this.props;
         setFieldsValue({
-            organization: userOrgCode
+            organization: userOrgID
         });
+        console.log('userOrgID', userOrgID);
         let postData = {
-            org_code: userOrgCode,
-            is_active: true,
-            page: 1
+            org: userOrgID,
+            status: 1,
+            page: 1,
+            size: 10
         };
         let userData = await getUsers({}, postData);
-        let dataSource = (userData && userData.results) || [];
+        let dataSource = (userData && userData.content) || [];
         this.setState({
-            total: userData.count || 0,
+            total: (userData && userData.pageinfo && userData.pageinfo.total) || 0,
             page: 1,
             dataSource
         });
     }
 
     renderContent () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         const {
-            platform: { roles = [] }
+            platform: {
+                roles = []
+            }
         } = this.props;
         var systemRoles = [];
-        if (user.is_superuser) {
-            systemRoles.push({
-                name: '苗圃角色',
-                value: roles.filter(role => role.grouptype === 0)
-            });
-            systemRoles.push({
-                name: '施工角色',
-                value: roles.filter(role => role.grouptype === 1)
-            });
-            systemRoles.push({
-                name: '监理角色',
-                value: roles.filter(role => role.grouptype === 2)
-            });
-            systemRoles.push({
-                name: '业主角色',
-                value: roles.filter(role => role.grouptype === 3)
-            });
-            systemRoles.push({
-                name: '养护角色',
-                value: roles.filter(role => role.grouptype === 4)
-            });
-            systemRoles.push({
-                name: '供应商角色',
-                value: roles.filter(role => role.grouptype === 6)
-            });
-        } else {
-            for (let i = 0; i < user.groups.length; i++) {
-                const rolea = user.groups[i].grouptype;
-                switch (rolea) {
-                    case 0:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        break;
-                    case 1:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        systemRoles.push({
-                            name: '施工角色',
-                            value: roles.filter(role => role.grouptype === 1)
-                        });
-                        systemRoles.push({
-                            name: '养护角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 2:
-                        systemRoles.push({
-                            name: '监理角色',
-                            value: roles.filter(role => role.grouptype === 2)
-                        });
-                        break;
-                    case 3:
-                        systemRoles.push({
-                            name: '业主角色',
-                            value: roles.filter(role => role.grouptype === 3)
-                        });
-                        break;
-                    case 4:
-                        systemRoles.push({
-                            name: '养护角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 6:
-                        systemRoles.push({
-                            name: '供应商角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    default:
-                        break;
-                }
+        let parentRoleType = [];
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID === 0) {
+                parentRoleType.push(role);
             }
-        }
+        });
+        parentRoleType.map((type) => {
+            systemRoles.push({
+                name: type && type.RoleName,
+                value: roles.filter(role => role.ParentID === type.ID)
+            });
+        });
         const objs = systemRoles.map(roless => {
             return (
                 <OptGroup label={roless.name} key={roless.name}>
                     {roless.value.map(role => {
                         return (
-                            <Option key={role.id} value={String(role.id)}>
-                                {role.name}
+                            <Option key={role.ID} value={String(role.ID)}>
+                                {role.RoleName}
                             </Option>
                         );
                     })}
@@ -222,13 +188,113 @@ class AddMember extends Component {
         return objs;
     }
 
+    _handleCancel = async () => {
+        const {
+            actions: {
+                changeAddMemVisible
+            }
+        } = this.props;
+        changeAddMemVisible(false);
+    }
+
+    _check = async (user, e) => {
+        const {
+            relationMem = []
+        } = this.state;
+        const {
+            actions: {
+                putCheckGroupMans,
+                checkGroupMemChangeStatus
+            },
+            memberChangeStatus = 0,
+            selectMemGroup
+        } = this.props;
+        let checked = e.target.checked;
+        if (checked) {
+            relationMem.push(user.ID);
+            let postData = {
+                userIds: relationMem.join(','),
+                checkgroup_id: Number(selectMemGroup)
+            };
+            let data = await putCheckGroupMans({}, postData);
+            if (data && data.code && data.code === 1) {
+                await checkGroupMemChangeStatus(memberChangeStatus + 1);
+            } else {
+                Notification.error({
+                    message: '关联失败'
+                });
+            }
+        } else {
+            relationMem.map((memberID, index) => {
+                if (memberID === user.ID) {
+                    relationMem.splice(index, 1); // 删除该元素
+                }
+            });
+            let postData = {
+                userIds: relationMem.join(','),
+                checkgroup_id: Number(selectMemGroup)
+            };
+            let data = await putCheckGroupMans({}, postData);
+            if (data && data.code && data.code === 1) {
+                await checkGroupMemChangeStatus(memberChangeStatus + 1);
+            } else {
+                Notification.error({
+                    message: '关联失败'
+                });
+            }
+        }
+        this.setState({
+            relationMem
+        });
+    }
+
+    changePage = (obj) => {
+        let current = obj.current;
+        this.setState({
+            page: current
+        }, () => {
+            this.query(current);
+        });
+    }
+
+    query (current = 1) {
+        const {
+            form: { validateFields },
+            actions: {
+                getUsers
+            }
+        } = this.props;
+        validateFields(async (err, values) => {
+            if (!err) {
+                let postData = {
+                    org: values.organization ? values.organization : '',
+                    keyword: values.keyword ? values.keyword : '',
+                    role: values.role ? values.role : '',
+                    status: 1,
+                    page: current,
+                    size: 10
+                };
+                let userData = await getUsers({}, postData);
+                let dataSource = (userData && userData.content) || [];
+                this.setState({
+                    total: (userData && userData.pageinfo && userData.pageinfo.total) || 0,
+                    page: current,
+                    dataSource
+                });
+            }
+        });
+    }
+    clear = async () => {
+        this.props.form.resetFields();
+        await this.getInitialUserData();
+    }
+
     render () {
         const {
             form: { getFieldDecorator },
             orgTreeSelectData
         } = this.props;
         const {
-            relationMem,
             loading = false,
             page,
             total,
@@ -278,7 +344,6 @@ class AddMember extends Component {
                                                                     input.toLowerCase()
                                                                 ) >= 0
                                                         }
-                                                        mode='multiple'
                                                         style={{ width: '100%' }}
                                                     >
                                                         {this.renderContent()}
@@ -343,92 +408,6 @@ class AddMember extends Component {
             </div>
 
         );
-    }
-
-    _handleCancel = async () => {
-        const {
-            actions: {
-                changeAddMemVisible
-            }
-        } = this.props;
-        changeAddMemVisible(false);
-    }
-
-    _check = async (user, e) => {
-        const {
-            relationMem = []
-        } = this.state;
-        const {
-            actions: {
-                postCheckGroupMans,
-                checkGroupMemChangeStatus
-            },
-            memberChangeStatus = 0,
-            selectMemGroup
-        } = this.props;
-        let checked = e.target.checked;
-        if (checked) {
-            relationMem.push(user.id);
-            let postData = {
-                members: relationMem
-            };
-            await postCheckGroupMans({id: selectMemGroup}, postData);
-            await checkGroupMemChangeStatus(memberChangeStatus + 1);
-        } else {
-            relationMem.map((memberID, index) => {
-                if (memberID === user.id) {
-                    relationMem.splice(index, 1); // 删除该元素
-                }
-            });
-            let postData = {
-                members: relationMem
-            };
-            await postCheckGroupMans({id: selectMemGroup}, postData);
-            await checkGroupMemChangeStatus(memberChangeStatus + 1);
-        }
-        this.setState({
-            relationMem
-        });
-    }
-
-    changePage = (obj) => {
-        let current = obj.current;
-        this.setState({
-            page: current
-        }, () => {
-            this.query(current);
-        });
-    }
-
-    query (current = 1) {
-        const {
-            form: { validateFields },
-            actions: {
-                getUsers
-            }
-        } = this.props;
-        validateFields(async (err, values) => {
-            if (!err) {
-                let postData = {
-                    org_code: values.organization ? values.organization : '',
-                    keyword: values.keyword ? values.keyword : '',
-                    roles: values.role ? values.role : '',
-                    is_active: true,
-                    page: current
-                };
-                let userData = await getUsers({}, postData);
-                let dataSource = (userData && userData.results) || [];
-                this.setState({
-                    total: userData.count || 0,
-                    page: current,
-                    dataSource
-                });
-            }
-        });
-    }
-    clear = async () => {
-        this.props.form.resetFields();
-        await this.getInitialUserData();
     }
 }
 export default Form.create()(AddMember);

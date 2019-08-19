@@ -25,6 +25,7 @@ import {
     getProjectNameBySection
 } from '_platform/gisAuth';
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 export default class SupervisorTable extends Component {
     constructor (props) {
@@ -46,19 +47,20 @@ export default class SupervisorTable extends Component {
             thinclass: '',
             status: '',
             SupervisorCheck: '',
-            role: '',
             rolename: '',
             percent: 0,
             messageTotalNum: '',
             treeTotalNum: '',
             imgArr: [],
             smallclassData: '',
-            thinclassData: ''
+            thinclassData: '',
+            userOptions: []
         };
+        this.section = '';
     }
     componentDidMount () {
         let user = getUser();
-        this.sections = JSON.parse(user.sections);
+        this.section = user.section;
     }
     render () {
         const { tblData } = this.state;
@@ -95,7 +97,6 @@ export default class SupervisorTable extends Component {
             treetypeoption,
             thinclassoption,
             statusoption,
-            users,
             typeoption
         } = this.props;
         const {
@@ -106,13 +107,11 @@ export default class SupervisorTable extends Component {
             thinclass,
             status,
             bigType,
-            treetypename
+            treetypename,
+            userOptions = []
         } = this.state;
         const suffix1 = sxm ? (
             <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
-        const suffix2 = rolename ? (
-            <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
         let columns = [];
         let header = '';
@@ -165,21 +164,15 @@ export default class SupervisorTable extends Component {
             },
             {
                 title: '监理人',
-                dataIndex: 'Supervisor',
+                dataIndex: 'SupervisorName',
                 render: (text, record) => {
-                    if (text === 0) {
+                    if (record.SupervisorUserName && record.SupervisorName) {
+                        return <p>{record.SupervisorName + '(' + record.SupervisorUserName + ')'}</p>;
+                    } else if (record.SupervisorName && !record.SupervisorUserName) {
+                        return <p>{record.SupervisorName}</p>;
+                    } else {
                         return <p> / </p>;
                     }
-                    return (
-                        <span>
-                            {users && users[text]
-                                ? users[text].Full_Name +
-                                  '(' +
-                                  users[text].User_Name +
-                                  ')'
-                                : ''}
-                        </span>
-                    );
                 }
             },
             {
@@ -313,12 +306,20 @@ export default class SupervisorTable extends Component {
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>监理人：</span>
-                        <Input
-                            suffix={suffix2}
-                            value={rolename}
+                        <Select
+                            allowClear
+                            showSearch
                             className='forest-forestcalcw4'
+                            placeholder={'请输入姓名搜索'}
+                            onSearch={this.handleUserSearch.bind(this)}
                             onChange={this.onRoleNameChange.bind(this)}
-                        />
+                            showArrow={false}
+                            filterOption={false}
+                            notFoundContent={null}
+                            value={rolename || undefined}
+                        >
+                            {userOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg-datePicker6'>
                         <span className='forest-search-span6'>监理抽查时间：</span>
@@ -407,10 +408,6 @@ export default class SupervisorTable extends Component {
         this.setState({ sxm: '' });
     };
 
-    emitEmpty2 = () => {
-        this.setState({ rolename: '' });
-    };
-
     sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
@@ -492,8 +489,42 @@ export default class SupervisorTable extends Component {
         this.setState({ SupervisorCheck, status: value || '' });
     }
 
+    handleUserSearch = async (value) => {
+        const {
+            actions: {
+                getUsers
+            }
+        } = this.props;
+        let userList = [];
+        let userOptions = [];
+        if (value.length >= 2) {
+            let postData = {
+                fullname: value
+            };
+            let userData = await getUsers({}, postData);
+            if (userData && userData.content && userData.content instanceof Array) {
+                userList = userData.content;
+                userList.map((user) => {
+                    userOptions.push(
+                        <Option
+                            key={user.ID}
+                            title={`${user.Full_Name}(${user.User_Name})`}
+                            value={user.ID}>
+                            {`${user.Full_Name}(${user.User_Name})`}
+                        </Option>
+                    );
+                });
+            }
+            this.setState({
+                userOptions
+            });
+        }
+    }
     onRoleNameChange (value) {
-        this.setState({ rolename: value.target.value });
+        console.log('value', value);
+        this.setState({
+            rolename: value
+        });
     }
 
     datepick (value) {
@@ -552,14 +583,13 @@ export default class SupervisorTable extends Component {
         resetinput(leftkeycode);
     }
 
-    query (page) {
+    query = async (page) => {
         const {
             sxm = '',
             section = '',
             SupervisorCheck = '',
             smallclass = '',
             thinclass = '',
-            role = '',
             rolename = '',
             sstime = '',
             setime = '',
@@ -576,7 +606,10 @@ export default class SupervisorTable extends Component {
             return;
         }
         const {
-            actions: { getqueryTree },
+            actions: {
+                getqueryTree,
+                getUserDetail
+            },
             keycode = '',
             platform: { tree = {} },
             treetypes
@@ -605,54 +638,77 @@ export default class SupervisorTable extends Component {
             page,
             size,
             bigType,
-            treetype
+            treetype,
+            supervisor: rolename
         };
-        if (role) postdata[role] = rolename;
-        this.setState({ loading: true, percent: 0 });
-        getqueryTree({}, postdata).then(rst => {
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
-            let tblData = rst.content;
-            if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
-                    plan.order = (page - 1) * size + i + 1;
-
-                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
-                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    let statusname = '';
-
-                    plan.SupervisorCheck = plan.SupervisorCheck;
-                    plan.CheckStatus = plan.CheckStatus;
-                    plan.statusname = statusname;
-
-                    plan.statusname = statusname;
-                    let locationstatus = plan.LocationTime
-                        ? '已定位'
-                        : '未定位';
-                    plan.locationstatus = locationstatus;
-                    let yssj1 = plan.SupervisorTime
-                        ? moment(plan.SupervisorTime).format('YYYY-MM-DD')
-                        : '/';
-                    let yssj2 = plan.SupervisorTime
-                        ? moment(plan.SupervisorTime).format('HH:mm:ss')
-                        : '/';
-                    plan.yssj1 = yssj1;
-                    plan.yssj2 = yssj2;
-                });
-                let treeTotalNum = rst.total;
-                let messageTotalNum = rst.pageinfo.total;
-                const pagination = { ...this.state.pagination };
-                pagination.total = rst.pageinfo.total;
-                pagination.pageSize = size;
-                this.setState({
-                    tblData,
-                    pagination: pagination,
-                    messageTotalNum: messageTotalNum,
-                    treeTotalNum
-                });
-            }
+        this.setState({
+            loading: true,
+            percent: 0
         });
+        let rst = await getqueryTree({}, postdata);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
+        let tblData = rst.content;
+        if (tblData instanceof Array) {
+            let userIDList = [];
+            let userDataList = {};
+            for (let i = 0; i < tblData.length; i++) {
+                let plan = tblData[i];
+                plan.order = (page - 1) * size + i + 1;
+                plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                let statusname = '';
+
+                plan.SupervisorCheck = plan.SupervisorCheck;
+                plan.CheckStatus = plan.CheckStatus;
+                plan.statusname = statusname;
+
+                plan.statusname = statusname;
+                let locationstatus = plan.LocationTime
+                    ? '已定位'
+                    : '未定位';
+                plan.locationstatus = locationstatus;
+                let yssj1 = plan.SupervisorTime
+                    ? moment(plan.SupervisorTime).format('YYYY-MM-DD')
+                    : '/';
+                let yssj2 = plan.SupervisorTime
+                    ? moment(plan.SupervisorTime).format('HH:mm:ss')
+                    : '/';
+                plan.yssj1 = yssj1;
+                plan.yssj2 = yssj2;
+                let userData = '';
+                if (userIDList.indexOf(Number(plan.Supervisor)) === -1) {
+                    userData = await getUserDetail({id: plan.Supervisor});
+                } else {
+                    userData = userDataList[Number(plan.Supervisor)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
+                plan.SupervisorName = (userData && userData.Full_Name) || '';
+                plan.SupervisorUserName = (userData && userData.User_Name) || '';
+            }
+            let treeTotalNum = rst.total;
+            let messageTotalNum = rst.pageinfo.total;
+            const pagination = { ...this.state.pagination };
+            pagination.total = rst.pageinfo.total;
+            pagination.pageSize = size;
+            this.setState({
+                tblData,
+                pagination: pagination,
+                messageTotalNum: messageTotalNum,
+                treeTotalNum,
+                loading: false,
+                percent: 100
+            });
+        }
     }
 
     exportexcel () {
@@ -660,7 +716,6 @@ export default class SupervisorTable extends Component {
             sxm = '',
             section = '',
             // SupervisorCheck = '',
-            role = '',
             rolename = '',
             sstime = '',
             setime = '',
@@ -668,7 +723,7 @@ export default class SupervisorTable extends Component {
             bigType = '',
             treetype = ''
         } = this.state;
-        if (this.sections.length !== 0) {
+        if (this.section) {
             // 不是admin，要做查询判断了
             if (section === '') {
                 message.info('请选择标段信息');
@@ -689,9 +744,9 @@ export default class SupervisorTable extends Component {
             page: 1,
             size: exportsize,
             bigType,
-            treetype
+            treetype,
+            supervisor: rolename
         };
-        if (role) postdata[role] = rolename;
         this.setState({ loading: true, percent: 0 });
         getexportTree4Supervisor({}, postdata).then(rst3 => {
             this.setState({ loading: false });

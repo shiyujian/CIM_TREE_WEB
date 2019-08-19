@@ -12,7 +12,6 @@ import 'moment/locale/zh-cn';
 import XLSX from 'xlsx';
 const Option = Select.Option;
 const {RangePicker} = DatePicker;
-window.config = window.config || {};
 
 export default class TaskStatisTable extends Component {
     constructor (props) {
@@ -46,7 +45,6 @@ export default class TaskStatisTable extends Component {
             statisData: [],
             taskStatusSelect: ''
         };
-        this.sections = [];
         this.section = '';
         this.totalDataPer = false;
     }
@@ -91,7 +89,15 @@ export default class TaskStatisTable extends Component {
         },
         {
             title: '面积(亩)',
-            dataIndex: 'Area'
+            dataIndex: 'Area',
+            render: text => {
+                let number = text.toFixed(2);
+                return (
+                    <span title={number} href='#'>
+                        {number}
+                    </span>
+                );
+            }
         },
         {
             title: '养护人员',
@@ -252,24 +258,16 @@ export default class TaskStatisTable extends Component {
 
     componentDidMount = async () => {
         try {
-            let text = window.localStorage.getItem('QH_USER_DATA');
-            text = JSON.parse(text);
-            console.log('text', text);
-            this.user = getUser();
-            if (text.username === 'admin') {
+            const user = getUser();
+            if (user.username === 'admin') {
                 this.totalDataPer = true;
             }
-            let groups = text.groups || [];
-            groups.map((group) => {
-                if (group.name.indexOf('业主') !== -1) {
-                    this.totalDataPer = true;
-                }
-            });
-            let sections = this.user.sections;
-            this.sections = JSON.parse(sections);
-            console.log('this.totalDataPer', this.totalDataPer);
-            if ((this.sections && this.sections instanceof Array && this.sections.length > 0) || this.totalDataPer) {
-                this.section = this.sections[0];
+            let userRoles = user.roles || '';
+            if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('业主') !== -1) {
+                this.totalDataPer = true;
+            }
+            this.section = user.section;
+            if (this.section || this.totalDataPer) {
                 await this._loadCuringTypes();
                 await this._loadAreaData();
                 await this._loadTaskData();
@@ -782,7 +780,6 @@ export default class TaskStatisTable extends Component {
                         if (task && task.ID) {
                             for (let t = 0; t < curingTypes.length; t++) {
                                 let type = curingTypes[t];
-                                console.log('type', type);
                                 if (type.ID === task.CuringType) {
                                     // 获取task的养护类型
                                     task.typeName = type.Base_Name;
@@ -1122,6 +1119,7 @@ export default class TaskStatisTable extends Component {
                                 value={taskStatusSelect}
                                 onChange={this.handleTaskStatusChange.bind(this)}
                             >
+                                <Option key='全部' value={''} title='全部'>全部</Option>
                                 <Option key='已上报' value={2} title='已上报'>已上报</Option>
                             </Select>
                         </div>
@@ -1131,12 +1129,13 @@ export default class TaskStatisTable extends Component {
                             <Button style={{marginRight: 20}} onClick={this.handleResetSearch.bind(this)}>重置</Button>
                         </div>
                     </div>
+                    <div className='echartsClass'>
+                        <TaskStatisEcharts
+                            {...this.props}
+                            {...this.state} />
+                    </div>
 
-                    <TaskStatisEcharts
-                        {...this.props}
-                        {...this.state} />
                     <Table
-                        style={{width: 'calc(100% - 170px)'}}
                         columns={this.columns}
                         dataSource={taskSearchData}
                         rowKey='ID'

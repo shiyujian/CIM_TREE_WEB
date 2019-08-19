@@ -34,12 +34,15 @@ export default class PlantTop extends Component {
             <div>
                 <Spin spinning={this.state.loading}>
                     <Card>
-                        选择日期：
-                        <DatePicker
-                            defaultValue={moment(stime, DATE_FORMAT)}
-                            onChange={this.handleChangeDate.bind(this)}
-                        />
-                        <Button type='primary' style={{ marginLeft: 50 }} onClick={this.toExport.bind(this)}>导出<Icon type='download' /></Button>
+                        <div className='ScheduleDisplay-search-layout' >
+                            选择日期：
+                            <DatePicker
+                                defaultValue={moment(stime, DATE_FORMAT)}
+                                onChange={this.handleChangeDate.bind(this)}
+                            />
+                            <Button type='primary' style={{ marginLeft: 50 }} onClick={this.toExport.bind(this)}>导出<Icon type='download' /></Button>
+                        </div>
+
                         <div
                             id='PlantTop'
                             style={{ width: '100%', height: '340px' }}
@@ -57,9 +60,11 @@ export default class PlantTop extends Component {
         });
     }
     async query (dateString) {
-        let { dataList, dataListReal } = this.state;
         const { leftkeycode } = this.props;
-        const { getTreedayplans, getTreetotalstatbyday } = this.props.actions;
+        const {
+            getTreedayplans,
+            getTreetotalstatbyday
+        } = this.props.actions;
         try {
             if (!leftkeycode) {
                 return;
@@ -67,24 +72,27 @@ export default class PlantTop extends Component {
             this.setState({
                 loading: true
             });
+            let dataList = [];
+            let dataListReal = [];
             // 获取计划栽植量
-            await getTreedayplans({}, {
+            let rep = await getTreedayplans({}, {
                 section: leftkeycode,
                 stime: dateString + ' 00:00:00',
                 etime: dateString + ' 23:59:59'
-            }).then(rep => {
-                if (rep && rep.code && rep.code === 200) {
-                    dataList = rep.content;
-                }
             });
+
+            if (rep && rep.code && rep.code === 200) {
+                dataList = rep.content;
+            }
             // 获取实际栽植量
-            await getTreetotalstatbyday({}, {
+            let totalList = await getTreetotalstatbyday({}, {
                 section: leftkeycode,
                 stime: dateString + ' 00:00:00',
                 etime: dateString + ' 23:59:59'
-            }).then(rep => {
-                dataListReal = rep;
             });
+            if (totalList instanceof Array) {
+                dataListReal = totalList;
+            }
             this.setState({
                 dataList: dataList,
                 dataListReal: dataListReal,
@@ -113,25 +121,50 @@ export default class PlantTop extends Component {
         let yPlantData = [];
         let yRealData = [];
         let yRatioData = [];
-        dataList.map(item => {
+        if (dataList.length === 0 && dataListReal.length > 0) {
             dataListReal.map(row => {
-                if (item.Section === row.Section) {
-                    sectionsData.map((sectionData) => {
-                        if (item.Section === sectionData.No) {
-                            xAxisData.push(sectionData.Name);
-                        }
-                    });
-                    yPlantData.push(item.Num);
-                    yRealData.push(row.Num);
-                    let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    if (isNaN(ratio) || ratio === 'Infinity') {
-                        yRatioData.push(0);
-                    } else {
-                        yRatioData.push(ratio);
+                sectionsData.map((sectionData) => {
+                    if (row.Section === sectionData.No) {
+                        xAxisData.push(sectionData.Name);
                     }
-                }
+                });
+                yPlantData.push(0);
+                yRealData.push(row.Num);
+                yRatioData.push(100);
             });
-        });
+        } else if (dataList.length > 0 && dataListReal.length === 0) {
+            dataList.map(item => {
+                sectionsData.map((sectionData) => {
+                    if (item.Section === sectionData.No) {
+                        xAxisData.push(sectionData.Name);
+                        console.log('xAxisData', xAxisData);
+                    }
+                });
+                yPlantData.push(item.Num);
+                yRealData.push(0);
+                yRatioData.push(0);
+            });
+        } else if (dataList.length > 0 && dataListReal.length > 0) {
+            dataList.map(item => {
+                dataListReal.map(row => {
+                    if (item.Section === row.Section) {
+                        sectionsData.map((sectionData) => {
+                            if (item.Section === sectionData.No) {
+                                xAxisData.push(sectionData.Name);
+                            }
+                        });
+                        yPlantData.push(item.Num);
+                        yRealData.push(row.Num);
+                        let ratio = (row.Num / item.Num * 100).toFixed(2);
+                        if (isNaN(ratio) || ratio === 'Infinity') {
+                            yRatioData.push(0);
+                        } else {
+                            yRatioData.push(ratio);
+                        }
+                    }
+                });
+            });
+        }
 
         let myChart = echarts.init(document.getElementById('PlantTop'));
         let optionLine = {
@@ -146,8 +179,15 @@ export default class PlantTop extends Component {
             },
             toolbox: {
                 feature: {
-                    saveAsImage: { show: true }
-                }
+                    saveAsImage: {
+                        show: true,
+                        iconStyle: {
+                            textPosition: 'bottom',
+                            shadowOffsetX: 10
+                        }
+                    }
+                },
+                right: 20
             },
             legend: {
                 bottom: 10,
@@ -165,7 +205,7 @@ export default class PlantTop extends Component {
             yAxis: [
                 {
                     type: 'value',
-                    name: '颗',
+                    name: '棵',
                     axisLabel: {
                         formatter: '{value} '
                     }
@@ -214,17 +254,33 @@ export default class PlantTop extends Component {
         let yPlantData = [];
         let yRealData = [];
         let yRatioData = [];
-        dataList.map(item => {
+        if (dataList.length === 0 && dataListReal.length > 0) {
             dataListReal.map(row => {
-                if (item.Section === row.Section) {
-                    xAxisData.push(item.Section);
-                    yPlantData.push(item.Num);
-                    yRealData.push(row.Num);
-                    let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    yRatioData.push(ratio);
-                }
+                xAxisData.push(row.Section);
+                yPlantData.push(0);
+                yRealData.push(row.Num);
+                yRatioData.push(100);
             });
-        });
+        } else if (dataList.length > 0 && dataListReal.length === 0) {
+            dataList.map(item => {
+                xAxisData.push(item.Section);
+                yPlantData.push(item.Num);
+                yRealData.push(0);
+                yRatioData.push(0);
+            });
+        } else if (dataList.length > 0 && dataListReal.length > 0) {
+            dataList.map(item => {
+                dataListReal.map(row => {
+                    if (item.Section === row.Section) {
+                        xAxisData.push(item.Section);
+                        yPlantData.push(item.Num);
+                        yRealData.push(row.Num);
+                        let ratio = (row.Num / item.Num * 100).toFixed(2);
+                        yRatioData.push(ratio);
+                    }
+                });
+            });
+        }
         legendList.map(item => {
             let obj = {};
             xAxisData.map((row, col) => {

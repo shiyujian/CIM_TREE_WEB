@@ -49,20 +49,14 @@ export default class DegitalAccept extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getForestUsers,
                 getTreeNodeList,
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree
             },
-            users,
             platform: { tree = {} },
             supervisorUsersList
         } = this.props;
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
         if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
             let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
             let totalThinClass = data.totalThinClass || [];
@@ -172,23 +166,22 @@ export default class DegitalAccept extends Component {
             }
         } = this.props;
         const user = getUser();
-        let sections = user.sections;
-        sections = JSON.parse(sections);
+        let section = user.section;
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (sections && sections instanceof Array && sections.length > 0) {
+        if (section) {
             let roles = await getRoles();
             console.log();
-            let roleID = [];
+            let roleID = '';
             if (roles && roles instanceof Array && roles.length > 0) {
                 roles.map((role) => {
-                    if (role && role.name && role.name === '监理文书') {
-                        roleID.push(role.id);
+                    if (role && role.RoleName && role.RoleName === '监理文书') {
+                        roleID = role.ID;
                     }
                 });
                 let postData = {
-                    roles: roleID,
-                    sections: sections,
-                    is_active: true
+                    role: roleID,
+                    section: section,
+                    status: 1
                 };
                 await getSupervisorUsers({}, postData);
             }
@@ -249,7 +242,6 @@ export default class DegitalAccept extends Component {
         } = this.props;
         let treeList = tree.thinClassTree;
 
-        let user = getUser();
         let keycode = keys[0] || '';
         const {
             actions: { setkeycode }
@@ -273,14 +265,15 @@ export default class DegitalAccept extends Component {
         });
 
         // 标段
-        let sections = JSON.parse(user.sections);
+        let user = getUser();
+        let section = user.section;
         let permission = getUserIsManager();
         if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
         } else {
             sectionsData.map((sectionData) => {
-                if (sections[0] === sectionData.No) {
+                if (section && section === sectionData.No) {
                     this.setSectionOption(sectionData);
                 }
             });

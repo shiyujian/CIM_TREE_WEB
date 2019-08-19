@@ -2,30 +2,27 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 
 import {
-    MAIN_API
+    SYSTEM_API
 } from '_platform/api';
 
 export const ID = 'Checkwork_electronicfence';
-// 修改选择地图的方式
-export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 // 获取考勤群体
 export const getCheckGroupOK = createAction(`${ID}_getCheckGroup`);
-export const getCheckGroup = createFetchAction(`${MAIN_API}/check-group/`, [getCheckGroupOK], 'GET');
+export const getCheckGroup = createFetchAction(`${SYSTEM_API}/checkgroups`, [getCheckGroupOK], 'GET');
 
 // 获取群体下的所有围栏
-export const getCheckScope = createFetchAction(`${MAIN_API}/group/{{id}}/scope/`, [], 'GET');
+export const getCheckScope = createFetchAction(`${SYSTEM_API}/enclosures?groupId={{groupId}}`, [], 'GET');
 
 // 为群体设置电子围栏
-export const postCheckScope = createFetchAction(`${MAIN_API}/group/{{id}}/scope/`, [], 'POST');
+export const postCheckScope = createFetchAction(`${SYSTEM_API}/enclosure`, [], 'POST');
 
 // 更新群体的电子围栏信息
-export const putCheckScope = createFetchAction(`${MAIN_API}/scope/{{id}}/`, [], 'PUT');
+export const putCheckScope = createFetchAction(`${SYSTEM_API}/enclosure`, [], 'PUT');
 
 // 删除该群体的电子围栏
-export const deleteCheckScope = createFetchAction(`${MAIN_API}/scope/{{id}}/`, [], 'DELETE');
+export const deleteCheckScope = createFetchAction(`${SYSTEM_API}/deleteenclosure/{{id}}`, [], 'DELETE');
 
 export const actions = {
-    changeSelectMap,
     getCheckGroupOK,
     getCheckGroup,
     getCheckScope,
@@ -34,12 +31,14 @@ export const actions = {
     deleteCheckScope
 };
 export default handleActions({
-    [changeSelectMap]: (state, {payload}) => ({
-        ...state,
-        selectMap: payload
-    }),
-    [getCheckGroupOK]: (state, {payload}) => ({
-        ...state,
-        checkGroupsData: payload
-    })
+    [getCheckGroupOK]: (state, {payload}) => {
+        if (payload && payload.content && payload.content instanceof Array) {
+            let data = {
+                checkGroupsData: payload.content
+            };
+            return data;
+        } else {
+            return {checkGroupsData: []};
+        }
+    }
 }, {});

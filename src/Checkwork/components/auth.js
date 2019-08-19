@@ -1,4 +1,5 @@
 import './Checkwork.less';
+import {handlePOLYGONWktData} from '_platform/gisAuth';
 export const fillAreaColor = (index) => {
     let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
     return colors[index % 5];
@@ -26,7 +27,7 @@ export const handleAreaLayerData = async (eventKey, getTreearea) => {
                 coords.push(str);
             });
         } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+            str = handlePOLYGONWktData(wkt);
             coords.push(str);
         }
         return coords;
@@ -42,7 +43,7 @@ export const handleCoordinates = (str) => {
     let treearea = [];
     let arr = [];
     target.map((data, index) => {
-        if ((data[1] > 30) && (data[1] < 45) && (data[0] > 110) && (data[0] < 120)) {
+        if (data && data instanceof Array && data[1] && data[0]) {
             arr.push([data[1], data[0]]);
         }
     });
@@ -52,14 +53,12 @@ export const handleCoordinates = (str) => {
 // 处理搜索数据
 export const handleFilterData = (values, start, end) => {
     let params = {};
-    params.org_code = values.org_code ? values.org_code : '';
-    params.group = values.group ? values.group : '';
-    params.name = values.name ? values.name : '';
+    params.orgID = values.orgID ? values.orgID : '';
+    params.groupId = values.groupId ? values.groupId : '';
     if (values.searchDate) {
-        params.start = start;
-        params.end = end;
+        params.sTime = start;
+        params.eTime = end;
     }
-    params.checkin = values.checkin ? values.checkin : '';
     if (values.status === 2) { // 迟到默认可查询状态5
         params.status = values.status + ',5';
     } else if (values.status === 3) { // 早退默认可查询状态5

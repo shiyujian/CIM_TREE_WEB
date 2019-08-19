@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import { Form, Button, Card, Row, Col, Table, Input, Modal, Upload, Icon, InputNumber, message } from 'antd';
 import { CULTIVATIONMODE } from '_platform/api';
 import './PurchaseDetails.less';
-import { getForestImgUrl } from '_platform/auth';
+import { getForestImgUrl, getUser } from '_platform/auth';
 
 const Dragger = Upload.Dragger;
 class PurchaseDetails extends Component {
@@ -39,15 +39,10 @@ class PurchaseDetails extends Component {
         const { getPurchaseById, getWpunittree, getOrgTree_new, getOfferInventoryById } = this.props.actions;
         this.purchaseid = this.props.purchaseDetailsKey;
         // 获得登陆用户的 苗圃基地/供应商的code
-        const userData = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        if (userData && userData.account && userData.groups.length > 0) {
-            userData.groups.map(item => {
-                if (item.grouptype === 0 || item.grouptype === 6) {
-                    this.grouptype = item.grouptype;
-                }
-            });
-            this.org_code = userData.account.org_code;
-        }
+        const user = getUser();
+        let roles = user.roles || '';
+        this.grouptype = roles.ParentID;
+        this.org_code = user.org;
         // 根据ID采购单详情
         getPurchaseById({id: this.purchaseid}).then((rep) => {
             rep.Specs.map(item => {

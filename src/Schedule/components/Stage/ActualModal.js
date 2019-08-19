@@ -4,44 +4,102 @@ import {
     Col,
     Input,
     Form,
-    Icon,
     Button,
     Table,
     Modal,
     DatePicker,
     Select,
-    notification,
     Card,
     Steps
 } from 'antd';
+import {
+    ExecuteStateList
+} from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
 const Step = Steps.Step;
+const { Option } = Select;
+const dateFormat = 'YYYY-MM-DD';
 export default class ActualModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
             treeDatasource: [],
-            history: []
+            workFlow: []
         };
+        this.getTaskDetail.bind(this); // 获取任务详情
     }
     async componentDidMount () {
+        this.getTaskDetail(); // 获取任务详情
+    }
+    getTaskDetail = async () => {
         const {
-            actions: { getTask },
-            id
+            workID,
+            actions: { getWorkDetails },
+            form: { setFieldsValue },
+            platform: { tree = {} }
         } = this.props;
-        let params = {
-            task_id: id
-        };
-        let task = await getTask(params);
-        let history = [];
-        if (task && task.history) {
-            history = task.history;
-        }
         this.setState({
-            treeDatasource: this.props.actualDataSource,
-            history
+            workID: workID
+        });
+        let rep = await getWorkDetails({ID: workID}, {});
+        let FormParams = [];
+        if (rep && rep.Works && rep.Works.length > 0) {
+            rep.Works.map(item => {
+                if (item.CurrentNodeName === '施工填报' &&
+                    item.FormValues &&
+                    item.FormValues.length > 0 &&
+                    item.FormValues[0].FormParams
+                ) {
+                    FormParams = item.FormValues[0].FormParams;
+                }
+            });
+        }
+        console.log('123', FormParams);
+        console.log('123', FormParams);
+        let param = {};
+        let TableList = [];
+        FormParams.map(item => {
+            if (item.Key === 'TableInfo') {
+                TableList = JSON.parse(item.Val);
+            } else {
+                param[item.Key] = item.Val;
+            }
+        });
+
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let sectionName = '';
+        let projectName = '';
+
+        let currentSection = '';
+        if (param && param.Section) {
+            currentSection = param.Section;
+        }
+        let code = currentSection.split('-');
+        if (code && code.length === 3) {
+            // 获取当前标段所在的项目
+            sectionData.map(project => {
+                if (code[0] === project.No) {
+                    projectName = project.Name;
+                    project.children.map(section => {
+                        // 获取当前标段的名字
+                        if (section.No === param.Section) {
+                            sectionName = section.Name;
+                        }
+                    });
+                }
+            });
+            param.sectionName = sectionName;
+            param.projectName = projectName;
+        }
+        setFieldsValue({
+            Section: sectionName,
+            TodayDate: param.TodayDate ? moment(param.TodayDate).format(dateFormat) : ''
+        });
+        this.setState({
+            TableList,
+            workFlow: rep.Works
         });
     }
 
@@ -49,7 +107,10 @@ export default class ActualModal extends Component {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { history } = this.state;
+        const {
+            workFlow,
+            TableList
+        } = this.state;
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
@@ -59,7 +120,6 @@ export default class ActualModal extends Component {
                 <Modal
                     title='日进度计划流程详情'
                     width={800}
-                    // onOk={this.props.onok}
                     onCancel={this.props.oncancel}
                     visible
                     footer={null}
@@ -67,201 +127,160 @@ export default class ActualModal extends Component {
                     <div>
                         <Form>
                             <Row>
-                                <Col span={24}>
-                                    <Row>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='标段'
-                                            >
-                                                {getFieldDecorator(
-                                                    'stagesection',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props
-                                                            .sectionName ||
-                                                            '暂无标段'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请选择标段'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={12}>
-                                            <FormItem
-                                                {...FormItemLayout}
-                                                label='日期'
-                                            >
-                                                {getFieldDecorator(
-                                                    'stagetimedate',
-                                                    {
-                                                        initialValue: `${this
-                                                            .props.actualTimeDate ||
-                                                            '暂无日期'}`,
-                                                        rules: [
-                                                            {
-                                                                required: false,
-                                                                message:
-                                                                    '请输入日期'
-                                                            }
-                                                        ]
-                                                    }
-                                                )(<Input readOnly />)}
-                                            </FormItem>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Table
-                                            columns={this.columns1}
-                                            dataSource={
-                                                this.state.treeDatasource
-                                            }
-                                            bordered
-                                            rowKey='index'
-                                            className='foresttable'
-                                            pagination={false}
-                                        />
-                                    </Row>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='标段'
+                                    >
+                                        {getFieldDecorator(
+                                            'Section'
+                                        )(
+                                            <Input readOnly />
+                                        )}
+                                    </FormItem>
                                 </Col>
+                                <Col span={12}>
+                                    <FormItem
+                                        {...FormItemLayout}
+                                        label='日期'
+                                    >
+                                        {getFieldDecorator(
+                                            'TodayDate'
+                                        )(
+                                            <Input readOnly />
+                                        )}
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Table
+                                    columns={this.columns}
+                                    dataSource={TableList}
+                                    bordered
+                                    rowKey='ID'
+                                    className='foresttable'
+                                    pagination={false}
+                                />
                             </Row>
                         </Form>
                         <Card title={'审批流程'} style={{ marginTop: 10 }}>
                             <Steps
                                 direction='vertical'
                                 size='small'
-                                current={
-                                    history.length > 0 ? history.length - 1 : 0
-                                }
+                                current={workFlow.length - 1}
                             >
-                                {history
-                                    .map((step, index) => {
-                                        const {
-                                            state: {
-                                                participants: [
-                                                    { executor = {} } = {}
-                                                ] = []
-                                            } = {}
-                                        } = step;
-                                        if (step.status === 'processing') {
-                                            return (
-                                                <Step
-                                                    title={
-                                                        <div
-                                                            style={{
-                                                                marginBottom: 8
-                                                            }}
-                                                        >
-                                                            <span>
-                                                                {
-                                                                    step.state
-                                                                        .name
-                                                                }
-                                                                -(执行中)
-                                                            </span>
-                                                            <span
-                                                                style={{
-                                                                    paddingLeft: 20
-                                                                }}
-                                                            >
-                                                                当前执行人:{' '}
-                                                            </span>
-                                                            <span
-                                                                style={{
-                                                                    color:
-                                                                        '#108ee9'
-                                                                }}
-                                                            >
-                                                                {' '}
-                                                                {`${
-                                                                    executor.person_name
-                                                                }` ||
-                                                                    `${
-                                                                        executor.username
-                                                                    }`}
-                                                            </span>
-                                                        </div>
-                                                    }
-                                                    key={index}
-                                                />
-                                            );
+                                {workFlow.map(item => {
+                                    if (item.ExecuteState === 1) {
+                                        if (item.CurrentNodeName === '结束') {
+                                            return <Step key={item.ID} title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
+                                                </div>
+                                            } />;
                                         } else {
-                                            const {
-                                                records: [record]
-                                            } = step;
-                                            const {
-                                                log_on = '',
-                                                participant: {
-                                                    executor = {}
-                                                } = {},
-                                                note = ''
-                                            } = record || {};
-                                            const {
-                                                person_name: name = ''
-                                            } = executor;
-                                            return (
-                                                <Step
-                                                    key={index}
-                                                    title={`${
-                                                        step.state.name
-                                                    }-(${step.status})`}
-                                                    description={
-                                                        <div
-                                                            style={{
-                                                                lineHeight: 2.6
-                                                            }}
-                                                        >
-                                                            <div>
-                                                                意见：
-                                                                {note}
-                                                            </div>
-                                                            <div>
-                                                                <span>
-                                                                    {`${
-                                                                        step
-                                                                            .state
-                                                                            .name
-                                                                    }`}
-                                                                    人:
-                                                                    {`${name}` ||
-                                                                        `${
-                                                                            executor.username
-                                                                        }`}{' '}
-                                                                    [
-                                                                    {
-                                                                        executor.username
-                                                                    }
-                                                                    ]
-                                                                </span>
-                                                                <span
-                                                                    style={{
-                                                                        paddingLeft: 20
-                                                                    }}
-                                                                >
-                                                                    {`${
-                                                                        step
-                                                                            .state
-                                                                            .name
-                                                                    }`}
-                                                                    时间：
-                                                                    {moment(
-                                                                        log_on
-                                                                    ).format(
-                                                                        'YYYY-MM-DD HH:mm:ss'
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                />
-                                            );
+                                            return <Step key={item.ID} title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
+                                                </div>
+                                            } description={
+                                                <div>
+                                                    <span>
+                                                        {item.CurrentNodeName}人：
+                                                        {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
+                                                    </span>
+                                                    <span style={{marginLeft: 20}}>
+                                                        {item.CurrentNodeName}时间：
+                                                        {item.RunTime}
+                                                    </span>
+                                                </div>
+                                            } />;
                                         }
-                                    })
-                                    .filter(h => !!h)}
+                                    } else if (item.ExecuteState === 2) {
+                                        // 退回
+                                        return <Step key={item.ID} title={
+                                            <div>
+                                                <span>{item.CurrentNodeName}</span>
+                                                <span style={{marginLeft: 10}}>-({
+                                                    ExecuteStateList.map(row => {
+                                                        if (row.value === item.ExecuteState) {
+                                                            return row.label;
+                                                        }
+                                                    })
+                                                })</span>
+                                            </div>
+                                        } description={<div>
+                                            {
+                                                item.CurrentNodeName !== '施工填报' ? <div>
+                                                    {
+                                                        item.FormValues && item.FormValues.length ? <div>意见：{
+                                                            item.FormValues[0].FormParams && item.FormValues[0].FormParams.length && item.FormValues[0].FormParams[0].Val
+                                                        }</div> : ''
+                                                    }
+                                                </div> : ''
+                                            }
+                                            <div>
+                                                <span>
+                                                    {item.CurrentNodeName}人：
+                                                    {item.ExecutorObj && item.ExecutorObj.Full_Name}({item.ExecutorObj && item.ExecutorObj.User_Name})
+                                                </span>
+                                                <span style={{marginLeft: 20}}>
+                                                    {item.CurrentNodeName}时间：
+                                                    {item.RunTime}
+                                                </span>
+                                            </div>
+                                        </div>} />;
+                                    } else {
+                                        if (item.ExecutorObj) {
+                                            // 未结束
+                                            return <Step key={item.ID} title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
+                                                    <span style={{marginLeft: 20}}>
+                                                        当前执行人：
+                                                        <span style={{color: '#108ee9'}}>
+                                                            {`${item.ExecutorObj && item.ExecutorObj.Full_Name}(${item.ExecutorObj && item.ExecutorObj.User_Name})`}
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            } />;
+                                        } else {
+                                            // 已结束
+                                            return <Step key={item.ID} title={
+                                                <div>
+                                                    <span>{item.CurrentNodeName}</span>
+                                                    <span style={{marginLeft: 10}}>-({
+                                                        ExecuteStateList.map(row => {
+                                                            if (row.value === item.ExecuteState) {
+                                                                return row.label;
+                                                            }
+                                                        })
+                                                    })</span>
+                                                </div>
+                                            } />;
+                                        }
+                                    }
+                                })}
                             </Steps>
                         </Card>
                         <Row style={{ marginTop: 10 }}>
@@ -283,14 +302,14 @@ export default class ActualModal extends Component {
         const { states = [] } = task;
         return states.find(state => state.status === 'processing');
     }
-    columns1 = [
+    columns = [
         {
             title: '序号',
             dataIndex: 'key',
             key: 'key',
             width: '10%',
             render: (text, record, index) => {
-                return <span>{record.key + 1}</span>;
+                return <span>{record.ID + 1}</span>;
             }
         },
         {

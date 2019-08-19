@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser, getForestImgUrl, getUserIsManager } from '_platform/auth';
+import { getForestImgUrl, getUserIsManager } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData
@@ -26,6 +26,7 @@ import {
 import ChangeLocInfoModal from './ChangeLocInfoModal';
 const { RangePicker } = DatePicker;
 const InputGroup = Input.Group;
+const { Option } = Select;
 
 export default class LocmeasureTable extends Component {
     constructor (props) {
@@ -52,7 +53,6 @@ export default class LocmeasureTable extends Component {
             SupervisorCheck: '',
             CheckStatus: '',
             // islocation: '',
-            role: 'inputer',
             rolename: '',
             percent: 0,
             messageTotalNum: '',
@@ -78,7 +78,8 @@ export default class LocmeasureTable extends Component {
             changeLocInfoVisible: false,
             changeLocInfoAllStatus: false,
             example: '',
-            postData: ''
+            postData: '',
+            userOptions: []
         };
         this.columns = [
             {
@@ -133,19 +134,15 @@ export default class LocmeasureTable extends Component {
             },
             {
                 title: '测量人',
-                dataIndex: 'Inputer',
+                dataIndex: 'InputerName',
                 render: (text, record) => {
-                    const { users } = this.props;
-                    return (
-                        <span>
-                            {users && users[text]
-                                ? users[text].Full_Name +
-                                  '(' +
-                                  users[text].User_Name +
-                                  ')'
-                                : ''}
-                        </span>
-                    );
+                    if (record.InputerUserName && record.InputerName) {
+                        return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                    } else if (record.InputerName && !record.InputerUserName) {
+                        return <p>{record.InputerName}</p>;
+                    } else {
+                        return <p> / </p>;
+                    }
                 }
             },
             {
@@ -327,8 +324,6 @@ export default class LocmeasureTable extends Component {
         ];
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
     // 表格的多选设置
     onRowSelectChange = (selectedRowKeys, selectedRows) => {
@@ -427,10 +422,6 @@ export default class LocmeasureTable extends Component {
         this.setState({ sxm: '' });
     };
 
-    emitEmpty2 = () => {
-        this.setState({ rolename: '' });
-    };
-
     sxmChange (value) {
         this.setState({ sxm: value.target.value });
     }
@@ -503,8 +494,42 @@ export default class LocmeasureTable extends Component {
         this.setState({ islocation: value || '' });
     }
 
+    handleUserSearch = async (value) => {
+        const {
+            actions: {
+                getUsers
+            }
+        } = this.props;
+        let userList = [];
+        let userOptions = [];
+        if (value.length >= 2) {
+            let postData = {
+                fullname: value
+            };
+            let userData = await getUsers({}, postData);
+            if (userData && userData.content && userData.content instanceof Array) {
+                userList = userData.content;
+                userList.map((user) => {
+                    userOptions.push(
+                        <Option
+                            key={user.ID}
+                            title={`${user.Full_Name}(${user.User_Name})`}
+                            value={user.ID}>
+                            {`${user.Full_Name}(${user.User_Name})`}
+                        </Option>
+                    );
+                });
+            }
+            this.setState({
+                userOptions
+            });
+        }
+    }
     onRoleNameChange (value) {
-        this.setState({ rolename: value.target.value });
+        console.log('value', value);
+        this.setState({
+            rolename: value
+        });
     }
 
     datepick (value) {
@@ -708,7 +733,6 @@ export default class LocmeasureTable extends Component {
             bigType = '',
             treetype = '',
             locationstatus = '',
-            role = '',
             rolename = '',
             stime = '',
             lstime = '',
@@ -842,9 +866,9 @@ export default class LocmeasureTable extends Component {
             gd: gd,
             gf: gf,
             tqhd: tqhd,
-            tqzj: tqzj
+            tqzj: tqzj,
+            inputer: rolename
         };
-        if (role) postData[role] = rolename;
         this.setState({ loading: true, percent: 0 });
         getexportTree({}, postData).then(rst3 => {
             if (rst3 === '') {
@@ -874,15 +898,13 @@ export default class LocmeasureTable extends Component {
         });
         this.query(pagination.current);
     }
-    query (page) {
-        const { users } = this.props;
+    query = async (page) => {
         const {
             sxm = '',
             section = '',
             bigType = '',
             treetype = '',
             // islocation = '',
-            role = '',
             rolename = '',
             stime = '',
             etime = '',
@@ -911,7 +933,10 @@ export default class LocmeasureTable extends Component {
             return;
         }
         const {
-            actions: { getqueryTree },
+            actions: {
+                getqueryTree,
+                getUserDetail
+            },
             keycode = '',
             platform: { tree = {} }
         } = this.props;
@@ -1019,398 +1044,416 @@ export default class LocmeasureTable extends Component {
             gd: gd,
             gf: gf,
             tqhd: tqhd,
-            tqzj: tqzj
+            tqzj: tqzj,
+            inputer: rolename
         };
-        if (role) postData[role] = rolename;
 
-        this.setState({ loading: true, percent: 0 });
-        getqueryTree({}, postData).then(rst => {
-            this.setState({ loading: false, percent: 100 });
-            if (!rst) return;
-            let tblData = rst.content;
-            if (tblData instanceof Array) {
-                tblData.forEach((plan, i) => {
-                    plan.order = (page - 1) * size + i + 1;
-                    plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
-                    plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-                    plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
-                    let statusname = '';
-
-                    plan.SupervisorCheck = plan.SupervisorCheck;
-                    plan.CheckStatus = plan.CheckStatus;
-                    plan.statusname = statusname;
-                    let islocation = plan.LocationTime ? '已定位' : '未定位';
-                    plan.islocation = islocation;
-                    let createtime1 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('YYYY-MM-DD')
-                        : '/';
-                    let createtime2 = plan.CreateTime
-                        ? moment(plan.CreateTime).format('HH:mm:ss')
-                        : '/';
-                    let createtime3 = plan.LocationTime
-                        ? moment(plan.LocationTime).format('YYYY-MM-DD')
-                        : '/';
-                    let createtime4 = plan.LocationTime
-                        ? moment(plan.LocationTime).format('HH:mm:ss')
-                        : '/';
-                    plan.createtime1 = createtime1;
-                    plan.createtime2 = createtime2;
-                    plan.createtime3 = createtime3;
-                    plan.createtime4 = createtime4;
-                });
-
-                let messageTotalNum = rst.pageinfo.total;
-                let treeTotalNum = rst.total;
-                const pagination = { ...this.state.pagination };
-                pagination.total = rst.pageinfo.total;
-                pagination.pageSize = size;
-
-                if (bigType === '5') {
-                    this.columns = [
-                        {
-                            title: '序号',
-                            dataIndex: 'order'
-                        },
-                        {
-                            title: '顺序码',
-                            dataIndex: 'ZZBM'
-                        },
-                        {
-                            title: '项目',
-                            dataIndex: 'Project'
-                        },
-                        {
-                            title: '标段',
-                            dataIndex: 'sectionName'
-                        },
-                        {
-                            title: '位置',
-                            dataIndex: 'place'
-                        },
-                        {
-                            title: '树种',
-                            dataIndex: 'TreeTypeObj.TreeTypeName'
-                        },
-                        {
-                            title: '状态',
-                            dataIndex: 'statusname',
-                            render: (text, record) => {
-                                let statusname = '';
-                                if (record.Status === 2) {
-                                    statusname = '不合格';
-                                } else if (
-                                    record.SupervisorCheck === -1 &&
-                                    record.CheckStatus === -1
-                                ) {
-                                    statusname = '未抽查';
-                                } else {
-                                    if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
-                                        statusname = '抽查退回';
-                                    } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
-                                        statusname = '抽查通过';
-                                    }
-                                }
-                                return <span>{statusname}</span>;
-                            }
-                        },
-                        {
-                            title: '测量人',
-                            dataIndex: 'Inputer',
-                            render: (text, record) => {
-                                return (
-                                    <span>
-                                        {users && users[text]
-                                            ? users[text].Full_Name +
-                                              '(' +
-                                              users[text].User_Name +
-                                              ')'
-                                            : ''}
-                                    </span>
-                                );
-                            }
-                        },
-                        {
-                            title: '测量时间',
-                            render: (text, record) => {
-                                const {
-                                    createtime1 = '',
-                                    createtime2 = ''
-                                } = record;
-                                return (
-                                    <div>
-                                        <div>{createtime1}</div>
-                                        <div>{createtime2}</div>
-                                    </div>
-                                );
-                            }
-                        },
-                        {
-                            title: '实际栽植量',
-                            dataIndex: 'Num'
-                        }
-                    ];
-                } else {
-                    this.columns = [
-                        {
-                            title: '序号',
-                            dataIndex: 'order'
-                        },
-                        {
-                            title: '顺序码',
-                            dataIndex: 'ZZBM'
-                        },
-                        {
-                            title: '项目',
-                            dataIndex: 'Project'
-                        },
-                        {
-                            title: '标段',
-                            dataIndex: 'sectionName'
-                        },
-                        {
-                            title: '位置',
-                            dataIndex: 'place'
-                        },
-                        {
-                            title: '树种',
-                            dataIndex: 'TreeTypeObj.TreeTypeName'
-                        },
-                        {
-                            title: '状态',
-                            dataIndex: 'statusname',
-                            render: (text, record) => {
-                                let statusname = '';
-                                if (record.Status === 2) {
-                                    statusname = '不合格';
-                                } else if (
-                                    record.SupervisorCheck === -1 &&
-                                    record.CheckStatus === -1
-                                ) {
-                                    statusname = '未抽查';
-                                } else {
-                                    if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
-                                        statusname = '抽查退回';
-                                    } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
-                                        statusname = '抽查通过';
-                                    }
-                                }
-                                return <span>{statusname}</span>;
-                            }
-                        },
-                        {
-                            title: '定位',
-                            dataIndex: 'islocation'
-                        },
-                        {
-                            title: '测量人',
-                            dataIndex: 'Inputer',
-                            render: (text, record) => {
-                                return (
-                                    <span>
-                                        {users && users[text]
-                                            ? users[text].Full_Name +
-                                              '(' +
-                                              users[text].User_Name +
-                                              ')'
-                                            : ''}
-                                    </span>
-                                );
-                            }
-                        },
-                        {
-                            title: '测量时间',
-                            render: (text, record) => {
-                                const {
-                                    createtime1 = '',
-                                    createtime2 = ''
-                                } = record;
-                                return (
-                                    <div>
-                                        <div>{createtime1}</div>
-                                        <div>{createtime2}</div>
-                                    </div>
-                                );
-                            }
-                        },
-                        // {
-                        //     title: '定位时间',
-                        //     render: (text, record) => {
-                        //         const {
-                        //             createtime3 = '',
-                        //             createtime4 = ''
-                        //         } = record;
-                        //         return (
-                        //             <div>
-                        //                 <div>{createtime3}</div>
-                        //                 <div>{createtime4}</div>
-                        //             </div>
-                        //         );
-                        //     }
-                        // },
-                        {
-                            title: (
-                                <div>
-                                    <div>高度</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            render: (text, record) => {
-                                if (record.GD != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.GDFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.GDFJ
-                                            )}
-                                        >
-                                            {record.GD}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>冠幅</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            render: (text, record) => {
-                                if (record.GF != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.GFFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.GFFJ
-                                            )}
-                                        >
-                                            {record.GF}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>胸径</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            render: (text, record) => {
-                                if (record.XJ != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.XJFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.XJFJ
-                                            )}
-                                        >
-                                            {record.XJ}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>地径</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            render: (text, record) => {
-                                if (record.DJ != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.DJFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.DJFJ
-                                            )}
-                                        >
-                                            {record.DJ}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>土球厚度</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            dataIndex: 'tqhd',
-                            render: (text, record) => {
-                                if (record.TQHD != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.TQHDFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.TQHDFJ
-                                            )}
-                                        >
-                                            {record.TQHD}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        },
-                        {
-                            title: (
-                                <div>
-                                    <div>土球直径</div>
-                                    <div>(cm)</div>
-                                </div>
-                            ),
-                            dataIndex: 'tqzj',
-                            render: (text, record) => {
-                                if (record.TQZJ != 0) {
-                                    return (
-                                        <a
-                                            disabled={!record.TQHDFJ}
-                                            onClick={this.onImgClick.bind(
-                                                this,
-                                                record.TQHDFJ
-                                            )}
-                                        >
-                                            {record.TQZJ}
-                                        </a>
-                                    );
-                                } else {
-                                    return <span>/</span>;
-                                }
-                            }
-                        }
-                    ];
-                }
-
-                this.setState({
-                    tblData,
-                    pagination: pagination,
-                    messageTotalNum: messageTotalNum,
-                    treeTotalNum,
-                    postData
-                });
-            }
+        this.setState({
+            loading: true,
+            percent: 0
         });
+        let rst = await getqueryTree({}, postData);
+        if (!(rst && rst.content)) {
+            this.setState({
+                loading: false,
+                percent: 100
+            });
+            return;
+        }
+        let tblData = rst.content;
+        if (tblData instanceof Array) {
+            let userIDList = [];
+            let userDataList = {};
+            for (let i = 0; i < tblData.length; i++) {
+                let plan = tblData[i];
+                plan.order = (page - 1) * size + i + 1;
+                plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+                plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
+                plan.place = getSmallThinNameByPlaceData(plan.Section, plan.SmallClass, plan.ThinClass, thinClassTree);
+                let statusname = '';
+
+                plan.SupervisorCheck = plan.SupervisorCheck;
+                plan.CheckStatus = plan.CheckStatus;
+                plan.statusname = statusname;
+                let islocation = plan.LocationTime ? '已定位' : '未定位';
+                plan.islocation = islocation;
+                let createtime1 = plan.CreateTime
+                    ? moment(plan.CreateTime).format('YYYY-MM-DD')
+                    : '/';
+                let createtime2 = plan.CreateTime
+                    ? moment(plan.CreateTime).format('HH:mm:ss')
+                    : '/';
+                let createtime3 = plan.LocationTime
+                    ? moment(plan.LocationTime).format('YYYY-MM-DD')
+                    : '/';
+                let createtime4 = plan.LocationTime
+                    ? moment(plan.LocationTime).format('HH:mm:ss')
+                    : '/';
+                plan.createtime1 = createtime1;
+                plan.createtime2 = createtime2;
+                plan.createtime3 = createtime3;
+                plan.createtime4 = createtime4;
+                let userData = '';
+                if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
+                    userData = await getUserDetail({id: plan.Inputer});
+                } else {
+                    userData = userDataList[Number(plan.Inputer)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
+                plan.InputerName = (userData && userData.Full_Name) || '';
+                plan.InputerUserName = (userData && userData.User_Name) || '';
+            }
+
+            let messageTotalNum = rst.pageinfo.total;
+            let treeTotalNum = rst.total;
+            const pagination = { ...this.state.pagination };
+            pagination.total = rst.pageinfo.total;
+            pagination.pageSize = size;
+
+            if (bigType === '5') {
+                this.columns = [
+                    {
+                        title: '序号',
+                        dataIndex: 'order'
+                    },
+                    {
+                        title: '顺序码',
+                        dataIndex: 'ZZBM'
+                    },
+                    {
+                        title: '项目',
+                        dataIndex: 'Project'
+                    },
+                    {
+                        title: '标段',
+                        dataIndex: 'sectionName'
+                    },
+                    {
+                        title: '位置',
+                        dataIndex: 'place'
+                    },
+                    {
+                        title: '树种',
+                        dataIndex: 'TreeTypeObj.TreeTypeName'
+                    },
+                    {
+                        title: '状态',
+                        dataIndex: 'statusname',
+                        render: (text, record) => {
+                            let statusname = '';
+                            if (record.Status === 2) {
+                                statusname = '不合格';
+                            } else if (
+                                record.SupervisorCheck === -1 &&
+                                    record.CheckStatus === -1
+                            ) {
+                                statusname = '未抽查';
+                            } else {
+                                if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
+                                    statusname = '抽查退回';
+                                } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
+                                    statusname = '抽查通过';
+                                }
+                            }
+                            return <span>{statusname}</span>;
+                        }
+                    },
+                    {
+                        title: '测量人',
+                        dataIndex: 'InputerName',
+                        render: (text, record) => {
+                            if (record.InputerUserName && record.InputerName) {
+                                return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                            } else if (record.InputerName && !record.InputerUserName) {
+                                return <p>{record.InputerName}</p>;
+                            } else {
+                                return <p> / </p>;
+                            }
+                        }
+                    },
+                    {
+                        title: '测量时间',
+                        render: (text, record) => {
+                            const {
+                                createtime1 = '',
+                                createtime2 = ''
+                            } = record;
+                            return (
+                                <div>
+                                    <div>{createtime1}</div>
+                                    <div>{createtime2}</div>
+                                </div>
+                            );
+                        }
+                    },
+                    {
+                        title: '实际栽植量',
+                        dataIndex: 'Num'
+                    }
+                ];
+            } else {
+                this.columns = [
+                    {
+                        title: '序号',
+                        dataIndex: 'order'
+                    },
+                    {
+                        title: '顺序码',
+                        dataIndex: 'ZZBM'
+                    },
+                    {
+                        title: '项目',
+                        dataIndex: 'Project'
+                    },
+                    {
+                        title: '标段',
+                        dataIndex: 'sectionName'
+                    },
+                    {
+                        title: '位置',
+                        dataIndex: 'place'
+                    },
+                    {
+                        title: '树种',
+                        dataIndex: 'TreeTypeObj.TreeTypeName'
+                    },
+                    {
+                        title: '状态',
+                        dataIndex: 'statusname',
+                        render: (text, record) => {
+                            let statusname = '';
+                            if (record.Status === 2) {
+                                statusname = '不合格';
+                            } else if (
+                                record.SupervisorCheck === -1 &&
+                                    record.CheckStatus === -1
+                            ) {
+                                statusname = '未抽查';
+                            } else {
+                                if (record.SupervisorCheck === 0 || record.CheckStatus === 0) {
+                                    statusname = '抽查退回';
+                                } else if (record.SupervisorCheck === 1 || record.CheckStatus === 1) {
+                                    statusname = '抽查通过';
+                                }
+                            }
+                            return <span>{statusname}</span>;
+                        }
+                    },
+                    {
+                        title: '定位',
+                        dataIndex: 'islocation'
+                    },
+                    {
+                        title: '测量人',
+                        dataIndex: 'InputerName',
+                        render: (text, record) => {
+                            if (record.InputerUserName && record.InputerName) {
+                                return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+                            } else if (record.InputerName && !record.InputerUserName) {
+                                return <p>{record.InputerName}</p>;
+                            } else {
+                                return <p> / </p>;
+                            }
+                        }
+                    },
+                    {
+                        title: '测量时间',
+                        render: (text, record) => {
+                            const {
+                                createtime1 = '',
+                                createtime2 = ''
+                            } = record;
+                            return (
+                                <div>
+                                    <div>{createtime1}</div>
+                                    <div>{createtime2}</div>
+                                </div>
+                            );
+                        }
+                    },
+                    // {
+                    //     title: '定位时间',
+                    //     render: (text, record) => {
+                    //         const {
+                    //             createtime3 = '',
+                    //             createtime4 = ''
+                    //         } = record;
+                    //         return (
+                    //             <div>
+                    //                 <div>{createtime3}</div>
+                    //                 <div>{createtime4}</div>
+                    //             </div>
+                    //         );
+                    //     }
+                    // },
+                    {
+                        title: (
+                            <div>
+                                <div>高度</div>
+                                <div>(cm)</div>
+                            </div>
+                        ),
+                        render: (text, record) => {
+                            if (record.GD != 0) {
+                                return (
+                                    <a
+                                        disabled={!record.GDFJ}
+                                        onClick={this.onImgClick.bind(
+                                            this,
+                                            record.GDFJ
+                                        )}
+                                    >
+                                        {record.GD}
+                                    </a>
+                                );
+                            } else {
+                                return <span>/</span>;
+                            }
+                        }
+                    },
+                    {
+                        title: (
+                            <div>
+                                <div>冠幅</div>
+                                <div>(cm)</div>
+                            </div>
+                        ),
+                        render: (text, record) => {
+                            if (record.GF != 0) {
+                                return (
+                                    <a
+                                        disabled={!record.GFFJ}
+                                        onClick={this.onImgClick.bind(
+                                            this,
+                                            record.GFFJ
+                                        )}
+                                    >
+                                        {record.GF}
+                                    </a>
+                                );
+                            } else {
+                                return <span>/</span>;
+                            }
+                        }
+                    },
+                    {
+                        title: (
+                            <div>
+                                <div>胸径</div>
+                                <div>(cm)</div>
+                            </div>
+                        ),
+                        render: (text, record) => {
+                            if (record.XJ != 0) {
+                                return (
+                                    <a
+                                        disabled={!record.XJFJ}
+                                        onClick={this.onImgClick.bind(
+                                            this,
+                                            record.XJFJ
+                                        )}
+                                    >
+                                        {record.XJ}
+                                    </a>
+                                );
+                            } else {
+                                return <span>/</span>;
+                            }
+                        }
+                    },
+                    {
+                        title: (
+                            <div>
+                                <div>地径</div>
+                                <div>(cm)</div>
+                            </div>
+                        ),
+                        render: (text, record) => {
+                            if (record.DJ != 0) {
+                                return (
+                                    <a
+                                        disabled={!record.DJFJ}
+                                        onClick={this.onImgClick.bind(
+                                            this,
+                                            record.DJFJ
+                                        )}
+                                    >
+                                        {record.DJ}
+                                    </a>
+                                );
+                            } else {
+                                return <span>/</span>;
+                            }
+                        }
+                    },
+                    {
+                        title: (
+                            <div>
+                                <div>土球厚度</div>
+                                <div>(cm)</div>
+                            </div>
+                        ),
+                        dataIndex: 'tqhd',
+                        render: (text, record) => {
+                            if (record.TQHD != 0) {
+                                return (
+                                    <a
+                                        disabled={!record.TQHDFJ}
+                                        onClick={this.onImgClick.bind(
+                                            this,
+                                            record.TQHDFJ
+                                        )}
+                                    >
+                                        {record.TQHD}
+                                    </a>
+                                );
+                            } else {
+                                return <span>/</span>;
+                            }
+                        }
+                    },
+                    {
+                        title: (
+                            <div>
+                                <div>土球直径</div>
+                                <div>(cm)</div>
+                            </div>
+                        ),
+                        dataIndex: 'tqzj',
+                        render: (text, record) => {
+                            if (record.TQZJ != 0) {
+                                return (
+                                    <a
+                                        disabled={!record.TQHDFJ}
+                                        onClick={this.onImgClick.bind(
+                                            this,
+                                            record.TQHDFJ
+                                        )}
+                                    >
+                                        {record.TQZJ}
+                                    </a>
+                                );
+                            } else {
+                                return <span>/</span>;
+                            }
+                        }
+                    }
+                ];
+            }
+
+            this.setState({
+                tblData,
+                pagination: pagination,
+                messageTotalNum: messageTotalNum,
+                treeTotalNum,
+                postData,
+                loading: false,
+                percent: 100
+            });
+        }
     }
 
     treeTable (details) {
@@ -1434,14 +1477,11 @@ export default class LocmeasureTable extends Component {
             bigType,
             treetypename,
             status,
-            selectedRowKeys = []
-            // islocation
+            selectedRowKeys = [],
+            userOptions = []
         } = this.state;
         const suffix1 = sxm ? (
             <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
-        const suffix2 = rolename ? (
-            <Icon type='close-circle' onClick={this.emitEmpty2} />
         ) : null;
         let header = '';
         let permission = getUserIsManager();
@@ -1556,13 +1596,20 @@ export default class LocmeasureTable extends Component {
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>测量人：</span>
-                        <Input
-                            suffix={suffix2}
-                            value={rolename}
-                            placeholder='请输入用户名'
+                        <Select
+                            allowClear
+                            showSearch
                             className='forest-forestcalcw4'
+                            placeholder={'请输入姓名搜索'}
+                            onSearch={this.handleUserSearch.bind(this)}
                             onChange={this.onRoleNameChange.bind(this)}
-                        />
+                            showArrow={false}
+                            filterOption={false}
+                            notFoundContent={null}
+                            value={rolename || undefined}
+                        >
+                            {userOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg-datePicker'>
                         <span className='forest-search-span'>测量时间：</span>

@@ -8,7 +8,12 @@ import {
     DatePicker,
     Select
 } from 'antd';
-import { getUserIsManager, getCompanyDataByOrgCode } from '_platform/auth';
+import {
+    getUser,
+    getCompanyDataByOrgCode,
+    getUserIsManager
+} from '_platform/auth';
+import {ORGTYPE} from '_platform/api';
 import { handleFilterData } from '../auth';
 const FormItem = Form.Item;
 const { Option, OptGroup } = Select;
@@ -27,7 +32,6 @@ class CountFilter extends Component {
             groupArray: [],
             start: '',
             end: '',
-            statusArray: [],
             permission: false,
             userCompany: ''
         };
@@ -38,7 +42,7 @@ class CountFilter extends Component {
         const {
             actions: {
                 getTreeNodeList,
-                getOrgTree
+                getOrgTreeByOrgType
             },
             platform: { tree = {} }
         } = this.props;
@@ -48,29 +52,27 @@ class CountFilter extends Component {
             }
             this.companyList = [];
             // 是否为业主或管理员
+            // let permission = true;
             let permission = getUserIsManager();
             if (permission) {
-                if (!(tree && tree.org && tree.org.children && tree.org.children instanceof Array && tree.org.children.length > 0)) {
-                    let orgData = await getOrgTree({}, { depth: 7 });
-                    console.log('orgData', orgData);
-                    await orgData.children.map(async (child) => {
-                        if (child.name !== '苗圃基地' && child.name !== '供应商') {
-                            await this.getCompanyList(child);
-                        }
-                    });
-                } else {
-                    await tree.org.children.map(async (child) => {
-                        if (child.name !== '苗圃基地' && child.name !== '供应商') {
-                            await this.getCompanyList(child);
-                        }
-                    });
+                for (let i = 0; i < ORGTYPE.length; i++) {
+                    let type = ORGTYPE[i];
+                    let orgData = await getOrgTreeByOrgType({orgtype: type});
+                    if (orgData && orgData.content && orgData.content instanceof Array && orgData.content.length > 0) {
+                        await this.getCompanyList(orgData.content);
+                    }
+                }
+                await this.getUserCompany();
+            } else {
+                let parentData = await this.getUserCompany();
+                if (parentData && parentData.ID) {
+                    this.companyList.push(parentData);
                 }
             }
+            this.props.getCompanyDataList(this.companyList);
             this.setState({
                 permission
             });
-            await this.getUserCompany();
-            console.log('this.companyList', this.companyList);
         } catch (e) {
             console.log('componentDidMount', e);
         }
@@ -79,45 +81,56 @@ class CountFilter extends Component {
     getUserCompany = async () => {
         const {
             actions: {
-                getOrgTreeByCode
+                getParentOrgTreeByID
             },
             form: { setFieldsValue }
         } = this.props;
         try {
-            let user = localStorage.getItem('QH_USER_DATA');
-            user = JSON.parse(user);
+            let user = getUser();
+            let parentData = '';
             // admin没有部门
             if (user.username !== 'admin') {
                 // userOrgCode为登录用户自己的部门code
-                let userOrgCode = user.account.org_code;
-                let parentData = await getCompanyDataByOrgCode(userOrgCode, getOrgTreeByCode);
-                let companyOrgCode = parentData.code;
-                await setFieldsValue({
-                    org_code: companyOrgCode
-                });
-                this.setState({
-                    userCompany: companyOrgCode
-                });
-                // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
-                await this.getCheckGroupList(companyOrgCode);
-                await this.query();
+                let orgID = user.org;
+                parentData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                console.log('parentData', parentData);
+                if (parentData && parentData.ID) {
+                    let companyOrgID = parentData.ID;
+                    await setFieldsValue({
+                        orgID: companyOrgID
+                    });
+                    this.setState({
+                        userCompany: companyOrgID
+                    });
+                    // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
+                    await this.getCheckGroupList(companyOrgID);
+                    await this.query();
+                }
+            } else {
+                if (this.companyList && this.companyList instanceof Array && this.companyList.length > 0) {
+                    let companyData = this.companyList[0];
+                    let companyOrgID = companyData.ID;
+                    await setFieldsValue({
+                        orgID: companyOrgID
+                    });
+                    this.setState({
+                        userCompany: companyOrgID
+                    });
+                    // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
+                    await this.getCheckGroupList(companyOrgID);
+                    await this.query();
+                }
             }
+            return parentData;
         } catch (e) {
             console.log('getUserCompany', e);
         }
     }
     // 查找所有的公司的List
     getCompanyList = async (data) => {
-        if (data && data.extra_params && data.extra_params.companyStatus) {
-            if (data.extra_params.companyStatus === '项目' || data.extra_params.companyStatus === '非公司') {
-                if (data && data.children && data.children.length > 0) {
-                    await data.children.map((child) => {
-                        return this.getCompanyList(child);
-                    });
-                }
-            } else if (data.extra_params.companyStatus === '公司' || data.extra_params.companyStatus.indexOf('单位') !== -1) {
-                await this.companyList.push(data);
-            }
+        console.log('data', data);
+        if (data && data instanceof Array) {
+            this.companyList = this.companyList.concat(data);
         }
     }
     // 公司选择
@@ -129,7 +142,7 @@ class CountFilter extends Component {
             permission
         } = this.state;
         await setFieldsValue({
-            org_code: value
+            orgID: value
         });
         // 非业主账户只能查找自己的公司的考勤群体
         if (permission) {
@@ -142,242 +155,93 @@ class CountFilter extends Component {
             actions: { getCheckGroup }
         } = this.props;
         let groupArray = [];
-        let groupList = await getCheckGroup({}, {org_code: value});
-        groupList.map(group => {
-            groupArray.push(
-                <Option key={group.id} value={group.id}>
-                    {group.name}
-                </Option>
-            );
-        });
+        let groupList = await getCheckGroup({}, {orgCode: value});
+        if (groupList && groupList.content && groupList.content instanceof Array) {
+            groupList.content.map(group => {
+                groupArray.push(
+                    <Option key={group.id} value={group.id}>
+                        {group.Name}
+                    </Option>
+                );
+            });
+        }
         this.setState({
-            groupArray: groupArray
+            groupArray
         });
     }
 
     renderContent () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
         const {
             platform: { roles = [] }
         } = this.props;
-        const {
-            permission
-        } = this.state;
-        var systemRoles = [];
-        if (permission) {
-            systemRoles.push({
-                name: '苗圃角色',
-                value: roles.filter(role => role.grouptype === 0)
-            });
-            systemRoles.push({
-                name: '施工角色',
-                value: roles.filter(role => role.grouptype === 1)
-            });
-            systemRoles.push({
-                name: '监理角色',
-                value: roles.filter(role => role.grouptype === 2)
-            });
-            systemRoles.push({
-                name: '业主角色',
-                value: roles.filter(role => role.grouptype === 3)
-            });
-            systemRoles.push({
-                name: '养护角色',
-                value: roles.filter(role => role.grouptype === 4)
-            });
-            systemRoles.push({
-                name: '供应商角色',
-                value: roles.filter(role => role.grouptype === 6)
-            });
-        } else {
-            for (let i = 0; i < user.groups.length; i++) {
-                const rolea = user.groups[i].grouptype;
-                switch (rolea) {
-                    case 0:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        break;
-                    case 1:
-                        systemRoles.push({
-                            name: '苗圃角色',
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        systemRoles.push({
-                            name: '施工角色',
-                            value: roles.filter(role => role.grouptype === 1)
-                        });
-                        systemRoles.push({
-                            name: '养护角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 2:
-                        systemRoles.push({
-                            name: '监理角色',
-                            value: roles.filter(role => role.grouptype === 2)
-                        });
-                        break;
-                    case 3:
-                        systemRoles.push({
-                            name: '业主角色',
-                            value: roles.filter(role => role.grouptype === 3)
-                        });
-                        break;
-                    case 4:
-                        systemRoles.push({
-                            name: '养护角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    case 6:
-                        systemRoles.push({
-                            name: '供应商角色',
-                            value: roles.filter(role => role.grouptype === 4)
-                        });
-                        break;
-                    default:
-                        break;
-                }
+        let systemRoles = [];
+        let parentRoleType = [];
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID === 0) {
+                parentRoleType.push(role);
             }
-        }
+        });
+        console.log('parentRoleType', parentRoleType);
+        parentRoleType.map((type) => {
+            systemRoles.push({
+                name: type && type.RoleName,
+                value: roles.filter(role => role.ParentID === type.ID)
+            });
+        });
+
         const objs = systemRoles.map(roless => {
             return (
                 <OptGroup label={roless.name} key={roless.name}>
                     {roless.value.map(role => {
                         return (
-                            <Option key={role.id} value={String(role.id)}>
-                                {role.name}
+                            <Option key={role.ID} value={String(role.ID)}>
+                                {role.RoleName}
                             </Option>
                         );
                     })}
                 </OptGroup>
             );
         });
+        console.log('systemRoles', systemRoles);
         return objs;
     }
     renderTitle () {
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        const {
-            platform: { roles = [] }
-        } = this.props;
-        const {
-            permission
-        } = this.state;
         var systemRoles = [];
-        if (permission) {
-            systemRoles.push({
-                name: '苗圃职务',
-                children: ['苗圃'],
-                value: roles.filter(role => role.grouptype === 0)
-            });
-            systemRoles.push({
-                name: '施工职务',
-                children: [
-                    '施工领导',
-                    '协调调度人',
-                    '质量负责人',
-                    '安全负责人',
-                    '文明负责人',
-                    '普通员工',
-                    '施工文书',
-                    '测量员',
-                    '施工整改人'
-                ],
-                value: roles.filter(role => role.grouptype === 1)
-            });
-            systemRoles.push({
-                name: '监理职务',
-                children: ['总监', '监理组长', '普通监理', '监理文书'],
-                value: roles.filter(role => role.grouptype === 2)
-            });
-            systemRoles.push({
-                name: '业主职务',
-                children: ['业主', '业主文书', '业主领导'],
-                value: roles.filter(role => role.grouptype === 3)
-            });
-            systemRoles.push({
-                name: '苗圃基地职务',
-                children: ['苗圃基地'],
-                value: roles.filter(role => role.grouptype === 5)
-            });
-            systemRoles.push({
-                name: '供应商职务',
-                children: ['供应商'],
-                value: roles.filter(role => role.grouptype === 6)
-            });
-        } else {
-            for (let i = 0; i < user.groups.length; i++) {
-                const rolea = user.groups[i].grouptype;
-                switch (rolea) {
-                    case 0:
-                        systemRoles.push({
-                            name: '苗圃职务',
-                            children: ['苗圃'],
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        break;
-                    case 1:
-                        systemRoles.push({
-                            name: '苗圃职务',
-                            children: ['苗圃'],
-                            value: roles.filter(role => role.grouptype === 0)
-                        });
-                        systemRoles.push({
-                            name: '施工职务',
-                            children: [
-                                '施工领导',
-                                '协调调度人',
-                                '质量负责人',
-                                '安全负责人',
-                                '文明负责人',
-                                '普通员工',
-                                '施工文书',
-                                '测量员',
-                                '施工整改人'
-                            ],
-                            value: roles.filter(role => role.grouptype === 1)
-                        });
-                        break;
-                    case 2:
-                        systemRoles.push({
-                            name: '监理职务',
-                            children: [
-                                '总监',
-                                '监理组长',
-                                '普通监理',
-                                '监理文书'
-                            ],
-                            value: roles.filter(role => role.grouptype === 2)
-                        });
-                        break;
-                    case 3:
-                        systemRoles.push({
-                            name: '业主职务',
-                            children: ['业主', '业主文书', '业主领导'],
-                            value: roles.filter(role => role.grouptype === 3)
-                        });
-                        break;
-                    case 5:
-                        systemRoles.push({
-                            name: '苗圃基地职务',
-                            children: ['苗圃基地'],
-                            value: roles.filter(role => role.grouptype === 5)
-                        });
-                        break;
-                    case 6:
-                        systemRoles.push({
-                            name: '供应商职务',
-                            children: ['供应商'],
-                            value: roles.filter(role => role.grouptype === 6)
-                        });
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+        systemRoles.push({
+            name: '苗圃职务',
+            children: ['苗圃']
+        });
+        systemRoles.push({
+            name: '施工职务',
+            children: [
+                '施工领导',
+                '协调调度人',
+                '质量负责人',
+                '安全负责人',
+                '文明负责人',
+                '普通员工',
+                '施工文书',
+                '测量员',
+                '施工整改人'
+            ]
+        });
+        systemRoles.push({
+            name: '监理职务',
+            children: ['总监', '监理组长', '普通监理', '监理文书']
+        });
+        systemRoles.push({
+            name: '业主职务',
+            children: ['业主', '业主文书', '业主领导']
+        });
+        systemRoles.push({
+            name: '苗圃基地职务',
+            children: ['苗圃基地']
+        });
+        systemRoles.push({
+            name: '供应商职务',
+            children: ['供应商']
+        });
+
         const objs = systemRoles.map(roless => {
             return (
                 <OptGroup label={roless.name} key={roless.name} >
@@ -401,43 +265,14 @@ class CountFilter extends Component {
         });
     }
 
-    onCheckinChange (value) { // 出勤选择下拉框和状态选择下拉框联动
-        const {
-            form: { setFieldsValue }
-        } = this.props;
-        setFieldsValue({
-            status: undefined
-        });
-        let statusArray = [];
-        if (value === 'y') { // 出勤时可以选择的状态有正常打卡,迟到,和早退
-            let arr = [{label: '正常打卡', value: 4}, {label: '迟到', value: 2}, {label: '早退', value: 3}];
-            arr.map(p => {
-                statusArray.push(
-                    <Option key={p.value} value={p.value}>
-                        {p.label}
-                    </Option>
-                );
-            });
-        } else if (value === 'n') { // 缺勤时可以选择的状态有打卡一次
-            let arr = [{label: '未打卡', value: 1}];
-            arr.map(p => {
-                statusArray.push(
-                    <Option key={p.value} value={p.value}>
-                        {p.label}
-                    </Option>
-                );
-            });
-        }
-        this.setState({
-            statusArray: statusArray
-        });
-    }
-
     render () {
         const {
             form: { getFieldDecorator }
         } = this.props;
-        const { groupArray, statusArray } = this.state;
+        const {
+            groupArray
+        } = this.state;
+        console.log('this.companyList', this.companyList);
         return (
             <Form style={{ marginBottom: 24 }}>
                 <Row gutter={24}>
@@ -445,8 +280,11 @@ class CountFilter extends Component {
                         <Row>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='公司'>
-                                    {getFieldDecorator('org_code', {
-
+                                    {getFieldDecorator('orgID', {
+                                        rules: [{
+                                            required: true,
+                                            message: '请选择公司'
+                                        }]
                                     })(
                                         <Select
                                             allowClear
@@ -457,8 +295,11 @@ class CountFilter extends Component {
                                         >
                                             {
                                                 this.companyList.map((company) => {
-                                                    return <Option title={company.name} key={company.code} value={company.code}>
-                                                        {company.name}
+                                                    return <Option
+                                                        title={company.OrgName}
+                                                        key={company.ID}
+                                                        value={company.ID}>
+                                                        {company.OrgName}
                                                     </Option>;
                                                 })
                                             }
@@ -468,7 +309,7 @@ class CountFilter extends Component {
                             </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='考勤群体'>
-                                    {getFieldDecorator('group', {
+                                    {getFieldDecorator('groupId', {
 
                                     })(
                                         <Select placeholder='请选择考勤群体' allowClear>
@@ -477,21 +318,6 @@ class CountFilter extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='姓名'>
-                                    {getFieldDecorator('name', {
-
-                                    })(
-                                        <Input placeholder='请输入姓名' />
-                                    )}
-                                </FormItem>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-                <Row gutter={24}>
-                    <Col span={18}>
-                        <Row>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='时间'>
                                     {getFieldDecorator('searchDate', {
@@ -511,58 +337,16 @@ class CountFilter extends Component {
                                     )}
                                 </FormItem>
                             </Col>
-                            <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='出勤'>
-                                    {getFieldDecorator('checkin', {
-
-                                    })(
-                                        <Select
-                                            allowClear
-                                            placeholder='请选择是否出勤'
-                                            onChange={this.onCheckinChange.bind(this)}
-                                        >
-                                            <Option
-                                                key={'n'}
-                                                value={'n'}
-                                            >
-                                                缺勤
-                                            </Option>
-                                            <Option
-                                                key={'y'}
-                                                value={'y'}
-                                            >
-                                                出勤
-                                            </Option>
-                                        </Select>
-                                    )}
-                                </FormItem>
-                            </Col>
-                            <Col span={8}>
-                                <FormItem {...CountFilter.layout} label='状态'>
-                                    {getFieldDecorator('status', {
-
-                                    })(
-                                        <Select placeholder='请选择状态' allowClear>
-                                            {statusArray}
-                                        </Select>
-                                    )}
-                                </FormItem>
-                            </Col>
                         </Row>
                     </Col>
                     <Col span={5} offset={1}>
                         <Row gutter={10}>
                             <Col span={12}>
                                 <Button
-                                    type='Primary'
+                                    type='primary'
                                     onClick={this.query.bind(this)}
                                 >
                                     查询
-                                </Button>
-                            </Col>
-                            <Col span={12}>
-                                <Button onClick={this.clear.bind(this)}>
-                                    清除
                                 </Button>
                             </Col>
                         </Row>
@@ -571,6 +355,34 @@ class CountFilter extends Component {
                 <Row gutter={24}>
                     <Col span={18}>
                         <Row>
+                            <Col span={8}>
+                                <FormItem {...CountFilter.layout} label='状态'>
+                                    {getFieldDecorator('status', {
+
+                                    })(
+                                        <Select placeholder='请选择状态' allowClear>
+                                            <Option tile='出勤' value={1} key='出勤'>
+                                                出勤
+                                            </Option>
+                                            <Option tile='迟到' value={2} key='迟到'>
+                                                迟到
+                                            </Option>
+                                            <Option tile='早退' value={3} key='早退'>
+                                                早退
+                                            </Option>
+                                            <Option tile='迟到并早退' value={4} key='迟到并早退'>
+                                                迟到并早退
+                                            </Option>
+                                            <Option tile='请假' value={5} key='请假'>
+                                                请假
+                                            </Option>
+                                            <Option tile='缺勤' value={0} key='缺勤'>
+                                                缺勤
+                                            </Option>
+                                        </Select>
+                                    )}
+                                </FormItem>
+                            </Col>
                             <Col span={8}>
                                 <FormItem {...CountFilter.layout} label='角色'>
                                     {getFieldDecorator('role', {
@@ -587,7 +399,6 @@ class CountFilter extends Component {
                                                     ) >= 0
                                             }
                                             allowClear
-                                            // mode='multiple'
                                             style={{ width: '100%' }}
                                         >
                                             {this.renderContent()}
@@ -612,6 +423,15 @@ class CountFilter extends Component {
                             </Col>
                         </Row>
                     </Col>
+                    <Col span={5} offset={1}>
+                        <Row gutter={10}>
+                            <Col span={12}>
+                                <Button onClick={this.clear.bind(this)}>
+                                    清除
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Col>
                 </Row>
             </Form>
         );
@@ -629,12 +449,12 @@ class CountFilter extends Component {
             end
         } = this.state;
         validateFields((err, values) => {
-            console.log('err', err);
-            console.log('values', values);
-            let params = handleFilterData(values, start, end);
-            console.log('params', params);
-            changeFilterData(params);
-            this.props.query(1, params);
+            if (!err) {
+                let params = handleFilterData(values, start, end);
+                console.log('params', params);
+                changeFilterData(params);
+                this.props.query(1, params);
+            }
         });
     }
     clear () {
@@ -650,23 +470,29 @@ class CountFilter extends Component {
             end
         } = this.state;
         setFieldsValue({
-            checkin: undefined,
             duty: undefined,
-            group: undefined,
-            name: undefined,
-            org_code: userCompany || undefined,
+            groupId: undefined,
+            orgID: userCompany || undefined,
             role: undefined,
             searchDate: undefined,
             status: undefined
         });
-        validateFields((err, values) => {
-            console.log('err', err);
-            console.log('values', values);
-            let params = handleFilterData(values, start, end);
-            console.log('params', params);
-            changeFilterData(params);
-            this.props.query(1, params);
+        this.setState({
+            start: '',
+            end: ''
+        }, () => {
+            this.query();
         });
+        // validateFields((err, values) => {
+        //     console.log('err', err);
+        //     console.log('values', values);
+        //     if (!err) {
+        //         let params = handleFilterData(values, start, end);
+        //         console.log('params', params);
+        //         changeFilterData(params);
+        //         this.props.query(1, params);
+        //     }
+        // });
     }
 }
 export default Form.create()(CountFilter);

@@ -3,6 +3,7 @@ import { actionsMap } from '_platform/store/util';
 import fieldFactory from '_platform/store/service/field';
 import createFetchAction from 'fetch-action';
 import {
+    base,
     WORKFLOW_API,
     FOREST_API
 } from '_platform/api';
@@ -50,8 +51,23 @@ export const gettreetype = forestFetchAction(
 
 const changeDocs = createAction(`${ID}_22CHANGE_DOCS`);
 const selectDocuments = createAction(`${ID}_22SELECTDOUMENT`);
-
+// 2019-7-27 两库合并
+// 获取节点列表
+export const getNodeList = createFetchAction(`${base}/flow/nodes`, []);
+// 获取流程列表
+export const getFlowList = createFetchAction(`${base}/flow/flows`, [], 'GET');
+// 获取任务详情
+export const getWorkDetails = createFetchAction(`${base}/flow/work/{{ID}}`, [], 'GET');
+// 流程执行
+export const postSendwork = createFetchAction(`${base}/flow/sendwork`, [], 'POST');
+// 流程退回
+export const postBackwork = createFetchAction(`${base}/flow/backwork`, [], 'POST');
 export const actions = {
+    getNodeList,
+    getFlowList,
+    getWorkDetails,
+    postSendwork,
+    postBackwork,
     ...parameterReducer,
     setTaskDetailLoading,
     patchDeadline,

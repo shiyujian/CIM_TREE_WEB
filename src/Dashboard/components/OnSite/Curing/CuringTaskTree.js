@@ -9,6 +9,7 @@ import {
     genPopUpContent,
     handleCuringTaskMess
 } from '../../auth';
+import {handlePOLYGONWktData} from '_platform/gisAuth';
 // 养护任务类型图片
 import curingTaskDrainImg from '../../CuringTaskImg/drain.png';
 import curingTaskFeedImg from '../../CuringTaskImg/feed.png';
@@ -193,24 +194,24 @@ export default class CuringTaskTree extends Component {
                                                 </div>
                                                 <div className='CuringTaskTree-button'>
                                                     <Button className='CuringTaskTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'all' ? 'primary' : ''}
+                                                        type={timeType === 'all' ? 'primary' : 'default'}
                                                         id='all' onClick={this.handleTimeChange.bind(this)}>
                                                         全部
                                                     </Button>
                                                     <Button className='CuringTaskTree-button-layout' id='today'
-                                                        type={timeType === 'today' ? 'primary' : ''}
+                                                        type={timeType === 'today' ? 'primary' : 'default'}
                                                         onClick={this.handleTimeChange.bind(this)}>
                                                         今天
                                                     </Button>
                                                 </div>
                                                 <div className='CuringTaskTree-button'>
                                                     <Button className='CuringTaskTree-button-layout' style={{ marginRight: 10 }}
-                                                        type={timeType === 'week' ? 'primary' : ''}
+                                                        type={timeType === 'week' ? 'primary' : 'default'}
                                                         id='week' onClick={this.handleTimeChange.bind(this)}>
                                                         一周内
                                                     </Button>
                                                     <Button className='CuringTaskTree-button-layout' id='custom'
-                                                        type={timeType === 'custom' ? 'primary' : ''}
+                                                        type={timeType === 'custom' ? 'primary' : 'default'}
                                                         onClick={this.handleTimeChange.bind(this)}>
                                                         自定义
                                                     </Button>
@@ -595,7 +596,7 @@ export default class CuringTaskTree extends Component {
                     }
                 });
             } else if (wkt.indexOf('POLYGON') !== -1) {
-                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                str = handlePOLYGONWktData(wkt);
                 if (type === 'plan') {
                     // 只有一个图形，必须要设置图标
                     this._handleCuringPlanCoordLayer(str, task, eventKey, 1, isFocus);

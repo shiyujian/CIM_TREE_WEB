@@ -7,7 +7,7 @@ import {
     Content,
     DynamicTitle
 } from '_platform/components/layout';
-import { actions, actions2 } from '../store/permission';
+import { actions } from '../store/permission';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '_platform/store/global';
@@ -20,7 +20,7 @@ import { Roles, Table } from '../components/Permission';
     },
     dispatch => ({
         actions: bindActionCreators(
-            { ...actions, ...platformActions, ...actions2 },
+            { ...actions, ...platformActions },
             dispatch
         )
     })

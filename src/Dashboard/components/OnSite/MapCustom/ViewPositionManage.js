@@ -10,6 +10,7 @@ import customViewCloseSelImg from '../../InitialPositionImg/delete2.png';
 import {
     PROJECTPOSITIONCENTER
 } from '_platform/api';
+import {getUser} from '_platform/auth';
 
 export default class ViewPositionManage extends Component {
     constructor (props) {
@@ -43,12 +44,12 @@ export default class ViewPositionManage extends Component {
                                     <div>
                                         {
                                             PROJECTPOSITIONCENTER.map((view, index) => {
-                                                return (<div className='ViewPositionManage-rightInitialPositionMenu-areaViewData' key={view.name}>
+                                                return (<div className='ViewPositionManage-rightInitialPositionMenu-areaViewData' key={view.Name}>
                                                     <Button
                                                         className='ViewPositionManage-rightInitialPositionMenu-areaViewData-button'
                                                         onClick={this.locationToMapCustomPosition.bind(this, view)}
-                                                        type={userMapPositionName === view.name ? 'primary' : 'default'}>
-                                                        {view.name}
+                                                        type={userMapPositionName === view.Name ? 'primary' : 'default'}>
+                                                        {view.Name}
                                                     </Button>
                                                 </div>);
                                             })
@@ -61,12 +62,12 @@ export default class ViewPositionManage extends Component {
                                     <div>
                                         {
                                             customViewByUserID.map((view, index) => {
-                                                if (userMapPositionName === view.name) {
+                                                if (userMapPositionName === view.Name) {
                                                     return (<div className='ViewPositionManage-rightInitialPositionMenu-customViewData-Select' key={view.id}>
                                                         <a className='ViewPositionManage-rightInitialPositionMenu-customViewData-ALabel-Select'
-                                                            title={view.name}
+                                                            title={view.Name}
                                                             onClick={this.locationToMapCustomPosition.bind(this, view)}>
-                                                            {view.name}
+                                                            {view.Name}
                                                         </a>
                                                         <Popconfirm title='确认要删除么'
                                                             onConfirm={this.handleDeleteMapCustomPosition.bind(this, view)}
@@ -78,9 +79,9 @@ export default class ViewPositionManage extends Component {
                                                 } else {
                                                     return (<div className='ViewPositionManage-rightInitialPositionMenu-customViewData-Unselect' key={view.id}>
                                                         <a className='ViewPositionManage-rightInitialPositionMenu-customViewData-ALabel-Unselect'
-                                                            title={view.name}
+                                                            title={view.Name}
                                                             onClick={this.locationToMapCustomPosition.bind(this, view)}>
-                                                            {view.name}
+                                                            {view.Name}
                                                         </a>
                                                         <Popconfirm title='确认要删除么'
                                                             onConfirm={this.handleDeleteMapCustomPosition.bind(this, view)}
@@ -126,17 +127,17 @@ export default class ViewPositionManage extends Component {
             },
             map
         } = this.props;
-        await setUserMapPositionName(view.name);
+        await setUserMapPositionName(view.Name);
         // 修改地图聚焦点
-        if (view && view.id && view.center && view.center instanceof Array && view.center.length > 0) {
-            let center = [view.center[0].lat, view.center[0].lng];
+        if (view && view.ID && view.Lat && view.Lng) {
+            let center = [view.Lat, view.Lng];
             await map.panTo(center);
         } else {
             await map.panTo(view.center);
         }
         // 因先设置直接跳转,然后直接修改放大层级，无法展示，只能在跳转坐标之后，设置时间再重新修改放大层级
         setTimeout(async () => {
-            await map.setZoom(view.zoom);
+            await map.setZoom(view.Zoom);
         }, 500);
     }
     // 删除选择的视图
@@ -149,22 +150,23 @@ export default class ViewPositionManage extends Component {
         } = this.props;
         try {
             let postData = {
-                id: view.id
+                id: view.ID
             };
             let data = await deleteUserCustomView(postData);
-            if (data) {
-                Notification.error({
-                    message: '删除视图失败',
-                    duration: 3
-                });
-            } else {
+            if (data && data.code && data.code === 1) {
                 Notification.success({
                     message: '删除视图成功',
                     duration: 3
                 });
+            } else {
+                Notification.error({
+                    message: '删除视图失败',
+                    duration: 3
+                });
+                return;
             }
-            const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-            await getCustomViewByUserID({id: user.id});
+            let user = getUser();
+            await getCustomViewByUserID({id: user.ID});
         } catch (e) {
             console.log('handleDeleteMapCustomPosition', e);
         }

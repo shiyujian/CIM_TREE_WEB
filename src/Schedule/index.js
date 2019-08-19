@@ -19,6 +19,7 @@ export default class Schedule extends Component {
     render () {
         const {
             Stage,
+            NodeManage,
             ScheduleAnalyze,
             EnterAnalyze,
             ScheduleDisplay
@@ -39,6 +40,13 @@ export default class Schedule extends Component {
                             exact
                             path='/schedule/stagereport'
                             component={Stage}
+                        />
+                    )}
+                    {NodeManage && (
+                        <Route
+                            exact
+                            path='/schedule/nodemanage'
+                            component={NodeManage}
                         />
                     )}
                     {EnterAnalyze && (
@@ -74,26 +82,33 @@ export default class Schedule extends Component {
             icon: <Icon name='suitcase' />
         },
         {
+            key: 'nodemanage',
+            id: 'SCHEDULE.NODEMANAGE',
+            name: '节点管理',
+            path: '/schedule/nodemanage',
+            icon: <Icon name='suitcase' />
+        },
+        {
             key: 'scheduledisplay',
             id: 'SCHEDULE.SCHEDULEDISPLAY',
             name: '进度展示',
             path: '/schedule/scheduledisplay',
             icon: <Icon name='warning' />
-        },
-        {
-            key: 'enteranalyze',
-            id: 'SCHEDULE.ENTERANALYZE',
-            name: '苗木进场分析',
-            path: '/schedule/enteranalyze',
-            icon: <Icon name='ship' />
-        },
-        {
-            key: 'scheduleanalyze',
-            name: '种植进度分析',
-            id: 'SCHEDULE.SCHEDULEANALYZE',
-            path: '/schedule/scheduleanalyze',
-            icon: <Icon name='warning' />
         }
+        // {
+        //     key: 'enteranalyze',
+        //     id: 'SCHEDULE.ENTERANALYZE',
+        //     name: '苗木进场分析',
+        //     path: '/schedule/enteranalyze',
+        //     icon: <Icon name='ship' />
+        // },
+        // {
+        //     key: 'scheduleanalyze',
+        //     name: '种植进度分析',
+        //     id: 'SCHEDULE.SCHEDULEANALYZE',
+        //     path: '/schedule/scheduleanalyze',
+        //     icon: <Icon name='warning' />
+        // }
     ];
 
     static defaultOpenKeys = ['stagereport'];

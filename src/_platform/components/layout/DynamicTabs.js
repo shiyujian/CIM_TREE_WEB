@@ -30,9 +30,11 @@ export default class DynamicTabs extends Component {
         if (ignore) {
             return null;
         }
-        if (pathname === '/project/auxiliaryacceptance' || pathname === '/project/projectimage') {
+        if (pathname === '/project/auxiliaryacceptance' ||
+            pathname === '/project/projectimage') {
             return null;
         }
+        console.log('tabs', tabs);
         let index = tabs.findIndex(tab => tab.path === pathname);
         if (index === -1) {
             index = 0;

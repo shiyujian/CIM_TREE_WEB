@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { Sidebar, Content, DynamicTitle } from '_platform/components/layout';
 import { actions } from '../store/person';
 import { actions as platformActions } from '_platform/store/global';
-import { Tree, Table, Addition, Edit } from '../components/Person';
+import { Tree, Table } from '../components/Person';
 
 @connect(
     state => {
@@ -31,8 +31,6 @@ export default class Person extends Component {
                 <Content>
                     <Table {...this.props} />
                 </Content>
-                <Addition {...this.props} />
-                <Edit {...this.props} />
             </div>
         );
     }
@@ -40,10 +38,12 @@ export default class Person extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getTreeNodeList
+                getTreeNodeList,
+                getUsersOK
             },
             platform: { tree = {} }
         } = this.props;
+        await getUsersOK([]);
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
         }

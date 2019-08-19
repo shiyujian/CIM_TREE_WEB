@@ -12,13 +12,13 @@ import {
     handleCoordinates
 } from '../auth';
 import {
-    computeSignedArea
+    computeSignedArea,
+    handlePOLYGONWktData
 } from '_platform/gisAuth';
 import ScopeCreateModal from './ScopeCreateModal';
 import '../Checkwork.less';
 
 const Panel = Collapse.Panel;
-window.config = window.config || {};
 
 export default class ScopeCreateTable extends Component {
     constructor (props) {
@@ -82,6 +82,7 @@ export default class ScopeCreateTable extends Component {
         let me = this;
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
+        mapInitialization.attributionControl = false;
         this.map = L.map('mapid', mapInitialization);
         // 加载基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {
@@ -115,9 +116,8 @@ export default class ScopeCreateTable extends Component {
                 });
                 return;
             }
-            // 此处圈选区域的数组与其他地方不一样，因林总不需要lat，lng这两个字段，院内api需要
-            coordinates.push(e.latlng);
-            // coordinates.push([e.latlng.lat, e.latlng.lng]);
+
+            coordinates.push([e.latlng.lat, e.latlng.lng]);
             if (me.state.polygonData) {
                 me.map.removeLayer(me.state.polygonData);
             }
@@ -149,217 +149,6 @@ export default class ScopeCreateTable extends Component {
                     tiletype: 'wtms'
                 }
             ).addTo(this.map);
-        }
-    }
-    render () {
-        const {
-            createBtnVisible,
-            scopeModalVisible,
-            coordinates,
-            groupSelected,
-            groupScopeStatus
-        } = this.state;
-        let okDisplay = false;
-        if (coordinates.length <= 2) {
-            okDisplay = true;
-        }
-        let retreatDisplay = false;
-        if (coordinates.length <= 0) {
-            retreatDisplay = true;
-        }
-        return (
-            <div className='checkWork-container'>
-                <div
-                    ref='appendBody'
-                    className='checkWork-map checkWork-r-main'
-                >
-                    <div
-                        className={`checkWork-menuPanel`}
-                        style={
-                            this.state.menuIsExtend
-                                ? {
-                                    transform: 'translateX(0)',
-                                    width: this.state.menuWidth
-                                }
-                                : {
-                                    transform: `translateX(-${
-                                        this.state.menuWidth
-                                    }px)`,
-                                    width: this.state.menuWidth
-                                }
-                        }
-                    >
-                        <aside className='checkWork-aside' draggable='false'>
-                            <div style={{margin: 10}}>
-                                <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
-                            </div>
-                            <Collapse
-                                defaultActiveKey={[this.options[0].value]}
-                                accordion
-                            >
-                                {this.options.map(option => {
-                                    return (
-                                        <Panel
-                                            key={option.value}
-                                            header={option.label}
-                                        >
-                                            {this.renderPanel(option)}
-                                        </Panel>
-                                    );
-                                })}
-                            </Collapse>
-                        </aside>
-                        {this.state.menuIsExtend ? (
-                            <div
-                                className='checkWork-foldBtn'
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this._extendAndFold.bind(this)}
-                            >
-                                收起
-                            </div>
-                        ) : (
-                            <div
-                                className='checkWork-foldBtn'
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this._extendAndFold.bind(this)}
-                            >
-                                展开
-                            </div>
-                        )}
-                    </div>
-                    {
-                        groupSelected && !createBtnVisible ? (
-                            <div className='checkWork-treeControl2'>
-                                <div>
-                                    {
-                                        groupScopeStatus
-                                            ? (
-                                                <div>
-                                                    <Button type='primary' style={{marginRight: 10}} onClick={this._handlePutScope.bind(this)}>修改</Button>
-                                                    <Popconfirm
-                                                        onConfirm={this._handleDelectScope.bind(this)}
-                                                        title='确定要删除该群体的电子围栏么'
-                                                        okText='确定'
-                                                        cancelText='取消'>
-                                                        <Button type='danger'>删除</Button>
-                                                    </Popconfirm>
-                                                </div>
-                                            )
-                                            : (
-                                                <Button type='primary' style={{marginRight: 10}} onClick={this._handleAddScope.bind(this)}>创建</Button>
-                                            )
-                                    }
-                                </div>
-                            </div>
-                        ) : ''
-                    }
-                    {
-                        createBtnVisible ? (
-                            <div className='checkWork-treeControl2'>
-                                <div>
-                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateScopeOk.bind(this)}>确定</Button>
-                                    <Button type='info' style={{marginRight: 10}} disabled={retreatDisplay} onClick={this._handleCreateScopeRetreat.bind(this)}>上一步</Button>
-                                    <Button type='danger' onClick={this._handleCreateScopeCancel.bind(this)}>撤销</Button>
-                                </div>
-                            </div>
-                        ) : ''
-                    }
-                    {
-                        scopeModalVisible ? (
-                            <ScopeCreateModal
-                                {...this.props}
-                                {...this.state}
-                                onOk={this.handleScopeModalOk.bind(this)}
-                                onCancel={this.handleScopeModalCancel.bind(this)}
-                            />
-                        ) : ''
-                    }
-                    <div className='checkWork-treeControl'>
-                        <div>
-                            <Button
-                                type={
-                                    this.state.mapLayerBtnType
-                                        ? 'primary'
-                                        : 'info'
-                                }
-                                onClick={this._toggleTileLayer.bind(this, 1)}
-                            >
-                                卫星图
-                            </Button>
-                            <Button
-                                type={
-                                    this.state.mapLayerBtnType
-                                        ? 'info'
-                                        : 'primary'
-                                }
-                                onClick={this._toggleTileLayer.bind(this, 2)}
-                            >
-                                地图
-                            </Button>
-                        </div>
-                    </div>
-                    <div>
-                        <div
-                            style={
-                                this.state.selectedMenu === '1' &&
-                                this.state.isNotThree
-                                    ? {}
-                                    : { display: 'none' }
-                            }
-                        >
-                            <div
-                                id='mapid'
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    borderLeft: '1px solid #ccc'
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>);
-    }
-    /* 渲染菜单panel */
-    renderPanel (option) {
-        const {
-            platform: {
-                tree = {}
-            },
-            groupTreeLoading,
-            areaTreeLoading,
-            checkGroupsData = []
-        } = this.props;
-        if (option && option.value) {
-            switch (option.value) {
-                // 区域地块
-                case 'geojsonFeature_area':
-                    return (
-                        <Spin spinning={areaTreeLoading}>
-                            <AreaTree
-                                {...this.props}
-                                {...this.state}
-                                onCheck={this.handleAreaCheck.bind(this)}
-                                content={tree.thinClassTree || []}
-                            />
-                        </Spin>
-
-                    );
-                case 'geojsonFeature_checkWork':
-                    return (
-                        <Spin spinning={groupTreeLoading}>
-                            <CheckGroupTree
-                                {...this.props}
-                                {...this.state}
-                                onSelect={this.handleGroupSelect.bind(this)}
-                                content={checkGroupsData || []}
-                            />
-                        </Spin>
-                    );
-            }
         }
     }
     // 控制基础树图层是否展示
@@ -494,6 +283,7 @@ export default class ScopeCreateTable extends Component {
             groupScopeDataList
         } = this.state;
         try {
+            this._handleCreateScopeCancel();
             // 节点的点击状态
             let selected = info.selected;
             // 节点的具体信息
@@ -517,20 +307,26 @@ export default class ScopeCreateTable extends Component {
                     groupScopeStatus = true;
                 } else {
                     // 否则重新获取
-                    let data = await getCheckScope({id: eventKey});
+                    let data = await getCheckScope({groupId: eventKey});
                     // 存在数据  说明有电子围栏
-                    if (data && data instanceof Array && data.length > 0) {
+                    if (data && data.content && data.content instanceof Array && data.content.length > 0) {
                         groupScopeStatus = true;
+                        groupScopeDataList[eventKey] = data.content[0];
                         // 点击群体的电子围栏的坐标数据
-                        let groupScopeData = data && data[0] && data[0].boundary;
-                        let groupScopeLayer = L.polygon(groupScopeData, {
-                            color: 'yellow',
-                            fillColor: 'yellow',
-                            fillOpacity: 0.3
-                        }).addTo(this.map);
-                        this.map.fitBounds(groupScopeLayer.getBounds());
-                        groupScopeLayerList[eventKey] = groupScopeLayer;
-                        groupScopeDataList[eventKey] = data[0];
+                        let wkt = data.content[0].Gem;
+                        let str = '';
+                        let groupScopeData = '';
+                        if (wkt) {
+                            str = handlePOLYGONWktData(wkt);
+                            groupScopeData = handleCoordinates(str);
+                            let groupScopeLayer = L.polygon(groupScopeData, {
+                                color: 'yellow',
+                                fillColor: 'yellow',
+                                fillOpacity: 0.3
+                            }).addTo(this.map);
+                            this.map.fitBounds(groupScopeLayer.getBounds());
+                            groupScopeLayerList[eventKey] = groupScopeLayer;
+                        }
                     }
                 }
             }
@@ -543,7 +339,7 @@ export default class ScopeCreateTable extends Component {
                 groupScopeLayerList
             });
         } catch (e) {
-            console.log('e', e);
+            console.log('handleGroupSelect', e);
         }
     }
     /* 在地图上添加marker和polygan */
@@ -586,18 +382,18 @@ export default class ScopeCreateTable extends Component {
         try {
             // 删除选中群体的电子围栏
             let data = await deleteCheckScope({id: groupScopeDataList[groupSelectKey].id});
-            if (data) {
-                Notification.error({
-                    message: '电子围栏删除失败',
-                    duration: 3
-                });
-                return;
-            } else {
+            if (data && data.code && data.code === 1) {
                 Notification.success({
                     message: '电子围栏删除成功',
                     duration: 3
                 });
                 this.deleteGroupSelectScope();
+            } else {
+                Notification.error({
+                    message: '电子围栏删除失败',
+                    duration: 3
+                });
+                return;
             }
         } catch (e) {
             console.log('delete', e);
@@ -613,13 +409,9 @@ export default class ScopeCreateTable extends Component {
         });
         try {
             // 坐标
-            let coords = [];
-            coordinates.map((data) => {
-                coords.push([data.lat, data.lng]);
-            });
             // 选择面积
             let regionArea = 0;
-            regionArea = computeSignedArea(coords, 2);
+            regionArea = computeSignedArea(coordinates, 2);
 
             regionArea = regionArea * 0.0015;
             this.setState({
@@ -750,5 +542,216 @@ export default class ScopeCreateTable extends Component {
             TileLayerUrl: TILEURLS[index],
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
+    }
+    /* 渲染菜单panel */
+    renderPanel (option) {
+        const {
+            platform: {
+                tree = {}
+            },
+            groupTreeLoading,
+            areaTreeLoading,
+            checkGroupsData = []
+        } = this.props;
+        if (option && option.value) {
+            switch (option.value) {
+                // 区域地块
+                case 'geojsonFeature_area':
+                    return (
+                        <Spin spinning={areaTreeLoading}>
+                            <AreaTree
+                                {...this.props}
+                                {...this.state}
+                                onCheck={this.handleAreaCheck.bind(this)}
+                                content={tree.thinClassTree || []}
+                            />
+                        </Spin>
+
+                    );
+                case 'geojsonFeature_checkWork':
+                    return (
+                        <Spin spinning={groupTreeLoading}>
+                            <CheckGroupTree
+                                {...this.props}
+                                {...this.state}
+                                onSelect={this.handleGroupSelect.bind(this)}
+                                content={checkGroupsData || []}
+                            />
+                        </Spin>
+                    );
+            }
+        }
+    }
+    render () {
+        const {
+            createBtnVisible,
+            scopeModalVisible,
+            coordinates,
+            groupSelected,
+            groupScopeStatus
+        } = this.state;
+        let okDisplay = false;
+        if (coordinates.length <= 2) {
+            okDisplay = true;
+        }
+        let retreatDisplay = false;
+        if (coordinates.length <= 0) {
+            retreatDisplay = true;
+        }
+        return (
+            <div className='checkWork-container'>
+                <div
+                    ref='appendBody'
+                    className='checkWork-map checkWork-r-main'
+                >
+                    <div
+                        className={`checkWork-menuPanel`}
+                        style={
+                            this.state.menuIsExtend
+                                ? {
+                                    transform: 'translateX(0)',
+                                    width: this.state.menuWidth
+                                }
+                                : {
+                                    transform: `translateX(-${
+                                        this.state.menuWidth
+                                    }px)`,
+                                    width: this.state.menuWidth
+                                }
+                        }
+                    >
+                        <aside className='checkWork-aside' draggable='false'>
+                            <div style={{margin: 10}}>
+                                <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
+                            </div>
+                            <Collapse
+                                defaultActiveKey={[this.options[0].value]}
+                                accordion
+                            >
+                                {this.options.map(option => {
+                                    return (
+                                        <Panel
+                                            key={option.value}
+                                            header={option.label}
+                                        >
+                                            {this.renderPanel(option)}
+                                        </Panel>
+                                    );
+                                })}
+                            </Collapse>
+                        </aside>
+                        {this.state.menuIsExtend ? (
+                            <div
+                                className='checkWork-foldBtn'
+                                style={{ left: this.state.menuWidth }}
+                                onClick={this._extendAndFold.bind(this)}
+                            >
+                                收起
+                            </div>
+                        ) : (
+                            <div
+                                className='checkWork-foldBtn'
+                                style={{ left: this.state.menuWidth }}
+                                onClick={this._extendAndFold.bind(this)}
+                            >
+                                展开
+                            </div>
+                        )}
+                    </div>
+                    {
+                        groupSelected && !createBtnVisible ? (
+                            <div className='checkWork-treeControl2'>
+                                <div>
+                                    {
+                                        groupScopeStatus
+                                            ? (
+                                                <div>
+                                                    <Button type='primary' style={{marginRight: 10}} onClick={this._handlePutScope.bind(this)}>修改</Button>
+                                                    <Popconfirm
+                                                        onConfirm={this._handleDelectScope.bind(this)}
+                                                        title='确定要删除该群体的电子围栏么'
+                                                        okText='确定'
+                                                        cancelText='取消'>
+                                                        <Button type='danger'>删除</Button>
+                                                    </Popconfirm>
+                                                </div>
+                                            )
+                                            : (
+                                                <Button type='primary' style={{marginRight: 10}} onClick={this._handleAddScope.bind(this)}>创建</Button>
+                                            )
+                                    }
+                                </div>
+                            </div>
+                        ) : ''
+                    }
+                    {
+                        createBtnVisible ? (
+                            <div className='checkWork-treeControl2'>
+                                <div>
+                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateScopeOk.bind(this)}>确定</Button>
+                                    <Button type='default' style={{marginRight: 10}} disabled={retreatDisplay} onClick={this._handleCreateScopeRetreat.bind(this)}>上一步</Button>
+                                    <Button type='danger' onClick={this._handleCreateScopeCancel.bind(this)}>撤销</Button>
+                                </div>
+                            </div>
+                        ) : ''
+                    }
+                    {
+                        scopeModalVisible ? (
+                            <ScopeCreateModal
+                                {...this.props}
+                                {...this.state}
+                                onOk={this.handleScopeModalOk.bind(this)}
+                                onCancel={this.handleScopeModalCancel.bind(this)}
+                            />
+                        ) : ''
+                    }
+                    <div className='checkWork-treeControl'>
+                        <div>
+                            <Button
+                                type={
+                                    this.state.mapLayerBtnType
+                                        ? 'primary'
+                                        : 'info'
+                                }
+                                onClick={this._toggleTileLayer.bind(this, 1)}
+                            >
+                                卫星图
+                            </Button>
+                            <Button
+                                type={
+                                    this.state.mapLayerBtnType
+                                        ? 'info'
+                                        : 'primary'
+                                }
+                                onClick={this._toggleTileLayer.bind(this, 2)}
+                            >
+                                地图
+                            </Button>
+                        </div>
+                    </div>
+                    <div>
+                        <div
+                            style={
+                                this.state.selectedMenu === '1' &&
+                                this.state.isNotThree
+                                    ? {}
+                                    : { display: 'none' }
+                            }
+                        >
+                            <div
+                                id='mapid'
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    borderLeft: '1px solid #ccc'
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>);
     }
 }

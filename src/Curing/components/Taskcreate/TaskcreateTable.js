@@ -3,7 +3,12 @@ import {
     Button, Collapse, Notification, Spin, Checkbox
 } from 'antd';
 import L from 'leaflet';
-import {FOREST_GIS_API, TILEURLS, INITLEAFLET_API, WMSTILELAYERURL} from '_platform/api';
+import {
+    FOREST_GIS_API,
+    TILEURLS,
+    INITLEAFLET_API,
+    WMSTILELAYERURL
+} from '_platform/api';
 import AreaTreeCreate from '../AreaTreeCreate';
 import TaskCheckTree from '../TaskCheckTree';
 import {
@@ -20,7 +25,8 @@ import {
 import {
     getHandleWktData,
     getWktData,
-    computeSignedArea
+    computeSignedArea,
+    handlePOLYGONWktData
 } from '_platform/gisAuth';
 import TaskCreateModal from './TaskCreateModal';
 import '../Curing.less';
@@ -30,7 +36,6 @@ import {
 } from '_platform/auth';
 
 const Panel = Collapse.Panel;
-window.config = window.config || {};
 
 export default class TaskCreateTable extends Component {
     constructor (props) {
@@ -64,6 +69,7 @@ export default class TaskCreateTable extends Component {
             regionThinNo: '', // 圈选区域内的细班code
             regionSectionNo: '', // 圈选区域内的标段code
             regionSectionName: '', // 圈选区域内的标段名称
+            regionSmallThinClassName: '', // 圈选区域内的小班细班名称
             regionArea: 0, // 圈选区域内面积
             // 直接选择细班坐标数据
             treeCoords: {},
@@ -74,7 +80,6 @@ export default class TaskCreateTable extends Component {
         this.tileLayer = null;
         this.tileTreeLayerBasic = null;
         this.map = null;
-        this.sections = [];
         this.section = '';
         this.totalSmallClass = [];
         /* 菜单宽度调整 */
@@ -139,12 +144,8 @@ export default class TaskCreateTable extends Component {
                 tree = {}
             }
         } = this.props;
-        this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
-        if (this.sections && this.sections instanceof Array && this.sections.length > 0) {
-            this.section = this.sections[0];
-        }
+        let user = getUser();
+        this.section = user.section;
         try {
             await changeCheckedKeys([]);
             await changeSelectMap('细班选择');
@@ -169,6 +170,7 @@ export default class TaskCreateTable extends Component {
         let me = this;
         let mapInitialization = INITLEAFLET_API;
         mapInitialization.crs = L.CRS.EPSG4326;
+        mapInitialization.attributionControl = false;
         this.map = L.map('mapid', mapInitialization);
         // 加载基础图层
         this.tileLayer = L.tileLayer(TILEURLS[1], {
@@ -388,7 +390,7 @@ export default class TaskCreateTable extends Component {
                             <div className='Curing-treeControl2'>
                                 <div>
                                     <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
-                                    {RetreatDisplay ? '' : <Button type='info' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
+                                    {RetreatDisplay ? '' : <Button type='default' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
                                     <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
                                 </div>
                             </div>
@@ -410,7 +412,7 @@ export default class TaskCreateTable extends Component {
                                 type={
                                     this.state.mapLayerBtnType
                                         ? 'primary'
-                                        : 'info'
+                                        : 'default'
                                 }
                                 onClick={this._toggleTileLayer.bind(this, 1)}
                             >
@@ -419,7 +421,7 @@ export default class TaskCreateTable extends Component {
                             <Button
                                 type={
                                     this.state.mapLayerBtnType
-                                        ? 'info'
+                                        ? 'default'
                                         : 'primary'
                                 }
                                 onClick={this._toggleTileLayer.bind(this, 2)}
@@ -512,17 +514,21 @@ export default class TaskCreateTable extends Component {
         const {
             areaLayerList
         } = this.state;
+        const {
+            selectMap
+        } = this.props;
         let me = this;
         try {
             // 当前选中的节点
             let eventKey = info.node.props.eventKey;
             // 当前的选中状态
             let checked = info.checked;
-            if (keys && keys.length === 0) {
+            if (selectMap === '细班选择' && keys && keys.length === 0) {
                 this.setState({
                     createBtnVisible: false
                 });
             }
+
             // 选中节点对key进行处理
             let handleKey = eventKey.split('-');
             // 如果选中的是细班，则直接添加图层
@@ -534,9 +540,11 @@ export default class TaskCreateTable extends Component {
                             layer.addTo(me.map);
                             me.map.fitBounds(layer.getBounds());
                         });
-                        this.setState({
-                            createBtnVisible: true
-                        });
+                        if (selectMap === '细班选择') {
+                            this.setState({
+                                createBtnVisible: true
+                            });
+                        }
                     } else {
                         console.log('_addAreaLayer_addAreaLayer');
                         // 如果不是添加过，需要请求数据
@@ -616,7 +624,7 @@ export default class TaskCreateTable extends Component {
     _handleTaskWkt = async (wkt, eventKey, task, type, isFocus) => {
         let str = '';
         try {
-            if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+            if (wkt && wkt.indexOf('MULTIPOLYGON') !== -1) {
                 let data = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf('))') + 1);
                 let arr = data.split('),(');
                 arr.map((a, index) => {
@@ -643,8 +651,8 @@ export default class TaskCreateTable extends Component {
                         }
                     }
                 });
-            } else if (wkt.indexOf('POLYGON') !== -1) {
-                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+            } else if (wkt && wkt.indexOf('POLYGON') !== -1) {
+                str = handlePOLYGONWktData(wkt);
                 if (type === 'plan') {
                     // 只有一个图形，必须要设置图标
                     this._handlePlanCoordLayer(str, task, eventKey, 1, isFocus);
@@ -654,6 +662,7 @@ export default class TaskCreateTable extends Component {
             }
         } catch (e) {
             console.log('处理wkt', e);
+            console.log('wktwktwktwkt', wkt);
         }
     }
     // 处理任务数据
@@ -874,10 +883,8 @@ export default class TaskCreateTable extends Component {
             treeCoords
         } = this.state;
 
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (!(this.sections && this.sections instanceof Array && this.sections.length > 0)) {
+        if (!this.section) {
             Notification.error({
                 message: '当前登录用户未关联标段，不能下发任务',
                 duration: 2
@@ -949,7 +956,7 @@ export default class TaskCreateTable extends Component {
             regionArea = regionArea * 0.0015;
             // 包括的细班号
             let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
-            let regionData = getThinClassName(regionThinClass, totalThinClass, this.sections, bigTreeList);
+            let regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
             // let sectionBool = regionData.sectionBool;
             // if (!sectionBool) {
             //     Notification.error({
@@ -963,10 +970,12 @@ export default class TaskCreateTable extends Component {
             //     this.resetButState();
             //     return;
             // }
+            console.log('regionData', regionData);
             let regionThinName = regionData.regionThinName;
             let regionThinNo = regionData.regionThinNo;
             let regionSectionNo = regionData.regionSectionNo;
             let regionSectionName = regionData.regionSectionName;
+            let regionSmallThinClassName = regionData.regionSmallThinClassName;
             // 区域内树木数量
             // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
             this.setState({
@@ -975,6 +984,7 @@ export default class TaskCreateTable extends Component {
                 // treeNum,
                 regionData,
                 regionThinName,
+                regionSmallThinClassName,
                 regionThinNo,
                 regionSectionNo,
                 regionSectionName,
@@ -1056,6 +1066,7 @@ export default class TaskCreateTable extends Component {
             regionThinNo: '',
             regionSectionNo: '',
             regionSectionName: '',
+            regionSmallThinClassName: '',
             regionArea: 0,
             wkt: ''
         });

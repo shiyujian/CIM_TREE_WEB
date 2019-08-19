@@ -281,6 +281,58 @@ class Edit extends Component {
             RegionCode
         });
     }
+    checkPersonSupplierName = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 30) {
+                callback(`请输入30个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPersonTelephone = async (rule, value, callback) => {
+        if (value) {
+            // 手机号正则
+            let reg = /^[1]([3-9])[0-9]{9}$/;
+            console.log('reg.test(value)', reg.test(value));
+            // isNaN(value);
+            if (!isNaN(value) && reg.test(value)) {
+                if (value > 0) {
+                    callback();
+                } else {
+                    callback(`请输入正确的手机号`);
+                }
+            } else {
+                callback(`请输入正确的手机号`);
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPersonName = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 15) {
+                callback(`请输入15个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
+    checkPersonAddress = async (rule, value, callback) => {
+        if (value) {
+            if (value.length > 30) {
+                callback(`请输入30个字以下`);
+            } else {
+                callback();
+            }
+        } else {
+            callback();
+        }
+    }
     render () {
         const {
             fileList,
@@ -414,9 +466,17 @@ class Edit extends Component {
                                     >
                                         {getFieldDecorator('SupplierName', {
                                             initialValue: record && record.SupplierName,
-                                            rules: [{required: true, message: '必填项'}]
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '请输入供应商名称（30个字以下）'
+                                                },
+                                                {
+                                                    validator: this.checkPersonSupplierName
+                                                }
+                                            ]
                                         })(
-                                            <Input placeholder='请输入供应商名称'
+                                            <Input placeholder='请输入供应商名称（30个字以下）'
                                                 disabled={isAmend} />
                                         )}
                                     </FormItem>
@@ -430,7 +490,7 @@ class Edit extends Component {
                                             initialValue: record && record.USCC,
                                             rules: [{
                                                 required: isSwitch,
-                                                message: '必填项'
+                                                message: '请输入社会统一信用码'
                                             }]
                                         })(
                                             <Input placeholder='请输入社会统一信用码' />
@@ -445,7 +505,7 @@ class Edit extends Component {
                                         {getFieldDecorator('RegionCode', {
                                             rules: [{
                                                 required: true,
-                                                message: '必填项'
+                                                message: '选择您所在的城市'
                                             }]
                                         })(
                                             <Cascader placeholder='选择您所在的城市'
@@ -461,10 +521,18 @@ class Edit extends Component {
                                         label='详细地址'
                                     >
                                         {getFieldDecorator('Address', {
-                                            rules: [{required: true, message: '必填项'}],
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '请输入地址（30个字以下）'
+                                                },
+                                                {
+                                                    validator: this.checkPersonAddress
+                                                }
+                                            ],
                                             initialValue: record && record.Address
                                         })(
-                                            <Input placeholder='请输入详细地址' />
+                                            <Input placeholder='请输入地址（30个字以下）' />
                                         )}
                                     </FormItem>
                                 </Col>
@@ -475,10 +543,18 @@ class Edit extends Component {
                                     >
                                         {getFieldDecorator('LegalPerson', {
                                             initialValue: record && record.LegalPerson,
-                                            rules: [{required: true, message: '必填项'}]
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '请输入姓名（15个字以下）'
+                                                },
+                                                {
+                                                    validator: this.checkPersonName
+                                                }
+                                            ]
                                         })(
                                             <Input
-                                                placeholder={isSwitch ? '请输入法人姓名' : '请输入负责人姓名'} />
+                                                placeholder={isSwitch ? '请输入法人姓名（15个字以下）' : '请输入负责人姓名（15个字以下）'} />
                                         )}
                                     </FormItem>
                                 </Col>
@@ -489,7 +565,15 @@ class Edit extends Component {
                                     >
                                         {getFieldDecorator('LegalPersonPhone', {
                                             initialValue: record && record.LegalPersonPhone,
-                                            rules: [{required: true, message: '必填项'}]
+                                            rules: [
+                                                {
+                                                    required: true,
+                                                    message: '请输入手机号'
+                                                },
+                                                {
+                                                    validator: this.checkPersonTelephone
+                                                }
+                                            ]
                                         })(
                                             <Input
                                                 placeholder={isSwitch ? '请输入法人手机号' : '请输入负责人手机号'}

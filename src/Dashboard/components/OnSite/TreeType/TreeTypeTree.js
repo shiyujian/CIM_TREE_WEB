@@ -5,8 +5,11 @@ import {
     getIconType
 } from '../../auth';
 import {
-    FOREST_GIS_TREETYPE_API
+    FOREST_GIS_API
 } from '_platform/api';
+import {
+    trim
+} from '_platform/auth';
 const TreeNode = Tree.TreeNode;
 const Search = Input.Search;
 export default class TreeTypeTree extends Component {
@@ -64,7 +67,7 @@ export default class TreeTypeTree extends Component {
                 <Spin spinning={treetypesTreeLoading}>
                     <Search
                         placeholder='请输入树种名称或顺序码'
-                        onSearch={this.searchTree.bind(this)}
+                        onSearch={this.handleSearchTree.bind(this)}
                         style={{ width: '100%', marginBotton: 10, paddingRight: 5 }}
                     />
                     <div className={this.genIconClass()}>
@@ -148,7 +151,7 @@ export default class TreeTypeTree extends Component {
         }
         await this.props.removeTileTreeLayerBasic();
         await this.removeTileTreeTypeLayerFilter();
-        let url = FOREST_GIS_TREETYPE_API +
+        let url = FOREST_GIS_API +
             `/geoserver/xatree/wms?cql_filter=TreeType%20IN%20(${queryData})`;
         // this.tileTreeTypeLayerFilter指的是一下获取多个树种的图层，单个树种的图层直接存在treeLayerList对象中
         this.tileTreeTypeLayerFilter = L.tileLayer.wms(url,
@@ -173,7 +176,7 @@ export default class TreeTypeTree extends Component {
         }
     }
 
-    searchTree = async (value) => {
+    handleSearchTree = async (value) => {
         const {
             treetypes = [],
             actions: {
@@ -181,6 +184,7 @@ export default class TreeTypeTree extends Component {
             }
         } = this.props;
         try {
+            value = trim(value);
             if (value) {
                 let searchTree = [];
                 let keys = [];
@@ -229,7 +233,7 @@ export default class TreeTypeTree extends Component {
                 });
             }
         } catch (e) {
-            console.log('searchTree', e);
+            console.log('handleSearchTree', e);
         }
     }
 

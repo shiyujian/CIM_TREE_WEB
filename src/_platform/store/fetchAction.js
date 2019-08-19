@@ -11,7 +11,8 @@ import { encrypt } from './secrect';
 import { Notification } from 'antd';
 import {
     clearUser,
-    removePermissions
+    removePermissions,
+    getUser
 } from '../auth';
 require('es6-promise').polyfill();
 
@@ -25,11 +26,10 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
     method = method.toUpperCase(); // 将字符串改为大写
     return (pathnames = {}, data = {}, refresh = true) => {
         data = data instanceof Array ? data : Object.assign({}, defaultParams, data);
-        let forestLoginUserData = window.localStorage.getItem('FOREST_LOGIN_USER_DATA');
-        forestLoginUserData = JSON.parse(forestLoginUserData) || {};
-        if (forestLoginUserData && forestLoginUserData.ID && forestLoginUserData.Token) {
-            let token = forestLoginUserData.Token;
-            let ID = forestLoginUserData.ID;
+        let user = getUser();
+        if (user && user.ID && user.token) {
+            let token = user.token;
+            let ID = user.ID;
             let secrectData = encrypt(ID, token);
             let headData = {
                 'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export const forestFetchAction = (url, [successAction, failAction] = [], method 
                                     });
                                     clearUser();
                                     removePermissions();
-                                    window.localStorage.removeItem('FOREST_LOGIN_USER_DATA');
+                                    window.localStorage.removeItem('LOGIN_USER_DATA');
                                     let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
                                     if (!remember) {
                                         window.localStorage.removeItem('LOGIN_USER_PASSDATA');

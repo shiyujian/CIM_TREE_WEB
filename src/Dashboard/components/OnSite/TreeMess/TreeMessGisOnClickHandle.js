@@ -215,9 +215,8 @@ export default class TreeMessGisOnClickHandle extends Component {
                 getCuringTreeInfo,
                 getCuringTypes,
                 getCuringMessage,
-                getForestUserDetail,
                 getUserDetail,
-                getOrgTreeByCode,
+                getParentOrgTreeByID,
                 getTreeLocationCoord,
                 getLocationNameByCoordinate
             },
@@ -323,21 +322,31 @@ export default class TreeMessGisOnClickHandle extends Component {
 
             let seedlingMess = getSeedlingMess(queryTreeData, carData, nurserysData);
             let treeMess = getTreeMessFun(SmallClassName, ThinClassName, queryTreeData, nurserysData, bigTreeList);
+            let userIDList = [];
+            let userDataList = {};
             for (let i = 0; i < treeflowData.length; i++) {
-                let userForestData = await getForestUserDetail({
-                    id: treeflowData[i].FromUser
-                });
-                if (userForestData && userForestData.PK) {
-                    let userEcidiData = await getUserDetail({
-                        pk: userForestData.PK
-                    });
-                    let orgCode = userEcidiData && userEcidiData.account && userEcidiData.account.org_code;
-                    let parent = await getCompanyDataByOrgCode(orgCode, getOrgTreeByCode);
-                    console.log('parent', parent);
-                    let companyName = (parent && parent.name) || '';
-                    treeflowData[i].companyName = companyName;
-                    treeflowData[i].orgData = parent;
+                let userDetail = '';
+                if (userIDList.indexOf(Number(treeflowData[i].FromUser)) === -1) {
+                    userDetail = await getUserDetail({id: treeflowData[i].FromUser});
+                } else {
+                    userDetail = userDataList[Number(treeflowData[i].FromUser)];
                 }
+                if (userDetail && userDetail.ID) {
+                    userIDList.push(userDetail.ID);
+                    userDataList[userDetail.ID] = userDetail;
+                }
+                let orgID = userDetail && userDetail.Org;
+                let parent = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                // 如果该施工人员所在的单位没有公司类型，则保存施工人员所在的组织机构
+                let companyName = '';
+                if (parent && parent.ID) {
+                    companyName = (parent && parent.OrgName) || '';
+                } else {
+                    companyName = (userDetail && userDetail.OrgObj && userDetail.OrgObj.OrgName) || '';
+                    parent = (userDetail && userDetail.OrgObj) || '';
+                }
+                treeflowData[i].companyName = companyName;
+                treeflowData[i].orgData = parent;
             }
             let flowMess = treeflowData;
             let curingMess = await getCuringMess(curingTaskData, curingTypeArr, getCuringMessage);

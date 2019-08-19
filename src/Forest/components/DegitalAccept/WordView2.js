@@ -57,6 +57,7 @@ export default class WordView1 extends Component {
         try {
             let mapInitialization = INITLEAFLET_API;
             mapInitialization.crs = L.CRS.EPSG4326;
+            mapInitialization.attributionControl = false;
             this.map = L.map('mapid', mapInitialization);
             // 加载基础图层
             this.tileLayer = L.tileLayer(TILEURLS[1], {

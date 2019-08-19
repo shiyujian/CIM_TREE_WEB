@@ -72,21 +72,15 @@ export default class Locmeasureinfo extends Component {
         const {
             actions: {
                 getTreeList,
-                getForestUsers,
                 getTreeNodeList,
                 setkeycode,
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree
             },
-            users,
             treetypes,
             platform: { tree = {} }
         } = this.props;
-        // 避免反复获取森林用户数据，提高效率
-        if (!users) {
-            getForestUsers();
-        }
         // 避免反复获取森林树种列表，提高效率
         if (!treetypes) {
             getTreeList().then(x => this.setTreeTypeOption(x));
@@ -245,7 +239,6 @@ export default class Locmeasureinfo extends Component {
         } = this.props;
         let treeList = tree.thinClassTree;
 
-        let user = getUser();
         let keycode = keys[0] || '';
         const {
             actions: { setkeycode }
@@ -271,14 +264,15 @@ export default class Locmeasureinfo extends Component {
         });
 
         // 标段
-        let sections = JSON.parse(user.sections);
+        let user = getUser();
+        let section = user.section;
         let permission = getUserIsManager();
         if (permission) {
             // 是admin或者业主
             this.setSectionOption(sectionsData);
         } else {
             sectionsData.map((sectionData) => {
-                if (sections[0] === sectionData.No) {
+                if (section && section === sectionData.No) {
                     this.setSectionOption(sectionData);
                 }
             });

@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
     Table,
     Modal,
-    Spin
+    Spin,
+    Notification
 } from 'antd';
 import CountFilter from './CountFilter';
 import moment from 'moment';
@@ -17,8 +18,310 @@ export default class CountTable extends Component {
             seeVisible: false, // 查看弹框
             pagination: {},
             loading: false,
-            imgs: []
+            imgs: [],
+            companyList: []
         };
+    }
+
+    columns = [
+        // {
+        //     title: '公司',
+        //     dataIndex: 'OrgCode',
+        //     key: 'OrgCode',
+        //     render: (text, record, index) => {
+        //         const {
+        //             companyList = []
+        //         } = this.state;
+        //         let org = '';
+        //         companyList.map((company) => {
+        //             if (company.ID === 44) {
+        //                 console.log('company', company);
+        //             }
+        //             if (company.ID === text) {
+        //                 org = company;
+        //             };
+        //         });
+        //         if (org && org.OrgName) {
+        //             return <div style={{textAlign: 'Center'}}>
+        //                 <div className='column' title={org.OrgName}>
+        //                     {org.OrgName}
+        //                 </div>
+        //             </div>;
+        //         } else {
+        //             return '/';
+        //         }
+        //     }
+        // },
+        {
+            title: '公司名称',
+            dataIndex: 'CompanyName',
+            key: 'CompanyName'
+        },
+        {
+            title: '姓名',
+            dataIndex: 'Name',
+            key: 'Name'
+        },
+        {
+            title: '账号',
+            dataIndex: 'Number',
+            key: 'Number'
+        },
+        {
+            title: '角色',
+            dataIndex: 'Role',
+            key: 'Role',
+            render: (text, record, index) => {
+                const {
+                    platform: { roles = [] }
+                } = this.props;
+                if (text && text.ID && text.RoleName) {
+                    return text.RoleName;
+                } else {
+                    let roleName = '';
+                    if (text) {
+                        roles.map((role) => {
+                            if (role && role.ID && role.ID === Number(text)) {
+                                roleName = role.RoleName;
+                            }
+                        });
+                    }
+
+                    return roleName;
+                }
+            }
+
+        },
+        {
+            title: '职务',
+            dataIndex: 'Post',
+            key: 'Post'
+        },
+        {
+            title: '考勤群体',
+            dataIndex: 'GroupName',
+            key: 'GroupName'
+        },
+        {
+            title: '日期',
+            dataIndex: 'Date',
+            key: 'Date',
+            render: (text, record, index) => {
+                if (record && record.Date) {
+                    return <div style={{textAlign: 'Center'}}>
+                        <div>
+                            {moment(text).format('YYYY-MM-DD')}
+                        </div>
+                    </div>;
+                } else {
+                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
+                }
+            }
+        },
+        {
+            title: '上班时间',
+            render: (text, record, index) => {
+                if (record.PunchTime) {
+                    if (record.OnPath) {
+                        return <div style={{textAlign: 'Center'}}>
+                            <div>
+                                <a onClick={this.previewCheckinImg.bind(this, record)}>
+                                    {moment(record.PunchTime).format('YYYY-MM-DD')}
+                                </a>
+                            </div>
+                            <div>
+                                <a onClick={this.previewCheckinImg.bind(this, record)}>
+                                    {moment(record.PunchTime).format('HH:mm:ss')}
+                                </a>
+                            </div>
+                        </div>;
+                    } else {
+                        return <div style={{textAlign: 'Center'}}>
+                            <div onClick={this.previewCheckinImg.bind(this, record)}>
+                                {moment(record.PunchTime).format('YYYY-MM-DD')}
+                            </div>
+                            <div onClick={this.previewCheckinImg.bind(this, record)}>
+                                {moment(record.PunchTime).format('HH:mm:ss')}
+                            </div>
+                        </div>;
+                    }
+                } else {
+                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
+                }
+            }
+        },
+        {
+            title: '下班时间',
+            render: (text, record, index) => {
+                if (record.OffTime) {
+                    if (record.OffPath) {
+                        return <div style={{textAlign: 'Center'}}>
+                            <div>
+                                <a onClick={this.previewCheckoutImg.bind(this, record)}>
+                                    {moment(record.OffTime).format('YYYY-MM-DD')}
+                                </a>
+                            </div>
+                            <div>
+                                <a onClick={this.previewCheckoutImg.bind(this, record)}>
+                                    {moment(record.OffTime).format('HH:mm:ss')}
+                                </a>
+                            </div>
+                        </div>;
+                    } else {
+                        return <div style={{textAlign: 'Center'}}>
+                            <div onClick={this.previewCheckoutImg.bind(this, record)}>
+                                {moment(record.OffTime).format('YYYY-MM-DD')}
+                            </div>
+                            <div onClick={this.previewCheckoutImg.bind(this, record)}>
+                                {moment(record.OffTime).format('HH:mm:ss')}
+                            </div>
+                        </div>;
+                    }
+                } else {
+                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
+                }
+            }
+        },
+        {
+            title: '状态',
+            dataIndex: 'State',
+            key: 'State',
+            render: (text) => {
+                if (text) {
+                    if (text === 0) {
+                        return <span>缺勤</span>;
+                    } else if (text === 1) {
+                        return <span>出勤</span>;
+                    } else if (text === 2) {
+                        return <span>迟到</span>;
+                    } else if (text === 3) {
+                        return <span>早退</span>;
+                    } else if (text === 4) {
+                        return <span>迟到并早退</span>;
+                    } else if (text === 5) {
+                        return <span>请假</span>;
+                    }
+                } else {
+                    return <span>/</span>;
+                }
+            }
+        }
+    ];
+
+    handleTableChange = async (pagination) => {
+        const {
+            filterData = {}
+        } = this.props;
+        const pager = { ...this.state.pagination };
+        pager.current = pagination.current;
+        await this.query(pagination.current, filterData);
+        this.setState({
+            pagination: pager
+        });
+    }
+
+    query = async (current, queryParams) => {
+        const {
+            actions: {
+                getCheckRecord
+            }
+        } = this.props;
+        console.log('current', current);
+        try {
+            let postaData = {
+                page: current,
+                size: 10,
+                orgCode: queryParams.orgID ? queryParams.orgID : '',
+                groupId: queryParams.groupId ? queryParams.groupId : '',
+                name: queryParams.name ? queryParams.name : '',
+                sTime: queryParams.sTime ? queryParams.sTime : '',
+                eTime: queryParams.eTime ? queryParams.eTime : '',
+                state: queryParams.status ? queryParams.status : '',
+                role: queryParams.role ? queryParams.role : '',
+                post: queryParams.duty ? queryParams.duty : ''
+            };
+            this.setState({
+                loading: true
+            });
+            let data = await getCheckRecord({}, postaData);
+            if (data && data.code && data.code === 1) {
+                let results = (data && data.content) || [];
+                const pagination = { ...this.state.pagination };
+                pagination.total = data.pageinfo && data.pageinfo.total;
+                pagination.pageSize = 10;
+                pagination.current = current;
+                let totalNum = data.pageinfo && data.pageinfo.total;
+                this.setState({
+                    allcheckrecord: results,
+                    loading: false,
+                    pagination,
+                    totalNum
+                });
+            } else {
+                Notification.error({
+                    message: '查询失败'
+                });
+                const pagination = { ...this.state.pagination };
+                pagination.total = 0;
+                pagination.pageSize = 10;
+                pagination.current = 1;
+                this.setState({
+                    allcheckrecord: [],
+                    loading: false,
+                    pagination,
+                    totalNum: 0
+                });
+            }
+        } catch (e) {
+            console.log('query', e);
+        }
+    }
+
+    // 上班的照片
+    previewCheckinImg (record) {
+        let imgs = this.onImgClick((record && record.OnPath) || []);
+        this.setState({
+            seeVisible: true,
+            imgs: imgs
+        });
+    }
+    // 下班的照片
+    previewCheckoutImg (record) {
+        let imgs = this.onImgClick((record && record.OffPath) || []);
+        this.setState({
+            seeVisible: true,
+            imgs: imgs
+        });
+    }
+
+    onImgClick = (datas) => {
+        let srcs = [];
+        try {
+            let arr = datas.split(',');
+            arr.map(rst => {
+                let src = getForestImgUrl(rst);
+                srcs.push(src);
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+        return srcs;
+    };
+
+    handleCancel () {
+        this.setState({
+            seeVisible: false,
+            imgs: []
+        });
+    }
+
+    getCompanyDataList = (list) => {
+        console.log('list', list);
+        if (list && list instanceof Array) {
+            this.setState({
+                companyList: list
+            });
+        }
     }
 
     render () {
@@ -29,9 +332,13 @@ export default class CountTable extends Component {
         } = this.state;
         return (
             <div>
-                <CountFilter {...this.props} {...this.state} query={this.query.bind(this)} />
                 <Spin spinning={this.state.loading} tip='数据加载中，请稍等...'>
-                    <div>此次查询人数:  {this.state.totalNum} 人</div>
+                    <CountFilter
+                        {...this.props}
+                        {...this.state}
+                        getCompanyDataList={this.getCompanyDataList.bind(this)}
+                        query={this.query.bind(this)} />
+                    <div>此次查询数据:  {this.state.totalNum} 条</div>
                     <Table
                         dataSource={allcheckrecord}
                         columns={this.columns}
@@ -57,267 +364,4 @@ export default class CountTable extends Component {
             </div>
         );
     }
-
-    handleTableChange = async (pagination) => {
-        const {
-            filterData = {}
-        } = this.props;
-        const pager = { ...this.state.pagination };
-        pager.current = pagination.current;
-        await this.query(pagination.current, filterData);
-        this.setState({
-            pagination: pager
-        });
-    }
-
-    query = async (current, queryParams) => {
-        const {actions: {getCheckRecord}} = this.props;
-        console.log('current', current);
-        try {
-            let postaData = {
-                page: current,
-                page_size: 10,
-                ordering: '-created_on',
-                org_code: queryParams.org_code ? queryParams.org_code : '',
-                group: queryParams.group ? queryParams.group : '',
-                name: queryParams.name ? queryParams.name : '',
-                start: queryParams.start ? queryParams.start : '',
-                end: queryParams.end ? queryParams.end : '',
-                checkin: queryParams.checkin ? queryParams.checkin : '',
-                status: queryParams.status ? queryParams.status : '',
-                role: queryParams.role ? queryParams.role : '',
-                duty: queryParams.duty ? queryParams.duty : ''
-            };
-            this.setState({
-                loading: true
-            });
-            let data = await getCheckRecord({}, postaData);
-            let results = (data && data.results) || [];
-            const pagination = { ...this.state.pagination };
-            pagination.total = data.count;
-            pagination.pageSize = 10;
-            pagination.current = current;
-            let totalNum = data.count;
-            this.setState({
-                allcheckrecord: results,
-                loading: false,
-                pagination,
-                totalNum
-            });
-        } catch (e) {
-            console.log('query', e);
-        }
-    }
-
-    // 上班的照片
-    previewCheckinImg (record) {
-        let imgs = this.onImgClick((record && record.checkin_record && record.checkin_record.imgs) || []);
-        console.log('imgs', imgs);
-        this.setState({
-            seeVisible: true,
-            imgs: imgs
-        });
-    }
-    // 下班的照片
-    previewCheckoutImg (record) {
-        let imgs = this.onImgClick((record && record.checkout_record && record.checkout_record.imgs) || []);
-        console.log('imgs', imgs);
-        this.setState({
-            seeVisible: true,
-            imgs: imgs
-        });
-    }
-
-    onImgClick = (datas) => {
-        let srcs = [];
-        try {
-            datas.map((data) => {
-                let arr = data.split(',');
-                arr.map(rst => {
-                    let src = getForestImgUrl(rst);
-                    srcs.push(src);
-                });
-            });
-        } catch (e) {
-            console.log('处理图片', e);
-        }
-        return srcs;
-    };
-
-    handleCancel () {
-        this.setState({
-            seeVisible: false,
-            imgs: []
-        });
-    }
-
-    columns = [
-        {
-            title: '部门',
-            dataIndex: 'user.account.organization',
-            key: 'user.account.organization',
-            render: (text, record, index) => {
-                let organization = (record && record.user && record.user.account && record.user.account.organization) || '';
-                let company = '';
-                if (record && record.check_group && record.check_group.length > 0) {
-                    company = record.check_group[0].org_name;
-                }
-                return <div style={{textAlign: 'Center'}}>
-                    <div className='column' title={company}>
-                        {company}
-                    </div>
-                    <div className='column' title={organization}>
-                        {organization}
-                    </div>
-                </div>;
-            }
-        },
-        {
-            title: '姓名',
-            dataIndex: 'user.account.person_name',
-            key: 'user.account.person_name'
-        },
-        {
-            title: '账号',
-            dataIndex: 'user.username',
-            key: 'user.username'
-        },
-        {
-            title: '角色',
-            render: (text, record, index) => {
-                if (record && record.user && record.user.groups && record.user.groups.length > 0) {
-                    return <span>{record.user.groups[0].name}</span>;
-                }
-            }
-        },
-        {
-            title: '职务',
-            dataIndex: 'user.account.title',
-            key: 'user.account.title'
-        },
-        {
-            title: '考勤群体',
-            render: (text, record, index) => {
-                if (record && record.check_group && record.check_group.length > 0) {
-                    let name = '';
-                    record.check_group.map((group, index) => {
-                        if (index > 0) {
-                            name = name + ',' + group.name;
-                        } else {
-                            name = name + group.name;
-                        }
-                    });
-                    return <div className='column' title={name}>{name}</div>;
-                } else {
-                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
-                }
-            }
-        },
-        {
-            title: '日期',
-            dataIndex: 'created_on',
-            key: 'created_on',
-            render: (text, record, index) => {
-                if (record && record.created_on) {
-                    return <div style={{textAlign: 'Center'}}>
-                        <div>
-                            {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
-                        </div>
-                    </div>;
-                } else {
-                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
-                }
-            }
-        },
-        {
-            title: '上班时间',
-            dataIndex: 'checkin_record.check_time',
-            key: 'checkin_record.check_time',
-            render: (text, record, index) => {
-                if (record && record.checkin_record && record.checkin_record.check_time) {
-                    if (record.checkin_record.imgs) {
-                        return <div style={{textAlign: 'Center'}}>
-                            <div>
-                                <a onClick={this.previewCheckinImg.bind(this, record)}>
-                                    {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
-                                </a>
-                            </div>
-                            <div>
-                                <a onClick={this.previewCheckinImg.bind(this, record)}>
-                                    {moment(text).utc().zone(-0).format('HH:mm:ss')}
-                                </a>
-                            </div>
-                        </div>;
-                    } else {
-                        return <div style={{textAlign: 'Center'}}>
-                            <div onClick={this.previewCheckinImg.bind(this, record)}>
-                                {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
-                            </div>
-                            <div onClick={this.previewCheckinImg.bind(this, record)}>
-                                {moment(text).utc().zone(-0).format('HH:mm:ss')}
-                            </div>
-                        </div>;
-                    }
-                } else {
-                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
-                }
-            }
-        },
-        {
-            title: '下班时间',
-            dataIndex: 'checkout_record.check_time',
-            key: 'checkout_record.check_time',
-            render: (text, record, index) => {
-                if (record && record.checkout_record && record.checkout_record.check_time) {
-                    if (record.checkin_record.imgs) {
-                        return <div style={{textAlign: 'Center'}}>
-                            <div>
-                                <a onClick={this.previewCheckoutImg.bind(this, record)}>
-                                    {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
-                                </a>
-                            </div>
-                            <div>
-                                <a onClick={this.previewCheckoutImg.bind(this, record)}>
-                                    {moment(text).utc().zone(-0).format('HH:mm:ss')}
-                                </a>
-                            </div>
-                        </div>;
-                    } else {
-                        return <div style={{textAlign: 'Center'}}>
-                            <div onClick={this.previewCheckoutImg.bind(this, record)}>
-                                {moment(text).utc().zone(-0).format('YYYY-MM-DD')}
-                            </div>
-                            <div onClick={this.previewCheckoutImg.bind(this, record)}>
-                                {moment(text).utc().zone(-0).format('HH:mm:ss')}
-                            </div>
-                        </div>;
-                    }
-                } else {
-                    return <div style={{textAlign: 'Center'}}><span>/</span></div>;
-                }
-            }
-        },
-        {
-            title: '状态',
-            dataIndex: 'status',
-            key: 'status',
-            render: (text) => {
-                if (text) {
-                    if (text === 1) {
-                        return <span>缺勤</span>;
-                    } else if (text === 2) {
-                        return <span>迟到</span>;
-                    } else if (text === 3) {
-                        return <span>早退</span>;
-                    } else if (text === 4) {
-                        return <span>正常</span>;
-                    } else if (text === 5) {
-                        return <span>迟到,早退</span>;
-                    }
-                } else {
-                    return <span>/</span>;
-                }
-            }
-        }
-    ];
 }

@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import * as actions from '../store/electronicFence';
 import { actions as platformActions } from '_platform/store/global';
 import { ScopeCreateTable } from '../components/ElectronicFence';
-import { getCompanyDataByOrgCode, getAreaTreeData } from '_platform/auth';
+import { getCompanyDataByOrgCode, getAreaTreeData, getUser } from '_platform/auth';
 @connect(
     state => {
         const { checkwork: { electronicFence = {} }, platform } = state;
@@ -21,10 +21,7 @@ export default class ElectronicFence extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            userOrgCode: '',
-            companyOrgCode: '',
             parentData: '',
-            user: '',
             groupTreeLoading: false,
             areaTreeLoading: false
         };
@@ -40,9 +37,9 @@ export default class ElectronicFence extends Component {
             }
         } = this.props;
         // 获取用户的公司信息
-        let user = localStorage.getItem('QH_USER_DATA');
-        user = JSON.parse(user);
+        let user = getUser();
         try {
+            await getCheckGroupOK([]);
             if (user.username !== 'admin') {
                 // // 获取考勤群体数据
                 await this.loadCheckGroupData(user);
@@ -54,8 +51,6 @@ export default class ElectronicFence extends Component {
                 } else {
                     await this._loadAreaData();
                 }
-            } else {
-                await getCheckGroupOK([]);
             }
         } catch (e) {
             console.log('org', e);
@@ -66,7 +61,7 @@ export default class ElectronicFence extends Component {
     loadCheckGroupData = async (user) => {
         const {
             actions: {
-                getOrgTreeByCode,
+                getParentOrgTreeByID,
                 getCheckGroup
             }
         } = this.props;
@@ -74,22 +69,19 @@ export default class ElectronicFence extends Component {
             this.setState({
                 groupTreeLoading: true
             });
-            let userOrgCode = '';
-            let companyOrgCode = '';
+            let userOrgID = '';
+            let companyOrgID = '';
             let parentData = '';
             // userOrgCode为登录用户自己的部门code
-            userOrgCode = user.account.org_code;
-            parentData = await getCompanyDataByOrgCode(userOrgCode, getOrgTreeByCode);
-            companyOrgCode = parentData.code;
+            userOrgID = user.org;
+            parentData = await getCompanyDataByOrgCode(userOrgID, getParentOrgTreeByID);
+            companyOrgID = parentData.ID;
             // companyOrgCode为登录用户的公司信息，通过公司的code来获取群体
             let postData = {
-                org_code: companyOrgCode
+                orgCode: companyOrgID
             };
             await getCheckGroup({}, postData);
             this.setState({
-                user,
-                userOrgCode,
-                companyOrgCode,
                 parentData,
                 groupTreeLoading: false
             });

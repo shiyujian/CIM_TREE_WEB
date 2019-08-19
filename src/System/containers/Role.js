@@ -3,9 +3,8 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { DynamicTitle } from '_platform/components/layout';
 import { actions as platformActions } from '_platform/store/global';
-import { actions, actions3 } from '../store/role';
-import { actions as actions2 } from '../store/coop';
-import { Table, Addition } from '../components/Role';
+import { actions } from '../store/role';
+import { Table } from '../components/Role';
 
 @connect(
     state => {
@@ -17,7 +16,7 @@ import { Table, Addition } from '../components/Role';
     },
     dispatch => ({
         actions: bindActionCreators(
-            { ...actions, ...platformActions, ...actions2, ...actions3 },
+            { ...actions, ...platformActions },
             dispatch
         )
     })
@@ -29,7 +28,6 @@ export default class Role extends Component {
             <div style={{ overflow: 'hidden', padding: 20 }}>
                 <DynamicTitle title='角色设置' {...this.props} />
                 <Table {...this.props} />
-                <Addition {...this.props} />
             </div>
         );
     }

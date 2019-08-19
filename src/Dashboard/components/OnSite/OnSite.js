@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-15 21:56:43
+ * @Last Modified time: 2019-08-19 09:21:01
  */
 import React, { Component } from 'react';
 import {
@@ -107,8 +107,7 @@ class OnSite extends Component {
             }
         } = this.props;
         let user = getUser();
-        console.log('user', user);
-        await getCustomViewByUserID({id: user.id});
+        await getCustomViewByUserID({id: user.ID});
         await this.initMap();
         window.addEventListener('keydown', this.keydownHandler);
     }

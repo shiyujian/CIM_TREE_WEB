@@ -1,1 +1,0 @@
-export ContrastTable from './ContrastTable';

@@ -25,10 +25,10 @@ class SupplyTable extends Component {
     }
     componentDidMount () {
         // 获取该用户所在苗圃基地的id
-        const { org_code } = getUser();
+        const { org } = getUser();
         const { getNurseryByPk } = this.props.actions;
         getNurseryByPk({}, {
-            pk: org_code
+            pk: org
         }).then(rep => {
             if (rep.code === 200 && rep.content.length > 0) {
                 this.nurserybase = rep.content[0].ID;

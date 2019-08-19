@@ -3,11 +3,12 @@ import { DynamicTitle, Content, Sidebar } from '_platform/components/layout';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import './Schedule.less';
-import { Actual, Total, WeekPlan, PkCodeTree } from '../components/Stage';
+import { PkCodeTree, ActualNew, WeekPlanNew } from '../components/Stage';
 import { Spin, Tabs } from 'antd';
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
 import { actions } from '../store/stage';
+import { getUser } from '_platform/auth';
 const TabPane = Tabs.TabPane;
 
 @connect(
@@ -31,6 +32,7 @@ export default class Stage extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            auditorList: [], // 审核人列表
             treetyoption: [],
             treeLists: [],
             leftkeycode: '',
@@ -58,8 +60,60 @@ export default class Stage extends Component {
                 loading: false
             });
         }
+        this.getAuditor();
+        let user = getUser();
+        let section = user.section;
+        if (section) {
+            let code = section.split('-');
+            if (code && code.length === 3) {
+                this.setState({
+                    leftkeycode: code[0]
+                });
+            }
+        }
     }
 
+    getAuditor = async () => {
+        const {
+            actions: {
+                getUsers,
+                getRoles
+            }
+        } = this.props;
+        let user = await getUser();
+        if (!(user && user.section)) {
+            return;
+        }
+        let roles = await getRoles();
+        let postRoleData = ''; // 监理文书ID
+        roles.map((role) => {
+            if (role && role.ID && role.ParentID && role.RoleName === '监理文书') {
+                postRoleData = role.ID;
+            }
+        });
+        let postdata = {
+            role: postRoleData,
+            section: user.section,
+            status: 1,
+            page: '',
+            size: ''
+        };
+        getUsers({}, postdata).then(rep => {
+            if (rep.code === 200) {
+                let auditorList = [];
+                rep.content.map(item => {
+                    auditorList.push({
+                        Full_Name: item.Full_Name,
+                        User_Name: item.User_Name,
+                        id: item.ID
+                    });
+                });
+                this.setState({
+                    auditorList
+                });
+            }
+        });
+    }
     render () {
         const { leftkeycode, loading } = this.state;
         const {
@@ -91,15 +145,12 @@ export default class Stage extends Component {
                             </Sidebar>
                             <Content>
                                 <div>
-                                    <Tabs>
-                                        <TabPane tab='总计划进度' key='1'>
-                                            <Total {...this.props} {...this.state} />
-                                        </TabPane>
+                                    <Tabs defaultActiveKey='2'>
                                         <TabPane tab='每周计划进度' key='2'>
-                                            <WeekPlan {...this.props} {...this.state} />
+                                            <WeekPlanNew {...this.props} {...this.state} />
                                         </TabPane>
                                         <TabPane tab='每日实际进度' key='3'>
-                                            <Actual
+                                            <ActualNew
                                                 {...this.props}
                                                 {...this.state}
                                             />

@@ -4,7 +4,6 @@ import { actions } from '../store/query';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { actions as platformActions } from '_platform/store/global';
-import { getUser } from '_platform/auth';
 import { DatePicker, Row, Col, Button, Table } from 'antd';
 import { IN_OFF_DUTY_API } from '_platform/api';
 import moment from 'moment';
@@ -21,7 +20,10 @@ const { MonthPicker } = DatePicker;
         return { ...query, platform };
     },
     dispatch => ({
-        actions: bindActionCreators({ ...actions, ...platformActions }, dispatch)
+        actions: bindActionCreators(
+            { ...actions, ...platformActions },
+            dispatch
+        )
     })
 )
 export default class Query extends Component {
@@ -36,16 +38,7 @@ export default class Query extends Component {
         };
     }
 
-    componentDidMount () {
-        const { actions: { getCheckListAc } } = this.props;
-        let time = moment().format('YYYY-MM');
-        // getCheckListAc({
-        // 	month: time
-        // });
-        if (getUser().org_code) {
-            // this._getOrgInfo(getUser().org_code)
-        }
-    }
+    componentDidMount () {}
 
     onMonthChange (value) {
         this.setState({
@@ -54,14 +47,18 @@ export default class Query extends Component {
     }
 
     searchClick () {
-        const { actions: { getCheckListAc } } = this.props;
+        const {
+            actions: { getCheckListAc }
+        } = this.props;
         // getCheckListAc({
         // 	month: this.state.month
         // });
     }
 
     _getOrgInfo (org_code) {
-        const { actions: { getOrgInfoAc } } = this.props;
+        const {
+            actions: { getOrgInfoAc }
+        } = this.props;
         // getOrgInfoAc({
         // 	org_code:org_code,
         // })
@@ -95,23 +92,36 @@ export default class Query extends Component {
                 <DynamicTitle title='个人考勤' {...this.props} />
                 <Content>
                     <Row>
-                        <Col span={8}>工作日正常上班时间：{this.state.on_duty}</Col>
-                        <Col span={8}>工作日正常下班时间：{this.state.off_duty}</Col>
                         <Col span={8}>
-                            <MonthPicker style={{ display: 'block', float: 'left' }}
+                            工作日正常上班时间：{this.state.on_duty}
+                        </Col>
+                        <Col span={8}>
+                            工作日正常下班时间：{this.state.off_duty}
+                        </Col>
+                        <Col span={8}>
+                            <MonthPicker
+                                style={{ display: 'block', float: 'left' }}
                                 allowClear={false}
                                 defaultValue={moment()}
                                 placeholder='请选择查询月份'
-                                onChange={this.onMonthChange.bind(this)} />
-                            <Button style={{ display: 'block', float: 'left' }} onClick={this.searchClick.bind(this)}>查询</Button>
+                                onChange={this.onMonthChange.bind(this)}
+                            />
+                            <Button
+                                style={{ display: 'block', float: 'left' }}
+                                onClick={this.searchClick.bind(this)}
+                            >
+                                查询
+                            </Button>
                         </Col>
                     </Row>
                     <Row>
-                        <Table dataSource={newChecks}
+                        <Table
+                            dataSource={newChecks}
                             columns={this.columns}
                             className='foresttables'
                             rowSelection={rowSelection}
-                            bordered />
+                            bordered
+                        />
                     </Row>
                 </Content>
             </div>
@@ -120,15 +130,36 @@ export default class Query extends Component {
 
     renderChecks (checkList) {
         let array = [];
-        checkList.map((check) => {
+        checkList.map(check => {
             let obj = {
                 id: check.id,
-                created_on: moment(check.created_on).utc().date() + '日',
-                check_time: (check.checkin_record !== null) ? this.getCheckTime(check.checkin_record.check_time) : null,
-                checkout_time: (check.checkout_record !== null) ? this.getCheckTime(check.checkout_record.check_time) : null,
-                all_time: this.getAllTime(check.checkin_record, check.checkout_record, check.created_on),
-                absence_time: this.getAbsenceTime(check.checkin_record, check.checkout_record, check.created_on),
-                status: this.getStatus(check.checkin_record, check.checkout_record, check.created_on)
+                created_on:
+                    moment(check.created_on)
+                        .utc()
+                        .date() + '日',
+                check_time:
+                    check.checkin_record !== null
+                        ? this.getCheckTime(check.checkin_record.check_time)
+                        : null,
+                checkout_time:
+                    check.checkout_record !== null
+                        ? this.getCheckTime(check.checkout_record.check_time)
+                        : null,
+                all_time: this.getAllTime(
+                    check.checkin_record,
+                    check.checkout_record,
+                    check.created_on
+                ),
+                absence_time: this.getAbsenceTime(
+                    check.checkin_record,
+                    check.checkout_record,
+                    check.created_on
+                ),
+                status: this.getStatus(
+                    check.checkin_record,
+                    check.checkout_record,
+                    check.created_on
+                )
             };
             array.push(obj);
         });
@@ -136,7 +167,9 @@ export default class Query extends Component {
     }
 
     getCheckTime (time) {
-        return moment(time).utc().format('YYYY-MM-DD HH:mm:ss');
+        return moment(time)
+            .utc()
+            .format('YYYY-MM-DD HH:mm:ss');
     }
     // 获取在岗时间
     getAllTime (in_record, out_record, created_on) {
@@ -144,8 +177,16 @@ export default class Query extends Component {
         if (in_record === null || out_record === null) {
             all_time = '0';
         } else {
-            let login_time = moment(moment(in_record.check_time).utc().format('YYYY-MM-DD HH:mm:ss')).valueOf();
-            let out_time = moment(moment(out_record.check_time).utc().format('YYYY-MM-DD HH:mm:ss')).valueOf();
+            let login_time = moment(
+                moment(in_record.check_time)
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm:ss')
+            ).valueOf();
+            let out_time = moment(
+                moment(out_record.check_time)
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm:ss')
+            ).valueOf();
             all_time = this._getTimeText(out_time - login_time);
         }
         return all_time;
@@ -159,32 +200,74 @@ export default class Query extends Component {
     }
     // 获取缺勤时间
     getAbsenceTime (in_record, out_record, created_on) {
-        let on_duty = moment(moment(created_on).utc().format('YYYY-MM-DD') + ' ' + this.state.on_duty).valueOf();
-        let off_duty = moment(moment(created_on).utc().format('YYYY-MM-DD') + ' ' + this.state.off_duty).valueOf();
+        let on_duty = moment(
+            moment(created_on)
+                .utc()
+                .format('YYYY-MM-DD') +
+                ' ' +
+                this.state.on_duty
+        ).valueOf();
+        let off_duty = moment(
+            moment(created_on)
+                .utc()
+                .format('YYYY-MM-DD') +
+                ' ' +
+                this.state.off_duty
+        ).valueOf();
         let time = '';
         if (in_record === null || out_record === null) {
             time = this._getTimeText(off_duty - on_duty);
         } else {
-            let login_time = moment(moment(in_record.check_time).utc().format('YYYY-MM-DD HH:mm:ss')).valueOf();
-            let out_time = moment(moment(out_record.check_time).utc().format('YYYY-MM-DD HH:mm:ss')).valueOf();
-            if ((out_time - login_time) >= (off_duty - on_duty)) {
+            let login_time = moment(
+                moment(in_record.check_time)
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm:ss')
+            ).valueOf();
+            let out_time = moment(
+                moment(out_record.check_time)
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm:ss')
+            ).valueOf();
+            if (out_time - login_time >= off_duty - on_duty) {
                 time = this._getTimeText(out_time - login_time);
             } else {
-                time = this._getTimeText((off_duty - on_duty) - (out_time - login_time));
+                time = this._getTimeText(
+                    off_duty - on_duty - (out_time - login_time)
+                );
             }
         }
         return time;
     }
     // 获取当前状态
     getStatus (in_record, out_record, created_on) {
-        let on_duty = moment(moment(created_on).utc().format('YYYY-MM-DD') + ' ' + this.state.on_duty).valueOf();
-        let off_duty = moment(moment(created_on).utc().format('YYYY-MM-DD') + ' ' + this.state.off_duty).valueOf();
+        let on_duty = moment(
+            moment(created_on)
+                .utc()
+                .format('YYYY-MM-DD') +
+                ' ' +
+                this.state.on_duty
+        ).valueOf();
+        let off_duty = moment(
+            moment(created_on)
+                .utc()
+                .format('YYYY-MM-DD') +
+                ' ' +
+                this.state.off_duty
+        ).valueOf();
         let status = '';
         if (in_record === null || out_record === null) {
             status = '缺卡';
         } else {
-            let login_time = moment(moment(in_record.check_time).utc().format('YYYY-MM-DD HH:mm:ss')).valueOf();
-            let out_time = moment(moment(out_record.check_time).utc().format('YYYY-MM-DD HH:mm:ss')).valueOf();
+            let login_time = moment(
+                moment(in_record.check_time)
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm:ss')
+            ).valueOf();
+            let out_time = moment(
+                moment(out_record.check_time)
+                    .utc()
+                    .format('YYYY-MM-DD HH:mm:ss')
+            ).valueOf();
             if (on_duty > login_time && off_duty < out_time) {
                 status = '正常';
             } else if (on_duty > login_time && off_duty > out_time) {
@@ -229,4 +312,4 @@ export default class Query extends Component {
             key: 'status'
         }
     ];
-};
+}

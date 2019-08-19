@@ -46,10 +46,8 @@ class Filter extends Component {
         let user = getUser();
         let projectArray = [];
         let sectionArray = [];
-        let sections = user.sections;
-        sections = JSON.parse(sections);
-        if (sections && sections instanceof Array && sections.length > 0) {
-            let section = sections[0];
+        let section = user.section;
+        if (section) {
             let code = section.split('-');
             if (code && code.length === 3) {
                 // 获取当前标段所在的项目

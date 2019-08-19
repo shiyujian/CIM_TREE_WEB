@@ -23,75 +23,6 @@ class AsideTree extends Component {
         };
         this.section = '';
     }
-
-    componentDidMount = async () => {
-        const {
-            actions: {
-                getTreeNodeList,
-                changeSelectMemTeam
-            },
-            platform: { tree = {} }
-        } = this.props;
-        try {
-            this.user = getUser();
-            let sections = this.user.sections;
-            sections = JSON.parse(sections);
-            await changeSelectMemTeam('');
-            // 首先查看是否为管理员，是的话，获取全部信息
-            if (this.user.username === 'admin') {
-                if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
-                    await getTreeNodeList();
-                }
-                await this._getAdminData();
-            } else if (sections && sections instanceof Array && sections.length > 0) {
-                // 然后查看有没有关联标段，没有关联的人无法获取列表
-                await this._getSectionData();
-            }
-        } catch (e) {
-            console.log('changeSelectMemTeam', e);
-        }
-    }
-    // 非管理员，获取文档数据
-    _getSectionData = async () => {
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
-        // 使目录树和标段相关联
-        this.section = sections[0];
-        await this._getSectionTeams();
-        this.setState({
-            addDisabled: false
-        });
-    }
-    // 获取文档列表
-    async _docList (section) {
-        if (this.user.username === 'admin') {
-            this._getAdminTeams(section);
-        } else {
-            this._getSectionTeams();
-        }
-    }
-    // 非管理员获取文档树结构
-    _getSectionTeams = async () => {
-        const {
-            actions: {
-                getCuringGroup
-            },
-            platform: { tree = {} }
-        } = this.props;
-        let sectionData = (tree && tree.bigTreeList) || [];
-        let taskTeams = await getCuringGroup({}, {section: this.section});
-        let sectionName = await getSectionName(this.section, sectionData);
-        let teamsTree = [
-            {
-                ID: this.section,
-                GroupName: sectionName,
-                children: taskTeams
-            }
-        ];
-        this.setState({
-            teamsTree
-        });
-    }
     static loop (data = [], parent) {
         if (data) {
             if (data.children) {
@@ -134,114 +65,31 @@ class AsideTree extends Component {
             }
         }
     }
-
-    render () {
+    componentDidMount = async () => {
         const {
-            teamsTree = [],
-            teamVisible,
-            addDisabled,
-            selected
-        } = this.state;
-        const {
-            form: { getFieldDecorator }
+            actions: {
+                getTreeNodeList,
+                changeSelectMemTeam
+            },
+            platform: { tree = {} }
         } = this.props;
-        const FormItemLayout = {
-            labelCol: { span: 6 },
-            wrapperCol: { span: 18 }
-        };
-        return (
-            <div className='total-main'>
-                <div className='test'>
-                    <Button
-                        className='buttonStyle'
-                        // style={{marginRight: 10, marginBottom: 10, left: 10}}
-                        type='primary'
-                        onClick={this._handleModalVisible.bind(this)}
-                        disabled={addDisabled}
-                    >
-                    新增班组
-                    </Button>
-                    {
-                        !selected
-                            ? (
-                                <Button
-                                    className='buttonStyle'
-                                    type='danger'
-                                    disabled={!selected}>
-                                    删除班组
-                                </Button>
-                            ) : (
-                                <Popconfirm
-                                    onConfirm={this._handleDelDoc.bind(this)}
-                                    title='确定要删除该班组么'
-                                    okText='确定'
-                                    disabled={!selected}
-                                    cancelText='取消' >
-                                    <Button
-                                        className='buttonStyle'
-                                        type='danger'>
-                                    删除班组
-                                    </Button>
-                                </Popconfirm>
-                            )
-                    }
-                    <div className='aside-main'>
-                        <div className='aside'>
-                            {teamsTree.length ? (
-                                <Tree
-                                    showLine
-                                    defaultExpandAll
-                                    onSelect={this._handleTreeSelect.bind(this)}
-                                >
-                                    {teamsTree.map(p => {
-                                        return AsideTree.loop(p);
-                                    })}
-                                </Tree>
-                            ) : (
-                                ''
-                            )}
-                        </div>
-                    </div>
-                </div>
-                {
-                    teamVisible
-                        ? (<Modal
-                            title='添加班组'
-                            visible={teamVisible}
-                            maskClosable={false}
-                            onOk={this._handleAddTeam.bind(this)}
-                            onCancel={this._handleCancelModal.bind(this)}
-                        >
-                            <Row>
-                                <FormItem {...FormItemLayout} label='班组名称'>
-                                    {getFieldDecorator('teamName', {
-                                        rules: [
-                                            { required: true, message: '请输入班组名称' }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入班组名称'
-                                        />
-                                    )}
-                                </FormItem>
-                            </Row>
-                            <Row>
-                                <FormItem {...FormItemLayout} label='班组描述'>
-                                    {getFieldDecorator('teamDesc', {
-                                        rules: [
-                                            { required: true, message: '请输入班组描述' }
-                                        ]
-                                    })(
-                                        <Input
-                                            placeholder='请输入班组描述'
-                                        />
-                                    )}
-                                </FormItem>
-                            </Row>
-                        </Modal>) : ''
+        try {
+            this.user = getUser();
+            let section = this.user.section;
+            await changeSelectMemTeam('');
+            // 首先查看是否为管理员，是的话，获取全部信息
+            if (this.user.username === 'admin') {
+                if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
+                    await getTreeNodeList();
                 }
-            </div>
-        );
+                await this._getAdminData();
+            } else if (section) {
+                // 然后查看有没有关联标段，没有关联的人无法获取列表
+                await this._getSectionData();
+            }
+        } catch (e) {
+            console.log('changeSelectMemTeam', e);
+        }
     }
     // 初始化时获取admin文档树数据
     _getAdminData = async () => {
@@ -280,11 +128,53 @@ class AsideTree extends Component {
             }
         });
     }
-    // 删除或增加文档后管理员更新树结构
+    // 非管理员，获取文档数据
+    _getSectionData = async () => {
+        this.section = this.user.section;
+        // 使目录树和标段相关联
+        await this._getSectionTeams();
+        this.setState({
+            addDisabled: false
+        });
+    }
+    // 获取文档列表
+    async _docList (section) {
+        if (this.user.username === 'admin') {
+            this._getAdminTeams(section);
+        } else {
+            this._getSectionTeams();
+        }
+    }
+    // 非管理员获取文档树结构
+    _getSectionTeams = async () => {
+        const {
+            actions: {
+                getCuringGroup
+            },
+            platform: { tree = {} }
+        } = this.props;
+        let sectionData = (tree && tree.bigTreeList) || [];
+        let taskTeams = await getCuringGroup({}, {section: this.section});
+        let sectionName = await getSectionName(this.section, sectionData);
+        let teamsTree = [
+            {
+                ID: this.section,
+                GroupName: sectionName,
+                children: taskTeams
+            }
+        ];
+        this.setState({
+            teamsTree
+        });
+    }
+    // 删除或增加文档后   管理员更新树结构
     _getAdminTeams = async (section) => {
         const {
             actions: {
                 getCuringGroup
+            },
+            platform: {
+                tree
             }
         } = this.props;
         const {
@@ -292,15 +182,9 @@ class AsideTree extends Component {
         } = this.state;
         teamsTree.map(async (data, index) => {
             if (data && data.ID && data.ID === section) {
-                let sectionName = data.name;
                 let taskTeams = await getCuringGroup({}, {section: section});
                 if (taskTeams && taskTeams.length > 0) {
-                    data = {
-                        key: section,
-                        name: sectionName,
-                        children: taskTeams
-                    };
-                    teamsTree[index] = data;
+                    data.children = taskTeams;
                 } else {
                     teamsTree.splice(index, 1);
                 }
@@ -455,6 +339,115 @@ class AsideTree extends Component {
         this.setState({
             teamVisible: true
         });
+    }
+
+    render () {
+        const {
+            teamsTree = [],
+            teamVisible,
+            addDisabled,
+            selected
+        } = this.state;
+        const {
+            form: { getFieldDecorator }
+        } = this.props;
+        const FormItemLayout = {
+            labelCol: { span: 6 },
+            wrapperCol: { span: 18 }
+        };
+        return (
+            <div className='total-main'>
+                <div className='test'>
+                    <Button
+                        className='buttonStyle'
+                        // style={{marginRight: 10, marginBottom: 10, left: 10}}
+                        type='primary'
+                        onClick={this._handleModalVisible.bind(this)}
+                        disabled={addDisabled}
+                    >
+                    新增班组
+                    </Button>
+                    {
+                        !selected
+                            ? (
+                                <Button
+                                    className='buttonStyle'
+                                    type='danger'
+                                    disabled={!selected}>
+                                    删除班组
+                                </Button>
+                            ) : (
+                                <Popconfirm
+                                    onConfirm={this._handleDelDoc.bind(this)}
+                                    title='确定要删除该班组吗'
+                                    okText='确定'
+                                    disabled={!selected}
+                                    cancelText='取消' >
+                                    <Button
+                                        className='buttonStyle'
+                                        type='danger'>
+                                    删除班组
+                                    </Button>
+                                </Popconfirm>
+                            )
+                    }
+                    <div className='aside-main'>
+                        <div className='aside'>
+                            {teamsTree.length ? (
+                                <Tree
+                                    showLine
+                                    defaultExpandAll
+                                    onSelect={this._handleTreeSelect.bind(this)}
+                                >
+                                    {teamsTree.map(p => {
+                                        return AsideTree.loop(p);
+                                    })}
+                                </Tree>
+                            ) : (
+                                ''
+                            )}
+                        </div>
+                    </div>
+                </div>
+                {
+                    teamVisible
+                        ? (<Modal
+                            title='添加班组'
+                            visible={teamVisible}
+                            maskClosable={false}
+                            onOk={this._handleAddTeam.bind(this)}
+                            onCancel={this._handleCancelModal.bind(this)}
+                        >
+                            <Row>
+                                <FormItem {...FormItemLayout} label='班组名称'>
+                                    {getFieldDecorator('teamName', {
+                                        rules: [
+                                            { required: true, message: '请输入班组名称' }
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder='请输入班组名称'
+                                        />
+                                    )}
+                                </FormItem>
+                            </Row>
+                            <Row>
+                                <FormItem {...FormItemLayout} label='班组描述'>
+                                    {getFieldDecorator('teamDesc', {
+                                        rules: [
+                                            { required: true, message: '请输入班组描述' }
+                                        ]
+                                    })(
+                                        <Input
+                                            placeholder='请输入班组描述'
+                                        />
+                                    )}
+                                </FormItem>
+                            </Row>
+                        </Modal>) : ''
+                }
+            </div>
+        );
     }
 }
 export default Form.create()(AsideTree);

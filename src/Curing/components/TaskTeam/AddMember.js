@@ -4,21 +4,20 @@ import {
 } from 'antd';
 import { getUser } from '_platform/auth';
 import '../Curing.less';
-import moment from 'moment';
 import 'moment/locale/zh-cn';
-window.config = window.config || {};
 
 export default class AddMember extends Component {
     constructor (props) {
         super(props);
         this.state = {
             modalVisible: false,
-            roles: [],
+            curingRoleID: [],
             dataSource: [],
             RelationMem: [],
             totalUserData: []
         };
         this.user = null;
+        this.section = '';
     }
 
     async componentDidMount () {
@@ -28,25 +27,28 @@ export default class AddMember extends Component {
             }
         } = this.props;
         this.user = getUser();
-        let sections = this.user.sections;
-        this.sections = JSON.parse(sections);
+        this.section = this.user.section;
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (!(this.sections && this.sections instanceof Array && this.sections.length > 0) && (this.user.username !== 'admin')) {
+        if (!this.section && (this.user.username !== 'admin')) {
             return;
         }
         // 需要找到是养护角色的人
-        let role = await getRoles();
-        const curingRoles = role.filter(rst => rst.grouptype === 4);
-        let roles = curingRoles.map(item => { return item.id; });
+        let roleData = await getRoles();
+        let curingRoleID = '';
+        roleData.map((role) => {
+            if (role && role.ID && role.ParentID && role.RoleName === '养护') {
+                curingRoleID = role.ID;
+            };
+        });
         this.setState({
-            roles: roles
+            curingRoleID
         });
         await this._queryMember();
     };
     // 查找人员
     _queryMember = async () => {
         const {
-            roles = []
+            curingRoleID = ''
         } = this.state;
         const {
             actions: {
@@ -54,31 +56,33 @@ export default class AddMember extends Component {
             },
             selectSection
         } = this.props;
-        if (roles.length === 0) {
+        if (!curingRoleID) {
             return;
         }
-        let sections = [];
+        let section = '';
         if (this.user.username === 'admin') {
             // 如果没有点击节点，则获取全部养护人员，为防止人员列表过长，需要禁止
             if (!selectSection) {
                 return;
             }
-            sections.push(selectSection);
+            section = selectSection;
         } else {
-            sections = this.sections;
+            section = this.section;
         }
         try {
             let postdata = {};
             postdata = {
-                roles: roles,
-                sections: sections,
-                is_active: true
+                role: curingRoleID,
+                section: section,
+                status: 1
             };
 
-            let users = await getUsers({}, postdata);
-            this.setState({
-                users
-            });
+            let userData = await getUsers({}, postdata);
+            if (userData && userData.code && userData.code === 200) {
+                this.setState({
+                    userData: (userData && userData.content) || []
+                });
+            }
         } catch (error) {
             console.log(error);
         }
@@ -102,7 +106,7 @@ export default class AddMember extends Component {
             addMemVisible
         } = this.props;
         const {
-            users
+            userData
         } = this.state;
         return (
             <div>
@@ -120,7 +124,7 @@ export default class AddMember extends Component {
                             rowKey='id'
                             size='small'
                             columns={this.columns}
-                            dataSource={users}
+                            dataSource={userData}
                         />
                         <Row style={{marginTop: 10}}>
                             <Button onClick={this._handleCancel.bind(this)} style={{float: 'right'}}type='primary'>关闭</Button>
@@ -134,30 +138,15 @@ export default class AddMember extends Component {
 
     _getRelMem = async () => {
         const {
-            curingGroupMans,
-            actions: {
-                getForestUserDetail
-            }
+            curingGroupMans
         } = this.props;
         let RelationMem = [];
         if (curingGroupMans && curingGroupMans instanceof Array && curingGroupMans.length > 0) {
-            let requestArr = [];
             curingGroupMans.map((user) => {
                 if (user && user.User) {
-                    let postData = {
-                        id: user && user.User
-                    };
-                    requestArr.push(getForestUserDetail(postData));
+                    RelationMem.push(user && user.User);
                 }
             });
-            let dataSource = [];
-            if (requestArr && requestArr.length > 0) {
-                dataSource = await Promise.all(requestArr);
-                console.log('dataSource', dataSource);
-                await dataSource.map((data) => {
-                    RelationMem.push(Number(data.PK));
-                });
-            }
         }
         this.setState({
             RelationMem: RelationMem
@@ -170,8 +159,8 @@ export default class AddMember extends Component {
                 changeAddMemVisible
             }
         } = this.props;
-        changeAddMemVisible(false);
         await this.getRelatedMans();
+        changeAddMemVisible(false);
     }
 
     _check = async (user, e) => {
@@ -181,27 +170,14 @@ export default class AddMember extends Component {
         const {
             actions: {
                 postCuringGroupMan,
-                deleteCuringGroupMan,
-                getForestAllUsersData
+                deleteCuringGroupMan
             },
             selectMemTeam,
             curingGroupMans
         } = this.props;
         let checked = e.target.checked;
         try {
-            console.log('user', user);
-            let checkUserId = '';
-            let username = (user && user.username) || '';
-            if (username) {
-                let postData = {
-                    username
-                };
-                let forestData = await getForestAllUsersData({}, postData);
-                if (forestData && forestData.content && forestData.content.length > 0) {
-                    let forestUserDetail = forestData.content[0];
-                    checkUserId = forestUserDetail.ID;
-                }
-            }
+            let checkUserId = (user && user.ID) || '';
             if (checked) {
                 try {
                     if (checkUserId) {
@@ -209,12 +185,12 @@ export default class AddMember extends Component {
                             'GroupID': selectMemTeam.ID,
                             'GroupName': selectMemTeam.GroupName, // 班组名称
                             'User': checkUserId, // 用户ID  非PK
-                            'FullName': user.account.person_name || user.username // 用户姓名
+                            'FullName': user.Full_Name || user.User_Name // 用户姓名
                         };
                         let addData = await postCuringGroupMan({}, postAddData);
                         if (addData && addData.code && addData.code === 1) {
                             await this.getRelatedMans();
-                            RelationMem.push(user.id);
+                            RelationMem.push(user.ID);
                             Notification.success({
                                 message: '关联用户成功',
                                 duration: 1
@@ -248,7 +224,7 @@ export default class AddMember extends Component {
                 if (deleteData && deleteData.code && deleteData.code === 1) {
                     await this.getRelatedMans();
                     RelationMem.map((memberID, index) => {
-                        if (memberID === user.id) {
+                        if (memberID === user.ID) {
                             RelationMem.splice(index, 1); // 删除该元素
                         }
                     });
@@ -294,29 +270,34 @@ export default class AddMember extends Component {
         },
         {
             title: '名称',
-            dataIndex: 'account.person_name'
+            dataIndex: 'Full_Name'
         },
         {
             title: '用户名',
-            dataIndex: 'username'
+            dataIndex: 'User_Name'
         },
         {
             title: '所属部门',
-            dataIndex: 'account.organization'
+            dataIndex: 'OrgObj',
+            render: (text, record, index) => {
+                if (record.OrgObj && record.OrgObj.OrgName) {
+                    return record.OrgObj.OrgName;
+                }
+            }
         },
         {
             title: '职务',
-            dataIndex: 'account.title'
+            dataIndex: 'Duty'
         },
         {
             title: '手机号码',
-            dataIndex: 'account.person_telephone'
+            dataIndex: 'Phone'
         },
         {
             title: '关联',
             render: user => {
                 const { RelationMem = [] } = this.state;
-                const checked = RelationMem.some(memberID => Number(memberID) === user.id);
+                const checked = RelationMem.some(memberID => Number(memberID) === user.ID);
 
                 return (
                     <Checkbox

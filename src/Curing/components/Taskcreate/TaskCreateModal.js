@@ -3,11 +3,10 @@ import { Button, Modal, Form, Row, Col, DatePicker, Select, Input, Notification,
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import PersonTree from './PersonTree';
-import { getUser } from '_platform/auth';
+import {getUser} from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
-const { TextArea } = Input;
 
 class TaskCreateModal extends Component {
     constructor (props) {
@@ -24,7 +23,7 @@ class TaskCreateModal extends Component {
         const {
             actions: {
                 getCuringTypes,
-                getForestAllUsersData
+                getUsers
             }
         } = this.props;
         let curingTypes = await getCuringTypes();
@@ -38,13 +37,13 @@ class TaskCreateModal extends Component {
         this.setState({
             typeOptionArr
         });
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
+        let user = getUser();
         let username = (user && user.username) || '';
         if (username) {
             let postData = {
                 username
             };
-            let forestData = await getForestAllUsersData({}, postData);
+            let forestData = await getUsers({}, postData);
             if (forestData && forestData.content && forestData.content.length > 0) {
                 let signUser = forestData.content[0];
                 this.setState({
@@ -70,7 +69,7 @@ class TaskCreateModal extends Component {
             treeNum = 0,
             regionArea = 0,
             regionSectionName,
-            regionThinName
+            regionSmallThinClassName
         } = this.props;
         const {
             typeOptionArr,
@@ -178,7 +177,7 @@ class TaskCreateModal extends Component {
                         <Row>
                             <FormItem {...FormItemLayout} label='细班'>
                                 {getFieldDecorator('taskThinClass', {
-                                    initialValue: `${regionThinName}`,
+                                    initialValue: `${regionSmallThinClassName}`,
                                     rules: [
                                         { required: true, message: '请输入细班名称' }
                                     ]

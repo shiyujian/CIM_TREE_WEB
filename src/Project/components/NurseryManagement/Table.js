@@ -1,6 +1,17 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { Row, Col, Input, Button, Select, Table, Pagination, Modal, Form, Spin, Notification } from 'antd';
+import {
+    Row,
+    Col,
+    Input,
+    Button,
+    Select,
+    Table,
+    Modal,
+    Form,
+    Spin,
+    Notification
+} from 'antd';
 import Edit from './Edit';
 import Addition from './Addition';
 import { getUser, formItemLayout, getForestImgUrl, getUserIsManager } from '_platform/auth';
@@ -16,8 +27,6 @@ class Tablelevel extends Component {
         this.state = {
             status: '', // 审核状态
             nurseryname: '', // 苗圃名称
-            total: 0,
-            page: 1,
             loading: true,
             nurseryList: [], // 苗圃列表
             visible: false, // 新增编辑苗圃弹框
@@ -33,7 +42,11 @@ class Tablelevel extends Component {
             blackVisible: false, // 拉黑modal
             blackRecord: '', // 拉黑的信息
             addVisible: false,
-            editVisible: false
+            editVisible: false,
+            pagination: {
+                current: 1,
+                showQuickJumper: true
+            }
         };
         this.onClear = this.onClear.bind(this); // 清空
         this.onSearch = this.onSearch.bind(this); // 查询
@@ -42,7 +55,7 @@ class Tablelevel extends Component {
         this.toAdd = this.toAdd.bind(this); // 新增苗圃弹框
         this.handleAudit = this.handleAudit.bind(this); // 苗圃审核
         this.handleCancel = this.handleCancel.bind(this); // 隐藏弹框
-        this.handlePage = this.handlePage.bind(this); // 换页
+        this.handleTableChange = this.handleTableChange.bind(this); // 换页
     }
     columns = [
         {
@@ -180,10 +193,9 @@ class Tablelevel extends Component {
     componentDidMount () {
         const { getRegionCodes, getSupplierList } = this.props.actions;
         // 获取当前组织机构的权限
-        const user = JSON.parse(window.localStorage.getItem('QH_USER_DATA'));
-        if (user.groups && user.groups.length > 0) {
-            this.groupId = user.groups[0].id;
-        }
+        const user = getUser();
+        let userRoles = user.roles || '';
+        this.groupId = userRoles && userRoles.ID;
         let permission = getUserIsManager();
         this.setState({
             permission
@@ -245,15 +257,20 @@ class Tablelevel extends Component {
         });
         this.onSearch();
     }
-    handlePage (page) {
+    handleTableChange (pagination) {
+        const pager = { ...this.state.pagination };
+        pager.current = pagination.current;
         this.setState({
-            page
+            pagination: pager
         }, () => {
             this.onSearch();
         });
     }
     onClear () {
+        const pagination = { ...this.state.pagination };
+        pagination.current = 1;
         this.setState({
+            pagination,
             nurseryname: ''
         }, () => {
             this.onSearch();
@@ -268,8 +285,17 @@ class Tablelevel extends Component {
         });
     }
     onSearch () {
-        const { page, status, nurseryname } = this.state;
-        const { getNurseryList } = this.props.actions;
+        const {
+            status,
+            nurseryname
+        } = this.state;
+        const {
+            actions: {
+                getNurseryList
+            }
+        } = this.props;
+        const pagination = { ...this.state.pagination };
+        const page = pagination.current;
         const param = {
             status: status === undefined ? '' : status,
             nurseryname,
@@ -280,12 +306,15 @@ class Tablelevel extends Component {
             loading: true
         });
         getNurseryList({}, param).then((rep) => {
-            if (rep.code === 200) {
+            if (rep && rep.code && rep.code === 200) {
+                let pageinfo = (rep && rep.pageinfo) || '';
+                pagination.total = (pageinfo && pageinfo.total) || 0;
+                pagination.current = (pageinfo && pageinfo.page) || 1;
+                pagination.pageSize = 10;
                 this.setState({
-                    total: rep.pageinfo.total,
                     nurseryList: rep.content,
-                    page: rep.pageinfo.page,
-                    loading: false
+                    loading: false,
+                    pagination
                 });
             }
         });
@@ -296,10 +325,10 @@ class Tablelevel extends Component {
             if (err) {
                 return;
             }
-            const { id } = getUser();
+            const { ID } = getUser();
             const param = {
                 ID: this.state.record.ID,
-                Checker: id,
+                Checker: ID,
                 CheckStatus: values.CheckStatus,
                 CheckInfo: values.CheckInfo,
                 CheckTime: moment().format('YYYY-MM-DD HH:mm:ss')
@@ -340,6 +369,10 @@ class Tablelevel extends Component {
     toDelete (record, e) {
         e.preventDefault();
         const { deleteNursery } = this.props.actions;
+        const {
+            nurseryList
+        } = this.state;
+        const pagination = { ...this.state.pagination };
         const self = this;
         confirm({
             title: '此操作会删除该苗圃下 所有的绑定关系，你确定继续吗?',
@@ -352,7 +385,16 @@ class Tablelevel extends Component {
                             message: '如未删除成功，请确认该组织机构下无用户',
                             duration: 2
                         });
-                        self.onSearch();
+                        if (nurseryList instanceof Array && nurseryList.length === 1) {
+                            if (pagination.current > 1) {
+                                pagination.current = pagination.current - 1;
+                            }
+                        }
+                        self.setState({
+                            pagination
+                        }, () => {
+                            self.onSearch();
+                        });
                     } else {
                         Notification.warning({
                             message: '如未删除成功，请确认本机构下无用户',
@@ -414,25 +456,29 @@ class Tablelevel extends Component {
                     let nursery = nuseryList[index];
                     // 当前被拉黑苗圃下的人员
                     let userAllResults = [];
-                    let orgCode = nursery.OrgPK;
+                    let orgID = nursery.ID;
                     let postData = {
-                        org_code: orgCode,
+                        org: orgID,
                         page: 1,
-                        page_size: 20
+                        size: 20
                     };
                     let userList = await getUsers({}, postData);
-                    userAllResults = userAllResults.concat((userList && userList.results) || []);
-                    let total = userList.count;
-                    // 为了防止人员过多，对人员进行分页获取处理
-                    if (total > 20) {
-                        for (let i = 0; i < (total / 20) - 1; i++) {
-                            postData = {
-                                org_code: orgCode,
-                                page: i + 2,
-                                page_size: 20
-                            };
-                            let datas = await getUsers({}, postData);
-                            userAllResults = userAllResults.concat((datas && datas.results) || []);
+                    if (userList && userList.code && userList.code === 200) {
+                        userAllResults = userAllResults.concat((userList && userList.content) || []);
+                        let total = userList.pageinfo.total;
+                        // 为了防止人员过多，对人员进行分页获取处理
+                        if (total > 20) {
+                            for (let i = 0; i < (total / 20) - 1; i++) {
+                                postData = {
+                                    org: orgID,
+                                    page: i + 2,
+                                    size: 20
+                                };
+                                let datas = await getUsers({}, postData);
+                                if (datas && datas.code && datas.code === 200) {
+                                    userAllResults = userAllResults.concat((datas && datas.content) || []);
+                                }
+                            }
                         }
                     }
                     // 人员拉黑请求数组
@@ -440,20 +486,18 @@ class Tablelevel extends Component {
 
                     userAllResults.map((user) => {
                         // 之前没有对该身份证进行拉黑，则push进入拉黑请求数组中
-                        if (user && user.account && user.account.id_num && !(user.account.is_black === 1) && userIDNumList.indexOf(user.account.id_num) === -1) {
+                        if (user && user.ID && !user.IsBlack && user.Number && userIDNumList.indexOf(user.Number) === -1) {
                             let blackPostData = {
-                                id: user.id,
+                                id: user.ID + '',
                                 is_black: 1,
-                                black_remark: `苗圃基地${nursery.NurseryName}: ${values.BlackInfo}`,
-                                change_all: true
+                                black_remark: `苗圃基地${nursery.NurseryName}: ${values.BlackInfo}`
                             };
                             blackPostRequestList.push(postForestUserBlackList({}, blackPostData));
-                            userIDNumList.push(user.account.id_num);
+                            userIDNumList.push(user.Number);
                         }
                     });
                     let blackData = await Promise.all(blackPostRequestList);
-                    console.log('blackData', blackData);
-                    if (blackData && blackData.length > 0) {
+                    if (blackData && blackData instanceof Array && blackData.length > 0) {
                         Notification.success({
                             message: '苗圃人员拉黑成功',
                             duration: 2
@@ -464,7 +508,6 @@ class Tablelevel extends Component {
                         BlackInfo: values.BlackInfo
                     };
                     let nurseryBlackData = await postNurseryBlack({}, nurseryPostData);
-                    console.log('nurseryBlackData', nurseryBlackData);
                     if (nurseryBlackData && nurseryBlackData.code && nurseryBlackData.code === 1) {
                         Notification.success({
                             message: '苗圃拉黑成功',
@@ -508,12 +551,19 @@ class Tablelevel extends Component {
             record: null
         });
     }
+    handleQuery = () => {
+        const pagination = { ...this.state.pagination };
+        pagination.current = 1;
+        this.setState({
+            pagination
+        }, () => {
+            this.onSearch();
+        });
+    }
     render () {
         const {
             status,
             nurseryList,
-            page,
-            total,
             editVisible,
             addVisible,
             seeVisible,
@@ -523,7 +573,8 @@ class Tablelevel extends Component {
             nurseryname,
             Leader,
             textCord,
-            blackVisible
+            blackVisible,
+            pagination
         } = this.state;
         const { getFieldDecorator } = this.props.form;
         let img = getForestImgUrl(imageUrl);
@@ -542,7 +593,7 @@ class Tablelevel extends Component {
                         <Input className='search_input' value={nurseryname} onChange={this.handleName} />
                         <Button
                             type='primary'
-                            onClick={this.onSearch}
+                            onClick={this.handleQuery.bind(this)}
                             style={{minWidth: 30, marginRight: 20}}
                         >
                             查询
@@ -592,9 +643,9 @@ class Tablelevel extends Component {
                                 bordered
                                 rowClassName={this.setBlackListColor.bind(this)}
                                 dataSource={nurseryList}
-                                pagination={false} rowKey='ID' />
-                            <Pagination total={total} current={page} pageSize={10} style={{marginTop: '10px'}}
-                                showQuickJumper page='1' onChange={this.handlePage} />
+                                pagination={pagination}
+                                onChange={this.handleTableChange.bind(this)}
+                                rowKey='ID' />
                         </Spin>
                     </Col>
                 </Row>

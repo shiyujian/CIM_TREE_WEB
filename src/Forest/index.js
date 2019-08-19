@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-16 11:20:26
+ * @Last Modified time: 2019-08-19 10:43:55
  */
 /**
  *
@@ -74,13 +74,11 @@ export default class ForestContainer extends Component {
             Locmeasureinfo = null,
             Supervisorinfo = null,
             Checkerinfo = null,
-            Faithinfo = null,
             Faithanalyze = null,
             Qualityanalyze = null,
             Enteranalyze = null,
             Scheduleanalyze = null,
             Dataimport = null,
-            Contrastinfo = null,
             CarPackage = null,
             DataExport = null,
             SeedlingsChange = null,
@@ -142,9 +140,6 @@ export default class ForestContainer extends Component {
                             component={Checkerinfo}
                         />
                     )}
-                    {Faithinfo && (
-                        <Route path='/forest/faithinfo' component={Faithinfo} />
-                    )}
                     {Faithanalyze && (
                         <Route
                             path='/forest/faithanalyze'
@@ -179,12 +174,6 @@ export default class ForestContainer extends Component {
                         <Route
                             path='/forest/dataexport'
                             component={DataExport}
-                        />
-                    )}
-                    {Contrastinfo && (
-                        <Route
-                            path='/forest/contrastinfo'
-                            component={Contrastinfo}
                         />
                     )}
                     {SeedlingsChange && (
@@ -299,19 +288,19 @@ export default class ForestContainer extends Component {
                     id: 'FOREST.PLANTSTRENGTHANALYSI',
                     path: '/forest/plantstrengthanalysi',
                     name: '栽植强度分析'
-                },
-                {
-                    key: 'datastatis',
-                    id: 'FOREST.DATASTATIS',
-                    path: '/forest/datastatis',
-                    name: '数据统计'
-                },
-                {
-                    key: 'useranalysis',
-                    id: 'FOREST.USERANALYSIS',
-                    path: '/forest/useranalysis',
-                    name: '用户行为统计'
                 }
+                // {
+                //     key: 'datastatis',
+                //     id: 'FOREST.DATASTATIS',
+                //     path: '/forest/datastatis',
+                //     name: '数据统计'
+                // },
+                // {
+                //     key: 'useranalysis',
+                //     id: 'FOREST.USERANALYSIS',
+                //     path: '/forest/useranalysis',
+                //     name: '用户行为统计'
+                // }
             ]
         },
         {

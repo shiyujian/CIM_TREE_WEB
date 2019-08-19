@@ -5,7 +5,6 @@ import {
 import { getUser } from '_platform/auth';
 import AddMember from './AddMember';
 import '../Curing.less';
-window.config = window.config || {};
 
 export default class TaskTeamTable extends Component {
     constructor (props) {
@@ -18,11 +17,10 @@ export default class TaskTeamTable extends Component {
     }
 
     async componentDidMount () {
-        this.user = getUser();
-        let sections = this.user.sections;
-        sections = JSON.parse(sections);
+        const user = getUser();
+        let section = user.section;
         // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (sections && sections instanceof Array && sections.length > 0) {
+        if (section) {
             this.setState({
                 relateDisabled: false
             });
@@ -31,12 +29,23 @@ export default class TaskTeamTable extends Component {
 
     componentDidUpdate = async (prevProps, prevState) => {
         const {
-            selectMemTeam
+            selectMemTeam,
+            addMemVisible,
+            selectState,
+            actions: {
+                getCuringGroupMansOk
+            }
         } = this.props;
-        console.log('selectMemTeam', selectMemTeam);
         let selectMemTeamID = (selectMemTeam && selectMemTeam.ID) || '';
         let prevMemTeamID = (prevProps.selectMemTeam && prevProps.selectMemTeam.ID) || '';
         if (selectMemTeamID && selectMemTeamID !== prevMemTeamID) {
+            await this.getGetTaskTeamData();
+        }
+        if (!addMemVisible && addMemVisible !== prevProps.addMemVisible) {
+            await this.getGetTaskTeamData();
+        }
+        if (!selectState && prevProps.selectState) {
+            await getCuringGroupMansOk([]);
             await this.getGetTaskTeamData();
         }
     }
@@ -45,11 +54,11 @@ export default class TaskTeamTable extends Component {
         const {
             curingGroupMans = [],
             actions: {
-                getForestUserDetail
+                getUserDetail
             }
         } = this.props;
         try {
-            console.log('curingGroupMans', curingGroupMans);
+            // 因养护班组内的人员数据只有FullName  所以需要重新获取人员详情
             if (curingGroupMans && curingGroupMans.length > 0) {
                 let requestArr = [];
                 curingGroupMans.map((user) => {
@@ -57,13 +66,12 @@ export default class TaskTeamTable extends Component {
                         let postData = {
                             id: user && user.User
                         };
-                        requestArr.push(getForestUserDetail(postData));
+                        requestArr.push(getUserDetail(postData));
                     }
                 });
                 let dataSource = [];
                 if (requestArr && requestArr.length > 0) {
                     dataSource = await Promise.all(requestArr);
-                    console.log('dataSource', dataSource);
                 }
                 this.setState({
                     dataSource
@@ -92,13 +100,19 @@ export default class TaskTeamTable extends Component {
         }
         return (
             <div>
-                <Button style={{marginBottom: 10}} type='primary' disabled={disabled} onClick={this._addMemberModal.bind(this)}>关联用户</Button>
+                <Button
+                    style={{marginBottom: 10}}
+                    type='primary'
+                    disabled={disabled}
+                    onClick={this._addMemberModal.bind(this)}>
+                        关联用户
+                </Button>
                 <Table
                     style={{width: '100%'}}
                     columns={this.columns}
                     bordered
                     // rowKey='id'
-                    dataSource={dataSource}
+                    dataSource={disabled ? [] : dataSource}
                 />
                 <AddMember {...this.props} />
             </div>
@@ -112,7 +126,6 @@ export default class TaskTeamTable extends Component {
             }
         } = this.props;
         changeAddMemVisible(true);
-        console.log('addMemberVisible', this.props);
     }
     columns = [
         {

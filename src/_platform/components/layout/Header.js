@@ -33,13 +33,36 @@ export default class Header extends Component {
         tasks: 0
     };
     componentDidMount () {
-        const { tasks = 0 } = getUser();
-        if (tasks > 0) {
-            this.setState({
-                dotShow: true,
-                tasks: tasks
-            });
+        const user = getUser();
+        const tasks = user.tasks;
+        if (user && user.ID) {
+            if (tasks > 0) {
+                this.setState({
+                    dotShow: true,
+                    tasks: tasks
+                });
+            }
+        } else {
+            this.clearSystemUser();
         }
+    }
+
+    clearSystemUser = () => {
+        const {
+            history,
+            actions: { clearTab }
+        } = this.props;
+        clearUser();
+        clearTab();
+        removePermissions();
+        window.localStorage.removeItem('LOGIN_USER_DATA');
+        let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
+        if (!remember) {
+            window.localStorage.removeItem('LOGIN_USER_PASSDATA');
+        }
+        setTimeout(() => {
+            history.replace('/login');
+        }, 500);
     }
 
     onClickDot = () => {
@@ -47,6 +70,20 @@ export default class Header extends Component {
             dotShow: false
         });
     };
+
+    selectKeys () {
+        const { match: { params: { module = '' } = {} } = {} } = this.props;
+        const { key = '' } =
+            Header.menus.find(menu => {
+                const pathnames = /^\/(\w+)/.exec(menu.path) || [];
+                return pathnames[1] === module;
+            }) || {};
+        return [key];
+    }
+
+    signOut () {
+        this.clearSystemUser();
+    }
 
     render () {
         const {
@@ -78,13 +115,13 @@ export default class Header extends Component {
                 path: '/overall/news',
                 icon: <Icon name='cubes' />
             },
-            {
-                key: 'datum',
-                id: 'DATUM',
-                title: '资料管理',
-                path: '/datum/standard',
-                icon: <Icon name='book' />
-            },
+            // {
+            //     key: 'datum',
+            //     id: 'DATUM',
+            //     title: '资料管理',
+            //     path: '/datum/standard',
+            //     icon: <Icon name='book' />
+            // },
             {
                 key: 'schedule',
                 id: 'SCHEDULE',
@@ -106,13 +143,13 @@ export default class Header extends Component {
                 path: '/curing/taskcreate',
                 icon: <Icon name='map' />
             },
-            {
-                key: 'market',
-                id: 'MARKET',
-                title: '苗木市场',
-                path: '/market/seedlingsupply',
-                icon: <Icon name='shopping-cart' />
-            },
+            // {
+            //     key: 'market',
+            //     id: 'MARKET',
+            //     title: '苗木市场',
+            //     path: '/market/seedlingsupply',
+            //     icon: <Icon name='shopping-cart' />
+            // },
             {
                 key: 'checkwork',
                 id: 'CHECKWORK',
@@ -140,24 +177,22 @@ export default class Header extends Component {
                 title: '项目管理',
                 path: '/project/nurseryManagement',
                 icon: <Icon name='sitemap' />
-            },
-            {
-                key: 'dipping',
-                id: 'DIPPING',
-                title: '三维倾斜',
-                path: '/dipping/dipping',
-                icon: <Icon name='plane' />
             }
+            // {
+            //     key: 'dipping',
+            //     id: 'DIPPING',
+            //     title: '三维倾斜',
+            //     path: '/dipping/dipping',
+            //     icon: <Icon name='plane' />
+            // }
         ];
         const { match: { params: { module = '' } = {} } = {} } = this.props;
         const ignore = Header.ignoreModules.some(m => m === module);
         if (ignore) {
             return null;
         }
-        const { username = '', name = '', is_superuser = false } = getUser();
+        const { username = '', name = '' } = getUser();
         let permissions = getPermissions() || [];
-        // permissions.splice(4,1,"appmeta.PROJECT.NURSERY.NONE.READ");
-        // console.log('permissions333', permissions);
         if (fullScreenState === 'fullScreen') {
             return null;
         }
@@ -177,30 +212,32 @@ export default class Header extends Component {
                     {Header.menus.map(menu => {
                         let has = permissions.some(
                             permission =>
-                                permission === `appmeta.${menu.id}.READ`
+                                permission.FunctionCode === `appmeta.${menu.id}.READ`
                         );
                         // let has = true;
                         let str;
-                        if (has) {
-                            if (username !== 'admin') {
+                        if (has || username === 'admin') {
+                            if (username) {
                                 /*
 									  对用户各个模块权限进行遍历，如果拥有某个子模块的权限，则将子模块的权限
 									进行处理变换成子模块的路径
 									*/
                                 for (var i = 0; i < permissions.length; i++) {
                                     try {
-                                        let missArr = permissions[i].split('.');
-                                        if (missArr[0] === 'appmeta' && missArr[1] === menu.id) {
-                                            if (
-                                                permissions[i].indexOf(menu.id) !==
-                                                    -1 &&
-                                                permissions[i] !==
-                                                    `appmeta.${menu.id}.READ` &&
-                                                permissions[i].indexOf(`.NONE.READ`) ===
-                                                    -1
-                                            ) {
-                                                str = permissions[i];
-                                                break;
+                                        if (permissions[i] && permissions[i].FunctionCode) {
+                                            let missArr = permissions[i].FunctionCode.split('.');
+                                            if (missArr[0] === 'appmeta' && missArr[1] === menu.id) {
+                                                if (
+                                                    permissions[i].FunctionCode.indexOf(menu.id) !==
+                                                        -1 &&
+                                                    permissions[i].FunctionCode !==
+                                                        `appmeta.${menu.id}.READ` &&
+                                                    permissions[i].FunctionCode.indexOf(`.NONE.READ`) ===
+                                                        -1
+                                                ) {
+                                                    str = permissions[i].FunctionCode;
+                                                    break;
+                                                }
                                             }
                                         }
                                     } catch (e) {
@@ -226,23 +263,6 @@ export default class Header extends Component {
                                 </Menu.Item>
                             );
                         }
-                        // for (var i = 0; i < permissions.length; i++) {
-                        // 取出数据使用二进制进行判断对比 如果有这个1就显示否则隐藏
-                        // 	if (permissions[i].value & 1 == "1") {
-                        // 		if (permissions[i].id == `${menu.id}`) {
-                        // 			return (
-                        // 				<Menu.Item
-                        // 					key={menu.key}
-                        // 					className="nav-item">
-                        // 					<Link to={menu.path}>
-                        // 						{menu.icon}
-                        // 						<span className="title">{menu.title}</span>
-                        // 					</Link>
-                        // 				</Menu.Item>)
-                        // 		}
-                        // 	}
-                        // break;
-                        // }
                     })}
                 </Menu>
                 <div className='head-right'>
@@ -270,35 +290,4 @@ export default class Header extends Component {
             </header>
         );
     }
-
-    selectKeys () {
-        const { match: { params: { module = '' } = {} } = {} } = this.props;
-        const { key = '' } =
-            Header.menus.find(menu => {
-                const pathnames = /^\/(\w+)/.exec(menu.path) || [];
-                return pathnames[1] === module;
-            }) || {};
-        return [key];
-    }
-
-    signOut () {
-        const {
-            history,
-            actions: { clearTab }
-        } = this.props;
-        console.log('history', history);
-        clearUser();
-        clearTab();
-        removePermissions();
-        window.localStorage.removeItem('FOREST_LOGIN_USER_DATA');
-        let remember = window.localStorage.getItem('QH_LOGIN_REMEMBER');
-        if (!remember) {
-            window.localStorage.removeItem('LOGIN_USER_PASSDATA');
-        }
-        setTimeout(() => {
-            history.replace('/login');
-        }, 500);
-    }
-
-    Download () {}
 }

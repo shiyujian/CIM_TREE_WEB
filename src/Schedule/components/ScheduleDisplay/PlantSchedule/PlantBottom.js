@@ -57,7 +57,7 @@ export default class PlantBottom extends Component {
             <div>
                 <Spin spinning={this.state.loading}>
                     <Card>
-                        <div className='ScheduleDisplay-search-layout' style={{ marginLeft: 20 }} >
+                        <div className='ScheduleDisplay-search-layout' >
                             <div className='ScheduleDisplay-mrg-datePicker'>
                                 <label className='ScheduleDisplay-search-span'>
                                     施工时间：
@@ -79,7 +79,7 @@ export default class PlantBottom extends Component {
                                     {sectionoption}
                                 </Select>
                             </div>
-                            <Button type='primary' style={{ marginLeft: 50 }} onClick={this.onSearch.bind(this)}>查询</Button>
+                            {/* <Button type='primary' style={{ marginLeft: 50 }} onClick={this.onSearch.bind(this)}>查询</Button> */}
                             <Button type='primary' style={{ marginLeft: 25 }} onClick={this.toExport.bind(this)}>导出<Icon type='download' /></Button>
                         </div>
                         <div
@@ -190,40 +190,84 @@ export default class PlantBottom extends Component {
         let yRatioData = [];
         let yCompleteData = [];
         let yGrandData = [];
-        dataList.map(item => {
-            let PlanDate = moment(item.PlanDate).format(DATE_FORMAT_);
-            xAxisData.push(PlanDate);
-            yPlantData.push(item.Num);
-            dataListReal.map(row => {
-                if (item.Section === row.Section && PlanDate === row.Label) {
-                    yRealData.push(row.Num);
-                    let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    // yRatioData.push(ratio);
-                    if (isNaN(ratio) || ratio === 'Infinity') {
-                        yRatioData.push(0);
-                    } else {
-                        yRatioData.push(ratio);
-                    }
-                    yCompleteData.push(row.Complete);
-                }
-            });
-        });
-        xAxisData.map((date) => {
-            dataListTask.map(item => {
+        if (dataList.length > 0 && dataListReal.length > 0) {
+            dataList.map((item, index) => {
+                let PlanDate = moment(item.PlanDate).format(DATE_FORMAT_);
+                xAxisData.push(PlanDate);
+                yPlantData.push(item.Num);
+                yRealData.push(0);
+                yRatioData.push(0);
+                yCompleteData.push(0);
+                yGrandData.push(0);
                 dataListReal.map(row => {
-                    if (item.Section === row.Section) {
-                        if (date === moment(row.Label).format(DATE_FORMAT_)) {
-                            let ratio = (row.Complete / item.Sum * 100).toFixed(2);
-                            if (isNaN(ratio) || ratio === 'Infinity') {
-                                yGrandData.push(0);
-                            } else {
-                                yGrandData.push(ratio);
-                            }
+                    if (item.Section === row.Section && PlanDate === row.Label) {
+                        yRealData[index] = row.Num;
+                        let ratio = (row.Num / item.Num * 100).toFixed(2);
+                        // yRatioData.push(ratio);
+                        if (isNaN(ratio) || ratio === 'Infinity') {
+                            yRatioData[index] = 0;
+                        } else {
+                            yRatioData[index] = ratio;
                         }
+                        yCompleteData[index] = row.Complete;
                     }
                 });
             });
-        });
+            yGrandData.map((data, index) => {
+                let date = xAxisData[index];
+                dataListTask.map(item => {
+                    dataListReal.map(row => {
+                        if (item.Section === row.Section) {
+                            if (date === moment(row.Label).format(DATE_FORMAT_)) {
+                                let ratio = (row.Complete / item.Sum * 100).toFixed(2);
+                                if (isNaN(ratio) || ratio === 'Infinity') {
+                                    data = 0;
+                                } else {
+                                    data = ratio;
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+        } else if (dataList.length > 0 && dataListReal.length === 0) {
+            dataList.map(item => {
+                let PlanDate = moment(item.PlanDate).format(DATE_FORMAT_);
+                xAxisData.push(PlanDate);
+                yPlantData.push(item.Num);
+                yRealData.push(0);
+                yRatioData.push(0);
+                yCompleteData.push(0);
+                yGrandData.push(0);
+            });
+        } else if (dataList.length === 0 && dataListReal.length > 0) {
+            dataListReal.map(row => {
+                let PlanDate = moment(row.Label).format(DATE_FORMAT_);
+                xAxisData.push(PlanDate);
+                yPlantData.push(0);
+                yRealData.push(row.Num);
+                yRatioData.push(100);
+                yCompleteData.push(row.Complete);
+                yGrandData.push(0);
+            });
+            yGrandData.map((data, index) => {
+                let date = xAxisData[index];
+                dataListTask.map(item => {
+                    dataListReal.map(row => {
+                        if (item.Section === row.Section) {
+                            if (date === moment(row.Label).format(DATE_FORMAT_)) {
+                                let ratio = (row.Complete / item.Sum * 100).toFixed(2);
+                                if (isNaN(ratio) || ratio === 'Infinity') {
+                                    data = 0;
+                                } else {
+                                    data = ratio;
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+        }
 
         const myChart = echarts.init(document.getElementById('PlantBottom'));
         let optionLine = {
@@ -238,8 +282,15 @@ export default class PlantBottom extends Component {
             },
             toolbox: {
                 feature: {
-                    saveAsImage: { show: true }
-                }
+                    saveAsImage: {
+                        show: true,
+                        iconStyle: {
+                            textPosition: 'bottom',
+                            shadowOffsetX: 10
+                        }
+                    }
+                },
+                right: 20
             },
             legend: {
                 bottom: 10,
@@ -256,14 +307,14 @@ export default class PlantBottom extends Component {
             ],
             yAxis: [
                 {
-                    type: 'value',
-                    name: '颗',
+                    type: 'log',
+                    name: '棵',
                     axisLabel: {
                         formatter: '{value} '
                     }
                 },
                 {
-                    type: 'value',
+                    type: 'log',
                     name: '百分比',
                     axisLabel: {
                         formatter: '{value}.0%'
@@ -318,39 +369,117 @@ export default class PlantBottom extends Component {
         let yRatioData = [];
         let yCompleteData = [];
         let yGrandData = [];
-        dataList.map(item => {
-            let PlanDate = moment(item.PlanDate.split(' ')[0], DATE_FORMAT).format(DATE_FORMAT_);
-            xAxisData.push(PlanDate);
-            yPlantData.push(item.Num);
-            dataListReal.map(row => {
-                if (item.Section === row.Section && PlanDate === row.Label) {
-                    yRealData.push(row.Num);
-                    let ratio = (row.Num / item.Num * 100).toFixed(2);
-                    if (isNaN(ratio) || ratio === 'Infinity') {
-                        yRatioData.push(0);
-                    } else {
-                        yRatioData.push(ratio);
-                    }
-                    yCompleteData.push(row.Complete);
-                }
-            });
-        });
-        xAxisData.map((date) => {
-            dataListTask.map(item => {
+        if (dataList.length > 0 && dataListReal.length > 0) {
+            dataList.map((item, index) => {
+                let PlanDate = moment(item.PlanDate).format(DATE_FORMAT_);
+                xAxisData.push(PlanDate);
+                yPlantData.push(item.Num);
+                yRealData.push(0);
+                yRatioData.push(0);
+                yCompleteData.push(0);
+                yGrandData.push(0);
                 dataListReal.map(row => {
-                    if (item.Section === row.Section) {
-                        if (date === moment(row.Label).format(DATE_FORMAT_)) {
-                            let ratio = (row.Complete / item.Sum * 100).toFixed(2);
-                            if (isNaN(ratio) || ratio === 'Infinity') {
-                                yGrandData.push(0);
-                            } else {
-                                yGrandData.push(ratio);
-                            }
+                    if (item.Section === row.Section && PlanDate === row.Label) {
+                        yRealData[index] = row.Num;
+                        let ratio = (row.Num / item.Num * 100).toFixed(2);
+                        // yRatioData.push(ratio);
+                        if (isNaN(ratio) || ratio === 'Infinity') {
+                            yRatioData[index] = 0;
+                        } else {
+                            yRatioData[index] = ratio;
                         }
+                        yCompleteData[index] = row.Complete;
                     }
                 });
             });
-        });
+            yGrandData.map((data, index) => {
+                let date = xAxisData[index];
+                dataListTask.map(item => {
+                    dataListReal.map(row => {
+                        if (item.Section === row.Section) {
+                            if (date === moment(row.Label).format(DATE_FORMAT_)) {
+                                let ratio = (row.Complete / item.Sum * 100).toFixed(2);
+                                if (isNaN(ratio) || ratio === 'Infinity') {
+                                    data = 0;
+                                } else {
+                                    data = ratio;
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+        } else if (dataList.length > 0 && dataListReal.length === 0) {
+            dataList.map(item => {
+                let PlanDate = moment(item.PlanDate).format(DATE_FORMAT_);
+                xAxisData.push(PlanDate);
+                yPlantData.push(item.Num);
+                yRealData.push(0);
+                yRatioData.push(0);
+                yCompleteData.push(0);
+                yGrandData.push(0);
+            });
+        } else if (dataList.length === 0 && dataListReal.length > 0) {
+            dataListReal.map(row => {
+                let PlanDate = moment(row.Label).format(DATE_FORMAT_);
+                xAxisData.push(PlanDate);
+                yPlantData.push(0);
+                yRealData.push(row.Num);
+                yRatioData.push(100);
+                yCompleteData.push(row.Complete);
+                yGrandData.push(0);
+            });
+            yGrandData.map((data, index) => {
+                let date = xAxisData[index];
+                dataListTask.map(item => {
+                    dataListReal.map(row => {
+                        if (item.Section === row.Section) {
+                            if (date === moment(row.Label).format(DATE_FORMAT_)) {
+                                let ratio = (row.Complete / item.Sum * 100).toFixed(2);
+                                if (isNaN(ratio) || ratio === 'Infinity') {
+                                    data = 0;
+                                } else {
+                                    data = ratio;
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+        }
+        // dataList.map(item => {
+        //     let PlanDate = moment(item.PlanDate.split(' ')[0], DATE_FORMAT).format(DATE_FORMAT_);
+        //     xAxisData.push(PlanDate);
+        //     yPlantData.push(item.Num);
+        //     dataListReal.map(row => {
+        //         if (item.Section === row.Section && PlanDate === row.Label) {
+        //             yRealData.push(row.Num);
+        //             let ratio = (row.Num / item.Num * 100).toFixed(2);
+        //             if (isNaN(ratio) || ratio === 'Infinity') {
+        //                 yRatioData.push(0);
+        //             } else {
+        //                 yRatioData.push(ratio);
+        //             }
+        //             yCompleteData.push(row.Complete);
+        //         }
+        //     });
+        // });
+        // xAxisData.map((date) => {
+        //     dataListTask.map(item => {
+        //         dataListReal.map(row => {
+        //             if (item.Section === row.Section) {
+        //                 if (date === moment(row.Label).format(DATE_FORMAT_)) {
+        //                     let ratio = (row.Complete / item.Sum * 100).toFixed(2);
+        //                     if (isNaN(ratio) || ratio === 'Infinity') {
+        //                         yGrandData.push(0);
+        //                     } else {
+        //                         yGrandData.push(ratio);
+        //                     }
+        //                 }
+        //             }
+        //         });
+        //     });
+        // });
         legendList.map(item => {
             let obj = {};
             xAxisData.map((row, col) => {

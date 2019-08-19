@@ -11,7 +11,7 @@ import { actions as platformActions } from '_platform/store/global';
 import { actions } from '../store/org';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Tree, Info, Edit, Addition } from '../components/Org';
+import { Tree, Info, Edit, Addition, AddProject, EditProject } from '../components/Org';
 
 @connect(
     state => {
@@ -32,7 +32,9 @@ export default class Org extends Component {
     render () {
         const {
             editOrgVisible,
-            addition
+            addition,
+            addProjectVisible,
+            editProjectVisible
         } = this.props;
         return (
             <div>
@@ -45,6 +47,8 @@ export default class Org extends Component {
                 </Content>
                 {(addition && addition.visible) ? <Addition {...this.props} /> : ''}
                 {editOrgVisible ? <Edit {...this.props} /> : ''}
+                {addProjectVisible ? <AddProject {...this.props} /> : ''}
+                {editProjectVisible ? <EditProject {...this.props} /> : ''}
             </div>
         );
     }
@@ -52,10 +56,20 @@ export default class Org extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getTreeNodeList
+                getTreeNodeList,
+                changeSidebarField,
+                clearAdditionField,
+                changeAdditionField,
+                changeEditOrgVisible
             },
             platform: { tree = {} }
         } = this.props;
+        await changeSidebarField('parent', null);
+        await changeSidebarField('addition', false);
+        await changeAdditionField('visible', false);
+        await changeEditOrgVisible(false);
+        await changeSidebarField('node', '');
+        await clearAdditionField();
         if (!(tree && tree.bigTreeList && tree.bigTreeList instanceof Array && tree.bigTreeList.length > 0)) {
             await getTreeNodeList();
         }

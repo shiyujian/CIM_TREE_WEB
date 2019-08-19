@@ -2,7 +2,15 @@ import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Input } from 'antd';
 import L from 'leaflet';
 import moment from 'moment';
-import {handleTrackData, getSectionName, getIconType, genPopUpContent} from '../../auth';
+import {
+    handleTrackData,
+    getSectionName,
+    getIconType,
+    genPopUpContent
+} from '../../auth';
+import {
+    trim
+} from '_platform/auth';
 import './TrackTree.less';
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
@@ -88,106 +96,6 @@ export default class TrackTree extends Component {
         await this.handleRemoveAllTrackLayer();
     }
 
-    render () {
-        let {
-            trackTree = [],
-            trackTreeLoading
-        } = this.props;
-        const {
-            timeType,
-            stime,
-            etime,
-            searchDateData,
-            searchNameData,
-            searchName
-        } = this.state;
-        let contents = [];
-        if (searchName) {
-            contents = searchNameData;
-        } else if (etime && stime) {
-            for (let j = 0; j < searchDateData.length; j++) {
-                const element = searchDateData[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        } else {
-            for (let j = 0; j < trackTree.length; j++) {
-                const element = trackTree[j];
-                if (element !== undefined) {
-                    contents.push(element);
-                }
-            }
-        };
-        return (
-            <div>
-                <Spin spinning={trackTreeLoading}>
-                    <Search
-                        className='TrackTree-search'
-                        placeholder='人名搜索'
-                        onSearch={this.searchUserName.bind(this)}
-                    />
-                    <div className='TrackTree-button'>
-                        <Button className='TrackTree-button-layout' style={{marginRight: 10}}
-                            type={timeType === 'all' ? 'primary' : ''}
-                            id='all' onClick={this.handleTimeChange.bind(this)}>
-                            全部
-                        </Button>
-                        <Button className='TrackTree-button-layout' id='today'
-                            type={timeType === 'today' ? 'primary' : ''}
-                            onClick={this.handleTimeChange.bind(this)}>
-                            今天
-                        </Button>
-                    </div>
-                    <div className='TrackTree-button'>
-                        <Button className='TrackTree-button-layout' style={{marginRight: 10}}
-                            type={timeType === 'week' ? 'primary' : ''}
-                            id='week' onClick={this.handleTimeChange.bind(this)}>
-                            一周内
-                        </Button>
-                        <Button className='TrackTree-button-layout' id='custom'
-                            type={timeType === 'custom' ? 'primary' : ''}
-                            onClick={this.handleTimeChange.bind(this)}>
-                            自定义
-                        </Button>
-                    </div>
-                    {
-                        timeType === 'custom'
-                            ? <RangePicker
-                                style={{width: 220, marginBottom: 10}}
-                                showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
-                                format='YYYY-MM-DD HH:mm:ss'
-                                placeholder={['Start Time', 'End Time']}
-                                onChange={this.handleDateChange.bind(this)}
-                            />
-                            : ''
-                    }
-                    <div className='TrackTree-statis-layout'>
-                        <span style={{verticalAlign: 'middle'}}>人名</span>
-                        <span className='TrackTree-data-text'>
-                            次数
-                        </span>
-                    </div>
-                    <div>
-                        {
-                            contents.map((content) => {
-                                return (
-                                    <div className='TrackTree-mrg10' key={content.ID}>
-                                        <span style={{verticalAlign: 'middle'}}>{content.Full_Name}</span>
-                                        <span className='TrackTree-data-text'>
-                                            {content.children.length}
-                                        </span>
-                                    </div>
-                                );
-                            })
-                        }
-                    </div>
-                </Spin>
-            </div>
-
-        );
-    }
-
     searchUserName = (value) => {
         let {
             trackTree = []
@@ -198,6 +106,7 @@ export default class TrackTree extends Component {
             searchDateData
         } = this.state;
         // 如果没有搜索数据，则展示全部数据，并将地图上的图层清空
+        value = trim(value);
         if (!value) {
             this.setState({
                 searchNameData: [],
@@ -244,6 +153,9 @@ export default class TrackTree extends Component {
         let {
             trackTree = []
         } = this.props;
+        const {
+            searchName
+        } = this.state;
         try {
             let target = e.target;
             let timeType = target.getAttribute('id');
@@ -262,6 +174,30 @@ export default class TrackTree extends Component {
                 }, () => {
                     if (trackTree.length === 0) {
                         this.query();
+                    } else {
+                        if (searchName) {
+                            let contents = [];
+                            for (let j = 0; j < trackTree.length; j++) {
+                                const element = trackTree[j];
+                                if (element !== undefined) {
+                                    contents.push(element);
+                                }
+                            }
+                            let ckeckedData = [];
+                            let searchNameData = [];
+                            contents.map((content) => {
+                                let name = content.Full_Name;
+                                if (name.indexOf(searchName) !== -1) {
+                                    searchNameData.push(content);
+                                    if (content && content.children) {
+                                        ckeckedData = ckeckedData.concat(content.children);
+                                    }
+                                }
+                            });
+                            this.setState({
+                                searchNameData
+                            });
+                        }
                     }
                 });
                 return;
@@ -298,12 +234,14 @@ export default class TrackTree extends Component {
                 getInspectRouter,
                 getTrackTree,
                 getTrackTreeLoading
-            }
+            },
+            trackTree = []
         } = this.props;
         const {
             stime,
             etime,
-            timeType
+            timeType,
+            searchName
         } = this.state;
         try {
             this.handleRemoveAllTrackLayer();
@@ -319,6 +257,29 @@ export default class TrackTree extends Component {
                 await getTrackTree(searchDateData);
             }
             await getTrackTreeLoading(false);
+            if (searchName) {
+                let contents = [];
+                for (let j = 0; j < searchDateData.length; j++) {
+                    const element = searchDateData[j];
+                    if (element !== undefined) {
+                        contents.push(element);
+                    }
+                }
+                let ckeckedData = [];
+                let searchNameData = [];
+                contents.map((content) => {
+                    let name = content.Full_Name;
+                    if (name.indexOf(searchName) !== -1) {
+                        searchNameData.push(content);
+                        if (content && content.children) {
+                            ckeckedData = ckeckedData.concat(content.children);
+                        }
+                    }
+                });
+                this.setState({
+                    searchNameData
+                });
+            }
             this.setState({
                 searchDateData
             });
@@ -331,13 +292,14 @@ export default class TrackTree extends Component {
     handleTrackLocation = async (ckeckedData) => {
         try {
             this.handleRemoveAllTrackLayer();
-            ckeckedData.forEach((child, index) => {
-                if (index === ckeckedData.length - 1) {
-                    this.handleTrackAddLayer(child, true);
+            for (let i = 0; i < ckeckedData.length; i++) {
+                let child = ckeckedData[i];
+                if (i === ckeckedData.length - 1) {
+                    await this.handleTrackAddLayer(child, true);
                 } else {
-                    this.handleTrackAddLayer(child, false);
+                    await this.handleTrackAddLayer(child, false);
                 }
-            });
+            }
         } catch (e) {
             console.log('handleTrackLocation', e);
         }
@@ -352,11 +314,14 @@ export default class TrackTree extends Component {
         const {
             actions: {
                 getMapList,
-                getUserDetail
+                getUserDetail,
+                getTrackTreeLoading
             },
+            platform: {tree = {}},
             map
         } = this.props;
         try {
+            await getTrackTreeLoading(true);
             let selectKey = data.ID;
             if (trackLayerList[selectKey]) {
                 trackLayerList[selectKey].addTo(map);
@@ -364,29 +329,34 @@ export default class TrackTree extends Component {
                     trackMarkerLayerList[selectKey].addTo(map);
                 }
                 if (isFocus) {
+                    await getTrackTreeLoading(false);
                     map.fitBounds(trackLayerList[selectKey].getBounds());
                 }
             } else {
                 let routes = await getMapList({ routeID: selectKey });
                 if (!(routes && routes instanceof Array && routes.length > 0)) {
+                    if (isFocus) {
+                        await getTrackTreeLoading(false);
+                    }
                     return;
                 }
                 let latlngs = [];
                 routes.forEach(item => {
                     latlngs.push([item.Y, item.X]);
                 });
-                if (data && data.PatrolerUser && data.PatrolerUser.PK) {
+                if (data && data.PatrolerUser && data.PatrolerUser.ID) {
                     let user = {};
-                    if (this.userDetailList[data.PatrolerUser.PK]) {
-                        user = this.userDetailList[data.PatrolerUser.PK];
+                    if (this.userDetailList[data.PatrolerUser.ID]) {
+                        user = this.userDetailList[data.PatrolerUser.ID];
                     } else {
-                        user = await getUserDetail({pk: data.PatrolerUser.PK});
-                        this.userDetailList[data.PatrolerUser.PK] = user;
+                        user = await getUserDetail({id: data.PatrolerUser.ID});
+                        this.userDetailList[data.PatrolerUser.ID] = user;
                     };
                     let sectionName = '';
-                    if (user && user.account && user.account.sections && user.account.sections.length > 0) {
-                        let section = user.account.sections[0];
-                        sectionName = getSectionName(section);
+                    if (user && user.Section) {
+                        let bigTreeList = (tree && tree.bigTreeList) || [];
+                        let section = user.Section;
+                        sectionName = getSectionName(section, bigTreeList);
                     }
 
                     let iconData = {
@@ -396,9 +366,8 @@ export default class TrackTree extends Component {
                         },
                         key: selectKey,
                         properties: {
-                            name: user.account.person_name ? user.account.person_name : user.username,
-                            organization: user.account.organization ? user.account.organization : '',
-                            person_telephone: user.account.person_telephone ? user.account.person_telephone : '',
+                            name: user.Full_Name ? user.Full_Name : user.User_Name,
+                            phone: user.Phone ? user.Phone : '',
                             sectionName: sectionName,
                             type: 'track'
                         },
@@ -412,6 +381,7 @@ export default class TrackTree extends Component {
                 );
                 trackLayerList[selectKey] = polyline;
                 if (isFocus) {
+                    await getTrackTreeLoading(false);
                     map.fitBounds(polyline.getBounds());
                 }
                 this.setState({
@@ -470,5 +440,105 @@ export default class TrackTree extends Component {
         for (let v in trackMarkerLayerList) {
             map.removeLayer(trackMarkerLayerList[v]);
         }
+    }
+
+    render () {
+        let {
+            trackTree = [],
+            trackTreeLoading
+        } = this.props;
+        const {
+            timeType,
+            stime,
+            etime,
+            searchDateData,
+            searchNameData,
+            searchName
+        } = this.state;
+        let contents = [];
+        if (searchName) {
+            contents = searchNameData;
+        } else if (etime && stime) {
+            for (let j = 0; j < searchDateData.length; j++) {
+                const element = searchDateData[j];
+                if (element !== undefined) {
+                    contents.push(element);
+                }
+            }
+        } else {
+            for (let j = 0; j < trackTree.length; j++) {
+                const element = trackTree[j];
+                if (element !== undefined) {
+                    contents.push(element);
+                }
+            }
+        };
+        return (
+            <div>
+                <Spin spinning={trackTreeLoading}>
+                    <Search
+                        className='TrackTree-search'
+                        placeholder='人名搜索'
+                        onSearch={this.searchUserName.bind(this)}
+                    />
+                    <div className='TrackTree-button'>
+                        <Button className='TrackTree-button-layout' style={{marginRight: 10}}
+                            type={timeType === 'all' ? 'primary' : 'default'}
+                            id='all' onClick={this.handleTimeChange.bind(this)}>
+                            全部
+                        </Button>
+                        <Button className='TrackTree-button-layout' id='today'
+                            type={timeType === 'today' ? 'primary' : 'default'}
+                            onClick={this.handleTimeChange.bind(this)}>
+                            今天
+                        </Button>
+                    </div>
+                    <div className='TrackTree-button'>
+                        <Button className='TrackTree-button-layout' style={{marginRight: 10}}
+                            type={timeType === 'week' ? 'primary' : 'default'}
+                            id='week' onClick={this.handleTimeChange.bind(this)}>
+                            一周内
+                        </Button>
+                        <Button className='TrackTree-button-layout' id='custom'
+                            type={timeType === 'custom' ? 'primary' : 'default'}
+                            onClick={this.handleTimeChange.bind(this)}>
+                            自定义
+                        </Button>
+                    </div>
+                    {
+                        timeType === 'custom'
+                            ? <RangePicker
+                                style={{width: 220, marginBottom: 10}}
+                                showTime={{ format: 'YYYY-MM-DD HH:mm:ss' }}
+                                format='YYYY-MM-DD HH:mm:ss'
+                                placeholder={['Start Time', 'End Time']}
+                                onChange={this.handleDateChange.bind(this)}
+                            />
+                            : ''
+                    }
+                    <div className='TrackTree-statis-layout'>
+                        <span style={{verticalAlign: 'middle'}}>人名</span>
+                        <span className='TrackTree-data-text'>
+                            次数
+                        </span>
+                    </div>
+                    <div>
+                        {
+                            contents.map((content) => {
+                                return (
+                                    <div className='TrackTree-mrg10' key={content.ID}>
+                                        <span style={{verticalAlign: 'middle'}}>{content.Full_Name}</span>
+                                        <span className='TrackTree-data-text'>
+                                            {content.children.length}
+                                        </span>
+                                    </div>
+                                );
+                            })
+                        }
+                    </div>
+                </Spin>
+            </div>
+
+        );
     }
 }

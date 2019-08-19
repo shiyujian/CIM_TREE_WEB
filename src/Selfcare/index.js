@@ -52,20 +52,20 @@ export default class Selfcare extends Component {
             name: '个人任务',
             path: '/selfcare/task',
             icon: <Icon name='tasks' />
-        },
-        {
-            key: 'query',
-            id: 'SELFCARE.QUERY',
-            name: '个人考勤',
-            path: '/selfcare/query',
-            icon: <Icon name='shekel' />
-        },
-        {
-            key: 'leave',
-            id: 'SELFCARE.LEAVE',
-            name: '个人请假',
-            path: '/selfcare/leave',
-            icon: <Icon name='shekel' />
         }
+        // {
+        //     key: 'query',
+        //     id: 'SELFCARE.QUERY',
+        //     name: '个人考勤',
+        //     path: '/selfcare/query',
+        //     icon: <Icon name='shekel' />
+        // },
+        // {
+        //     key: 'leave',
+        //     id: 'SELFCARE.LEAVE',
+        //     name: '个人请假',
+        //     path: '/selfcare/leave',
+        //     icon: <Icon name='shekel' />
+        // }
     ];
 }

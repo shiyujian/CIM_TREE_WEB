@@ -2,11 +2,9 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 
 import {
-    MAIN_API
+    SYSTEM_API
 } from '_platform/api';
 export const ID = 'Checkwork_attendancegroup';
-// 修改选择地图的方式
-export const changeSelectMap = createAction(`${ID}_changeSelectMap`);
 // 修改左侧树的loading
 export const changeAsideTreeLoading = createAction(`${ID}_changeAsideTreeLoading`);
 
@@ -18,20 +16,15 @@ export const changeSelectState = createAction(`${ID}_changeSelectState`);
 export const changeSelectMemGroup = createAction(`${ID}_changeSelectMemGroup`);
 // 获取考勤群体
 export const getCheckGroupOK = createAction(`${ID}_getCheckGroup`);
-export const getCheckGroup = createFetchAction(`${MAIN_API}/check-group/`, [getCheckGroupOK], 'GET');
+export const getCheckGroup = createFetchAction(`${SYSTEM_API}/checkgroups`, [getCheckGroupOK], 'GET');
 // 增加考勤群体
-export const postCheckGroup = createFetchAction(`${MAIN_API}/check-group/`, [], 'POST');
+export const postCheckGroup = createFetchAction(`${SYSTEM_API}/checkgroup`, [], 'POST');
 // 删除考勤群体
-export const deleteCheckGroup = createFetchAction(`${MAIN_API}/check-group/{{id}}/`, [], 'DELETE');
-// 将人员信息上传至redux
-export const getCheckGroupMansOk = createAction(`${ID}_getCheckGroupMansOk`);
+export const deleteCheckGroup = createFetchAction(`${SYSTEM_API}/checkgroup/{{id}}`, [], 'DELETE');
 // 获取群体成员
-export const getCheckGroupMans = createFetchAction(`${MAIN_API}/group/{{id}}/members/`, [getCheckGroupMansOk], 'GET');
-// 获取群体成员的ID列表
-export const getCheckGroupMansIDList = createFetchAction(`${MAIN_API}/group/{{id}}/members/id-list/`, [], 'GET');
-
+export const getCheckGroupMans = createFetchAction(`${SYSTEM_API}/groupusers?groupId={{groupId}}`, [], 'GET');
 // 增加群体成员/删除群体成员
-export const postCheckGroupMans = createFetchAction(`${MAIN_API}/group/{{id}}/members/`, [], 'POST');
+export const putCheckGroupMans = createFetchAction(`${SYSTEM_API}/groupuser`, [], 'PUT');
 // 群组增加删减人员后，需要对redux中群体人员的信息进行更新，根据这个状态判断是否需要更新
 export const checkGroupMemChangeStatus = createAction(`${ID}_checkGroupMemChangeStatus`);
 
@@ -45,16 +38,10 @@ export const actions = {
     postCheckGroup,
     deleteCheckGroup,
     getCheckGroupMans,
-    postCheckGroupMans,
-    getCheckGroupMansOk,
-    getCheckGroupMansIDList,
+    putCheckGroupMans,
     checkGroupMemChangeStatus
 };
 export default handleActions({
-    [changeSelectMap]: (state, {payload}) => ({
-        ...state,
-        selectMap: payload
-    }),
     [changeAsideTreeLoading]: (state, {payload}) => ({
         ...state,
         asideTreeLoading: payload
@@ -75,12 +62,14 @@ export default handleActions({
         ...state,
         selectState: payload
     }),
-    [getCheckGroupOK]: (state, {payload}) => ({
-        ...state,
-        checkGroupsData: payload
-    }),
-    [getCheckGroupMansOk]: (state, {payload}) => ({
-        ...state,
-        checkGroupMans: payload
-    })
+    [getCheckGroupOK]: (state, {payload}) => {
+        if (payload && payload.content && payload.content instanceof Array) {
+            let data = {
+                checkGroupsData: payload.content
+            };
+            return data;
+        } else {
+            return {checkGroupsData: []};
+        }
+    }
 }, {});

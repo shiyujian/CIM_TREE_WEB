@@ -12,7 +12,6 @@ import {
 } from 'antd';
 import moment from 'moment';
 import { FOREST_API } from '_platform/api';
-import { getUser } from '_platform/auth';
 import '../index.less';
 import {
     getSmallThinNameByPlaceData,
@@ -118,10 +117,8 @@ export default class TreeAdoptInfoTable extends Component {
         ];
     }
     componentDidMount () {
-        let user = getUser();
-        this.sections = JSON.parse(user.sections);
     }
-   
+
     render () {
         const {
             treetypeoption,
@@ -275,10 +272,10 @@ export default class TreeAdoptInfoTable extends Component {
                             查询
                         </Button>
                     </Col>
-                    <Col span={16} className='forest-quryrstcnt'>
+                    <Col span={18} className='forest-quryrstcnt'>
                         <span>此次查询共有苗木：{this.state.totalNum}棵</span>
                     </Col>
-                    <Col span={6} >
+                    <Col span={4} >
                         <Button
                             type='primary'
                             onClick={this.onExport.bind(this)}

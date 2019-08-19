@@ -3,7 +3,6 @@ import { actionsMap } from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import fieldFactory from '_platform/store/service/field';
 import {
-    USER_API,
     FOREST_API
 } from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
@@ -14,17 +13,11 @@ const getTags = forestFetchAction(`${FOREST_API}/tree/nurseryconfigs`, [
     getTagsOK
 ]);
 
-export const ModifyVisible = createAction('人员变更Modal显示隐藏');
 export const setModifyPer = createAction('人员存储要变更的数据');
 
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
 const filterReducer = fieldFactory(ID, 'filter');
-const getPersonInfo = createFetchAction(
-    `${USER_API}/users/?is_black={{is_black}}&page={{page}}`,
-    [],
-    'GET'
-);
 
 export const actions = {
     ...sidebarReducer,
@@ -32,9 +25,7 @@ export const actions = {
     ...filterReducer,
     getTagsOK,
     getTags,
-    ModifyVisible,
-    setModifyPer,
-    getPersonInfo
+    setModifyPer
 };
 
 export default handleActions(
@@ -42,10 +33,6 @@ export default handleActions(
         [getTagsOK]: (state, { payload }) => ({
             ...state,
             tags: payload
-        }),
-        [ModifyVisible]: (state, { payload }) => ({
-            ...state,
-            Modvisible: payload
         }),
         [setModifyPer]: (state, { payload }) => ({
             ...state,
