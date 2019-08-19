@@ -58,6 +58,7 @@ class DrawAreaAcceptModal extends Component {
             section,
             itemDetail,
             record,
+            supervisorUsersList,
             actions: {
                 getAreaAcceptByThinClass
             }
@@ -88,8 +89,25 @@ class DrawAreaAcceptModal extends Component {
                 }
             }
             await this.addThinClassLayer(thinclass, section);
+            let UserOptionList = [];
+            if (supervisorUsersList && supervisorUsersList instanceof Array && supervisorUsersList.length > 0) {
+                supervisorUsersList.map((user) => {
+                    if (user && user.ID) {
+                        UserOptionList.push(
+                            <Option
+                                title={`${(user.Full_Name) || ''}(${(user.User_Name) || ''})`}
+                                value={user.ID}
+                                key={user.ID}
+                            >
+                                {`${(user.Full_Name) || ''}(${(user.User_Name) || ''})`}
+                            </Option>
+                        );
+                    }
+                });
+            }
             this.setState({
-                selectThinClassNo
+                selectThinClassNo,
+                UserOptionList
             });
         }
     }
@@ -355,7 +373,6 @@ class DrawAreaAcceptModal extends Component {
         const {
             section,
             thinclass,
-            supervisorUsersList,
             form: {
                 setFieldsValue
             },
@@ -409,22 +426,6 @@ class DrawAreaAcceptModal extends Component {
             }
             let viewRegionArea = actualRegionArea * 0.0015;
 
-            let UserOptionList = [];
-            if (supervisorUsersList && supervisorUsersList instanceof Array && supervisorUsersList.length > 0) {
-                supervisorUsersList.map((user) => {
-                    if (user && user.ID) {
-                        UserOptionList.push(
-                            <Option
-                                title={`${(user.Full_Name) || ''}(${(user.User_Name) || ''})`}
-                                value={user.ID}
-                                key={user.ID}
-                            >
-                                {`${(user.Full_Name) || ''}(${(user.User_Name) || ''})`}
-                            </Option>
-                        );
-                    }
-                });
-            }
             let thinClassTree = [];
             if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
                 thinClassTree = tree.thinClassTree;
@@ -444,7 +445,6 @@ class DrawAreaAcceptModal extends Component {
                 Area: viewRegionArea
             });
             this.setState({
-                UserOptionList,
                 loading: false,
                 selectThinClassNo,
                 wkt,

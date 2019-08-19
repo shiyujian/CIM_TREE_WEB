@@ -600,9 +600,16 @@ export default handleActions({
         };
     },
     [getSupervisorUsersOK]: (state, { payload }) => {
-        return {
-            ...state,
-            supervisorUsersList: payload
-        };
+        if (payload && payload.content && payload.content instanceof Array) {
+            return {
+                ...state,
+                supervisorUsersList: payload.content
+            };
+        } else {
+            return {
+                ...state,
+                supervisorUsersList: ''
+            };
+        }
     }
 }, {});
