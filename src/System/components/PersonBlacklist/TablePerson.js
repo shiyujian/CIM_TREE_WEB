@@ -336,7 +336,6 @@ class TablePerson extends Component {
                 title: '移除黑名单',
                 key: 'Edit',
                 render: record => {
-                    return '/';
                     if (record.ID) {
                         return (
                             '/'

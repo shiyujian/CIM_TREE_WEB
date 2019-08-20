@@ -235,7 +235,6 @@ export default class Tree extends Component {
                                     style={{ float: 'left' }}
                                     type='primary'
                                     ghost
-                                    disabled
                                     onClick={this.handleAddProject.bind(this)}
                                 >
                                         新建项目
@@ -245,21 +244,13 @@ export default class Tree extends Component {
                                     style={{ float: 'left' }}
                                     type='primary'
                                     ghost
-                                    disabled
                                     onClick={this.handleAddOrg.bind(this)}
                                 >
                                         新建组织机构
                                 </Button>
 
                         }
-                        <Button
-                            style={{ float: 'right' }}
-                            type='danger'
-                            disabled
-                            ghost>
-                                        删除
-                        </Button>
-                        {/* {
+                        {
                             deleteOrgDisabled
                                 ? (
                                     !deleteProjectDisabled
@@ -297,7 +288,7 @@ export default class Tree extends Component {
                                         删除
                                     </Button>
                                 </Popconfirm>
-                        } */}
+                        }
 
                     </div>
                     <SimpleTree

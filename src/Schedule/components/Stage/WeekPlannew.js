@@ -624,7 +624,6 @@ class WeekPlanNew extends Component {
                 />
                 <Button
                     type='primary'
-                    disabled
                     style={{marginBottom: 10}}
                     onClick={this.onAdd.bind(this)}>
                         新增

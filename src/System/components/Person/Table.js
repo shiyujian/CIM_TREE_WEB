@@ -140,7 +140,6 @@ class Users extends Component {
             title: '操作',
             key: '10',
             render: (text, record) => {
-                return '/';
                 const user = getUser();
                 let userRoles = user.roles || '';
                 // 是否为供应商文书
@@ -349,14 +348,13 @@ class Users extends Component {
                 <Col span={3}>
                     <Button
                         type='primary'
-                        disabled
-                        // disabled={!(node && node.ID)}
+                        disabled={!(node && node.ID)}
                         onClick={this.append.bind(this)}>
                             添加用户
                     </Button>
                 </Col>
                 <Col span={3}>
-                    {/* {
+                    {
                         selectedRowKeys.length > 0
                             ? <Popconfirm
                                 title='是否真的要删除选中用户?'
@@ -371,10 +369,7 @@ class Users extends Component {
                             : <Button type='danger' disabled>
                                 批量删除
                             </Button>
-                    } */}
-                    <Button type='danger' disabled>
-                                批量删除
-                    </Button>
+                    }
                 </Col>
             </div>);
         } else {

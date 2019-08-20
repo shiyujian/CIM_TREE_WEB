@@ -99,8 +99,7 @@ export default class Info extends Component {
                                         style={{ float: 'right' }}
                                         type='primary'
                                         ghost
-                                        // disabled={disabled}
-                                        disabled
+                                        disabled={disabled}
                                     >
                                         编辑
                                     </Button>
