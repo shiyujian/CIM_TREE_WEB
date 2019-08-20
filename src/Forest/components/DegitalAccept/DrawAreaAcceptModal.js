@@ -28,9 +28,11 @@ import {
 import {
     fillAreaColor,
     handleAreaLayerData,
-    handleCoordinates,
-    getUser
+    handleCoordinates
 } from './auth';
+import {
+    getUser
+} from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -427,7 +429,7 @@ class DrawAreaAcceptModal extends Component {
             let viewRegionArea = actualRegionArea * 0.0015;
 
             let thinClassTree = [];
-            if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
+            if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0) {
                 thinClassTree = tree.thinClassTree;
             } else if (tree.onSiteThinClassTree && tree.onSiteThinClassTree instanceof Array && tree.onSiteThinClassTree.length > 0) {
                 thinClassTree = tree.onSiteThinClassTree;
@@ -502,7 +504,7 @@ class DrawAreaAcceptModal extends Component {
                         this.setState({
                             loading: false
                         });
-                        this.props.handleCloseDrawAreaModal();
+                        this.props.handleCloseDrawAreaModal(1);
                     } else {
                         Notification.error({
                             message: '面积验收提交失败'

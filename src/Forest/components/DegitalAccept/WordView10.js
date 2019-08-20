@@ -13,6 +13,9 @@ import {
     handleCoordinates,
     wktToJson
 } from './auth';
+import {
+    handlePOLYGONWktData
+} from '_platform/gisAuth';
 import moment from 'moment';
 export default class WordView1 extends Component {
     static propTypes = {};
@@ -76,7 +79,7 @@ export default class WordView1 extends Component {
                     coords.push(str);
                 });
             } else if (wkt.indexOf('POLYGON') !== -1) {
-                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                str = handlePOLYGONWktData(wkt);
                 coords.push(str);
             }
             this.setState({
@@ -192,6 +195,7 @@ export default class WordView1 extends Component {
         handleDetail.jianli = (record && record.SupervisorObj && record.SupervisorObj.Full_Name) || '';
         handleDetail.shigong = (record && record.ConstructerObj && record.ConstructerObj.Full_Name) || '';
         handleDetail.checker = (record && record.ApplierObj && record.ApplierObj.Full_Name) || '';
+        handleDetail.surveyorName = (record && record.SurveyorObj && record.SurveyorObj.Full_Name) || '';
         handleDetail.designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || '';
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.applyTime = (record && record.ApplyTime && moment(record.ApplyTime).format('YYYY年MM月DD日')) || '';
@@ -245,7 +249,7 @@ export default class WordView1 extends Component {
                                     <td style={{ height: 60, align: 'center' }}>施工员</td>
                                     <td colSpan='1'>{handleDetail.shigong}</td>
                                     <td>测量员</td>
-                                    <td colSpan='1'> / </td>
+                                    <td colSpan='1'>{handleDetail.surveyorName}</td>
                                     <td>设计面积</td>
                                     <td >{`${handleDetail.designArea} (亩)`}</td>
                                 </tr>

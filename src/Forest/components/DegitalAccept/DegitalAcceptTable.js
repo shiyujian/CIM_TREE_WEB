@@ -126,7 +126,7 @@ export default class DegitalAcceptTable extends Component {
                 title: '树种',
                 dataIndex: 'treetype',
                 render: () => {
-                    return <span > 暂无字段 </span>;
+                    return '/';
                 }
             },
             {
@@ -181,7 +181,7 @@ export default class DegitalAcceptTable extends Component {
                                 </div>
                                 );
                             } else {
-                                return <span > 暂无 </span>;
+                                return '/';
                             }
                         } else if (record.status === '完成') {
                             return (<div >
@@ -195,7 +195,7 @@ export default class DegitalAcceptTable extends Component {
                         }
                     } else {
                         if (record.status === '未申请' || record.status === '待验收') {
-                            return <span > 暂无 </span>;
+                            return '/';
                         } else if (record.status === '完成') {
                             return (<div >
                                 <a onClick={this.viewWord.bind(this, record)} >
@@ -636,12 +636,15 @@ export default class DegitalAcceptTable extends Component {
             drawAreaVisible: true
         });
     }
-    handleCloseDrawAreaModal = async () => {
+    handleCloseDrawAreaModal = async (type) => {
         this.setState({
             drawAreaVisible: false,
             itemDetail: '',
             record: ''
         });
+        if (type && type === 1) {
+            this.handleTableChange({current: 1});
+        }
     }
     // 翻页
     handleTableChange (pagination) {
