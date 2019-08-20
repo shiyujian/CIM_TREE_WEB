@@ -8,9 +8,6 @@ import {
     Select,
     notification
 } from 'antd';
-import {
-    WEEK_THREENODE_ID
-} from '_platform/api';
 const { Option } = Select;
 const formItemLayout = {
     labelCol: {

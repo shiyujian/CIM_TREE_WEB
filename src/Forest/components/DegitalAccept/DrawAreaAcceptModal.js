@@ -17,7 +17,8 @@ import {
     getWktData,
     getSectionNameBySection,
     getProjectNameBySection,
-    getHandleWktData
+    getHandleWktData,
+    handlePOLYGONWktData
 } from '_platform/gisAuth';
 import {
     WMSTILELAYERURL,
@@ -200,7 +201,7 @@ class DrawAreaAcceptModal extends Component {
                     coords.push(str);
                 });
             } else if (wkt.indexOf('POLYGON') !== -1) {
-                str = wkt.slice(wkt.indexOf('(') + 3, wkt.indexOf(')'));
+                str = handlePOLYGONWktData(wkt);
                 coords.push(str);
             }
             if (coords && coords instanceof Array && coords.length > 0) {

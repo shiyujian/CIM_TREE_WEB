@@ -8,10 +8,6 @@ import {
     Select,
     notification
 } from 'antd';
-import {
-    ACYUAL_THREENODE_ID,
-    ACYUAL_FOURNODE_ID
-} from '_platform/api';
 const { Option } = Select;
 const formItemLayout = {
     labelCol: {
