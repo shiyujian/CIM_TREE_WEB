@@ -91,10 +91,10 @@ class Login extends Component {
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
-                    if (value.length >= 4 && value.length <= 16) {
+                    if (value.length >= 3 && value.length <= 16) {
                         callback();
                     } else {
-                        callback('请输入用户名(4到16位)');
+                        callback('请输入用户名(3到16位)');
                     }
                 } else {
                     callback(`请输入正确的用户名`);
@@ -193,7 +193,7 @@ class Login extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入用户名(4到16位)'
+                                                        message: '请输入用户名(3到16位)'
                                                     },
                                                     {
                                                         validator: this.checkUserName
