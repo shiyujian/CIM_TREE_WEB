@@ -51,6 +51,7 @@ class NodeTable extends Component {
         getNodefieldList({}, {
             nodeid: NodeID // 节点ID
         }).then(rep => {
+            console.log('节点表单', rep);
             this.setState({
                 dataListForm: rep
             });
@@ -363,22 +364,9 @@ class NodeTable extends Component {
         {
             title: '存储方式',
             dataIndex: 'FieldType'
-        },
-        {
-            title: '操作',
-            dataIndex: 'active',
-            width: '200',
-            render: (text, record) => {
-                return (<div>
-                    <a onClick={this.onEditForm.bind(this, record.ID)}>编辑</a>
-                </div>);
-            }
         }
     ];
     onSeeForm (ID) {
-
-    }
-    onEditForm () {
 
     }
     onDeleteForm (ID) {
