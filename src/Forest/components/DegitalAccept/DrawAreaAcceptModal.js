@@ -471,18 +471,17 @@ class DrawAreaAcceptModal extends Component {
             form: {
                 validateFields
             },
-            areaDataList = {},
+            areaData = '',
             thinclass,
             section
         } = this.props;
         try {
             validateFields(async (err, values) => {
-                console.log('err', err);
                 if (!err) {
                     let user = getUser();
                     let designArea = 0;
-                    if (areaDataList[thinclass] && areaDataList[thinclass].area) {
-                        designArea = areaDataList[thinclass].area;
+                    if (areaData && areaData.area) {
+                        designArea = areaData.area;
                     }
                     let postData = {
                         Section: section,

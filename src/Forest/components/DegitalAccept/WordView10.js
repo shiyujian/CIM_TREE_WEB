@@ -200,7 +200,8 @@ export default class WordView1 extends Component {
         handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
         handleDetail.applyTime = (record && record.ApplyTime && moment(record.ApplyTime).format('YYYY年MM月DD日')) || '';
         handleDetail.createTime = (record && record.CheckTime && moment(record.CheckTime).format('YYYY年MM月DD日')) || '';
-
+        handleDetail.areaRate = (detail && detail.AreaRate && Math.abs(detail.AreaRate)) || '';
+        handleDetail.area = (detail && detail.Area && (detail.Area * 0.0015).toFixed(2)) || '';
         return handleDetail;
     }
     render () {
@@ -255,9 +256,11 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td style={{ height: 60, align: 'center' }}>实际面积</td>
-                                    <td>{`${handleDetail.actualArea} (亩)`}</td>
-                                    <td >误差值及备注</td>
-                                    <td colSpan='3'>/</td>
+                                    <td colSpan='1'>{`${handleDetail.actualArea} (亩)`}</td>
+                                    <td>造林面积</td>
+                                    <td colSpan='1'>{`${handleDetail.area} (亩)`}</td>
+                                    <td>误差值</td>
+                                    <td>{`${handleDetail.areaRate}`}</td>
                                 </tr>
                                 <tr>
                                     <td style={{ height: 60 }} >施工执行标准名称及编号</td>
