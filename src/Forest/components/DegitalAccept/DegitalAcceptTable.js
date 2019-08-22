@@ -99,7 +99,8 @@ export default class DegitalAcceptTable extends Component {
             record: '',
             itemDetail: '',
             drawAreaVisible: false,
-            reDrawAreaVisible: false
+            reDrawAreaVisible: false,
+            areaDataList: {}
         };
         this.columns = [
             {
@@ -605,13 +606,27 @@ export default class DegitalAcceptTable extends Component {
     handleDrawAreaAccept = async (record) => {
         const {
             thinclass,
-            section
+            section,
+            areaDataList = {}
         } = this.state;
         const {
             actions: {
-                getAcceptanceThinclasses
+                getAcceptanceThinclasses,
+                getTreearea
             }
         } = this.props;
+        let handleKey = thinclass.split('-');
+        let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+        let rst = await getTreearea({}, { no: no });
+        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
+            Notification.error({
+                message: '该细班不存在设计数据，请施工设计提交设计数据'
+            });
+            return;
+        } else {
+            let data = rst.content.find(content => content.Section === section);
+            areaDataList[thinclass] = data;
+        }
         if (record.status === '退回') {
             let array = thinclass.split('-');
             let array1 = [];
@@ -633,7 +648,8 @@ export default class DegitalAcceptTable extends Component {
             }
         }
         this.setState({
-            drawAreaVisible: true
+            drawAreaVisible: true,
+            areaDataList
         });
     }
     handleCloseDrawAreaModal = async (type) => {

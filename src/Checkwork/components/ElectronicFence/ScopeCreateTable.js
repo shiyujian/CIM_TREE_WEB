@@ -98,7 +98,7 @@ export default class ScopeCreateTable extends Component {
             zoomOffset: 1
         }).addTo(this.map);
         // 加载树图层
-        this.getTileLayer2();
+        // this.getTileLayer2();
         // 地图点击事件
         this.map.on('click', function (e) {
             const {
