@@ -184,7 +184,6 @@ class Tablelevel extends Component {
                 return (
                     <InputNumber
                         min={1}
-                        max={record.num}
                         value={text}
                         onChange={this.handleNum.bind(this, index)} />
                 );
