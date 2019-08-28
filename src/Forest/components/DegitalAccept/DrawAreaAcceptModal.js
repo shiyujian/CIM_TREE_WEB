@@ -410,7 +410,8 @@ class DrawAreaAcceptModal extends Component {
             if (thinAreaNum > 1) {
                 wkt = 'MULTIPOLYGON((';
                 coords.map((coord, index) => {
-                    let num = computeSignedArea(coord, 1);
+                    console.log('coord', coord);
+                    let num = computeSignedArea(coord, 2);
                     actualRegionArea = actualRegionArea + num;
                     if (index === 0) {
                         // 获取细班选择坐标wkt
@@ -425,6 +426,8 @@ class DrawAreaAcceptModal extends Component {
                 // 获取手动框选坐标wkt
                 wkt = wkt + getHandleWktData(coords);
                 wkt = wkt + ')';
+                console.log('coords', coords);
+
                 actualRegionArea = computeSignedArea(coords, 2);
             }
             let viewRegionArea = actualRegionArea * 0.0015;
@@ -662,7 +665,7 @@ class DrawAreaAcceptModal extends Component {
                             </FormItem>
                         </Row>
                         <Row>
-                            <FormItem {...FormItemLayout} label='面积(平方米)'>
+                            <FormItem {...FormItemLayout} label='面积(亩)'>
                                 {
                                     getFieldDecorator('Area', {
                                         rules: [
