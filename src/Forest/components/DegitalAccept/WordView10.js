@@ -9,9 +9,7 @@ import L from 'leaflet';
 import './index.less';
 import {
     fillAreaColor,
-    handleAreaLayerData,
-    handleCoordinates,
-    wktToJson
+    handleCoordinates
 } from './auth';
 import {
     handlePOLYGONWktData

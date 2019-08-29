@@ -100,7 +100,7 @@ export default class DegitalAcceptTable extends Component {
             itemDetail: '',
             drawAreaVisible: false,
             reDrawAreaVisible: false,
-            areaData: ''
+            thinClassDesignData: []
         };
         this.columns = [
             {
@@ -614,7 +614,7 @@ export default class DegitalAcceptTable extends Component {
                 getTreearea
             }
         } = this.props;
-        let areaData = '';
+        let thinClassDesignData = [];
         let handleKey = thinclass.split('-');
         let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
         let rst = await getTreearea({}, { no: no });
@@ -624,8 +624,11 @@ export default class DegitalAcceptTable extends Component {
             });
             return;
         } else {
-            let data = rst.content.find(content => content.Section === section);
-            areaData = data;
+            rst.content.map((content) => {
+                if (content.Section && content.Section === section) {
+                    thinClassDesignData.push(content);
+                }
+            });
         }
         if (record.status === '退回') {
             let array = thinclass.split('-');
@@ -649,7 +652,7 @@ export default class DegitalAcceptTable extends Component {
         }
         this.setState({
             drawAreaVisible: true,
-            areaData
+            thinClassDesignData
         });
     }
     handleCloseDrawAreaModal = async (type) => {

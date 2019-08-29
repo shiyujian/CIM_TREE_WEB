@@ -50,7 +50,6 @@ class DrawAreaAcceptModal extends Component {
             loading: false,
             selectThinClassNo: '',
             wkt: '',
-            areaLayerList: {},
             actualRegionArea: 0
         };
     }
@@ -70,12 +69,12 @@ class DrawAreaAcceptModal extends Component {
             let thinClassArr = thinclass.split('-');
             let selectThinClassNo = thinClassArr[0] + '-' + thinClassArr[1] + '-' + thinClassArr[3] + '-' + thinClassArr[4];
             // 查询该细班的面积验收是否已经审核
-            let queryPostData = {
-                section: section,
-                thinclass: selectThinClassNo,
-                page: 1,
-                size: 5
-            };
+            // let queryPostData = {
+            //     section: section,
+            //     thinclass: selectThinClassNo,
+            //     page: 1,
+            //     size: 5
+            // };
             // let queryData = await getAreaAcceptByThinClass({}, queryPostData);
             // if (queryData && queryData.content &&
             //     queryData.content instanceof Array && queryData.content.length > 0) {
@@ -150,39 +149,33 @@ class DrawAreaAcceptModal extends Component {
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey, section) => {
         const {
-            areaLayerList
-        } = this.state;
-        const {
             actions: {
                 getTreearea
             }
         } = this.props;
         try {
-            let coords = await handleAreaLayerData(eventKey, getTreearea, section);
-            if (coords && coords instanceof Array && coords.length > 0) {
-                for (let i = 0; i < coords.length; i++) {
-                    let str = coords[i];
-                    let treearea = handleCoordinates(str);
-                    let message = {
-                        key: 3,
-                        type: 'Feature',
-                        properties: {name: '', type: 'area'},
-                        geometry: { type: 'Polygon', coordinates: treearea }
+            let coordsList = await handleAreaLayerData(eventKey, getTreearea, section);
+            if (coordsList && coordsList instanceof Array && coordsList.length > 0) {
+                for (let t = 0; t < coordsList.length; t++) {
+                    let coords = coordsList[t];
+                    if (coords && coords instanceof Array && coords.length > 0) {
+                        for (let i = 0; i < coords.length; i++) {
+                            let str = coords[i];
+                            let treearea = handleCoordinates(str);
+                            let message = {
+                                key: 3,
+                                type: 'Feature',
+                                properties: {name: '', type: 'area'},
+                                geometry: { type: 'Polygon', coordinates: treearea }
+                            };
+                            let layer = this._createMarker(message);
+                            if (i === coords.length - 1) {
+                                this.map.fitBounds(layer.getBounds());
+                            }
+                        }
                     };
-                    let layer = this._createMarker(message);
-                    if (i === coords.length - 1) {
-                        this.map.fitBounds(layer.getBounds());
-                    }
-                    if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].push(layer);
-                    } else {
-                        areaLayerList[eventKey] = [layer];
-                    }
                 }
-                this.setState({
-                    areaLayerList
-                });
-            };
+            }
         } catch (e) {
             console.log('加载细班图层', e);
         }
@@ -474,7 +467,7 @@ class DrawAreaAcceptModal extends Component {
             form: {
                 validateFields
             },
-            areaData = '',
+            thinClassDesignData = [],
             thinclass,
             section
         } = this.props;
@@ -483,9 +476,14 @@ class DrawAreaAcceptModal extends Component {
                 if (!err) {
                     let user = getUser();
                     let designArea = 0;
-                    if (areaData && areaData.area) {
-                        designArea = areaData.area;
+                    if (thinClassDesignData && thinClassDesignData instanceof Array && thinClassDesignData.length > 0) {
+                        thinClassDesignData.map((areaData) => {
+                            if (areaData && areaData.area) {
+                                designArea = designArea + areaData.area;
+                            }
+                        });
                     }
+
                     let postData = {
                         Section: section,
                         ThinClass: selectThinClassNo,

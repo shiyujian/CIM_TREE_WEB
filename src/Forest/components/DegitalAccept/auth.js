@@ -95,20 +95,33 @@ export const handleAreaLayerData = async (eventKey, getTreearea, sectionn) => {
         let coords = [];
         let str = '';
         let contents = rst.content;
-        let data = contents.find(content => content.Section === section);
-        let wkt = data.coords;
-        if (wkt.indexOf('MULTIPOLYGON') !== -1) {
-            let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
-            let arr = datas.split('),(');
-            arr.map((a, index) => {
-                str = a.slice(a.indexOf('(') + 1, a.length - 1);
+        let datas = [];
+        let coordsList = [];
+        contents.map((content) => {
+            if (content.Section && content.Section === section) {
+                datas.push(content);
+            }
+        });
+        // let data = contents.find(content => content.Section === section);
+        // console.log('data', data);
+        datas.map((data) => {
+            let wkt = data.coords;
+            if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+                let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
+                let arr = datas.split('),(');
+                arr.map((a, index) => {
+                    str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                    coords.push(str);
+                });
+            } else if (wkt.indexOf('POLYGON') !== -1) {
+                str = handlePOLYGONWktData(wkt);
                 coords.push(str);
-            });
-        } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = handlePOLYGONWktData(wkt);
-            coords.push(str);
-        }
-        return coords;
+            }
+            coordsList.push(coords);
+        });
+        console.log('coordsList', coordsList);
+
+        return coordsList;
     } catch (e) {
         console.log('handleAreaLayerData', e);
     }

@@ -22,7 +22,6 @@ export default class WordView1 extends Component {
         super(props);
         this.state = {
             loading: false,
-            areaLayerList: [],
             leader: '',
             unitName: '',
             detail: '',
@@ -86,37 +85,31 @@ export default class WordView1 extends Component {
     // 选中细班，则在地图上加载细班图层
     _addAreaLayer = async (eventKey, section) => {
         const {
-            areaLayerList
-        } = this.state;
-        const {
             actions: { getTreearea }
         } = this.props;
         try {
-            let coords = await handleAreaLayerData(eventKey, getTreearea, section);
-            if (coords && coords instanceof Array && coords.length > 0) {
-                for (let i = 0; i < coords.length; i++) {
-                    let str = coords[i];
-                    let treearea = handleCoordinates(str);
-                    let message = {
-                        key: 3,
-                        type: 'Feature',
-                        properties: {name: '', type: 'area'},
-                        geometry: { type: 'Polygon', coordinates: treearea }
+            let coordsList = await handleAreaLayerData(eventKey, getTreearea, section);
+            if (coordsList && coordsList instanceof Array && coordsList.length > 0) {
+                for (let t = 0; t < coordsList.length; t++) {
+                    let coords = coordsList[t];
+                    if (coords && coords instanceof Array && coords.length > 0) {
+                        for (let i = 0; i < coords.length; i++) {
+                            let str = coords[i];
+                            let treearea = handleCoordinates(str);
+                            let message = {
+                                key: 3,
+                                type: 'Feature',
+                                properties: {name: '', type: 'area'},
+                                geometry: { type: 'Polygon', coordinates: treearea }
+                            };
+                            let layer = this._createMarker(message);
+                            if (i === coords.length - 1) {
+                                this.map.fitBounds(layer.getBounds());
+                            }
+                        }
                     };
-                    let layer = this._createMarker(message);
-                    if (i === coords.length - 1) {
-                        this.map.fitBounds(layer.getBounds());
-                    }
-                    if (areaLayerList[eventKey]) {
-                        areaLayerList[eventKey].push(layer);
-                    } else {
-                        areaLayerList[eventKey] = [layer];
-                    }
                 }
-                this.setState({
-                    areaLayerList
-                });
-            };
+            }
         } catch (e) {
             console.log('加载细班图层', e);
         }
