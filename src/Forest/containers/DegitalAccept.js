@@ -170,7 +170,6 @@ export default class DegitalAccept extends Component {
         // 首先查看有没有关联标段，没有关联的人无法获取人员
         if (section) {
             let roles = await getRoles();
-            console.log();
             let roleID = '';
             if (roles && roles instanceof Array && roles.length > 0) {
                 roles.map((role) => {
