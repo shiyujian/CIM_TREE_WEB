@@ -208,18 +208,19 @@ class Addition extends Component {
 
     checkPassWord = async (rule, value, callback) => {
         if (value) {
-            // 手机号正则
-            let reg = /^[a-zA-Z0-9_]{6,16}$/;
+            // 密码正则
+            let reg = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{6,16}$/;
+            // let reg = /^[a-zA-Z0-9_]{6,16}$/;
             console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
             if (reg.test(value)) {
                 if (value) {
                     callback();
                 } else {
-                    callback(` 请输入6到16位（字母，数字，下划线）密码`);
+                    callback(` 请输入6到16位（字母，数字，特殊字符组合）密码`);
                 }
             } else {
-                callback(` 请输入6到16位（字母，数字，下划线）密码`);
+                callback(` 请输入6到16位（字母，数字，特殊字符组合）密码`);
             }
         } else {
             callback();
@@ -527,7 +528,7 @@ class Addition extends Component {
                                         rules: [
                                             {
                                                 required: true,
-                                                message: '请输入6到16位（字母，数字，下划线）密码',
+                                                message: '请输入6到16位（字母，数字，特殊字符组合）密码',
                                                 max: 15
                                             },
                                             {
@@ -536,7 +537,7 @@ class Addition extends Component {
                                         ]
                                     })(
                                         <Input
-                                            placeholder='请输入6到16位（字母，数字，下划线）密码'
+                                            placeholder='请输入6到16位（字母，数字，特殊字符组合）密码'
                                         />
                                     )}
                                 </FormItem>

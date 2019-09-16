@@ -108,7 +108,8 @@ class Login extends Component {
     }
     checkPassWord = async (rule, value, callback) => {
         if (value) {
-            let reg = /^[^\s]*$/;
+            let reg = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{6,16}$/;
+            // let reg = /^[^\s]*$/;
             console.log('reg.test(value)', reg.test(value));
             // isNaN(value);
             if (reg.test(value)) {
@@ -116,13 +117,13 @@ class Login extends Component {
                     if (value.length >= 6 && value.length <= 16) {
                         callback();
                     } else {
-                        callback('请输入密码(6到16位)');
+                        callback('请输入6到16位（字母，数字，特殊字符组合）密码');
                     }
                 } else {
-                    callback(`请输入正确的密码`);
+                    callback(`请输入6到16位（字母，数字，特殊字符组合）密码`);
                 }
             } else {
-                callback(`请输入正确的密码`);
+                callback(`请输入6到16位（字母，数字，特殊字符组合）密码`);
             }
         } else {
             callback();
@@ -222,7 +223,7 @@ class Login extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入密码(6到16位)'
+                                                        message: '请输入6到16位（字母，数字，特殊字符组合）密码'
                                                     },
                                                     {
                                                         validator: this.checkPassWord
@@ -238,7 +239,7 @@ class Login extends Component {
                                                         }}
                                                         id='pwdInp'
                                                         type={pwdType}
-                                                        placeholder='请输入密码(6到16位)'
+                                                        placeholder='请输入密码'
                                                     />
                                                     <a
                                                         className='btn-change-type'
@@ -415,6 +416,9 @@ class Login extends Component {
                                                     {
                                                         required: true,
                                                         message: '请输入新密码'
+                                                    },
+                                                    {
+                                                        validator: this.checkPassWord
                                                     }
                                                 ]
                                             })(
