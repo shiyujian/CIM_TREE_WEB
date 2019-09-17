@@ -38,7 +38,6 @@ class Login extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            isPwd: true,
             forgectState: false,
             checked: '',
             getSecurityCodeStatus: false,
@@ -117,13 +116,13 @@ class Login extends Component {
                     if (value.length >= 6 && value.length <= 16) {
                         callback();
                     } else {
-                        callback('请输入6到16位（字母，数字，特殊字符组合）密码');
+                        callback('6到16位（至少包括字母、数字以及特殊符号中的2种）');
                     }
                 } else {
-                    callback(`请输入6到16位（字母，数字，特殊字符组合）密码`);
+                    callback(`6到16位（至少包括字母、数字以及特殊符号中的2种）`);
                 }
             } else {
-                callback(`请输入6到16位（字母，数字，特殊字符组合）密码`);
+                callback(`6到16位（至少包括字母、数字以及特殊符号中的2种）`);
             }
         } else {
             callback();
@@ -141,14 +140,6 @@ class Login extends Component {
         const loginTitle = require('./images/logo1.png');
         const docDescibe = require('./images/doc.png');
         const hello = require('./images/hello.png');
-        const pwdType = this.state.isPwd ? 'password' : 'text';
-        /// 密码输入框类型改变时图标变化
-        let chgTypeImg = require('./images/icon_eye1.png');
-        if (this.state.isPwd) {
-            chgTypeImg = require('./images/icon_eye1.png');
-        } else {
-            chgTypeImg = require('./images/icon_eye2.png');
-        }
 
         return (
             <div className='login-wrap'>
@@ -223,32 +214,22 @@ class Login extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入6到16位（字母，数字，特殊字符组合）密码'
-                                                    },
-                                                    {
-                                                        validator: this.checkPassWord
+                                                        message: '6到16位（至少包括字母、数字以及特殊符号中的2种）'
                                                     }
+                                                    // {
+                                                    //     validator: this.checkPassWord
+                                                    // }
                                                 ]
                                             })(
                                                 <div>
-                                                    <Input
+                                                    <Input.Password
                                                         style={{
                                                             color: '#000000',
                                                             borderBottom:
                                                                 '1px solid #cccccc'
                                                         }}
                                                         id='pwdInp'
-                                                        type={pwdType}
                                                         placeholder='请输入密码'
-                                                    />
-                                                    <a
-                                                        className='btn-change-type'
-                                                        style={{
-                                                            backgroundImage: `url(${chgTypeImg})`
-                                                        }}
-                                                        onClick={this.handleClick.bind(
-                                                            this
-                                                        )}
                                                     />
                                                 </div>
                                             )}
@@ -415,7 +396,7 @@ class Login extends Component {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入新密码'
+                                                        message: '6到16位（至少包括字母、数字以及特殊符号中的2种）'
                                                     },
                                                     {
                                                         validator: this.checkPassWord
@@ -429,7 +410,7 @@ class Login extends Component {
                                                         borderBottom:
                                                             '1px solid #cccccc'
                                                     }}
-                                                    placeholder='请输入新密码'
+                                                    placeholder='6到16位（至少包括字母、数字以及特殊符号中的2种）'
                                                 />
                                             )}
                                         </FormItem>
@@ -489,12 +470,6 @@ class Login extends Component {
             forgectState: false
         });
     }
-    handleClick (e) {
-        e.preventDefault();
-        this.setState({
-            isPwd: !this.state.isPwd
-        });
-    }
 
     handleSubmit (e) {
         e.preventDefault();
@@ -518,7 +493,10 @@ class Login extends Component {
                 getRolePermission,
                 getUsers
             },
-            history: { replace }
+            history: { replace },
+            form: {
+                setFieldsValue
+            }
         } = this.props;
         await clearUser();
         await clearUser();
@@ -536,6 +514,23 @@ class Login extends Component {
         console.log('forestUserData', forestUserData);
         if (forestUserData && forestUserData instanceof Array && forestUserData.length === 1) {
             let forestLoginUserData = forestUserData[0];
+            let reg = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{6,16}$/;
+            if (!reg.test(data.password)) {
+                Notification.warning({
+                    message: '尊敬的用户，系统升级，检测到您的密码强度过低，为了保障账户安全，请您重新设置登录密码！',
+                    duration: 3
+                });
+                this.setState({
+                    forgectState: true
+                }, () => {
+                    setFieldsValue({
+                        nickname: data.username
+                        // phone: forestLoginUserData.Phone
+                    });
+                });
+                return;
+            }
+
             if (!forestLoginUserData.Number && forestLoginUserData.User_Name !== 'admin') {
                 Notification.error({
                     message: '该用户未进行实名认证，不能登录',
