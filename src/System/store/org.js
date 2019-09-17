@@ -2,13 +2,15 @@ import {createAction, handleActions, combineActions} from 'redux-actions';
 import {actionsMap} from '_platform/store/util';
 import createFetchAction from 'fetch-action';
 import { SYSTEM_API } from '_platform/api';
-
+import {forestFetchAction} from '_platform/store/fetchAction';
 import fieldFactory from '_platform/store/service/field';
 
 export const ID = 'SYSTEM_ORG';
 
 const sidebarReducer = fieldFactory(ID, 'sidebar');
 const additionReducer = fieldFactory(ID, 'addition');
+export const getRegionCodes = forestFetchAction(`${SYSTEM_API}/regioncodes`, [], 'GET'); // 获取行政区划编码
+
 // 编辑组织机构Visible
 export const changeEditOrgVisible = createAction(`${ID}编辑组织机构Visible`);
 // 添加项目Visible
@@ -26,6 +28,7 @@ const deleteProject = createFetchAction(`${SYSTEM_API}/project/{{ID}}`, [], 'DEL
 export const actions = {
     ...sidebarReducer,
     ...additionReducer,
+    getRegionCodes,
     changeEditOrgVisible,
     changeAddProjectVisible,
     changeEditProjectVisible,

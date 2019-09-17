@@ -60,6 +60,8 @@ export default class Header extends Component {
         if (!remember) {
             window.localStorage.removeItem('LOGIN_USER_PASSDATA');
         }
+        window.localStorage.removeItem('RegionCodeList');
+        window.localStorage.clear();
         setTimeout(() => {
             history.replace('/login');
         }, 500);
