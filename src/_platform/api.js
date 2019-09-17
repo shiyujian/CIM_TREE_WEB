@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-20 16:43:56
+ * @Last Modified time: 2019-09-17 10:21:26
  */
 /**
  *
@@ -47,10 +47,9 @@ import 'whatwg-fetch';
 require('es6-promise').polyfill();
 
 window.config = window.config || {};
-let DOMAIN, STATIC_FILE_IP;
+let DOMAIN;
 
 DOMAIN = window.config.DOMAIN;
-STATIC_FILE_IP = window.config.STATIC_FILE_IP;
 
 /** *********************公共资源服务**************************/
 export { DOMAIN };
@@ -60,24 +59,8 @@ export const SERVICE_API = `${base}/service/construction/api`;
 export const WORKFLOW_API = `${base}/service/workflow/api`;
 // 文件预览的接口
 export const previewWord_API = window.config.previewWord_API;
-// 静态资源文件服务==========STATIC_FILE_IP
-
-export const STATIC_PREVIEW_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_PREVIEW_PORT
-}`;
-
-/**
- * 资料管理接口（使用原院内接口）
- */
-export const SOURCE_API = `${STATIC_FILE_IP}:${window.config.STATIC_PREVIEW_PORT}`;
-export const FILE_API = `${base}/service/fileserver`;
-export const STATIC_DOWNLOAD_API = `${STATIC_FILE_IP}:${
-    window.config.STATIC_DOWNLOAD_PORT
-}`;
-
-/**
- * 资料管理接口（使用原院内接口）
- */
+// 静态资源文件服务
+export const STATIC_PREVIEW_API = `${base}`;
 
 export const MAIN_API = `${base}/cms`;
 // 高德地图逆坐标查询
@@ -416,28 +399,6 @@ export const MODULES = [
             // }
         ]
     },
-    // {
-    //     id: 'DATUM',
-    //     name: '资料管理',
-    //     children: [
-    //         {
-    //             id: 'DATUM.STANDARD',
-    //             name: '制度标准'
-    //         },
-    //         {
-    //             id: 'DATUM.ENGINEERING',
-    //             name: '工程文档'
-    //         },
-    //         {
-    //             id: 'DATUM.REDIOS',
-    //             name: '工程影像'
-    //         },
-    //         {
-    //             id: 'DATUM.VIDEO',
-    //             name: '视频资料'
-    //         }
-    //     ]
-    // },
     {
         id: 'SCHEDULE',
         name: '进度管理',

@@ -36,14 +36,6 @@ window.config = {
     SEEDLING: 'http://39.97.163.176:808',
     // 林总图片新接口
     ALIIMG: 'https://xatree-1.oss-cn-qingdao.aliyuncs.com',
-    // 静态文件存储服务IP
-    STATIC_FILE_IP: 'http://39.105.221.187',
-    // 静态文件存储服务预览端口
-    STATIC_PREVIEW_PORT: '6510',
-    // 静态文件存储服务上传端口
-    STATIC_UPLOAD_PORT: '6511',
-    // 静态文件存储服务下载端口
-    STATIC_DOWNLOAD_PORT: '6512',
 
     // word在线预览地址
     previewWord_API: 'http://docs.ecidi.com:6500/view/url?url=',

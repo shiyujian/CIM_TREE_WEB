@@ -39,13 +39,6 @@ export const tree_menus = [
         icon: <Icon name='cubes' />
     },
     {
-        key: 'datum',
-        id: 'DATUM',
-        title: '资料管理',
-        path: '/datum/standard',
-        icon: <Icon name='book' />
-    },
-    {
         key: 'schedule',
         id: 'SCHEDULE',
         title: '进度管理',

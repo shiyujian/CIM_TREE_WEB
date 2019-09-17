@@ -8,7 +8,6 @@ import { DatePicker, Row, Col, Button, Table } from 'antd';
 import { IN_OFF_DUTY_API } from '_platform/api';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import '../../Datum/components/Datum/index.less';
 
 // moment.locale('zh-cn');
 let on_off_duty = IN_OFF_DUTY_API.split('--');
