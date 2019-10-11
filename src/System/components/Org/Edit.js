@@ -342,14 +342,23 @@ class Addition extends Component {
                                                 <Option key={'非公司'} value={'非公司'}>
                                                     非公司
                                                 </Option>
-                                                <Option key={'业主单位'} value={'业主单位'}>
-                                                    业主单位
-                                                </Option>
                                                 <Option key={'施工单位'} value={'施工单位'}>
                                                     施工单位
                                                 </Option>
                                                 <Option key={'监理单位'} value={'监理单位'}>
                                                     监理单位
+                                                </Option>
+                                                <Option key={'业主单位'} value={'业主单位'}>
+                                                    业主单位
+                                                </Option>
+                                                <Option key={'设计单位'} value={'设计单位'}>
+                                                    设计单位
+                                                </Option>
+                                                <Option key={'造价单位'} value={'造价单位'}>
+                                                    造价单位
+                                                </Option>
+                                                <Option key={'养护单位'} value={'养护单位'}>
+                                                    养护单位
                                                 </Option>
                                             </Select>
                                         )}

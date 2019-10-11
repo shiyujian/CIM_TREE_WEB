@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-09-17 10:21:26
+ * @Last Modified time: 2019-10-11 11:16:03
  */
 /**
  *
@@ -107,7 +107,12 @@ export const WORKFLOW_CODE = {
 };
 
 export const ORGTYPE = [
-    '业主单位', '施工单位', '监理单位', '养护单位'
+    '业主单位',
+    '施工单位',
+    '监理单位',
+    '设计单位',
+    '造价单位',
+    '养护单位'
 ];
 // 当前执行的项目
 export const DEFAULT_PROJECT = 'P191';
