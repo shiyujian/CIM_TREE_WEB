@@ -317,7 +317,7 @@ class Users extends Component {
             if (userRoles.RoleName === '施工文书') {
                 isClericalStaff = true;
             }
-            if (isClericalStaff && (node.topParent === '苗圃基地' || node.topParent === '供应商')) {
+            if (isClericalStaff && node.NurseryName) {
                 return true;
             }
             if (user.username === 'admin') {

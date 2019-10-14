@@ -200,8 +200,7 @@ export default class Tree extends Component {
             let selectOrgData = JSON.parse(eventKey);
             if (selectOrgData && selectOrgData.ID) {
                 const user = getUser();
-                let topProject = Tree.loop(orgTreeArrList, selectOrgData.ID);
-                if (this.compare(user, topProject, selectOrgData.ID)) {
+                if (this.compare(user, selectOrgData, selectOrgData.ID)) {
                     await changeSidebarField('node', selectOrgData);
                     let orgID = '';
                     if (selectOrgData && selectOrgData.OrgPK) {
@@ -227,13 +226,13 @@ export default class Tree extends Component {
         }
     }
     // 判断点击的点  用户是否有权限查看
-    compare (user, topProject, eventKey) {
+    compare (user, selectOrgData, eventKey) {
         let userRoles = user.roles || '';
         let isClericalStaff = false;
         if (userRoles.RoleName === '施工文书') {
             isClericalStaff = true;
         }
-        if (isClericalStaff && (topProject.topParent === '苗圃基地' || topProject.topParent === '供应商')) {
+        if (isClericalStaff && selectOrgData.NurseryName) {
             return true;
         }
         if (user.username === 'admin') {
@@ -247,29 +246,6 @@ export default class Tree extends Component {
         });
         return status;
     }
-    static loop = (list, ID, loopTimes = 0, topParent) => {
-        let rst = null;
-        list.forEach((item = {}) => {
-            if (loopTimes === 0) {
-                topParent = item.name;
-            }
-            const {
-                ID: value,
-                children = []
-            } = item;
-            if (value === ID) {
-                rst = item;
-                rst.topParent = topParent;
-            } else {
-                const tmp = Tree.loop(children, ID, loopTimes + 1, topParent);
-                if (tmp) {
-                    rst = tmp;
-                    rst.topParent = topParent;
-                }
-            }
-        });
-        return rst;
-    };
 
     // 设置登录用户所在公司的所有部门作为选项数组,用来判断用户点击的部门是否是自己所在的公司下的部门
     orgArrLoop (data = [], loopTimes = 0) {
