@@ -132,10 +132,10 @@ export default class Header extends Component {
                 icon: <Icon name='tree' />
             },
             {
-                key: 'curing',
-                id: 'CURING',
+                key: 'conservation',
+                id: 'CONSERVATION',
                 title: '养护管理',
-                path: '/curing/taskcreate',
+                path: '/conservation/taskcreate',
                 icon: <Icon name='map' />
             },
             // {
@@ -160,10 +160,10 @@ export default class Header extends Component {
                 icon: <Icon name='user' />
             },
             {
-                key: 'system',
-                id: 'SYSTEM',
+                key: 'setup',
+                id: 'SETUP',
                 title: '系统设置',
-                path: '/system/person',
+                path: '/setup/person',
                 icon: <Icon name='cogs' />
             },
             {

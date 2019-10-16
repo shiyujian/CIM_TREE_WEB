@@ -1,4 +1,3 @@
-export docFactory from './doc';
 export orgFactory from './org';
 export rolesFactory from './roles';
 export taskFactory from './task';

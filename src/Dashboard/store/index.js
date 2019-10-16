@@ -2,43 +2,45 @@ import { createAction, handleActions } from 'redux-actions';
 import createFetchAction from 'fetch-action';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import {
-    FOREST_API,
+    ADOPT_API,
     LBSAMAP_API,
     TREEPIPE_API,
-    SYSTEM_API
+    SYSTEM_API,
+    TREE_API,
+    CURING_API
 } from '_platform/api';
 const ID = 'dashboard';
 // 获取隐患列表
-export const getRisk = forestFetchAction(`${FOREST_API}/tree/patrolevents`, []);
+export const getRisk = forestFetchAction(`${TREE_API}/patrolevents`, []);
 // 获取隐患详情
-export const getRiskContactSheet = forestFetchAction(`${FOREST_API}/tree/patrolevent/{{ID}}`, []);
+export const getRiskContactSheet = forestFetchAction(`${TREE_API}/patrolevent/{{ID}}`, []);
 // 获取巡检路线
-export const getInspectRouter = forestFetchAction(`${FOREST_API}/tree/patrolroutes`, [], 'GET');
+export const getInspectRouter = forestFetchAction(`${TREE_API}/patrolroutes`, [], 'GET');
 // 获取轨迹列表
-export const getMapList = forestFetchAction(`${FOREST_API}/tree/patrolpositions?routeid={{routeID}}`, []);
+export const getMapList = forestFetchAction(`${TREE_API}/patrolpositions?routeid={{routeID}}`, []);
 // 获取种植流程
-export const getTreeflows = forestFetchAction(`${FOREST_API}/tree/treeflows`, []);
+export const getTreeflows = forestFetchAction(`${TREE_API}/treeflows`, []);
 // 获取苗圃信息
-export const getNurserys = forestFetchAction(`${FOREST_API}/tree/nurserys`, []);
+export const getNurserys = forestFetchAction(`${TREE_API}/nurserys`, []);
 // 获取打包车辆信息
-export const getCarpackbysxm = forestFetchAction(`${FOREST_API}/tree/carpackbysxm/{{sxm}}`, []);
+export const getCarpackbysxm = forestFetchAction(`${TREE_API}/carpackbysxm/{{sxm}}`, []);
 // 获取树木现场种植的信息
-export const getTreeMess = forestFetchAction(`${FOREST_API}/tree/tree/{{sxm}}`, []);
+export const getTreeMess = forestFetchAction(`${TREE_API}/tree/{{sxm}}`, []);
 // 获取树的树种类型
-export const getTreeTypeAction = forestFetchAction(`${FOREST_API}/tree/treetypes`, []);
+export const getTreeTypeAction = forestFetchAction(`${TREE_API}/treetypes`, []);
 // 苗木养护查询
-export const getCuring = forestFetchAction(`${FOREST_API}/curing/curings`, [], 'GET');
+export const getCuring = forestFetchAction(`${CURING_API}/curings`, [], 'GET');
 export const getAdoptTreeOk = createAction(`${ID}苗木结缘树`);
 // 获取领养树的全部数据
-export const getAdoptTreeData = forestFetchAction(`${FOREST_API}/adopt/adopttrees`, [getAdoptTreeOk], 'GET');
+export const getAdoptTreeData = forestFetchAction(`${ADOPT_API}/adopttrees`, [getAdoptTreeOk], 'GET');
 // 根据领养人名称获取领养树
-export const getAdoptTreeByAdopter = forestFetchAction(`${FOREST_API}/adopt/adopttrees?aadopter={{aadopter}}`, [], 'GET');
+export const getAdoptTreeByAdopter = forestFetchAction(`${ADOPT_API}/adopttrees?aadopter={{aadopter}}`, [], 'GET');
 // 获取树木定位信息
-export const getTreeLocationCoord = forestFetchAction(`${FOREST_API}/tree/locationcoord?sxm={{sxm}}`, [], 'GET');
+export const getTreeLocationCoord = forestFetchAction(`${TREE_API}/locationcoord?sxm={{sxm}}`, [], 'GET');
 // 苗木定位位置地理坐标系查询
-export const getTreeLocation = forestFetchAction(`${FOREST_API}/tree/treelocations?sxm={{sxm}}&crs=4326`, [], 'GET');
+export const getTreeLocation = forestFetchAction(`${TREE_API}/treelocations?sxm={{sxm}}&crs=4326`, [], 'GET');
 // 获取苗木结缘信息
-export const getAdoptTrees = forestFetchAction(`${FOREST_API}/adopt/adopttrees`, [], 'GET');
+export const getAdoptTrees = forestFetchAction(`${ADOPT_API}/adopttrees`, [], 'GET');
 // 根据坐标获取地址信息
 export const getLocationNameByCoordinate = createFetchAction(`${LBSAMAP_API}/v3/geocode/regeo`, [], 'GET');
 // 灌溉官网查询数据

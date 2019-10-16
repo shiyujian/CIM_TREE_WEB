@@ -1,21 +1,24 @@
 import {createAction, handleActions} from 'redux-actions';
-import {FOREST_API} from '_platform/api';
+import {
+    UPLOAD_API,
+    SYSTEM_API
+} from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import {createFetchActionWithHeaders as myFetch} from './myfetchAction';
 
 export const ID = 'nurserymanagement';
 export const getNurseryListOK = createAction(`${ID}_getNurseryList`);
-export const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybases`, [getNurseryListOK]); // 获取苗圃列表
-export const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers`); // 获取供应商列表
-export const getNb2ss = forestFetchAction(`${FOREST_API}/system/nb2ss`); // 获取苗圃基地供应商的绑定关系
-export const checknb2s = forestFetchAction(`${FOREST_API}/system/checknb2s`, [], 'POST'); // 苗圃基地供应商的绑定审核
-export const putSupplier = forestFetchAction(`${FOREST_API}/system/supplier`, [], 'PUT'); // 编辑供应商
-export const postNb22s = forestFetchAction(`${FOREST_API}/system/nb2s`, [], 'POST'); // 新增绑定关系
-export const deleteNb22s = forestFetchAction(`${FOREST_API}/system/nb2s/{{ID}}`, [], 'DELETE'); // 删除绑定
+export const getNurseryList = forestFetchAction(`${SYSTEM_API}/nurserybases`, [getNurseryListOK]); // 获取苗圃列表
+export const getSupplierList = forestFetchAction(`${SYSTEM_API}/suppliers`); // 获取供应商列表
+export const getNb2ss = forestFetchAction(`${SYSTEM_API}/nb2ss`); // 获取苗圃基地供应商的绑定关系
+export const checknb2s = forestFetchAction(`${SYSTEM_API}/checknb2s`, [], 'POST'); // 苗圃基地供应商的绑定审核
+export const putSupplier = forestFetchAction(`${SYSTEM_API}/supplier`, [], 'PUT'); // 编辑供应商
+export const postNb22s = forestFetchAction(`${SYSTEM_API}/nb2s`, [], 'POST'); // 新增绑定关系
+export const deleteNb22s = forestFetchAction(`${SYSTEM_API}/nb2s/{{ID}}`, [], 'DELETE'); // 删除绑定
 
-export const getRegionCodes = forestFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
+export const getRegionCodes = forestFetchAction(`${SYSTEM_API}/regioncodes`); // 获取行政区划编码
 export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
-export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=org`, [], 'POST');
+export const postUploadImage = myFetch(`${UPLOAD_API}?filetype=org`, [], 'POST');
 
 export const actions = {
     getNurseryListOK,

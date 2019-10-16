@@ -14,7 +14,7 @@ import {
     Spin
 } from 'antd';
 import { checkTel, isCardNo, layoutT } from '../common';
-import { FOREST_API } from '_platform/api';
+import { UPLOAD_API } from '_platform/api';
 import { getForestImgUrl, getUser } from '_platform/auth';
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -333,7 +333,7 @@ class Edit extends Component {
         } = this.props;
 
         const props = {
-            action: `${FOREST_API}/UploadHandler.ashx?filetype=org`,
+            action: `${UPLOAD_API}?filetype=org`,
             listType: 'picture',
             fileList: fileList,
             beforeUpload: (file, fileList) => {
@@ -360,7 +360,7 @@ class Edit extends Component {
             }
         };
         const propsBack = {
-            action: `${FOREST_API}/UploadHandler.ashx?filetype=org`,
+            action: `${UPLOAD_API}?filetype=org`,
             listType: 'picture',
             fileList: fileListBack,
             beforeUpload: (file, fileList) => {

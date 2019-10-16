@@ -1,57 +1,57 @@
 import { createAction, handleActions } from 'redux-actions';
-import { FOREST_API } from '_platform/api';
+import { TREE_API } from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
 const ID = 'ENTRY';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
 export const gettreetype = forestFetchAction(
-    `${FOREST_API}/tree/nurserystat?`,
+    `${TREE_API}/nurserystat?`,
     []
 );
 export const gettreeevery = forestFetchAction(
-    `${FOREST_API}/tree/treetypes`,
+    `${TREE_API}/treetypes`,
     []
 );
 export const nowmessage = forestFetchAction(
-    `${FOREST_API}/tree/queryTree?page=1&size=5`,
+    `${TREE_API}/queryTree?page=1&size=5`,
     []
 );
 
 export const getTotalSat = forestFetchAction(
-    `${FOREST_API}/tree/totalstat`,
+    `${TREE_API}/totalstat`,
     []
 );
 export const gettreetypeAll = forestFetchAction(
-    `${FOREST_API}/tree/treestat`,
+    `${TREE_API}/treestat`,
     []
 );
 export const gettreetypeSection = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=Section`,
+    `${TREE_API}/treestatbyspecfield?stattype=Section`,
     []
 );
 export const gettreetypeSmallClass = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`,
+    `${TREE_API}/treestatbyspecfield?stattype=SmallClass`,
     []
 );
 export const gettreetypeThinClass = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass`,
+    `${TREE_API}/treestatbyspecfield?stattype=ThinClass`,
     []
 );
 export const getSmallClassList = forestFetchAction(
-    `${FOREST_API}/tree/wpunit4apps?parent={{no}}`,
+    `${TREE_API}/wpunit4apps?parent={{no}}`,
     []
 );
 
 export const progressdata = forestFetchAction(
-    `${FOREST_API}/tree/progressstat?`,
+    `${TREE_API}/progressstat?`,
     []
 );
 export const progressalldata = forestFetchAction(
-    `${FOREST_API}/tree/progresss?`,
+    `${TREE_API}/progresss?`,
     []
 );
 export const progressstat4pie = forestFetchAction(
-    `${FOREST_API}/tree/progressstat4pie?`,
+    `${TREE_API}/progressstat4pie?`,
     []
 );
 

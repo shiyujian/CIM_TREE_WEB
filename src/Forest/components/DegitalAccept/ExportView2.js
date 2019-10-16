@@ -6,7 +6,7 @@ import {
     WMSTILELAYERURL,
     TILEURLS,
     INITLEAFLET_API,
-    FOREST_API
+    DOCEXPORT_API
 } from '_platform/api';
 import {
     fillAreaColor,
@@ -200,7 +200,7 @@ export default class ExportView1 extends Component {
             let data = await postMapImage({}, postData);
             console.log('data', data);
             if (data && data.indexOf('png') !== -1) {
-                let downloadUrl = `${FOREST_API}/DocExport.ashx?action=acceptance&acceptancedetailid=${detail.ID}&mapimage=${data}`;
+                let downloadUrl = `${DOCEXPORT_API}?action=acceptance&acceptancedetailid=${detail.ID}&mapimage=${data}`;
                 await this.createLink(this, downloadUrl);
                 this.props.onPressOk();
             } else {

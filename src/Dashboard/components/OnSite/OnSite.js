@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-19 09:21:01
+ * @Last Modified time: 2019-10-16 10:50:24
  */
 import React, { Component } from 'react';
 import {
@@ -23,7 +23,7 @@ import TrackTree from './Track/TrackTree';
 import TreeTypeTree from './TreeType/TreeTypeTree';
 import OnSiteAreaTree from './OnSiteAreaTree';
 import TreeMessGisOnClickHandle from './TreeMess/TreeMessGisOnClickHandle';
-import CuringTaskTree from './Curing/CuringTaskTree';
+import CuringTaskTree from './Conservation/CuringTaskTree';
 import SurvivalRateTree from './SurvivalRate/SurvivalRateTree';
 import TreeAdoptTree from './Adopt/TreeAdoptTree';
 import GetMenuTree from './GetMenuTree';

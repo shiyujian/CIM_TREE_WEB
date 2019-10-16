@@ -5,7 +5,6 @@ import treeReducer, * as treeActions from './tree';
 
 import { handleActions, combineActions } from 'redux-actions';
 import {
-    docFactory,
     taskFactory,
     tasksFactory,
     usersFactory,
@@ -16,7 +15,6 @@ import {
 import { actionsMap } from '../util';
 
 const ID = 'SINGLETON';
-const docReducer = docFactory(ID);
 const orgReducer = orgFactory(ID);
 const rolesReducer = rolesFactory(ID);
 const taskReducer = taskFactory(ID);
@@ -27,7 +25,6 @@ export const actions = {
     ...asideActions,
     ...previewActions,
     ...tabsActions,
-    ...docReducer,
     ...taskReducer,
     ...tasksReducer,
     ...usersReducer,
@@ -63,10 +60,6 @@ export default handleActions(
         [combineActions(...actionsMap(tasksReducer))]: (state, action) => ({
             ...state,
             tasks: tasksReducer(state.tasks, action)
-        }),
-        [combineActions(...actionsMap(docReducer))]: (state, action) => ({
-            ...state,
-            doc: docReducer(state.doc, action)
         }),
         [combineActions(...actionsMap(usersReducer))]: (state, action) => ({
             ...state,

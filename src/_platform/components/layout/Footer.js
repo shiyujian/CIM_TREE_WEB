@@ -27,6 +27,6 @@ export default class Footer extends Component {
         );
     }
 
-	static ignoreModules = ['login', 'curing', 'dashboard', 'checkwork', 'dipping'];
+	static ignoreModules = ['login', 'conservation', 'dashboard', 'checkwork', 'dipping'];
 	// static ignoreModules = ['login', 'dashboard'];
 }

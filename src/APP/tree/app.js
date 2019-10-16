@@ -24,13 +24,12 @@ export default class App extends Component {
         const { default: Login } = await import('../../LoginQH');
         const { default: Dashboard } = await import('../../Dashboard');
         const { default: Forest } = await import('../../Forest');
-        const { default: Curing } = await import('../../Curing');
+        const { default: Conservation } = await import('../../Conservation');
         const { default: Overall } = await import('../../Overall');
         const { default: Schedule } = await import('../../Schedule');
-        const { default: System } = await import('../../System');
+        const { default: Setup } = await import('../../Setup');
         const { default: Selfcare } = await import('../../Selfcare');
         const { default: Project } = await import('../../Project');
-        // const { default: Market } = await import('../../Market');
         const { default: Checkwork } = await import('../../Checkwork');
         const { default: Dipping } = await import('../../Dipping');
 
@@ -39,13 +38,12 @@ export default class App extends Component {
             Login,
             Dashboard,
             Forest,
-            Curing,
+            Conservation,
             Overall,
             Schedule,
             Selfcare,
-            System,
+            Setup,
             Project,
-            // Market,
             Checkwork,
             Dipping
         });
@@ -57,13 +55,12 @@ export default class App extends Component {
             Login,
             Dashboard,
             Forest,
-            Curing,
+            Conservation,
             Overall,
             Schedule,
             Selfcare,
-            System,
+            Setup,
             Project,
-            // Market,
             Checkwork,
             Dipping
         } =
@@ -81,7 +78,7 @@ export default class App extends Component {
                             <Route path='/dashboard' component={Dashboard} />
                         )}
                         {Forest && <Route path='/forest' component={Forest} />}
-                        {Curing && <Route path='/curing' component={Curing} />}
+                        {Conservation && <Route path='/conservation' component={Conservation} />}
                         {Overall && (
                             <Route path='/overall' component={Overall} />
                         )}
@@ -91,13 +88,10 @@ export default class App extends Component {
                         {Selfcare && (
                             <Route path='/selfcare' component={Selfcare} />
                         )}
-                        {System && <Route path='/system' component={System} />}
+                        {Setup && <Route path='/setup' component={Setup} />}
                         {Project && (
                             <Route path='/project' component={Project} />
                         )}
-                        {/* {Market && (
-                            <Route path='/market' component={Market} />
-                        )} */}
                         {Checkwork && (
                             <Route path='/checkwork' component={Checkwork} />
                         )}

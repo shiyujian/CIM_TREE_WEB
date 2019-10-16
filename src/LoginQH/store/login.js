@@ -1,15 +1,19 @@
 import {createAction, handleActions} from 'redux-actions';
 import createFetchAction from 'fetch-action';
-import {WORKFLOW_API, FOREST_API} from '_platform/api';
+import {
+    WORKFLOW_API,
+    VALIDATE_API,
+    SYSTEM_API
+} from '_platform/api';
 
 // 忘记密码 找回密码
 const forgectOK = createAction('发送成功');
 
 const getTasks = createFetchAction(`${WORKFLOW_API}/participant-task/`);
 
-const loginForest = createFetchAction(`${FOREST_API}/system/login`, [], 'GET');
+const loginForest = createFetchAction(`${SYSTEM_API}/login`, [], 'GET');
 
-const getSecurityCode = createFetchAction(`${FOREST_API}/ValidateHandler.ashx`, [], 'GET');
+const getSecurityCode = createFetchAction(`${VALIDATE_API}`, [], 'GET');
 
 export const actions = {
     forgectOK,

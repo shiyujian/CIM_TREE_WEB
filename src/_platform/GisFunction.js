@@ -1,4 +1,3 @@
-import './Curing.less';
 
 // 获取项目的小班
 export const getSmallClass = (smallClassList) => {

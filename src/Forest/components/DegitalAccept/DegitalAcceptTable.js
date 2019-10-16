@@ -13,7 +13,7 @@ import {
     Divider
 } from 'antd';
 import {
-    FOREST_API
+    DOCEXPORT_API
 } from '_platform/api';
 import moment from 'moment';
 import WordView1 from './WordView1';
@@ -830,7 +830,7 @@ export default class DegitalAcceptTable extends Component {
                     }
                 } else if (checktype === 10) {
                     let ID = record.ID;
-                    let downloadUrl = `${FOREST_API}/DocExport.ashx?action=areaacceptance&id=${ID}`;
+                    let downloadUrl = `${DOCEXPORT_API}?action=areaacceptance&id=${ID}`;
                     await this.createLink(this, downloadUrl);
                 } else {
                     const postdata = {
@@ -845,7 +845,7 @@ export default class DegitalAcceptTable extends Component {
                             console.log('detailList', detailList);
                             for (let i = 0; i < detailList.length; i++) {
                                 let detail = detailList[i];
-                                let downloadUrl = `${FOREST_API}/DocExport.ashx?action=acceptance&acceptancedetailid=${detail.ID}`;
+                                let downloadUrl = `${DOCEXPORT_API}?action=acceptance&acceptancedetailid=${detail.ID}`;
                                 await this.createLink(this, downloadUrl);
                             }
                         } else {

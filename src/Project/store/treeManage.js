@@ -1,18 +1,21 @@
 import {createAction, handleActions} from 'redux-actions';
-import {FOREST_API} from '_platform/api';
+import {
+    UPLOAD_API,
+    TREE_API
+} from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import { createFetchActionWithHeaders as myFetch } from './fetchAction';
 
 export const ID = 'treemanage';
 export const getTreeTypeListOK = createAction(`${ID}_gettreeTypeListlist`);
-export const getTreeTypeList = forestFetchAction(`${FOREST_API}/tree/treetypes`, [getTreeTypeListOK]);
-export const postTreeType = forestFetchAction(`${FOREST_API}/tree/treetype`, [], 'POST');
-export const putTreeType = forestFetchAction(`${FOREST_API}/tree/treetype`, [], 'PUT');
-export const deleteTreeType = forestFetchAction(`${FOREST_API}/tree/treetype/{{ID}}`, [], 'DELETE');
+export const getTreeTypeList = forestFetchAction(`${TREE_API}/treetypes`, [getTreeTypeListOK]);
+export const postTreeType = forestFetchAction(`${TREE_API}/treetype`, [], 'POST');
+export const putTreeType = forestFetchAction(`${TREE_API}/treetype`, [], 'PUT');
+export const deleteTreeType = forestFetchAction(`${TREE_API}/treetype/{{ID}}`, [], 'DELETE');
 export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
 export const changeViewVisible = createAction(`${ID}changeViewVisible`);
 export const postForsetPic = myFetch(
-    `${FOREST_API}/UploadHandler.ashx?filetype=treetype`,
+    `${UPLOAD_API}?filetype=treetype`,
     [],
     'POST'
 );

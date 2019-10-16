@@ -51,21 +51,13 @@ class Flow extends Component {
     }
 
     getWorkflowAPI () {
-        // let system = JSON.parse(window.localStorage.getItem('USER_DATA'));
-        //       let Workflow_API = '';
-        //       const System_API = API_CONFIG.Workflow_API;
-        //       for(var i=0;i<System_API.length;i++){
-        //           if(system.system === System_API[i].name){
-        //               Workflow_API = System_API[i].value;
-        //           }
-        //       }
         console.log('接口IP', base);
         return base;
     }
 
     getList () {
         console.log(base);
-        const { getflowList }  = this.props.flowActions;
+        const { getflowList } = this.props.flowActions;
         getflowList({
             Workflow_API: base
         }).then(rep => {
@@ -89,7 +81,6 @@ class Flow extends Component {
                 message.info('获取流程列表失败');
             }
         });
-
 
         // const { getTemplate } = this.props.flowActions;
 

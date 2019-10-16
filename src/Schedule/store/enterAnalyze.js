@@ -1,24 +1,24 @@
 import { createAction, handleActions } from 'redux-actions';
-import { FOREST_API } from '_platform/api';
+import { TREE_API } from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
 const ID = 'ENTERANALYZE';
 
 export const setkeycode = createAction(`${ID}_setkeycode`);
 export const gettreetype = forestFetchAction(
-    `${FOREST_API}/tree/nurserystat?`,
+    `${TREE_API}/nurserystat?`,
     []
 );
 export const gettreeevery = forestFetchAction(
-    `${FOREST_API}/tree/treetypes`,
+    `${TREE_API}/treetypes`,
     []
 );
 export const nowmessage = forestFetchAction(
-    `${FOREST_API}/tree/queryTree?page=1&size=5`,
+    `${TREE_API}/queryTree?page=1&size=5`,
     []
 );
 
 export const getTotalSat = forestFetchAction(
-    `${FOREST_API}/tree/totalstat`,
+    `${TREE_API}/totalstat`,
     []
 );
 

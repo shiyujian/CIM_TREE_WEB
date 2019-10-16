@@ -8,9 +8,14 @@ import {
     createFetchActionWithHeaders as myFetch
 } from './fetchAction';
 import {
-    FOREST_API,
+    UPLOAD_API,
     TENCENTANALYSIS_API,
-    SYSTEM_API
+    SYSTEM_API,
+    TREE_API,
+    TREES_API,
+    ROUTE_API,
+    DB_API,
+    DOCEXPORT_API
 } from '_platform/api';
 import {
     forestFetchAction
@@ -25,243 +30,243 @@ export const clearList = createAction(`${ID}清空列表`);
 export const nurseryName = createAction(`${ID}供应商名字`);
 const getTreeListOK = createAction('获取森林树种列表');
 
-export const getTree = forestFetchAction(`${FOREST_API}/tree/wpunits`, [
+export const getTree = forestFetchAction(`${TREE_API}/wpunits`, [
     getTreeOK
 ]); //    √
-export const getNurseryBackstat = forestFetchAction(`${FOREST_API}/tree/nurserybackstat?`); // 苗木整车退苗分析
-export const getCarpackstat = forestFetchAction(`${FOREST_API}/tree/carpackstat?`); // 车辆包大数据统计
-export const getCarinstat = forestFetchAction(`${FOREST_API}/tree/carinstat?`, []); // 车辆进场分析
-export const getCarbackstat = forestFetchAction(`${FOREST_API}/tree/carbackstat?`); // 车辆包退苗分析
-export const getNurseryinstat = forestFetchAction(`${FOREST_API}/tree/nurseryinstat?`); // 苗木进场分析
-export const getNurserybackstat = forestFetchAction(`${FOREST_API}/tree/nurserybackstat?`); // 苗木退苗分析
-export const getNurserytotal = forestFetchAction(`${FOREST_API}/tree/nurserytotal?`); // 苗木进场出圃统计
-export const getLocationtotalstat = forestFetchAction(`${FOREST_API}/tree/locationtotalstat?`); // 苗木定位总统计
+export const getNurseryBackstat = forestFetchAction(`${TREE_API}/nurserybackstat?`); // 苗木整车退苗分析
+export const getCarpackstat = forestFetchAction(`${TREE_API}/carpackstat?`); // 车辆包大数据统计
+export const getCarinstat = forestFetchAction(`${TREE_API}/carinstat?`, []); // 车辆进场分析
+export const getCarbackstat = forestFetchAction(`${TREE_API}/carbackstat?`); // 车辆包退苗分析
+export const getNurseryinstat = forestFetchAction(`${TREE_API}/nurseryinstat?`); // 苗木进场分析
+export const getNurserybackstat = forestFetchAction(`${TREE_API}/nurserybackstat?`); // 苗木退苗分析
+export const getNurserytotal = forestFetchAction(`${TREE_API}/nurserytotal?`); // 苗木进场出圃统计
+export const getLocationtotalstat = forestFetchAction(`${TREE_API}/locationtotalstat?`); // 苗木定位总统计
 export const getCountSection = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=Section`,
+    `${TREE_API}/treestatbyspecfield?stattype=Section`,
     []
 ); // 获取各标段种植数量
 
 export const getCountSmall = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=SmallClass`,
+    `${TREE_API}/treestatbyspecfield?stattype=SmallClass`,
     []
 ); // 获取各小班种植数量
 export const getCountThin = forestFetchAction(
-    `${FOREST_API}/tree/treestatbyspecfield?stattype=ThinClass`,
+    `${TREE_API}/treestatbyspecfield?stattype=ThinClass`,
     []
 ); // 获取各细班种植数量
 export const getTreeevery = forestFetchAction(
-    `${FOREST_API}/tree/treetypes`,
+    `${TREE_API}/treetypes`,
     []
 );
 export const gettreetype = forestFetchAction(
-    `${FOREST_API}/tree/treetypesbyno`,
+    `${TREE_API}/treetypesbyno`,
     []
 );
 export const getfactoryAnalyse = forestFetchAction(
-    `${FOREST_API}/tree/factoryAnalyse`,
+    `${TREE_API}/factoryAnalyse`,
     []
 );
-export const getnurserys = forestFetchAction(`${FOREST_API}/tree/nurserys`, []);
+export const getnurserys = forestFetchAction(`${TREE_API}/nurserys`, []);
 export const getNurserysTree = forestFetchAction(
-    `${FOREST_API}/tree/treenurserys`,
+    `${TREE_API}/treenurserys`,
     []
 );
 export const getqueryTree = forestFetchAction(
-    `${FOREST_API}/tree/queryTree`,
+    `${TREE_API}/queryTree`,
     []
 );
-export const getTreeList = forestFetchAction(`${FOREST_API}/tree/treetypes`, [
+export const getTreeList = forestFetchAction(`${TREE_API}/treetypes`, [
     getTreeListOK
 ]);
 export const getexportFactoryAnalyseInfo = forestFetchAction(
-    `${FOREST_API}/tree/exportFactoryAnalyseInfo`,
+    `${TREE_API}/exportFactoryAnalyseInfo`,
     []
 );
 export const getexportFactoryAnalyseDetailInfo = forestFetchAction(
-    `${FOREST_API}/tree/exportFactoryAnalyseDetailInfo`,
+    `${TREE_API}/exportFactoryAnalyseDetailInfo`,
     []
 );
 export const getexportFactoryAnalyse = forestFetchAction(
-    `${FOREST_API}/tree/exportFactoryAnalyse`,
+    `${TREE_API}/exportFactoryAnalyse`,
     []
 );
 export const getexportTree4Checker = forestFetchAction(
-    `${FOREST_API}/tree/exportTree4Checker`,
+    `${TREE_API}/exportTree4Checker`,
     []
 );
 export const getexportTree4Supervisor = forestFetchAction(
-    `${FOREST_API}/tree/exportTree4Supervisor`,
+    `${TREE_API}/exportTree4Supervisor`,
     []
 );
 export const getexportTree = forestFetchAction(
-    `${FOREST_API}/tree/exportTree`,
+    `${TREE_API}/exportTree`,
     []
 );
 export const getexportNurserys = forestFetchAction(
-    `${FOREST_API}/tree/exportNurserys`,
+    `${TREE_API}/exportNurserys`,
     []
 );
 export const getexportTreeNurserys = forestFetchAction(
-    `${FOREST_API}/tree/exportTreeNurserys`,
+    `${TREE_API}/exportTreeNurserys`,
     []
 );
 
 export const getNurserysCount = forestFetchAction(
-    `${FOREST_API}/tree/nurserys/count/`,
+    `${TREE_API}/nurserys/count/`,
     []
 );
 export const getNurserysCountFast = forestFetchAction(
-    `${FOREST_API}/tree/nurserys/count/fast/`,
+    `${TREE_API}/nurserys/count/fast/`,
     []
 );
 export const getNurserysProgress = forestFetchAction(
-    `${FOREST_API}/tree/nurserys/progress/`,
+    `${TREE_API}/nurserys/progress/`,
     []
 );
 export const getTotalSat = forestFetchAction(
-    `${FOREST_API}/tree/totalstat`,
+    `${TREE_API}/totalstat`,
     []
 );
-export const getquality = forestFetchAction(`${FOREST_API}/trees/quality/`, []);
-export const getreturn = forestFetchAction(`${FOREST_API}/trees/return/`, []);
+export const getquality = forestFetchAction(`${TREES_API}/quality/`, []);
+export const getreturn = forestFetchAction(`${TREES_API}/return/`, []);
 export const getreturnowner = forestFetchAction(
-    `${FOREST_API}/trees/return/owner/`,
+    `${TREES_API}/return/owner/`,
     []
 );
 export const getreturnsupervision = forestFetchAction(
-    `${FOREST_API}/trees/return/supervision/`,
+    `${TREES_API}/return/supervision/`,
     []
 );
-export const getCount = forestFetchAction(`${FOREST_API}/tree/treestat`, []);
+export const getCount = forestFetchAction(`${TREE_API}/treestat`, []);
 export const getTreesProgress = forestFetchAction(
-    `${FOREST_API}/trees/progress/`,
+    `${TREES_API}/progress/`,
     []
 );
 export const getSmallClassList = forestFetchAction(
-    `${FOREST_API}/tree/wpunit4apps?parent={{no}}`,
+    `${TREE_API}/wpunit4apps?parent={{no}}`,
     []
 );
 
-export const getHonesty = forestFetchAction(`${FOREST_API}/trees/honesty/`, []);
+export const getHonesty = forestFetchAction(`${TREES_API}/honesty/`, []);
 export const getHonestyNursery = forestFetchAction(
-    `${FOREST_API}/trees/honesty/nursery/`,
+    `${TREES_API}/honesty/nursery/`,
     []
 );
 export const getHonestyNew = forestFetchAction(
-    `${FOREST_API}/tree/factoryAnalyseInfo`,
+    `${TREE_API}/factoryAnalyseInfo`,
     []
 );
 export const getHonestyNewSort = forestFetchAction(
-    `${FOREST_API}/trees/honesty/new/fast/?sort=true`,
+    `${TREES_API}/honesty/new/fast/?sort=true`,
     []
 );
 export const postFile = forestFetchAction(
-    `${FOREST_API}/db/import_location/`,
+    `${DB_API}/import_location/`,
     [],
     'POST'
 );
 export const getHonestyNewDetail = forestFetchAction(
-    `${FOREST_API}/tree/factoryAnalyseDetailInfo?factory={{name}}`,
+    `${TREE_API}/factoryAnalyseDetailInfo?factory={{name}}`,
     [getHonestyNewDetailOk],
     'GET'
 );
 export const getHonestyNewDetailModal = forestFetchAction(
-    `${FOREST_API}/trees/honesty/new/?detail=true`,
+    `${TREES_API}/honesty/new/?detail=true`,
     []
 );
 export const getHonestyNewTreetype = forestFetchAction(
-    `${FOREST_API}/tree/factoryanalysebytreetype`,
+    `${TREE_API}/factoryanalysebytreetype`,
     ''
 );
 export const postPositionData = forestFetchAction(
-    `${FOREST_API}/tree/importLocations?user={{id}}`,
+    `${TREE_API}/importLocations?user={{id}}`,
     [],
     'POST'
 ); //    √
 export const getcarpackage = forestFetchAction(
-    `${FOREST_API}/tree/carpacks`,
+    `${TREE_API}/carpacks`,
     []
 );
 export const getexportcarpackage = forestFetchAction(
-    `${FOREST_API}/tree/exportcarpacks`,
+    `${TREE_API}/exportcarpacks`,
     []
 );
 export const getNurserysByPack = forestFetchAction(
-    `${FOREST_API}/tree/nurserysbypack`,
+    `${TREE_API}/nurserysbypack`,
     []
 );
 export const getTreeLocations = forestFetchAction(
-    `${FOREST_API}/tree/treelocations`,
+    `${TREE_API}/treelocations`,
     []
 ); // 获取同步后的苗木定位列表
 export const getExportTreeLocations = forestFetchAction(
-    `${FOREST_API}/tree/exporttreelocations`,
+    `${TREE_API}/exporttreelocations`,
     []
 ); // 导出同步后的苗木定位列表
 
 export const getSeedlingInfo = forestFetchAction(
-    `${FOREST_API}/tree/remarktree?remark={{remark}}&pics={{pics}}&sxm={{sxm}}`,
+    `${TREE_API}/remarktree?remark={{remark}}&pics={{pics}}&sxm={{sxm}}`,
     []
 ); // 修改备注信息
 
 // 获取种植流程
 export const getTreeflows = forestFetchAction(
-    `${FOREST_API}/tree/treeflows`,
+    `${TREE_API}/treeflows`,
     []
 );
 // 获取打包车辆信息
 export const getCarpackbysxm = forestFetchAction(
-    `${FOREST_API}/tree/carpackbysxm/{{sxm}}`,
+    `${TREE_API}/carpackbysxm/{{sxm}}`,
     []
 );
 // 获取树木现场种植的信息
 export const getTreeMess = forestFetchAction(
-    `${FOREST_API}/tree/tree/{{sxm}}`,
+    `${TREE_API}/tree/{{sxm}}`,
     []
 );
 // 获取树木定位信息
 export const getTreeLocationCoord = forestFetchAction(
-    `${FOREST_API}/tree/locationcoord?sxm={{sxm}}`,
+    `${TREE_API}/locationcoord?sxm={{sxm}}`,
     [], 'GET'
 );
 
 export const postForsetPic = myFetch(
-    `${FOREST_API}/UploadHandler.ashx?filetype=leader`,
+    `${UPLOAD_API}?filetype=leader`,
     [],
     'POST'
 );
 export const clearTreeData = forestFetchAction(
-    `${FOREST_API}/tree/cleartreedata`,
+    `${TREE_API}/cleartreedata`,
     [],
     'GET'
 );
 
 // 栽植、未栽植数量统计
 export const getTreePlanting = forestFetchAction(
-    `${FOREST_API}/tree/treestat4pie`,
+    `${TREE_API}/treestat4pie`,
     []
 );
 
 // 定位、未定位数量统计，用于饼图
 export const getLocationStat = forestFetchAction(
-    `${FOREST_API}/tree/locationstat4pie`,
+    `${TREE_API}/locationstat4pie`,
     []
 );
 
 // 按树种统计栽植量
 export const getStatByTreetype = forestFetchAction(
-    `${FOREST_API}/tree/statbytreetype`,
+    `${TREE_API}/statbytreetype`,
     []
 );
 
 // 获取死亡记录或结缘筛选记录
 export const getTreeStatuss = forestFetchAction(
-    `${FOREST_API}/tree/treestatuss`,
+    `${TREE_API}/treestatuss`,
     []
 );
 // 获取标段，小班或者细班的定位量
 export const getLocationStatBySpecfield = forestFetchAction(
-    `${FOREST_API}/tree/locationstatbyspecfield`,
+    `${TREE_API}/locationstatbyspecfield`,
     []
 );
 
@@ -288,64 +293,64 @@ export const getTencentOffLineAusage = createFetchAction(
 
 // 获取苗木来源地分析数据
 export const getNurseryFromData = forestFetchAction(
-    `${FOREST_API}/tree/nursersourcestat?section={{section}}&regioncode={{regioncode}}&etime={{etime}}`,
+    `${TREE_API}/nursersourcestat?section={{section}}&regioncode={{regioncode}}&etime={{etime}}`,
     []
 );
 export const getTreeEntrance = forestFetchAction(
-    `${FOREST_API}/tree/nurserystat?`,
+    `${TREE_API}/nurserystat?`,
     []
 );
 // 用户分析用户统计
 export const getUserStat = forestFetchAction(
-    `${FOREST_API}/tree/userstat`,
+    `${TREE_API}/userstat`,
     []
 );
 // 用户分析新增用户统计
 export const getNewUserStat = forestFetchAction(
-    `${FOREST_API}/tree/newuserstat`,
+    `${TREE_API}/newuserstat`,
     []
 );
 // 用户分析活跃用户统计
 export const getActivityUserStat = forestFetchAction(
-    `${FOREST_API}/tree/activityuserstat`,
+    `${TREE_API}/activityuserstat`,
     []
 );
 // 用户分析用户按标段统计
 export const getSectionUserStat = forestFetchAction(
-    `${FOREST_API}/tree/sectionuserstat`,
+    `${TREE_API}/sectionuserstat`,
     []
 );
 // 根据细班信息获取树种列表
 export const getTreetypeByThinclass = forestFetchAction(
-    `${FOREST_API}/route/thinclassplans`,
+    `${ROUTE_API}/thinclassplans`,
     []
 );
 
-export const getTreearea = forestFetchAction(`${FOREST_API}/route/thinclasses?`, [], 'GET'); // 获取细班详情
+export const getTreearea = forestFetchAction(`${ROUTE_API}/thinclasses?`, [], 'GET'); // 获取细班详情
 
 // 苗木来源地分析苗圃总览 苗圃基地、供应商数据统计
 export const getNurseryBaseStat = forestFetchAction(
-    `${FOREST_API}/tree/nurserybasestat`,
+    `${TREE_API}/nurserybasestat`,
     []
 );
 // 苗木来源地分析苗圃总览 苗圃基地进场统计
 export const getNurseryEnterStat = forestFetchAction(
-    `${FOREST_API}/tree/nurseryinstatbynurserybase`,
+    `${TREE_API}/nurseryinstatbynurserybase`,
     []
 );
 // 苗木来源地分析苗圃总览 供应商苗木进场统计
 export const getSupplierEnterStat = forestFetchAction(
-    `${FOREST_API}/tree/nurseryinstatbysupplier`,
+    `${TREE_API}/nurseryinstatbysupplier`,
     []
 );
 // 苗木来源地分析苗圃总览 苗圃基地退苗统计
 export const getNurseryBackStat = forestFetchAction(
-    `${FOREST_API}/tree/nurserybackstatbynurserybase`,
+    `${TREE_API}/nurserybackstatbynurserybase`,
     []
 );
 // 苗木来源地分析苗圃总览 供应商苗木退苗统计
 export const getSupplierBackStat = forestFetchAction(
-    `${FOREST_API}/tree/nurserybackstatbysupplier`,
+    `${TREE_API}/nurserybackstatbysupplier`,
     []
 );
 // 获取苗圃列表
@@ -357,17 +362,17 @@ export const getSupplierListOK = createAction(`${ID}_getSupplierList`);
 export const getSupplierList = forestFetchAction(`${SYSTEM_API}/suppliers`, [], 'GET', []);
 // 数据维护
 // 修改苗圃信息
-export const putChangeNurseryInfoInCar = forestFetchAction(`${FOREST_API}/tree/batchnursery`, [], 'PUT', []);
+export const putChangeNurseryInfoInCar = forestFetchAction(`${TREE_API}/batchnursery`, [], 'PUT', []);
 // 修改车辆信息
-export const putChangCarPackInfo = forestFetchAction(`${FOREST_API}/tree/carpack`, [], 'PUT', []);
+export const putChangCarPackInfo = forestFetchAction(`${TREE_API}/carpack`, [], 'PUT', []);
 // 车辆包合并
-export const putMergeCarPack = forestFetchAction(`${FOREST_API}/tree/packmerge`, [], 'PUT', []);
+export const putMergeCarPack = forestFetchAction(`${TREE_API}/packmerge`, [], 'PUT', []);
 // 车辆包内苗木移动车辆包内苗木移动
-export const putMoveTreeInCar = forestFetchAction(`${FOREST_API}/tree/packnurserymove`, [], 'PUT', []);
+export const putMoveTreeInCar = forestFetchAction(`${TREE_API}/packnurserymove`, [], 'PUT', []);
 // 修改现场测量信息
-export const putChangeLocInfo = forestFetchAction(`${FOREST_API}/tree/batchtree`, [], 'PUT', []);
+export const putChangeLocInfo = forestFetchAction(`${TREE_API}/batchtree`, [], 'PUT', []);
 // 导出苗木死亡信息
-export const exportEcporttreestatuss = forestFetchAction(`${FOREST_API}/tree/ecporttreestatuss`, [], 'GET', []);
+export const exportEcporttreestatuss = forestFetchAction(`${TREE_API}/ecporttreestatuss`, [], 'GET', []);
 
 /**
  * 数字化验收
@@ -375,63 +380,63 @@ export const exportEcporttreestatuss = forestFetchAction(`${FOREST_API}/tree/ecp
  */
 // 获取数字化验收列表
 export const getDigitalAcceptList = forestFetchAction(
-    `${FOREST_API}/tree/acceptances`,
+    `${TREE_API}/acceptances`,
     []
 );
 
 // 获取数字化验收详情
 export const getDigitalAcceptDetail = forestFetchAction(
-    `${FOREST_API}/tree/acceptancedetails`,
+    `${TREE_API}/acceptancedetails`,
     []
 );
 
 // 获取苗木质量验收结果列表
 export const getMQulityCheckList = forestFetchAction(
-    `${FOREST_API}/tree/qualitytrees`,
+    `${TREE_API}/qualitytrees`,
     []
 );
 // 获取土球质量验收结果列表
 export const getTQulityCheckList = forestFetchAction(
-    `${FOREST_API}/tree/samplingnurserys`,
+    `${TREE_API}/samplingnurserys`,
     []
 );
 // 获取苗木(栽植/支架/浇水)验收结果列表
 export const getZZJQulityCheckList = forestFetchAction(
-    `${FOREST_API}/tree/patrolevents`,
+    `${TREE_API}/patrolevents`,
     []
 );
 // 大数据验收结果列表
 export const getBigDataCheckList = forestFetchAction(
-    `${FOREST_API}/tree/trees`,
+    `${TREE_API}/trees`,
     []
 );
 // 数字化验收导出表格数据
-export const getExportAcceptList = forestFetchAction(`${FOREST_API}/tree/exportacceptances`, [], 'GET', []);
+export const getExportAcceptList = forestFetchAction(`${TREE_API}/exportacceptances`, [], 'GET', []);
 // 数字化验收导出验收单
-export const getExportAcceptReport = forestFetchAction(`${FOREST_API}/DocExport.ashx?action=acceptance&acceptancedetailid={{acceptancedetailid}}`, [], 'GET', []);
+export const getExportAcceptReport = forestFetchAction(`${DOCEXPORT_API}?action=acceptance&acceptancedetailid={{acceptancedetailid}}`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
-export const getUnitMessageBySection = forestFetchAction(`${FOREST_API}/tree/sections`, [], 'GET', []);
+export const getUnitMessageBySection = forestFetchAction(`${TREE_API}/sections`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
-export const postMapImage = forestFetchAction(`${FOREST_API}/route/mapimage`, [], 'POST', []);
+export const postMapImage = forestFetchAction(`${ROUTE_API}/mapimage`, [], 'POST', []);
 // 获取第十项信息
-export const getAcceptanceThinclasses = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET', []);
+export const getAcceptanceThinclasses = forestFetchAction(`${ROUTE_API}/acceptancethinclasses`, [], 'GET', []);
 // 查询细班验收施工是否提交，是否还需要反复提交
-export const getAreaAcceptByThinClass = forestFetchAction(`${FOREST_API}/route/acceptancethinclasses`, [], 'GET');
+export const getAreaAcceptByThinClass = forestFetchAction(`${ROUTE_API}/acceptancethinclasses`, [], 'GET');
 // 辅助验收模块
 export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`);
 export const getSupervisorUsers = createFetchAction(`${SYSTEM_API}/users`, [getSupervisorUsersOK], 'GET');
 // 面积验收施工提交
-export const postAreaAccept = forestFetchAction(`${FOREST_API}/route/acceptancethinclass`, [], 'POST', []);
+export const postAreaAccept = forestFetchAction(`${ROUTE_API}/acceptancethinclass`, [], 'POST', []);
 
 // 死亡苗木信息
 // 获取死亡苗木信息
 export const getDieTreesData = forestFetchAction(
-    `${FOREST_API}/tree/dietrees`,
+    `${TREE_API}/dietrees`,
     []
 );
 // 导出死亡苗木列表
 export const getExportDieTree = forestFetchAction(
-    `${FOREST_API}/tree/exportDieTree`,
+    `${TREE_API}/exportDieTree`,
     []
 );
 

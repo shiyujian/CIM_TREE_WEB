@@ -198,8 +198,6 @@ class Edite extends Component {
     // 上传文件
     uploadProps = {
         name: 'a_file',
-        // multiple: false,
-        // action: `${FOREST_API}/UploadHandler.ashx?filetype=treetype`,
         beforeUpload: file => {
             const {
                 actions: { postForsetPic },

@@ -1,22 +1,25 @@
 import {createAction, handleActions} from 'redux-actions';
-import {FOREST_API} from '_platform/api';
+import {
+    UPLOAD_API,
+    SYSTEM_API
+} from '_platform/api';
 import {createFetchActionWithHeaders as myFetch} from './myfetchAction';
 import {forestFetchAction} from '_platform/store/fetchAction';
 
 export const ID = 'suppliermanagement';
-export const getNurseryList = forestFetchAction(`${FOREST_API}/system/nurserybases`); // 获取苗圃列表
+export const getNurseryList = forestFetchAction(`${SYSTEM_API}/nurserybases`); // 获取苗圃列表
 
-export const getSupplierList = forestFetchAction(`${FOREST_API}/system/suppliers`); // 获取供应商列表
-export const postSupplier = forestFetchAction(`${FOREST_API}/system/supplier`, [], 'POST'); // 新建供应商
-export const putSupplier = forestFetchAction(`${FOREST_API}/system/supplier`, [], 'PUT'); // 编辑供应商
-export const deleteSupplier = forestFetchAction(`${FOREST_API}/system/supplier/{{ID}}`, [], 'DELETE'); // 删除供应商
-export const checkSupplier = forestFetchAction(`${FOREST_API}/system/checksupplier`, [], 'post'); // 供应商审核
-export const getNb2ss = forestFetchAction(`${FOREST_API}/system/nb2ss`); // 获取苗圃基地供应商的绑定关系
+export const getSupplierList = forestFetchAction(`${SYSTEM_API}/suppliers`); // 获取供应商列表
+export const postSupplier = forestFetchAction(`${SYSTEM_API}/supplier`, [], 'POST'); // 新建供应商
+export const putSupplier = forestFetchAction(`${SYSTEM_API}/supplier`, [], 'PUT'); // 编辑供应商
+export const deleteSupplier = forestFetchAction(`${SYSTEM_API}/supplier/{{ID}}`, [], 'DELETE'); // 删除供应商
+export const checkSupplier = forestFetchAction(`${SYSTEM_API}/checksupplier`, [], 'post'); // 供应商审核
+export const getNb2ss = forestFetchAction(`${SYSTEM_API}/nb2ss`); // 获取苗圃基地供应商的绑定关系
 
-export const getRegionCodes = forestFetchAction(`${FOREST_API}/system/regioncodes`); // 获取行政区划编码
+export const getRegionCodes = forestFetchAction(`${SYSTEM_API}/regioncodes`); // 获取行政区划编码
 export const changeEditVisible = createAction(`${ID}_changeEditVisible`);
-export const postUploadImage = myFetch(`${FOREST_API}/UploadHandler.ashx?filetype=org`, [], 'POST');
-export const postSupplierBlack = forestFetchAction(`${FOREST_API}/system/blacksupplier`, [], 'POST'); // 供应商拉黑
+export const postUploadImage = myFetch(`${UPLOAD_API}?filetype=org`, [], 'POST');
+export const postSupplierBlack = forestFetchAction(`${SYSTEM_API}/blacksupplier`, [], 'POST'); // 供应商拉黑
 
 export const actions = {
     getNurseryList,

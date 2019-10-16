@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-11 11:16:03
+ * @Last Modified time: 2019-10-16 11:35:17
  */
 /**
  *
@@ -55,14 +55,58 @@ DOMAIN = window.config.DOMAIN;
 export { DOMAIN };
 export const CODE_PROJECT = '森林大数据';
 export const base = `${DOMAIN}`;
-export const SERVICE_API = `${base}/service/construction/api`;
-export const WORKFLOW_API = `${base}/service/workflow/api`;
+export const WORKFLOW_API = `${DOMAIN}/service/workflow/api`;
 // 文件预览的接口
 export const previewWord_API = window.config.previewWord_API;
+// 定位数据导入模块
+export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
+// 考勤打卡
+export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
+// GIS服务
+export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
+export const XACOMPANYINITLEAFLET_API = window.config.XACompanyInitLeaflet;
+export const SEEDLING_API = `${window.config.SEEDLING}`;
+export const INITLEAFLET_API = window.config.initLeaflet;
+export const TREEPIPE_API = `${window.config.PIPE}`;
 // 静态资源文件服务
-export const STATIC_PREVIEW_API = `${base}`;
+export const STATIC_PREVIEW_API = `${DOMAIN}`;
+// 文件预览的接口
+export const PREVIEWWORD_API = window.config.previewWord_API;
+// 阿里云图片
+export const FOREST_IMG = `${window.config.ALIIMG}`;
+// 森林服务
+export const FOREST_API = `${DOMAIN}`;
+// 系统
+export const SYSTEM_API = `${DOMAIN}/system`;
+// 新闻通知
+export const NEWS_API = `${DOMAIN}/cms`;
+// 文档管理
+export const DOC_API = `${DOMAIN}/doc`;
+// 苗木服务
+export const TREE_API = `${DOMAIN}/tree`;
+//
+export const TREES_API = `${DOMAIN}/trees`;
+// 养护服务
+export const CURING_API = `${DOMAIN}/curing`;
+// 路线服务
+export const ROUTE_API = `${DOMAIN}/route`;
+// 结缘服务
+export const ADOPT_API = `${DOMAIN}/adopt`;
+// 流程服务
+export const FLOW_API = `${DOMAIN}/flow`;
+// DB服务
+export const DB_API = `${DOMAIN}/db`;
+// 会议服务
+export const MEETING_API = `${DOMAIN}/meeting`;
+// 文件导出服务
+export const DOCEXPORT_API = `${DOMAIN}/DocExport.ashx`;
+// 验证码服务
+export const VALIDATE_API = `${DOMAIN}/ValidateHandler.ashx`;
+// 文件上传
+export const OSSUPLOAD_API = `${DOMAIN}/OSSUploadHandler.ashx`;
+export const UPLOAD_API = `${DOMAIN}/UploadHandler.ashx`;
+export const SHAPEUPLOAD_API = `${DOMAIN}/ShapeUploadHandler.ashx`;
 
-export const MAIN_API = `${base}/cms`;
 // 高德地图逆坐标查询
 export const LBSAMAP_API = window.config.LBSAMAP;
 export const LBSAMAP_KEY = '8325164e247e15eea68b59e89200988b';
@@ -74,20 +118,6 @@ export const TILEURLS = {
     1: window.config.IMG_W,
     2: window.config.VEC_W
 };
-
-export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
-// 智慧森林
-export const FOREST_API = `${DOMAIN}`;
-export const SYSTEM_API = `${DOMAIN}/system`;
-export const SEEDLING_API = `${window.config.SEEDLING}`;
-export const FOREST_IMG = `${window.config.ALIIMG}`;
-export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
-export const INITLEAFLET_API = window.config.initLeaflet;
-export const TREEPIPE_API = `${window.config.PIPE}`;
-export const UPLOADFOREST_API = `${base}/OSSUploadHandler.ashx`;
-
-// 考勤打卡
-export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
 
 /** *********************静态常量**************************/
 export const WORKFLOW_CODE = {
@@ -533,59 +563,27 @@ export const MODULES = [
         ]
     },
     {
-        id: 'CURING',
+        id: 'CONSERVATION',
         name: '养护管理',
         children: [
             {
-                id: 'CURING.TASKCREATE',
+                id: 'CONSERVATION.TASKCREATE',
                 name: '任务下发'
             },
             {
-                id: 'CURING.TASKREPORT',
+                id: 'CONSERVATION.TASKREPORT',
                 name: '任务上报'
             },
             {
-                id: 'CURING.TASKSTATIS',
+                id: 'CONSERVATION.TASKSTATIS',
                 name: '任务统计'
             },
             {
-                id: 'CURING.TASKTEAM',
+                id: 'CONSERVATION.TASKTEAM',
                 name: '养护班组'
             }
         ]
     },
-    // {
-    //     id: 'MARKET',
-    //     name: '苗木市场',
-    //     children: [
-    //         {
-    //             id: 'MARKET.SUPERMARKET.NONE',
-    //             name: '苗木超市',
-    //             children: [
-    //                 {
-    //                     id: 'MARKET.SEEDLINGSUPPLY',
-    //                     name: '苗木供应'
-    //                 },
-    //                 {
-    //                     id: 'MARKET.SEEDLINGPURCHASE',
-    //                     name: '苗木求购'
-    //                 }
-    //             ]
-    //         },
-    //         {
-    //             id: 'MARKET.SUPPLYRELEASE',
-    //             name: '供应发布'
-    //         },
-    //         {
-    //             id: 'MARKET.DEMANDRELEASE',
-    //             name: '需求发布'
-    //         },
-    //         {
-    //             id: 'MARKET.OFFERMANAGE',
-    //             name: '报价管理'
-    //         }
-    //     ]
-    // },
     {
         id: 'CHECKWORK',
         name: '考勤管理',
@@ -630,35 +628,35 @@ export const MODULES = [
         ]
     },
     {
-        id: 'SYSTEM',
+        id: 'SETUP',
         name: '系统设置',
         children: [
             {
-                id: 'SYSTEM.ROLE',
+                id: 'SETUP.ROLE',
                 name: '角色设置'
             },
             {
-                id: 'SYSTEM.PERMISSION',
+                id: 'SETUP.PERMISSION',
                 name: '权限设置'
             },
             {
-                id: 'SYSTEM.PERSON',
+                id: 'SETUP.PERSON',
                 name: '用户管理'
             },
             {
-                id: 'SYSTEM.WORKFLOW',
+                id: 'SETUP.WORKFLOW',
                 name: '流程设置'
             },
             {
-                id: 'SYSTEM.ORG',
+                id: 'SETUP.ORG',
                 name: '组织机构'
             },
             {
-                id: 'SYSTEM.BLACKLIST.NONE',
+                id: 'SETUP.BLACKLIST.NONE',
                 name: '黑名单',
                 children: [
                     {
-                        id: 'SYSTEM.PERSONBLACKLIST',
+                        id: 'SETUP.PERSONBLACKLIST',
                         name: '人员黑名单'
                     }
                 ]

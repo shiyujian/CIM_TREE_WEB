@@ -15,7 +15,7 @@ import {
     Divider
 } from 'antd';
 import moment from 'moment';
-import { FOREST_API } from '_platform/api';
+import { UPLOAD_API } from '_platform/api';
 import { getUser, getForestImgUrl } from '_platform/auth';
 import '../index.less';
 import {
@@ -124,7 +124,7 @@ export default class SeedlingsChange extends Component {
         name: 'a_file',
         multiple: true,
         showUploadList: false,
-        action: `${FOREST_API}/UploadHandler.ashx?filetype=leader`,
+        action: `${UPLOAD_API}?filetype=leader`,
         beforeUpload: file => {
             const {
                 actions: { postForsetPic }
