@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { message, Modal, Spin } from 'antd';
+import { message, Modal } from 'antd';
 import { bindActionCreators } from 'redux';
 import * as actions from '_platform/store/global/preview';
-import { previewWord_API } from '../../api';
+import { PREVIEWWORD_API } from '../../api';
 import './Preview.less';
 
 @connect(
@@ -57,7 +57,7 @@ export default class Preview extends React.Component {
             return null;
         } else {
             if (previewType === 'office') {
-                return <iframe src={`${previewWord_API}${previewUrl}`}
+                return <iframe src={`${PREVIEWWORD_API}${previewUrl}`}
                     width='100%' height='100%' frameBorder='0' style={{ minHeight: 480 }} />;
             } else {
                 return <iframe src={`/pdfjs/web/viewer.html?file=${previewUrl}`}

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-16 11:35:17
+ * @Last Modified time: 2019-10-16 14:59:32
  */
 /**
  *
@@ -56,8 +56,6 @@ export { DOMAIN };
 export const CODE_PROJECT = '森林大数据';
 export const base = `${DOMAIN}`;
 export const WORKFLOW_API = `${DOMAIN}/service/workflow/api`;
-// 文件预览的接口
-export const previewWord_API = window.config.previewWord_API;
 // 定位数据导入模块
 export const NURSERYLOCATION_DOWLOAD = `${window.config.nurseryLocation}`;
 // 考勤打卡
@@ -68,6 +66,11 @@ export const XACOMPANYINITLEAFLET_API = window.config.XACompanyInitLeaflet;
 export const SEEDLING_API = `${window.config.SEEDLING}`;
 export const INITLEAFLET_API = window.config.initLeaflet;
 export const TREEPIPE_API = `${window.config.PIPE}`;
+export const WMSTILELAYERURL = window.config.WMSTileLayerUrl;
+export const TILEURLS = {
+    1: window.config.IMG_W,
+    2: window.config.VEC_W
+};
 // 静态资源文件服务
 export const STATIC_PREVIEW_API = `${DOMAIN}`;
 // 文件预览的接口
@@ -112,30 +115,8 @@ export const LBSAMAP_API = window.config.LBSAMAP;
 export const LBSAMAP_KEY = '8325164e247e15eea68b59e89200988b';
 // 腾讯移动分析
 export const TENCENTANALYSIS_API = window.config.TENCENTANALYSIS;
-// 质量监控地图
-export const WMSTILELAYERURL = window.config.WMSTileLayerUrl;
-export const TILEURLS = {
-    1: window.config.IMG_W,
-    2: window.config.VEC_W
-};
 
 /** *********************静态常量**************************/
-export const WORKFLOW_CODE = {
-    总进度计划报批流程: 'TEMPLATE_001',
-    每日进度填报流程: 'TEMPLATE_003',
-    每周进度填报流程: 'TEMPLATE_013'
-    // 每日进度计划填报流程: 'TEMPLATE_007',
-    // 表单管理流程: 'TEMPLATE_002',
-    // 机械设备报批流程: 'TEMPLATE_004',
-    // 工程材料报批流程: 'TEMPLATE_005',
-    // 苗木资料报批流程: 'TEMPLATE_006',
-    // 检验批验收审批流程: 'TEMPLATE_008',
-    // 安全体系报批流程: 'TEMPLATE_009',
-    // 普通审查流程: 'TEMPLATE_010',
-    // 审查核定流程: 'TEMPLATE_011',
-    // 总监审查流程: 'TEMPLATE_012'
-};
-
 export const ORGTYPE = [
     '业主单位',
     '施工单位',
@@ -200,33 +181,6 @@ export const TREETYPENO = [
     {
         id: '5',
         name: '地被'
-    }
-];
-// 苗木市场  需求发布
-export const CULTIVATIONMODE = [
-    {
-        id: 0,
-        name: '地苗'
-    },
-    {
-        id: 1,
-        name: '断根苗'
-    },
-    {
-        id: 2,
-        name: '假植苗'
-    },
-    {
-        id: 3,
-        name: '袋苗'
-    },
-    {
-        id: 4,
-        name: '盆苗'
-    },
-    {
-        id: 5,
-        name: '山苗'
     }
 ];
 // 进度管理 进度填报和进度展示
