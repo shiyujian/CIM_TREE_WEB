@@ -4,6 +4,7 @@ import { Route } from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import { Icon } from 'react-fa';
+import {ScheduleMenu} from '_platform/MenuJson';
 
 export default class Schedule extends Component {
     async componentDidMount () {
@@ -30,7 +31,7 @@ export default class Schedule extends Component {
                 <Aside>
                     <Submenu
                         {...this.props}
-                        menus={Schedule.menus}
+                        menus={ScheduleMenu}
                         defaultOpenKeys={Schedule.defaultOpenKeys}
                     />
                 </Aside>
@@ -72,44 +73,6 @@ export default class Schedule extends Component {
             </Body>
         );
     }
-
-    static menus = [
-        {
-            key: 'stagereport',
-            id: 'SCHEDULE.STAGEREPORT',
-            name: '进度填报',
-            path: '/schedule/stagereport',
-            icon: <Icon name='suitcase' />
-        },
-        {
-            key: 'nodemanage',
-            id: 'SCHEDULE.NODEMANAGE',
-            name: '节点管理',
-            path: '/schedule/nodemanage',
-            icon: <Icon name='suitcase' />
-        },
-        {
-            key: 'scheduledisplay',
-            id: 'SCHEDULE.SCHEDULEDISPLAY',
-            name: '进度展示',
-            path: '/schedule/scheduledisplay',
-            icon: <Icon name='warning' />
-        }
-        // {
-        //     key: 'enteranalyze',
-        //     id: 'SCHEDULE.ENTERANALYZE',
-        //     name: '苗木进场分析',
-        //     path: '/schedule/enteranalyze',
-        //     icon: <Icon name='ship' />
-        // },
-        // {
-        //     key: 'scheduleanalyze',
-        //     name: '种植进度分析',
-        //     id: 'SCHEDULE.SCHEDULEANALYZE',
-        //     path: '/schedule/scheduleanalyze',
-        //     icon: <Icon name='warning' />
-        // }
-    ];
 
     static defaultOpenKeys = ['stagereport'];
 }

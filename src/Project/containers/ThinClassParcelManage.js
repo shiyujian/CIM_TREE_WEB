@@ -77,7 +77,7 @@ class ThinClassParcelManage extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='细班分块管理' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         {
                             treeList.length > 0 ? <TreeProjectList
                                 treeData={treeList}

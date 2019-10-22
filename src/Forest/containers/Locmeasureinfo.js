@@ -199,7 +199,7 @@ export default class Locmeasureinfo extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='现场测量信息' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

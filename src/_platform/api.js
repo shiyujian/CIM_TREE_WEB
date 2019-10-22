@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-16 14:59:32
+ * @Last Modified time: 2019-10-21 19:35:16
  */
 /**
  *
@@ -99,6 +99,8 @@ export const ADOPT_API = `${DOMAIN}/adopt`;
 export const FLOW_API = `${DOMAIN}/flow`;
 // DB服务
 export const DB_API = `${DOMAIN}/db`;
+// 二维码分发
+export const QRCODE_API = `${DOMAIN}/qrcode`;
 // 会议服务
 export const MEETING_API = `${DOMAIN}/meeting`;
 // 文件导出服务
@@ -628,18 +630,26 @@ export const MODULES = [
                     {
                         id: 'PROJECT.THINCLASSTORAGE',
                         name: '细班导入'
-                    }, {
+                    },
+                    {
                         id: 'PROJECT.THINCLASSPARCELMANAGE',
                         name: '细班分块管理'
-                    }, {
+                    },
+                    {
                         id: 'PROJECT.THINCLASSTREETYPEMANAGE',
                         name: '细班树种管理'
-                    }, {
+                    },
+                    {
                         id: 'PROJECT.PARCELSTORAGE',
                         name: '地块导入'
-                    }, {
+                    },
+                    {
                         id: 'PROJECT.PARCELMANAGE',
                         name: '地块管理'
+                    },
+                    {
+                        id: 'PROJECT.QRCODEDISTRIBUTE',
+                        name: '二维码派发信息'
                     }
                 ]
             }, {

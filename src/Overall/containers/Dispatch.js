@@ -4,15 +4,19 @@ import { actions as platformActions } from '_platform/store/global';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Tabs } from 'antd';
+import {ORGTYPE} from '_platform/api';
 import { actions } from '../store/dispatch';
-import { getUser } from '_platform/auth';
+import {ReceivePage, SendPage} from '../components/Dispatch';
+import {getCompanyDataByOrgCode, getUser} from '_platform/auth';
 const TabPane = Tabs.TabPane;
 
 @connect(
     state => {
         const {
-            platform,
-            overall: { dispatch = {} }
+            overall: {
+                dispatch = {}
+            },
+            platform
         } = state || {};
         return { ...dispatch, platform };
     },
@@ -27,61 +31,79 @@ export default class Dispatch extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            datas: [],
-            orgList: []
+            orgTreeArrList: [],
+            companyList: [],
+            parentOrgID: undefined,
+            permission: false,
+            personOrgID: ''
         };
     }
-    static propTypes = {};
 
-    componentDidMount () {
+    componentDidMount = async () => {
         const {
-            actions: { getReceiveInfoAc, getSentInfoAc, getOrgTree }
+            actions: {
+                getOrgTree,
+                getOrgTreeByOrgType,
+                getParentOrgTreeByID,
+                setGetMessageStatus
+            }
         } = this.props;
+        await setGetMessageStatus(false);
         const user = getUser();
-        let orgCode = user.org;
-        if (orgCode) {
-            let orgListCodes = orgCode.split('_');
-            orgListCodes.pop();
-            let codeu = orgListCodes.join();
-            let ucode = codeu.replace(/,/g, '_');
-            getOrgTree().then(item => {
-                if (user.username === 'admin') {
-                    getReceiveInfoAc({
-                        user: encodeURIComponent('admin')
-                    });
-                } else {
-                    getReceiveInfoAc({
-                        user: encodeURIComponent(ucode)
-                    });
-                }
-                if (user.username === 'admin') {
-                    getSentInfoAc({
-                        user: encodeURIComponent('admin')
-                    });
-                } else {
-                    getSentInfoAc({
-                        user: encodeURIComponent(ucode)
-                    });
-                }
-                this.setState({
-                    orgList: item
-                });
-            });
+        console.log('user', user);
+        let permission = false;
+        let parentOrgID = '';
+        let personOrgID = '';
+        if (user.username === 'admin') {
+            permission = true;
         }
-    }
-    tabChange (tabValue) {
-        const {
-            actions: { setTabActive }
-        } = this.props;
-        setTabActive(tabValue);
+        if (!permission) {
+            // 获取登录用户的公司的信息
+            personOrgID = user.org;
+            // 根据登录用户的部门code获取所在公司的code，这里没有对苗圃和供应商做对应处理
+            let parentOrgData = await getCompanyDataByOrgCode(personOrgID, getParentOrgTreeByID);
+            // 如果在公司下，则获取公司所有的信息
+            if (parentOrgData && parentOrgData.ID) {
+                parentOrgID = parentOrgData.ID;
+            }
+        }
+        let orgTreeArrList = await getOrgTree();
+        this.setState({
+            orgTreeArrList
+        });
+        let companyList = [];
+        for (let i = 0; i < ORGTYPE.length; i++) {
+            let type = ORGTYPE[i];
+            let orgData = await getOrgTreeByOrgType({orgtype: type});
+            if (orgData && orgData.content && orgData.content instanceof Array && orgData.content.length > 0) {
+                if (orgData.content && orgData.content instanceof Array) {
+                    companyList = companyList.concat(orgData.content);
+                }
+            }
+        }
+        console.log('companyList', companyList);
+        this.setState({
+            orgTreeArrList,
+            companyList,
+            parentOrgID,
+            permission,
+            personOrgID
+        });
+        await setGetMessageStatus(true);
     }
 
     render () {
-        const { tabValue = '1' } = this.props;
         return (
             <div style={{ overflow: 'hidden', padding: 20 }}>
                 <DynamicTitle title='现场收发文' {...this.props} />
-                现场收发文
+                <Tabs>
+                    <TabPane tab='收文管理' key='1'>
+                        <ReceivePage {...this.props} {...this.state} />
+                    </TabPane>
+                    <TabPane tab='发文管理' key='2'>
+                        <SendPage {...this.props} {...this.state} />
+                    </TabPane>
+                </Tabs>
             </div>
         );
     }

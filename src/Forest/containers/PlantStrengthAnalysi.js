@@ -105,7 +105,7 @@ class PlantStrengthAnalysi extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='栽植强度分析' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-07-04 14:32:29
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-16 10:52:35
+ * @Last Modified time: 2019-10-21 15:22:18
  */
 /**
  *
@@ -31,7 +31,7 @@ import { Route, Switch } from 'react-router-dom';
 import { Main, Body } from '_platform/components/layout';
 import Aside from './components/Aside';
 import Submenu from '_platform/components/panels/Submenu';
-import { Icon } from 'react-fa';
+import {ConservationMenu} from '_platform/MenuJson';
 
 export default class Conservation extends Component {
     async componentDidMount () {
@@ -44,13 +44,18 @@ export default class Conservation extends Component {
     }
 
     render () {
-        const { TaskCreate, TaskReport, TaskStatis, TaskTeam } = this.state || {};
+        const {
+            TaskCreate,
+            TaskReport,
+            TaskStatis,
+            TaskTeam
+        } = this.state || {};
         return (
             <Body >
                 <Aside >
                     <Submenu
                         {...this.props}
-                        menus={Conservation.menus}
+                        menus={ConservationMenu}
                         defaultOpenKeys={Conservation.defaultOpenKeys}
                     />
                 </Aside>
@@ -86,32 +91,5 @@ export default class Conservation extends Component {
         );
     }
 
-    static menus = [
-        {
-            key: 'TASKCREATE',
-            id: 'CONSERVATION.TASKCREATE',
-            path: '/conservation/taskcreate',
-            name: '任务下发',
-            icon: <Icon name='line-chart' />
-        }, {
-            key: 'TASKREPORT',
-            id: 'CONSERVATION.TASKREPORT',
-            path: '/conservation/taskreport',
-            name: '任务上报',
-            icon: <Icon name='file-text-o' />
-        }, {
-            key: 'TASKSTATIS',
-            id: 'CONSERVATION.TASKSTATIS',
-            path: '/conservation/taskstatis',
-            name: '任务统计',
-            icon: <Icon name='file-text' />
-        }, {
-            key: 'TASKTEAM',
-            id: 'CONSERVATION.TASKTEAM',
-            path: '/conservation/taskteam',
-            name: '养护班组',
-            icon: <Icon name='users' />
-        }
-    ];
     static defaultOpenKeys = ['TASKCREATE'];
 }

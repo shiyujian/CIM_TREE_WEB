@@ -110,9 +110,6 @@ export default class SupervisorTable extends Component {
             treetypename,
             userOptions = []
         } = this.state;
-        const suffix1 = sxm ? (
-            <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
         let columns = [];
         let header = '';
         columns = [
@@ -202,7 +199,6 @@ export default class SupervisorTable extends Component {
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>顺序码：</span>
                         <Input
-                            suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
                             onChange={this.sxmChange.bind(this)}

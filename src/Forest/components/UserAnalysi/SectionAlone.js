@@ -38,28 +38,28 @@ export default class SectionAlone extends Component {
             // let myChart1 = echarts.init(document.getElementById('jobDynamicNum'));
             let myChart2 = echarts.init(document.getElementById('superviseRegisterSum'));
             // let myChart3 = echarts.init(document.getElementById('superviseDynamicNum'));
-        let option = {
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: { // 坐标轴指示器，坐标轴触发有效
-                    type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-                }
-            },
-            xAxis: {
-                type: 'category',
-                data: []
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [{
-                data: [],
-                type: 'bar'
-            }]
-        };
-        myChart.setOption(option);
-        // myChart1.setOption(option);
-        myChart2.setOption(option);
+            let option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: []
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: [],
+                    type: 'bar'
+                }]
+            };
+            myChart.setOption(option);
+            // myChart1.setOption(option);
+            myChart2.setOption(option);
         // myChart3.setOption(option);
         } catch (e) {
             console.log('e', e);
@@ -74,7 +74,7 @@ export default class SectionAlone extends Component {
         let treeList = (tree && tree.bigTreeList) || [];
         return (
             <div>
-                <Sidebar width={190}>
+                <Sidebar>
                     {
                         treeList.length > 0 ? <PkCodeTree
                             treeData={treeList}

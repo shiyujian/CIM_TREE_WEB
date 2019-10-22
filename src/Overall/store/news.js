@@ -1,5 +1,4 @@
 import { createAction, handleActions } from 'redux-actions';
-import createFetchAction from './fetchAction';
 import fetchAction from 'fetch-action';
 import {createFetchActionWithHeaders as myFetch} from './myfetchAction';
 import { base, NEWS_API } from '_platform/api';

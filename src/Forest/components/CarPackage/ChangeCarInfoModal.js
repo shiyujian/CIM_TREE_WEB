@@ -18,7 +18,9 @@ class ChangeCarInfoModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            sectionsList: []
+            sectionsList: [],
+            currentSection: '',
+            currentProject: ''
         };
     }
     componentDidMount = async () => {
@@ -70,6 +72,9 @@ class ChangeCarInfoModal extends Component {
             } else {
                 status = '';
             }
+            console.log('section', section);
+            console.log('project', project);
+
             setFieldsValue({
                 carNumber: (currentRecord && currentRecord.LicensePlate) || '',
                 status: status,
@@ -80,6 +85,10 @@ class ChangeCarInfoModal extends Component {
                 totalNumber: (currentRecord && currentRecord.NurseryNum) || '',
                 dirverName: (currentRecord && currentRecord.Driver) || '',
                 dirverPhone: (currentRecord && currentRecord.DriverPhone) || ''
+            });
+            this.setState({
+                currentSection: section,
+                currentProject: project
             });
         } catch (e) {
             console.log('componentDidMount', e);
@@ -92,15 +101,21 @@ class ChangeCarInfoModal extends Component {
                 validateFields
             },
             actions: {
-                putChangCarPackInfo
+                putChangCarPackInfo,
+                getNurserysByPack,
+                putChangeNurseryInfoInCar
             },
             currentRecord
         } = this.props;
+        const {
+            currentSection,
+            currentProject
+        } = this.state;
         try {
             validateFields(async (err, values) => {
                 console.log('values', values);
                 if (!err) {
-                    let postData = {
+                    let changCarPostData = {
                         'Status': values.status,
                         'LicensePlate': values.carNumber,
                         'Section': values.section,
@@ -111,20 +126,88 @@ class ChangeCarInfoModal extends Component {
                         'DriverPhone': values.dirverPhone,
                         'ID': currentRecord.ID
                     };
-                    console.log('postData', postData);
-                    let data = await putChangCarPackInfo({}, postData);
-                    console.log('data', data);
-                    if (data && data.code === 1) {
-                        Notification.success({
-                            message: '修改车辆信息成功',
-                            duration: 3
-                        });
-                        await this.props.onEditCarModalOk();
+                    console.log('changCarPostData', changCarPostData);
+                    if (currentSection !== values.section) {
+                        let nurseryPostData = {
+                            packid: currentRecord.ID
+                        };
+                        let rst = await getNurserysByPack({}, nurseryPostData);
+                        if (rst && rst.content) {
+                            let content = rst.content;
+                            let example = content[0];
+                            let selectedRowSXM = [];
+                            content.map((data) => {
+                                selectedRowSXM.push(data.ZZBM);
+                            });
+
+                            let changeNurseryPostData = {
+                                'XJ': '',
+                                'GD': '',
+                                'GF': '',
+                                'DJ': '',
+                                'TQZJ': '',
+                                'TQHD': '',
+                                'TreeType': (example && example.TreeType) || '',
+                                'NurseryName': (example && example.NurseryName) || '',
+                                'Factory': (example && example.Factory) || '',
+                                'TreePlace': (example && example.TreePlace) || '',
+                                'NurseryID': (example && example.NurseryID) || '',
+                                'SupplierID': (example && example.SupplierID) || '',
+                                'BD': values.section,
+                                'IsPack': example.IsPack,
+                                'ZZBM': selectedRowSXM
+                            };
+                            let changeNurseryData = await putChangeNurseryInfoInCar({}, changeNurseryPostData);
+                            console.log('changeNurseryData', changeNurseryData);
+                            if (changeNurseryData && changeNurseryData.code === 1) {
+                                Notification.success({
+                                    message: '修改苗圃信息成功，修改车辆信息中',
+                                    duration: 3
+                                });
+                                let changCarData = await putChangCarPackInfo({}, changCarPostData);
+                                console.log('changCarData', changCarData);
+                                if (changCarData && changCarData.code === 1) {
+                                    Notification.success({
+                                        message: '修改车辆信息成功',
+                                        duration: 3
+                                    });
+                                    await this.props.onEditCarModalOk();
+                                } else {
+                                    Notification.error({
+                                        message: '修改车辆信息失败',
+                                        duration: 3
+                                    });
+                                }
+                            } else {
+                                if (changeNurseryData.msg === '修改前后树种的苗圃测量参数不一致，不允许进行树种修改！') {
+                                    Notification.error({
+                                        message: '修改前后树种的苗圃测量参数不一致，不允许进行树种修改！',
+                                        duration: 3
+                                    });
+                                } else {
+                                    Notification.error({
+                                        message: '修改苗圃信息失败,请修改苗圃信息后再修改车辆信息',
+                                        duration: 3
+                                    });
+                                }
+                            }
+                        }
+                        console.log('aaaaaaaaaaaa');
                     } else {
-                        Notification.error({
-                            message: '修改车辆信息失败',
-                            duration: 3
-                        });
+                        let changCarData = await putChangCarPackInfo({}, changCarPostData);
+                        console.log('changCarData', changCarData);
+                        if (changCarData && changCarData.code === 1) {
+                            Notification.success({
+                                message: '修改车辆信息成功',
+                                duration: 3
+                            });
+                            await this.props.onEditCarModalOk();
+                        } else {
+                            Notification.error({
+                                message: '修改车辆信息失败',
+                                duration: 3
+                            });
+                        }
                     }
                 }
             });

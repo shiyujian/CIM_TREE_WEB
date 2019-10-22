@@ -164,7 +164,7 @@ export default class CarPackage extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='车辆打包信息' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

@@ -568,9 +568,6 @@ export default class CarPackageTable extends Component {
             status,
             mmtype
         } = this.state;
-        const suffix1 = licenseplate ? (
-            <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
         let header = '';
         header = (
             <div>
@@ -578,7 +575,6 @@ export default class CarPackageTable extends Component {
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>车牌号：</span>
                         <Input
-                            suffix={suffix1}
                             value={licenseplate}
                             className='forest-forestcalcw4'
                             onChange={this.licenseplateChange.bind(this)}

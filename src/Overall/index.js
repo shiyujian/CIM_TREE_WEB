@@ -4,6 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import { Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import { Icon } from 'react-fa';
+import {OverallMenu} from '_platform/MenuJson';
 
 export default class Overall extends Component {
     async componentDidMount () {
@@ -18,26 +19,15 @@ export default class Overall extends Component {
     render () {
         const {
             News,
-            Dispatch,
-            Material,
-            FormManage
+            Dispatch
         } = this.state || {};
         return (
             <Body>
                 <Aside>
-                    <Submenu {...this.props} menus={Overall.menus} />
+                    <Submenu {...this.props} menus={OverallMenu} />
                 </Aside>
                 <Switch>
                     {News && <Route path='/overall/news' component={News} />}
-                    {Material && (
-                        <Route path='/overall/material' component={Material} />
-                    )}
-                    {FormManage && (
-                        <Route
-                            path='/overall/formmanage'
-                            component={FormManage}
-                        />
-                    )}
                     {Dispatch && (
                         <Route path='/overall/dispatch' component={Dispatch} />
                     )}

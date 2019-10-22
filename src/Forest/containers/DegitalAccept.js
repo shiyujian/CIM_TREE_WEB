@@ -207,7 +207,7 @@ export default class DegitalAccept extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='数字化验收' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

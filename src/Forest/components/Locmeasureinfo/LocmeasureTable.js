@@ -328,9 +328,10 @@ export default class LocmeasureTable extends Component {
     // 表格的多选设置
     onRowSelectChange = (selectedRowKeys, selectedRows) => {
         let selectedRowSXM = [];
-        for (let i = 0; i < selectedRows.length; i++) {
-            selectedRowSXM.push(selectedRows[i].ZZBM);
+        for (let i = 0; i < selectedRowKeys.length; i++) {
+            selectedRowSXM.push(selectedRowKeys[i]);
         }
+
         this.setState({
             selectedRowKeys,
             selectedRows,
@@ -1480,9 +1481,6 @@ export default class LocmeasureTable extends Component {
             selectedRowKeys = [],
             userOptions = []
         } = this.state;
-        const suffix1 = sxm ? (
-            <Icon type='close-circle' onClick={this.emitEmpty1} />
-        ) : null;
         let header = '';
         let permission = getUserIsManager();
         // let permission = false;
@@ -1492,7 +1490,6 @@ export default class LocmeasureTable extends Component {
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>顺序码：</span>
                         <Input
-                            suffix={suffix1}
                             value={sxm}
                             className='forest-forestcalcw4'
                             onChange={this.sxmChange.bind(this)}
@@ -1792,7 +1789,7 @@ export default class LocmeasureTable extends Component {
                         bordered
                         className='foresttable'
                         columns={this.columns}
-                        rowKey='order'
+                        rowKey='ZZBM'
                         rowSelection={rowSelection}
                         loading={{
                             tip: (

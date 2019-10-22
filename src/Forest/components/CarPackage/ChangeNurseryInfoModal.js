@@ -180,15 +180,32 @@ class ChangeNurseryInfoModal extends Component {
     }
     // 选择苗圃，设置苗圃ID
     handleNurserySelect = async (value, info) => {
+        const {
+            nurseryList,
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        let nurseryDetail = '';
+        nurseryList.map((nursery) => {
+            if (nursery.ID === value) {
+                nurseryDetail = nursery;
+            }
+        });
+        if (nurseryDetail) {
+            setFieldsValue({
+                place: nurseryDetail.Address || ''
+            });
+        }
         this.setState({
-            nurseryID: info.key
+            nurseryID: value
         });
     }
     // 选择供应商，设置供应商ID
     handleSupplierSelect = async (value, info) => {
         console.log('info', info);
         this.setState({
-            supplierID: info.key
+            supplierID: value
         });
     }
     render () {
@@ -247,7 +264,7 @@ class ChangeNurseryInfoModal extends Component {
                                             }>
                                             {
                                                 nurseryList.map((nursery) => {
-                                                    return <Option key={nursery.ID} value={nursery.NurseryName}>
+                                                    return <Option key={nursery.ID} value={nursery.ID}>
                                                         {nursery.NurseryName}
                                                     </Option>;
                                                 })
@@ -281,7 +298,7 @@ class ChangeNurseryInfoModal extends Component {
                                             }>
                                             {
                                                 supplierList.map((supplier) => {
-                                                    return <Option key={supplier.ID} value={supplier.SupplierName}>
+                                                    return <Option key={supplier.ID} value={supplier.ID}>
                                                         {supplier.SupplierName}
                                                     </Option>;
                                                 })

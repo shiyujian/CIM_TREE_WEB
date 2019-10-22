@@ -85,7 +85,7 @@ export default class SeedlingsChange extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='苗木信息修改' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

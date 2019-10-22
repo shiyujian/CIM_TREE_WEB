@@ -74,10 +74,16 @@ export default class Nursmeasureinfo extends Component {
                 setkeycode,
                 getThinClassList,
                 getTotalThinClass,
-                getThinClassTree
+                getThinClassTree,
+                getNurseryList,
+                getSupplierList,
+                getNurseryListOK,
+                getSupplierListOK
             },
             treetypes,
-            platform: { tree = {} }
+            platform: { tree = {} },
+            nurseryList,
+            supplierList
         } = this.props;
         // 避免反复获取森林用户数据，提高效率
 
@@ -94,6 +100,19 @@ export default class Nursmeasureinfo extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+        }
+
+        if (!nurseryList) {
+            let nurseryData = await getNurseryList();
+            if (nurseryData && nurseryData.content) {
+                await getNurseryListOK(nurseryData.content);
+            }
+        }
+        if (!supplierList) {
+            let supplierData = await getSupplierList();
+            if (supplierData && supplierData.content) {
+                await getSupplierListOK(supplierData.content);
+            }
         }
 
         // 类型
@@ -167,7 +186,7 @@ export default class Nursmeasureinfo extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='苗圃测量信息' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

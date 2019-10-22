@@ -322,10 +322,24 @@ class HandleChangeDetailModal extends Component {
     // 打开修改苗木信息弹窗
     handlChangeNurseryInfoClick = async () => {
         const {
-            details = []
+            details = [],
+            selectedRowSXM = []
         } = this.state;
         try {
-            let example = details[0];
+            let example = '';
+            let selectSXM = selectedRowSXM[0];
+            let selectDetail = '';
+            details.map((detail) => {
+                if (detail.ZZBM === selectSXM) {
+                    selectDetail = detail;
+                }
+            });
+            console.log('selectDetail', selectDetail);
+            if (selectDetail) {
+                example = selectDetail;
+            } else {
+                example = details[0];
+            }
             this.setState({
                 example,
                 changeNurseryInfoVisible: true,

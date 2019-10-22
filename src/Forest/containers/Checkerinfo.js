@@ -141,7 +141,7 @@ export default class Checkerinfo extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='业主抽查信息' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

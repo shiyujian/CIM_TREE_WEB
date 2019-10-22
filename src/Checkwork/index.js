@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-09-01 16:58:31
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2018-10-24 11:34:15
+ * @Last Modified time: 2019-10-21 15:23:40
  */
 import { injectReducer } from '../store';
 import React, { Component } from 'react';
@@ -17,6 +17,7 @@ import { Route, Switch } from 'react-router-dom';
 import { Main, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
 import Aside from './components/Aside';
+import {CheckWorkMenu} from '_platform/MenuJson';
 
 export default class CheckworkContainer extends Component {
     async componentDidMount () {
@@ -39,7 +40,7 @@ export default class CheckworkContainer extends Component {
                 <Aside>
                     <Submenu
                         {...this.props}
-                        menus={CheckworkContainer.menus}
+                        menus={CheckWorkMenu}
                         defaultOpenKeys={CheckworkContainer.defaultOpenKeys}
                     />
                 </Aside>
@@ -67,32 +68,5 @@ export default class CheckworkContainer extends Component {
         );
     }
 
-    static menus = [
-        {
-            key: 'attendancecount',
-            id: 'CHECKWORK.ATTENDANCECOUNT',
-            path: '/checkwork/attendancecount',
-            name: '考勤统计'
-        },
-        {
-            key: 'checkworksetup',
-            id: 'CHECKWORK.SETUP',
-            name: '考勤设置',
-            children: [
-                {
-                    key: 'electronicfence',
-                    id: 'CHECKWORK.ELECTRONICFENCE',
-                    path: '/checkwork/electronicfence',
-                    name: '电子围栏'
-                },
-                {
-                    key: 'attendancegroup',
-                    id: 'CHECKWORK.ATTENDANCEGROUP',
-                    path: '/checkwork/attendancegroup',
-                    name: '考勤群体'
-                }
-            ]
-        }
-    ];
     static defaultOpenKeys = ['checkworksetup'];
 }

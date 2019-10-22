@@ -119,7 +119,7 @@ export default class DataStatis extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='数据统计' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

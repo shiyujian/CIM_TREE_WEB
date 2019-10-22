@@ -86,7 +86,7 @@ class ParcelManage extends Component {
                 }}
             >
                 <DynamicTitle title='地块管理' {...this.props} />
-                <Sidebar width={190}>
+                <Sidebar>
                     {
                         treeList.length > 0 ? <TreeProjectList
                             treeData={treeList}

@@ -113,7 +113,7 @@ export default class VolunteerManage extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='志愿者管理' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <TreeProjectList
                             treeData={treeList}
                             selectedKeys={leftkeycode}

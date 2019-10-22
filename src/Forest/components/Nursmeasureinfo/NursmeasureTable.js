@@ -50,7 +50,9 @@ export default class NursmeasureTable extends Component {
             checkstatus: '',
             ispack: '',
             imgArr: [],
-            userOptions: []
+            userOptions: [],
+            factoryOptions: [],
+            nurseryOptions: []
         };
     }
     componentDidMount () {
@@ -103,17 +105,10 @@ export default class NursmeasureTable extends Component {
             treetypename,
             ispack,
             mmtype = '',
-            userOptions = []
+            userOptions = [],
+            factoryOptions = [],
+            nurseryOptions = []
         } = this.state;
-        const suffix3 = factory ? (
-            <Icon type='close-circle' onClick={this.emitEmpty3} />
-        ) : null;
-        const suffix4 = treeplace ? (
-            <Icon type='close-circle' onClick={this.emitEmpty4} />
-        ) : null;
-        const suffix5 = nurseryname ? (
-            <Icon type='close-circle' onClick={this.emitEmpty5} />
-        ) : null;
         let columns = [];
         let header = '';
         columns = [
@@ -430,7 +425,6 @@ export default class NursmeasureTable extends Component {
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>产地：</span>
                         <Input
-                            suffix={suffix4}
                             value={treeplace}
                             className='forest-forestcalcw4'
                             onChange={this.placechange.bind(this)}
@@ -438,21 +432,37 @@ export default class NursmeasureTable extends Component {
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>供应商：</span>
-                        <Input
-                            suffix={suffix3}
-                            value={factory}
+                        <Select
+                            allowClear
+                            showSearch
                             className='forest-forestcalcw4'
-                            onChange={this.factorychange.bind(this)}
-                        />
+                            placeholder={'请输入供应商搜索'}
+                            onSearch={this.handleFactorySearch.bind(this)}
+                            onChange={this.handleFactorychange.bind(this)}
+                            showArrow={false}
+                            filterOption={false}
+                            notFoundContent={null}
+                            value={factory || undefined}
+                        >
+                            {factoryOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>苗圃：</span>
-                        <Input
-                            suffix={suffix5}
-                            value={nurseryname}
+                        <Select
+                            allowClear
+                            showSearch
                             className='forest-forestcalcw4'
-                            onChange={this.nurschange.bind(this)}
-                        />
+                            placeholder={'请输入苗圃搜索'}
+                            onSearch={this.handleNurserySearch.bind(this)}
+                            onChange={this.handleNurserychange.bind(this)}
+                            showArrow={false}
+                            filterOption={false}
+                            notFoundContent={null}
+                            value={nurseryname || undefined}
+                        >
+                            {nurseryOptions}
+                        </Select>
                     </div>
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>填报人：</span>
@@ -671,18 +681,73 @@ export default class NursmeasureTable extends Component {
             rolename: value
         });
     }
+    handleFactorySearch = (value) => {
+        const {
+            supplierList = []
+        } = this.props;
+        let factoryOptions = [];
+        if (value && value.length >= 2) {
+            if (supplierList && supplierList instanceof Array && supplierList.length > 0) {
+                supplierList.map((supplier) => {
+                    if (supplier && supplier.SupplierName.indexOf(value) !== -1) {
+                        factoryOptions.push(
+                            <Option
+                                key={supplier.ID}
+                                title={`${supplier.SupplierName}`}
+                                value={supplier.ID}>
+                                {`${supplier.SupplierName}`}
+                            </Option>
+                        );
+                    }
+                });
+            }
+            this.setState({
+                factoryOptions
+            });
+        }
+    }
+    handleFactorychange = (value) => {
+        this.setState({
+            factory: value
+        });
+    }
 
-    factorychange (value) {
-        this.setState({ factory: value.target.value });
+    handleNurserySearch = (value) => {
+        const {
+            nurseryList = []
+        } = this.props;
+        let nurseryOptions = [];
+        if (value && value.length >= 2) {
+            if (nurseryList && nurseryList instanceof Array && nurseryList.lenght > 0) {
+                nurseryList.map((nursery) => {
+                    if (nursery && nursery.NurseryName.indexOf(value) !== -1) {
+                        nurseryOptions.push(
+                            <Option
+                                key={nursery.ID}
+                                title={`${nursery.NurseryName}`}
+                                value={nursery.ID}>
+                                {`${nursery.NurseryName}`}
+                            </Option>
+                        );
+                    }
+                });
+            }
+            this.setState({
+                nurseryOptions
+            });
+        }
+    }
+
+    handleNurserychange = (value) => {
+        this.setState({
+            nurseryname: value
+        });
     }
 
     placechange (value) {
         this.setState({ treeplace: value.target.value });
     }
 
-    nurschange (value) {
-        this.setState({ nurseryname: value.target.value });
-    }
     datepick (value) {
         this.setState({
             stime: value[0]
@@ -758,8 +823,8 @@ export default class NursmeasureTable extends Component {
             ispack = '',
             mmtype = ''
         } = this.state;
-        if (section === '' && sxm === '') {
-            message.info('请选择项目及标段信息或输入顺序码');
+        if (section === '' && sxm === '' && nurseryname === '' && factory === '') {
+            message.info('请选择项目及标段信息或输入顺序码,供应商，苗圃');
             return;
         }
         const {

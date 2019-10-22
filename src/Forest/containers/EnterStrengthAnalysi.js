@@ -67,7 +67,7 @@ export default class EnterStrengthAnalysi extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='进场强度分析' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

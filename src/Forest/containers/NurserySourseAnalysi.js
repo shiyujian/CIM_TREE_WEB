@@ -68,7 +68,7 @@ export default class NurserySourseAnalysi extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='苗木来源地分析' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

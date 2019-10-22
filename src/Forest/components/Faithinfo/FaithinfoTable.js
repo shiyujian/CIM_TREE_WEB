@@ -42,10 +42,6 @@ export default class FaithinfoTable extends Component {
             typeoption
         } = this.props;
         const { factory, section, bigType } = this.state;
-        // 清除
-        const suffix = factory ? (
-            <Icon type='close-circle' onClick={this.emitEmpty} />
-        ) : null;
         let columns = [];
         let header = '';
         columns = [
@@ -120,7 +116,6 @@ export default class FaithinfoTable extends Component {
                     <div className='forest-mrg10'>
                         <span className='forest-search-span'>供应商：</span>
                         <Input
-                            suffix={suffix}
                             value={factory}
                             className='forest-forestcalcw4'
                             onChange={this.factorychange.bind(this)}

@@ -1,0 +1,87 @@
+.steps{ /* 流程图*/
+    height: 150px;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 0 30px;
+    background-color: #fff;
+    border-radius: 4px; 
+    margin-left: 15%;
+}
+.steps .active_wrapper .process_first_icon{
+    /*background: url('../../assets/scene/tianxie_1.png') no-repeat;*/
+    background-size: 100%;
+}
+.steps .active_wrapper  .process_second_icon{
+    /*background: url('../../assets/scene/liuchentu_1.png') no-repeat;*/
+    background-size: 100%;
+}
+.steps .active_wrapper .process_third_icon{
+    /*background: url('../../assets/scene/shangchuan_1.png') no-repeat;*/
+    background-size: 100%; 
+}
+.steps .process_bar{ /* 未完成时状态*/
+    float: left;
+    border:1px solid #ccc;
+    width: 30%;
+    margin-top: 30px;
+}
+.steps .process_bar_finish{ /* 完成时状态*/
+    float: left;
+    border:1px solid #1890ff;
+    width: 30%;
+    margin-top: 30px;
+}
+
+.steps .process_wrapper{
+    float: left;
+    width: 30px;
+    height: 40px;
+    margin-top: 15px;
+    text-align: center;
+}
+.steps span{
+    display: inline-block;
+    width: 150px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 16px;
+    text-align: center;
+    margin-left: -60px;
+}
+.steps p{
+    width: 150px;
+    margin-bottom: 0px;
+    margin-left: -60px;
+}
+.steps .process_icon{
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    margin: 0 auto;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+}
+.steps  .process_current{
+    color: #000;
+}
+.steps  .process_current .process_icon{
+    border: 1px solid #000;
+}
+.steps  .process_finish{
+    color: #1890ff;
+}
+.steps  .process_finish .process_icon{
+    border: 1px solid #1890ff;
+}
+
+:global(.Details .ant-carousel .slick-slide) {
+  text-align: center;
+  height: 160px;
+  line-height: 160px;
+  background: #364d79;
+  overflow: hidden;
+}
+
+:global(.Details .ant-carousel .slick-slide h3) {
+  color: #fff;
+}

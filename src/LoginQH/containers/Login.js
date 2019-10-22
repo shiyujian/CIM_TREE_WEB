@@ -17,6 +17,7 @@ import {
     removePermissions
 } from '_platform/auth';
 import './Login.less';
+import APPImg from './images/senlin.png';
 
 const FormItem = Form.Item;
 
@@ -42,7 +43,8 @@ class Login extends Component {
             checked: '',
             getSecurityCodeStatus: false,
             countDown: 60,
-            setUserStatus: false
+            setUserStatus: false,
+            appDownloadVisible: false
         };
         clearUser();
     }
@@ -129,13 +131,28 @@ class Login extends Component {
         }
     }
 
+    handleAppDownload = () => {
+        this.setState({
+            forgectState: true,
+            appDownloadVisible: true
+        });
+    }
+
+    handleAppDownloadCancel = () => {
+        this.setState({
+            forgectState: false,
+            appDownloadVisible: false
+        });
+    }
+
     render () {
         const { getFieldDecorator } = this.props.form;
         const {
             forgectState,
             getSecurityCodeStatus,
             setUserStatus,
-            countDown
+            countDown,
+            appDownloadVisible
         } = this.state;
         const loginTitle = require('./images/logo1.png');
         const docDescibe = require('./images/doc.png');
@@ -206,7 +223,7 @@ class Login extends Component {
                                         </FormItem>
                                         <FormItem
                                             style={{
-                                                marginTop: '50px',
+                                                marginTop: '40px',
                                                 marginLeft: '24px'
                                             }}
                                         >
@@ -236,7 +253,7 @@ class Login extends Component {
                                         </FormItem>
                                         <FormItem
                                             style={{
-                                                marginTop: '40px',
+                                                marginTop: '30px',
                                                 marginLeft: '10px'
                                             }}
                                         >
@@ -244,26 +261,20 @@ class Login extends Component {
                                                 valuePropName: 'checked',
                                                 initialValue: false
                                             })(
-                                                <div>
+                                                <div style={{display: 'inlineBlock'}}>
                                                     <Checkbox
                                                         style={{
                                                             color: 'gray',
-                                                            paddingLeft: '5%'
+                                                            display: 'inlineBlock'
                                                         }}
-                                                        onChange={this.loginRememberChange.bind(
-                                                            this
-                                                        )}
-                                                        checked={
-                                                            this.state.checked
-                                                        }
+                                                        onChange={this.loginRememberChange.bind(this)}
+                                                        checked={this.state.checked}
                                                     >
                                                         记住密码
                                                     </Checkbox>
                                                     <span
                                                         className='forgetPassword'
-                                                        onClick={this.ForgetPassword.bind(
-                                                            this
-                                                        )}
+                                                        onClick={this.ForgetPassword.bind(this)}
                                                     >
                                                         忘记密码
                                                     </span>
@@ -277,172 +288,216 @@ class Login extends Component {
                                         >
                                             登录
                                         </Button>
+                                        <div style={{marginLeft: 24}}>
+                                            <a
+                                                onClick={this.handleAppDownload.bind(this)}>
+                                                    APP下载
+                                            </a>
+                                        </div>
                                     </Form>
                                 </div>
                             </div>
                         ) : (
-                            <div className='main-box'>
-                                <div className='main-img'>
-                                    <h1
-                                        style={{
-                                            textAlign: 'center',
-                                            color: 'red'
-                                        }}
-                                    />
-                                    <Form
-                                        onSubmit={this.sureSubmit.bind(this)}
-                                        className='login-form'
-                                        id='loginForm'
-                                    >
-                                        <FormItem
-                                            style={{
-                                                marginTop: '40px',
-                                                marginLeft: '24px'
-                                            }}
-                                        >
-                                            {getFieldDecorator('nickname', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请输入用户名'
-                                                    }
-                                                ]
-                                            })(
-                                                <Input
-                                                    id='nickname'
-                                                    style={{
-                                                        color: '#000000',
-                                                        borderBottom:
-                                                            '1px solid #cccccc'
-                                                    }}
-                                                    onChange={this.handleChangeUser.bind(this)}
-                                                    placeholder='请输入用户名'
-                                                />
-                                            )}
-                                        </FormItem>
-
-                                        <FormItem
-                                            style={{
-                                                marginTop: '30px',
-                                                marginLeft: '24px'
-                                            }}
-                                        >
-                                            {getFieldDecorator('phone', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请输入手机号'
-                                                    }
-                                                ]
-                                            })(
-                                                <div>
-                                                    <Input
-                                                        style={{
-                                                            color: '#000000',
-                                                            borderBottom:
-                                                                '1px solid #cccccc'
-                                                        }}
-                                                        id='phoneNumber'
-                                                        placeholder='请输入手机号'
-                                                    />
-                                                    {
-                                                        getSecurityCodeStatus && setUserStatus
-                                                            ? <a
-                                                                className='security-code-status'
-                                                            >{`${countDown}秒后重发`}</a>
-                                                            : <a
-                                                                className='security-code-type'
-                                                                onClick={this.handleGetSecurityCode.bind(
-                                                                    this
-                                                                )}
-                                                            >获取验证码</a>
-                                                    }
-
+                            appDownloadVisible
+                                ? (
+                                    <div className='main-box'>
+                                        <div className='main-at' />
+                                        <a className='login-title'>
+                                            <img src={hello} />
+                                        </a>
+                                        <div className='main-img'>
+                                            <div style={{
+                                                marginLeft: 85
+                                            }}>>
+                                                <div style={{
+                                                    paddingTop: 125
+                                                }}>
+                                                    <h2 style={{marginLeft: 5}}>
+                                                    雄安森林APP下载：
+                                                    </h2>
                                                 </div>
-                                            )}
-                                        </FormItem>
-                                        <FormItem
-                                            style={{
-                                                marginTop: '30px',
-                                                marginLeft: '24px'
-                                            }}
-                                        >
-                                            {getFieldDecorator('securityCode', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '请输入验证码'
-                                                    }
-                                                ]
-                                            })(
-                                                <Input
-                                                    id='securityCode'
+                                                <img src={APPImg} />
+                                                <a
+                                                    type='primary'
+                                                    onClick={this.handleAppDownloadCancel.bind(this)}
                                                     style={{
-                                                        color: '#000000',
-                                                        borderBottom:
-                                                            '1px solid #cccccc'
+                                                        width: '35%',
+                                                        height: '45px',
+                                                        marginTop: 5,
+                                                        marginLeft: 175,
+                                                        fontSize: 16,
+                                                        display: 'block'
                                                     }}
-                                                    placeholder='请输入验证码'
-                                                />
-                                            )}
-                                        </FormItem>
-                                        <FormItem
-                                            style={{
-                                                marginTop: '30px',
-                                                marginLeft: '24px'
-                                            }}
-                                        >
-                                            {getFieldDecorator('newPassWord', {
-                                                rules: [
-                                                    {
-                                                        required: true,
-                                                        message: '6到16位（至少包括字母、数字以及特殊符号中的2种）'
-                                                    },
-                                                    {
-                                                        validator: this.checkPassWord
-                                                    }
-                                                ]
-                                            })(
-                                                <Input
-                                                    id='newPassWord'
-                                                    style={{
-                                                        color: '#000000',
-                                                        borderBottom:
-                                                            '1px solid #cccccc'
-                                                    }}
-                                                    placeholder='6到16位（至少包括字母、数字以及特殊符号中的2种）'
-                                                />
-                                            )}
-                                        </FormItem>
-                                        <Button
-                                            type='primary'
-                                            onClick={this.cancel.bind(this)}
-                                            style={{
-                                                width: '35%',
-                                                height: '45px',
-                                                marginTop: 50,
-                                                marginLeft: '10%',
-                                                fontSize: 18
-                                            }}
-                                        >
+                                                >
                                             返回
-                                        </Button>
-                                        <Button
-                                            type='primary'
-                                            htmlType='submit'
-                                            style={{
-                                                width: '35%',
-                                                height: '45px',
-                                                marginTop: 50,
-                                                marginLeft: '10%',
-                                                fontSize: 18
-                                            }}
-                                        >
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className='main-box'>
+                                        <div className='main-img'>
+                                            <h1
+                                                style={{
+                                                    textAlign: 'center',
+                                                    color: 'red'
+                                                }}
+                                            />
+                                            <Form
+                                                onSubmit={this.sureSubmit.bind(this)}
+                                                className='login-form'
+                                                id='loginForm'
+                                            >
+                                                <FormItem
+                                                    style={{
+                                                        marginTop: '40px',
+                                                        marginLeft: '24px'
+                                                    }}
+                                                >
+                                                    {getFieldDecorator('nickname', {
+                                                        rules: [
+                                                            {
+                                                                required: true,
+                                                                message: '请输入用户名'
+                                                            }
+                                                        ]
+                                                    })(
+                                                        <Input
+                                                            id='nickname'
+                                                            style={{
+                                                                color: '#000000',
+                                                                borderBottom:
+                                                            '1px solid #cccccc'
+                                                            }}
+                                                            onChange={this.handleChangeUser.bind(this)}
+                                                            placeholder='请输入用户名'
+                                                        />
+                                                    )}
+                                                </FormItem>
+
+                                                <FormItem
+                                                    style={{
+                                                        marginTop: '30px',
+                                                        marginLeft: '24px'
+                                                    }}
+                                                >
+                                                    {getFieldDecorator('phone', {
+                                                        rules: [
+                                                            {
+                                                                required: true,
+                                                                message: '请输入手机号'
+                                                            }
+                                                        ]
+                                                    })(
+                                                        <div>
+                                                            <Input
+                                                                style={{
+                                                                    color: '#000000',
+                                                                    borderBottom:
+                                                                '1px solid #cccccc'
+                                                                }}
+                                                                id='phoneNumber'
+                                                                placeholder='请输入手机号'
+                                                            />
+                                                            {
+                                                                getSecurityCodeStatus && setUserStatus
+                                                                    ? <a
+                                                                        className='security-code-status'
+                                                                    >{`${countDown}秒后重发`}</a>
+                                                                    : <a
+                                                                        className='security-code-type'
+                                                                        onClick={this.handleGetSecurityCode.bind(
+                                                                            this
+                                                                        )}
+                                                                    >获取验证码</a>
+                                                            }
+
+                                                        </div>
+                                                    )}
+                                                </FormItem>
+                                                <FormItem
+                                                    style={{
+                                                        marginTop: '30px',
+                                                        marginLeft: '24px'
+                                                    }}
+                                                >
+                                                    {getFieldDecorator('securityCode', {
+                                                        rules: [
+                                                            {
+                                                                required: true,
+                                                                message: '请输入验证码'
+                                                            }
+                                                        ]
+                                                    })(
+                                                        <Input
+                                                            id='securityCode'
+                                                            style={{
+                                                                color: '#000000',
+                                                                borderBottom:
+                                                            '1px solid #cccccc'
+                                                            }}
+                                                            placeholder='请输入验证码'
+                                                        />
+                                                    )}
+                                                </FormItem>
+                                                <FormItem
+                                                    style={{
+                                                        marginTop: '30px',
+                                                        marginLeft: '24px'
+                                                    }}
+                                                >
+                                                    {getFieldDecorator('newPassWord', {
+                                                        rules: [
+                                                            {
+                                                                required: true,
+                                                                message: '6到16位（至少包括字母、数字以及特殊符号中的2种）'
+                                                            },
+                                                            {
+                                                                validator: this.checkPassWord
+                                                            }
+                                                        ]
+                                                    })(
+                                                        <Input
+                                                            id='newPassWord'
+                                                            style={{
+                                                                color: '#000000',
+                                                                borderBottom:
+                                                            '1px solid #cccccc'
+                                                            }}
+                                                            placeholder='6到16位（至少包括字母、数字以及特殊符号中的2种）'
+                                                        />
+                                                    )}
+                                                </FormItem>
+                                                <Button
+                                                    type='primary'
+                                                    onClick={this.cancel.bind(this)}
+                                                    style={{
+                                                        width: '35%',
+                                                        height: '45px',
+                                                        marginTop: 50,
+                                                        marginLeft: '10%',
+                                                        fontSize: 18
+                                                    }}
+                                                >
+                                            返回
+                                                </Button>
+                                                <Button
+                                                    type='primary'
+                                                    htmlType='submit'
+                                                    style={{
+                                                        width: '35%',
+                                                        height: '45px',
+                                                        marginTop: 50,
+                                                        marginLeft: '10%',
+                                                        fontSize: 18
+                                                    }}
+                                                >
                                             确定
-                                        </Button>
-                                    </Form>
-                                </div>
-                            </div>
+                                                </Button>
+                                            </Form>
+                                        </div>
+                                    </div>
+                                )
                         )
                     }
                 </div>

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2019-07-18 09:44:12
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-08-19 10:43:55
+ * @Last Modified time: 2019-10-21 15:20:18
  */
 /**
  *
@@ -55,7 +55,7 @@ import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
-import { Icon } from 'react-fa';
+import {ForestMenu} from '_platform/MenuJson';
 
 export default class ForestContainer extends Component {
     async componentDidMount () {
@@ -99,7 +99,7 @@ export default class ForestContainer extends Component {
                 <Aside>
                     <Submenu
                         {...this.props}
-                        menus={ForestContainer.menus}
+                        menus={ForestMenu}
                         defaultOpenKeys={ForestContainer.defaultOpenKeys}
                     />
                 </Aside>
@@ -253,155 +253,5 @@ export default class ForestContainer extends Component {
         );
     }
 
-    static menus = [
-        {
-            key: 'nursoverallinfo',
-            id: 'FOREST.NURSOVERALLINFO',
-            path: '/forest/nursoverallinfo',
-            name: '苗木综合信息'
-        },
-        {
-            key: 'statis',
-            id: 'FOREST.STATIS',
-            name: '统计图表',
-            children: [
-                {
-                    key: 'useranalysi',
-                    id: 'FOREST.USERANALYSI',
-                    path: '/forest/useranalysi',
-                    name: '用户分析'
-                },
-                {
-                    key: 'nurserysourseanalysi',
-                    id: 'FOREST.NURSERYSOURSEANALYSI',
-                    path: '/forest/nurserysourseanalysi',
-                    name: '苗木来源地分析'
-                },
-                {
-                    key: 'enterstrengthanalysi',
-                    id: 'FOREST.ENTERSTRENGTHANALYSI',
-                    path: '/forest/enterstrengthanalysi',
-                    name: '进场强度分析'
-                },
-                {
-                    key: 'plantstrengthanalysi',
-                    id: 'FOREST.PLANTSTRENGTHANALYSI',
-                    path: '/forest/plantstrengthanalysi',
-                    name: '栽植强度分析'
-                }
-                // {
-                //     key: 'datastatis',
-                //     id: 'FOREST.DATASTATIS',
-                //     path: '/forest/datastatis',
-                //     name: '数据统计'
-                // },
-                // {
-                //     key: 'useranalysis',
-                //     id: 'FOREST.USERANALYSIS',
-                //     path: '/forest/useranalysis',
-                //     name: '用户行为统计'
-                // }
-            ]
-        },
-        {
-            key: 'building',
-            id: 'FOREST.BUILDING',
-            name: '建设期信息',
-            children: [
-                {
-                    key: 'nursmeasureinfo',
-                    id: 'FOREST.NURSMEASUREINFO',
-                    path: '/forest/nursmeasureinfo',
-                    name: '苗圃测量信息'
-                },
-                {
-                    key: 'carpackage',
-                    id: 'FOREST.CARPACKAGE',
-                    path: '/forest/carpackage',
-                    name: '车辆打包信息'
-                },
-                {
-                    key: 'locmeasureinfo',
-                    id: 'FOREST.LOCMEASUREINFO',
-                    path: '/forest/locmeasureinfo',
-                    name: '现场测量信息'
-                },
-                {
-                    key: 'supervisorinfo',
-                    id: 'FOREST.SUPERVISORINFO',
-                    path: '/forest/supervisorinfo',
-                    name: '监理抽查信息'
-                },
-                {
-                    key: 'checkerinfo',
-                    id: 'FOREST.OWNERINFO',
-                    path: '/forest/checkerinfo',
-                    name: '业主抽查信息'
-                }
-            ]
-        },
-        {
-            key: 'management',
-            id: 'FOREST.MANAGEMENT',
-            name: '养管护信息',
-            children: [
-                {
-                    key: 'curinginfo',
-                    id: 'FOREST.CURINGINFO',
-                    path: '/forest/curinginfo',
-                    name: '养护信息'
-                },
-                {
-                    key: 'treeadoptinfo',
-                    id: 'FOREST.TREEADOPTINFO',
-                    path: '/forest/treeadoptinfo',
-                    name: '苗木死亡调查'
-                },
-                {
-                    key: 'dietrees',
-                    id: 'FOREST.DIETREES',
-                    path: '/forest/dietrees',
-                    name: '苗木死亡信息'
-                }
-            ]
-        },
-        {
-            key: 'import',
-            id: 'FOREST.IMPORT',
-            name: '数据信息维护',
-            children: [
-                {
-                    key: 'seedlingschange',
-                    id: 'FOREST.SEEDLINGSCHANGE',
-                    path: '/forest/seedlingschange',
-                    name: '苗木信息修改'
-                },
-                {
-                    key: 'treedataclear',
-                    id: 'FOREST.TREEDATACLEAR',
-                    path: '/forest/treedataclear',
-                    name: '苗木信息删除'
-                },
-                {
-                    key: 'dataimport',
-                    id: 'FOREST.DATAIMPORT',
-                    path: '/forest/dataimport',
-                    name: '定位数据导入'
-                },
-                {
-                    key: 'dataexport',
-                    id: 'FOREST.DATAEXPORT',
-                    path: '/forest/dataexport',
-                    name: '定位数据导出'
-                }
-            ]
-        },
-        {
-            key: 'degitalaccept',
-            id: 'FOREST.DEGITALACCEPT',
-            path: '/forest/degitalaccept',
-            name: '数字化验收'
-        }
-    ];
     static defaultOpenKeys = [''];
 }

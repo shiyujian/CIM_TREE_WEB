@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
 import { Main, Aside, Body } from '_platform/components/layout';
 import Submenu from '_platform/components/panels/Submenu';
-import { Icon } from 'react-fa';
+import {SlefCareMenu} from '_platform/MenuJson';
 
 export default class Selfcare extends Component {
     async componentDidMount () {
@@ -17,11 +17,16 @@ export default class Selfcare extends Component {
     }
 
     render () {
-        const { Tasks, Task, Query, Leave } = this.state || {};
+        const {
+            Tasks,
+            Task,
+            Query,
+            Leave
+        } = this.state || {};
         return (
             <Body>
                 <Aside>
-                    <Submenu {...this.props} menus={Selfcare.menus} />
+                    <Submenu {...this.props} menus={SlefCareMenu} />
                 </Aside>
                 <Main>
                     {Tasks && (
@@ -44,28 +49,4 @@ export default class Selfcare extends Component {
             </Body>
         );
     }
-
-    static menus = [
-        {
-            key: 'tasks',
-            id: 'SELFCARE.TASK',
-            name: '个人任务',
-            path: '/selfcare/task',
-            icon: <Icon name='tasks' />
-        }
-        // {
-        //     key: 'query',
-        //     id: 'SELFCARE.QUERY',
-        //     name: '个人考勤',
-        //     path: '/selfcare/query',
-        //     icon: <Icon name='shekel' />
-        // },
-        // {
-        //     key: 'leave',
-        //     id: 'SELFCARE.LEAVE',
-        //     name: '个人请假',
-        //     path: '/selfcare/leave',
-        //     icon: <Icon name='shekel' />
-        // }
-    ];
 }

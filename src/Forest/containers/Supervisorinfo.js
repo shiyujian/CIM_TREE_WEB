@@ -158,7 +158,7 @@ export default class Supervisorinfo extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='监理验收信息' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

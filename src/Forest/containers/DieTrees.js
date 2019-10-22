@@ -178,7 +178,7 @@ export default class DieTrees extends Component {
             <Body>
                 <Main>
                     <DynamicTitle title='苗木死亡信息' {...this.props} />
-                    <Sidebar width={190}>
+                    <Sidebar>
                         <PkCodeTree
                             treeData={treeList}
                             selectedKeys={leftkeycode}

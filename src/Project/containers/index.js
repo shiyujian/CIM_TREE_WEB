@@ -10,3 +10,4 @@ export ThinClassParcelManage from './ThinClassParcelManage';
 export ThinClassTreeTypeManage from './ThinClassTreeTypeManage';
 export ParcelStorage from './ParcelStorage';
 export ParcelManage from './ParcelManage';
+export QRCodeDistribute from './QRCodeDistribute';

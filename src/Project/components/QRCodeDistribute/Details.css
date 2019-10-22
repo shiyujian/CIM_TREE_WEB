@@ -1,0 +1,18 @@
+
+.QRCodeDetails{
+    .ant-form-item-label{
+        text-align-last: justify;
+    }
+}
+
+:global(.Details .ant-carousel .slick-slide) {
+  text-align: center;
+  height: 160px;
+  line-height: 160px;
+  background: #364d79;
+  overflow: hidden;
+}
+
+:global(.Details .ant-carousel .slick-slide h3) {
+  color: #fff;
+}
