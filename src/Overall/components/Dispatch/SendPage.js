@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     Table,
-    Tabs,
+    Divider,
     Button,
     Row,
     Col,
@@ -13,7 +13,10 @@ import {
     Form,
     DatePicker
 } from 'antd';
-import { getUser } from '_platform/auth';
+import {
+    getUser,
+    trim
+} from '_platform/auth';
 import moment from 'moment';
 import SendPageModal from './SendPageModal';
 import './index.less';
@@ -111,7 +114,6 @@ class SendPage extends Component {
                 return (
                     <div>
                         <a
-                            style={{ marginRight: '10px' }}
                             onClick={this._viewClick.bind(
                                 this,
                                 record
@@ -119,6 +121,7 @@ class SendPage extends Component {
                         >
                             查看
                         </a>
+                        <Divider type='vertical' />
                         <Popconfirm
                             title='确定删除吗?'
                             onConfirm={this._deleteClick.bind(this, record.ID)}
@@ -275,7 +278,7 @@ class SendPage extends Component {
             console.log('values', values);
             console.log('err', err);
             let postData = {
-                filename: values.title1 || '', // 邮件名称
+                filename: trim(values.title1) || '', // 邮件名称
                 receivingunit: values.orgLists1 || '', // 接收单位
                 sendunit: permission ? '' : parentOrgID, // 如果不是管理员，获取自己公司的收文
                 copyunit: values.ccLists1 || '', // 抄送单位
@@ -484,6 +487,7 @@ class SendPage extends Component {
                     onCancel={this.handleCancel.bind(this)}
                     closable={false}
                     maskClosable={false}
+                    footer={null}
                     // footer={null}
                 >
                     <div>
@@ -504,6 +508,13 @@ class SendPage extends Component {
                                 __html: detail && detail.Text
                             }}
                         />
+                        <Row>
+                            <Button
+                                onClick={this.handleCancel.bind(this)}
+                                style={{float: 'right'}}>
+                                关闭
+                            </Button>
+                        </Row>
                     </div>
                 </Modal>
             </Row>

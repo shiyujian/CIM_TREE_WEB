@@ -6,7 +6,11 @@ export default () => {
 };
 
 export const trim = (str) => {
-    return str.replace(/(^\s*)|(\s*$)/g, '');
+    if (str) {
+        return str.replace(/(^\s*)|(\s*$)/g, '');
+    } else {
+        return str;
+    }
 };
 
 export const getUser = () => {

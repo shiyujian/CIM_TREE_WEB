@@ -10,11 +10,15 @@ import {
     Form,
     Input,
     DatePicker,
-    Select
+    Select,
+    Divider
 } from 'antd';
 import moment from 'moment';
 import ReceivePageModal from './ReceivePageModal';
-import { getUser } from '_platform/auth';
+import {
+    getUser,
+    trim
+} from '_platform/auth';
 import './index.less';
 
 const Option = Select.Option;
@@ -79,25 +83,49 @@ class ReceivePage extends Component {
         {
             title: '操作',
             render: record => {
-                return (
-                    <span>
-                        <a
-                            style={{ marginRight: '10px' }}
-                            onClick={this._viewClick.bind(
-                                this,
-                                record
-                            )}
-                        >
-                            查看
-                        </a>
-                        <a
-                            style={{ marginRight: '10px' }}
-                            onClick={this._sentDoc.bind(this, record)}
-                        >
-                            回文
-                        </a>
-                    </span>
-                );
+                const {
+                    permission,
+                    parentOrgID
+                } = this.props;
+                if (permission) {
+                    return (
+                        <span>
+                            <a
+                                onClick={this._viewClick.bind(this, record)}
+                            >
+                                查看
+                            </a>
+                        </span>
+                    );
+                } else {
+                    if (record.ReceivingUnit.indexOf(parentOrgID) !== -1) {
+                        return (
+                            <span>
+                                <a
+                                    onClick={this._viewClick.bind(this, record)}
+                                >
+                                    查看
+                                </a>
+                                <Divider type='vertical' />
+                                <a
+                                    onClick={this._sentDoc.bind(this, record)}
+                                >
+                                    回文
+                                </a>
+                            </span>
+                        );
+                    } else {
+                        return (
+                            <span>
+                                <a
+                                    onClick={this._viewClick.bind(this, record)}
+                                >
+                                    查看
+                                </a>
+                            </span>
+                        );
+                    }
+                }
             }
         }
     ];
@@ -208,18 +236,32 @@ class ReceivePage extends Component {
 
         this.props.form.validateFields(async (err, values) => {
             console.log('err', err);
-            let postData = {
-                filename: values.title || '', // 邮件名称
+            let receivePostData = {
+                filename: trim(values.title) || '', // 邮件名称
                 sendunit: values.orgLists || '', // 发文单位id
                 receivingunit: permission ? '' : parentOrgID, // 如果不是管理员，获取自己公司的收文
                 // copyunit:       //抄送单位
                 sTime: stime, // 开始时间
                 eTime: etime // 结束时间
             };
-            let data = await getDispatchs({}, postData);
+            let receiveData = await getDispatchs({}, receivePostData);
             let dataSource = [];
-            if (data && data.content) {
-                dataSource = data.content;
+            if (receiveData && receiveData.content && receiveData.content.length > 0) {
+                dataSource = receiveData.content;
+            }
+            if (!permission) {
+                let copyPostData = {
+                    filename: values.title || '', // 邮件名称
+                    sendunit: values.orgLists || '', // 发文单位id
+                    // receivingunit: permission ? '' : parentOrgID, // 如果不是管理员，获取自己公司的收文
+                    copyunit: permission ? '' : parentOrgID, // 如果不是管理员，获取自己公司的收文
+                    sTime: stime, // 开始时间
+                    eTime: etime // 结束时间
+                };
+                let copyData = await getDispatchs({}, copyPostData);
+                if (copyData && copyData.content && copyData.content.length > 0) {
+                    dataSource = dataSource.concat(copyData.content);
+                }
             }
             this.setState({
                 dataSource: dataSource
@@ -390,6 +432,7 @@ class ReceivePage extends Component {
                     onCancel={this.handleCancel.bind(this)}
                     closable={false}
                     maskClosable={false}
+                    footer={null}
                 // footer={null}
                 >
                     <div>
@@ -410,6 +453,13 @@ class ReceivePage extends Component {
                                 __html: detail && detail.Text
                             }}
                         />
+                        <Row>
+                            <Button
+                                onClick={this.handleCancel.bind(this)}
+                                style={{float: 'right'}}>
+                                关闭
+                            </Button>
+                        </Row>
                     </div>
                 </Modal>
             </Row>
