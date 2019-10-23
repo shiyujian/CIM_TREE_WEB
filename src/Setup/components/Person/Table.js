@@ -377,8 +377,8 @@ class Users extends Component {
                 <Col span={3}>
                     <Button
                         onClick={this.append.bind(this)}
-                        // disabled={!(node && node.ID)}
-                        disabled
+                        disabled={!(node && node.ID)}
+                        // disabled
                     >
                         添加用户
                     </Button>
