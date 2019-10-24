@@ -145,7 +145,7 @@ class TableList extends Component {
         let dk = this.props.section;
         let sections = this.props.section;
         let projectList = this.props.projectList;
-        if (projectList.length > 0 && dk !== undefined) {
+        if (projectList.length > 0 && dk) {
             for (let i = 0; i < projectList.length; i++) {
                 if (projectList[i].No === dk.split('-')[0]) {
                     dk = projectList[i].Name;

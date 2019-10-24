@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-22 15:10:38
+ * @Last Modified time: 2019-10-24 14:39:03
  */
 /**
  *
@@ -47,9 +47,10 @@ import 'whatwg-fetch';
 require('es6-promise').polyfill();
 
 window.config = window.config || {};
-let DOMAIN;
+let DOMAIN, SDOMAIN;
 
 DOMAIN = window.config.DOMAIN;
+SDOMAIN = window.config.SDOMAIN;
 
 /** *********************公共资源服务**************************/
 export { DOMAIN };
@@ -102,7 +103,7 @@ export const DB_API = `${DOMAIN}/db`;
 // 二维码分发
 export const QRCODE_API = `${DOMAIN}/qrcode`;
 // 会议服务
-export const MEETING_API = `${DOMAIN}/meeting`;
+export const MEETING_API = `${SDOMAIN}/meeting`;
 // 文件导出服务
 export const DOCEXPORT_API = `${DOMAIN}/DocExport.ashx`;
 // 验证码服务

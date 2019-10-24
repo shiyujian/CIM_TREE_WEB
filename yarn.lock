@@ -4569,6 +4569,11 @@ gauge@~2.7.3:
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
 
+gcoord@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/gcoord/-/gcoord-0.2.3.tgz#bdf8d48ed199785177eb29727ef3ab16b29d895e"
+  integrity sha512-BxSlrzGzv/tNzkyTS3/wWTH/EL0dWFLGNAC2wNFPUrlJ5dm9qrzgE6G1kuT/hjkbzr68tlDimcw6wZ3YCwHWzg==
+
 geojson-equality@0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/geojson-equality/-/geojson-equality-0.1.6.tgz#a171374ef043e5d4797995840bae4648e0752d72"

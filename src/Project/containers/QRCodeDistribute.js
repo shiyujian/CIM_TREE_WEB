@@ -125,15 +125,21 @@ export default class QRCodeDistribute extends Component {
 
     getMmQrcodes (queryParams) { // 获取二维码申请列表和审核列表
         const {actions: {getQrcodes}} = this.props;
-        let params = '';
         let section = this.state.section ? this.state.section : '';
         let isgarden = 0;
         let status = queryParams ? (queryParams.status ? queryParams.status : '') : '';
         let gardentype = queryParams ? (queryParams.gardentype ? queryParams.gardentype : '') : '';
         let stime = queryParams ? (queryParams.stime ? queryParams.stime : '') : '';
         let etime = queryParams ? (queryParams.etime ? queryParams.etime : '') : '';
-        params = 'section=' + section + '&isgarden=' + isgarden + '&status=' + status + '&gardentype=' + gardentype + '&stime=' + stime + '&etime=' + etime;
-        getQrcodes({params})
+        let postData = {
+            section: section,
+            isgarden: isgarden,
+            status: status,
+            gardentype: gardentype,
+            stime: stime,
+            etime: etime
+        };
+        getQrcodes({}, postData)
             .then((data) => {
                 this.setState({
                     mmqrcodelist: data.content
@@ -143,15 +149,21 @@ export default class QRCodeDistribute extends Component {
 
     getQrcodes (queryParams) { // 获取二维码申请列表和审核列表
         const {actions: {getQrcodes}} = this.props;
-        let params = '';
         let section = this.state.section ? this.state.section : '';
         let isgarden = 1;
         let status = queryParams ? (queryParams.status ? queryParams.status : '') : '';
         let gardentype = queryParams ? (queryParams.gardentype ? queryParams.gardentype : '') : '';
         let stime = queryParams ? (queryParams.stime ? queryParams.stime : '') : '';
         let etime = queryParams ? (queryParams.etime ? queryParams.etime : '') : '';
-        params = 'section=' + section + '&isgarden=' + isgarden + '&status=' + status + '&gardentype=' + gardentype + '&stime=' + stime + '&etime=' + etime;
-        getQrcodes({params})
+        let postData = {
+            section: section,
+            isgarden: isgarden,
+            status: status,
+            gardentype: gardentype,
+            stime: stime,
+            etime: etime
+        };
+        getQrcodes({}, postData)
             .then((data) => {
                 this.setState({
                     qrcodelist: data.content

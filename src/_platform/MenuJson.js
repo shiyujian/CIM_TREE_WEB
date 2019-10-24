@@ -6,15 +6,22 @@ export const OverallMenu = [
         key: 'news',
         id: 'OVERALL.NEWS',
         path: '/overall/news',
-        name: '新闻通知',
-        icon: <Icon name='calendar-check-o' />
+        name: '新闻通知'
+        // icon: <Icon name='calendar-check-o' />
     },
     {
         key: 'dispatch',
         id: 'OVERALL.DISPATCH',
         path: '/overall/dispatch',
-        name: '现场收发文',
-        icon: <Icon name='newspaper-o' />
+        name: '现场收发文'
+        // icon: <Icon name='newspaper-o' />
+    },
+    {
+        key: 'MeetingManage',
+        id: 'OVERALL.MEETINGMANAGE',
+        path: '/overall/MeetingManage',
+        name: '会议管理'
+        // icon: <Icon name='newspaper-o' />
     }
 ];
 export const ScheduleMenu = [

@@ -135,19 +135,8 @@ class ChartList extends Component {
         // }
     }
     render () {
-        const {} = this.state;
         return (
             <div style={{margin: 10, height: 310}}>
-                {/* this.props.qrcodestatcount.length>0?
-                    <div id='lineChart' style={{float: 'left', width: '50%', height: 300, borderRadius: 5, border:'1px solid #ccc',padding: 10}}></div>
-                    :
-                    <div id='lineChart' style={{float: 'left', width: '50%', height: 300, borderRadius: 5, border:'1px solid #ccc',padding: 10, textAlign:'center', lineHeight:'300px'}}>暂无数据</div>
-                }
-                {this.props.qrcodestat.length>0?
-                    <div id='pieChart' style={{float: 'left',marginLeft: '1%', width: '49%', height: 300, borderRadius: 5, border:'1px solid #ccc', padding: 10}}></div>
-                    :
-                    <div id='pieChart' style={{float: 'left',marginLeft: '1%', width: '49%', height: 300, borderRadius: 5, border:'1px solid #ccc', padding: 10, textAlign:'center', lineHeight:'300px'}}>暂无数据</div>
-                */}
                 <div id='lineChart' style={{float: 'left', width: '50%', height: 300, borderRadius: 5, border: '1px solid #ccc', padding: 10}} />
                 <div id='pieChart' style={{float: 'left', marginLeft: '1%', width: '49%', height: 300, borderRadius: 5, border: '1px solid #ccc', padding: 10}} />
             </div>

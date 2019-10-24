@@ -60,7 +60,7 @@ class Examine extends Component {
                 gardentype: gardentype
             };
         }
-        getQrcodestores({}, {params})
+        getQrcodestores({}, params)
             .then((data) => {
                 if (data && data.content && data.content.length > 0) {
                     this.setState({
@@ -135,7 +135,7 @@ class Examine extends Component {
         } = this.props;
         let dk = detailRow.Section;
         let sections = detailRow.Section;
-        if (projectList.length > 0 && dk !== undefined) {
+        if (projectList.length > 0 && dk) {
             for (let i = 0; i < projectList.length; i++) {
                 if (projectList[i].No === dk.split('-')[0]) {
                     dk = projectList[i].Name;

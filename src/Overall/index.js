@@ -19,7 +19,8 @@ export default class Overall extends Component {
     render () {
         const {
             News,
-            Dispatch
+            Dispatch,
+            MeetingManage
         } = this.state || {};
         return (
             <Body>
@@ -31,39 +32,11 @@ export default class Overall extends Component {
                     {Dispatch && (
                         <Route path='/overall/dispatch' component={Dispatch} />
                     )}
+                    {MeetingManage && (
+                        <Route path='/overall/meetingmanage' component={MeetingManage} />
+                    )}
                 </Switch>
             </Body>
         );
     }
-
-    static menus = [
-        {
-            key: 'news',
-            id: 'OVERALL.NEWS',
-            path: '/overall/news',
-            name: '新闻通知',
-            icon: <Icon name='calendar-check-o' />
-        }
-        // {
-        //     key: 'dispatch',
-        //     id: 'OVERALL.DISPATCH',
-        //     path: '/overall/dispatch',
-        //     name: '现场收发文',
-        //     icon: <Icon name='newspaper-o' />
-        // },
-        // {
-        //     key: 'material',
-        //     id: 'OVERALL.MATERAIL',
-        //     path: '/overall/material',
-        //     name: '物资管理',
-        //     icon: <Icon name='bars' />
-        // },
-        // {
-        //     key: 'form',
-        //     id: 'OVERALL.FORM',
-        //     path: '/overall/formmanage',
-        //     name: '表单管理',
-        //     icon: <Icon name='file-text' />
-        // }
-    ];
 }

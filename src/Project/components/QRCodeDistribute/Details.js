@@ -28,7 +28,7 @@ export default class Details extends Component {
         let dk = detailRow.Section;
         let sections = detailRow.Section;
         let startendNo = detailRow.Distributes ? detailRow.Distributes[0].StartNo + ' - ' + detailRow.Distributes[0].EndNo : '';
-        if (projectList.length > 0 && dk !== undefined) {
+        if (projectList.length > 0 && dk) {
             for (let i = 0; i < projectList.length; i++) {
                 if (projectList[i].No === dk.split('-')[0]) {
                     dk = projectList[i].Name;

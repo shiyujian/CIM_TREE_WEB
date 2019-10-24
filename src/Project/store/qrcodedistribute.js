@@ -6,7 +6,7 @@ import createFetchAction from 'fetch-action';
 export const ID = 'Project_QRCodeDistribute';
 
 // 获取二维码申请和审核列表
-const getQrcodes = createFetchAction(`${QRCODE_API}/qrcodes?{{params}}`, [], 'GET');
+const getQrcodes = createFetchAction(`${QRCODE_API}/qrcodes`, [], 'GET');
 // 获取二维码申请详情
 const getQrcodeDetail = createFetchAction(`${QRCODE_API}/qrcode/{{ID}}`, [], 'GET');
 // 二维码申请

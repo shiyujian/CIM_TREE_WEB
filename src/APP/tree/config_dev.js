@@ -27,7 +27,7 @@ window.config = {
     // 测试库接口地址
     // DOMAIN: 'http://39.97.163.176:6510',
     // 林总用户接口地址
-    SDOMAIN: 'http://39.97.163.176',
+    SDOMAIN: 'http://www.xazhyl.com',
     // 二维展示根据坐标获取树木顺序码端口
     DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
     // 灌溉接口
