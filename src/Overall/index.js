@@ -20,7 +20,11 @@ export default class Overall extends Component {
         const {
             News,
             Dispatch,
-            MeetingManage
+            MeetingManage,
+            Standard,
+            Engineering,
+            Redios,
+            Interim
         } = this.state || {};
         return (
             <Body>
@@ -35,6 +39,22 @@ export default class Overall extends Component {
                     {MeetingManage && (
                         <Route path='/overall/meetingmanage' component={MeetingManage} />
                     )}
+                    {
+                        Standard &&
+                        <Route exact path='/overall/standard' component={Standard} />
+                    }
+                    {
+                        Engineering &&
+                        <Route path='/overall/engineering' component={Engineering} />
+                    }
+                    {
+                        Redios &&
+                        <Route path='/overall/redios' component={Redios} />
+                    }
+                    {
+                        Interim &&
+                        <Route path='/overall/interim' component={Interim} />
+                    }
                 </Switch>
             </Body>
         );

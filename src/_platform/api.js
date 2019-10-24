@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-24 14:39:03
+ * @Last Modified time: 2019-10-24 21:26:25
  */
 /**
  *
@@ -380,15 +380,30 @@ export const MODULES = [
             {
                 id: 'OVERALL.DISPATCH',
                 name: '现场收发文'
+            },
+            {
+                id: 'OVERALL.MEETINGMANAGE',
+                name: '会议管理'
+            },
+            {
+                id: 'OVERALL.DATUM.NONE',
+                name: '资料文档',
+                children: [
+                    {
+                        id: 'OVERALL.STANDARD',
+                        name: '制度标准'
+                    }, {
+                        id: 'OVERALL.ENGINEERING',
+                        name: '工程文档'
+                    }, {
+                        id: 'OVERALL.REDIOS',
+                        name: '会议记录'
+                    }, {
+                        id: 'OVERALL.INTERIM',
+                        name: '过程资料'
+                    }
+                ]
             }
-            // {
-            //     id: 'OVERALL.MATERAIL',
-            //     name: '物资管理'
-            // },
-            // {
-            //     id: 'OVERALL.FORM',
-            //     name: '表单管理'
-            // }
         ]
     },
     {

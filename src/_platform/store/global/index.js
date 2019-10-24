@@ -10,7 +10,8 @@ import {
     usersFactory,
     workflowAction,
     orgFactory,
-    rolesFactory
+    rolesFactory,
+    docFactory
 } from '../higher-order';
 import { actionsMap } from '../util';
 
@@ -20,6 +21,7 @@ const rolesReducer = rolesFactory(ID);
 const taskReducer = taskFactory(ID);
 const tasksReducer = tasksFactory(ID);
 const usersReducer = usersFactory(ID);
+const docReducer = docFactory(ID);
 
 export const actions = {
     ...asideActions,
@@ -31,7 +33,8 @@ export const actions = {
     ...orgReducer,
     ...rolesReducer,
     ...workflowAction,
-    ...treeActions
+    ...treeActions,
+    ...docReducer
     // ...progressActions
 };
 
@@ -72,6 +75,10 @@ export default handleActions(
         [combineActions(...actionsMap(rolesReducer))]: (state, action) => ({
             ...state,
             roles: rolesReducer(state.roles, action)
+        }),
+        [combineActions(...actionsMap(docReducer))]: (state, action) => ({
+            ...state,
+            doc: docReducer(state.doc, action)
         })
     },
     {}

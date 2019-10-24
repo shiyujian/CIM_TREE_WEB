@@ -22,6 +22,34 @@ export const OverallMenu = [
         path: '/overall/MeetingManage',
         name: '会议管理'
         // icon: <Icon name='newspaper-o' />
+    },
+    {
+        key: 'datum',
+        id: 'OVERALL.DATUM',
+        name: '资料文档',
+        children: [
+            {
+                key: 'standard',
+                id: 'OVERALL.STANDARD',
+                path: '/overall/standard',
+                name: '制度标准'
+            }, {
+                key: 'engineering',
+                id: 'OVERALL.ENGINEERING',
+                path: '/overall/engineering',
+                name: '工程文档'
+            }, {
+                key: 'redios',
+                id: 'OVERALL.REDIOS',
+                path: '/overall/redios',
+                name: '会议记录'
+            }, {
+                key: 'interim',
+                id: 'OVERALL.INTERIM',
+                path: '/overall/interim',
+                name: '过程资料'
+            }
+        ]
     }
 ];
 export const ScheduleMenu = [
