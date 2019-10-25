@@ -649,8 +649,10 @@ class Users extends Component {
                 status: searchUserStatus === undefined ? '' : searchUserStatus
             };
             if (!searchOveralSituation) {
-                if (node && node.ID) {
-                    postData.org = (node && node.ID) || '';
+                if (node && node.OrgPK) {
+                    postData.org = node.OrgPK;
+                } else if (node && node.ID) {
+                    postData.org = node.ID;
                 } else {
                     Notification.error({
                         message: '请先选择部门'
