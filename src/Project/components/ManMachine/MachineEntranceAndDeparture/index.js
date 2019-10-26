@@ -1,0 +1,1 @@
+export MachineEntranceAndDepartureTable from './MachineEntranceAndDepartureTable';

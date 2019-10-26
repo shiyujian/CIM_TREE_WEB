@@ -293,6 +293,20 @@ export const SlefCareMenu = [
 ];
 export const SetupMenu = [
     {
+        key: 'Person',
+        id: 'SETUP.PERSON',
+        name: '用户管理',
+        path: '/setup/person',
+        icon: <Icon name='users' />
+    },
+    {
+        key: 'Org',
+        id: 'SETUP.ORG',
+        name: '组织机构',
+        path: '/setup/org',
+        icon: <Icon name='street-view' />
+    },
+    {
         key: 'Role',
         id: 'SETUP.ROLE',
         name: '角色设置',
@@ -308,25 +322,11 @@ export const SetupMenu = [
         icon: <Icon name='key' />
     },
     {
-        key: 'Person',
-        id: 'SETUP.PERSON',
-        name: '用户管理',
-        path: '/setup/person',
-        icon: <Icon name='users' />
-    },
-    {
         key: 'Workflow',
         id: 'SETUP.WORKFLOW',
         name: '流程设置',
         path: '/setup/workflow',
         icon: <Icon name='object-group' />
-    },
-    {
-        key: 'Org',
-        id: 'SETUP.ORG',
-        name: '组织机构',
-        path: '/setup/org',
-        icon: <Icon name='street-view' />
     },
     {
         key: 'Blacklist',
@@ -430,6 +430,31 @@ export const ProjectMenu = [
                 id: 'PROJECT.RELEVANCEMANAGEMENT',
                 name: '绑定管理',
                 path: '/project/relevanceManagement'
+            }
+        ]
+    },
+    {
+        key: 'ManMachine ',
+        name: '人机物料',
+        id: 'PROJECT.MANMACHINE.NONE',
+        children: [
+            {
+                key: 'ManEntranceAndDeparture',
+                id: 'PROJECT.MANENTRANCEANDDEPARTURE',
+                name: '人员进离场',
+                path: '/project/manentranceanddeparture'
+            },
+            {
+                key: 'MachineEntranceAndDeparture',
+                id: 'PROJECT.MACHINEENTRANCEANDDEPARTURE',
+                name: '机械进离场',
+                path: '/project/machineentranceanddeparture'
+            },
+            {
+                key: 'ManMachineGroup',
+                id: 'PROJECT.MANMACHINEGROUP',
+                name: '班组维护',
+                path: '/project/manmachinegroup'
             }
         ]
     }
