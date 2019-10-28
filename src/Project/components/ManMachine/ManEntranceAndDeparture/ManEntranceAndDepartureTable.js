@@ -787,31 +787,34 @@ export default class ManEntranceAndDepartureTable extends Component {
                                             </div> */}
                                         </div>
                                     </div>
-                                    <div style={{
-                                        display: 'inline-block',
-                                        paddingLeft: '5px',
-                                        paddingRight: '5px'
-                                    }}>
-                                        <div
-                                            style={{
-                                                width: '50px',
-                                                display: 'inline-block',
-                                                textAlign: 'right',
-                                                verticalAlign: 'top'
-                                            }}
-                                        >
+                                    <div>
+                                        <div style={{
+                                            display: 'inline-block',
+                                            paddingLeft: '5px',
+                                            paddingRight: '5px'
+                                        }}>
+                                            <div
+                                                style={{
+                                                    width: '50px',
+                                                    display: 'inline-block',
+                                                    textAlign: 'right',
+                                                    verticalAlign: 'top'
+                                                }}
+                                            >
                                         单位：
-                                        </div>
-                                        <div
-                                            style={{
-                                                width: 'calc(100% - 50px)',
-                                                display: 'inline-block'
-                                            }}
-                                        >
-                                            {printData.orgName}
-                                            {/* 华东勘测设计研究院 */}
+                                            </div>
+                                            <div
+                                                style={{
+                                                    width: 'calc(100% - 50px)',
+                                                    display: 'inline-block'
+                                                }}
+                                            >
+                                                {printData.orgName}
+                                                {/* 华东勘测设计研究院 */}
+                                            </div>
                                         </div>
                                     </div>
+
                                 </Row>
                             </div>
                         );
