@@ -242,7 +242,7 @@ export default class CarPackageTable extends Component {
     componentDidMount () {
     }
     componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode != this.state.leftkeycode) {
+        if (nextProps.leftkeycode !== this.state.leftkeycode) {
             this.setState(
                 {
                     leftkeycode: nextProps.leftkeycode

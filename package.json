@@ -1,7 +1,7 @@
 {
   "name": "CIM_WEB",
-  "description": "森林大数据建设管理平台5.00.8",
-  "version": "5.00.8",
+  "description": "森林大数据建设管理平台5.00.9",
+  "version": "5.00.9",
   "main": "src/index.js",
   "author": "ECIDI",
   "license": "GPL",
@@ -98,7 +98,6 @@
     "moment": "^2.18.1",
     "normalize.css": "^5.0.0",
     "prop-types": "^15.5.10",
-    "qrcode.react": "^0.7.2",
     "query-string": "^5.0.0",
     "react": "^15.6.1",
     "react-d3-components": "^0.6.6",
@@ -125,6 +124,7 @@
     "whatwg-fetch": "^2.0.2",
     "wolfy87-eventemitter": "^5.2.1",
     "xlsx": "^0.14.1",
+    "qrcode.react": "^0.9.3",
     "gcoord": "^0.2.3"
   }
 }

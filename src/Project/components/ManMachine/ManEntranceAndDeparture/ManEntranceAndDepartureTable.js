@@ -252,7 +252,7 @@ export default class ManEntranceAndDepartureTable extends Component {
             });
             return;
         }
-        let tblData = rst.content;
+        let contentData = rst.content;
         console.log('companyList', companyList);
         let orgName = '';
         companyList.map((company) => {
@@ -264,8 +264,8 @@ export default class ManEntranceAndDepartureTable extends Component {
         // 获取填报人唯一性数组
         let userIDList = [];
         let userDataList = [];
-        for (let i = 0; i < tblData.length; i++) {
-            let plan = tblData[i];
+        for (let i = 0; i < contentData.length; i++) {
+            let plan = contentData[i];
             plan.order = (page - 1) * 10 + i + 1;
             // 公司名
             plan.orgName = orgName || '';
@@ -313,14 +313,18 @@ export default class ManEntranceAndDepartureTable extends Component {
         pagination.total = (rst.pageinfo && rst.pageinfo.total) || 0;
         pagination.pageSize = 10;
         this.setState({
-            tblData,
+            tblData: contentData,
             pagination,
             selectedRowKeys: [],
             dataSourceSelected: []
         }, () => {
+            const {
+                tblData
+            } = this.state;
             for (let t = 0; t < tblData.length; t++) {
                 let data = tblData[t];
                 var canvas = document.getElementById(`${data.ID}`);
+                console.log('canvas', canvas);
                 var strDataURI = canvas.toDataURL('image/png');
                 data.src = strDataURI;
             }
@@ -537,7 +541,7 @@ export default class ManEntranceAndDepartureTable extends Component {
             selectedRowKeys,
             onChange: this.onSelectChange
         };
-        console.log('printDataSource', printDataSource);
+        console.log('tblData', tblData);
         return (
             <div>
                 {this.treeTable(tblData)}

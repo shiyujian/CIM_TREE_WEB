@@ -251,7 +251,7 @@ class ReceivePage extends Component {
             }
             if (!permission) {
                 let copyPostData = {
-                    filename: values.title || '', // 邮件名称
+                    filename: trim(values.title) || '', // 邮件名称
                     sendunit: values.orgLists || '', // 发文单位id
                     // receivingunit: permission ? '' : parentOrgID, // 如果不是管理员，获取自己公司的收文
                     copyunit: permission ? '' : parentOrgID, // 如果不是管理员，获取自己公司的收文
