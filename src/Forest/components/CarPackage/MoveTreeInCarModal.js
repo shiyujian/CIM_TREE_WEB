@@ -142,8 +142,8 @@ class MoveTreeInCarModal extends Component {
         try {
             if (dataChecked && currentRecord && currentRecord.ID) {
                 let postData = {
-                    'PackID': dataChecked,
                     'OldPackID': currentRecord.ID,
+                    'PackID': dataChecked,
                     'SXMs': selectedRowSXM
                 };
                 let data = await putMoveTreeInCar({}, postData);

@@ -34,7 +34,7 @@ class MergeCarPackModal extends Component {
             etime: '',
             pagination: {},
             dataChecked: '',
-            selectRecort: ''
+            selectRecord: ''
         };
     }
     FormItemLayout = {
@@ -118,12 +118,12 @@ class MergeCarPackModal extends Component {
             if (dataChecked === record.ID) {
                 this.setState({
                     dataChecked: '',
-                    selectRecort: ''
+                    selectRecord: ''
                 });
             } else {
                 this.setState({
                     dataChecked: record.ID,
-                    selectRecort: record
+                    selectRecord: record
                 });
             }
         }
@@ -299,7 +299,7 @@ class MergeCarPackModal extends Component {
         const {
             sectionsList = [],
             dataSource = [],
-            selectRecort,
+            selectRecord,
             dataChecked
         } = this.state;
         let bigTreeList = tree.bigTreeList || [];
@@ -480,8 +480,8 @@ class MergeCarPackModal extends Component {
                                         style={{wordWrap: 'break-word'}}
                                         title={
                                             <div>
-                                                <p>{`确定将 ${currentRecord.LicensePlate}(${currentRecord.Section}) 中的 ${selectRecort.NurseryNum} 棵`}</p>
-                                                <p>{`苗木移动至 ${selectRecort.LicensePlate}(${selectRecort.Section}) 中,`}</p>
+                                                <p>{`确定将 ${currentRecord.LicensePlate}(${currentRecord.Section}) 中的 ${selectRecord.NurseryNum} 棵`}</p>
+                                                <p>{`苗木移动至 ${selectRecord.LicensePlate}(${selectRecord.Section}) 中,`}</p>
                                                 <p>{`同时清除 ${currentRecord.LicensePlate} 么`}</p>
                                             </div>
                                         }

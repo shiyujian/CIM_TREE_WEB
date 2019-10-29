@@ -74,12 +74,12 @@ class ChangeNurseryInfoModal extends Component {
                     project: project,
                     section: section,
                     isPack: isPack,
-                    GD: '',
-                    GF: '',
-                    XJ: '',
-                    DJ: '',
-                    TQZJ: '',
-                    TQHD: ''
+                    GD: '1',
+                    GF: '1',
+                    XJ: '1',
+                    DJ: '1',
+                    TQZJ: '1',
+                    TQHD: '1'
                 });
                 this.setState({
                     nurseryID: (example && example.NurseryID) || '',
@@ -99,7 +99,8 @@ class ChangeNurseryInfoModal extends Component {
             actions: {
                 putChangeNurseryInfoInCar
             },
-            selectedRowSXM
+            selectedRowSXM,
+            example
         } = this.props;
         const {
             nurseryID,
@@ -107,14 +108,15 @@ class ChangeNurseryInfoModal extends Component {
         } = this.state;
         validateFields(async (err, values) => {
             console.log('values', values);
+
             if (!err) {
                 let postData = {
-                    'XJ': values.XJ,
-                    'GD': values.GD,
-                    'GF': values.GF,
-                    'DJ': values.DJ,
-                    'TQZJ': values.TQZJ,
-                    'TQHD': values.TQHD,
+                    'XJ': (example && example.XJ && values.XJ) || '',
+                    'GD': (example && example.GD && values.GD) || '',
+                    'GF': (example && example.GF && values.GF) || '',
+                    'DJ': (example && example.DJ && values.DJ) || '',
+                    'TQZJ': (example && example.TQZJ && values.TQZJ) || '',
+                    'TQHD': (example && example.TQHD && values.TQHD) || '',
                     'TreeType': values.treeTypeNursery,
                     'NurseryName': values.nurseryName,
                     'Factory': values.supplierName,
@@ -449,11 +451,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -473,11 +475,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -497,11 +499,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -521,11 +523,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -545,11 +547,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -569,11 +571,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>

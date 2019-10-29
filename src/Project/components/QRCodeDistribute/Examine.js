@@ -321,7 +321,7 @@ class Examine extends Component {
         }
         if (key === 'startNo') {
             if (value !== '' && this.state.endNo !== '') { // 实时计算编码量
-                if (value.length === 10) {
+                if (value.length === 7) {
                     this.getCalqrcodenum(value, this.state.endNo);
                 }
             }
@@ -331,7 +331,7 @@ class Examine extends Component {
         }
         if (key === 'endNo') {
             if (value !== '' && this.state.startNo !== '') { // 实时计算编码量
-                if (value.length === 10) {
+                if (value.length === 7) {
                     this.getCalqrcodenum(this.state.startNo, value);
                 }
             }
@@ -387,7 +387,7 @@ class Examine extends Component {
                 duration: 3
             });
             return false;
-        } else if (this.state.startNo.length !== 10) {
+        } else if (this.state.startNo.length !== 7) {
             Notification.error({
                 message: '起始编码长度错误，请审查',
                 duration: 3
@@ -400,7 +400,7 @@ class Examine extends Component {
                 duration: 3
             });
             return false;
-        } else if (this.state.endNo.length !== 10) {
+        } else if (this.state.endNo.length !== 7) {
             Notification.error({
                 message: '截止编码长度错误，请审查',
                 duration: 3
@@ -459,46 +459,7 @@ class Examine extends Component {
                     });
                 }
             });
-        } else if (type === 'yl') {
-            const {
-                actions: {postQrcodeCheck}
-            } = this.props;
-            if (this.state.status === '') {
-                Notification.error({
-                    message: '请选择审核状态',
-                    duration: 3
-                });
-                return false;
-            }
-            let data = {
-                CheckInfo: this.state.checkinfo,
-                Checker: this.props.userid,
-                DistributeNum: +this.state.distributeNum, // 派发数量
-                Distributes: [{
-                    DistributeNum: +this.state.distributeNum,
-                    StoreID: this.state.storeId,
-                    EndNo: this.state.endNo,
-                    StartNo: this.state.startNo
-                }],
-                ID: this.props.detailRow.ID,
-                Status: +this.state.status, // 审核状态
-                StockNum: this.state.stocknum
-            };
-            postQrcodeCheck({}, data).then((res) => {
-                if (res.code === 1) {
-                    Notification.success({
-                        message: '园林设施二维码审核成功'
-                    });
-                    this.props.onApplyBack('facility');
-                    this.props.reloadList();
-                } else {
-                    Notification.error({
-                        message: res.msg
-                    });
-                }
-            });
         }
     }
 }
-Examine = Form.create()(Examine);
-export default Examine;
+export default Form.create()(Examine);
