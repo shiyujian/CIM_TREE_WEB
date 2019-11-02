@@ -35,7 +35,8 @@ class HandleChangeDetailModal extends Component {
             selectedRowSXM: [],
             changeNurseryInfoVisible: false,
             example: '',
-            moveTreeInCarVisible: false
+            moveTreeInCarVisible: false,
+            changeMessageStatus: false // 是否进行修改信息，修改的话，车辆打包信息页面需要重新搜索
         };
     }
     FormItemLayout = {
@@ -357,7 +358,8 @@ class HandleChangeDetailModal extends Component {
             detailModalVisible: true,
             selectedRowKeys: [],
             selectedRows: [],
-            selectedRowSXM: []
+            selectedRowSXM: [],
+            changeMessageStatus: true
         });
         await this.getNurseryData();
     }
@@ -387,7 +389,8 @@ class HandleChangeDetailModal extends Component {
             detailModalVisible: true,
             selectedRowKeys: [],
             selectedRows: [],
-            selectedRowSXM: []
+            selectedRowSXM: [],
+            changeMessageStatus: true
         });
         await this.getNurseryData();
     }
@@ -400,7 +403,10 @@ class HandleChangeDetailModal extends Component {
     }
     // 关闭车辆包详情页面弹窗
     handleChangeDetailModalCancel = async () => {
-        this.props.onChangeDetailModalCancel();
+        const {
+            changeMessageStatus
+        } = this.state;
+        this.props.onChangeDetailModalCancel(changeMessageStatus);
     }
     // 表格多选
     onSelectChange = async (selectedRowKeys, selectedRows) => {

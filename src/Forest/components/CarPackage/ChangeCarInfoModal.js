@@ -8,7 +8,8 @@ import {
     Select,
     Notification,
     Button,
-    Popconfirm
+    Popconfirm,
+    InputNumber
 } from 'antd';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
@@ -263,25 +264,6 @@ class ChangeCarInfoModal extends Component {
             callback();
         }
     }
-    // 自定义校验总数
-    checkTotalNumber = async (rule, value, callback) => {
-        if (value) {
-            let reg = /^[1-9]\d*$/;
-            console.log('reg.test(value)', reg.test(value));
-            // isNaN(value);
-            if (!isNaN(value) && reg.test(value)) {
-                if (value > 0) {
-                    callback();
-                } else {
-                    callback(`请输入数字`);
-                }
-            } else {
-                callback(`请输入数字`);
-            }
-        } else {
-            callback();
-        }
-    }
     render () {
         const {
             form: { getFieldDecorator },
@@ -482,13 +464,10 @@ class ChangeCarInfoModal extends Component {
                                                 {
                                                     required: true,
                                                     message: '请输入总数'
-                                                },
-                                                {
-                                                    validator: this.checkTotalNumber
                                                 }
                                             ]
                                         }
-                                    )(<Input />)}
+                                    )(<InputNumber />)}
                                 </FormItem>
                             </Col>
                             <Col span={12}>

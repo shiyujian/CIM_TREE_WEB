@@ -95,6 +95,12 @@ export default class Header extends Component {
         if (tabs && tabs.fullScreenState) {
             fullScreenState = tabs.fullScreenState;
         }
+        let href = window.location.href;
+        let reg = new RegExp(/(\w+):\/\/([^/:]+)(:\d*)?/);
+        let result = href.match(reg);
+        console.log('href', href);
+        console.log('result', result);
+
         Header.menus = [
             {
                 key: 'home',
