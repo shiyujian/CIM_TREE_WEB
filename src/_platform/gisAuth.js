@@ -1,4 +1,4 @@
-// 处理POLYGON开头的wkt内容
+// 处理wkt坐标数据内容
 export const handlePOLYGONWktData = (wkt) => {
     let str = wkt.slice(wkt.indexOf('('), wkt.indexOf(')'));
     str = str.replace(/[(]/g, '');
@@ -71,7 +71,7 @@ export const handleAreaRealLayerData = async (eventKey, treeNodeName, getTreeare
         console.log('await', e);
     }
 };
-
+// 字符串转数组
 export const handleCoordinates = (str) => {
     let target = str.split(',').map(item => {
         return item.split(' ').map(_item => _item - 0);
@@ -86,12 +86,11 @@ export const handleCoordinates = (str) => {
     treearea.push(arr);
     return treearea;
 };
-
+// 图层颜色填充
 export const fillAreaColor = (index) => {
     let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
     return colors[index % 5];
 };
-
 // 获取手动框选坐标wkt
 export const getHandleWktData = (coords) => {
     let wkt = '';

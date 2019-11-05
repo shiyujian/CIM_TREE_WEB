@@ -38,6 +38,7 @@ export default class TreeMessGisOnClickHandle extends Component {
             map
         } = this.props;
         if (map) {
+            // 添加地图点击事件
             await map.on('click', this.handleTreeMessGisClickFunction);
         }
     }
@@ -48,7 +49,9 @@ export default class TreeMessGisOnClickHandle extends Component {
         const {
             treeMarkerLayer
         } = this.state;
+        // 关闭地图点击事件
         map.off('click', this.handleTreeMessGisClickFunction);
+        // 去除点击地图坐标
         if (treeMarkerLayer) {
             map.removeLayer(treeMarkerLayer);
         }

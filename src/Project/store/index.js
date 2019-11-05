@@ -4,6 +4,10 @@ import treeManageReducer, {actions as treeManageActions} from './treeManage';
 import nurseryManagementReducer, {actions as nurseryManagementActions} from './nurseryManagement';
 import projectImageReducer, {actions as projectImageActions} from './projectImage';
 import qrcodedistributeReducer, {actions as qrcodedistributeActions} from './qrcodedistribute';
+// 人员进离场
+import manEntranceAndDepartureReducer, { actions as manEntranceAndDepartureActions } from './ManMachine/manEntranceAndDeparture';
+import machineEntranceAndDepartureReducer, { actions as machineEntranceAndDepartureActions } from './ManMachine/machineEntranceAndDeparture';
+import manMachineGroupReducer, { actions as manMachineGroupActions } from './ManMachine/manMachineGroup';
 
 export default handleActions({
     [combineActions(...actionsMap(treeManageActions))]: (state = {}, action) => ({
@@ -21,5 +25,18 @@ export default handleActions({
     [combineActions(...actionsMap(qrcodedistributeActions))]: (state = {}, action) => ({
         ...state,
         qrcodedistribute: qrcodedistributeReducer(state.qrcodedistribute, action)
+    }),
+    // 人员进离场
+    [combineActions(...actionsMap(manEntranceAndDepartureActions))]: (state = {}, action) => ({
+        ...state,
+        manEntranceAndDeparture: manEntranceAndDepartureReducer(state.manEntranceAndDeparture, action)
+    }),
+    [combineActions(...actionsMap(machineEntranceAndDepartureActions))]: (state = {}, action) => ({
+        ...state,
+        machineEntranceAndDeparture: machineEntranceAndDepartureReducer(state.machineEntranceAndDeparture, action)
+    }),
+    [combineActions(...actionsMap(manMachineGroupActions))]: (state = {}, action) => ({
+        ...state,
+        manMachineGroup: manMachineGroupReducer(state.manMachineGroup, action)
     })
 }, {});

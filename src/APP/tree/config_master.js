@@ -27,7 +27,7 @@ window.config = {
     // 测试库接口地址
     // DOMAIN: 'http://39.97.163.176:6510',
     // 林总用户接口地址
-    SDOMAIN: 'http://39.97.163.176',
+    SDOMAIN: 'http://www.xazhyl.com',
     // 二维展示根据坐标获取树木顺序码端口
     DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
     // 灌溉接口
@@ -74,6 +74,14 @@ window.config = {
         // center: [30.2528290000, 120.0177300000], // 华东院
         zoomControl: false,
         zoom: 13,
+        minZoom: 10
+    },
+    XACompanyInitLeaflet: {
+        // center: [39.029373914931, 115.893481987848], // 小白楼
+        center: [38.99042701799772, 116.0396146774292],
+        // center: [39.048904, 115.884522],
+        zoomControl: false,
+        zoom: 15,
         minZoom: 10
     },
     // 个人考勤的上下班时间，如果当前的部门未配置的话拿此上下班时间，用[--]分开，此处必须配置

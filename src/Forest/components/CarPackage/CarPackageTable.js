@@ -242,7 +242,7 @@ export default class CarPackageTable extends Component {
     componentDidMount () {
     }
     componentWillReceiveProps (nextProps) {
-        if (nextProps.leftkeycode != this.state.leftkeycode) {
+        if (nextProps.leftkeycode !== this.state.leftkeycode) {
             this.setState(
                 {
                     leftkeycode: nextProps.leftkeycode
@@ -290,12 +290,20 @@ export default class CarPackageTable extends Component {
             currentRecord: record
         });
     }
-    // 关闭修改车辆信息弹窗
-    handleChangeDetailModalCancel = async () => {
+    // 关闭修改苗圃信息弹窗
+    handleChangeDetailModalCancel = async (changeMessageStatus) => {
         this.setState({
             handleChangeDetailVisible: false,
             currentRecord: ''
         });
+        if (changeMessageStatus) {
+            const pager = { ...this.state.pagination };
+            this.setState({
+                editCarInfoVisible: false,
+                currentRecord: ''
+            });
+            await this.query(pager.current);
+        }
     }
     // 修改车辆信息
     handleEditCarInfoClick = async (record) => {

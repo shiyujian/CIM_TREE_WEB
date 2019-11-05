@@ -33,12 +33,14 @@ export default class Overall extends Component {
                 </Aside>
                 <Switch>
                     {News && <Route path='/overall/news' component={News} />}
-                    {Dispatch && (
-                        <Route path='/overall/dispatch' component={Dispatch} />
-                    )}
-                    {MeetingManage && (
-                        <Route path='/overall/meetingmanage' component={MeetingManage} />
-                    )}
+                    {
+                        Dispatch && (
+                            <Route path='/overall/dispatch' component={Dispatch} />
+                        )}
+                    {
+                        MeetingManage && (
+                            <Route path='/overall/meetingmanage' component={MeetingManage} />
+                        )}
                     {
                         Standard &&
                         <Route exact path='/overall/standard' component={Standard} />

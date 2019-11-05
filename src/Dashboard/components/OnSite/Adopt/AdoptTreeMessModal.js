@@ -25,7 +25,7 @@ class AdoptTreeMessModal extends Component {
     }
 
     componentDidMount = async () => {
-        
+
     };
 
     handleTreeModalCancel = async () => {
@@ -70,8 +70,8 @@ class AdoptTreeMessModal extends Component {
             let curingObject = {
                 curingTypeData,
                 curingData
-            }
-            return curingObject
+            };
+            return curingObject;
         }
     }
 

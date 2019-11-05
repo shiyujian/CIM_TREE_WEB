@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-24 21:26:25
+ * @Last Modified time: 2019-11-05 09:54:40
  */
 /**
  *
@@ -82,6 +82,8 @@ export const FOREST_IMG = `${window.config.ALIIMG}`;
 export const FOREST_API = `${DOMAIN}`;
 // 系统
 export const SYSTEM_API = `${DOMAIN}/system`;
+// 园林
+export const GARDEN_API = `${DOMAIN}/garden`;
 // 新闻通知
 export const NEWS_API = `${DOMAIN}/cms`;
 // 文档管理
@@ -353,11 +355,11 @@ export const NodeType = [
 ];
 // 项目管理  树种管理 苗圃测量
 export const NURSERYPARAM = [
-    '土球直径', '土球厚度', '高度', '冠幅', '胸径', '地径', '分枝数量', '地径超过1cm分枝数量'
+    '土球直径', '土球厚度', '高度', '冠幅', '胸径', '地径', '分枝数量', '分枝点', '条长', '地径超过0.5厘米分支数量', '地径超过1cm分枝数量', '地径超过3厘米分支数量'
 ];
 // 项目管理  树种管理 现场测量
 export const TREEPARAM = [
-    '地径', '高度', '胸径', '密度', '面积', '分枝数量', '地径超过1cm分枝数量'
+    '地径', '高度', '胸径', '密度', '面积', '分枝数量', '分枝点', '条长', '地径超过0.5厘米分支数量', '地径超过1cm分枝数量', '地径超过3厘米分支数量'
 ];
 
 export const MODULES = [
@@ -604,6 +606,14 @@ export const MODULES = [
         name: '系统设置',
         children: [
             {
+                id: 'SETUP.PERSON',
+                name: '用户管理'
+            },
+            {
+                id: 'SETUP.ORG',
+                name: '组织机构'
+            },
+            {
                 id: 'SETUP.ROLE',
                 name: '角色设置'
             },
@@ -612,16 +622,8 @@ export const MODULES = [
                 name: '权限设置'
             },
             {
-                id: 'SETUP.PERSON',
-                name: '用户管理'
-            },
-            {
                 id: 'SETUP.WORKFLOW',
                 name: '流程设置'
-            },
-            {
-                id: 'SETUP.ORG',
-                name: '组织机构'
             },
             {
                 id: 'SETUP.BLACKLIST.NONE',
@@ -687,6 +689,24 @@ export const MODULES = [
                     {
                         id: 'PROJECT.RELEVANCEMANAGEMENT',
                         name: '绑定管理'
+                    }
+                ]
+            },
+            {
+                name: '人机物料',
+                id: 'PROJECT.MANMACHINE.NONE',
+                children: [
+                    {
+                        id: 'PROJECT.MANENTRANCEANDDEPARTURE',
+                        name: '人员进离场'
+                    },
+                    {
+                        id: 'PROJECT.MACHINEENTRANCEANDDEPARTURE',
+                        name: '机械进离场'
+                    },
+                    {
+                        id: 'PROJECT.MANMACHINEGROUP',
+                        name: '班组维护'
                     }
                 ]
             }

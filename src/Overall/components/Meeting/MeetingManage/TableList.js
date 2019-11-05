@@ -53,6 +53,7 @@ class TableList extends Component {
         let params = {
             meetingtype: '日常会议',
             projectcode: 'P193',
+            belongsystem: '雄安森林大数据平台',
             name: name,
             creater: '',
             openid: '',

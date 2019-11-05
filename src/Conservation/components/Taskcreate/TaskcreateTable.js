@@ -188,6 +188,39 @@ export default class TaskCreateTable extends Component {
         }).addTo(this.map);
         // 加载树图层
         this.getTileLayer2();
+        // // 地图点击事件
+        // this.map.on('mousemove', function (e) {
+        //     const {
+        //         coordinates,
+        //         createBtnVisible
+        //     } = me.state;
+        //     const {
+        //         selectMap
+        //     } = me.props;
+        //     if (selectMap === '细班选择') {
+        //         return;
+        //     }
+        //     // 对点击点的坐标进行保存
+        //     coordinates.push([e.latlng.lat, e.latlng.lng]);
+        //     if (coordinates.length > 2 && !createBtnVisible) {
+        //         me.setState({
+        //             createBtnVisible: true
+        //         });
+        //     }
+        //     // 去除原来的图层，只保留最新的图层
+        //     if (me.state.polygonData) {
+        //         me.map.removeLayer(me.state.polygonData);
+        //     }
+        //     let polygonData = L.polygon(coordinates, {
+        //         color: 'white',
+        //         fillColor: 'red',
+        //         fillOpacity: 0.5
+        //     }).addTo(me.map);
+        //     me.setState({
+        //         coordinates,
+        //         polygonData: polygonData
+        //     });
+        // });
         // 地图点击事件
         this.map.on('click', function (e) {
             const {
@@ -200,12 +233,14 @@ export default class TaskCreateTable extends Component {
             if (selectMap === '细班选择') {
                 return;
             }
+            // 对点击点的坐标进行保存
             coordinates.push([e.latlng.lat, e.latlng.lng]);
             if (coordinates.length > 2 && !createBtnVisible) {
                 me.setState({
                     createBtnVisible: true
                 });
             }
+            // 去除原来的图层，只保留最新的图层
             if (me.state.polygonData) {
                 me.map.removeLayer(me.state.polygonData);
             }
@@ -307,154 +342,6 @@ export default class TaskCreateTable extends Component {
             }
         }
     }
-
-    render () {
-        const {
-            createBtnVisible,
-            taskModalVisible,
-            coordinates
-        } = this.state;
-        const {
-            selectMap
-        } = this.props;
-        let RetreatDisplay = false;
-        let okDisplay = false;
-        if (selectMap === '细班选择') {
-            RetreatDisplay = true;
-        } else if (coordinates.length <= 2) {
-            okDisplay = true;
-        }
-        return (
-            <div className='Conservation-container'>
-                <div
-                    ref='appendBody'
-                    className='Conservation-map Conservation-r-main'
-                >
-                    <div
-                        className={`Conservation-menuPanel`}
-                        style={
-                            this.state.menuIsExtend
-                                ? {
-                                    transform: 'translateX(0)',
-                                    width: this.state.menuWidth
-                                }
-                                : {
-                                    transform: `translateX(-${
-                                        this.state.menuWidth
-                                    }px)`,
-                                    width: this.state.menuWidth
-                                }
-                        }
-                    >
-                        <aside className='Conservation-aside' draggable='false'>
-                            <div style={{margin: 10}}>
-                                <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
-                                <Checkbox checked={this.state.curingLayerChecked} onChange={this.curingLayerChange.bind(this)}>展示养护图层</Checkbox>
-                            </div>
-                            <Collapse
-                                defaultActiveKey={[this.options[0].value]}
-                                accordion
-                            >
-                                {this.options.map(option => {
-                                    return (
-                                        <Panel
-                                            key={option.value}
-                                            header={option.label}
-                                        >
-                                            {this.renderPanel(option)}
-                                        </Panel>
-                                    );
-                                })}
-                            </Collapse>
-                        </aside>
-                        {this.state.menuIsExtend ? (
-                            <div
-                                className='Conservation-foldBtn'
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this._extendAndFold.bind(this)}
-                            >
-                                收起
-                            </div>
-                        ) : (
-                            <div
-                                className='Conservation-foldBtn'
-                                style={{ left: this.state.menuWidth }}
-                                onClick={this._extendAndFold.bind(this)}
-                            >
-                                展开
-                            </div>
-                        )}
-                    </div>
-                    {
-                        createBtnVisible ? (
-                            <div className='Conservation-treeControl2'>
-                                <div>
-                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
-                                    {RetreatDisplay ? '' : <Button type='default' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
-                                    <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
-                                </div>
-                            </div>
-                        ) : ''
-                    }
-                    {
-                        taskModalVisible ? (
-                            <TaskCreateModal
-                                {...this.props}
-                                {...this.state}
-                                onOk={this.handleTaskModalOk.bind(this)}
-                                onCancel={this.handleTaskModalCancel.bind(this)}
-                            />
-                        ) : ''
-                    }
-                    <div className='Conservation-treeControl'>
-                        <div>
-                            <Button
-                                type={
-                                    this.state.mapLayerBtnType
-                                        ? 'primary'
-                                        : 'default'
-                                }
-                                onClick={this._toggleTileLayer.bind(this, 1)}
-                            >
-                                卫星图
-                            </Button>
-                            <Button
-                                type={
-                                    this.state.mapLayerBtnType
-                                        ? 'default'
-                                        : 'primary'
-                                }
-                                onClick={this._toggleTileLayer.bind(this, 2)}
-                            >
-                                地图
-                            </Button>
-                        </div>
-                    </div>
-                    <div>
-                        <div
-                            style={
-                                this.state.selectedMenu === '1' &&
-                                this.state.isNotThree
-                                    ? {}
-                                    : { display: 'none' }
-                            }
-                        >
-                            <div
-                                id='mapid'
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    borderLeft: '1px solid #ccc'
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>);
-    }
     // 控制基础树图层是否展示
     treeLayerChange = () => {
         const {
@@ -508,6 +395,218 @@ export default class TaskCreateTable extends Component {
         } catch (e) {
             console.log('curingLayerChange', e);
         }
+    }
+    // 确定圈选地图
+    _handleCreateTaskOk = async () => {
+        const {
+            actions: {
+                postThinClassesByRegion // 查询圈选地图内的细班
+            },
+            selectMap,
+            checkedKeys,
+            platform: {
+                tree = {}
+            }
+        } = this.props;
+        const {
+            coordinates,
+            treeCoords
+        } = this.state;
+
+        // 首先查看有没有关联标段，没有关联的人无法获取人员
+        if (!this.section) {
+            Notification.error({
+                message: '当前登录用户未关联标段，不能下发任务',
+                duration: 2
+            });
+            return;
+        }
+        this.setState({
+            taskModalVisible: true
+        });
+        let coords = [];
+        let thinAreaNum = 0;
+        if (selectMap === '细班选择') {
+            let thinClassCoords = [];
+            checkedKeys.map((key) => {
+                if (treeCoords[key]) {
+                    let arrData = treeCoords[key];
+                    console.log('arrData', arrData);
+                    arrData.map((arr) => {
+                        console.log('arr', arr);
+
+                        thinAreaNum = thinAreaNum + 1;
+                        thinClassCoords = thinClassCoords.concat(arr);
+                    });
+                }
+            });
+            console.log('thinClassCoords', thinClassCoords);
+
+            if (thinClassCoords.length === 1) {
+                coords = thinClassCoords[0];
+            } else {
+                coords = thinClassCoords;
+            }
+        } else if (selectMap === '手动框选') {
+            coords = coordinates;
+        }
+        try {
+            let totalThinClass = tree.totalThinClass || [];
+            let bigTreeList = (tree && tree.bigTreeList) || [];
+            // 坐标
+            let wkt = '';
+            // 选择面积
+            let regionArea = 0;
+            if (selectMap === '细班选择' && thinAreaNum > 1) {
+                wkt = 'MULTIPOLYGON((';
+                coords.map((coord, index) => {
+                    let num = computeSignedArea(coord, 1);
+                    regionArea = regionArea + num;
+                    if (index === 0) {
+                        // 获取细班选择坐标wkt
+                        wkt = wkt + getWktData(coord);
+                    } else {
+                        wkt = wkt + ',' + getWktData(coord);
+                    }
+                });
+                wkt = wkt + '))';
+            } else if (selectMap === '手动框选') {
+                wkt = 'POLYGON(';
+                // 获取手动框选坐标wkt
+                wkt = wkt + getHandleWktData(coords);
+                wkt = wkt + ')';
+                regionArea = computeSignedArea(coords, 2);
+            } else {
+                let num = computeSignedArea(coords, 1);
+                regionArea = regionArea + num;
+                wkt = 'POLYGON(';
+                wkt = wkt + getWktData(coords);
+                wkt = wkt + ')';
+            }
+            regionArea = regionArea * 0.0015;
+            // 包括的细班号
+            let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
+            let regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
+            // let sectionBool = regionData.sectionBool;
+            // if (!sectionBool) {
+            //     Notification.error({
+            //         message: '当前所选区域存在不属于登录用户所在标段，请重新选择区域',
+            //         duration: 2
+            //     });
+            //     if (this.state.polygonData) {
+            //         this.map.removeLayer(this.state.polygonData);
+            //     }
+            //     this.resetModalState();
+            //     this.resetButState();
+            //     return;
+            // }
+            console.log('regionData', regionData);
+            let regionThinName = regionData.regionThinName;
+            let regionThinNo = regionData.regionThinNo;
+            let regionSectionNo = regionData.regionSectionNo;
+            let regionSectionName = regionData.regionSectionName;
+            let regionSmallThinClassName = regionData.regionSmallThinClassName;
+            // 区域内树木数量
+            // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
+            this.setState({
+                wkt,
+                regionArea,
+                // treeNum,
+                regionData,
+                regionThinName,
+                regionSmallThinClassName,
+                regionThinNo,
+                regionSectionNo,
+                regionSectionName,
+                noLoading: true
+            });
+        } catch (e) {
+            console.log('树木数量', e);
+        }
+    }
+    // 圈选图层返回上一步
+    _handleCreateTaskRetreat = async () => {
+        const {
+            coordinates
+        } = this.state;
+        if (this.state.polygonData) {
+            this.map.removeLayer(this.state.polygonData);
+        }
+        coordinates.pop();
+        if (coordinates.length === 0) {
+            this.resetButState();
+            return;
+        }
+        let polygonData = L.polygon(coordinates, {
+            color: 'white',
+            fillColor: 'red',
+            fillOpacity: 0.5
+        }).addTo(this.map);
+        this.setState({
+            coordinates,
+            polygonData: polygonData
+        });
+    }
+    // 撤销圈选图层
+    _handleCreateTaskCancel =() => {
+        const {
+            areaLayerList,
+            polygonData
+        } = this.state;
+        const {
+            actions: {
+                changeCheckedKeys
+            }
+        } = this.props;
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        changeCheckedKeys([]);
+        for (let i in areaLayerList) {
+            areaLayerList[i].map((layer) => {
+                this.map.removeLayer(layer);
+            });
+        }
+        this.resetButState();
+    }
+    // 确认下发任务
+    handleTaskModalOk = () => {
+        const {
+            polygonData
+        } = this.state;
+        if (polygonData) {
+            this.map.removeLayer(polygonData);
+        }
+        this.resetModalState();
+        this.resetButState();
+    }
+    // 取消下发任务
+    handleTaskModalCancel = () => {
+        this.resetModalState();
+    }
+    // 取消下发任务时清空之前存储的state
+    resetModalState = () => {
+        this.setState({
+            taskModalVisible: false,
+            noLoading: false,
+            // treeNum: 0,
+            regionThinClass: [],
+            regionThinName: '',
+            regionThinNo: '',
+            regionSectionNo: '',
+            regionSectionName: '',
+            regionSmallThinClassName: '',
+            regionArea: 0,
+            wkt: ''
+        });
+    }
+    // 取消圈选和按钮的功能
+    resetButState = () => {
+        this.setState({
+            createBtnVisible: false,
+            polygonData: '',
+            coordinates: []
+        });
     }
     // 选择细班是否展示数据，或是隐藏数据
     async handleAreaCheck (keys, info) {
@@ -866,219 +965,6 @@ export default class TaskCreateTable extends Component {
             return layer;
         }
     }
-    // 确定圈选地图
-    _handleCreateTaskOk = async () => {
-        const {
-            actions: {
-                postThinClassesByRegion // 查询圈选地图内的细班
-            },
-            selectMap,
-            checkedKeys,
-            platform: {
-                tree = {}
-            }
-        } = this.props;
-        const {
-            coordinates,
-            treeCoords
-        } = this.state;
-
-        // 首先查看有没有关联标段，没有关联的人无法获取人员
-        if (!this.section) {
-            Notification.error({
-                message: '当前登录用户未关联标段，不能下发任务',
-                duration: 2
-            });
-            return;
-        }
-        this.setState({
-            taskModalVisible: true
-        });
-        let coords = [];
-        let thinAreaNum = 0;
-        if (selectMap === '细班选择') {
-            let thinClassCoords = [];
-            checkedKeys.map((key) => {
-                if (treeCoords[key]) {
-                    let arrData = treeCoords[key];
-                    console.log('arrData', arrData);
-                    arrData.map((arr) => {
-                        console.log('arr', arr);
-
-                        thinAreaNum = thinAreaNum + 1;
-                        thinClassCoords = thinClassCoords.concat(arr);
-                    });
-                }
-            });
-            console.log('thinClassCoords', thinClassCoords);
-
-            if (thinClassCoords.length === 1) {
-                coords = thinClassCoords[0];
-            } else {
-                coords = thinClassCoords;
-            }
-        } else if (selectMap === '手动框选') {
-            coords = coordinates;
-        }
-        try {
-            let totalThinClass = tree.totalThinClass || [];
-            let bigTreeList = (tree && tree.bigTreeList) || [];
-            // 坐标
-            let wkt = '';
-            // 选择面积
-            let regionArea = 0;
-            if (selectMap === '细班选择' && thinAreaNum > 1) {
-                wkt = 'MULTIPOLYGON((';
-                coords.map((coord, index) => {
-                    let num = computeSignedArea(coord, 1);
-                    regionArea = regionArea + num;
-                    if (index === 0) {
-                        // 获取细班选择坐标wkt
-                        wkt = wkt + getWktData(coord);
-                    } else {
-                        wkt = wkt + ',' + getWktData(coord);
-                    }
-                });
-                wkt = wkt + '))';
-            } else if (selectMap === '手动框选') {
-                wkt = 'POLYGON(';
-                // 获取手动框选坐标wkt
-                wkt = wkt + getHandleWktData(coords);
-                wkt = wkt + ')';
-                regionArea = computeSignedArea(coords, 2);
-            } else {
-                let num = computeSignedArea(coords, 1);
-                regionArea = regionArea + num;
-                wkt = 'POLYGON(';
-                wkt = wkt + getWktData(coords);
-                wkt = wkt + ')';
-            }
-            regionArea = regionArea * 0.0015;
-            // 包括的细班号
-            let regionThinClass = await postThinClassesByRegion({}, {WKT: wkt});
-            let regionData = getThinClassName(regionThinClass, totalThinClass, this.section, bigTreeList);
-            // let sectionBool = regionData.sectionBool;
-            // if (!sectionBool) {
-            //     Notification.error({
-            //         message: '当前所选区域存在不属于登录用户所在标段，请重新选择区域',
-            //         duration: 2
-            //     });
-            //     if (this.state.polygonData) {
-            //         this.map.removeLayer(this.state.polygonData);
-            //     }
-            //     this.resetModalState();
-            //     this.resetButState();
-            //     return;
-            // }
-            console.log('regionData', regionData);
-            let regionThinName = regionData.regionThinName;
-            let regionThinNo = regionData.regionThinNo;
-            let regionSectionNo = regionData.regionSectionNo;
-            let regionSectionName = regionData.regionSectionName;
-            let regionSmallThinClassName = regionData.regionSmallThinClassName;
-            // 区域内树木数量
-            // let treeNum = await postTreeLocationNumByRegion({}, {WKT: wkt});
-            this.setState({
-                wkt,
-                regionArea,
-                // treeNum,
-                regionData,
-                regionThinName,
-                regionSmallThinClassName,
-                regionThinNo,
-                regionSectionNo,
-                regionSectionName,
-                noLoading: true
-            });
-        } catch (e) {
-            console.log('树木数量', e);
-        }
-    }
-    // 圈选图层返回上一步
-    _handleCreateTaskRetreat = async () => {
-        const {
-            coordinates
-        } = this.state;
-        let me = this;
-        if (me.state.polygonData) {
-            me.map.removeLayer(me.state.polygonData);
-        }
-        coordinates.pop();
-        if (coordinates.length === 0) {
-            this.resetButState();
-            return;
-        }
-        let polygonData = L.polygon(coordinates, {
-            color: 'white',
-            fillColor: 'red',
-            fillOpacity: 0.5
-        }).addTo(me.map);
-        me.setState({
-            coordinates,
-            polygonData: polygonData
-        });
-    }
-    // 撤销圈选图层
-    _handleCreateTaskCancel =() => {
-        const {
-            areaLayerList,
-            polygonData
-        } = this.state;
-        const {
-            actions: {
-                changeCheckedKeys
-            }
-        } = this.props;
-        if (polygonData) {
-            this.map.removeLayer(polygonData);
-        }
-        changeCheckedKeys([]);
-        for (let i in areaLayerList) {
-            areaLayerList[i].map((layer) => {
-                this.map.removeLayer(layer);
-            });
-        }
-        this.resetButState();
-    }
-    // 确认下发任务
-    handleTaskModalOk = () => {
-        const {
-            polygonData
-        } = this.state;
-        if (polygonData) {
-            this.map.removeLayer(polygonData);
-        }
-        this.resetModalState();
-        this.resetButState();
-    }
-    // 取消下发任务
-    handleTaskModalCancel = () => {
-        this.resetModalState();
-    }
-    // 取消下发任务时清空之前存储的state
-    resetModalState = () => {
-        this.setState({
-            taskModalVisible: false,
-            noLoading: false,
-            // treeNum: 0,
-            regionThinClass: [],
-            regionThinName: '',
-            regionThinNo: '',
-            regionSectionNo: '',
-            regionSectionName: '',
-            regionSmallThinClassName: '',
-            regionArea: 0,
-            wkt: ''
-        });
-    }
-    // 取消圈选和按钮的功能
-    resetButState = () => {
-        this.setState({
-            createBtnVisible: false,
-            polygonData: '',
-            coordinates: []
-        });
-    }
     componentDidUpdate (prevProps, prevState) {
         const {
             selectMap,
@@ -1117,5 +1003,152 @@ export default class TaskCreateTable extends Component {
             TileLayerUrl: TILEURLS[index],
             mapLayerBtnType: !this.state.mapLayerBtnType
         });
+    }
+    render () {
+        const {
+            createBtnVisible,
+            taskModalVisible,
+            coordinates
+        } = this.state;
+        const {
+            selectMap
+        } = this.props;
+        let RetreatDisplay = false;
+        let okDisplay = false;
+        if (selectMap === '细班选择') {
+            RetreatDisplay = true;
+        } else if (coordinates.length <= 2) {
+            okDisplay = true;
+        }
+        return (
+            <div className='Conservation-container'>
+                <div
+                    ref='appendBody'
+                    className='Conservation-map Conservation-r-main'
+                >
+                    <div
+                        className={`Conservation-menuPanel`}
+                        style={
+                            this.state.menuIsExtend
+                                ? {
+                                    transform: 'translateX(0)',
+                                    width: this.state.menuWidth
+                                }
+                                : {
+                                    transform: `translateX(-${
+                                        this.state.menuWidth
+                                    }px)`,
+                                    width: this.state.menuWidth
+                                }
+                        }
+                    >
+                        <aside className='Conservation-aside' draggable='false'>
+                            <div style={{margin: 10}}>
+                                <Checkbox checked={this.state.treeLayerChecked} onChange={this.treeLayerChange.bind(this)}>展示树图层</Checkbox>
+                                <Checkbox checked={this.state.curingLayerChecked} onChange={this.curingLayerChange.bind(this)}>展示养护图层</Checkbox>
+                            </div>
+                            <Collapse
+                                defaultActiveKey={[this.options[0].value]}
+                                accordion
+                            >
+                                {this.options.map(option => {
+                                    return (
+                                        <Panel
+                                            key={option.value}
+                                            header={option.label}
+                                        >
+                                            {this.renderPanel(option)}
+                                        </Panel>
+                                    );
+                                })}
+                            </Collapse>
+                        </aside>
+                        {this.state.menuIsExtend ? (
+                            <div
+                                className='Conservation-foldBtn'
+                                style={{ left: this.state.menuWidth }}
+                                onClick={this._extendAndFold.bind(this)}
+                            >
+                                收起
+                            </div>
+                        ) : (
+                            <div
+                                className='Conservation-foldBtn'
+                                style={{ left: this.state.menuWidth }}
+                                onClick={this._extendAndFold.bind(this)}
+                            >
+                                展开
+                            </div>
+                        )}
+                    </div>
+                    {
+                        createBtnVisible ? (
+                            <div className='Conservation-treeControl2'>
+                                <div>
+                                    <Button type='primary' style={{marginRight: 10}} disabled={okDisplay} onClick={this._handleCreateTaskOk.bind(this)}>确定</Button>
+                                    {RetreatDisplay ? '' : <Button type='default' style={{marginRight: 10}} onClick={this._handleCreateTaskRetreat.bind(this)}>上一步</Button>}
+                                    <Button type='danger' onClick={this._handleCreateTaskCancel.bind(this)}>撤销</Button>
+                                </div>
+                            </div>
+                        ) : ''
+                    }
+                    {
+                        taskModalVisible ? (
+                            <TaskCreateModal
+                                {...this.props}
+                                {...this.state}
+                                onOk={this.handleTaskModalOk.bind(this)}
+                                onCancel={this.handleTaskModalCancel.bind(this)}
+                            />
+                        ) : ''
+                    }
+                    <div className='Conservation-treeControl'>
+                        <div>
+                            <Button
+                                type={
+                                    this.state.mapLayerBtnType
+                                        ? 'primary'
+                                        : 'default'
+                                }
+                                onClick={this._toggleTileLayer.bind(this, 1)}
+                            >
+                                卫星图
+                            </Button>
+                            <Button
+                                type={
+                                    this.state.mapLayerBtnType
+                                        ? 'default'
+                                        : 'primary'
+                                }
+                                onClick={this._toggleTileLayer.bind(this, 2)}
+                            >
+                                地图
+                            </Button>
+                        </div>
+                    </div>
+                    <div>
+                        <div
+                            style={
+                                this.state.selectedMenu === '1' &&
+                                this.state.isNotThree
+                                    ? {}
+                                    : { display: 'none' }
+                            }
+                        >
+                            <div
+                                id='mapid'
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    borderLeft: '1px solid #ccc'
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>);
     }
 }

@@ -11,3 +11,8 @@ export ThinClassTreeTypeManage from './ThinClassTreeTypeManage';
 export ParcelStorage from './ParcelStorage';
 export ParcelManage from './ParcelManage';
 export QRCodeDistribute from './QRCodeDistribute';
+
+// 人机物料
+export ManEntranceAndDeparture from './ManMachine/ManEntranceAndDeparture';
+export MachineEntranceAndDeparture from './ManMachine/MachineEntranceAndDeparture';
+export ManMachineGroup from './ManMachine/ManMachineGroup';

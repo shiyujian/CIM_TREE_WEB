@@ -21,8 +21,8 @@ class ChangeNurseryInfoModal extends Component {
         super(props);
         this.state = {
             sectionsList: [],
-            nurseryID: '',
-            supplierID: ''
+            nurseryName: '',
+            supplierName: ''
         };
     }
     componentDidMount = async () => {
@@ -67,23 +67,23 @@ class ChangeNurseryInfoModal extends Component {
                     isPack = '';
                 }
                 setFieldsValue({
-                    nurseryName: (example && example.NurseryName) || '',
-                    supplierName: (example && example.Factory) || '',
+                    nurseryID: (example && example.NurseryID) || '',
+                    supplierID: (example && example.SupplierID) || '',
                     place: (example && example.TreePlace) || '',
                     treeTypeNursery: (example && example.TreeType) || '',
                     project: project,
                     section: section,
                     isPack: isPack,
-                    GD: '',
-                    GF: '',
-                    XJ: '',
-                    DJ: '',
-                    TQZJ: '',
-                    TQHD: ''
+                    GD: '1',
+                    GF: '1',
+                    XJ: '1',
+                    DJ: '1',
+                    TQZJ: '1',
+                    TQHD: '1'
                 });
                 this.setState({
-                    nurseryID: (example && example.NurseryID) || '',
-                    supplierID: (example && example.SupplierID) || ''
+                    nurseryName: (example && example.NurseryName) || '',
+                    supplierName: (example && example.Factory) || ''
                 });
             }
         } catch (e) {
@@ -99,28 +99,30 @@ class ChangeNurseryInfoModal extends Component {
             actions: {
                 putChangeNurseryInfoInCar
             },
-            selectedRowSXM
+            selectedRowSXM,
+            example
         } = this.props;
         const {
-            nurseryID,
-            supplierID
+            nurseryName,
+            supplierName
         } = this.state;
         validateFields(async (err, values) => {
             console.log('values', values);
+
             if (!err) {
                 let postData = {
-                    'XJ': values.XJ,
-                    'GD': values.GD,
-                    'GF': values.GF,
-                    'DJ': values.DJ,
-                    'TQZJ': values.TQZJ,
-                    'TQHD': values.TQHD,
+                    'XJ': (example && example.XJ && values.XJ) || '',
+                    'GD': (example && example.GD && values.GD) || '',
+                    'GF': (example && example.GF && values.GF) || '',
+                    'DJ': (example && example.DJ && values.DJ) || '',
+                    'TQZJ': (example && example.TQZJ && values.TQZJ) || '',
+                    'TQHD': (example && example.TQHD && values.TQHD) || '',
                     'TreeType': values.treeTypeNursery,
-                    'NurseryName': values.nurseryName,
-                    'Factory': values.supplierName,
+                    'NurseryName': nurseryName,
+                    'Factory': supplierName,
                     'TreePlace': values.place,
-                    'NurseryID': nurseryID,
-                    'SupplierID': supplierID,
+                    'NurseryID': values.nurseryID,
+                    'SupplierID': values.supplierID,
                     'BD': values.section,
                     'IsPack': values.isPack,
                     'ZZBM': selectedRowSXM
@@ -197,15 +199,25 @@ class ChangeNurseryInfoModal extends Component {
                 place: nurseryDetail.Address || ''
             });
         }
+        console.log('nurseryDetail', nurseryDetail);
         this.setState({
-            nurseryID: value
+            nurseryName: nurseryDetail.NurseryName
         });
     }
     // 选择供应商，设置供应商ID
     handleSupplierSelect = async (value, info) => {
-        console.log('info', info);
+        const {
+            supplierList
+        } = this.props;
+        let supplierDetail = '';
+        supplierList.map((supplier) => {
+            if (supplier.ID === value) {
+                supplierDetail = supplier;
+            }
+        });
+        console.log('supplierDetail', supplierDetail);
         this.setState({
-            supplierID: value
+            supplierName: supplierDetail.SupplierName
         });
     }
     render () {
@@ -244,12 +256,12 @@ class ChangeNurseryInfoModal extends Component {
                                         label='苗圃名称'
                                     >
                                         {getFieldDecorator(
-                                            'nurseryName',
+                                            'nurseryID',
                                             {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请选择苗圃名称'
+                                                        message: '请选择苗圃'
                                                     }
                                                 ]
                                             }
@@ -278,7 +290,7 @@ class ChangeNurseryInfoModal extends Component {
                                         label='供应商名称'
                                     >
                                         {getFieldDecorator(
-                                            'supplierName',
+                                            'supplierID',
                                             {
                                                 rules: [
                                                     {
@@ -449,11 +461,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -473,11 +485,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -497,11 +509,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -521,11 +533,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -545,11 +557,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>
@@ -569,11 +581,11 @@ class ChangeNurseryInfoModal extends Component {
                                                 ]
                                             }
                                         )(<RadioGroup>
-                                            <Radio value={'/100'}>/100</Radio>
-                                            <Radio value={'/10'}>/10</Radio>
-                                            <Radio value={''}>1</Radio>
-                                            <Radio value={'*10'}>x10</Radio>
-                                            <Radio value={'*100'}>x100</Radio>
+                                            <Radio value={'0.01'}>/100</Radio>
+                                            <Radio value={'0.1'}>/10</Radio>
+                                            <Radio value={'1'}>1</Radio>
+                                            <Radio value={'10'}>x10</Radio>
+                                            <Radio value={'100'}>x100</Radio>
                                         </RadioGroup>)}
                                     </FormItem>
                                 </Col>

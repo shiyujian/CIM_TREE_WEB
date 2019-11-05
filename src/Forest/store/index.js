@@ -371,6 +371,8 @@ export const putMergeCarPack = forestFetchAction(`${TREE_API}/packmerge`, [], 'P
 export const putMoveTreeInCar = forestFetchAction(`${TREE_API}/packnurserymove`, [], 'PUT', []);
 // 修改现场测量信息
 export const putChangeLocInfo = forestFetchAction(`${TREE_API}/batchtree`, [], 'PUT', []);
+// 删除车辆包
+export const deleteCarPack = forestFetchAction(`${TREE_API}/carpack/{{id}}`, [], 'DELETE', []);
 // 导出苗木死亡信息
 export const exportEcporttreestatuss = forestFetchAction(`${TREE_API}/ecporttreestatuss`, [], 'GET', []);
 
@@ -538,6 +540,7 @@ export const actions = {
     putMergeCarPack,
     putMoveTreeInCar,
     putChangeLocInfo,
+    deleteCarPack,
     getUnitMessageBySection,
     getExportAcceptList,
     getExportAcceptReport,

@@ -54,7 +54,9 @@ export default class TreeAdoptTree extends Component {
             map
         } = this.props;
         if (map) {
+            // 添加地图点击事件
             await map.on('click', this.handleAdoptTreeGisClickFunction);
+            // 加载苗木结缘图层
             await this.getTileTreeAdoptBasic();
         }
     }
@@ -65,7 +67,9 @@ export default class TreeAdoptTree extends Component {
         const {
             adoptTreeMarkerLayerList
         } = this.state;
+        // 关闭地图点击事件
         map.off('click', this.handleAdoptTreeGisClickFunction);
+        // 去除苗木结缘图层
         this.removeTileTreeAdoptLayer();
         for (let t in adoptTreeMarkerLayerList) {
             map.removeLayer(adoptTreeMarkerLayerList[t]);
@@ -78,6 +82,7 @@ export default class TreeAdoptTree extends Component {
                 dashboardCompomentMenu
             } = this.props;
             if (dashboardCompomentMenu === 'geojsonFeature_treeAdopt' && e) {
+                // 通过点击坐标获取苗木结缘信息
                 this.getSxmByLocation(e.latlng.lng, e.latlng.lat);
             }
         } catch (e) {
@@ -348,6 +353,10 @@ export default class TreeAdoptTree extends Component {
             '&J=' +
             rowp;
         jQuery.getJSON(url, null, async (data) => {
+            await this.setState({
+                adoptTreeModalVisible: true,
+                adoptTreeModalLoading: true
+            });
             if (data.features && data.features.length) {
                 let adoptTreeMess = await this.getTreeAdoptInfo(data, x, y);
                 if (adoptTreeMess) {
@@ -413,6 +422,7 @@ export default class TreeAdoptTree extends Component {
         try {
             let postdata = {
                 sxm: data.features[0].properties.SXM
+                // sxm: 'ABG9834'
             };
             let totalThinClass = tree.totalThinClass || [];
             let bigTreeList = (tree && tree.bigTreeList) || [];

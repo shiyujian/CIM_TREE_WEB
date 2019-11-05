@@ -3,6 +3,7 @@ import { LBSAMAP_KEY } from '_platform/api';
 import {getForestImgUrl} from '_platform/auth';
 import {handlePOLYGONWktData} from '_platform/gisAuth';
 
+// 获取施工包数据，并将数据进行整理
 export const getAreaData = async (getTreeNodeList, getThinClassList) => {
     let rst = await getTreeNodeList();
     if (!(rst && rst instanceof Array && rst.length > 0)) {
@@ -364,12 +365,11 @@ export const getIconType = (type) => {
             break;
     }
 };
-
+// 图层颜色填充
 export const fillAreaColor = (index) => {
     let colors = ['#c3c4f5', '#e7c8f5', '#c8f5ce', '#f5b6b8', '#e7c6f5'];
     return colors[index % 5];
 };
-
 // 获取标段名称
 export const getSectionName = (section, bigTreeList = []) => {
     let sectionName = '';
@@ -408,7 +408,58 @@ export const onImgClick = (data) => {
     }
     return srcs;
 };
-
+// 点击区域地块处理细班坐标数据
+export const handleAreaLayerData = async (eventKey, getTreearea, sectionn) => {
+    let handleKey = eventKey.split('-');
+    let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
+    let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
+    if (handleKey.length === 4) {
+        no = eventKey;
+        section = sectionn;
+    }
+    try {
+        // 获取设计数据
+        let rst = await getTreearea({}, { no: no });
+        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
+            return;
+        }
+        let coords = [];
+        let str = '';
+        let contents = rst.content;
+        let data = contents.find(content => content.Section === section);
+        let wkt = data.coords;
+        // 将坐标字符串转化为数组
+        if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+            let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
+            let arr = datas.split('),(');
+            arr.map((a, index) => {
+                str = a.slice(a.indexOf('(') + 1, a.length - 1);
+                coords.push(str);
+            });
+        } else if (wkt.indexOf('POLYGON') !== -1) {
+            str = handlePOLYGONWktData(wkt);
+            coords.push(str);
+        }
+        return coords;
+    } catch (e) {
+        console.log('handleAreaLayerData', e);
+    }
+};
+// 字符串转数组
+export const handleCoordinates = (str) => {
+    let target = str.split(',').map(item => {
+        return item.split(' ').map(_item => _item - 0);
+    });
+    let treearea = [];
+    let arr = [];
+    target.map((data, index) => {
+        if (data && data instanceof Array && data[1] && data[0]) {
+            arr.push([data[1], data[0]]);
+        }
+    });
+    treearea.push(arr);
+    return treearea;
+};
 // 获取任务中的标段，小班，细班名称
 export const getTaskThinClassName = (task, totalThinClass, bigTreeList = []) => {
     try {
@@ -485,7 +536,6 @@ export const getTaskThinClassName = (task, totalThinClass, bigTreeList = []) => 
         console.log('getTaskThinClassName', e);
     }
 };
-
 // 获取成活率的标段，小班，细班名称
 export const getThinClassName = (thinClass, section, totalThinClass, bigTreeList = []) => {
     try {
@@ -560,58 +610,6 @@ export const getThinClassName = (thinClass, section, totalThinClass, bigTreeList
         console.log('getThinClassName', e);
     }
 };
-
-// 点击区域地块处理细班坐标数据
-export const handleAreaLayerData = async (eventKey, getTreearea, sectionn) => {
-    let handleKey = eventKey.split('-');
-    let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-    let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-    if (handleKey.length === 4) {
-        no = eventKey;
-        section = sectionn;
-    }
-    try {
-        let rst = await getTreearea({}, { no: no });
-        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
-            return;
-        }
-        let coords = [];
-        let str = '';
-        let contents = rst.content;
-        let data = contents.find(content => content.Section === section);
-        let wkt = data.coords;
-        if (wkt.indexOf('MULTIPOLYGON') !== -1) {
-            let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
-            let arr = datas.split('),(');
-            arr.map((a, index) => {
-                str = a.slice(a.indexOf('(') + 1, a.length - 1);
-                coords.push(str);
-            });
-        } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = handlePOLYGONWktData(wkt);
-            coords.push(str);
-        }
-        return coords;
-    } catch (e) {
-        console.log('handleAreaLayerData', e);
-    }
-};
-
-export const handleCoordinates = (str) => {
-    let target = str.split(',').map(item => {
-        return item.split(' ').map(_item => _item - 0);
-    });
-    let treearea = [];
-    let arr = [];
-    target.map((data, index) => {
-        if (data && data instanceof Array && data[1] && data[0]) {
-            arr.push([data[1], data[0]]);
-        }
-    });
-    treearea.push(arr);
-    return treearea;
-};
-
 export const handleRiskData = (datas) => {
     let riskObj = {};
     let risks = [];

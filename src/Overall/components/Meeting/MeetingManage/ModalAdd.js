@@ -225,6 +225,7 @@ class ModalAdd extends Component {
                 let params = {
                     MeetingType: '日常会议',
                     ProjectCode: 'P193',
+                    BelongSystem: '雄安森林大数据平台',
                     Contacter: values.Contacter, // 联系人
                     Creater: getUser().ID || '',
                     StartTime,

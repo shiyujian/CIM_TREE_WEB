@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-23 11:28:20
+ * @Last Modified time: 2019-10-26 15:01:06
  */
 import React, { Component } from 'react';
 import {
@@ -143,6 +143,7 @@ class OnSite extends Component {
             customViewByUserID = []
         } = this.props;
         try {
+            // 地图默认配置
             let mapInitialization = INITLEAFLET_API;
             // 根据用户的自定义视图来查看聚焦点
             if (customViewByUserID && customViewByUserID instanceof Array && customViewByUserID.length > 0) {

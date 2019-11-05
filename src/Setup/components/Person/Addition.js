@@ -74,6 +74,7 @@ class Addition extends Component {
                 });
             });
         } else {
+            let roleName = userRoles.RoleName;
             const rolea = userRoles.ParentID;
             parentRoleType.map((type) => {
                 if (rolea === type.ID) {
@@ -83,6 +84,16 @@ class Addition extends Component {
                     });
                 }
             });
+            if (roleName === '施工文书') {
+                parentRoleType.map((type) => {
+                    if (type.RoleName === '苗圃') {
+                        systemRoles.push({
+                            name: type && type.RoleName,
+                            value: roles.filter(role => role.ParentID === type.ID)
+                        });
+                    }
+                });
+            }
         }
         const objs = systemRoles.map(roless => {
             return (

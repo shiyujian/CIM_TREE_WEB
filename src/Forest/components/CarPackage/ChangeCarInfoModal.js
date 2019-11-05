@@ -8,7 +8,8 @@ import {
     Select,
     Notification,
     Button,
-    Popconfirm
+    Popconfirm,
+    InputNumber
 } from 'antd';
 import 'moment/locale/zh-cn';
 const FormItem = Form.Item;
@@ -141,12 +142,12 @@ class ChangeCarInfoModal extends Component {
                             });
 
                             let changeNurseryPostData = {
-                                'XJ': '',
-                                'GD': '',
-                                'GF': '',
-                                'DJ': '',
-                                'TQZJ': '',
-                                'TQHD': '',
+                                'XJ': '1',
+                                'GD': '1',
+                                'GF': '1',
+                                'DJ': '1',
+                                'TQZJ': '1',
+                                'TQHD': '1',
                                 'TreeType': (example && example.TreeType) || '',
                                 'NurseryName': (example && example.NurseryName) || '',
                                 'Factory': (example && example.Factory) || '',
@@ -159,38 +160,38 @@ class ChangeCarInfoModal extends Component {
                             };
                             let changeNurseryData = await putChangeNurseryInfoInCar({}, changeNurseryPostData);
                             console.log('changeNurseryData', changeNurseryData);
-                            if (changeNurseryData && changeNurseryData.code === 1) {
+                            // if (changeNurseryData && changeNurseryData.code === 1) {
+                            Notification.success({
+                                message: '修改苗圃信息成功，修改车辆信息中',
+                                duration: 3
+                            });
+                            let changCarData = await putChangCarPackInfo({}, changCarPostData);
+                            console.log('changCarData', changCarData);
+                            if (changCarData && changCarData.code === 1) {
                                 Notification.success({
-                                    message: '修改苗圃信息成功，修改车辆信息中',
+                                    message: '修改车辆信息成功',
                                     duration: 3
                                 });
-                                let changCarData = await putChangCarPackInfo({}, changCarPostData);
-                                console.log('changCarData', changCarData);
-                                if (changCarData && changCarData.code === 1) {
-                                    Notification.success({
-                                        message: '修改车辆信息成功',
-                                        duration: 3
-                                    });
-                                    await this.props.onEditCarModalOk();
-                                } else {
-                                    Notification.error({
-                                        message: '修改车辆信息失败',
-                                        duration: 3
-                                    });
-                                }
+                                await this.props.onEditCarModalOk();
                             } else {
-                                if (changeNurseryData.msg === '修改前后树种的苗圃测量参数不一致，不允许进行树种修改！') {
-                                    Notification.error({
-                                        message: '修改前后树种的苗圃测量参数不一致，不允许进行树种修改！',
-                                        duration: 3
-                                    });
-                                } else {
-                                    Notification.error({
-                                        message: '修改苗圃信息失败,请修改苗圃信息后再修改车辆信息',
-                                        duration: 3
-                                    });
-                                }
+                                Notification.error({
+                                    message: '修改车辆信息失败',
+                                    duration: 3
+                                });
                             }
+                            // } else {
+                            //     if (changeNurseryData.msg === '修改前后树种的苗圃测量参数不一致，不允许进行树种修改！') {
+                            //         Notification.error({
+                            //             message: '修改前后树种的苗圃测量参数不一致，不允许进行树种修改！',
+                            //             duration: 3
+                            //         });
+                            //     } else {
+                            //         Notification.error({
+                            //             message: '修改苗圃信息失败,请修改苗圃信息后再修改车辆信息',
+                            //             duration: 3
+                            //         });
+                            //     }
+                            // }
                         }
                         console.log('aaaaaaaaaaaa');
                     } else {
@@ -263,25 +264,6 @@ class ChangeCarInfoModal extends Component {
             callback();
         }
     }
-    // 自定义校验总数
-    checkTotalNumber = async (rule, value, callback) => {
-        if (value) {
-            let reg = /^[1-9]\d*$/;
-            console.log('reg.test(value)', reg.test(value));
-            // isNaN(value);
-            if (!isNaN(value) && reg.test(value)) {
-                if (value > 0) {
-                    callback();
-                } else {
-                    callback(`请输入数字`);
-                }
-            } else {
-                callback(`请输入数字`);
-            }
-        } else {
-            callback();
-        }
-    }
     render () {
         const {
             form: { getFieldDecorator },
@@ -342,34 +324,34 @@ class ChangeCarInfoModal extends Component {
                                             ]
                                         }
                                     )(<Select>
-                                        <Option key={'0'} value={-1} title={'打包'}>
+                                        <Option key={'打包'} value={-1} title={'打包'}>
                                         打包
                                         </Option>
-                                        <Option key={'1'} value={0} title={'施工提交'}>
+                                        <Option key={'施工提交'} value={0} title={'施工提交'}>
                                         施工提交
                                         </Option>
-                                        <Option key={'-1'} value={1} title={'监理合格'}>
+                                        <Option key={'监理合格'} value={1} title={'监理合格'}>
                                         监理合格
                                         </Option>
-                                        <Option key={'-1'} value={2} title={'监理退苗'}>
+                                        <Option key={'监理退苗'} value={2} title={'监理退苗'}>
                                         监理退苗
                                         </Option>
-                                        <Option key={'-1'} value={3} title={'监理合格施工同意'}>
+                                        <Option key={'监理合格施工同意'} value={3} title={'监理合格施工同意'}>
                                         监理合格施工同意
                                         </Option>
-                                        <Option key={'-1'} value={4} title={'监理合格施工不同意'}>
+                                        <Option key={'监理合格施工不同意'} value={4} title={'监理合格施工不同意'}>
                                         监理合格施工不同意
                                         </Option>
-                                        <Option key={'-1'} value={5} title={'监理退苗施工同意'}>
+                                        <Option key={'监理退苗施工同意'} value={5} title={'监理退苗施工同意'}>
                                         监理退苗施工同意
                                         </Option>
-                                        <Option key={'-1'} value={6} title={'监理退苗施工不同意'}>
+                                        <Option key={'监理退苗施工不同意'} value={6} title={'监理退苗施工不同意'}>
                                         监理退苗施工不同意
                                         </Option>
-                                        <Option key={'-1'} value={7} title={'业主合格'}>
+                                        <Option key={'业主合格'} value={7} title={'业主合格'}>
                                         业主合格
                                         </Option>
-                                        <Option key={'-1'} value={8} title={'业主退苗'}>
+                                        <Option key={'业主退苗'} value={8} title={'业主退苗'}>
                                         业主退苗
                                         </Option>
                                     </Select>)}
@@ -482,13 +464,10 @@ class ChangeCarInfoModal extends Component {
                                                 {
                                                     required: true,
                                                     message: '请输入总数'
-                                                },
-                                                {
-                                                    validator: this.checkTotalNumber
                                                 }
                                             ]
                                         }
-                                    )(<Input />)}
+                                    )(<InputNumber />)}
                                 </FormItem>
                             </Col>
                             <Col span={12}>
