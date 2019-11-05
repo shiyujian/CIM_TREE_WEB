@@ -357,23 +357,21 @@ export default class TreeAdoptTree extends Component {
                 adoptTreeModalVisible: true,
                 adoptTreeModalLoading: true
             });
-            await this.getTreeMessData(data, x, y);
-            await this.handleOkAdoptTreeMessModal();
-            // if (data.features && data.features.length) {
-            //     let adoptTreeMess = await this.getTreeAdoptInfo(data, x, y);
-            //     if (adoptTreeMess) {
-            //         await this.setState({
-            //             adoptTreeModalVisible: true,
-            //             adoptTreeModalLoading: true
-            //         });
-            //         await this.getTreeMessData(data, x, y);
-            //         await this.handleOkAdoptTreeMessModal();
-            //     } else {
-            //         message.warning('未查询到结缘数据');
-            //     }
-            // } else {
-            //     message.warning('未查询到结缘数据');
-            // }
+            if (data.features && data.features.length) {
+                let adoptTreeMess = await this.getTreeAdoptInfo(data, x, y);
+                if (adoptTreeMess) {
+                    await this.setState({
+                        adoptTreeModalVisible: true,
+                        adoptTreeModalLoading: true
+                    });
+                    await this.getTreeMessData(data, x, y);
+                    await this.handleOkAdoptTreeMessModal();
+                } else {
+                    message.warning('未查询到结缘数据');
+                }
+            } else {
+                message.warning('未查询到结缘数据');
+            }
         });
     }
     // 获取苗木结缘信息
@@ -423,8 +421,8 @@ export default class TreeAdoptTree extends Component {
         } = this.props;
         try {
             let postdata = {
-                // sxm: data.features[0].properties.SXM
-                sxm: 'ABG9834'
+                sxm: data.features[0].properties.SXM
+                // sxm: 'ABG9834'
             };
             let totalThinClass = tree.totalThinClass || [];
             let bigTreeList = (tree && tree.bigTreeList) || [];
