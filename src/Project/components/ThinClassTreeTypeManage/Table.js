@@ -302,10 +302,11 @@ class Tablelevel extends Component {
         // 业主和管理员
         let permissionOperate = false;
         this.userSection = userData.section;
-        if (userData.username === 'admin') {
+        if (userData.username === 'admin' || this.userSection.indexOf(',') > -1) {
             permissionOperate = true;
             this.setState({
-                isSuperAdmin: true
+                isSuperAdmin: true,
+                section: ''
             });
         } else {
             this.setState({
@@ -322,8 +323,6 @@ class Tablelevel extends Component {
         });
         // 初始化地图
         this.initMap();
-        // 获取历史数据
-        this.getDataHistory();
         // 获取所有树种
         this.getTreeTypes();
     }
@@ -337,6 +336,8 @@ class Tablelevel extends Component {
             }, () => {
                 // 获取表格数据
                 this.onSearch(1);
+                // 获取历史数据
+                this.getDataHistory();
             });
         }
     }
@@ -850,12 +851,12 @@ class Tablelevel extends Component {
                             </Button>
                         </FormItem>
                         <FormItem>
-                            <Button
+                            {/* <Button
                                 type='primary'
                                 onClick={this.onHistory.bind(this)}
                                 style={{marginLeft: 50}}>
                                 历史导入列表
-                            </Button>
+                            </Button> */}
                         </FormItem>
                     </Form>
                 </div>
