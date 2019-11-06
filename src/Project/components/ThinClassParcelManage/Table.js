@@ -105,9 +105,11 @@ class Tablelevel extends Component {
     componentDidMount () {
         let userData = getUser();
         this.userSection = userData.section;
-        if (userData.username === 'admin') {
+        console.log('用户的标段', this.userSection);
+        if (userData.username === 'admin' || this.userSection.indexOf(',') > -1) {
             this.setState({
-                isSuperAdmin: true
+                isSuperAdmin: true,
+                section: ''
             });
         } else {
             this.setState({
@@ -117,8 +119,6 @@ class Tablelevel extends Component {
         }
         // 初始化地图
         this.initMap();
-        // 获取历史数据
-        this.getDataHistory();
         // 获取所有树种
         this.getTreeTypes();
     }
@@ -130,6 +130,8 @@ class Tablelevel extends Component {
                 leftkeycode: nextProps.leftkeycode,
                 sectionList: nextProps.sectionList
             }, () => {
+                // 获取历史数据
+                this.getDataHistory();
                 // 获取表格数据
                 this.onSearch(1);
             });
@@ -178,8 +180,10 @@ class Tablelevel extends Component {
     }
     getDataHistory () {
         const { getDataimports } = this.props.actions;
+        const { isSuperAdmin, leftkeycode } = this.state;
+        console.log();
         getDataimports({}, {
-            section: this.userSection,
+            section: isSuperAdmin ? leftkeycode : this.userSection,
             datatype: 'thinclass',
             stime: '',
             etime: '',
@@ -506,7 +510,7 @@ class Tablelevel extends Component {
         });
     };
     onSearch (page = 1) {
-        const { number, leftkeycode, section } = this.state;
+        const { isSuperAdmin, number, leftkeycode, section } = this.state;
         this.setState({
             spinning: true
         });

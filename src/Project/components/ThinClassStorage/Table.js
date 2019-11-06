@@ -132,12 +132,41 @@ class Tablelevel extends Component {
                 console.log('定位过去', selectedRows);
                 this.onLocation(selectedRows);
             },
+            onSelectAll: (selected, selectedRows, changeRows) => {
+                console.log('全部选择', selected, selectedRows, changeRows);
+                if (selected) {
+                    changeRows.map(item => {
+                        selectKey.push(item.key);
+                    });
+                    this.setState({
+                        selectKey: selectKey
+                    });
+                } else {
+                    let newSelectKey = [];
+                    changeRows.map(item => {
+                        selectKey.map(row => {
+                            if (row.key === item.key) {
+
+                            } else {
+                                newSelectKey.push(row.key);
+                            }
+                        })
+                    });
+                    this.setState({
+                        selectKey: newSelectKey
+                    });
+                }
+            },
             onSelect: (record, selected) => {
-                console.log('选择');
+                console.log('选择', record.Section, '选择', this.userSection);
                 if (selected) {
                     // 增加
-                    if (isSuperAdmin || record.Section === this.userSection) {
+                    if (isSuperAdmin || record.Section === this.userSection || this.userSection.indexOf(record.Section) > -1) {
                         selectKey.push(record.key);
+                        this.setState({
+                            selectKey: selectKey
+                        })
+                        console.log('选中的key', selectKey);
                     } else {
                         message.error('勾选失败，当前用户所属标段与该细班所属标段不符');
                     }
@@ -145,6 +174,9 @@ class Tablelevel extends Component {
                     // 减少
                     let index = selectKey.indexOf(record.key);
                     selectKey.splice(index, 1);
+                    this.setState({
+                        selectKey: selectKey
+                    })
                 }
             },
             hideDefaultSelections: true,
@@ -172,7 +204,17 @@ class Tablelevel extends Component {
                         </FormItem>
                         <FormItem>
                             {
-                                this.state.indexBtn === 1 ? <Button type='primary' onClick={this.onAdd.bind(this)} style={{marginLeft: 50}}>上传细班</Button> : <Button type='primary' onClick={this.onPutStorage.bind(this)} style={{marginLeft: 50}} loading={spinning}>细班入库</Button>
+                                this.state.indexBtn === 1 ? <Button
+                                    type='primary'
+                                    onClick={this.onAdd.bind(this)}
+                                    style={{marginLeft: 50}}
+                                >上传细班</Button>
+                                : <Button
+                                    type='primary'
+                                    onClick={this.onPutStorage.bind(this)}
+                                    style={{marginLeft: 50}}
+                                    loading={spinning}
+                                >细班入库</Button>
                             }
                         </FormItem>
                     </Form>
@@ -180,7 +222,13 @@ class Tablelevel extends Component {
                 <div style={{marginTop: 20}}>
                     <div style={{width: 600, height: 700, float: 'left'}}>
                         <Spin spinning={spinning}>
-                            <Table rowSelection={rowSelection} columns={this.columns} dataSource={newDataList.length === 0 ? dataList : newDataList} pagination={false} />
+                            <Table
+                                rowKey="key"
+                                rowSelection={rowSelection}
+                                columns={this.columns}
+                                dataSource={newDataList.length === 0 ? dataList : newDataList}
+                                pagination={false}
+                            />
                         </Spin>
                         <Pagination style={{float: 'right', marginTop: 10}} current={page} total={total} onChange={this.handlePage.bind(this)} showQuickJumper />
                     </div>
@@ -468,11 +516,13 @@ class Tablelevel extends Component {
                 this.dataList = rep.features;
                 // 选中可以上传的
                 let selectKey = [];
-                this.dataList.map(item => {
+                this.dataList.map((item, index) => {
+                    item.key = index;
                     if (isSuperAdmin || item.Section === this.userSection) {
                         selectKey.push(item.key);
                     }
                 });
+                console.log('新数据', this.dataList);
                 this.setState({
                     confirmLoading: false,
                     indexBtn: 0,
