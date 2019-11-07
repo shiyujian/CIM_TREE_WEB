@@ -36,7 +36,7 @@ export default class AddMember extends Component {
         let roleData = await getRoles();
         let curingRoleID = '';
         roleData.map((role) => {
-            if (role && role.ID && role.ParentID && role.RoleName === '养护') {
+            if (role && role.ID && role.ParentID && role.RoleName.indexOf('养护') !== -1) {
                 curingRoleID = role.ID;
             };
         });
@@ -76,7 +76,7 @@ export default class AddMember extends Component {
                 section: section,
                 status: 1
             };
-
+            console.log('postdata', postdata);
             let userData = await getUsers({}, postdata);
             if (userData && userData.code && userData.code === 200) {
                 this.setState({
