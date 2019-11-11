@@ -36,7 +36,8 @@ export default class AddMember extends Component {
         let roleData = await getRoles();
         let curingRoleID = '';
         roleData.map((role) => {
-            if (role && role.ID && role.ParentID && role.RoleName.indexOf('养护') !== -1) {
+            if (role && role.ID && role.ParentID && role.RoleName.indexOf('养护') !== -1
+                && role.RoleName !== '养护文书') {
                 curingRoleID = role.ID;
             };
         });
