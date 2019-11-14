@@ -21,42 +21,37 @@ import {
 import {
     getForestImgUrl
 } from '_platform/auth';
+import FaceRecognitionPersonListModal from './FaceRecognitionPersonListModal';
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
-export default class MachineEntranceAndDepartureTable extends Component {
+export default class FaceRecognitionListTable extends Component {
     constructor (props) {
         super(props);
         this.state = {
             tblData: [],
-            pagination: {},
             loading: false,
             size: 10,
             exportsize: 100,
             stime: moment().format('YYYY-MM-DD 00:00:00'),
             etime: moment().format('YYYY-MM-DD 23:59:59'),
             section: '',
-            source: '',
+            status: '',
             percent: 0,
             keyword: '',
             picViewVisible: false,
-            imgSrcs: []
+            imgSrcs: [],
+            viewVisible: false,
+            faceDetail: ''
         };
     }
     columns = [
         {
-            title: '设备序列号',
-            dataIndex: 'LocationDeviceID',
-            key: 'LocationDeviceID',
-            render: (text, record) => {
-                if (text) {
-                    let arrayList = text.split('-');
-                    if (arrayList && arrayList instanceof Array && arrayList.length === 3) {
-                        return arrayList[2];
-                    }
-                } else {
-                    return '/';
-                }
+            title: '序号',
+            dataIndex: 'index',
+            key: 'index',
+            render: (text, record, index) => {
+                return index + 1;
             }
         },
         {
@@ -70,101 +65,88 @@ export default class MachineEntranceAndDepartureTable extends Component {
             key: 'sectionName'
         },
         {
-            title: '公司',
-            dataIndex: 'orgName',
-            key: 'orgName'
+            title: '设备SN',
+            dataIndex: 'SN',
+            key: 'SN'
         },
         {
-            title: '设备类型',
-            dataIndex: 'DeviceType',
-            key: 'DeviceType'
-        },
-        {
-            title: '设备名称',
-            dataIndex: 'DeviceName',
-            key: 'DeviceName'
-        },
-        {
-            title: '设备来源',
-            dataIndex: 'Source',
-            key: 'Source',
+            title: '进出口',
+            dataIndex: 'In',
+            key: 'In',
             render: (text, record) => {
-                if (text) {
-                    switch (text) {
-                        case 1:
-                            return '自有';
-                        case 2:
-                            return '租赁';
-                        case 3:
-                            return '自带';
-                    }
-                } else {
-                    return '/';
+                switch (text) {
+                    case 0:
+                        return '出';
+                    case 1:
+                        return '进';
                 }
             }
         },
         {
-            title: '进场时间',
-            dataIndex: 'EnterTime',
-            key: 'EnterTime'
-        },
-        {
-            title: '离场时间',
-            dataIndex: 'LeaveTime',
-            key: 'LeaveTime'
-        },
-        {
-            title: '照片',
-            dataIndex: 'Images',
-            render: (text, record, index) => {
-                if (record && record.Images) {
-                    return <a
-                        onClick={this.handlePicView.bind(this, record.Images)}>
-                            查看
-                    </a>;
-                } else {
-                    return '/';
-                }
-            }
-        },
-        {
-            title: '登记人',
-            dataIndex: 'InputerName',
+            title: '状态',
+            dataIndex: 'Status',
+            key: 'Status',
             render: (text, record) => {
-                if (record.InputerUserName && record.InputerName) {
-                    return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
-                } else if (record.InputerName && !record.InputerUserName) {
-                    return <p>{record.InputerName}</p>;
-                } else {
-                    return <p> / </p>;
+                switch (text) {
+                    case 0:
+                        return '离线';
+                    case 1:
+                        return '在线';
                 }
             }
         },
         {
-            title: '联系人',
-            dataIndex: 'Contacter',
-            key: 'Contacter'
+            title: '创建时间',
+            dataIndex: 'CreateTime',
+            key: 'CreateTime'
         },
         {
-            title: '电话',
-            dataIndex: 'Phone',
-            key: 'Phone'
-        }
+            title: '更新时间',
+            dataIndex: 'UpdateTime',
+            key: 'UpdateTime'
+        },
         // {
-        //     title: '操作',
-        //     render: (record, index) => {
-        //         return (
-        //             <div>
-        //                 <a
-        //                     type='primary'
-        //                     onClick={this.handleViewDetail.bind(this, record)}
-        //                 >
+        //     title: '照片',
+        //     dataIndex: 'Images',
+        //     render: (text, record, index) => {
+        //         if (record && record.Images) {
+        //             return <a
+        //                 onClick={this.handlePicView.bind(this, record.Images)}>
         //                     查看
-        //                 </a>
-        //             </div>
-        //         );
+        //             </a>;
+        //         } else {
+        //             return '/';
+        //         }
+        //     }
+        // },
+        // {
+        //     title: '登记人',
+        //     dataIndex: 'InputerName',
+        //     render: (text, record) => {
+        //         if (record.InputerUserName && record.InputerName) {
+        //             return <p>{record.InputerName + '(' + record.InputerUserName + ')'}</p>;
+        //         } else if (record.InputerName && !record.InputerUserName) {
+        //             return <p>{record.InputerName}</p>;
+        //         } else {
+        //             return <p> / </p>;
+        //         }
         //     }
         // }
+        {
+            title: '操作',
+            render: (record, index) => {
+                return (
+                    <div>
+                        <a
+                            type='primary'
+                            onClick={this.handleViewDetail.bind(this, record)}
+                        >
+                            查看
+                        </a>
+                    </div>
+                );
+            }
+        }
     ]
     componentDidMount () {
     }
@@ -182,7 +164,7 @@ export default class MachineEntranceAndDepartureTable extends Component {
 
     onTypeChange (value) {
         this.setState({
-            source: value
+            status: value
         });
     }
 
@@ -199,22 +181,15 @@ export default class MachineEntranceAndDepartureTable extends Component {
         });
     }
 
-    handleTableChange (pagination) {
-        const pager = { ...this.state.pagination };
-        pager.current = pagination.current;
-        this.setState({
-            pagination: pager
-        });
-        this.query(pagination.current);
-    }
-
     handleViewDetail = async (record) => {
         this.setState({
+            faceDetail: record,
             viewVisible: true
         });
     }
-    handleCancel () {
+    handleViewPersonListCancel () {
         this.setState({
+            faceDetail: '',
             viewVisible: false
         });
     }
@@ -252,80 +227,69 @@ export default class MachineEntranceAndDepartureTable extends Component {
     query = async (page) => {
         const {
             section = '',
-            source = '',
+            status = '',
             stime = '',
             etime = '',
             size,
             keyword = ''
         } = this.state;
-        if (section === '' && keyword === '') {
-            Notification.warning({
-                message: '请选择标段或输入关键词'
-            });
-            return;
-        }
+        // if (section === '' && keyword === '') {
+        //     Notification.warning({
+        //         message: '请选择标段或输入设备SN'
+        //     });
+        //     return;
+        // }
         const {
             platform: { tree = {} },
-            companyList,
+            leftkeycode,
             actions: {
-                getMachineEntrys,
+                getFaceRecognitionList,
                 getUserDetail
             }
         } = this.props;
 
         let thinClassTree = tree.thinClassTree;
         let postdata = {
-            keyword,
+            sn: keyword,
             section: section,
-            source,
-            stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
-            etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
-            page,
-            size
+            status
+            // stime: stime && moment(stime).format('YYYY-MM-DD HH:mm:ss'),
+            // etime: etime && moment(etime).format('YYYY-MM-DD HH:mm:ss'),
+            // page,
+            // size
         };
         this.setState({ loading: true, percent: 0 });
-        let rst = await getMachineEntrys({}, postdata);
-        if (!(rst && rst.content)) {
+        let tblData = await getFaceRecognitionList({}, postdata);
+        if (!(tblData && tblData instanceof Array)) {
             this.setState({
                 loading: false,
                 percent: 100
             });
             return;
         }
-        let tblData = rst.content;
         let userIDList = [];
         let userDataList = {};
         for (let i = 0; i < tblData.length; i++) {
             let plan = tblData[i];
-            plan.order = (page - 1) * 10 + i + 1;
             plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
             plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-            let orgName = '';
-            companyList.map((company) => {
-                if (company && company.Section && company.Section === plan.Section) {
-                    orgName = company.OrgName;
-                }
-            });
-            plan.orgName = orgName;
             let userData = '';
-            if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
-                userData = await getUserDetail({id: plan.Inputer});
-            } else {
-                userData = userDataList[Number(plan.Inputer)];
+            if (plan.Inputer) {
+                if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
+                    userData = await getUserDetail({id: plan.Inputer});
+                } else {
+                    userData = userDataList[Number(plan.Inputer)];
+                }
+                if (userData && userData.ID) {
+                    userIDList.push(userData.ID);
+                    userDataList[userData.ID] = userData;
+                }
+                plan.InputerName = (userData && userData.Full_Name) || '';
+                plan.InputerUserName = (userData && userData.User_Name) || '';
             }
-            if (userData && userData.ID) {
-                userIDList.push(userData.ID);
-                userDataList[userData.ID] = userData;
-            }
-            plan.InputerName = (userData && userData.Full_Name) || '';
-            plan.InputerUserName = (userData && userData.User_Name) || '';
         }
-        const pagination = { ...this.state.pagination };
-        pagination.total = (rst.pageinfo && rst.pageinfo.total) || 0;
-        pagination.pageSize = size;
         this.setState({
             tblData,
-            pagination: pagination,
             loading: false,
             percent: 100
         });
@@ -337,7 +301,7 @@ export default class MachineEntranceAndDepartureTable extends Component {
         } = this.props;
         const {
             section,
-            source,
+            status,
             keyword
         } = this.state;
         let header = '';
@@ -345,7 +309,7 @@ export default class MachineEntranceAndDepartureTable extends Component {
             <div>
                 <Row className='ManMachine-search-layout'>
                     <div className='ManMachine-mrg10'>
-                        <span className='ManMachine-search-span'>设备名称：</span>
+                        <span className='ManMachine-search-span'>设备SN：</span>
                         <Input
                             value={keyword}
                             className='ManMachine-forestcalcw4'
@@ -371,25 +335,22 @@ export default class MachineEntranceAndDepartureTable extends Component {
                         </Select>
                     </div>
                     <div className='ManMachine-mrg10'>
-                        <span className='ManMachine-search-span'>设备来源：</span>
+                        <span className='ManMachine-search-span'>状态：</span>
                         <Select
                             allowClear
                             className='ManMachine-forestcalcw4'
-                            value={source}
+                            value={status}
                             onChange={this.onTypeChange.bind(this)}
                         >
-                            <Option key={'自有'} value={1} title={'自有'}>
-                                自有
+                            <Option key={'离线'} value={0} title={'离线'}>
+                                离线
                             </Option>
-                            <Option key={'租赁'} value={2} title={'租赁'}>
-                                租赁
-                            </Option>
-                            <Option key={'自带'} value={3} title={'自带'}>
-                                自带
+                            <Option key={'在线'} value={1} title={'在线'}>
+                                在线
                             </Option>
                         </Select>
                     </div>
-                    <div className='ManMachine-mrg-datePicker'>
+                    {/* <div className='ManMachine-mrg-datePicker'>
                         <span className='ManMachine-search-span'>进离场时间：</span>
                         <RangePicker
                             style={{ verticalAlign: 'middle' }}
@@ -403,24 +364,19 @@ export default class MachineEntranceAndDepartureTable extends Component {
                             onChange={this.datepick.bind(this)}
                             onOk={this.datepick.bind(this)}
                         />
-                    </div>
+                    </div> */}
                 </Row>
                 <Row>
                     <Col span={2}>
                         <Button
                             type='primary'
-                            onClick={this.handleTableChange.bind(this, {
-                                current: 1
-                            })}
+                            onClick={this.query.bind(this)}
                         >
                             查询
                         </Button>
                     </Col>
                     <Col span={20} className='ManMachine-quryrstcnt'>
-                        <span>
-                            此次查询共有数据：
-                            {this.state.pagination.total}条
-                        </span>
+                        <span />
                     </Col>
                     <Col span={2}>
                         <Button
@@ -441,7 +397,7 @@ export default class MachineEntranceAndDepartureTable extends Component {
                         bordered
                         className='foresttable'
                         columns={this.columns}
-                        rowKey='order'
+                        rowKey='ID'
                         loading={{
                             tip: (
                                 <Progress
@@ -453,10 +409,8 @@ export default class MachineEntranceAndDepartureTable extends Component {
                             ),
                             spinning: this.state.loading
                         }}
-                        locale={{ emptyText: '当前无机械进离场信息' }}
+                        locale={{ emptyText: '当前无人脸识别列表信息' }}
                         dataSource={details}
-                        onChange={this.handleTableChange.bind(this)}
-                        pagination={this.state.pagination}
                     />
                 </Row>
             </div>
@@ -466,7 +420,8 @@ export default class MachineEntranceAndDepartureTable extends Component {
         const {
             tblData,
             imgSrcs = [],
-            picViewVisible
+            picViewVisible,
+            viewVisible
         } = this.state;
         return (
             <div>
@@ -499,6 +454,15 @@ export default class MachineEntranceAndDepartureTable extends Component {
                                 </Button>
                             </Row>
                         </Modal>)
+                        : ''
+                }
+                {
+                    viewVisible
+                        ? <FaceRecognitionPersonListModal
+                            {...this.props}
+                            {...this.state}
+                            handleViewPersonListCancel={this.handleViewPersonListCancel.bind(this)}
+                        />
                         : ''
                 }
             </div>

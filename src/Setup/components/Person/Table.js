@@ -113,14 +113,21 @@ class Users extends Component {
             key: '8',
             render: (text, record) => {
                 const {
-                    platform: { tree = {} }
+                    platform: { tree = {} },
+                    sidebar: {
+                        node = {}
+                    } = {}
                 } = this.props;
-                let bigTreeList = tree.bigTreeList;
-                if (record && record.Section) {
-                    let name = getSectionNameBySection(record.Section, bigTreeList);
-                    return name;
-                } else {
+                if (node.NurseryName) {
                     return '/';
+                } else {
+                    let bigTreeList = tree.bigTreeList;
+                    if (record && record.Section) {
+                        let name = getSectionNameBySection(record.Section, bigTreeList);
+                        return name;
+                    } else {
+                        return '/';
+                    }
                 }
             }
         },

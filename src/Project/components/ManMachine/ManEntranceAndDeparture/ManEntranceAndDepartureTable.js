@@ -10,11 +10,11 @@ import {
     Input,
     Progress,
     Divider,
-    Notification
+    Notification,
+    Popconfirm
 } from 'antd';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-import QRCode from 'qrcode.react';
 import {getLodop} from '_platform/LodopFuncs';
 import {trim} from '_platform/auth';
 import '../index.less';
@@ -70,6 +70,17 @@ export default class ManEntranceAndDepartureTable extends Component {
             dataIndex: 'workGroupName'
         },
         {
+            title: '人脸识别SN',
+            dataIndex: 'FaceSN',
+            render: (text, record, index) => {
+                if (text) {
+                    return <sapn>{text}</sapn>;
+                } else {
+                    return <sapn>未关联</sapn>;
+                }
+            }
+        },
+        {
             title: '登记时间',
             dataIndex: 'CreateTime'
         },
@@ -91,7 +102,7 @@ export default class ManEntranceAndDepartureTable extends Component {
             dataIndex: 'InStatus',
             render: (text, record, index) => {
                 if (text === 1) {
-                    return <sapn>进场</sapn>;
+                    return <sapn>在场</sapn>;
                 } else if (text === 0) {
                     return <sapn>离场</sapn>;
                 } else if (text === -1) {
@@ -106,12 +117,30 @@ export default class ManEntranceAndDepartureTable extends Component {
             dataIndex: 'operate',
             render: (text, record, index) => {
                 if (record.InStatus === -1) {
-                    return <a onClick={this.handlePrintSingle.bind(this, record)}>打印</a>;
+                    return <div>
+                        <a onClick={this.handlePrintSingle.bind(this, record)}>打印</a>
+                        <Divider type='vertical' />
+                        <Popconfirm
+                            onConfirm={this.handleDeleteWorkMan.bind(this, record)}
+                            title='确定要删除人员吗'
+                            okText='确定'
+                            cancelText='取消' >
+                            <a>删除</a>
+                        </Popconfirm>
+                    </div>;
                 } else {
                     return <div>
                         <a onClick={this.handlePrintSingle.bind(this, record)}>打印</a>
                         <Divider type='vertical' />
                         <a onClick={this.handleViewPersonEntrysOk.bind(this, record)}>查看</a>
+                        <Divider type='vertical' />
+                        <Popconfirm
+                            onConfirm={this.handleDeleteWorkMan.bind(this, record)}
+                            title='确定要删除人员吗'
+                            okText='确定'
+                            cancelText='取消' >
+                            <a>删除</a>
+                        </Popconfirm>
                     </div>;
                 }
             }
@@ -120,6 +149,8 @@ export default class ManEntranceAndDepartureTable extends Component {
     ];
     componentDidMount () {
         // this.query();
+    }
+    componentWillReceiveProps (nextProps) {
     }
     // 人员姓名
     handleWorkManNameChange (value) {
@@ -227,6 +258,21 @@ export default class ManEntranceAndDepartureTable extends Component {
                 getUserDetail
             }
         } = this.props;
+        console.log('companyList', companyList);
+        let orgName = '';
+        let section = '';
+        companyList.map((company) => {
+            if (leftkeycode === company.ID) {
+                orgName = company.OrgName;
+                section = company.Section;
+            }
+        });
+        if (!leftkeycode) {
+            Notification.warning({
+                message: '请选择单位'
+            });
+            return;
+        }
         if (!workGroup && !workManName) {
             Notification.warning({
                 message: '请选择班组或输入姓名'
@@ -253,14 +299,7 @@ export default class ManEntranceAndDepartureTable extends Component {
             return;
         }
         let contentData = rst.content;
-        console.log('companyList', companyList);
-        let orgName = '';
-        companyList.map((company) => {
-            if (leftkeycode === company.ID) {
-                orgName = company.OrgName;
-            }
-        });
-        console.log('aaaa', companyList);
+
         // 获取填报人唯一性数组
         let userIDList = [];
         let userDataList = [];
@@ -308,6 +347,8 @@ export default class ManEntranceAndDepartureTable extends Component {
             }
             plan.InputerName = (userData && userData.Full_Name) || '';
             plan.InputerUserName = (userData && userData.User_Name) || '';
+            // 二维码
+            plan.src = plan.QRCodePath;
         }
         const pagination = { ...this.state.pagination };
         pagination.total = (rst.pageinfo && rst.pageinfo.total) || 0;
@@ -316,23 +357,9 @@ export default class ManEntranceAndDepartureTable extends Component {
             tblData: contentData,
             pagination,
             selectedRowKeys: [],
-            dataSourceSelected: []
-        }, () => {
-            const {
-                tblData
-            } = this.state;
-            for (let t = 0; t < tblData.length; t++) {
-                let data = tblData[t];
-                var canvas = document.getElementById(`${data.ID}`);
-                console.log('canvas', canvas);
-                var strDataURI = canvas.toDataURL('image/png');
-                data.src = strDataURI;
-            }
-            this.setState({
-                loading: false,
-                percent: 100,
-                tblData
-            });
+            dataSourceSelected: [],
+            loading: false,
+            percent: 100
         });
     }
     // 表格的多选设置
@@ -398,6 +425,27 @@ export default class ManEntranceAndDepartureTable extends Component {
             viewPersonEntrysVisible: false,
             viewPersonEntrysRecord: ''
         });
+    }
+    handleDeleteWorkMan = async (record) => {
+        const {
+            actions: {
+                deleteWorkman
+            }
+        } = this.props;
+        let data = await deleteWorkman({id: record.ID});
+        console.log('data', data);
+        if (data && data.code && data.code === 1) {
+            Notification.success({
+                message: '删除人员成功',
+                duration: 3
+            });
+            await this.handleTableChange({current: 1});
+        } else {
+            Notification.error({
+                message: '删除人员失败',
+                duration: 3
+            });
+        }
     }
     treeTable (details) {
         const {
@@ -578,15 +626,6 @@ export default class ManEntranceAndDepartureTable extends Component {
                         /> : ''
                 }
                 {
-                    tblData.map((data) => {
-                        return <QRCode
-                            key={data.ID}
-                            id={data.ID}
-                            style={{display: 'none'}}
-                            value={data.ID} />;
-                    })
-                }
-                {
                     printDataSource.map((printData) => {
                         return (
                             <div
@@ -596,6 +635,7 @@ export default class ManEntranceAndDepartureTable extends Component {
                                     display: 'none',
                                     width: '8cm',
                                     height: '3cm',
+                                    border: 'black',
                                     fontSize: '12.5'
                                 }}>
                                 <Row>
@@ -610,17 +650,12 @@ export default class ManEntranceAndDepartureTable extends Component {
                                                 // width: '5cm',
                                                 width: 'calc(5cm - 5px)',
                                                 display: 'inline-block',
-                                                paddingLeft: '5px'
+                                                marginLeft: '5px',
+                                                paddingTop: '7px'
                                             }}
                                         >
                                             <div>
-                                                <div
-                                                    // style={{
-                                                    //     width: '2.5cm',
-                                                    //     display: 'inline-block',
-                                                    //     verticalAlign: 'top'
-                                                    // }}
-                                                >
+                                                <div>
                                                     <div
                                                         style={{
                                                             width: '50px',
@@ -641,32 +676,6 @@ export default class ManEntranceAndDepartureTable extends Component {
                                                         {/* 王伟王伟王伟 */}
                                                     </div>
                                                 </div>
-                                                {/* <div
-                                                    style={{
-                                                        width: '2.5cm',
-                                                        display: 'inline-block',
-                                                        verticalAlign: 'top'
-                                                    }}
-                                                >
-                                                    <div
-                                                        style={{
-                                                            width: '50px',
-                                                            display: 'inline-block',
-                                                            textAlign: 'right',
-                                                            verticalAlign: 'top'
-                                                        }}
-                                                    >
-                                                性别：
-                                                    </div>
-                                                    <div
-                                                        style={{
-                                                            width: 'calc(100% - 50px)',
-                                                            display: 'inline-block'
-                                                        }}
-                                                    >
-                                                        {printData.Gender}
-                                                    </div>
-                                                </div> */}
                                             </div>
                                             <div>
                                                 <div
@@ -758,11 +767,13 @@ export default class ManEntranceAndDepartureTable extends Component {
                                         <div
                                             style={{
                                                 // width: '3cm',
-                                                width: 'calc(3cm - 5px)',
+                                                width: 'calc(3cm - 15px)',
                                                 display: 'inline-block',
                                                 textAlign: 'right',
                                                 verticalAlign: 'top',
-                                                paddingRight: '5px'
+                                                marginRight: '15px',
+                                                paddingTop: '7px',
+                                                paddingBottom: '2px'
                                                 // marginTop: '0.5cm'
                                             }}
                                         >

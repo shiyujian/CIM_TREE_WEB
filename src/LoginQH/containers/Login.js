@@ -692,6 +692,7 @@ class Login extends Component {
                                                     雄安森林APP下载：
                                                     </h2>
                                                 </div>
+                                                <p style={{marginLeft: 5, fontSize: '18px'}}>安装密码：xaqnxl</p>
                                                 <img src={APPImg} />
                                                 <a
                                                     type='primary'

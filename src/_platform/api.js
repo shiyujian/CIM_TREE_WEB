@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-11-05 09:54:40
+ * @Last Modified time: 2019-11-14 09:55:51
  */
 /**
  *
@@ -642,35 +642,6 @@ export const MODULES = [
         name: '项目管理',
         children: [
             {
-                id: 'PROJECT.PLOTMANAGE.NONE',
-                name: '数据管理',
-                children: [
-                    {
-                        id: 'PROJECT.THINCLASSTORAGE',
-                        name: '细班导入'
-                    },
-                    {
-                        id: 'PROJECT.THINCLASSPARCELMANAGE',
-                        name: '细班分块管理'
-                    },
-                    {
-                        id: 'PROJECT.THINCLASSTREETYPEMANAGE',
-                        name: '细班树种管理'
-                    },
-                    {
-                        id: 'PROJECT.PARCELSTORAGE',
-                        name: '地块导入'
-                    },
-                    {
-                        id: 'PROJECT.PARCELMANAGE',
-                        name: '地块管理'
-                    },
-                    {
-                        id: 'PROJECT.QRCODEDISTRIBUTE',
-                        name: '二维码派发信息'
-                    }
-                ]
-            }, {
                 id: 'PROJECT.NURSERY.NONE',
                 name: '苗木管理',
                 children: [
@@ -707,6 +678,48 @@ export const MODULES = [
                     {
                         id: 'PROJECT.MANMACHINEGROUP',
                         name: '班组维护'
+                    },
+                    {
+                        id: 'PROJECT.MACHINEQRCODEPRINT',
+                        name: '机械二维码'
+                    },
+                    {
+                        id: 'PROJECT.FACERECOGNITIONLIST',
+                        name: '人脸识别列表'
+                    },
+                    {
+                        id: 'PROJECT.FACERECOGNITIONRECORD',
+                        name: '人脸识别记录'
+                    }
+                ]
+            },
+            {
+                id: 'PROJECT.PLOTMANAGE.NONE',
+                name: '数据管理',
+                children: [
+                    {
+                        id: 'PROJECT.THINCLASSTORAGE',
+                        name: '细班导入'
+                    },
+                    {
+                        id: 'PROJECT.THINCLASSPARCELMANAGE',
+                        name: '细班分块管理'
+                    },
+                    {
+                        id: 'PROJECT.THINCLASSTREETYPEMANAGE',
+                        name: '细班树种管理'
+                    },
+                    {
+                        id: 'PROJECT.PARCELSTORAGE',
+                        name: '地块导入'
+                    },
+                    {
+                        id: 'PROJECT.PARCELMANAGE',
+                        name: '地块管理'
+                    },
+                    {
+                        id: 'PROJECT.QRCODEDISTRIBUTE',
+                        name: '二维码派发信息'
                     }
                 ]
             }

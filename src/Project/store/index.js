@@ -8,6 +8,9 @@ import qrcodedistributeReducer, {actions as qrcodedistributeActions} from './qrc
 import manEntranceAndDepartureReducer, { actions as manEntranceAndDepartureActions } from './ManMachine/manEntranceAndDeparture';
 import machineEntranceAndDepartureReducer, { actions as machineEntranceAndDepartureActions } from './ManMachine/machineEntranceAndDeparture';
 import manMachineGroupReducer, { actions as manMachineGroupActions } from './ManMachine/manMachineGroup';
+import machineQRCodePrintReducer, { actions as machineQRCodePrintActions } from './ManMachine/machineQRCodePrint';
+import faceRecognitionListReducer, { actions as faceRecognitionListActions } from './ManMachine/faceRecognitionList';
+import faceRecognitionRecordReducer, { actions as faceRecognitionRecordActions } from './ManMachine/faceRecognitionRecord';
 
 export default handleActions({
     [combineActions(...actionsMap(treeManageActions))]: (state = {}, action) => ({
@@ -38,5 +41,17 @@ export default handleActions({
     [combineActions(...actionsMap(manMachineGroupActions))]: (state = {}, action) => ({
         ...state,
         manMachineGroup: manMachineGroupReducer(state.manMachineGroup, action)
+    }),
+    [combineActions(...actionsMap(machineQRCodePrintActions))]: (state = {}, action) => ({
+        ...state,
+        machineQRCodePrint: machineQRCodePrintReducer(state.machineQRCodePrint, action)
+    }),
+    [combineActions(...actionsMap(faceRecognitionListActions))]: (state = {}, action) => ({
+        ...state,
+        faceRecognitionList: faceRecognitionListReducer(state.faceRecognitionList, action)
+    }),
+    [combineActions(...actionsMap(faceRecognitionRecordActions))]: (state = {}, action) => ({
+        ...state,
+        faceRecognitionRecord: faceRecognitionRecordReducer(state.faceRecognitionRecord, action)
     })
 }, {});

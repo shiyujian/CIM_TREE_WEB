@@ -35,8 +35,16 @@ export default class ManMachineGroupTable extends Component {
             dataIndex: 'Gender'
         },
         {
+            title: '手机号',
+            dataIndex: 'Phone'
+        },
+        {
             title: '身份证号',
             dataIndex: 'ID_Card'
+        },
+        {
+            title: '血型',
+            dataIndex: 'BloodType'
         },
         {
             title: '工种',
@@ -65,19 +73,30 @@ export default class ManMachineGroupTable extends Component {
         },
         {
             title: '在场状态',
-            dataIndex: 'InStatus'
-        },
-        {
-            title: '身份证照片',
-            dataIndex: 'CardImages',
+            dataIndex: 'InStatus',
             render: (text, record, index) => {
-                if (text) {
-                    return <a onClick={this.handlePicView.bind(this, text)}>查看</a>;
+                if (text === 1) {
+                    return <sapn>在场</sapn>;
+                } else if (text === 0) {
+                    return <sapn>离场</sapn>;
+                } else if (text === -1) {
+                    return <sapn>仅登记</sapn>;
                 } else {
-                    return '/';
+                    return <sapn>/</sapn>;
                 }
             }
         },
+        // {
+        //     title: '身份证照片',
+        //     dataIndex: 'CardImages',
+        //     render: (text, record, index) => {
+        //         if (text) {
+        //             return <a onClick={this.handlePicView.bind(this, text)}>查看</a>;
+        //         } else {
+        //             return '/';
+        //         }
+        //     }
+        // },
         {
             title: '人脸照片',
             dataIndex: 'Images',

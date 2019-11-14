@@ -562,6 +562,7 @@ class Edit extends Component {
                                         ]
                                     })(
                                         <Select
+                                            allowClear
                                             placeholder='请选择标段'
                                             style={{ width: '100%' }}
                                         >

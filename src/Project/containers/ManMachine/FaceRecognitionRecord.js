@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { actions as platformActions } from '_platform/store/global';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Select, Spin, Notification } from 'antd';
+import { Select, Spin } from 'antd';
 import {
     Main,
     Aside,
@@ -19,20 +19,20 @@ import {
 import {
     ORGTYPE
 } from '_platform/api';
-import { actions } from '../../store/ManMachine/manEntranceAndDeparture';
+import { actions } from '../../store/ManMachine/faceRecognitionRecord';
 import {
-    ManEntranceAndDepartureTable,
+    FaceRecognitionRecordTable,
     PkCodeTree
-} from '../../components/ManMachine/ManEntranceAndDeparture';
+} from '../../components/ManMachine/FaceRecognitionRecord';
 const Option = Select.Option;
 
 @connect(
     state => {
         const {
             platform,
-            project: { manEntranceAndDeparture }
+            project: { faceRecognitionRecord }
         } = state;
-        return { platform, ...manEntranceAndDeparture };
+        return { platform, ...faceRecognitionRecord };
     },
     dispatch => ({
         actions: bindActionCreators(
@@ -41,7 +41,7 @@ const Option = Select.Option;
         )
     })
 )
-export default class ManEntranceAndDeparture extends Component {
+export default class FaceRecognitionRecord extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -192,9 +192,6 @@ export default class ManEntranceAndDeparture extends Component {
         this.setState({
             workGroupList
         });
-        Notification.warning({
-            message: '请选择班组'
-        });
     }
     // 重置
     resetinput (leftkeycode) {
@@ -211,11 +208,10 @@ export default class ManEntranceAndDeparture extends Component {
             loading,
             companyListTree
         } = this.state;
-
         return (
             <Body>
                 <Main>
-                    <DynamicTitle title='人员进离场' {...this.props} />
+                    <DynamicTitle title='人脸识别记录' {...this.props} />
                     <Sidebar>
                         <Spin spinning={loading}>
                             <PkCodeTree
@@ -224,10 +220,9 @@ export default class ManEntranceAndDeparture extends Component {
                                 onSelect={this.onSelect.bind(this)}
                             />
                         </Spin>
-
                     </Sidebar>
                     <Content>
-                        <ManEntranceAndDepartureTable
+                        <FaceRecognitionRecordTable
                             key={resetkey}
                             {...this.props}
                             {...this.state}

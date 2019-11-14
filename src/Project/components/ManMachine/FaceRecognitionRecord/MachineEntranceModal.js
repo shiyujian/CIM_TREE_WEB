@@ -45,19 +45,9 @@ export default class MachineEntranceAndDepartureTable extends Component {
     }
     columns = [
         {
-            title: '设备序列号',
-            dataIndex: 'LocationDeviceID',
-            key: 'LocationDeviceID',
-            render: (text, record) => {
-                if (text) {
-                    let arrayList = text.split('-');
-                    if (arrayList && arrayList instanceof Array && arrayList.length === 3) {
-                        return arrayList[2];
-                    }
-                } else {
-                    return '/';
-                }
-            }
+            title: '序号',
+            dataIndex: 'order',
+            key: 'order'
         },
         {
             title: '项目',
@@ -68,11 +58,6 @@ export default class MachineEntranceAndDepartureTable extends Component {
             title: '标段',
             dataIndex: 'sectionName',
             key: 'sectionName'
-        },
-        {
-            title: '公司',
-            dataIndex: 'orgName',
-            key: 'orgName'
         },
         {
             title: '设备类型',
@@ -139,16 +124,6 @@ export default class MachineEntranceAndDepartureTable extends Component {
                     return <p> / </p>;
                 }
             }
-        },
-        {
-            title: '联系人',
-            dataIndex: 'Contacter',
-            key: 'Contacter'
-        },
-        {
-            title: '电话',
-            dataIndex: 'Phone',
-            key: 'Phone'
         }
         // {
         //     title: '操作',
@@ -266,7 +241,7 @@ export default class MachineEntranceAndDepartureTable extends Component {
         }
         const {
             platform: { tree = {} },
-            companyList,
+            leftkeycode,
             actions: {
                 getMachineEntrys,
                 getUserDetail
@@ -300,13 +275,6 @@ export default class MachineEntranceAndDepartureTable extends Component {
             plan.order = (page - 1) * 10 + i + 1;
             plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
             plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
-            let orgName = '';
-            companyList.map((company) => {
-                if (company && company.Section && company.Section === plan.Section) {
-                    orgName = company.OrgName;
-                }
-            });
-            plan.orgName = orgName;
             let userData = '';
             if (userIDList.indexOf(Number(plan.Inputer)) === -1) {
                 userData = await getUserDetail({id: plan.Inputer});
@@ -453,7 +421,7 @@ export default class MachineEntranceAndDepartureTable extends Component {
                             ),
                             spinning: this.state.loading
                         }}
-                        locale={{ emptyText: '当前无机械进离场信息' }}
+                        locale={{ emptyText: '当前无安全隐患信息' }}
                         dataSource={details}
                         onChange={this.handleTableChange.bind(this)}
                         pagination={this.state.pagination}

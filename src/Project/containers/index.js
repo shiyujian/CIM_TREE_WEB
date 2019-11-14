@@ -16,3 +16,6 @@ export QRCodeDistribute from './QRCodeDistribute';
 export ManEntranceAndDeparture from './ManMachine/ManEntranceAndDeparture';
 export MachineEntranceAndDeparture from './ManMachine/MachineEntranceAndDeparture';
 export ManMachineGroup from './ManMachine/ManMachineGroup';
+export MachineQRCodePrint from './ManMachine/MachineQRCodePrint';
+export FaceRecognitionList from './ManMachine/FaceRecognitionList';
+export FaceRecognitionRecord from './ManMachine/FaceRecognitionRecord';

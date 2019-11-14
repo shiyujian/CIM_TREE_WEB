@@ -228,12 +228,12 @@ class AsideTree extends Component {
             let reg = /^[\u4e00-\u9fa5]/;
             if (reg.test(value)) {
                 if (value.length > 10) {
-                    callback(`请输入领导名称(10个字以下),仅支持中文`);
+                    callback(`请输入负责人名称(10个字以下),仅支持中文`);
                 } else {
                     callback();
                 }
             } else {
-                callback(`请输入领导名称(10个字以下),仅支持中文`);
+                callback(`请输入负责人名称(10个字以下),仅支持中文`);
             }
         } else {
             callback();
@@ -393,12 +393,12 @@ class AsideTree extends Component {
                                         </FormItem>
                                     </Row>
                                     <Row>
-                                        <FormItem {...FormItemLayout} label='班组领导'>
+                                        <FormItem {...FormItemLayout} label='班组负责人'>
                                             {getFieldDecorator('groupLeader', {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入领导名称(10个字以下),仅支持中文'
+                                                        message: '请输入负责人名称(10个字以下),仅支持中文'
                                                     },
                                                     {
                                                         validator: this.checkLeaderName
@@ -406,18 +406,18 @@ class AsideTree extends Component {
                                                 ]
                                             })(
                                                 <Input
-                                                    placeholder='请输入领导名称(10个字以下),仅支持中文'
+                                                    placeholder='请输入负责人名称(10个字以下),仅支持中文'
                                                 />
                                             )}
                                         </FormItem>
                                     </Row>
                                     <Row>
-                                        <FormItem {...FormItemLayout} label='领导电话'>
+                                        <FormItem {...FormItemLayout} label='负责人电话'>
                                             {getFieldDecorator('groupPhone', {
                                                 rules: [
                                                     {
                                                         required: true,
-                                                        message: '请输入班组领导电话'
+                                                        message: '请输入班组负责人电话'
                                                     },
                                                     {
                                                         validator: this.checkPersonTelephone
@@ -425,7 +425,7 @@ class AsideTree extends Component {
                                                 ]
                                             })(
                                                 <Input
-                                                    placeholder='请输入班组领导电话'
+                                                    placeholder='请输入班组负责人电话'
                                                 />
                                             )}
                                         </FormItem>

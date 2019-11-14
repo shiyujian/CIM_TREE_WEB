@@ -360,49 +360,6 @@ export const SetupMenu = [
 ];
 export const ProjectMenu = [
     {
-        key: 'plotManage',
-        name: '数据管理',
-        id: 'PROJECT.PLOTMANAGE',
-        children: [
-            {
-                key: 'ThinClassStorage',
-                id: 'PROJECT.THINCLASSTORAGE',
-                name: '细班导入',
-                path: '/project/thinClassStorage'
-            },
-            {
-                key: 'ThinClassParcelManage',
-                id: 'PROJECT.THINCLASSPARCELMANAGE',
-                name: '细班分块管理',
-                path: '/project/thinClassParcelManage'
-            },
-            {
-                key: 'ThinClassTreeTypeManage',
-                id: 'PROJECT.THINCLASSTREETYPEMANAGE',
-                name: '细班树种管理',
-                path: '/project/thinClassTreeTypeManage'
-            },
-            {
-                key: 'ParcelStorage',
-                id: 'PROJECT.PARCELSTORAGE',
-                name: '地块导入',
-                path: '/project/parcelStorage'
-            },
-            {
-                key: 'ParcelManage',
-                id: 'PROJECT.PARCELMANAGE',
-                name: '地块管理',
-                path: '/project/parcelManage'
-            },
-            {
-                key: 'QRCodeDistribute',
-                id: 'PROJECT.QRCODEDISTRIBUTE',
-                name: '二维码派发信息',
-                path: '/project/qrcodedistribute'
-            }
-        ]
-    },
-    {
         key: 'nursery',
         name: '苗木管理',
         id: 'PROJECT.NURSERY',
@@ -445,16 +402,77 @@ export const ProjectMenu = [
                 path: '/project/manentranceanddeparture'
             },
             {
+                key: 'ManMachineGroup',
+                id: 'PROJECT.MANMACHINEGROUP',
+                name: '班组维护',
+                path: '/project/manmachinegroup'
+            },
+            {
                 key: 'MachineEntranceAndDeparture',
                 id: 'PROJECT.MACHINEENTRANCEANDDEPARTURE',
                 name: '机械进离场',
                 path: '/project/machineentranceanddeparture'
             },
             {
-                key: 'ManMachineGroup',
-                id: 'PROJECT.MANMACHINEGROUP',
-                name: '班组维护',
-                path: '/project/manmachinegroup'
+                key: 'MachineQRCodePrint',
+                id: 'PROJECT.MACHINEQRCODEPRINT',
+                name: '机械二维码',
+                path: '/project/machineqrcodeprint'
+            },
+            {
+                key: 'FaceRecognitionList',
+                id: 'PROJECT.FACERECOGNITIONLIST',
+                name: '人脸识别列表',
+                path: '/project/facerecognitionlist'
+            },
+            {
+                key: 'FaceRecognitionRecord',
+                id: 'PROJECT.FACERECOGNITIONRECORD',
+                name: '人脸识别记录',
+                path: '/project/facerecognitionrecord'
+            }
+        ]
+    },
+    {
+        key: 'plotManage',
+        name: '数据管理',
+        id: 'PROJECT.PLOTMANAGE',
+        children: [
+            {
+                key: 'ThinClassStorage',
+                id: 'PROJECT.THINCLASSTORAGE',
+                name: '细班导入',
+                path: '/project/thinClassStorage'
+            },
+            {
+                key: 'ThinClassParcelManage',
+                id: 'PROJECT.THINCLASSPARCELMANAGE',
+                name: '细班分块管理',
+                path: '/project/thinClassParcelManage'
+            },
+            {
+                key: 'ThinClassTreeTypeManage',
+                id: 'PROJECT.THINCLASSTREETYPEMANAGE',
+                name: '细班树种管理',
+                path: '/project/thinClassTreeTypeManage'
+            },
+            {
+                key: 'ParcelStorage',
+                id: 'PROJECT.PARCELSTORAGE',
+                name: '地块导入',
+                path: '/project/parcelStorage'
+            },
+            {
+                key: 'ParcelManage',
+                id: 'PROJECT.PARCELMANAGE',
+                name: '地块管理',
+                path: '/project/parcelManage'
+            },
+            {
+                key: 'QRCodeDistribute',
+                id: 'PROJECT.QRCODEDISTRIBUTE',
+                name: '二维码派发信息',
+                path: '/project/qrcodedistribute'
             }
         ]
     }
