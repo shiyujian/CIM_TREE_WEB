@@ -208,10 +208,28 @@ class ModalAdd extends Component {
     handleOk () {
         const {
             form: { validateFields },
-            actions: { postMeeting }
+            actions: { postMeeting },
+            leftKeyCode = '',
+            permission = false,
+            parentOrgID = ''
         } = this.props;
         const { WKT, lat, lng } = this.state;
         validateFields((err, values) => {
+            if (permission) {
+                if (!leftKeyCode) {
+                    Notification.error({
+                        message: '请选择单位'
+                    });
+                    return;
+                }
+            } else {
+                if (!parentOrgID) {
+                    Notification.error({
+                        message: '当前用户无组织机构，请重新登录'
+                    });
+                    return;
+                }
+            }
             if (lat === '' || lng === '') {
                 message.warning('请务必在地图中选中会议位置');
                 return;
@@ -226,6 +244,7 @@ class ModalAdd extends Component {
                     MeetingType: '日常会议',
                     ProjectCode: 'P193',
                     BelongSystem: '雄安森林大数据平台',
+                    OrgID: permission ? leftKeyCode : parentOrgID,
                     Contacter: values.Contacter, // 联系人
                     Creater: getUser().ID || '',
                     StartTime,

@@ -147,10 +147,21 @@ export default class ManEntranceAndDepartureTable extends Component {
         }
 
     ];
-    componentDidMount () {
-        // this.query();
-    }
-    componentWillReceiveProps (nextProps) {
+    componentDidUpdate (prevProps, prevState) {
+        const {
+            leftKeyCode,
+            parentOrgID,
+            permission
+        } = this.props;
+        // if (permission && permission !== prevProps.permission) {
+        //     this.onSearch();
+        // }
+        // if (permission && leftKeyCode !== prevProps.leftKeyCode) {
+        //     this.onSearch();
+        // }
+        if (parentOrgID && parentOrgID !== prevProps.parentOrgID) {
+            this.query(1);
+        }
     }
     // 人员姓名
     handleWorkManNameChange (value) {
@@ -168,6 +179,12 @@ export default class ManEntranceAndDepartureTable extends Component {
     handleWorkTypeChange (value) {
         this.setState({
             workType: value
+        });
+    }
+    // 状态
+    handleInStatusChange (value) {
+        this.setState({
+            inStatus: value
         });
     }
     // 人员搜索
@@ -208,12 +225,6 @@ export default class ManEntranceAndDepartureTable extends Component {
             workManCreater: value
         });
     }
-    // 状态
-    onStatusChange (value) {
-        this.setState({
-            inStatus: value
-        });
-    }
     datepick (value) {
         this.setState({
             stime: value[0]
@@ -237,8 +248,8 @@ export default class ManEntranceAndDepartureTable extends Component {
     }
     // 重置
     resetinput () {
-        const { resetinput, leftkeycode } = this.props;
-        resetinput(leftkeycode);
+        const { resetinput, leftKeyCode } = this.props;
+        resetinput(leftKeyCode);
     }
     // 搜索
     query = async (page) => {
@@ -246,45 +257,49 @@ export default class ManEntranceAndDepartureTable extends Component {
             workGroup = '',
             workType = '',
             workManName = '',
-            workManCreater = ''
+            workManCreater = '',
+            inStatus = ''
         } = this.state;
         const {
-            companyList,
-            leftkeycode,
             workTypesList,
             workGroupList,
+            permission = false,
+            leftKeyCode,
+            parentOrgID = '',
+            parentOrgData = '',
+            selectOrgData = '',
             actions: {
                 getWorkmans,
                 getUserDetail
             }
         } = this.props;
-        console.log('companyList', companyList);
         let orgName = '';
-        let section = '';
-        companyList.map((company) => {
-            if (leftkeycode === company.ID) {
-                orgName = company.OrgName;
-                section = company.Section;
+        if (permission) {
+            if (!leftKeyCode) {
+                Notification.warning({
+                    message: '请选择单位'
+                });
+                return;
+            } else {
+                orgName = (selectOrgData && selectOrgData.orgName) || '';
             }
-        });
-        if (!leftkeycode) {
-            Notification.warning({
-                message: '请选择单位'
-            });
-            return;
+        } else {
+            if (!parentOrgID) {
+                Notification.warning({
+                    message: '当前用户无组织机构，请重新登录'
+                });
+                return;
+            } else {
+                orgName = (parentOrgData && parentOrgData.OrgName) || '';
+            }
         }
-        if (!workGroup && !workManName) {
-            Notification.warning({
-                message: '请选择班组或输入姓名'
-            });
-            return;
-        }
-
         let postdata = {
+            org: permission ? leftKeyCode : parentOrgID,
             team: workGroup || '',
             worktypeid: workType || '',
             name: workManName || '',
             creater: workManCreater || '',
+            instatus: inStatus,
             page,
             size: 10
         };
@@ -351,6 +366,7 @@ export default class ManEntranceAndDepartureTable extends Component {
             plan.src = plan.QRCodePath;
         }
         const pagination = { ...this.state.pagination };
+        pagination.current = page;
         pagination.total = (rst.pageinfo && rst.pageinfo.total) || 0;
         pagination.pageSize = 10;
         this.setState({
@@ -519,6 +535,32 @@ export default class ManEntranceAndDepartureTable extends Component {
                                     </Option>;
                                 })
                             }
+                        </Select>
+                    </div>
+                    <div className='ManMachine-mrg10'>
+                        <span className='ManMachine-search-span'>状态：</span>
+                        <Select
+                            allowClear
+                            showSearch
+                            filterOption={(input, option) =>
+                                option.props.children
+                                    .toLowerCase()
+                                    .indexOf(input.toLowerCase()) >= 0
+                            }
+                            className='ManMachine-forestcalcw4'
+                            defaultValue='全部'
+                            value={inStatus}
+                            onChange={this.handleInStatusChange.bind(this)}
+                        >
+                            <Option key={'仅登记'} value={-1} title={'仅登记'}>
+                                仅登记
+                            </Option>
+                            <Option key={'在场'} value={1} title={'在场'}>
+                                在场
+                            </Option>
+                            <Option key={'离场'} value={0} title={'离场'}>
+                                离场
+                            </Option>
                         </Select>
                     </div>
                     <div className='ManMachine-mrg10'>

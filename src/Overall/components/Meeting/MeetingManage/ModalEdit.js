@@ -136,11 +136,29 @@ class ModalEdit extends Component {
         const {
             recordID,
             form: { validateFields },
-            actions: { putMeeting }
+            actions: { putMeeting },
+            leftKeyCode = '',
+            permission = false,
+            parentOrgID = ''
         } = this.props;
         const { WKT, lat, lng } = this.state;
         console.log('WKT', WKT);
         validateFields((err, values) => {
+            if (permission) {
+                if (!leftKeyCode) {
+                    Notification.error({
+                        message: '请选择单位'
+                    });
+                    return;
+                }
+            } else {
+                if (!parentOrgID) {
+                    Notification.error({
+                        message: '当前用户无组织机构，请重新登录'
+                    });
+                    return;
+                }
+            }
             if (lat === '' || lng === '') {
                 message.warning('请务必在地图中选中会议位置');
                 return;
@@ -155,6 +173,7 @@ class ModalEdit extends Component {
                     MeetingType: '日常会议',
                     ProjectCode: 'P193',
                     BelongSystem: '雄安森林大数据平台',
+                    OrgID: permission ? leftKeyCode : parentOrgID,
                     ID: recordID || '',
                     Contacter: values.Contacter, // 联系人
                     Creater: getUser().ID || '',

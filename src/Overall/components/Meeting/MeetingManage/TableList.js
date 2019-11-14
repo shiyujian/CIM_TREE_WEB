@@ -44,16 +44,42 @@ class TableList extends Component {
         this.handleCancelEdit = this.handleCancelEdit.bind(this); // 取消创建
         this.handleCancelSee = this.handleCancelSee.bind(this); // 取消创建
     }
-    async componentDidMount () {
-        this.onSearch();
+    componentDidUpdate (prevProps, prevState) {
+        const {
+            leftKeyCode,
+            parentOrgID,
+            permission
+        } = this.props;
+        if (permission && permission !== prevProps.permission) {
+            this.onSearch();
+        }
+        if (permission && leftKeyCode !== prevProps.leftKeyCode) {
+            this.onSearch();
+        }
+        if (parentOrgID && parentOrgID !== prevProps.parentOrgID) {
+            this.onSearch();
+        }
     }
     onSearch () {
-        const { name, startTime, endTime, page } = this.state;
-        const { getMeetingList } = this.props.actions;
+        const {
+            name,
+            startTime,
+            endTime,
+            page
+        } = this.state;
+        const {
+            actions: {
+                getMeetingList
+            },
+            leftKeyCode = '',
+            permission = false,
+            parentOrgID = ''
+        } = this.props;
         let params = {
             meetingtype: '日常会议',
             projectcode: 'P193',
             belongsystem: '雄安森林大数据平台',
+            orgid: permission ? leftKeyCode : parentOrgID,
             name: name,
             creater: '',
             openid: '',
@@ -166,6 +192,7 @@ class TableList extends Component {
                 {
                     this.state.showModalAdd ? <ModalAdd
                         {...this.props}
+                        {...this.state}
                         onSearch={this.onSearch}
                         handleCancel={this.handleCancelAdd}
                         showModal={this.state.showModalAdd}
@@ -174,6 +201,7 @@ class TableList extends Component {
                 {
                     this.state.showModalEdit ? <ModalEdit
                         {...this.props}
+                        {...this.state}
                         recordID={this.state.recordID}
                         onSearch={this.onSearch}
                         handleCancel={this.handleCancelEdit}
@@ -183,6 +211,7 @@ class TableList extends Component {
                 {
                     this.state.showModalSee ? <ModalSee
                         {...this.props}
+                        {...this.state}
                         recordID={this.state.recordID}
                         onSearch={this.onSearch}
                         handleCancel={this.handleCancelSee}

@@ -1,45 +1,90 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Tree } from 'antd';
+
 const TreeNode = Tree.TreeNode;
 
 export default class PkCodeTree extends Component {
-    static propTypes = {};
-
-    static loop (data = [], time = 0) {
-        if (data && data instanceof Array) {
-            return data.map((item, index) => {
-                if (item.children) {
+    static loop (data = [], arr = []) {
+        return data.map(item => {
+            if (item && item.OrgCode) {
+                let companyStatus = false;
+                if (item.OrgType) {
+                    if (item.OrgType.indexOf('单位') !== -1) {
+                        companyStatus = true;
+                    } else if (item.OrgType === '非公司') {
+                        companyStatus = false;
+                    }
+                }
+                if (companyStatus) {
                     return (
                         <TreeNode
+                            value={JSON.stringify(item)}
+                            key={`${item.ID}`}
+                            title={`${item.OrgName}`}
+                        />
+                    );
+                } else if (item.children && item.children.length > 0) {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}`}
+                            value={`${item.ID}`}
+                            title={`${item.OrgName}`}
                             disabled
-                            key={item.ID}
-                            title={item.OrgName}>
-                            {PkCodeTree.loop(item.children, time + 1)}
+                        >
+                            {PkCodeTree.loop(item.children)}
                         </TreeNode>
                     );
+                } else {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}`}
+                            value={`${item.ID}`}
+                            title={`${item.OrgName}`}
+                            disabled
+                        />
+                    );
                 }
-                return <TreeNode key={item.ID} title={item.OrgName} />;
-            });
-        } else {
-            return <TreeNode key={data.ID} title={data.OrgName} />;
-        }
+            } else {
+                if (item && item.Orgs && item.Orgs.length > 0) {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}`}
+                            value={`${item.ID}`}
+                            title={`${item.ProjectName}`}
+                            disabled
+                        >
+                            {PkCodeTree.loop(item.Orgs)}
+                        </TreeNode>
+                    );
+                } else {
+                    return (
+                        <TreeNode
+                            key={`${item.ID}`}
+                            value={`${item.ID}`}
+                            title={`${item.ProjectName}`}
+                            disabled
+                        />
+                    );
+                }
+            }
+        });
     }
 
     render () {
-        const { treeData = [] } = this.props;
+        const {
+            platform: {
+                org = []
+            },
+            onSelect
+        } = this.props;
         return (
-            <div>
-                <Tree
-                    showLine
-                    selectedKeys={[this.props.selectedKeys]}
-                    defaultExpandAll
-                    autoExpandParent
-                    onSelect={this.props.onSelect}
-                    onExpand={this.props.onExpand}
-                >
-                    {PkCodeTree.loop(treeData)}
-                </Tree>
-            </div>
+            <Tree
+                selectedKeys={[this.props.selectedKeys]}
+                onSelect={onSelect}
+                showLine>
+                {PkCodeTree.loop(org)}
+            </Tree>
         );
     }
 }
