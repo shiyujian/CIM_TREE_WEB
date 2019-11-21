@@ -11,6 +11,13 @@ import {
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import '../index.less';
+import {
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
+import {
+    getForestImgUrl
+} from '_platform/auth';
 
 export default class FaceRecognitionPersonListModal extends Component {
     constructor (props) {
@@ -22,7 +29,9 @@ export default class FaceRecognitionPersonListModal extends Component {
             size: 10,
             exportsize: 100,
             percent: 0,
-            recordDetail: ''
+            recordDetail: '',
+            picViewVisible: false,
+            imgSrcs: []
         };
     }
     columns = [
@@ -33,6 +42,16 @@ export default class FaceRecognitionPersonListModal extends Component {
         {
             title: '姓名',
             dataIndex: 'Name'
+        },
+        {
+            title: '项目',
+            dataIndex: 'Project',
+            key: 'Project'
+        },
+        {
+            title: '标段',
+            dataIndex: 'sectionName',
+            key: 'sectionName'
         },
         {
             title: '性别',
@@ -73,6 +92,17 @@ export default class FaceRecognitionPersonListModal extends Component {
             }
         },
         {
+            title: '人脸识别照片',
+            dataIndex: 'ImagePath',
+            render: (text, record, index) => {
+                if (text) {
+                    return <a onClick={this.handlePicView.bind(this, text)}>查看</a>;
+                } else {
+                    return <sapn>/</sapn>;
+                }
+            }
+        },
+        {
             title: '操作',
             dataIndex: 'ID',
             render: (text, record, index) => {
@@ -94,11 +124,15 @@ export default class FaceRecognitionPersonListModal extends Component {
                 postReSendManToFaceDevice
             }
         } = this.props;
+        const {
+            pagination
+        } = this.state;
         let postData = {
             id: record.ID
         };
         this.setState({
-            loading: true
+            loading: true,
+            percent: 0
         });
         let data = await postReSendManToFaceDevice(postData);
         console.log('data', data);
@@ -106,13 +140,14 @@ export default class FaceRecognitionPersonListModal extends Component {
             // Notification.success({
             //     message: '成功'
             // });
-            this.query(1);
+            this.query(pagination.current || 1);
         } else {
             Notification.error({
                 message: '重新下发失败'
             });
             this.setState({
-                loading: false
+                loading: false,
+                percent: 100
             });
         }
     }
@@ -129,11 +164,15 @@ export default class FaceRecognitionPersonListModal extends Component {
     query = async (page) => {
         const {
             faceDetail,
+            section,
             actions: {
                 getFaceworkmans
-            }
+            },
+            platform: { tree = {} }
         } = this.props;
+        let thinClassTree = tree.thinClassTree;
         let postdata = {
+            section,
             page,
             size: 10
         };
@@ -151,6 +190,8 @@ export default class FaceRecognitionPersonListModal extends Component {
         for (let i = 0; i < tblData.length; i++) {
             let plan = tblData[i];
             plan.order = (page - 1) * 10 + i + 1;
+            plan.Project = getProjectNameBySection(plan.Section, thinClassTree);
+            plan.sectionName = getSectionNameBySection(plan.Section, thinClassTree);
             // 班组
             let groupName = '';
             if (plan.Group && plan.Group.Name) {
@@ -175,6 +216,30 @@ export default class FaceRecognitionPersonListModal extends Component {
             percent: 100
         });
     }
+    // 查看图片
+    handlePicView = (data) => {
+        let imgSrcs = [];
+        try {
+            let arr = data.split(',');
+            arr.map(rst => {
+                let src = getForestImgUrl(rst);
+                imgSrcs.push(src);
+            });
+            this.setState({
+                imgSrcs,
+                picViewVisible: true
+            });
+        } catch (e) {
+            console.log('处理图片', e);
+        }
+    }
+    // 关闭查看图片Modal
+    handlePicCancel = () => {
+        this.setState({
+            imgSrcs: [],
+            picViewVisible: false
+        });
+    }
     handleViewPersonListCancel = () => {
         this.props.handleViewPersonListCancel();
     }
@@ -182,7 +247,9 @@ export default class FaceRecognitionPersonListModal extends Component {
         const {
             tblData = [],
             percent,
-            loading
+            loading,
+            picViewVisible,
+            imgSrcs
         } = this.state;
         return (
             <Modal
@@ -195,6 +262,36 @@ export default class FaceRecognitionPersonListModal extends Component {
                 footer={null}
             >
                 <div>
+                    {
+                        picViewVisible
+                            ? (<Modal
+                                width={522}
+                                title='图片详情'
+                                style={{ textAlign: 'center' }}
+                                visible
+                                onOk={this.handlePicCancel.bind(this)}
+                                onCancel={this.handlePicCancel.bind(this)}
+                                footer={null}
+                            >
+                                {
+                                    imgSrcs.map((img) => {
+                                        return (
+                                            <img style={{ width: '490px' }} src={img} alt='图片' />
+                                        );
+                                    })
+                                }
+                                <Row style={{ marginTop: 10 }}>
+                                    <Button
+                                        onClick={this.handlePicCancel.bind(this)}
+                                        style={{ float: 'right' }}
+                                        type='primary'
+                                    >
+                                        关闭
+                                    </Button>
+                                </Row>
+                            </Modal>)
+                            : ''
+                    }
                     <Table
                         bordered
                         className='foresttable'

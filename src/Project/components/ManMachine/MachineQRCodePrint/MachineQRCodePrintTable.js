@@ -578,7 +578,7 @@ export default class MachineQRCodePrintTable extends Component {
                                                                 fontWeight: 'bold'
                                                             }}
                                                         >
-                                                            {`雄安森林定位设备`}
+                                                            {`雄安园林定位设备`}
                                                         </div>
                                                     </div>
                                                     <div

@@ -7,7 +7,7 @@ export const ID = 'PROJECT_MANENTRANCEANDDEPARTURE';
 // 获取人员进离场列表
 const getPersonEntrys = forestFetchAction(`${GARDEN_API}/personentrys`, []);
 // 获取人员登记列表
-const getWorkmans = forestFetchAction(`${GARDEN_API}/workmans`, []);
+const getWorkMans = forestFetchAction(`${GARDEN_API}/workmans`, []);
 // 获取工种类型
 export const getWorkTypes = forestFetchAction(`${GARDEN_API}/worktypes`, [], 'GET');
 // 获取班组
@@ -17,7 +17,7 @@ export const actions = {
     getWorkGroupOK,
     getWorkGroup,
     getPersonEntrys,
-    getWorkmans,
+    getWorkMans,
     getWorkTypes
 };
 

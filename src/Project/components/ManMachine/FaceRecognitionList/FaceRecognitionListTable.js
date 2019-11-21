@@ -233,12 +233,6 @@ export default class FaceRecognitionListTable extends Component {
             size,
             keyword = ''
         } = this.state;
-        // if (section === '' && keyword === '') {
-        //     Notification.warning({
-        //         message: '请选择标段或输入设备SN'
-        //     });
-        //     return;
-        // }
         const {
             platform: { tree = {} },
             leftkeycode,
@@ -247,7 +241,12 @@ export default class FaceRecognitionListTable extends Component {
                 getUserDetail
             }
         } = this.props;
-
+        if (section === '' && keyword === '') {
+            Notification.warning({
+                message: '请选择标段或输入设备SN'
+            });
+            return;
+        }
         let thinClassTree = tree.thinClassTree;
         let postdata = {
             sn: keyword,

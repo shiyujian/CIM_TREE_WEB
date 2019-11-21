@@ -7,13 +7,6 @@ export default class PkCodeTree extends Component {
 
     static loop (data = []) {
         return data.map((item, index) => {
-            // if (item.children) {
-            //     return (
-            //         <TreeNode key={item.No} title={item.Name}>
-            //             {PkCodeTree.loop(item.children)}
-            //         </TreeNode>
-            //     );
-            // }
             return <TreeNode key={item.No} title={item.Name} />;
         });
     }

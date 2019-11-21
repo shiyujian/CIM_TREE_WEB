@@ -12,8 +12,8 @@ class AsideTree extends Component {
         this.state = {
             loading: false,
             teamVisible: false, // 添加班组modal
-            teamsTree: [], // 文档列表
-            dirData: '', // 目录树
+            teamsTree: [],
+            dirData: '',
             addDisabled: true, // 是否能够添加班组
             selected: false, // 是否选中节点
             selectKey: '', // 选中节点的key
@@ -62,9 +62,9 @@ class AsideTree extends Component {
     handleGroupDataWithCompany = () => {
         const {
             workGroupsData = [],
-            parentData
+            parentOrgData
         } = this.props;
-        let name = (parentData && parentData.OrgName) || '公司名称';
+        let name = (parentOrgData && parentOrgData.OrgName) || '公司名称';
         let groupsTree = [];
         if (workGroupsData && workGroupsData.length > 0) {
             groupsTree.push({
@@ -83,11 +83,11 @@ class AsideTree extends Component {
                 getWorkGroup,
                 changeAsideTreeLoading
             },
-            companyOrgID
+            parentOrgID
         } = this.props;
         this.props.form.validateFields(async (err, values) => {
             if (!err) {
-                if (!companyOrgID) {
+                if (!parentOrgID) {
                     Notification.error({
                         message: '该用户非公司人员，不能添加班组',
                         duration: 3
@@ -98,7 +98,7 @@ class AsideTree extends Component {
                     Remark: values.groupDesc || '',
                     Leader: values.groupLeader || '',
                     LeaderPhone: values.groupPhone || '',
-                    OrgID: companyOrgID
+                    OrgID: parentOrgID
                 };
                 let workgroup = await postWorkGroup({}, postData);
                 if (workgroup && workgroup.code && workgroup.code === 1) {
@@ -110,7 +110,7 @@ class AsideTree extends Component {
                         teamVisible: false
                     });
                     await changeAsideTreeLoading(true);
-                    await getWorkGroup({}, {orgid: companyOrgID});
+                    await getWorkGroup({}, {orgid: parentOrgID});
                     await changeAsideTreeLoading(false);
                 } else {
                     Notification.error({
@@ -131,7 +131,7 @@ class AsideTree extends Component {
                 changeAsideTreeLoading,
                 getWorkGroup
             },
-            companyOrgID
+            parentOrgID
         } = this.props;
         const {
             selectKey,
@@ -151,7 +151,7 @@ class AsideTree extends Component {
                         selected: false
                     });
                     await changeAsideTreeLoading(true);
-                    await getWorkGroup({}, {orgid: companyOrgID});
+                    await getWorkGroup({}, {orgid: parentOrgID});
                     await changeAsideTreeLoading(false);
                 } else {
                     Notification.error({
@@ -181,12 +181,14 @@ class AsideTree extends Component {
         let selected = info && info.selected;
         let selectKey = (key && key[0]) || '';
         try {
-            await changeSelectMemGroup(selectKey);
-            await changeSelectState(selected);
-            this.setState({
-                selected,
-                selectKey
-            });
+            if (selectKey) {
+                await changeSelectMemGroup(selectKey);
+                await changeSelectState(selected);
+                this.setState({
+                    selected,
+                    selectKey
+                });
+            }
         } catch (e) {
             console.log('点击节点', e);
         }
@@ -286,8 +288,9 @@ class AsideTree extends Component {
         const {
             form: { getFieldDecorator },
             asideTreeLoading = false,
-            parentData,
-            workGroupsData = []
+            parentOrgData,
+            workGroupsData = [],
+            selectMemGroup
         } = this.props;
         const FormItemLayout = {
             labelCol: { span: 6 },
@@ -331,21 +334,18 @@ class AsideTree extends Component {
 
                         <div>
                             <div>
-                                {workGroupsData.length ? (
-                                    <Tree
-                                        showLine
-                                        defaultExpandAll
-                                        onSelect={this._handleTreeSelect.bind(this)}
-                                    >
-                                        {
-                                            groupsTree.map((group) => {
-                                                return this.loop(group);
-                                            })
-                                        }
-                                    </Tree>
-                                ) : (
-                                    ''
-                                )}
+                                <Tree
+                                    showLine
+                                    defaultExpandAll
+                                    selectedKeys={[selectMemGroup]}
+                                    onSelect={this._handleTreeSelect.bind(this)}
+                                >
+                                    {
+                                        groupsTree.map((group) => {
+                                            return this.loop(group);
+                                        })
+                                    }
+                                </Tree>
                             </div>
                         </div>
                     </div>
@@ -365,7 +365,7 @@ class AsideTree extends Component {
                                                 rules: [
                                                     { required: true, message: '请输入公司名称' }
                                                 ],
-                                                initialValue: `${parentData && parentData.OrgName}`
+                                                initialValue: `${parentOrgData && parentOrgData.OrgName}`
                                             })(
                                                 <Input
                                                     placeholder='请输入公司名称' readOnly

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { actions as platformActions } from '_platform/store/global';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Select, Spin } from 'antd';
 import {
     Main,
     Aside,
@@ -13,18 +12,13 @@ import {
 } from '_platform/components/layout';
 import {
     getUser,
-    getCompanyDataByOrgCode,
-    getUserIsManager
+    getCompanyDataByOrgCode
 } from '_platform/auth';
-import {
-    ORGTYPE
-} from '_platform/api';
 import { actions } from '../../store/ManMachine/manEntranceAndDeparture';
 import {
     ManEntranceAndDepartureTable,
     PkCodeTree
 } from '../../components/ManMachine/ManEntranceAndDeparture';
-const Option = Select.Option;
 
 @connect(
     state => {
@@ -62,7 +56,7 @@ export default class ManEntranceAndDeparture extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getOrgTreeByOrgType,
+                getWorkGroup,
                 getOrgTree,
                 getWorkTypes,
                 getParentOrgTreeByID
@@ -89,6 +83,14 @@ export default class ManEntranceAndDeparture extends Component {
             // 如果在公司下，则获取公司所有的信息
             if (parentOrgData && parentOrgData.ID) {
                 parentOrgID = parentOrgData.ID;
+                let data = await getWorkGroup({}, {orgid: parentOrgID});
+                let workGroupList = [];
+                if (data && data.content) {
+                    workGroupList = data.content;
+                }
+                this.setState({
+                    workGroupList
+                });
             }
         }
         // 获取工种

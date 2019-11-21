@@ -5,8 +5,6 @@ import {
 } from '_platform/api';
 import {forestFetchAction} from '_platform/store/fetchAction';
 export const ID = 'PROJECT_MANMACHINEGROUP';
-// 苗圃信息
-const getWorkmansList = forestFetchAction(`${GARDEN_API}/workmans`, []);
 // 获取班组
 export const getWorkGroupOK = createAction(`${ID}_getCheckGroup`);
 export const getWorkGroup = forestFetchAction(`${GARDEN_API}/workgroups`, [getWorkGroupOK], 'GET');
@@ -20,6 +18,8 @@ export const deletWorkGroup = forestFetchAction(`${GARDEN_API}/workgroup/{{id}}`
 export const changeSelectMemGroup = createAction(`${ID}_changeSelectMemGroup`);
 // 获取班组的人员数据
 export const getWorkMans = forestFetchAction(`${GARDEN_API}/workmans`, [], 'GET');
+// 删除人员登记信息
+export const deleteWorkman = forestFetchAction(`${GARDEN_API}/workman/{{id}}`, [], 'DELETE');
 // 修改所选节点的状态
 export const changeSelectState = createAction(`${ID}_changeSelectState`);
 // 修改左侧树的loading
@@ -28,9 +28,10 @@ export const changeAsideTreeLoading = createAction(`${ID}_changeAsideTreeLoading
 export const workGroupMemChangeStatus = createAction(`${ID}_checkGroupMemChangeStatus`);
 // 获取工种类型
 export const getWorkTypes = forestFetchAction(`${GARDEN_API}/worktypes`, [], 'GET');
+// 人员编辑
+export const putWorkman = forestFetchAction(`${GARDEN_API}/workman`, [], 'PUT');
 
 export const actions = {
-    getWorkmansList,
     getWorkGroupOK,
     getWorkGroup,
     postWorkGroup,
@@ -41,7 +42,9 @@ export const actions = {
     changeSelectState,
     changeAsideTreeLoading,
     workGroupMemChangeStatus,
-    getWorkTypes
+    getWorkTypes,
+    deleteWorkman,
+    putWorkman
 };
 
 export default handleActions(

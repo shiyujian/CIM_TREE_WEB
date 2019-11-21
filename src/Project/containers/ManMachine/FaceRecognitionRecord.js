@@ -13,12 +13,9 @@ import {
 } from '_platform/components/layout';
 import {
     getUser,
-    getCompanyDataByOrgCode,
+    getAreaTreeData,
     getUserIsManager
 } from '_platform/auth';
-import {
-    ORGTYPE
-} from '_platform/api';
 import { actions } from '../../store/ManMachine/faceRecognitionRecord';
 import {
     FaceRecognitionRecordTable,
@@ -45,10 +42,12 @@ export default class FaceRecognitionRecord extends Component {
     constructor (props) {
         super(props);
         this.state = {
+            permission: false,
+            parentOrgData: '',
+            parentOrgID: '',
+            selectOrgData: '',
             leftkeycode: '',
             resetkey: 0,
-            companyList: [],
-            companyListTree: [],
             userCompany: '',
             loading: false,
             // 工种
@@ -60,138 +59,88 @@ export default class FaceRecognitionRecord extends Component {
     componentDidMount = async () => {
         const {
             actions: {
-                getOrgTreeByOrgType,
-                getOrgTree,
-                getWorkTypes
-            }
+                getTreeNodeList,
+                getThinClassList,
+                getTotalThinClass,
+                getThinClassTree
+            },
+            platform: { tree = {} }
         } = this.props;
-        this.setState({
-            loading: true
-        });
-        // 获取左侧公司树
-        let projectList = await getOrgTree();
-        let permission = getUserIsManager();
-        let companyList = [];
-        let companyListTree = [];
-        if (permission) {
-            for (let i = 0; i < ORGTYPE.length; i++) {
-                let type = ORGTYPE[i];
-                let orgData = await getOrgTreeByOrgType({orgtype: type});
-                if (orgData && orgData.content && orgData.content instanceof Array && orgData.content.length > 0) {
-                    if (orgData.content && orgData.content instanceof Array) {
-                        let projectTree = this.handleSortCompanyTree(projectList, orgData.content, type);
-                        let companyTree = [];
-                        companyTree.push({
-                            ID: type,
-                            OrgName: type,
-                            children: projectTree
-                        });
-                        companyList = companyList.concat(orgData.content);
-                        companyListTree = companyListTree.concat(companyTree);
-                    }
-                }
-            }
-            await this.getUserCompany();
-        } else {
-            let parentData = await this.getUserCompany();
-            companyList.push(parentData);
-            if (parentData && parentData.ID) {
-                companyListTree.push({
-                    ID: 1,
-                    OrgName: parentData.OrgType,
-                    children: parentData
-                });
-            }
-        }
-        // 获取工种
-        let workTypesList = [];
-        let workTypeData = await getWorkTypes();
-        if (workTypeData && workTypeData.content) {
-            workTypesList = workTypeData.content;
-        }
-        this.setState({
-            workTypesList
-        });
-        this.setState({
-            companyList,
-            companyListTree,
-            loading: false,
-            workTypesList
-        });
-    }
-    handleSortCompanyTree = (projectList, orgData, type) => {
-        let projectTree = [];
-        // 首先建立项目的树
-        projectList.map((project) => {
-            projectTree.push({
-                ID: `${project.ID}${type}`, // 不同类型下的项目树的ID是相同的，为了区分
-                ProjectID: project.ID,
-                OrgName: project.ProjectName,
-                children: []
-            });
-        });
-        // 遍历公司，将公司按照项目分类
-        orgData.map((org) => {
-            projectTree.map((project) => {
-                if (project.ProjectID === org.ProjectID) {
-                    project.children.push(org);
-                }
-            });
-        });
-        // 删除项目树中公司项为空的元素
-        for (let i = projectTree.length - 1; i >= 0; i--) {
-            if (projectTree[i].children.length === 0) {
-                projectTree.splice(i, 1);
-            }
-        }
-        return projectTree;
-    }
-    // 获取用户自己的公司信息
-    getUserCompany = async () => {
-        const {
-            actions: {
-                getParentOrgTreeByID
-            }
-        } = this.props;
-        try {
-            let user = getUser();
-            let parentData = '';
-            // admin没有部门
-            if (user.username !== 'admin') {
-                // userOrgCode为登录用户自己的部门code
-                let orgID = user.org;
-                parentData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
-                if (parentData && parentData.ID) {
-                    let companyOrgID = parentData.ID;
-                    this.setState({
-                        userCompany: companyOrgID
-                    });
-                }
-            }
-            return parentData;
-        } catch (e) {
-            console.log('getUserCompany', e);
+        if (!(tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 0)) {
+            let data = await getAreaTreeData(getTreeNodeList, getThinClassList);
+            let totalThinClass = data.totalThinClass || [];
+            let projectList = data.projectList || [];
+            // 获取所有的区段数据，用来计算养护任务的位置
+            await getTotalThinClass(totalThinClass);
+            // 区域地块树
+            await getThinClassTree(projectList);
         }
     }
     onSelect = async (keys = [], info) => {
         const {
-            actions: {
-                getWorkGroup
-            }
+            platform: { tree = {} }
         } = this.props;
+        let treeList = tree.thinClassTree;
         let keycode = keys[0] || '';
         this.setState({
             leftkeycode: keycode,
             resetkey: ++this.state.resetkey
         });
-        let data = await getWorkGroup({}, {orgid: keycode});
-        let workGroupList = [];
-        if (data && data.content) {
-            workGroupList = data.content;
+        let sectionsData = [];
+        if (keycode) {
+            treeList.map((treeData) => {
+                if (keycode === treeData.No) {
+                    sectionsData = treeData.children;
+                }
+            });
         }
         this.setState({
-            workGroupList
+            sectionsData
         });
+
+        // 标段
+        let user = getUser();
+        let section = user.section;
+        let permission = getUserIsManager();
+        if (permission) {
+            // 是admin或者业主
+            this.setSectionOption(sectionsData);
+        } else {
+            sectionsData.map((sectionData) => {
+                if (section && section === sectionData.No) {
+                    this.setSectionOption(sectionData);
+                }
+            });
+        }
+    }
+    // 设置标段选项
+    setSectionOption (rst) {
+        let sectionOptions = [];
+        try {
+            if (rst instanceof Array) {
+                rst.map(sec => {
+                    sectionOptions.push(
+                        <Option key={sec.No} value={sec.No} title={sec.Name}>
+                            {sec.Name}
+                        </Option>
+                    );
+                });
+                this.setState({
+                    sectionOption: sectionOptions
+                });
+            } else {
+                sectionOptions.push(
+                    <Option key={rst.No} value={rst.No} title={rst.Name}>
+                        {rst.Name}
+                    </Option>
+                );
+                this.setState({
+                    sectionOption: sectionOptions
+                });
+            }
+        } catch (e) {
+            console.log('e', e);
+        }
     }
     // 重置
     resetinput (leftkeycode) {
@@ -204,22 +153,25 @@ export default class FaceRecognitionRecord extends Component {
     render () {
         const {
             leftkeycode,
-            resetkey,
-            loading,
-            companyListTree
+            resetkey
         } = this.state;
+        const {
+            platform: { tree = {} }
+        } = this.props;
+        let treeList = [];
+        if (tree.thinClassTree) {
+            treeList = tree.thinClassTree;
+        }
         return (
             <Body>
                 <Main>
                     <DynamicTitle title='人脸识别记录' {...this.props} />
                     <Sidebar>
-                        <Spin spinning={loading}>
-                            <PkCodeTree
-                                treeData={companyListTree}
-                                selectedKeys={leftkeycode}
-                                onSelect={this.onSelect.bind(this)}
-                            />
-                        </Spin>
+                        <PkCodeTree
+                            treeData={treeList}
+                            selectedKeys={leftkeycode}
+                            onSelect={this.onSelect.bind(this)}
+                        />
                     </Sidebar>
                     <Content>
                         <FaceRecognitionRecordTable

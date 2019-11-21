@@ -14,12 +14,16 @@ import {
 import {
     getUser,
     getAreaTreeData,
-    getUserIsManager
+    getUserIsManager,
+    getCompanyDataByOrgCode
 } from '_platform/auth';
-import { actions } from '../../store/ManMachine/machineEntranceAndDeparture';
-import PkCodeTree from '../../components/ManMachine/PkCodeTree';
 import {
-    MachineEntranceAndDepartureTable
+    ORGTYPE
+} from '_platform/api';
+import { actions } from '../../store/ManMachine/machineEntranceAndDeparture';
+import {
+    MachineEntranceAndDepartureTable,
+    PkCodeTree
 } from '../../components/ManMachine/MachineEntranceAndDeparture';
 const Option = Select.Option;
 
@@ -46,7 +50,8 @@ export default class MachineEntranceAndDeparture extends Component {
             leftkeycode: '',
             resetkey: 0,
             sectionsData: [],
-            smallClassesData: []
+            smallClassesData: [],
+            companyList: []
         };
     }
     componentDidMount = async () => {
@@ -56,7 +61,8 @@ export default class MachineEntranceAndDeparture extends Component {
                 getThinClassList,
                 getTotalThinClass,
                 getThinClassTree,
-                getMachineTypes
+                getMachineTypes,
+                getOrgTreeByOrgType
             },
             platform: { tree = {} }
         } = this.props;
@@ -68,6 +74,20 @@ export default class MachineEntranceAndDeparture extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+        }
+        let permission = getUserIsManager();
+        let companyList = [];
+        if (permission) {
+            let orgData = await getOrgTreeByOrgType({orgtype: '施工单位'});
+            if (orgData && orgData.content && orgData.content instanceof Array && orgData.content.length > 0) {
+                if (orgData.content && orgData.content instanceof Array) {
+                    companyList = companyList.concat(orgData.content);
+                }
+            }
+            await this.getUserCompany();
+        } else {
+            let parentData = await this.getUserCompany();
+            companyList.push(parentData);
         }
         // 机械设备类别列表
         let machineTypeData = await getMachineTypes();
@@ -86,8 +106,36 @@ export default class MachineEntranceAndDeparture extends Component {
             });
         }
         this.setState({
-            machineTypeOption
+            machineTypeOption,
+            companyList
         });
+    }
+    // 获取用户自己的公司信息
+    getUserCompany = async () => {
+        const {
+            actions: {
+                getParentOrgTreeByID
+            }
+        } = this.props;
+        try {
+            let user = getUser();
+            let parentData = '';
+            // admin没有部门
+            if (user.username !== 'admin') {
+                // userOrgCode为登录用户自己的部门code
+                let orgID = user.org;
+                parentData = await getCompanyDataByOrgCode(orgID, getParentOrgTreeByID);
+                if (parentData && parentData.ID) {
+                    let companyOrgID = parentData.ID;
+                    this.setState({
+                        userCompany: companyOrgID
+                    });
+                }
+            }
+            return parentData;
+        } catch (e) {
+            console.log('getUserCompany', e);
+        }
     }
     onSelect (keys = [], info) {
         const {

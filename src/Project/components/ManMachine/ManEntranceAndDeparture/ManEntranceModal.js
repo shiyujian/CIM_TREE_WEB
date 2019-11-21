@@ -108,8 +108,11 @@ export default class ManEntranceModal extends Component {
     // 搜索
     query = async (page) => {
         const {
-            companyList,
-            leftkeycode,
+            permission = false,
+            leftKeyCode,
+            parentOrgID = '',
+            parentOrgData = '',
+            selectOrgData = '',
             workTypesList,
             viewPersonEntrysRecord,
             actions: {
@@ -134,13 +137,26 @@ export default class ManEntranceModal extends Component {
             return;
         }
         let tblData = rst.content;
-        console.log('companyList', companyList);
         let orgName = '';
-        companyList.map((company) => {
-            if (leftkeycode === company.ID) {
-                orgName = company.OrgName;
+        if (permission) {
+            if (!leftKeyCode) {
+                Notification.warning({
+                    message: '请选择单位'
+                });
+                return;
+            } else {
+                orgName = (selectOrgData && selectOrgData.OrgName) || '';
             }
-        });
+        } else {
+            if (!parentOrgID) {
+                Notification.warning({
+                    message: '当前用户无组织机构，请重新登录'
+                });
+                return;
+            } else {
+                orgName = (parentOrgData && parentOrgData.OrgName) || '';
+            }
+        }
         // 获取组织机构唯一性数组
         let orgIDList = [];
         let orgDataList = [];

@@ -7,16 +7,19 @@ export const ID = 'PROJECT_MACHINEENTRANCEANDDEPARTURE';
 // 获取机械定位设备列表
 const getMachineLocationDevices = forestFetchAction(`${GARDEN_API}/locationdevices`, []);
 // 获取机械设备进离场列表
-const getMachineEntrys = forestFetchAction(`${GARDEN_API}/deviceworks`, []);
+const getDeviceWorks = forestFetchAction(`${GARDEN_API}/deviceworks`, []);
 // 获取机械设备列表
 export const getMachineTypes = forestFetchAction(`${GARDEN_API}/devicetypes`, [], 'GET');
 // 获取班组
 export const getWorkGroupOK = createAction(`${ID}_getCheckGroup`);
+// 获取每天机械设备进离场
+const getdeviceworksbyday = forestFetchAction(`${GARDEN_API}/deviceworksbyday`, []);
 export const actions = {
     getWorkGroupOK,
-    getMachineEntrys,
+    getDeviceWorks,
     getMachineLocationDevices,
-    getMachineTypes
+    getMachineTypes,
+    getdeviceworksbyday
 };
 
 export default handleActions(

@@ -5,24 +5,17 @@ const TreeNode = Tree.TreeNode;
 export default class PkCodeTree extends Component {
     static propTypes = {};
 
-    static loop (data = [], time = 0) {
-        if (data && data instanceof Array) {
-            return data.map((item, index) => {
-                if (item.children) {
-                    return (
-                        <TreeNode
-                            disabled
-                            key={item.ID}
-                            title={item.OrgName}>
-                            {PkCodeTree.loop(item.children, time + 1)}
-                        </TreeNode>
-                    );
-                }
-                return <TreeNode key={item.ID} title={item.OrgName} />;
-            });
-        } else {
-            return <TreeNode key={data.ID} title={data.OrgName} />;
-        }
+    static loop (data = []) {
+        return data.map((item, index) => {
+            // if (item.children) {
+            //     return (
+            //         <TreeNode key={item.No} title={item.Name}>
+            //             {PkCodeTree.loop(item.children)}
+            //         </TreeNode>
+            //     );
+            // }
+            return <TreeNode key={item.No} title={item.Name} />;
+        });
     }
 
     render () {
