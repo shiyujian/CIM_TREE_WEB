@@ -14,12 +14,15 @@ const getTasks = createFetchAction(`${WORKFLOW_API}/participant-task/`);
 const loginForest = createFetchAction(`${SYSTEM_API}/login`, [], 'GET');
 
 const getSecurityCode = createFetchAction(`${VALIDATE_API}`, [], 'GET');
+// 获取APK更新
+const getAPKUpdateInfo = createFetchAction(`${SYSTEM_API}/updateinfo?package=com.weimap.rfid.product&version=100&channel=wmap`, [], 'GET');
 
 export const actions = {
     forgectOK,
     getTasks,
     loginForest,
-    getSecurityCode
+    getSecurityCode,
+    getAPKUpdateInfo
 };
 export default handleActions({
     [forgectOK]: (state, action) => {

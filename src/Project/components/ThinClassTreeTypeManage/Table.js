@@ -318,6 +318,9 @@ class Tablelevel extends Component {
         if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('施工设计') !== -1) {
             permissionOperate = true;
         }
+        if (userRoles && userRoles.RoleName && userRoles.RoleName.indexOf('设计文书') !== -1) {
+            permissionOperate = true;
+        }
         this.setState({
             permissionOperate
         });

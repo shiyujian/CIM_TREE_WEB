@@ -172,9 +172,14 @@ class ModalAdd extends Component {
                     actions: { getLocationName, getGcjbyGps }
                 } = this.props;
                 // 转换坐标系
+
                 let GcjbyGpData = await getGcjbyGps({
                     locations: `${lngGps},${latGps}`
                 });
+                // lngGps = 116.116411;
+                // latGps = 39.00568;
+                console.log('GcjbyGpData', GcjbyGpData);
+
                 let lngGcj = '', latGcj = '';
                 if (GcjbyGpData && GcjbyGpData.status === '1' && GcjbyGpData.locations) {
                     let locationArr = GcjbyGpData.locations.split(',');

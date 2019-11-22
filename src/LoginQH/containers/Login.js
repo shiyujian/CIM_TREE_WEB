@@ -11,6 +11,7 @@ import {
     message,
     Notification
 } from 'antd';
+import QRCode from 'qrcode.react';
 import {
     clearUser,
     setPermissions,
@@ -44,12 +45,18 @@ class Login extends Component {
             getSecurityCodeStatus: false,
             countDown: 60,
             setUserStatus: false,
-            appDownloadVisible: false
+            appDownloadVisible: false,
+            APKUpdateInfo: ''
         };
         clearUser();
     }
 
-    componentDidMount () {
+    componentDidMount = async () => {
+        const {
+            actions: {
+                getAPKUpdateInfo
+            }
+        } = this.props;
         // 页面加载后自动聚焦至输入用户名
         this.nameInput.focus();
         let LOGIN_USER_PASSDATA = window.localStorage.getItem('LOGIN_USER_PASSDATA');
@@ -70,6 +77,11 @@ class Login extends Component {
                 this.state.checked = LOGIN_USER_PASSDATA.remember;
             }
         }
+        let APKUpdateInfo = await getAPKUpdateInfo();
+        console.log('APKUpdateInfo', APKUpdateInfo);
+        this.setState({
+            APKUpdateInfo
+        });
     }
     // 输入用户名
     handleChangeUser = (value) => {
@@ -528,7 +540,8 @@ class Login extends Component {
             getSecurityCodeStatus,
             setUserStatus,
             countDown,
-            appDownloadVisible
+            appDownloadVisible,
+            APKUpdateInfo
         } = this.state;
         const loginTitle = require('./images/logo1.png');
         const docDescibe = require('./images/doc.png');
@@ -666,6 +679,7 @@ class Login extends Component {
                                         </Button>
                                         <div style={{marginLeft: 24}}>
                                             <a
+                                                disabled={!(APKUpdateInfo && APKUpdateInfo.url)}
                                                 onClick={this.handleAppDownload.bind(this)}>
                                                     APP下载
                                             </a>
@@ -692,8 +706,15 @@ class Login extends Component {
                                                     雄安森林APP下载：
                                                     </h2>
                                                 </div>
-                                                <p style={{marginLeft: 5, fontSize: '18px'}}>安装密码：xaqnxl</p>
-                                                <img src={APPImg} />
+                                                <p style={{marginLeft: 5, fontSize: '18px'}}>版本号：{APKUpdateInfo.versionName}</p>
+                                                <QRCode
+                                                    style={{
+                                                        width: 210,
+                                                        height: 210
+                                                    }}
+                                                    key={APKUpdateInfo.url}
+                                                    id={APKUpdateInfo.url}
+                                                    value={APKUpdateInfo.url} />;
                                                 <a
                                                     type='primary'
                                                     onClick={this.handleAppDownloadCancel.bind(this)}
