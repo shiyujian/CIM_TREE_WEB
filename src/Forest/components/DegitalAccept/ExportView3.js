@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Spin, Modal, Row, Button, Tabs } from 'antd';
+import { Spin, Modal, Row, Button, Tabs, Notification } from 'antd';
 import L from 'leaflet';
 import './index.less';
 import {

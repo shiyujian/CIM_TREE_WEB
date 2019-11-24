@@ -451,10 +451,10 @@ export default class LocmeasureTable extends Component {
             thinclassData = '',
             bigType = ''
         } = this.state;
-        if (thinclass === '' && sxm === '') {
-            message.info('请选择项目，标段，小班及细班信息或输入顺序码');
-            return;
-        }
+        // if (thinclass === '' && sxm === '') {
+        //     message.info('请选择项目，标段，小班及细班信息或输入顺序码');
+        //     return;
+        // }
         const {
             actions: { getTreeLocations },
             platform: { tree = {} }

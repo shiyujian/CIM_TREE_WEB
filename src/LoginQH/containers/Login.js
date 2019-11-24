@@ -700,13 +700,14 @@ class Login extends Component {
                                                 marginLeft: 85
                                             }}>>
                                                 <div style={{
-                                                    paddingTop: 125
+                                                    paddingTop: 70
                                                 }}>
                                                     <h2 style={{marginLeft: 5}}>
                                                     雄安森林APP下载：
                                                     </h2>
                                                 </div>
                                                 <p style={{marginLeft: 5, fontSize: '18px'}}>版本号：{APKUpdateInfo.versionName}</p>
+                                                <p style={{marginLeft: 5, fontSize: '18px'}}>提示：请用浏览器打开</p>
                                                 <QRCode
                                                     style={{
                                                         width: 210,
@@ -714,7 +715,7 @@ class Login extends Component {
                                                     }}
                                                     key={APKUpdateInfo.url}
                                                     id={APKUpdateInfo.url}
-                                                    value={APKUpdateInfo.url} />;
+                                                    value={APKUpdateInfo.url} />
                                                 <a
                                                     type='primary'
                                                     onClick={this.handleAppDownloadCancel.bind(this)}
