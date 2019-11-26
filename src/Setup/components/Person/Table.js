@@ -149,16 +149,10 @@ class Users extends Component {
             render: (text, record) => {
                 const user = getUser();
                 let userRoles = user.roles || '';
-                // 是否为供应商文书
-                let userIsSupplierDocument = false;
-                // 是否为施工，监理，业主文书
-                // let userIsProjectDocument = true;
+                // 是否为文书
                 let userIsProjectDocument = false;
                 if (userRoles && userRoles.RoleName) {
-                    if (userRoles.RoleName === '供应商文书') {
-                        userIsSupplierDocument = true;
-                    }
-                    if (userRoles.RoleName === '业主文书' || userRoles.RoleName === '监理文书' || userRoles.RoleName === '施工文书') {
+                    if (userRoles.RoleName.indexOf('文书') !== -1) {
                         userIsProjectDocument = true;
                     }
                 }
@@ -211,7 +205,7 @@ class Users extends Component {
                             <a>删除</a>
                         </Popconfirm>
                     );
-                } else if (userIsProjectDocument || userIsSupplierDocument) {
+                } else if (userIsProjectDocument) {
                     if (!record.Status) {
                         arr.push(<a
                             key={4}
