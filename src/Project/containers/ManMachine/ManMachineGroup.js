@@ -138,16 +138,14 @@ export default class ManMachineGroup extends Component {
             selectOrgData = (info && info.node && info.node.props && info.node.props.value && JSON.parse(info.node.props.value)) || '';
         }
         let keycode = keys[0] || '';
-        this.setState({
-            leftKeyCode: keycode,
-            resetkey: ++this.state.resetkey
-        });
         let data = await getWorkGroup({}, {orgid: keycode});
         let workGroupList = [];
         if (data && data.content) {
             workGroupList = data.content;
         }
         this.setState({
+            leftKeyCode: keycode,
+            resetkey: ++this.state.resetkey,
             selectOrgData,
             workGroupList
         });

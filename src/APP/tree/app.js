@@ -14,7 +14,6 @@ import {
     Auth,
     Header,
     DynamicTabs,
-    Preview,
     Footer
 } from '_platform/components/layout';
 
@@ -99,7 +98,6 @@ export default class App extends Component {
                             <Route path='/dipping' component={Dipping} />
                         )}
                         <Route path='/:module?' component={Footer} />
-                        {Preview && <Preview />}
                     </div>
                 </BrowserRouter>
             </Provider>

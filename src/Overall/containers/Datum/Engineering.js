@@ -13,7 +13,6 @@ import {
 import { actions as platformActions } from '_platform/store/global';
 import * as previewActions from '_platform/store/global/preview';
 import { actions } from '../../store/Datum/engineering';
-import Preview from '_platform/components/layout/Preview';
 import {
     getUserIsManager,
     getUserIsDocument,
@@ -240,7 +239,6 @@ export default class Engineering extends Component {
                         }
                     </Content>
                 </Main>
-                <Preview />
             </Body>
         );
     }

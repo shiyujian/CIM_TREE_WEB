@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-11-14 09:55:51
+ * @Last Modified time: 2019-11-25 20:51:39
  */
 /**
  *
@@ -64,7 +64,6 @@ export const IN_OFF_DUTY_API = `${window.config.IN_OFF_DUTY}`;
 // GIS服务
 export const FOREST_GIS_API = window.config.DASHBOARD_ONSITE;
 export const XACOMPANYINITLEAFLET_API = window.config.XACompanyInitLeaflet;
-export const SEEDLING_API = `${window.config.SEEDLING}`;
 export const INITLEAFLET_API = window.config.initLeaflet;
 export const TREEPIPE_API = `${window.config.PIPE}`;
 export const WMSTILELAYERURL = window.config.WMSTileLayerUrl;
@@ -74,8 +73,6 @@ export const TILEURLS = {
 };
 // 静态资源文件服务
 export const STATIC_PREVIEW_API = `${DOMAIN}`;
-// 文件预览的接口
-export const PREVIEWWORD_API = window.config.previewWord_API;
 // 阿里云图片
 export const FOREST_IMG = `${window.config.ALIIMG}`;
 // 森林服务

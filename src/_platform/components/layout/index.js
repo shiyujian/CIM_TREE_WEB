@@ -8,4 +8,3 @@ export Footer from './Footer';
 export Body from './Body';
 export Sidebar from './Sidebar';
 export Main from './Main';
-export Preview from './Preview';

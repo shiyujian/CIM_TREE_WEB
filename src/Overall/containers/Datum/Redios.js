@@ -16,7 +16,6 @@ import {
     getUser,
     getCompanyDataByOrgCode
 } from '_platform/auth';
-import Preview from '_platform/components/layout/Preview';
 import * as previewActions from '_platform/store/global/preview';
 import { actions as platformActions } from '_platform/store/global';
 import { actions } from '../../store/Datum/redios';
@@ -258,7 +257,6 @@ export default class Redios extends Component {
                         }
                     </Content>
                 </Main>
-                <Preview />
             </Body>
         );
     }

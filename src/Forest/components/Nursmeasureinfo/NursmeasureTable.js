@@ -694,7 +694,7 @@ export default class NursmeasureTable extends Component {
                             <Option
                                 key={supplier.ID}
                                 title={`${supplier.SupplierName}`}
-                                value={supplier.ID}>
+                                value={supplier.SupplierName}>
                                 {`${supplier.SupplierName}`}
                             </Option>
                         );
@@ -718,24 +718,25 @@ export default class NursmeasureTable extends Component {
         } = this.props;
         let nurseryOptions = [];
         if (value && value.length >= 2) {
-            if (nurseryList && nurseryList instanceof Array && nurseryList.lenght > 0) {
+            if (nurseryList && nurseryList instanceof Array && nurseryList.length > 0) {
                 nurseryList.map((nursery) => {
                     if (nursery && nursery.NurseryName.indexOf(value) !== -1) {
                         nurseryOptions.push(
                             <Option
                                 key={nursery.ID}
                                 title={`${nursery.NurseryName}`}
-                                value={nursery.ID}>
+                                value={nursery.NurseryName}>
                                 {`${nursery.NurseryName}`}
                             </Option>
                         );
                     }
                 });
             }
-            this.setState({
-                nurseryOptions
-            });
         }
+        console.log('nurseryOptions', nurseryOptions);
+        this.setState({
+            nurseryOptions
+        });
     }
 
     handleNurserychange = (value) => {

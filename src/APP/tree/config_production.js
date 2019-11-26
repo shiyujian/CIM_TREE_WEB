@@ -32,13 +32,9 @@ window.config = {
     DASHBOARD_ONSITE: 'http://39.96.47.88:8080',
     // 灌溉接口
     PIPE: 'http://39.97.163.176:809',
-    // 苗木市场
-    SEEDLING: 'http://39.97.163.176:808',
     // 林总图片新接口
     ALIIMG: 'https://xatree-1.oss-cn-qingdao.aliyuncs.com',
 
-    // word在线预览地址
-    previewWord_API: 'http://docs.ecidi.com:6500/view/url?url=',
     // 高德地图逆地理编码
     LBSAMAP: 'https://restapi.amap.com',
     // 腾讯移动分析

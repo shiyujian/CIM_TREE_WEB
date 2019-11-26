@@ -5,7 +5,6 @@ import {bindActionCreators} from 'redux';
 import { actions as platformActions } from '_platform/store/global';
 import {News, Datum} from '../components';
 import * as previewActions from '_platform/store/global/preview';
-import Preview from '_platform/components/layout/Preview';
 import {actions as newsActions} from '../store/news';
 import {actions as datumActions} from '../store/datum';
 import banner from '../components/images/banner.png';
@@ -40,7 +39,6 @@ export default class Home extends Component {
                         {Datum && <Datum {...props} />}
                     </Col>
                 </Row>
-                <Preview />
             </div>
         );
     }
