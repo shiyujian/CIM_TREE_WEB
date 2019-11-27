@@ -314,6 +314,8 @@ export default class ManGroupTable extends Component {
                 plan.order = (page - 1) * 10 + i + 1;
                 // 公司名
                 plan.orgName = orgName;
+                // 打印公司名
+                plan.printOrgName = (orgName && orgName.slice(0, 24)) || '';
                 // 工种
                 let typeName = '/';
                 if (plan.WorkTypeID) {
@@ -340,6 +342,9 @@ export default class ManGroupTable extends Component {
                 plan.liftertime2 = plan.CreateTime
                     ? moment(plan.CreateTime).format('HH:mm:ss')
                     : '/';
+                if (plan.BloodType === '请选择血型') {
+                    plan.BloodType = '/';
+                }
                 // 获取上报人
                 if (plan.Creater) {
                     let userData = '';
@@ -769,7 +774,7 @@ export default class ManGroupTable extends Component {
                                     display: 'none',
                                     width: '8cm',
                                     height: '3cm',
-                                    fontSize: '11.5px'
+                                    fontSize: '10px'
                                 }}>
                                 <Row>
                                     <div
@@ -807,7 +812,7 @@ export default class ManGroupTable extends Component {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div>
+                                            {/* <div>
                                                 <div
                                                     style={{
                                                         width: '50px',
@@ -826,7 +831,7 @@ export default class ManGroupTable extends Component {
                                                 >
                                                     {printData && printData.Gender}
                                                 </div>
-                                            </div>
+                                            </div> */}
                                             <div>
                                                 <div
                                                     style={{
@@ -867,6 +872,26 @@ export default class ManGroupTable extends Component {
                                                     {printData.workGroupName}
                                                 </div>
                                             </div>
+                                            <div>
+                                                <div
+                                                    style={{
+                                                        width: '50px',
+                                                        display: 'inline-block',
+                                                        textAlign: 'right',
+                                                        verticalAlign: 'top'
+                                                    }}
+                                                >
+                                                单位：
+                                                </div>
+                                                <div
+                                                    style={{
+                                                        width: 'calc(100% - 50px)',
+                                                        display: 'inline-block'
+                                                    }}
+                                                >
+                                                    {printData.printOrgName}
+                                                </div>
+                                            </div>
                                         </div>
                                         <div
                                             style={{
@@ -874,7 +899,8 @@ export default class ManGroupTable extends Component {
                                                 display: 'inline-block',
                                                 textAlign: 'right',
                                                 verticalAlign: 'top',
-                                                marginRight: '15px',
+                                                marginRight: '10px',
+                                                marginLeft: '5px',
                                                 paddingTop: '5px',
                                                 paddingBottom: '2px'
                                             }}
@@ -885,14 +911,14 @@ export default class ManGroupTable extends Component {
                                                     id='myImg1'
                                                     alt='uu'
                                                     style={{
-                                                        height: '1.8cm',
-                                                        width: '1.8cm',
+                                                        height: '2.6cm',
+                                                        width: '2.6m',
                                                         margin: '0 auto'
                                                     }} />
                                             </div>
                                         </div>
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <div style={{
                                             display: 'inline-block',
                                             paddingLeft: '5px',
@@ -914,10 +940,10 @@ export default class ManGroupTable extends Component {
                                                     display: 'inline-block'
                                                 }}
                                             >
-                                                {printData.orgName}
+                                                {printData.printOrgName}
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                 </Row>
                             </div>

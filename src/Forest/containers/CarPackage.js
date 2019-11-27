@@ -16,7 +16,8 @@ import {
 import {
     getUser,
     getAreaTreeData,
-    getUserIsManager
+    getUserIsManager,
+    getDefaultProject
 } from '_platform/auth';
 
 const Option = Select.Option;
@@ -93,6 +94,10 @@ export default class CarPackage extends Component {
             await getTotalThinClass(totalThinClass);
             // 区域地块树
             await getThinClassTree(projectList);
+        }
+        let defaultProject = await getDefaultProject();
+        if (defaultProject) {
+            this.onSelect([defaultProject]);
         }
         // 状态
         let statusoption = [

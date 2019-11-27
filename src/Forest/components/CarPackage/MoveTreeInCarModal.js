@@ -19,6 +19,7 @@ import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
+import AddCarPack from './AddCarPack';
 const FormItem = Form.Item;
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
@@ -34,7 +35,8 @@ class MoveTreeInCarModal extends Component {
             etime: '',
             pagination: {},
             dataChecked: '',
-            selectRecort: ''
+            selectRecort: '',
+            addCarPackVisible: false
         };
     }
     FormItemLayout = {
@@ -210,6 +212,16 @@ class MoveTreeInCarModal extends Component {
                 : ''
         });
     }
+    handleAddCarPack = async () => {
+        this.setState({
+            addCarPackVisible: true
+        });
+    }
+    handleAddCarPackCancel = async () => {
+        this.setState({
+            addCarPackVisible: false
+        });
+    }
     // 翻页
     handleTableChange (pagination) {
         const pager = { ...this.state.pagination };
@@ -303,212 +315,229 @@ class MoveTreeInCarModal extends Component {
             sectionsList = [],
             dataSource = [],
             selectRecort,
-            dataChecked
+            dataChecked,
+            addCarPackVisible
         } = this.state;
         let bigTreeList = tree.bigTreeList || [];
         return (
-            <Modal
-                width={1000}
-                title='选择车辆'
-                visible
-                maskClosable={false}
-                footer={null}
-                onCancel={this.handleMoveTreeInCarCancel.bind(this)}
-            >
-                <div>
-                    <Form>
-                        <Row>
-                            <Col span={8}>
-                                <FormItem
-                                    {...this.FormItemLayout}
-                                    label='车牌号'
-                                >
-                                    {getFieldDecorator(
-                                        'carNumber',
-                                        {
-                                            rules: [
-                                                {
-                                                    required: false,
-                                                    message: '请输入车牌号'
-                                                }
-                                            ]
-                                        }
-                                    )(<Input allowClear />)}
-                                </FormItem>
-                            </Col>
-                            <Col span={8}>
-                                <FormItem
-                                    {...this.FormItemLayout}
-                                    label='项目'
-                                >
-                                    {getFieldDecorator(
-                                        'project',
-                                        {
-                                            rules: [
-                                                {
-                                                    required: false,
-                                                    message: '请选择项目'
-                                                }
-                                            ]
-                                        }
-                                    )(<Select onSelect={this.projectSelect.bind(this)}>
-                                        {
-                                            bigTreeList.map((project) => {
-                                                return <Option key={project.No} value={project.No}>
-                                                    {project.Name}
-                                                </Option>;
-                                            })
-                                        }
-                                    </Select>)}
-                                </FormItem>
-                            </Col>
-                            <Col span={8}>
-                                <FormItem
-                                    {...this.FormItemLayout}
-                                    label='标段'
-                                >
-                                    {getFieldDecorator(
-                                        'section',
-                                        {
-                                            rules: [
-                                                {
-                                                    required: false,
-                                                    message: '请选择标段'
-                                                }
-                                            ]
-                                        }
-                                    )(<Select>
-                                        {
-                                            sectionsList.map((section) => {
-                                                return <Option key={section.No} value={section.No}>
-                                                    {section.Name}
-                                                </Option>;
-                                            })
-                                        }
-                                    </Select>)}
-                                </FormItem>
-                            </Col>
-                            <Col span={8}>
-                                <FormItem
-                                    {...this.FormItemLayout}
-                                    label='状态'
-                                >
-                                    {getFieldDecorator(
-                                        'isShrub',
-                                        {
-                                            rules: [
-                                                {
-                                                    required: false,
-                                                    message: '请选择状态'
-                                                }
-                                            ]
-                                        }
-                                    )(<Select>
-                                        <Option key={'未打包'} value={0} title={'未打包'}>
-                                            未打包
-                                        </Option>
-                                        <Option key={'已打包'} value={1} title={'已打包'}>
-                                            已打包
-                                        </Option>
-                                    </Select>)}
-                                </FormItem>
-                            </Col>
-                            <Col span={10}>
-                                <FormItem
-                                    {...this.FormItemLayout}
-                                    label='创建时间'
-                                >
-                                    {getFieldDecorator(
-                                        'time',
-                                        {
-                                            rules: [
-                                                {
-                                                    required: false,
-                                                    message: '请选择创建时间'
-                                                }
-                                            ]
-                                        }
-                                    )(<RangePicker
-                                        style={{
-                                            verticalAlign: 'middle',
-                                            width: '100%'
-                                        }}
-                                        showTime={{ format: 'HH:mm:ss' }}
-                                        format={'YYYY/MM/DD HH:mm:ss'}
-                                        onChange={this.handleDatePick.bind(this)}
-                                    />)}
-                                </FormItem>
-                            </Col>
-                            <Col span={6}>
-                                <FormItem {...MoveTreeInCarModal.FormItemLayout1} >
-                                    {getFieldDecorator('button', {
-                                    })(
-                                        <div>
-                                            <Button
-                                                type='primary'
-                                                style={{marginLeft: 30}}
-                                                onClick={this.handleTableChange.bind(this, {current: 1})}
+            <div>
+                {
+                    addCarPackVisible
+                        ? <AddCarPack
+                            handleAddCarPackCancel={this.handleAddCarPackCancel.bind(this)}
+                            {...this.props}
+                            {...this.state} />
+                        : <Modal
+                            width={1000}
+                            title='选择车辆'
+                            visible
+                            maskClosable={false}
+                            footer={null}
+                            onCancel={this.handleMoveTreeInCarCancel.bind(this)}
+                        >
+                            <div>
+                                <Form>
+                                    <Row>
+                                        <Col span={8}>
+                                            <FormItem
+                                                {...this.FormItemLayout}
+                                                label='车牌号'
                                             >
+                                                {getFieldDecorator(
+                                                    'carNumber',
+                                                    {
+                                                        rules: [
+                                                            {
+                                                                required: false,
+                                                                message: '请输入车牌号'
+                                                            }
+                                                        ]
+                                                    }
+                                                )(<Input allowClear />)}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={8}>
+                                            <FormItem
+                                                {...this.FormItemLayout}
+                                                label='项目'
+                                            >
+                                                {getFieldDecorator(
+                                                    'project',
+                                                    {
+                                                        rules: [
+                                                            {
+                                                                required: false,
+                                                                message: '请选择项目'
+                                                            }
+                                                        ]
+                                                    }
+                                                )(<Select onSelect={this.projectSelect.bind(this)}>
+                                                    {
+                                                        bigTreeList.map((project) => {
+                                                            return <Option key={project.No} value={project.No}>
+                                                                {project.Name}
+                                                            </Option>;
+                                                        })
+                                                    }
+                                                </Select>)}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={8}>
+                                            <FormItem
+                                                {...this.FormItemLayout}
+                                                label='标段'
+                                            >
+                                                {getFieldDecorator(
+                                                    'section',
+                                                    {
+                                                        rules: [
+                                                            {
+                                                                required: false,
+                                                                message: '请选择标段'
+                                                            }
+                                                        ]
+                                                    }
+                                                )(<Select>
+                                                    {
+                                                        sectionsList.map((section) => {
+                                                            return <Option key={section.No} value={section.No}>
+                                                                {section.Name}
+                                                            </Option>;
+                                                        })
+                                                    }
+                                                </Select>)}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={8}>
+                                            <FormItem
+                                                {...this.FormItemLayout}
+                                                label='状态'
+                                            >
+                                                {getFieldDecorator(
+                                                    'isShrub',
+                                                    {
+                                                        rules: [
+                                                            {
+                                                                required: false,
+                                                                message: '请选择状态'
+                                                            }
+                                                        ]
+                                                    }
+                                                )(<Select>
+                                                    <Option key={'未打包'} value={0} title={'未打包'}>
+                                                    未打包
+                                                    </Option>
+                                                    <Option key={'已打包'} value={1} title={'已打包'}>
+                                                    已打包
+                                                    </Option>
+                                                </Select>)}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={10}>
+                                            <FormItem
+                                                {...this.FormItemLayout}
+                                                label='创建时间'
+                                            >
+                                                {getFieldDecorator(
+                                                    'time',
+                                                    {
+                                                        rules: [
+                                                            {
+                                                                required: false,
+                                                                message: '请选择创建时间'
+                                                            }
+                                                        ]
+                                                    }
+                                                )(<RangePicker
+                                                    style={{
+                                                        verticalAlign: 'middle',
+                                                        width: '100%'
+                                                    }}
+                                                    showTime={{ format: 'HH:mm:ss' }}
+                                                    format={'YYYY/MM/DD HH:mm:ss'}
+                                                    onChange={this.handleDatePick.bind(this)}
+                                                />)}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={6}>
+                                            <FormItem {...MoveTreeInCarModal.FormItemLayout1} >
+                                                {getFieldDecorator('button', {
+                                                })(
+                                                    <div>
+                                                        <Button
+                                                            type='primary'
+                                                            style={{marginLeft: 30}}
+                                                            onClick={this.handleTableChange.bind(this, {current: 1})}
+                                                        >
                                                         查询
-                                            </Button>
-                                        </div>
-                                    )}
-                                </FormItem>
-                            </Col>
-                        </Row>
-                    </Form>
-                    <Table
-                        bordered
-                        columns={this.columns}
-                        rowKey='order'
-                        loading={{
-                            spinning: this.state.loading
-                        }}
-                        dataSource={dataSource}
-                        onChange={this.handleTableChange.bind(this)}
-                        pagination={this.state.pagination}
-                    />
-                    <Row style={{marginTop: 20}}>
-                        <div style={{float: 'right'}}>
-                            <Button
-                                type='primary'
-                                style={{marginLeft: 30}}
-                                onClick={this.handleMoveTreeInCarCancel.bind(this)}
-                            >
-                            取消
-                            </Button>
-                            {
-                                dataChecked && currentRecord && currentRecord.LicensePlate
-                                    ? <Popconfirm
-                                        title={
-                                            <div>
-                                                <p>{`确定将 ${currentRecord.LicensePlate}(${currentRecord.Section}) 中的 ${selectedRowSXM.length} 棵`}</p>
-                                                <p>{`苗木移动至 ${selectRecort.LicensePlate}(${selectRecort.Section}) 中么`}</p>
-                                            </div>
-                                        }
-                                        onConfirm={this.handleMoveTreeInCarOk.bind(this)}
-                                        okText='确认'
-                                        cancelText='取消'
-                                    >
+                                                        </Button>
+                                                        <Button
+                                                            type='primary'
+                                                            style={{marginLeft: 30}}
+                                                            onClick={this.handleAddCarPack.bind(this)}
+                                                        >
+                                                        新增
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                    </Row>
+                                </Form>
+                                <Table
+                                    bordered
+                                    columns={this.columns}
+                                    rowKey='order'
+                                    loading={{
+                                        spinning: this.state.loading
+                                    }}
+                                    dataSource={dataSource}
+                                    onChange={this.handleTableChange.bind(this)}
+                                    pagination={this.state.pagination}
+                                />
+                                <Row style={{marginTop: 20}}>
+                                    <div style={{float: 'right'}}>
                                         <Button
                                             type='primary'
                                             style={{marginLeft: 30}}
+                                            onClick={this.handleMoveTreeInCarCancel.bind(this)}
                                         >
-                                        确定
+                                    取消
                                         </Button>
-                                    </Popconfirm>
-                                    : <Button
-                                        disabled
-                                        style={{marginLeft: 30}}
-                                    >
-                                        确定
-                                    </Button>
-                            }
+                                        {
+                                            dataChecked && currentRecord && currentRecord.LicensePlate
+                                                ? <Popconfirm
+                                                    title={
+                                                        <div>
+                                                            <p>{`确定将 ${currentRecord.LicensePlate}(${currentRecord.Section}) 中的 ${selectedRowSXM.length} 棵`}</p>
+                                                            <p>{`苗木移动至 ${selectRecort.LicensePlate}(${selectRecort.Section}) 中么`}</p>
+                                                        </div>
+                                                    }
+                                                    onConfirm={this.handleMoveTreeInCarOk.bind(this)}
+                                                    okText='确认'
+                                                    cancelText='取消'
+                                                >
+                                                    <Button
+                                                        type='primary'
+                                                        style={{marginLeft: 30}}
+                                                    >
+                                                确定
+                                                    </Button>
+                                                </Popconfirm>
+                                                : <Button
+                                                    disabled
+                                                    style={{marginLeft: 30}}
+                                                >
+                                                确定
+                                                </Button>
+                                        }
 
-                        </div>
-                    </Row>
-                </div>
-            </Modal>
+                                    </div>
+                                </Row>
+                            </div>
+                        </Modal>
+                }
+            </div>
         );
     }
 }

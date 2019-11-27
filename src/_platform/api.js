@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-11-25 20:51:39
+ * @Last Modified time: 2019-11-27 10:37:57
  */
 /**
  *
@@ -128,7 +128,7 @@ export const ORGTYPE = [
     '养护单位'
 ];
 // 当前执行的项目
-export const DEFAULT_PROJECT = 'P191';
+export const DEFAULT_PROJECT = 'P193';
 // 业主审核进度管理列表人员
 export const OWNERCHECKLIST = [
     '张亮', '陈津陵', '池铭炎', '李红宇', '张大伟', '郝晓飞', '黄雪晨', '李航'

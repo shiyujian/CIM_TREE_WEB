@@ -441,6 +441,8 @@ export const getExportDieTree = forestFetchAction(
     `${TREE_API}/exportDieTree`,
     []
 );
+// 车辆包新增
+export const postAddCarPack = forestFetchAction(`${TREE_API}/carpack`, [], 'POST', []);
 
 export const actions = {
     exportEcporttreestatuss,
@@ -552,7 +554,8 @@ export const actions = {
     getAreaAcceptByThinClass,
     getSupervisorUsersOK,
     getSupervisorUsers,
-    postAreaAccept
+    postAreaAccept,
+    postAddCarPack
 };
 export default handleActions({
     [getTreeOK]: (state, {

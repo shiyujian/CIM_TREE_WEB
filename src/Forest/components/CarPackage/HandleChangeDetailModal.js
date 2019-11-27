@@ -296,6 +296,12 @@ class HandleChangeDetailModal extends Component {
                         } else {
                             findStatus = false;
                         }
+                    } else if (stime && etime) {
+                        if (detail && moment(detail.CreateTime).isBetween(stime, etime)) {
+                            findStatus = true;
+                        } else {
+                            findStatus = false;
+                        }
                     }
                     if (findStatus) {
                         searchDetails.push(detail);
