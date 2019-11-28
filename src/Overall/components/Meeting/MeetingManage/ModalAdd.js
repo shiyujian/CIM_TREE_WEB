@@ -338,6 +338,9 @@ class ModalAdd extends Component {
             let addressname = (info && info.props && info.props.title) || '';
             let corrdArr = value.split(',');
             if (corrdArr && corrdArr instanceof Array && corrdArr.length === 2) {
+                if (markerUI) {
+                    this.map.removeLayer(markerUI);
+                }
                 let lngAmap = corrdArr[0];
                 let latAmap = corrdArr[1];
 
