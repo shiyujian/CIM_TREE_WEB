@@ -6,7 +6,8 @@ import {
     Input,
     Modal,
     Form,
-    message
+    message,
+    Select
 } from 'antd';
 import moment from 'moment';
 import L from 'leaflet';
@@ -15,7 +16,8 @@ import { formItemLayout, getUser } from '_platform/auth';
 import {
     WMSTILELAYERURL,
     TILEURLS,
-    XACOMPANYINITLEAFLET_API
+    XACOMPANYINITLEAFLET_API,
+    LBSAMAP_KEY
 } from '_platform/api';
 import './index.less';
 const FormItem = Form.Item;
@@ -23,6 +25,7 @@ const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 const AMap = window.AMap;
+const { Option } = Select;
 let markerUI;
 class ModalAdd extends Component {
     constructor (props) {
@@ -34,7 +37,9 @@ class ModalAdd extends Component {
             lng: '',
             WKT: 'POINT(0 0)',
             startTime: moment().format('YYYY-MM-DD HH:00:00'),
-            endTime: moment().add(1, 'h').format('YYYY-MM-DD HH:00:00')
+            endTime: moment().add(1, 'h').format('YYYY-MM-DD HH:00:00'),
+            locationOptions: [],
+            locationCoordinate: ''
         };
         this.handleCancel = this.handleCancel.bind(this); // 取消创建
         this.handleOk = this.handleOk.bind(this); // 确认创建
@@ -149,7 +154,6 @@ class ModalAdd extends Component {
                     Location: locationData.regeocode.formatted_address
                 });
                 this.setState({
-                    LocationUrl: locationData.regeocode.formatted_address,
                     lat: userPositionLatGps,
                     lng: userPositionLngGps,
                     WKT: `POINT(${userPositionLngGps} ${userPositionLatGps})`
@@ -172,31 +176,32 @@ class ModalAdd extends Component {
                     actions: { getLocationName, getGcjbyGps }
                 } = this.props;
                 // 转换坐标系
-
-                let GcjbyGpData = await getGcjbyGps({
+                // lngGps = 116.062125;
+                // latGps = 38.990779;
+                let locationAMapData = await getGcjbyGps({
                     locations: `${lngGps},${latGps}`
                 });
-                // lngGps = 116.116411;
-                // latGps = 39.00568;
-                console.log('GcjbyGpData', GcjbyGpData);
 
-                let lngGcj = '', latGcj = '';
-                if (GcjbyGpData && GcjbyGpData.status === '1' && GcjbyGpData.locations) {
-                    let locationArr = GcjbyGpData.locations.split(',');
-                    lngGcj = locationArr[0];
-                    latGcj = locationArr[1];
+                console.log('locationAMapData', locationAMapData);
+
+                let lngAMap = '';
+                let latAMap = '';
+                if (locationAMapData && locationAMapData.status === '1' && locationAMapData.locations) {
+                    let locationArr = locationAMapData.locations.split(',');
+                    lngAMap = locationArr[0];
+                    latAMap = locationArr[1];
                 }
-                console.log('lngGcj', lngGcj, latGcj);
                 // 获取地理位置
                 let locationData = await getLocationName({
-                    location: `${lngGcj},${latGcj}`
+                    location: `${lngAMap},${latAMap}`
                 });
+                console.log('locationData', locationData);
+
                 if (locationData && locationData.status === '1' && locationData.regeocode && locationData.regeocode.formatted_address) {
                     setFieldsValue({
                         Location: locationData.regeocode.formatted_address
                     });
                     this.setState({
-                        LocationUrl: locationData.regeocode.formatted_address,
                         lat: latGps,
                         lng: lngGps,
                         WKT: `POINT(${lngGps} ${latGps})`
@@ -286,8 +291,81 @@ class ModalAdd extends Component {
         });
     }
 
-    _handleCreateMeasureOk () {
+    handleLocationSearch = async (value) => {
+        const {
+            actions: {
+                getLocationDataByLocationName
+            }
+        } = this.props;
+        let locationOptions = [];
+        if (value && value.length >= 2) {
+            let postData = {
+                key: LBSAMAP_KEY,
+                keywords: value,
+                offset: 10,
+                page: 1
+            };
+            let data = await getLocationDataByLocationName({}, postData);
+            console.log('data', data);
+            if (data && data.status && data.status === '1' && data.pois) {
+                if (data.pois && data.pois instanceof Array && data.pois.length > 0) {
+                    data.pois.map((poi) => {
+                        locationOptions.push(
+                            <Option
+                                key={poi.id}
+                                title={`${poi.cityname}${poi.adname}${poi.name}`}
+                                value={poi.location}>
+                                {`${poi.cityname}${poi.adname}${poi.name}`}
+                            </Option>
+                        );
+                    });
+                }
+            }
+            this.setState({
+                locationOptions
+            });
+        }
+    }
+    handleLocationChange = async (value, info) => {
+        const {
+            form: {
+                setFieldsValue
+            }
+        } = this.props;
+        if (value) {
+            console.log('value', value);
+            console.log('info', info);
+            let addressname = (info && info.props && info.props.title) || '';
+            let corrdArr = value.split(',');
+            if (corrdArr && corrdArr instanceof Array && corrdArr.length === 2) {
+                let lngAmap = corrdArr[0];
+                let latAmap = corrdArr[1];
 
+                let result = gcoord.transform(
+                    [lngAmap, latAmap], // 经纬度坐标
+                    gcoord.GCJ02, // 当前坐标系
+                    gcoord.WGS84 // 目标坐标系
+                );
+                console.log('result', result);
+                let lngGps = result[0];
+                let latGps = result[1];
+
+                let center = [latGps, lngGps];
+                markerUI = new L.Marker([latGps, lngGps]);
+                this.map.addLayer(markerUI);
+                this.map.panTo(center);
+
+                setFieldsValue({
+                    Location: addressname
+                });
+                this.setState({
+                    locationCoordinate: value,
+                    lat: latGps,
+                    lng: lngGps,
+                    WKT: `POINT(${lngGps} ${latGps})`
+                });
+            }
+        }
     }
     render () {
         const {
@@ -296,7 +374,9 @@ class ModalAdd extends Component {
         const {
             userPositionData,
             startTime,
-            endTime
+            endTime,
+            locationOptions = [],
+            locationCoordinate
         } = this.state;
         console.log('userPositionData', userPositionData);
 
@@ -372,21 +452,30 @@ class ModalAdd extends Component {
                         {/* 地图 */}
                         <div style={{
                             display: this.state.visibleMap ? 'block' : 'none',
-                            width: '100%',
+                            width: 600,
                             height: 300,
                             marginBottom: 20,
                             overflow: 'hidden',
-                            border: '3px solid #ccc'
+                            border: '3px solid #ccc',
+                            position: 'relative'
                         }}>
                             <div id='mapid' style={{height: 300, width: '100%'}} />
                             <div id='mapid2' style={{display: 'none'}} />
                             <div>
-                                <Button
-                                    type='primary'
-                                    style={{marginRight: 10}}
-                                    onClick={this._handleCreateMeasureOk.bind(this)}>
-                                    确定
-                                </Button>
+                                <Select
+                                    allowClear
+                                    showSearch
+                                    className='meeting-gisButton'
+                                    placeholder={'请输入地址搜索'}
+                                    onSearch={this.handleLocationSearch.bind(this)}
+                                    onChange={this.handleLocationChange.bind(this)}
+                                    showArrow={false}
+                                    filterOption={false}
+                                    notFoundContent={null}
+                                    value={locationCoordinate || undefined}
+                                >
+                                    {locationOptions}
+                                </Select>
                             </div>
                         </div>
                         <FormItem

@@ -97,7 +97,6 @@ class ModalEdit extends Component {
                 });
                 console.log('WKT', lngGps);
                 this.setState({
-                    LocationUrl: locationData.regeocode.formatted_address,
                     lat: latGps,
                     lng: lngGps,
                     WKT: `POINT(${lngGps} ${latGps})`

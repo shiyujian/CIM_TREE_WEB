@@ -2,6 +2,7 @@ import asideReducer, * as asideActions from './aside';
 import previewReducer, * as previewActions from './preview';
 import tabsReducer, * as tabsActions from './tabs';
 import treeReducer, * as treeActions from './tree';
+import amapReducer, * as amapActions from './amap';
 
 import { handleActions, combineActions } from 'redux-actions';
 import {
@@ -34,6 +35,7 @@ export const actions = {
     ...rolesReducer,
     ...workflowAction,
     ...treeActions,
+    ...amapActions,
     ...docReducer
     // ...progressActions
 };
@@ -55,6 +57,10 @@ export default handleActions(
         [combineActions(...actionsMap(treeActions))]: (state, action) => ({
             ...state,
             tree: treeReducer(state.tree, action)
+        }),
+        [combineActions(...actionsMap(amapActions))]: (state, action) => ({
+            ...state,
+            amap: amapReducer(state.amap, action)
         }),
         [combineActions(...actionsMap(taskReducer))]: (state, action) => ({
             ...state,

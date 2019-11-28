@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-11-27 10:37:57
+ * @Last Modified time: 2019-11-28 15:36:26
  */
 /**
  *
@@ -70,6 +70,10 @@ export const WMSTILELAYERURL = window.config.WMSTileLayerUrl;
 export const TILEURLS = {
     1: window.config.IMG_W,
     2: window.config.VEC_W
+};
+export const AMAPTILEURLS = {
+    1: window.config.AMAP_W,
+    2: window.config.AMAP_R
 };
 // 静态资源文件服务
 export const STATIC_PREVIEW_API = `${DOMAIN}`;

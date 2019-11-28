@@ -3,7 +3,6 @@ import createFetchAction from 'fetch-action';
 import {forestFetchAction} from '_platform/store/fetchAction';
 import {
     ADOPT_API,
-    LBSAMAP_API,
     TREEPIPE_API,
     SYSTEM_API,
     TREE_API,
@@ -41,8 +40,6 @@ export const getTreeLocationCoord = forestFetchAction(`${TREE_API}/locationcoord
 export const getTreeLocation = forestFetchAction(`${TREE_API}/treelocations?sxm={{sxm}}&crs=4326`, [], 'GET');
 // 获取苗木结缘信息
 export const getAdoptTrees = forestFetchAction(`${ADOPT_API}/adopttrees`, [], 'GET');
-// 根据坐标获取地址信息
-export const getLocationNameByCoordinate = createFetchAction(`${LBSAMAP_API}/v3/geocode/regeo`, [], 'GET');
 // 灌溉官网查询数据
 export const getQueryTreePipe = createFetchAction(`${TREEPIPE_API}/pipe/query`, [], 'POST');
 // 根据用户ID获取用户自定义视图
@@ -99,7 +96,6 @@ export const actions = {
     getTreeLocationCoord,
     getTreeLocation,
     getAdoptTrees,
-    getLocationNameByCoordinate,
     getCustomViewByUserIDOk,
     getCustomViewByUserID,
     postUserCustomView,
