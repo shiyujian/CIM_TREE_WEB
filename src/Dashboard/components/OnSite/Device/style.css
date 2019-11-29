@@ -1,0 +1,64 @@
+:global(.leaflet-popup-content h2) {
+    font-weight: 400 !important;
+    font-size: 12px !important;
+}
+
+:global(.btnViewTrack) {
+    display: inline-block;
+    color: #fff !important;
+    border-radius: 4px;
+    background-color: #108ee9;
+    border-color: #108ee9;
+    padding: 0 20px;
+    line-height: 24px;
+    text-decoration: none;
+}
+
+:global(.btnViewTrack:hover) {
+    background-color: #49a9ee;
+    border-color: #49a9ee;
+    text-decoration: none;
+}
+
+/*修改菜单边距*/
+.aside :global(.ant-collapse-content) {
+    padding: 0 8px;
+}
+
+/*隐患详情*/
+.riskDetail :global(.ant-modal-footer){
+    display: none;
+}
+
+.riskDetail img{
+    display: block;
+    width: 305px;
+    height: 200px;
+}
+
+.riskDetail h3{
+    font-weight: 300;
+    font-size:14px;
+    margin:0 0 10px;
+}
+
+.riskDetail .mb{
+    margin-bottom:10px;
+}
+
+.riskDetail .divLine{
+    border-top: 1px dotted #DDD;
+}
+
+.riskDetail :global(.ant-carousel .slick-slide){
+    min-height: 200px;
+    max-height: 300px;
+}
+
+.riskDetail .noImg{
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    background-image: url('../../ImageIcon/noImg.png');
+    background-size: cover;
+}

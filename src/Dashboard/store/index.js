@@ -6,7 +6,8 @@ import {
     TREEPIPE_API,
     SYSTEM_API,
     TREE_API,
-    CURING_API
+    CURING_API,
+    GARDEN_API
 } from '_platform/api';
 const ID = 'dashboard';
 // 获取隐患列表
@@ -49,6 +50,8 @@ export const getCustomViewByUserID = createFetchAction(`${SYSTEM_API}/userviews?
 export const postUserCustomView = createFetchAction(`${SYSTEM_API}/userview`, [], 'POST');
 // 用户删除自定义视图
 export const deleteUserCustomView = createFetchAction(`${SYSTEM_API}/userview/{{id}}`, [], 'DELETE');
+// 获取机械列表
+export const getLocationDevices = forestFetchAction(`${GARDEN_API}/locationdevices`, []);
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -78,6 +81,9 @@ export const getSurvivalRateTreeLoading = createAction(`${ID}成活率树加载l
 export const getAdoptTreeLoading = createAction(`${ID}苗木结缘树加载loading`);
 export const setUserMapPositionName = createAction(`${ID}设置用户定位的视图名称`);
 export const switchAreaDistanceMeasureMenu = createAction(`${ID}切换二维展示面积测量和距离测量`);
+export const getDeviceTreeLoading = createAction(`${ID}机械设备树加载loading`);
+export const getDeviceTree = createAction(`${ID}机械设备树数据`);
+export const getDeviceTreeDay = createAction(`${ID}机械设备树数据天`);
 
 export const actions = {
     getRisk,
@@ -101,6 +107,7 @@ export const actions = {
     postUserCustomView,
     deleteUserCustomView,
     getQueryTreePipe,
+    getLocationDevices,
 
     switchDashboardCompoment,
     getAreaTree,
@@ -129,7 +136,10 @@ export const actions = {
     getSurvivalRateTreeLoading,
     getAdoptTreeLoading,
     setUserMapPositionName,
-    switchAreaDistanceMeasureMenu
+    switchAreaDistanceMeasureMenu,
+    getDeviceTreeDay,
+    getDeviceTreeLoading,
+    getDeviceTree
 };
 export default handleActions(
     {
@@ -311,6 +321,24 @@ export default handleActions(
             return {
                 ...state,
                 areaDistanceMeasureMenu: payload
+            };
+        },
+        [getDeviceTreeLoading]: (state, { payload }) => {
+            return {
+                ...state,
+                deviceTreeLoading: payload
+            };
+        },
+        [getDeviceTree]: (state, { payload }) => {
+            return {
+                ...state,
+                deviceTreeData: payload
+            };
+        },
+        [getDeviceTreeDay]: (state, { payload }) => {
+            return {
+                ...state,
+                deviceTreeDataDay: payload
             };
         }
     },

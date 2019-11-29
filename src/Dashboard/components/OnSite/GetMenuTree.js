@@ -4,7 +4,8 @@ import {
     getAreaData,
     handleRiskData,
     handleTrackData,
-    handleCuringTaskData
+    handleCuringTaskData,
+    handleLocationDeviceData
 } from '../auth';
 import {
     TREETYPENO
@@ -26,6 +27,7 @@ export default class GetMenuTree extends Component {
             trackTree,
             treetypesTree,
             curingTaskTree,
+            deviceTreeDataDay,
             // survivalRateTree,
             platform: {
                 tree = {}
@@ -36,7 +38,8 @@ export default class GetMenuTree extends Component {
                 getTrackTreeLoading,
                 getTreetypesTreeLoading,
                 getCuringTaskTreeLoading,
-                getSurvivalRateTreeLoading
+                getSurvivalRateTreeLoading,
+                getDeviceTreeLoading
             }
         } = this.props;
         if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
@@ -68,6 +71,11 @@ export default class GetMenuTree extends Component {
         } else {
             await this.getCuringTasks();
         }
+        // if (deviceTreeDataDay && deviceTreeDataDay instanceof Array && deviceTreeDataDay.length > 0) {
+        //     await getDeviceTreeLoading(false);
+        // } else {
+        await this.getLocationDevices();
+        // }
     }
     // 获取地块树数据
     loadAreaData = async () => {
@@ -295,6 +303,33 @@ export default class GetMenuTree extends Component {
             await getCuringTaskTreeLoading(false);
         } catch (e) {
 
+        }
+    }
+    // 获取机械定位设备
+    getLocationDevices = async () => {
+        const {
+            actions: {
+                getLocationDevices,
+                getDeviceTreeLoading,
+                getDeviceTreeDay
+            },
+            platform: {
+                tree = {}
+            }
+        } = this.props;
+        try {
+            let thinClassTree = tree.thinClassTree || tree.onSiteThinClassTree || [];
+            // loading开始
+            await getDeviceTreeLoading(true);
+            let data = await getLocationDevices();
+            if (data && data.content) {
+                let devices = handleLocationDeviceData(data.content, thinClassTree);
+                await getDeviceTreeDay(devices);
+            }
+            // loading结束
+            await getDeviceTreeLoading(false);
+        } catch (e) {
+            console.log('getLocationDevices', e);
         }
     }
 

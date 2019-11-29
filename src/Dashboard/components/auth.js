@@ -1,7 +1,11 @@
 import './OnSite/OnSite.less';
 import { LBSAMAP_KEY } from '_platform/api';
 import {getForestImgUrl} from '_platform/auth';
-import {handlePOLYGONWktData} from '_platform/gisAuth';
+import {
+    handlePOLYGONWktData,
+    getSectionNameBySection,
+    getProjectNameBySection
+} from '_platform/gisAuth';
 
 // 获取施工包数据，并将数据进行整理
 export const getAreaData = async (getTreeNodeList, getThinClassList) => {
@@ -317,6 +321,22 @@ export const genPopUpContent = (geo) => {
                         
 					</div>`;
         }
+        case 'device': {
+            return `<div>
+                    <h2><span>项目：</span>${properties.projectName}</h2>
+                    <h2><span>标段：</span>${properties.sectionName}</h2>
+                    <h2><span>机械名称：</span>${properties.name}</h2>
+                    <h2><span>机械编号：</span>${properties.indexNum}</h2>
+                    <h2><span>进场时间：</span>${properties.enterTime}</h2>
+                    <h2><span>司机姓名：</span>${properties.contacter}</h2>
+                    <h2><span>联系方式：</span>${properties.phone}</h2>
+                    <h2><span>设备照片：</span>
+                        <a href="javascript:;" class="btnViewDevice" data-id=${geo.key}>
+                        ${properties.images ? '查看' : ''}
+                        </a>
+                    </h2>
+                </div>`;
+        }
         default: {
             return null;
         }
@@ -361,6 +381,24 @@ export const getIconType = (type) => {
             return 'dashboard-curingTaskWatering';
         case '其他':
             return 'dashboard-curingTaskOther';
+        case 'deviceExcavatorImg':
+            return 'dashboard-deviceExcavatorImg';
+        case 'deviceLoaderImg':
+            return 'dashboard-deviceLoaderImg';
+        case 'deviceRollerImg':
+            return 'dashboard-deviceRollerImg';
+        case 'deviceRammerImg':
+            return 'dashboard-deviceRammerImg';
+        case 'deviceDumpTruckImg':
+            return 'dashboard-deviceDumpTruckImg';
+        case 'deviceCraneImg':
+            return 'dashboard-deviceCraneImg';
+        case 'deviceFogGunTruckImg':
+            return 'dashboard-deviceFogGunTruckImg';
+        case 'deviceDitchingMachineImg':
+            return 'dashboard-deviceDitchingMachineImg';
+        case 'deviceSprinklerImg':
+            return 'dashboard-deviceSprinklerImg';
         default:
             break;
     }
@@ -850,4 +888,100 @@ export const handleGetAddressByCoordinate = async (location, getLocationNameByCo
     } catch (e) {
 
     }
+};
+
+export const handleLocationDeviceData = (datas, thinClassTree) => {
+    let devicesObj = {};
+    let devices = [];
+    if (datas && datas instanceof Array && datas.length > 0) {
+        datas.forEach((data, index) => {
+            // 去除坐标为0的点  和  名称为空的点（名称为空的点   type类型也不一样）
+            if (!data.DeviceWork || !data.Latitude || !data.Longitude) {
+                return;
+            }
+            let type = data.DeviceWork.DeviceName;
+            let name = data.DeviceWork.DeviceName;
+            let noArr = data.QRCode.split('-');
+            let indexNum = '';
+            if (noArr && noArr instanceof Array && noArr.length === 3) {
+                indexNum = noArr[2];
+            }
+            let section = data.DeviceWork.Section;
+            let sectionName = getSectionNameBySection(section, thinClassTree) || '';
+            let projectName = getProjectNameBySection(section, thinClassTree) || '';
+            let contacter = data.DeviceWork.Contacter || '';
+            let phone = data.DeviceWork.Phone || '';
+            let enterTime = data.DeviceWork.EnterTime || '';
+            let images = data.DeviceWork.Images || '';
+            // 位置
+            let locationX = data.Longitude;
+            let locationY = data.Latitude;
+            let coordinates = [locationY, locationX];
+            // 机械类型
+            let iconType = 'deviceExcavatorImg';
+            let deviceType = '';
+            if (data.DeviceWork.DeviceName === '挖掘机') {
+                deviceType = '挖掘机';
+                iconType = 'deviceExcavatorImg';
+            } else if (data.DeviceWork.DeviceName === '装载机') {
+                deviceType = '装载机';
+                iconType = 'deviceLoaderImg';
+            } else if (data.DeviceWork.DeviceName === '压路机') {
+                deviceType = '压路机';
+                iconType = 'deviceRollerImg';
+            } else if (data.DeviceWork.DeviceName === '打夯机') {
+                deviceType = '打夯机';
+                iconType = 'deviceRammerImg';
+            } else if (data.DeviceWork.DeviceName === '自卸汽车') {
+                deviceType = '自卸汽车';
+                iconType = 'deviceDumpTruckImg';
+            } else if (data.DeviceWork.DeviceName === '吊车') {
+                deviceType = '吊车';
+                iconType = 'deviceCraneImg';
+            } else if (data.DeviceWork.DeviceName === '雾炮车') {
+                deviceType = '雾炮车';
+                iconType = 'deviceFogGunTruckImg';
+            } else if (data.DeviceWork.DeviceName === '开沟机') {
+                deviceType = '开沟机';
+                iconType = 'deviceDitchingMachineImg';
+            } else if (data.DeviceWork.DeviceName === '洒水车') {
+                deviceType = '洒水车';
+                iconType = 'deviceSprinklerImg';
+            }
+            devicesObj[type] = devicesObj[type] || {
+                key: deviceType,
+                properties: {
+                    name: deviceType
+                },
+                children: []
+            };
+            devicesObj[type].children.push({
+                type: 'device',
+                // iconType: iconType,
+                key: data.ID,
+                properties: {
+                    deviceType: deviceType,
+                    name: name,
+                    indexNum: indexNum,
+                    projectName: projectName,
+                    sectionName: sectionName,
+                    enterTime: enterTime,
+                    images: images,
+                    phone: phone,
+                    ID: data.ID,
+                    contacter: contacter,
+                    type: 'device',
+                    iconType: iconType
+                },
+                geometry: {
+                    type: 'Point',
+                    coordinates: coordinates
+                }
+            });
+        });
+    }
+    for (let i in devicesObj) {
+        devices.push(devicesObj[i]);
+    }
+    return devices;
 };

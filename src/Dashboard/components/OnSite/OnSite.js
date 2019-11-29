@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-10-26 15:01:06
+ * @Last Modified time: 2019-11-29 09:47:03
  */
 import React, { Component } from 'react';
 import {
@@ -31,6 +31,7 @@ import TreePipePage from './TreePipe/TreePipePage';
 import AreaDistanceMeasure from './AreaDistanceMeasure/AreaDistanceMeasure';
 import ViewPositionManage from './MapCustom/ViewPositionManage';
 import TreeAccept from './TreeAccept/TreeAccept';
+import DeviceTree from './Device/DeviceTree';
 import {
     fillAreaColor,
     handleAreaLayerData,
@@ -557,6 +558,17 @@ class OnSite extends Component {
                         dashboardCompomentMenu === 'geojsonFeature_treePipe'
                             ? (
                                 <TreePipePage
+                                    map={this.map}
+                                    {...this.props}
+                                    {...this.state}
+
+                                />
+                            ) : ''
+                    }
+                    { // 机械
+                        dashboardCompomentMenu === 'geojsonFeature_device'
+                            ? (
+                                <DeviceTree
                                     map={this.map}
                                     {...this.props}
                                     {...this.state}
