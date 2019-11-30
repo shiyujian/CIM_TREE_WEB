@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-04-26 10:45:34
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-11-29 09:47:03
+ * @Last Modified time: 2019-11-30 16:49:48
  */
 import React, { Component } from 'react';
 import {
@@ -159,7 +159,7 @@ class OnSite extends Component {
             this.map = L.map('mapid', mapInitialization);
             this.tileLayer = L.tileLayer(TILEURLS[1], {
                 subdomains: [1, 2, 3], // 天地图有7个服务节点，代码中不固定使用哪个节点的服务，而是随机决定从哪个节点请求服务，避免指定节点因故障等原因停止服务的风险
-                minZoom: 10,
+                minZoom: 1,
                 maxZoom: 17,
                 zoomOffset: 1
             }).addTo(this.map);

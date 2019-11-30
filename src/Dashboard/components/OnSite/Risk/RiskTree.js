@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Tree, Button, DatePicker, Spin, Checkbox, Modal, Row } from 'antd';
 import L from 'leaflet';
+import L1 from 'leaflet.markercluster';
+// import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import './RiskTree.less';
 import moment from 'moment';
 import RiskDetail from './RiskDetail';
@@ -12,7 +15,7 @@ import riskOtherImg from '../../RiskImg/other.png';
 
 const TreeNode = Tree.TreeNode;
 const { RangePicker } = DatePicker;
-
+let heatMarkerLayer = new L1.MarkerClusterGroup();
 export default class RiskTree extends Component {
     constructor (props) {
         super(props);
@@ -176,20 +179,24 @@ export default class RiskTree extends Component {
                         let children = riskData.children;
                         children.forEach((riskData, index) => {
                             if (riskMarkerLayerList[riskData.key]) {
-                                riskMarkerLayerList[riskData.key].addTo(map);
+                                heatMarkerLayer.addLayer(riskMarkerLayerList[riskData.key]);
                             } else {
                                 riskMarkerLayerList[riskData.key] = this._createMarker(riskData);
-                            }
+                                heatMarkerLayer.addLayer(this._createMarker(riskData));
+                            };
+                            map.addLayer(heatMarkerLayer);
                             if (index === children.length - 1) {
                                 map.panTo(riskData.geometry.coordinates);
                             }
                         });
+
                         this.setState({
                             riskMarkerLayerList
                         });
                     }
                 });
             });
+            // heatMarkerLayer.addTo(map);
         } catch (e) {
             console.log('handleRiskTypeAddLayer', e);
         }
@@ -535,12 +542,8 @@ export default class RiskTree extends Component {
         const {
             map
         } = this.props;
-        const {
-            riskMarkerLayerList // 安全隐患图标图层List
-        } = this.state;
-        for (let v in riskMarkerLayerList) {
-            map.removeLayer(riskMarkerLayerList[v]);
-        }
+        map.removeLayer(heatMarkerLayer);
+        heatMarkerLayer = new L1.MarkerClusterGroup();
     }
     /* 在地图上添加marker和polygan */
     _createMarker (geo) {
@@ -566,7 +569,7 @@ export default class RiskTree extends Component {
                     genPopUpContent(geo)
                 )
             );
-            marker.addTo(map);
+            // marker.addTo(map);
             return marker;
         } catch (e) {
             console.log('_createMarker', e);

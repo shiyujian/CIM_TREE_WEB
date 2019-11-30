@@ -327,11 +327,20 @@ export default class DegitalAcceptTable extends Component {
             },
             platform: {
                 roles = []
-            }
+            },
+            sectionSelect
         } = this.props;
         if (!value) {
             return;
         }
+        sectionSelect(value || '');
+        this.setState({
+            section: value || '',
+            smallclass: '',
+            thinclass: '',
+            smallclassData: '',
+            thinclassData: ''
+        });
         let rolesData = [];
         if (!(roles && roles instanceof Array && roles.length > 0)) {
             rolesData = await getRoles();
@@ -376,16 +385,7 @@ export default class DegitalAcceptTable extends Component {
                 </Option>);
             });
         }
-        const {
-            sectionSelect
-        } = this.props;
-        sectionSelect(value || '');
         this.setState({
-            section: value || '',
-            smallclass: '',
-            thinclass: '',
-            smallclassData: '',
-            thinclassData: '',
             shigongOptions,
             jianliOptions
         });

@@ -9,7 +9,7 @@
  * @Author: ecidi.mingey
  * @Date: 2018-06-21 09:03:44
  * @Last Modified by: ecidi.mingey
- * @Last Modified time: 2019-11-28 15:36:26
+ * @Last Modified time: 2019-11-30 11:17:40
  */
 /**
  *
@@ -683,15 +683,15 @@ export const MODULES = [
                     {
                         id: 'PROJECT.MACHINEQRCODEPRINT',
                         name: '机械二维码'
-                    },
-                    {
-                        id: 'PROJECT.FACERECOGNITIONLIST',
-                        name: '人脸识别列表'
-                    },
-                    {
-                        id: 'PROJECT.FACERECOGNITIONRECORD',
-                        name: '人脸识别记录'
                     }
+                    // {
+                    //     id: 'PROJECT.FACERECOGNITIONLIST',
+                    //     name: '人脸识别列表'
+                    // },
+                    // {
+                    //     id: 'PROJECT.FACERECOGNITIONRECORD',
+                    //     name: '人脸识别记录'
+                    // }
                 ]
             },
             {

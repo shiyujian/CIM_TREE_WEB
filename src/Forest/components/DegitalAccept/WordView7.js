@@ -70,16 +70,16 @@ export default class WordView1 extends Component {
                     tableData.push(
                         <tr>
                             <td>{unQualifiedList[a].SXM || ''}</td>
-                            <td colSpan='2'>{unQualifiedList[a].SupervisorInfo || ''}</td>
+                            <td colSpan='2'>{unQualifiedList[a].ProblemType || ''}</td>
                             <td>{unQualifiedList[b].SXM || ''}</td>
-                            <td colSpan='2'>{unQualifiedList[b].SupervisorInfo || ''}</td>
+                            <td colSpan='2'>{unQualifiedList[b].ProblemType || ''}</td>
                         </tr>
                     );
                 } else {
                     tableData.push(
                         <tr>
                             <td>{unQualifiedList[a].SXM || ''}</td>
-                            <td colSpan='2'>{unQualifiedList[a].SupervisorInfo || ''}</td>
+                            <td colSpan='2'>{unQualifiedList[a].ProblemType || ''}</td>
                             <td />
                             <td colSpan='2' />
                         </tr>
