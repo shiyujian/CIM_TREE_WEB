@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tree, Button, DatePicker, Spin, Checkbox } from 'antd';
+import { Tree, Button, DatePicker, Spin, Checkbox, Row } from 'antd';
 import L from 'leaflet';
 import './CuringTaskTree.less';
 import moment from 'moment';
@@ -237,12 +237,12 @@ export default class CuringTaskTree extends Component {
                                                     {
                                                         contents.map((content) => {
                                                             return (
-                                                                <div className='CuringTaskTree-mrg10' key={content.ID}>
+                                                                <Row className='CuringTaskTree-mrg10' key={content.ID}>
                                                                     <span style={{ verticalAlign: 'middle' }}>{content.Name}</span>
                                                                     <span className='CuringTaskTree-data-text'>
                                                                         {content.children.length}
                                                                     </span>
-                                                                </div>
+                                                                </Row>
                                                             );
                                                         })
                                                     }

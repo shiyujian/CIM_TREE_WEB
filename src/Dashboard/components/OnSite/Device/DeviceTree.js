@@ -15,6 +15,7 @@ import deviceCraneImg from './DeviceImgs/吊车.png';
 import deviceFogGunTruckImg from './DeviceImgs/雾炮车.png';
 import deviceDitchingMachineImg from './DeviceImgs/开沟机.png';
 import deviceSprinklerImg from './DeviceImgs/洒水车.png';
+import deviceDiggerImg from './DeviceImgs/挖坑机.png';
 
 const { RangePicker } = DatePicker;
 
@@ -40,6 +41,7 @@ export default class DeviceTree extends Component {
             deviceFogGunTruck: true,
             deviceDitchingMachine: true,
             deviceSprinkler: true,
+            deviceDigger: true,
             // 机械详情弹窗
             deviceMess: {}, // 机械详情
             isShowDevice: false // 是否显示机械详情弹窗
@@ -93,6 +95,11 @@ export default class DeviceTree extends Component {
             id: 'deviceSprinkler',
             label: '洒水车',
             img: deviceSprinklerImg
+        },
+        {
+            id: 'deviceDigger',
+            label: '挖坑机',
+            img: deviceDiggerImg
         }
     ]
     componentDidMount = async () => {
@@ -503,12 +510,12 @@ export default class DeviceTree extends Component {
                                                     {
                                                         contents.map((content) => {
                                                             return (
-                                                                <div className='DeviceTree-mrg10' key={content.key}>
+                                                                <Row className='DeviceTree-mrg10' key={content.key}>
                                                                     <span style={{ verticalAlign: 'middle' }}>{content.properties.name}</span>
                                                                     <span className='DeviceTree-data-text'>
                                                                         {content.children.length}
                                                                     </span>
-                                                                </div>
+                                                                </Row>
                                                             );
                                                         })
                                                     }

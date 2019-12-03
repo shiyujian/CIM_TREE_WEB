@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tree, Button, DatePicker, Spin, Input } from 'antd';
+import { Tree, Button, DatePicker, Spin, Input, Row } from 'antd';
 import L from 'leaflet';
 import moment from 'moment';
 import {
@@ -526,12 +526,12 @@ export default class TrackTree extends Component {
                         {
                             contents.map((content) => {
                                 return (
-                                    <div className='TrackTree-mrg10' key={content.ID}>
+                                    <Row className='TrackTree-mrg10' key={content.ID}>
                                         <span style={{verticalAlign: 'middle'}}>{content.Full_Name}</span>
                                         <span className='TrackTree-data-text'>
                                             {content.children.length}
                                         </span>
-                                    </div>
+                                    </Row>
                                 );
                             })
                         }

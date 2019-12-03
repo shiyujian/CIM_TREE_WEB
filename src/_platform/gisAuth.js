@@ -2,7 +2,6 @@
 export const handlePOLYGONWktData = (wkt) => {
     let str = wkt.slice(wkt.indexOf('('), wkt.indexOf(')'));
     str = str.replace(/[(]/g, '');
-    console.log('str', str);
     return str;
 };
 // 点击区域地块处理细班设计坐标数据
@@ -234,5 +233,25 @@ export const getSmallThinNameByThinClassData = (thinClass, thinClassTree) => {
         return smallThinName;
     } catch (e) {
         console.log('getSmallThinNameByPlaceData', e);
+    }
+};
+
+// 处理多边形中的坐标数据转化为数组
+export const handlePolygonLatLngs = (polygon) => {
+    try {
+        let coordinates = [];
+        if (polygon) {
+            let latLngs = polygon.getLatLngs();
+            if (latLngs && latLngs instanceof Array && latLngs.length > 0) {
+                let latLngList = latLngs[0];
+                for (let i = 0; i < latLngList.length; i++) {
+                    let latLngJson = [latLngList[i].lat, latLngList[i].lng];
+                    coordinates.push(latLngJson);
+                }
+            }
+        }
+        return coordinates;
+    } catch (e) {
+        console.log('handlePolygonLatLngs', e);
     }
 };

@@ -56,7 +56,7 @@ export default class DegitalAcceptTable extends Component {
             curingTreeData: [],
             pagination: {},
             loading: false,
-            size: 10,
+            size: 11,
             exportsize: 100,
             stime1: moment().format('YYYY-MM-DD 00:00:00'),
             etime1: moment().format('YYYY-MM-DD 23:59:59'),
@@ -161,6 +161,9 @@ export default class DegitalAcceptTable extends Component {
             {
                 title: '操作',
                 render: (text, record) => {
+                    const {
+                        curingTreeData
+                    } = this.state;
                     const user = getUser();
                     let duty = user.duty || '';
                     let permission = false;
@@ -194,6 +197,27 @@ export default class DegitalAcceptTable extends Component {
                                 <a onClick={this.exportFile.bind(this, record)}>导出</a>
                             </div>
                             );
+                        }
+                    } else if (record.CheckType && record.CheckType === 11) {
+                        let status = true;
+                        curingTreeData.map((data, index) => {
+                            if (index < 9) {
+                                if (data.status !== '完成') {
+                                    status = false;
+                                }
+                            }
+                        });
+                        if (status) {
+                            return (<div >
+                                <a onClick={this.viewWord.bind(this, record)} >
+                                    查看
+                                </a>
+                                <Divider type='vertical' />
+                                <a onClick={this.exportFile.bind(this, record)}>导出</a>
+                            </div>
+                            );
+                        } else {
+                            return '/';
                         }
                     } else {
                         if (record.status === '未申请' || record.status === '待验收') {
@@ -784,13 +808,26 @@ export default class DegitalAcceptTable extends Component {
             actions: {
                 getDigitalAcceptDetail,
                 getExportAcceptReport
+            },
+            platform: {
+                tree = {}
             }
         } = this.props;
         try {
             const {
                 stime1 = '',
-                etime1 = ''
+                etime1 = '',
+                section = '',
+                thinclass = ''
             } = this.state;
+            let array = thinclass.split('-');
+            let array1 = [];
+            array.map((item, i) => {
+                if (i !== 2) {
+                    array1.push(item);
+                }
+            });
+            let thinClassData = array1.join('-');
             console.log('record', record);
             let checktype = record.CheckType;
             if (record && record.ystype) {
@@ -832,6 +869,10 @@ export default class DegitalAcceptTable extends Component {
                 } else if (checktype === 10) {
                     let ID = record.ID;
                     let downloadUrl = `${DOCEXPORT_API}?action=areaacceptance&id=${ID}`;
+                    await this.createLink(this, downloadUrl);
+                } else if (checktype === 11) {
+                    let ID = record.ID;
+                    let downloadUrl = `${DOCEXPORT_API}?action=lastacceptance&section=${section}&thinclass=${thinClassData}`;
                     await this.createLink(this, downloadUrl);
                 } else {
                     const postdata = {

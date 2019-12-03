@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Table, Card } from 'antd';
-import Blade from './Blade';
+import { Table, Card, Row } from 'antd';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import './styles.less';
@@ -55,26 +54,25 @@ export default class Datum extends Component {
     columns = [
         {
             title: '任务标题',
-            dataIndex: 'Title'
+            dataIndex: 'Title',
+            render (text, record, index) {
+                return (
+                    <a className='hoverStyle'>
+                        <Link
+                            to={`/selfcare/task/${record.ID}`}
+                        >
+                            <span>text</span>
+                        </Link>
+                    </a>
+                );
+            }
         },
 
         {
             title: '提交时间',
-            dataIndex: 'CreateTime'
-        },
-        {
-            title: '操作',
-            width: 100,
-            render (record) {
-                return (
-                    <span>
-                        <Link
-                            to={`/selfcare/task/${record.ID}`}
-                        >
-                            <span>查看</span>
-                        </Link>
-                    </span>
-                );
+            dataIndex: 'CreateTime',
+            render: (text, record) => {
+                return moment(text).format('YYYY-MM-DD');
             }
         }
     ];
@@ -83,25 +81,28 @@ export default class Datum extends Component {
         const { workList } = this.state;
 
         return (
-            <Blade title='待办任务' >
-                <Link to='/selfcare/task'>
-                    <span style={{ float: 'right', marginTop: '-30px' }}>
+            <Row>
+                <Card title='待办任务'
+                    className='HomeCard'
+                    style={{marginRight:'1%'}}
+                    extra={
+                        <Link to='/selfcare/task'>
                         MORE
-                    </span>
-                </Link>
-                <div style={{ marginBottom: '14px', marginTop: '-9px' }}>
-                    <hr />
-                </div>
-                <div className='tableContainer'>
+                        </Link>
+                    }
+                >
                     <Table
-                        bordered
+                    // bordered
+                        size='small'
+                        showHeader={false}
                         dataSource={workList}
                         columns={this.columns}
                         pagination={{ showQuickJumper: true, pageSize: 5 }}
                         rowKey='ID'
                     />
-                </div>
-            </Blade>
+                </Card>
+            </Row>
+
         );
     }
 }

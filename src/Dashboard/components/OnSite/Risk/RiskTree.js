@@ -299,12 +299,12 @@ export default class RiskTree extends Component {
                                                     {
                                                         contents.map((content) => {
                                                             return (
-                                                                <div className='RiskTree-mrg10' key={content.key}>
+                                                                <Row className='RiskTree-mrg10' key={content.key}>
                                                                     <span style={{ verticalAlign: 'middle' }}>{content.properties.name}</span>
                                                                     <span className='RiskTree-data-text'>
                                                                         {content.children.length}
                                                                     </span>
-                                                                </div>
+                                                                </Row>
                                                             );
                                                         })
                                                     }

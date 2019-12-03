@@ -45,7 +45,7 @@ export const getYsTypeByID = (ID) => {
         case 10:
             return '造林面积';
         case 11:
-            return '总体';
+            return '总体合格率';
         default:
             return '';
     }

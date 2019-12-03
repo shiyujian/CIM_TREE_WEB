@@ -399,6 +399,8 @@ export const getIconType = (type) => {
             return 'dashboard-deviceDitchingMachineImg';
         case 'deviceSprinklerImg':
             return 'dashboard-deviceSprinklerImg';
+        case 'deviceDiggerImg':
+            return 'dashboard-deviceDiggerImg';
         default:
             break;
     }
@@ -919,34 +921,29 @@ export const handleLocationDeviceData = (datas, thinClassTree) => {
             let coordinates = [locationY, locationX];
             // 机械类型
             let iconType = 'deviceExcavatorImg';
-            let deviceType = '';
+            let deviceType = data.DeviceWork.DeviceName;
             if (data.DeviceWork.DeviceName === '挖掘机') {
-                deviceType = '挖掘机';
                 iconType = 'deviceExcavatorImg';
             } else if (data.DeviceWork.DeviceName === '装载机') {
-                deviceType = '装载机';
                 iconType = 'deviceLoaderImg';
             } else if (data.DeviceWork.DeviceName === '压路机') {
-                deviceType = '压路机';
                 iconType = 'deviceRollerImg';
             } else if (data.DeviceWork.DeviceName === '打夯机') {
-                deviceType = '打夯机';
                 iconType = 'deviceRammerImg';
             } else if (data.DeviceWork.DeviceName === '自卸汽车') {
-                deviceType = '自卸汽车';
                 iconType = 'deviceDumpTruckImg';
             } else if (data.DeviceWork.DeviceName === '吊车') {
-                deviceType = '吊车';
                 iconType = 'deviceCraneImg';
             } else if (data.DeviceWork.DeviceName === '雾炮车') {
-                deviceType = '雾炮车';
                 iconType = 'deviceFogGunTruckImg';
             } else if (data.DeviceWork.DeviceName === '开沟机') {
-                deviceType = '开沟机';
                 iconType = 'deviceDitchingMachineImg';
             } else if (data.DeviceWork.DeviceName === '洒水车') {
-                deviceType = '洒水车';
                 iconType = 'deviceSprinklerImg';
+            } else if (data.DeviceWork.DeviceName === '挖坑机') {
+                iconType = 'deviceDiggerImg';
+            } else {
+                iconType = '';
             }
             devicesObj[type] = devicesObj[type] || {
                 key: deviceType,

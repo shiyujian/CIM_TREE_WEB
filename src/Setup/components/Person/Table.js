@@ -216,8 +216,22 @@ class Users extends Component {
                         </a>);
                     } else if (record.IsBlack) {
                         arr = [];
-                        arr.push('/');
+                    } else if (record.IsForbidden) {
+                        arr.push(<a
+                            key={3}
+                            style={{ marginRight: '.5em', color: 'red' }}
+                            onClick={this.handleUserDisabled.bind(this, record)}
+                        >
+                            启用
+                        </a>);
                     } else if (!record.IsForbidden) {
+                        arr.push(<a
+                            key={3}
+                            style={{marginRight: '.5em'}}
+                            onClick={this.handleUserDisabled.bind(this, record)}
+                        >
+                            禁用
+                        </a>);
                         arr.push(
                             <a
                                 onClick={this.edit.bind(this, record)}
