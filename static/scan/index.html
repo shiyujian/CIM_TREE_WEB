@@ -120,6 +120,7 @@
 	var _winHeight = $(window).height();
 	$("body").css("height",_winHeight + 'px');
 	// $(".bgPic").css("height",_winHeight + 'px');
+	$(".scanDetailBox").css("display","block");
 	var _URLS = '../tree/treetype?sxm=';
 	
     $.ajax({
@@ -142,11 +143,8 @@
 				wx.config(config);
 				showScan();
 			}catch(e){
-				
+				console.log('ajax', e);
 			}
-			
-			
-			
         },
         error:function(res){
             alert("提交错误")
@@ -167,6 +165,7 @@
 
 	//二维码扫描
 	function showScan(){
+		console.log('showScanshowScanshowScan');
 		wx.ready(function () { 
 			wx.scanQRCode({
 				  needResult: 1,

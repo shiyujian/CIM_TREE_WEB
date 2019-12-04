@@ -86,7 +86,8 @@
 $(function () {
 	var _URL = '../tree/treetype?sxm=';
 	var _winHeight = $(window).height();
-	$("body").css("height",_winHeight + 'px');
+	// $("body").css("height",_winHeight + 'px');
+	$(".scanDetailBox").css("display","block");
 	(function ($) {
         $.getUrlParam = function (name) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
@@ -94,7 +95,17 @@ $(function () {
             if (r != null) return unescape(r[2]); return null;
         }
     })(jQuery);
-    var sxm = $.getUrlParam('sxm');
+	// var sxm = $.getUrlParam('sxm');
+	var searchURL = window.location.search;
+	searchURL = searchURL.substring(1, searchURL.length);
+	var searchURLList = searchURL.split("&");
+	var sxm = '';
+	for (var i = 0; i < searchURLList.length; i++) {
+		var searchURLData = searchURLList[i];
+		if (searchURLData.indexOf('qrcode=') !== -1) {
+			sxm = searchURLData.split("=")[1];
+		}
+	}
 	loadTreeType();
 	loadNursery();
 	function loadNursery(){
@@ -197,9 +208,5 @@ $(function () {
 			}
 		});
 	}
-    
-    
-    
-    
 });
 </script>
