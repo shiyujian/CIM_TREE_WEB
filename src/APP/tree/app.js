@@ -31,7 +31,6 @@ export default class App extends Component {
         const { default: Project } = await import('../../Project');
         const { default: Checkwork } = await import('../../Checkwork');
         const { default: Dipping } = await import('../../Dipping');
-        const { default: Scan } = await import('../../Scan');
 
         this.setState({
             Home,
@@ -45,8 +44,7 @@ export default class App extends Component {
             Setup,
             Project,
             Checkwork,
-            Dipping,
-            Scan
+            Dipping
         });
     }
 
@@ -63,8 +61,7 @@ export default class App extends Component {
             Setup,
             Project,
             Checkwork,
-            Dipping,
-            Scan
+            Dipping
 
         } =
             this.state || {};
