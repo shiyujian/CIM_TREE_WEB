@@ -44,8 +44,8 @@ export default class DeviceTree extends Component {
             deviceDigger: true,
             // 机械详情弹窗
             deviceMess: {}, // 机械详情
-            isShowDevice: false // 是否显示机械详情弹窗
-
+            isShowDevice: false, // 是否显示机械详情弹窗
+            deviceTrackLayerList: {}
         };
     }
 
@@ -126,14 +126,23 @@ export default class DeviceTree extends Component {
     }
     handleDeviceModalOk = async (e) => {
         const {
-            deviceSearchData
+            deviceSearchData,
+            deviceTrackLayerList
         } = this.state;
+        const {
+            actions: {
+                getLocationDeviceGPSHistory
+            },
+            deviceTreeDataDay,
+            map
+        } = this.props;
         let target = e.target;
         // 绑定机械详情点击事件
-        if (target.getAttribute('class') === 'btnViewDevice') {
+        if (target.getAttribute('class') === 'btnViewDevicePic') {
             let idDevice = target.getAttribute('data-id');
             let device = null;
             let deviceTreeList = [];
+            console.log('deviceSearchData', deviceSearchData);
             if (deviceSearchData && deviceSearchData.length > 0) {
                 deviceTreeList = deviceSearchData;
             }
@@ -147,6 +156,45 @@ export default class DeviceTree extends Component {
                 this.setState({
                     deviceMess: device.properties,
                     isShowDevice: true
+                });
+            }
+        } else if (target.getAttribute('class') === 'btnViewDeviceTrack') {
+            let carNo = target.getAttribute('data-id');
+            for (let v in deviceTrackLayerList) {
+                map.removeLayer(deviceTrackLayerList[v]);
+            }
+            let targetData = '';
+            deviceTreeDataDay.map(data => {
+                data.children.map((child) => {
+                    if (child.properties.carNo === carNo) {
+                        targetData = child;
+                        child.properties.trackStatus = true;
+                    }
+                });
+            });
+            console.log('deviceTrackLayerList', deviceTrackLayerList);
+            if (deviceTrackLayerList[targetData.properties.ID]) {
+                deviceTrackLayerList[targetData.properties.ID].addTo(map);
+            } else {
+                let postData = {
+                    carno: carNo,
+                    stime: moment().format('YYYY-MM-DD'),
+                    etime: moment().add(1, 'days').format('YYYY-MM-DD')
+                };
+                let locationData = await getLocationDeviceGPSHistory({}, postData);
+                let coordinates = [];
+                locationData.map((location) => {
+                    if (location.latitude && location.longitude && location.createDate) {
+                        if (moment(location.createDate).isBetween(targetData.properties.enterTime, targetData.properties.fictitiousLeaveTime)) {
+                            coordinates.push([location.latitude, location.longitude]);
+                        }
+                    }
+                });
+                console.log('coordinates', coordinates);
+                let polyline = L.polyline(coordinates, { color: 'red' }).addTo(map);
+                deviceTrackLayerList[targetData.properties.ID] = polyline;
+                this.setState({
+                    deviceTrackLayerList
                 });
             }
         }

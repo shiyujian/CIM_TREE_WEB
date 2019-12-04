@@ -52,6 +52,8 @@ export const postUserCustomView = createFetchAction(`${SYSTEM_API}/userview`, []
 export const deleteUserCustomView = createFetchAction(`${SYSTEM_API}/userview/{{id}}`, [], 'DELETE');
 // 获取机械列表
 export const getLocationDevices = forestFetchAction(`${GARDEN_API}/locationdevices`, []);
+// 获取机械定位设备轨迹信息
+export const getLocationDeviceGPSHistory = forestFetchAction(`${GARDEN_API}/gpshistory`, []);
 
 export const switchDashboardMenuType = createAction(`${ID}切换建设和运营菜单类型`);
 export const switchDashboardCompoment = createAction(`${ID}切换二维展示左侧按钮`);
@@ -108,6 +110,7 @@ export const actions = {
     deleteUserCustomView,
     getQueryTreePipe,
     getLocationDevices,
+    getLocationDeviceGPSHistory,
 
     switchDashboardCompoment,
     getAreaTree,

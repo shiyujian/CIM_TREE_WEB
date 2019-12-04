@@ -209,10 +209,10 @@ export default class DegitalAcceptTable extends Component {
                         });
                         if (status) {
                             return (<div >
-                                <a onClick={this.viewWord.bind(this, record)} >
+                                {/* <a onClick={this.viewWord.bind(this, record)} >
                                     查看
                                 </a>
-                                <Divider type='vertical' />
+                                <Divider type='vertical' /> */}
                                 <a onClick={this.exportFile.bind(this, record)}>导出</a>
                             </div>
                             );

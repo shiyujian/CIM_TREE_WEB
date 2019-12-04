@@ -6,6 +6,7 @@ import {
     getSectionNameBySection,
     getProjectNameBySection
 } from '_platform/gisAuth';
+import moment from 'moment';
 
 // 获取施工包数据，并将数据进行整理
 export const getAreaData = async (getTreeNodeList, getThinClassList) => {
@@ -331,10 +332,15 @@ export const genPopUpContent = (geo) => {
                     <h2><span>司机姓名：</span>${properties.contacter}</h2>
                     <h2><span>联系方式：</span>${properties.phone}</h2>
                     <h2><span>设备照片：</span>
-                        <a href="javascript:;" class="btnViewDevice" data-id=${geo.key}>
+                        <a href="javascript:;" class="btnViewDevicePic" data-id=${geo.key}>
                         ${properties.images ? '查看' : ''}
                         </a>
                     </h2>
+                    <h2><span>设备轨迹：</span>
+                        <a href="javascript:;" class="btnViewDeviceTrack" data-id=${properties.carNo}>
+                        ${!properties.trackStatus ? '查看' : ''}
+                    </a>
+                </h2>
                 </div>`;
         }
         default: {
@@ -914,11 +920,15 @@ export const handleLocationDeviceData = (datas, thinClassTree) => {
             let contacter = data.DeviceWork.Contacter || '';
             let phone = data.DeviceWork.Phone || '';
             let enterTime = data.DeviceWork.EnterTime || '';
+            let leaveTime = data.DeviceWork.LeaveTime || '';
+            let fictitiousLeaveTime = data.DeviceWork.LeaveTime || moment().add(1, 'days').format('YYYY-MM-DD 00:00:00');
             let images = data.DeviceWork.Images || '';
             // 位置
             let locationX = data.Longitude;
             let locationY = data.Latitude;
             let coordinates = [locationY, locationX];
+            // CarNo
+            let carNo = data.CarNo;
             // 机械类型
             let iconType = 'deviceExcavatorImg';
             let deviceType = data.DeviceWork.DeviceName;
@@ -963,12 +973,16 @@ export const handleLocationDeviceData = (datas, thinClassTree) => {
                     projectName: projectName,
                     sectionName: sectionName,
                     enterTime: enterTime,
+                    leaveTime: leaveTime,
+                    fictitiousLeaveTime: fictitiousLeaveTime,
                     images: images,
                     phone: phone,
                     ID: data.ID,
                     contacter: contacter,
                     type: 'device',
-                    iconType: iconType
+                    iconType: iconType,
+                    carNo: carNo,
+                    trackStatus: false
                 },
                 geometry: {
                     type: 'Point',
