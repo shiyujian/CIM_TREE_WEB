@@ -42,6 +42,13 @@ export default class GetMenuTree extends Component {
                 getDeviceTreeLoading
             }
         } = this.props;
+        await getAreaTreeLoading(true);
+        await getRiskTreeLoading(true);
+        await getTrackTreeLoading(true);
+        await getTreetypesTreeLoading(true);
+        await getCuringTaskTreeLoading(true);
+        await getSurvivalRateTreeLoading(true);
+        await getDeviceTreeLoading(true);
         if (tree && tree.thinClassTree && tree.thinClassTree instanceof Array && tree.thinClassTree.length > 1) {
             await getAreaTreeLoading(false);
             await getSurvivalRateTreeLoading(false);
@@ -71,11 +78,11 @@ export default class GetMenuTree extends Component {
         } else {
             await this.getCuringTasks();
         }
-        // if (deviceTreeDataDay && deviceTreeDataDay instanceof Array && deviceTreeDataDay.length > 0) {
-        //     await getDeviceTreeLoading(false);
-        // } else {
-        await this.getLocationDevices();
-        // }
+        if (deviceTreeDataDay && deviceTreeDataDay instanceof Array && deviceTreeDataDay.length > 0) {
+            await getDeviceTreeLoading(false);
+        } else {
+            await this.getLocationDevices();
+        }
     }
     // 获取地块树数据
     loadAreaData = async () => {

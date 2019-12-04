@@ -1,0 +1,346 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+	<link href="./css/mui.min.css" rel="stylesheet" />
+    <link href="./css/style.css"  rel="stylesheet" >
+</head>
+<body>
+	<div class="bgPic">
+		<div class="Bgtitle"></div>
+		<div id="#scanQRCode1" class="bgBtn" onClick="showScanQRCode()"></div>
+	</div>
+	<div class="scanDetailBox">
+		<img  id="detailPic" src="#" />
+		<div class="treeHead" id="sfzm">
+			<div class="treeHeadText">
+				<span>身份证明</span><span class="treeHeadTextVal"></span><span class="TreePlace"></span>
+			</div>
+			<ul class="treeHeadList">
+				<li class="NurseryName">
+					<label>苗圃名称</label>
+					<span  id="NurseryName"></span>
+				</li>
+				<li class="CheckerUser">
+					<label>抽检用户</label>
+					<span  id="CheckerUser"></span>
+				</li>
+				<li class="InputerUser">
+					<label>测量人员</label>
+					<span  id="InputerUser"></span>
+				</li>
+				<li class="SupervisorUser">
+					<label>监理人员</label>
+					<span  id="SupervisorUser"></span>
+				</li>
+			</ul>
+		</div>
+		<div class="myInfor" id="myinfodiv">
+			<div class="myInforTitle">
+				我的信息
+			</div>
+			<ul class="myInforList">
+				<li>
+					<label>名称</label>
+					<span class="myInforListVal"></span>
+				</li>
+				<li>
+					<label>科属</label>
+					<span class="TreeTypeGenera"></span>
+				</li>
+				<li id='xjli'>
+					<label>胸径</label>
+					<span class="xj"></span>
+				</li>
+				<li id='gdli'>
+					<label>高度</label>
+					<span class="gd"></span>
+				</li>
+				<li id='gfli'>
+					<label>冠幅</label>
+					<span class="gf"></span>
+				</li>
+				<li id='qmli'>
+					<label>起苗时间</label>
+					<span class="qmsj"></span>
+				</li>
+				<li>
+					<label>栽植时间</label>
+					<span class="zzsj"></span>
+				</li>
+			</ul>
+		</div>
+		<div class="aboutMe" style="margin:10px 20px">
+			<div class="aboutMeTitle">
+				关于我
+			</div>
+			<div class="aboutMeVal"></div>
+		</div>
+	</div>
+
+</body>
+
+</html>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/zepto.min.js"></script>
+<script src="js/scanQRCode.js"> </script>
+<script src="js/mui.min.js"></script>
+
+<script>
+  /*
+   * 注意：
+   * 1. 所有的JS接口只能在公众号绑定的域名下调用，公众号开发者需要先登录微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。
+   * 2. 如果发现在 Android 不能分享自定义内容，请到官网下载最新的包覆盖安装，Android 自定义分享接口需升级至 6.0.2.58 版本及以上。
+   * 3. 常见问题及完整 JS-SDK 文档地址：http://mp.weixin.qq.com/wiki/7/aaa137b55fb2e0456bf8dd9148dd613f.html
+   *
+   * 开发中遇到问题详见文档“附录5-常见错误及解决办法”解决，如仍未能解决可通过以下渠道反馈：
+   * 邮箱地址：weixin-open@qq.com
+   * 邮件主题：【微信JS-SDK反馈】具体问题
+   * 邮件内容说明：用简明的语言描述问题所在，并交代清楚遇到该问题的场景，可附上截屏图片，微信团队会尽快处理你的反馈。
+   */
+   //alert(window.location.href);
+/*
+   $(document).ready(function(){
+		$(".bgBtn").on("hold",function(){
+			alert("hold")
+		})
+		$(".bgBtn").on("release",function(){
+		
+			alert("release")
+		})
+   })*/
+	var url =  "wx/sign?url=" + window.location.href.split('#')[0];
+	var _winHeight = $(window).height();
+	$("body").css("height",_winHeight + 'px');
+	$(".bgPic").css("height",_winHeight + 'px');
+	var _URLS = '../tree/treetype?sxm=';
+	
+    $.ajax({
+        url: url,
+        type: "get",
+        contentType: "application/json; charset=utf-8",  
+        dataType: "json",  
+        success:function(res){
+			var config = {
+				  debug: false,
+				  appId: res.appid,
+				  timestamp: parseInt(res.timestamp),
+				  nonceStr: res.noncestr,
+				  signature: res.signature,
+				  jsApiList: [
+					'scanQRCode'
+				  ]
+			};
+			try{
+				wx.config(config);
+				showScan();
+			}catch(e){
+				
+			}
+			
+			
+			
+        },
+        error:function(res){
+            alert("提交错误")
+        }
+    })
+
+	//点击扫描
+	function showScanQRCode(){
+		wx.scanQRCode({
+			  needResult: 1,
+			  desc: 'scanQRCode desc',
+			  success: function (res) {
+				  Scan(res["resultStr"]);
+				  loadNursery(res["resultStr"]);
+			  }
+		});
+	}
+
+	//二维码扫描
+	function showScan(){
+		wx.ready(function () { 
+			wx.scanQRCode({
+				  needResult: 1,
+				  desc: 'scanQRCode desc',
+				  success: function (res) {
+					 Scan(res["resultStr"]);
+					 loadNursery(res["resultStr"]);
+				  }
+			});
+
+		});
+	}
+
+	/*var  data= 'BGH8917';
+	Scan(data)
+	loadNursery(data)*/
+	
+	function loadNursery(data){
+		if(data != ''){
+			$(".scanDetailBox").css("display","block");
+			$(".bgPic").css("display","none");
+			$.ajax({
+				type: "get",
+				url: '../tree/nurserys?sxm=' + data,
+				data: "",
+				dataType: "text",
+				success: function (response) {
+					try{
+						var response = JSON.parse(response);
+						response = response.content;
+						if(response.length > 0){
+							response = response[0];
+							$("#NurseryName").text(response["NurseryName"]);
+							$(".qmsj").text(response["CreateTime"]);
+							$(".TreePlace").text(response["TreePlace"]);
+						}else{
+							$("#sfzm").css("display","none");
+						}
+					}catch(e){
+						//mui.openWindow({
+						//	url:'../index.html',
+							//id:'index',
+						//})
+					}
+				},
+				error: function (d) {
+
+				}
+			});	
+		}
+	}
+	
+
+	//扫描详情
+	function Scan(data){
+		if(data != ''){
+			$(".scanDetailBox").css("display","block");
+			$(".bgPic").css("display","none");
+			$.ajax({
+				type: "get",
+				url: _URLS + data,
+				data: "",
+				dataType: "text",
+				success: function (response) {
+					try{
+						var response = JSON.parse(response);
+						
+						$("#detailPic").attr("src","../" +response["Pics"]);
+						$(".treeHeadTextVal").text(response["TreeTypeName"]);
+						$(".myInforListVal").text(response["TreeTypeName"]);
+						$(".aboutMeVal").text(response["GrowthHabit"]);
+						$(".zzsj").text(response["CreateTime"]);
+						
+						if(response.CheckerUser != null){
+							if(response.CheckerUser.Full_Name == null){
+								$(".CheckerUser").css("display","none");
+							}else{
+								$(".CheckerUser").css("display","block");
+								$("#CheckerUser").text(response.CheckerUser.Full_Name);
+							}
+						}
+						
+						if(response.InputerUser == null){
+							$(".InputerUser").css("display","none");
+						}else{
+							$(".InputerUser").css("display","block");
+							$("#InputerUser").text(response.InputerUser.Full_Name);
+						}
+						if(response.SupervisorUser != null){
+							if(response.SupervisorUser.Full_Name == null){
+								$(".SupervisorUser").css("display","none");
+							}else{
+								$(".SupervisorUser").css("display","block");
+								$("#SupervisorUser").text(response.SupervisorUser.Full_Name);
+							}
+						}
+						
+						$(".TreeTypeGenera").text(response["TreeTypeGenera"]);
+						var jqHeight = 0;
+						if(response["XJ"] != '' && response["XJ"] != 0){
+							$(".xj").text(response["XJ"]);
+						}else{
+							$("#xjli").css("display","none");
+							jqHeight = 30;
+						}
+						if(response["GD"] != '' && response["GD"] != 0){
+							$(".gd").text(response["GD"]);
+						}else{
+							$("#gdli").css("display","none");
+							jqHeight += 30;
+						}
+						if(response["GF"] != '' && response["GF"] != 0){
+							$(".gf").text(response["GF"]);
+						}else{
+							$("#gfli").css("display","none");
+							jqHeight +=30;
+						}
+						$("#myinfodiv").css("height",(260 - jqHeight) + "px");
+						
+					}catch(e){
+						//mui.openWindow({
+						//	url:'../index.html',
+							//id:'index',
+						//})
+					}
+				},
+				error: function (d) {
+
+				}
+			});
+
+			/*mui.openWindow({
+				url:'./html/treeDetail.html?sxm=' + data,
+				id:'treeDetail',
+			})*/
+			//window.location.href = './html/treeDetail.html?sxm=' + data;
+		}
+	}
+
+	function getUrlParam(name) {
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+		var r = window.location.search.substr(1).match(reg); //匹配目标参数
+		if (r != null) return unescape(r[2]); return null; //返回参数值
+	}
+
+	var dcode = getUrlParam("code");
+	isFollow();
+	//判断是否已经关注
+	function isFollow(){
+		var url = "wx/userinfo?code=" + dcode;
+		$.ajax({
+			url: url,
+			type: "get",
+			contentType: "application/json; charset=utf-8",  
+			dataType: "json",  
+			success:function(res){
+				res = eval("[" + res + "]")[0];
+				var isF = false;
+				if(res.subscribe && res.subscribe == 1){
+					isF = true;
+					
+				}else{
+					//弹出关注页面
+					//if(window.confirm("请关注本公众号!")){
+						
+					//}
+				}
+			},
+			error:function(res){
+				alert("提交错误")
+			}
+		})
+	}
+
+</script>
+<script src="js/zepto.min.js"></script>
+<script src="js/scanQRCode.js"> </script>

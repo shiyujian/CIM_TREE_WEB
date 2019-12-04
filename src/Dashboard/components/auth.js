@@ -339,8 +339,8 @@ export const genPopUpContent = (geo) => {
                     <h2><span>设备轨迹：</span>
                         <a href="javascript:;" class="btnViewDeviceTrack" data-id=${properties.carNo}>
                         ${!properties.trackStatus ? '查看' : ''}
-                    </a>
-                </h2>
+                        </a>
+                    </h2>
                 </div>`;
         }
         default: {

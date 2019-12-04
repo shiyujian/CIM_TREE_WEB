@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+	<link href="../css/mui.min.css" rel="stylesheet" />
+	<link href="../css/style.css" rel="stylesheet" />
+</head>
+<body>
+	<div class="scanDetailBox">
+		<img  id="detailPic" src="#" />
+		<div class="treeHead">
+			<div class="treeHeadText">
+				<span>身份证明</span><span class="treeHeadTextVal"></span><span class="TreePlace"></span>
+			</div>
+			<ul class="treeHeadList">
+				<li class="NurseryName">
+					<label>苗圃名称</label>
+					<span  id="NurseryName"></span>
+				</li>
+				<li class="CheckerUser">
+					<label>抽检用户</label>
+					<span  id="CheckerUser"></span>
+				</li>
+				<li class="InputerUser">
+					<label>测量人员</label>
+					<span  id="InputerUser"></span>
+				</li>
+				<li class="SupervisorUser">
+					<label>监理人员</label>
+					<span  id="SupervisorUser"></span>
+				</li>
+			</ul>
+		</div>
+		<div class="myInfor">
+			<div class="myInforTitle">
+				我的信息
+			</div>
+			<ul class="myInforList">
+				<li>
+					<label>名称</label>
+					<span class="myInforListVal"></span>
+				</li>
+				<li>
+					<label>科属</label>
+					<span class="TreeTypeGenera"></span>
+				</li>
+				<li id="xjli">
+					<label>胸径</label>
+					<span class="xj"></span>
+				</li>
+				<li id="gdli">
+					<label>高度</label>
+					<span class="gd"></span>
+				</li>
+				<li id="gfli">
+					<label>冠幅</label>
+					<span class="gf"></span>
+				</li>
+				<li>
+					<label>起苗时间</label>
+					<span class="qmsj"></span>
+				</li>
+				<li>
+					<label>栽植时间</label>
+					<span class="zzsj"></span>
+				</li>
+			</ul>
+		</div>
+		<div class="aboutMe" style="margin:10px 20px">
+			<div class="aboutMeTitle">
+				关于我
+			</div>
+			<div class="aboutMeVal"></div>
+		</div>
+	</div>
+</body>
+</html>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/mui.min.js"></script>
+<script type="text/javascript">
+$(function () {
+	var _URL = '../tree/treetype?sxm=';
+	var _winHeight = $(window).height();
+	$("body").css("height",_winHeight + 'px');
+	(function ($) {
+        $.getUrlParam = function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    })(jQuery);
+    var sxm = $.getUrlParam('sxm');
+	loadTreeType();
+	loadNursery();
+	function loadNursery(){
+		$.ajax({
+			type: "get",
+			url: '../tree/nurserys?sxm=' + sxm,
+			data: "",
+			dataType: "text",
+			success: function (response) {
+				try{
+					var response = JSON.parse(response);
+					response = response.content;
+					
+					if(response.length > 0){
+						response = response[0];						
+						
+						$("#NurseryName").text(response["NurseryName"]);
+						$(".qmsj").text(response["CreateTime"]);
+						$(".TreePlace").text(response["TreePlace"]);
+					}
+					
+				}catch(e){
+					//mui.openWindow({
+					//	url:'../index.html',
+						//id:'index',
+					//})
+				}
+			},
+			error: function (d) {
+
+			}
+		});	
+	}
+
+	function loadTreeType(){
+		$.ajax({
+			type: "get",
+			url: _URL + sxm,
+			data: "",
+			dataType: "text",
+			success: function (response) {
+				try{
+					$(".scanDetailBox").css("display","block");
+					var response = JSON.parse(response);
+					$("#detailPic").attr("src","../" +response["Pics"]);
+					$(".treeHeadTextVal").text(response["TreeTypeName"]);
+					$(".myInforListVal").text(response["TreeTypeName"]);
+					$(".aboutMeVal").text(response["GrowthHabit"]);
+					$(".zzsj").text(response["CreateTime"]);
+					debugger
+					if(response["XJ"] != "" && response["XJ"] != "0" && response["XJ"] !=0){
+						$(".xj").text(response["XJ"]);
+					}else{
+						document.getElementById("xjli").style.display = "none";
+					}
+					if(response["GD"] != "" && response["GD"] != "0" && response["GD"] !=0){
+						$(".gd").text(response["GD"]);
+					}else{
+						document.getElementById("gdli").style.display = "none";
+					}
+					if(response["GF"] != "" && response["GF"] != "0" && response["GF"] !=0){
+						$(".gf").text(response["GF"]);
+					}else{
+						document.getElementById("gfli").style.display = "none";
+					}
+					if(response.CheckerUser != null){
+						if(response.CheckerUser.Full_Name == null){
+							$(".CheckerUser").css("display","none");
+						}else{
+							$(".CheckerUser").css("display","block");
+							$("#CheckerUser").text(response.CheckerUser.Full_Name);
+						}
+					}
+					
+					if(response.InputerUser.Full_Name == null){
+						$(".InputerUser").css("display","none");
+					}else{
+						$(".InputerUser").css("display","block");
+						$("#InputerUser").text(response.InputerUser.Full_Name);
+					}
+					if(response.SupervisorUser != null){
+						if(response.SupervisorUser.Full_Name == null){
+							$(".SupervisorUser").css("display","none");
+						}else{
+							$(".SupervisorUser").css("display","block");
+							$("#SupervisorUser").text(response.SupervisorUser.Full_Name);
+						}
+					}
+					
+					$(".TreeTypeGenera").text(response["TreeTypeGenera"]);
+				}catch(e){
+					//mui.openWindow({
+					//	url:'../index.html',
+						//id:'index',
+					//})
+				}
+			},
+			error: function (d) {
+
+			}
+		});
+	}
+    
+    
+    
+    
+});
+</script>

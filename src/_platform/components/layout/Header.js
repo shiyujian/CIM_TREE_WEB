@@ -50,8 +50,10 @@ export default class Header extends Component {
     clearSystemUser = () => {
         const {
             history,
-            actions: { clearTab }
+            actions: { clearTab },
+            location: { pathname = '' } = {}
         } = this.props;
+        console.log('pathname', pathname);
         clearUser();
         clearTab();
         removePermissions();

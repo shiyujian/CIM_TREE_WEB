@@ -65,7 +65,6 @@ export default class RiskDetail extends Component {
                         </Button>
                     </Row>
                 </div>
-
             </Modal>
         );
     }

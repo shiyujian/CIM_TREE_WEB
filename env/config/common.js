@@ -200,6 +200,7 @@ module.exports = {
                 to: 'DeathCode.js'
             },
             { from: `../static/dippingdemo`, to: 'dippingdemo/' },
+            { from: `../static/scan/index.html`, to: 'scan.html' },
 
             {
                 from: `../src/APP/${process.env.proj}/config_${
