@@ -12,10 +12,10 @@
     <link href="./css/style.css"  rel="stylesheet" >
 </head>
 <body>
-	<div class="bgPic">
+	<!-- <div class="bgPic">
 		<div class="Bgtitle"></div>
 		<div id="#scanQRCode1" class="bgBtn" onClick="showScanQRCode()"></div>
-	</div>
+	</div> -->
 	<div class="scanDetailBox">
 		<img  id="detailPic" src="#" />
 		<div class="treeHead" id="sfzm">
@@ -119,7 +119,7 @@
 	var url =  "wx/sign?url=" + window.location.href.split('#')[0];
 	var _winHeight = $(window).height();
 	$("body").css("height",_winHeight + 'px');
-	$(".bgPic").css("height",_winHeight + 'px');
+	// $(".bgPic").css("height",_winHeight + 'px');
 	var _URLS = '../tree/treetype?sxm=';
 	
     $.ajax({

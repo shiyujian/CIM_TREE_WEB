@@ -174,19 +174,11 @@ export default class DegitalAcceptTable extends Component {
                     }
                     if (record.CheckType && record.CheckType === 10) {
                         if (record.status === '未申请' || record.status === '退回') {
-                            let status = true;
-                            curingTreeData.map((data, index) => {
-                                if (index < 3) {
-                                    if (data.status !== '完成') {
-                                        status = false;
-                                    }
-                                }
-                            });
                             let textData = '申请验收';
                             if (record.status === '退回') {
                                 textData = '重新申请';
                             }
-                            if (permission && status) {
+                            if (permission) {
                                 return (<div >
                                     <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
                                         {textData}

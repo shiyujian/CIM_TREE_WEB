@@ -98,11 +98,7 @@ export default class App extends Component {
                         {Checkwork && (
                             <Route path='/checkwork' component={Checkwork} />
                         )}
-                        {/* {Dipping && (
-                            <Route path='/scan.html' component={Dipping} />
-                        )} */}
                         <Route path='/dipping' component={Dipping} />
-                        <Route path='/scan' component={Scan} />
                         <Route path='/:module?' component={Footer} />
                     </div>
                 </BrowserRouter>
