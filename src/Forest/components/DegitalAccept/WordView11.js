@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { Spin, Modal } from 'antd';
+import {
+    getProjectNameBySection
+} from '_platform/gisAuth';
 import './index.less';
 import moment from 'moment';
 export default class WordView1 extends Component {
@@ -10,88 +13,97 @@ export default class WordView1 extends Component {
             loading: false,
             leader: '',
             unitName: '',
-            detail: ''
+            itemDetail: ''
         };
     }
 
     componentDidMount = async () => {
         const {
-            itemDetailList = [],
-            unQualifiedList = []
+            itemDetail
         } = this.props;
-        if (itemDetailList.length > 0) {
-            let detail = itemDetailList[0];
-            await this.getUnitMessage(detail);
-            this.setState({
-                detail
-            });
+        if (itemDetail && itemDetail.acceptance) {
+            await this.getUnitMessage();
         }
     }
 
     onOk () {
         this.props.onPressOk(11);
     }
-    getUnitMessage = (detail) => {
+    getUnitMessage = () => {
         const {
-            unitMessage = []
+            unitMessage = [],
+            thinclass,
+            section
         } = this.props;
         let leader = '';
         let unitName = '';
-        if (detail && detail.Section) {
-            unitMessage.map((unit) => {
-                if (unit && unit.Section && unit.Section === detail.Section) {
-                    leader = unit.Leader;
-                    unitName = unit.Unit;
-                }
-            });
-        }
+        unitMessage.map((unit) => {
+            if (unit && unit.Section && unit.Section === section) {
+                leader = unit.Leader;
+                unitName = unit.Unit;
+            }
+        });
         this.setState({
             leader,
             unitName
         });
     }
-    handleDetailData = (detail) => {
+    handleDetailData = (record) => {
+        const {
+            itemDetail,
+            platform: {
+                tree
+            },
+            section
+        } = this.props;
         let handleDetail = {};
-        handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
-        handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
-        handleDetail.shigong = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ConstructerObj && detail.AcceptanceObj.ConstructerObj.Full_Name) || '';
-        handleDetail.checker = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplierObj && detail.AcceptanceObj.ApplierObj.Full_Name) || '';
-        handleDetail.designArea = (detail && detail.DesignArea && (detail.DesignArea * 0.0015).toFixed(2)) || '';
-        handleDetail.actualArea = (detail && detail.ActualArea && (detail.ActualArea * 0.0015).toFixed(2)) || '';
-        handleDetail.sampleTapeArea = (detail && detail.SampleTapeArea && (detail.SampleTapeArea * 0.0015).toFixed(2)) || '';
-        handleDetail.applyTime = (detail && detail.AcceptanceObj && detail.AcceptanceObj.ApplyTime && moment(detail.AcceptanceObj.ApplyTime).format('YYYY年MM月DD日')) || '';
-        handleDetail.designNum = (detail && detail.DesignNum) || 0;
-        handleDetail.actualNum = (detail && detail.ActualNum) || 0;
-        handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
-        handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
-        handleDetail.checkNum = (detail && detail.CheckNum) || 0;
-        handleDetail.failedNum = (detail && detail.FailedNum) || 0;
-        handleDetail.treetypename = (detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName) || '';
-        handleDetail.createTime = (detail && detail.CreateTime && moment(detail.CreateTime).format('YYYY年MM月DD日')) || '';
-        let hgl = handleDetail.checkNum - handleDetail.failedNum; // 合格量
-        let qulityok = 0; // 默认全部不合格
-        if (handleDetail.checkNum !== 0) {
-            qulityok = hgl / handleDetail.checkNum;
+        let thinClassTree = [];
+        if (tree.thinClassTree) {
+            thinClassTree = tree.thinClassTree;
         }
-        handleDetail.qulityok = qulityok;
+        handleDetail.unit = getProjectNameBySection(section, thinClassTree);
+        handleDetail.score = (itemDetail && itemDetail.score) || 0;
+        handleDetail.score1 = (itemDetail && itemDetail.score1) || 0;
+        handleDetail.score11 = (itemDetail && itemDetail.score11) || 0;
+        handleDetail.score2 = (itemDetail && itemDetail.score2) || 0;
+        handleDetail.score21 = (itemDetail && itemDetail.score21) || 0;
+        handleDetail.score3 = (itemDetail && itemDetail.score3) || 0;
+        handleDetail.score31 = (itemDetail && itemDetail.score31) || 0;
+        handleDetail.score4 = (itemDetail && itemDetail.score4) || 0;
+        handleDetail.score41 = (itemDetail && itemDetail.score41) || 0;
+        handleDetail.score5 = (itemDetail && itemDetail.score5) || 0;
+        handleDetail.score51 = (itemDetail && itemDetail.score51) || 0;
+        handleDetail.score6 = (itemDetail && itemDetail.score6) || 0;
+        handleDetail.score61 = (itemDetail && itemDetail.score61) || 0;
+        handleDetail.score7 = (itemDetail && itemDetail.score7) || 0;
+        handleDetail.score71 = (itemDetail && itemDetail.score71) || 0;
+        handleDetail.score8 = (itemDetail && itemDetail.score8) || 0;
+        handleDetail.score81 = (itemDetail && itemDetail.score81) || 0;
+        handleDetail.score9 = (itemDetail && itemDetail.score9) || 0;
+        handleDetail.score91 = (itemDetail && itemDetail.score91) || 0;
+
         return handleDetail;
     }
 
     render () {
         const {
-            itemDetailList = []
+            thinclass,
+            record
         } = this.props;
         const {
             leader,
             unitName,
             loading,
-            detail
+            tableData
         } = this.state;
-        let array = ['', '', '', ''];
-        if (detail && detail.ThinClass) {
-            array = detail.ThinClass.split('-');
-        }
-        let handleDetail = this.handleDetailData(detail);
+        let list = thinclass.split('-');
+        let array = [];
+        list.map((item, i) => {
+            if (i !== 2) {
+                array.push(item);
+            }
+        });
+        let handleDetail = this.handleDetailData(record);
         console.log('handleDetail', handleDetail);
         return (
             <Spin spinning={this.state.loading}>
@@ -115,8 +127,8 @@ export default class WordView1 extends Component {
                                     <td colSpan='1'>{`${array[2]}小班${array[3]}细班`}</td>
                                 </tr>
                                 <tr>
-                                    <td className='hei60' >施工单位</td>
-                                    <td colSpan='5'> 《雄安新区造林工作手册》</td>
+                                    <td className='hei60'>施工单位</td>
+                                    <td colSpan='5'>{unitName}</td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' >施工执行标准名称及编号</td>
@@ -133,75 +145,75 @@ export default class WordView1 extends Component {
                                     <td>1</td>
                                     <td colSpan='2'>土地整理</td>
                                     <td>5%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score1}</td>
+                                    <td>{handleDetail.score11}</td>
                                 </tr>
                                 <tr>
                                     <td>2</td>
                                     <td colSpan='2'>放样点穴</td>
                                     <td>5%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score2}</td>
+                                    <td>{handleDetail.score21}</td>
                                 </tr>
                                 <tr>
                                     <td>3</td>
                                     <td colSpan='2'>挖穴</td>
                                     <td>5%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score3}</td>
+                                    <td>{handleDetail.score31}</td>
                                 </tr>
                                 <tr>
                                     <td>4</td>
                                     <td colSpan='2'>苗木质量</td>
                                     <td>25%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score4}</td>
+                                    <td>{handleDetail.score41}</td>
                                 </tr>
                                 <tr>
                                     <td>5</td>
                                     <td colSpan='2'>土球质量</td>
                                     <td>15%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score5}</td>
+                                    <td>{handleDetail.score51}</td>
                                 </tr>
                                 <tr>
                                     <td>6</td>
                                     <td colSpan='2'>苗木栽植</td>
                                     <td>10%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score6}</td>
+                                    <td>{handleDetail.score61}</td>
                                 </tr>
                                 <tr>
                                     <td>7</td>
                                     <td colSpan='2'>苗木支架</td>
                                     <td>10%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score7}</td>
+                                    <td>{handleDetail.score71}</td>
                                 </tr>
                                 <tr>
                                     <td>8</td>
                                     <td colSpan='2'>浇水</td>
                                     <td>10%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score8}</td>
+                                    <td>{handleDetail.score81}</td>
                                 </tr>
                                 <tr>
                                     <td>9</td>
                                     <td colSpan='2'>大数据</td>
                                     <td>15%</td>
-                                    <td />
-                                    <td />
+                                    <td>{handleDetail.score9}</td>
+                                    <td>{handleDetail.score91}</td>
                                 </tr>
                                 <tr>
                                     <td className='hei60' colSpan='5'>造林合格率得分（按比重计分进行综合评价）</td>
-                                    <td > 100</td>
+                                    <td >{handleDetail.score}</td>
                                 </tr>
                                 <tr>
-                                    <td className='hei110' >施工单位质量专检结果</td>
+                                    <td className='hei110' >施工单位自检记录</td>
                                     <td colSpan='5'>
                                         <div>
                                             <div style={{ float: 'left', marginLeft: 10 }}>
-                                                <p >项目专业质量检查员：</p><p>{handleDetail.checker}</p>
+                                                <p >项目经理：</p><p>{leader}</p>
                                             </div>
                                             <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.applyTime}</p>
                                         </div>
@@ -211,10 +223,13 @@ export default class WordView1 extends Component {
                                     <td className='hei110' >监理（建设）单位验收记录</td>
                                     <td colSpan='5'>
                                         <div>
-                                            <div style={{ float: 'left', marginLeft: 10 }}>
-                                                <p>监理工程师：</p><p>{handleDetail.jianli}</p>
+                                            <div>
+                                                <div style={{ float: 'left', marginLeft: 10 }}>
+                                                    <p>总监理工程师(建设单位项目负责人)：</p>
+                                                </div>
                                             </div>
-                                            <p style={{ float: 'right', marginRight: 10 }}>{handleDetail.createTime}</p>
+
+                                            <p style={{ float: 'right', marginRight: 10 }} />
                                         </div>
                                     </td>
                                 </tr>

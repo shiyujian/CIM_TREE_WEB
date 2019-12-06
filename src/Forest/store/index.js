@@ -422,8 +422,9 @@ export const getUnitMessageBySection = forestFetchAction(`${TREE_API}/sections`,
 export const postMapImage = forestFetchAction(`${ROUTE_API}/mapimage`, [], 'POST', []);
 // 获取第十项信息
 export const getAcceptanceThinclasses = forestFetchAction(`${ROUTE_API}/acceptancethinclasses`, [], 'GET', []);
-// 查询细班验收施工是否提交，是否还需要反复提交
-export const getAreaAcceptByThinClass = forestFetchAction(`${ROUTE_API}/acceptancethinclasses`, [], 'GET');
+// 获取第十一项信息
+export const getLastAcceptanceResult = forestFetchAction(`${TREE_API}/lastacceptanceresult`, [], 'GET', []);
+
 // 辅助验收模块
 export const getSupervisorUsersOK = createAction(`${ID}获取监理用户列表`);
 export const getSupervisorUsers = createFetchAction(`${SYSTEM_API}/users`, [getSupervisorUsersOK], 'GET');
@@ -549,9 +550,9 @@ export const actions = {
     getBigDataCheckList,
     postMapImage,
     getAcceptanceThinclasses,
+    getLastAcceptanceResult,
     getDieTreesData,
     getExportDieTree,
-    getAreaAcceptByThinClass,
     getSupervisorUsersOK,
     getSupervisorUsers,
     postAreaAccept,

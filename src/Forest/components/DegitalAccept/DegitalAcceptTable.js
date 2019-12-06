@@ -101,7 +101,8 @@ export default class DegitalAcceptTable extends Component {
             itemDetail: '',
             drawAreaVisible: false,
             reDrawAreaVisible: false,
-            thinClassDesignData: []
+            thinClassDesignData: [],
+            filterList: []
         };
         this.columns = [
             {
@@ -162,7 +163,8 @@ export default class DegitalAcceptTable extends Component {
                 title: '操作',
                 render: (text, record) => {
                     const {
-                        curingTreeData
+                        curingTreeData,
+                        filterList
                     } = this.state;
                     const user = getUser();
                     let duty = user.duty || '';
@@ -178,7 +180,15 @@ export default class DegitalAcceptTable extends Component {
                             if (record.status === '退回') {
                                 textData = '重新申请';
                             }
-                            if (permission) {
+                            let status = true;
+                            filterList.map((data, index) => {
+                                if (index < 3) {
+                                    if (data.status !== '完成') {
+                                        status = false;
+                                    }
+                                }
+                            });
+                            if (permission && status) {
                                 return (<div >
                                     <a onClick={this.handleDrawAreaAccept.bind(this, record)} >
                                         {textData}
@@ -200,7 +210,7 @@ export default class DegitalAcceptTable extends Component {
                         }
                     } else if (record.CheckType && record.CheckType === 11) {
                         let status = true;
-                        curingTreeData.map((data, index) => {
+                        filterList.map((data, index) => {
                             if (index < 9) {
                                 if (data.status !== '完成') {
                                     status = false;
@@ -209,10 +219,10 @@ export default class DegitalAcceptTable extends Component {
                         });
                         if (status) {
                             return (<div >
-                                {/* <a onClick={this.viewWord.bind(this, record)} >
+                                <a onClick={this.viewWord.bind(this, record)} >
                                     查看
                                 </a>
-                                <Divider type='vertical' /> */}
+                                <Divider type='vertical' />
                                 <a onClick={this.exportFile.bind(this, record)}>导出</a>
                             </div>
                             );
@@ -519,7 +529,8 @@ export default class DegitalAcceptTable extends Component {
         const {
             actions: {
                 getDigitalAcceptDetail,
-                getAcceptanceThinclasses
+                getAcceptanceThinclasses,
+                getLastAcceptanceResult
             }
         } = this.props;
         const {
@@ -552,21 +563,45 @@ export default class DegitalAcceptTable extends Component {
                 message.info('移动端详情尚未提交');
                 return;
             }
+        } else if (checktype === 11) {
+            let array = thinclass.split('-');
+            let array1 = [];
+            array.map((item, i) => {
+                if (i !== 2) {
+                    array1.push(item);
+                }
+            });
+            const postdata = {
+                section: section,
+                thinclass: array1.join('-')
+            };
+            let rst = await getLastAcceptanceResult({}, postdata);
+            if (rst && rst.score && rst.score) {
+                this.setState({
+                    visible11: true,
+                    itemDetail: rst,
+                    record
+                });
+            } else {
+                message.info('移动端详情尚未提交');
+                return;
+            }
+        } else {
+            const postdata = {
+                acceptanceid: record.ID,
+                status: record.Status, // 用当前条目的状态去查询
+                stime: stime1,
+                etime: etime1
+            };
+            let rst = await getDigitalAcceptDetail({}, postdata);
+            // if (!(rst instanceof Array) || rst.length === 0) {
+            //     message.info('移动端详情尚未提交');
+            //     return;
+            // }
+            this.setState({
+                itemDetailList: rst
+            });
         }
-        const postdata = {
-            acceptanceid: record.ID,
-            status: record.Status, // 用当前条目的状态去查询
-            stime: stime1,
-            etime: etime1
-        };
-        let rst = await getDigitalAcceptDetail({}, postdata);
-        // if (!(rst instanceof Array) || rst.length === 0) {
-        //     message.info('移动端详情尚未提交');
-        //     return;
-        // }
-        this.setState({
-            itemDetailList: rst
-        });
         switch (checktype) {
             case 1:
                 this.setState({
@@ -755,19 +790,46 @@ export default class DegitalAcceptTable extends Component {
             surveyor: cly,
             constructer: sgy
         };
+        let filterPostData = {
+            section,
+            thinclass: array1.join('-'),
+            page,
+            size: size
+        };
         this.setState({
             loading: true,
             percent: 0
         });
         try {
             let rst = await getDigitalAcceptList({}, postdata);
-            if (!rst) {
+            let filterRst = await getDigitalAcceptList({}, filterPostData);
+            if (!(rst && rst.content)) {
                 this.setState({
                     loading: false,
                     percent: 100
                 });
                 return;
             };
+            let filterDatas = filterRst && filterRst.content;
+            if (filterDatas instanceof Array) {
+                let result = [];
+                filterDatas.map((data, i) => {
+                    data.order = (page - 1) * size + i + 1;
+                    data.ystype = getYsTypeByID(data.CheckType);
+                    data.status = getStatusByID(data.Status);
+                    data.sectionName = getSectionNameBySection(data.Section, thinClassTree);
+                    data.Project = getProjectNameBySection(data.Section, thinClassTree);
+                    data.smallclass = `${smallclassData}号小班`;
+                    data.thinclass = `${thinclassData}号细班`;
+                    data.constructerName = (data.ConstructerObj && data.ConstructerObj.Full_Name) || '';
+                    data.surveyorName = (data.SurveyorObj && data.SurveyorObj.Full_Name) || '';
+                    data.supervisorName = (data.SupervisorObj && data.SupervisorObj.Full_Name) || '';
+                    result.push(data);
+                });
+                this.setState({
+                    filterList: result
+                });
+            }
             let curingTreeData = rst && rst.content;
             if (curingTreeData instanceof Array) {
                 let result = [];

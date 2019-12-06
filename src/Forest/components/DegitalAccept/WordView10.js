@@ -146,41 +146,45 @@ export default class WordView1 extends Component {
     setTableData = (corrds) => {
         console.log('corrds', corrds);
         let tableData = [];
+        let treearea = [];
         if (corrds.length > 0) {
             for (let i = 0; i < corrds.length; i++) {
                 let str = corrds[i];
                 let data = handleCoordinates(str);
                 console.log('data', data);
-                let treearea = data[0];
-                console.log('treearea', treearea);
-
-                for (let i = 0; i < treearea.length; i = i + 2) {
-                    let a = i;
-                    let b = i + 1;
-                    if (a !== treearea.length - 1) {
-                        tableData.push(
-                            <tr>
-                                <td>{a + 1}</td>
-                                <td>{treearea[a][1] || ''}</td>
-                                <td >{treearea[a][0] || ''}</td>
-                                <td>{b + 1}</td>
-                                <td>{treearea[b][1] || ''}</td>
-                                <td >{treearea[b][0] || ''}</td>
-                            </tr>
-                        );
-                    } else {
-                        tableData.push(
-                            <tr>
-                                <td>{a + 1}</td>
-                                <td>{treearea[a][1] || ''}</td>
-                                <td>{treearea[a][0] || ''}</td>
-                                <td />
-                                <td />
-                                <td />
-                            </tr>
-                        );
-                    }
+                if (data && data instanceof Array && data.length === 1) {
+                    treearea = treearea.concat(data[0]);
+                    console.log('data[0]', data[0]);
                 }
+            }
+        }
+        console.log('treearea', treearea);
+
+        for (let i = 0; i < treearea.length; i = i + 2) {
+            let a = i;
+            let b = i + 1;
+            if (a !== treearea.length - 1) {
+                tableData.push(
+                    <tr>
+                        <td>{a + 1}</td>
+                        <td>{treearea[a][1] || ''}</td>
+                        <td >{treearea[a][0] || ''}</td>
+                        <td>{b + 1}</td>
+                        <td>{treearea[b][1] || ''}</td>
+                        <td >{treearea[b][0] || ''}</td>
+                    </tr>
+                );
+            } else {
+                tableData.push(
+                    <tr>
+                        <td>{a + 1}</td>
+                        <td>{treearea[a][1] || ''}</td>
+                        <td>{treearea[a][0] || ''}</td>
+                        <td />
+                        <td />
+                        <td />
+                    </tr>
+                );
             }
         }
         this.setState({

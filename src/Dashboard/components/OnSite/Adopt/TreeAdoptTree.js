@@ -353,10 +353,10 @@ export default class TreeAdoptTree extends Component {
             '&J=' +
             rowp;
         jQuery.getJSON(url, null, async (data) => {
-            await this.setState({
-                adoptTreeModalVisible: true,
-                adoptTreeModalLoading: true
-            });
+            // await this.setState({
+            //     adoptTreeModalVisible: true,
+            //     adoptTreeModalLoading: true
+            // });
             if (data.features && data.features.length) {
                 let adoptTreeMess = await this.getTreeAdoptInfo(data, x, y);
                 if (adoptTreeMess) {

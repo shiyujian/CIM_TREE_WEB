@@ -60,29 +60,11 @@ class DrawAreaAcceptModal extends Component {
             section,
             itemDetail,
             record,
-            supervisorUsersList,
-            actions: {
-                getAreaAcceptByThinClass
-            }
+            supervisorUsersList
         } = this.props;
         if (thinclass) {
             let thinClassArr = thinclass.split('-');
             let selectThinClassNo = thinClassArr[0] + '-' + thinClassArr[1] + '-' + thinClassArr[3] + '-' + thinClassArr[4];
-            // 查询该细班的面积验收是否已经审核
-            // let queryPostData = {
-            //     section: section,
-            //     thinclass: selectThinClassNo,
-            //     page: 1,
-            //     size: 5
-            // };
-            // let queryData = await getAreaAcceptByThinClass({}, queryPostData);
-            // if (queryData && queryData.content &&
-            //     queryData.content instanceof Array && queryData.content.length > 0) {
-            //     Notification.error({
-            //         message: '该细班已经完成面积验收，请确认后再次提交'
-            //     });
-            //     return;
-            // }
             await this.initMap();
             await this._addAreaLayer(thinclass, section);
             if (record && record.status && record.status === '退回') {
@@ -689,6 +671,14 @@ class DrawAreaAcceptModal extends Component {
                                         ]
                                     })(
                                         <Select
+                                            allowClear
+                                            showSearch
+                                            filterOption={
+                                                (input, option) =>
+                                                    option.props.children
+                                                        .toLowerCase()
+                                                        .indexOf(input.toLowerCase()) >= 0
+                                            }
                                             placeholder={'请选择监理审核人'}>
                                             {UserOptionList}
                                         </Select>
