@@ -82,21 +82,36 @@ class ModalSee extends Component {
         getMeetingDetail({
             ID: recordID
         }).then(rep => {
-            setFieldsValue({
-                timeArr: [moment(rep.StartTime), moment(rep.EndTime)],
-                MeetingName: rep.MeetingName,
-                Location: rep.Location,
-                MeetingTheme: rep.MeetingTheme,
-                Contacter: rep.Contacter,
-                Phone: rep.Phone
-            });
-            this.setState({
-                lat: rep.Y,
-                lng: rep.X,
-                QRCode: rep.QRCode,
-                dataList: rep.Persons,
-                meetingRecord: rep
-            });
+            if (rep && rep.ID) {
+                setFieldsValue({
+                    timeArr: [moment(rep.StartTime), moment(rep.EndTime)],
+                    MeetingName: rep.MeetingName,
+                    Location: rep.Location,
+                    MeetingTheme: rep.MeetingTheme,
+                    Contacter: rep.Contacter,
+                    Phone: rep.Phone
+                });
+                let dataList = [];
+                if (rep.Persons && rep.Persons instanceof Array) {
+                    dataList = dataList.concat(rep.Persons);
+                }
+                if (rep.Users && rep.Users instanceof Array) {
+                    rep.Users.map((user) => {
+                        let data = {};
+                        data = user;
+                        data.Name = user.Full_Name;
+                        data.Unit = '';
+                        dataList.push(data);
+                    });
+                }
+                this.setState({
+                    lat: rep.Y,
+                    lng: rep.X,
+                    QRCode: rep.QRCode,
+                    dataList: dataList,
+                    meetingRecord: rep
+                });
+            }
         });
     }
     handleCancel () {

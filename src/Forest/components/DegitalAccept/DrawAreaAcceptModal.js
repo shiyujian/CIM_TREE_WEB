@@ -10,6 +10,7 @@ import {
     Notification
 } from 'antd';
 import L from 'leaflet';
+import wellknown from 'wellknown';
 import './DrawAreaAcceptModal.less';
 import {
     computeSignedArea,
@@ -18,7 +19,8 @@ import {
     getSectionNameBySection,
     getProjectNameBySection,
     getHandleWktData,
-    handlePOLYGONWktData
+    handlePOLYGONWktData,
+    handleMULTIPOLYGONLngLatToLatLng
 } from '_platform/gisAuth';
 import {
     WMSTILELAYERURL,
@@ -168,6 +170,9 @@ class DrawAreaAcceptModal extends Component {
             let str = '';
             let coords = [];
             let wkt = itemDetail.Coords;
+            let test = wellknown.parse(wkt);
+            console.log('test', test);
+
             if (wkt.indexOf('MULTIPOLYGON') !== -1) {
                 let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
                 let arr = datas.split('),(');
@@ -377,25 +382,34 @@ class DrawAreaAcceptModal extends Component {
                     thinClassCoords.push(arr);
                 });
             }
+
             if (thinClassCoords.length === 1) {
                 coords = thinClassCoords[0];
             } else {
                 coords = thinClassCoords;
             }
             if (thinAreaNum > 1) {
-                wkt = 'MULTIPOLYGON((';
-                coords.map((coord, index) => {
-                    console.log('coord', coord);
-                    let num = computeSignedArea(coord, 2);
-                    actualRegionArea = actualRegionArea + num;
-                    if (index === 0) {
-                        // 获取细班选择坐标wkt
-                        wkt = wkt + getWktData(coord);
-                    } else {
-                        wkt = wkt + ',' + getWktData(coord);
-                    }
-                });
-                wkt = wkt + '))';
+                let coordinatesData = handleMULTIPOLYGONLngLatToLatLng(thinClassCoords);
+                console.log('coordinatesData', coordinatesData);
+                let data = {
+                    type: 'MultiPolygon',
+                    coordinates: coordinatesData
+                };
+                let wkt = wellknown.stringify(data);
+                console.log('wkt', wkt);
+                // wkt = 'MULTIPOLYGON((';
+                // coords.map((coord, index) => {
+                //     console.log('coord', coord);
+                //     let num = computeSignedArea(coord, 2);
+                //     actualRegionArea = actualRegionArea + num;
+                //     if (index === 0) {
+                //         // 获取细班选择坐标wkt
+                //         wkt = wkt + getWktData(coord);
+                //     } else {
+                //         wkt = wkt + ',' + getWktData(coord);
+                //     }
+                // });
+                // wkt = wkt + '))';
             } else {
                 wkt = 'POLYGON(';
                 // 获取手动框选坐标wkt

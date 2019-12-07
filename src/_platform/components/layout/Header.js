@@ -89,6 +89,36 @@ export default class Header extends Component {
         this.clearSystemUser();
     }
 
+    handleOnsiteChange = async (path) => {
+        const {
+            history,
+            actions: { switchFullScreenState },
+            location: { pathname = '' } = {}
+        } = this.props;
+        switchFullScreenState('fullScreen');
+        this.startFullScreen();
+        history.push(path);
+    }
+    // 进入全屏
+    startFullScreen () {
+        try {
+            console.log('aaaaaaaaa');
+            var element = document.documentElement;
+            // W3C
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullScreen();
+            }
+        } catch (e) {
+            console.log('startFullScreen', e);
+        }
+    }
+
     render () {
         const {
             tabs = {}
@@ -254,17 +284,29 @@ export default class Header extends Component {
                                     menu.path = str;
                                 }
                             }
-
-                            return (
-                                <Menu.Item key={menu.key} className='nav-item'>
-                                    <Link to={menu.path}>
-                                        {menu.icon}
-                                        <span className='title'>
-                                            {menu.title}
-                                        </span>
-                                    </Link>
-                                </Menu.Item>
-                            );
+                            if (menu.path === '/dashboard/onsite') {
+                                return (
+                                    <Menu.Item key={menu.key} className='nav-item'>
+                                        <a onClick={this.handleOnsiteChange.bind(this, menu.path)}>
+                                            {menu.icon}
+                                            <span className='title'>
+                                                {menu.title}
+                                            </span>
+                                        </a>
+                                    </Menu.Item>
+                                );
+                            } else {
+                                return (
+                                    <Menu.Item key={menu.key} className='nav-item'>
+                                        <Link to={menu.path}>
+                                            {menu.icon}
+                                            <span className='title'>
+                                                {menu.title}
+                                            </span>
+                                        </Link>
+                                    </Menu.Item>
+                                );
+                            }
                         }
                     })}
                 </Menu>

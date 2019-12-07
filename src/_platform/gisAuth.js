@@ -35,41 +35,6 @@ export const handleAreaDesignLayerData = async (eventKey, treeNodeName, getTreea
         console.log('await', e);
     }
 };
-// 点击区域地块处理细班实际坐标数据
-export const handleAreaRealLayerData = async (eventKey, treeNodeName, getTreearea) => {
-    let handleKey = eventKey.split('-');
-    let no = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[3] + '-' + handleKey[4];
-    let section = handleKey[0] + '-' + handleKey[1] + '-' + handleKey[2];
-    try {
-        let rst = await getTreearea({}, { no: no });
-        if (!(rst && rst.content && rst.content instanceof Array && rst.content.length > 0)) {
-            return;
-        }
-        let coords = [];
-        let str = '';
-        let contents = rst.content;
-        let data = contents.find(content => content.Section === section);
-        // 更新后的坐标数据是否存在
-        let wkt = data.coords;
-        if (data.actualcoords) {
-            wkt = data.actualcoords;
-        }
-        if (wkt.indexOf('MULTIPOLYGON') !== -1) {
-            let datas = wkt.slice(wkt.indexOf('(') + 2, wkt.indexOf(')))') + 1);
-            let arr = datas.split('),(');
-            arr.map((a, index) => {
-                str = a.slice(a.indexOf('(') + 1, a.length - 1);
-                coords.push(str);
-            });
-        } else if (wkt.indexOf('POLYGON') !== -1) {
-            str = handlePOLYGONWktData(wkt);
-            coords.push(str);
-        }
-        return coords;
-    } catch (e) {
-        console.log('await', e);
-    }
-};
 // 字符串转数组
 export const handleCoordinates = (str) => {
     let target = str.split(',').map(item => {
@@ -251,6 +216,66 @@ export const handlePolygonLatLngs = (polygon) => {
             }
         }
         return coordinates;
+    } catch (e) {
+        console.log('handlePolygonLatLngs', e);
+    }
+};
+// MULTIPOLYGON wkt格式[115, 39] 转换为 leaflet地图格式[39, 115]
+export const handleMULTIPOLYGONLatLngToLngLat = (coordinates) => {
+    try {
+        let list = [];
+        console.log('coordinates', coordinates);
+        if (coordinates.length === 1) {
+            list[0] = [];
+            let arrayDatas = coordinates[0];
+            arrayDatas.map((datas, index) => {
+                list[0][index] = [];
+                datas.map((data) => {
+                    if (data.length === 2) {
+                        list[0][index].push([data[1], data[0]]);
+                    };
+                });
+            });
+        } else {
+            coordinates.map((arrayDatas, index) => {
+                list[index] = [];
+                let datas = arrayDatas[0];
+                console.log('datas', datas);
+                list[index][0] = [];
+                datas.map((data) => {
+                    if (data.length === 2) {
+                        list[index][0].push([data[1], data[0]]);
+                    };
+                });
+            });
+        }
+        return list;
+    } catch (e) {
+        console.log('handlePolygonLatLngs', e);
+    }
+};
+
+// MULTIPOLYGON leaflet地图格式[39, 115]  转换为 wkt格式[115, 39]
+export const handleMULTIPOLYGONLngLatToLatLng = (coordinates) => {
+    try {
+        let list = [];
+        coordinates.map((arrayDatas, index) => {
+            list[index] = [];
+            list[index][0] = [];
+            console.log('arrayDatas', arrayDatas);
+            let test = [];
+            arrayDatas.map((data) => {
+                console.log('data', data);
+
+                if (data.length === 2) {
+                    test.push([data[1], data[0]]);
+                };
+            });
+            console.log('test', test);
+
+            list[index][0].push(test);
+        });
+        return list;
     } catch (e) {
         console.log('handlePolygonLatLngs', e);
     }

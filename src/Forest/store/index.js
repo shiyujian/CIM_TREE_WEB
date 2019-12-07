@@ -418,8 +418,10 @@ export const getExportAcceptList = forestFetchAction(`${TREE_API}/exportacceptan
 export const getExportAcceptReport = forestFetchAction(`${DOCEXPORT_API}?action=acceptance&acceptancedetailid={{acceptancedetailid}}`, [], 'GET', []);
 // 获取标段对应的公司名称和项目经理
 export const getUnitMessageBySection = forestFetchAction(`${TREE_API}/sections`, [], 'GET', []);
-// 获取标段对应的公司名称和项目经理
+// 获取地图对应图层信息
 export const postMapImage = forestFetchAction(`${ROUTE_API}/mapimage`, [], 'POST', []);
+// 获取地图对应图层信息
+export const postAreaAcceptanceMapImage = forestFetchAction(`${ROUTE_API}/areaacceptancemapimage`, [], 'POST', []);
 // 获取第十项信息
 export const getAcceptanceThinclasses = forestFetchAction(`${ROUTE_API}/acceptancethinclasses`, [], 'GET', []);
 // 获取第十一项信息
@@ -549,6 +551,7 @@ export const actions = {
     getExportAcceptReport,
     getBigDataCheckList,
     postMapImage,
+    postAreaAcceptanceMapImage,
     getAcceptanceThinclasses,
     getLastAcceptanceResult,
     getDieTreesData,

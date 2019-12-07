@@ -31,6 +31,7 @@ import WordView11 from './WordView11';
 import ExportView1 from './ExportView1';
 import ExportView2 from './ExportView2';
 import ExportView3 from './ExportView3';
+import ExportView10 from './ExportView10';
 import DrawAreaAcceptModal from './DrawAreaAcceptModal';
 import '../index.less';
 import {
@@ -97,6 +98,7 @@ export default class DegitalAcceptTable extends Component {
             exportModalVisible1: false,
             exportModalVisible2: false,
             exportModalVisible3: false,
+            exportModalVisible10: false,
             record: '',
             itemDetail: '',
             drawAreaVisible: false,
@@ -869,7 +871,7 @@ export default class DegitalAcceptTable extends Component {
         const {
             actions: {
                 getDigitalAcceptDetail,
-                getExportAcceptReport
+                getAcceptanceThinclasses
             },
             platform: {
                 tree = {}
@@ -929,6 +931,22 @@ export default class DegitalAcceptTable extends Component {
                         });
                     }
                 } else if (checktype === 10) {
+                    const postdata = {
+                        section: section,
+                        thinclass: thinClassData
+                    };
+                    let rst = await getAcceptanceThinclasses({}, postdata);
+                    if (rst && rst.content && rst.content instanceof Array && rst.content.length > 0) {
+                        this.setState({
+                            exportModalVisible10: true,
+                            itemDetail: rst.content[0],
+                            record
+                        });
+                    } else {
+                        message.info('移动端详情尚未提交');
+                        return;
+                    }
+                    return;
                     let ID = record.ID;
                     let downloadUrl = `${DOCEXPORT_API}?action=areaacceptance&id=${ID}`;
                     await this.createLink(this, downloadUrl);
@@ -971,7 +989,9 @@ export default class DegitalAcceptTable extends Component {
             exportModalVisible1: false,
             exportModalVisible2: false,
             exportModalVisible3: false,
-            itemDetailList: ''
+            exportModalVisible10: false,
+            itemDetailList: '',
+            itemDetail: ''
         });
     }
     createLink = async (name, url) => {
@@ -1235,6 +1255,7 @@ export default class DegitalAcceptTable extends Component {
             exportModalVisible1,
             exportModalVisible2,
             exportModalVisible3,
+            exportModalVisible10,
             drawAreaVisible
         } = this.state;
         return (
@@ -1349,6 +1370,14 @@ export default class DegitalAcceptTable extends Component {
                 {
                     exportModalVisible3
                         ? <ExportView3
+                            onPressOk={this.handleExportModalClose.bind(this)}
+                            {...this.props}
+                            {...this.state}
+                        /> : ''
+                }
+                {
+                    exportModalVisible10
+                        ? <ExportView10
                             onPressOk={this.handleExportModalClose.bind(this)}
                             {...this.props}
                             {...this.state}

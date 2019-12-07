@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {actions} from '../store';
 import { actions as platformActions } from '_platform/store/global';
-import DashboardPage from '../components/DashboardPage';
+import OnSite from '../components/OnSite/OnSite';
 @connect(
     state => {
         const { dashboard, platform } = state;
@@ -16,8 +16,8 @@ import DashboardPage from '../components/DashboardPage';
         )
     })
 )
-export default class OnSite extends Component {
+export default class MapContainer extends Component {
     render () {
-        return <DashboardPage {...this.props} {...this.state} />;
+        return <OnSite {...this.props} {...this.state} />;
     }
 }
