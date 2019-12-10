@@ -21,13 +21,13 @@ import {
 } from '_platform/api';
 import { getUserIsManager, getUser } from '_platform/auth';
 import WeekPlanModal from './WeekPlanModal';
-import SearchFilter from './SearchFilter';
+import SearchFilter from '../SearchFilter';
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY-MM-DD';
 
-class WeekPlanNew extends Component {
+class WeekPlan extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -631,7 +631,6 @@ class WeekPlanNew extends Component {
                 <Table
                     columns={this.columns}
                     dataSource={workDataList}
-                    className='foresttable'
                     bordered
                     // rowKey='ID'
                 />
@@ -744,7 +743,6 @@ class WeekPlanNew extends Component {
                                             rowKey='ID'
                                             columns={this.columnsModal}
                                             dataSource={TableList}
-                                            className='foresttable'
                                         />
                                     </Row>
                                     <Row>
@@ -790,4 +788,4 @@ class WeekPlanNew extends Component {
         );
     }
 }
-export default Form.create()(WeekPlanNew);
+export default Form.create()(WeekPlan);

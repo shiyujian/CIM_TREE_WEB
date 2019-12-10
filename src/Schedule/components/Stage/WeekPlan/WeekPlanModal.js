@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react';
+import React, { Component } from 'react';
 import {
     Row,
     Col,
@@ -6,10 +6,10 @@ import {
     Form,
     Button,
     Table,
-    Modal,
-    DatePicker,
     Select,
+    Modal,
     Card,
+    DatePicker,
     Steps
 } from 'antd';
 import {
@@ -21,14 +21,13 @@ const FormItem = Form.Item;
 const Step = Steps.Step;
 const { Option } = Select;
 const dateFormat = 'YYYY-MM-DD';
-export default class ActualModal extends Component {
+export default class WeekPlanModal extends Component {
     constructor (props) {
         super(props);
         this.state = {
-            treeDatasource: [],
-            workFlow: []
+            TableList: [], // 表格数据
+            workFlow: [] // 流程节点
         };
-        this.getTaskDetail.bind(this); // 获取任务详情
     }
     async componentDidMount () {
         this.getTaskDetail(); // 获取任务详情
@@ -56,8 +55,6 @@ export default class ActualModal extends Component {
                 }
             });
         }
-        console.log('123', FormParams);
-        console.log('123', FormParams);
         let param = {};
         let TableList = [];
         FormParams.map(item => {
@@ -71,7 +68,6 @@ export default class ActualModal extends Component {
         let sectionData = (tree && tree.bigTreeList) || [];
         let sectionName = '';
         let projectName = '';
-
         let currentSection = '';
         if (param && param.Section) {
             currentSection = param.Section;
@@ -95,31 +91,36 @@ export default class ActualModal extends Component {
         }
         setFieldsValue({
             Section: sectionName,
-            TodayDate: param.TodayDate ? moment(param.TodayDate).format(dateFormat) : ''
+            StartDate: param.StartDate ? moment(param.StartDate).format(dateFormat) : '',
+            EndDate: param.EndDate ? moment(param.EndDate).format(dateFormat) : ''
         });
         this.setState({
             TableList,
             workFlow: rep.Works
         });
     }
-
     render () {
         const {
-            form: { getFieldDecorator }
+            form: {
+                getFieldDecorator
+            }
         } = this.props;
         const {
             workFlow,
             TableList
         } = this.state;
+        console.log('123', TableList);
         const FormItemLayout = {
             labelCol: { span: 8 },
             wrapperCol: { span: 16 }
         };
+
         return (
             <div>
                 <Modal
-                    title='日进度计划流程详情'
+                    title='周进度计划流程详情'
                     width={800}
+                    onOk={this.props.onok}
                     onCancel={this.props.oncancel}
                     visible
                     footer={null}
@@ -127,40 +128,54 @@ export default class ActualModal extends Component {
                     <div>
                         <Form>
                             <Row>
-                                <Col span={12}>
-                                    <FormItem
-                                        {...FormItemLayout}
-                                        label='标段'
-                                    >
-                                        {getFieldDecorator(
-                                            'Section'
-                                        )(
-                                            <Input readOnly />
-                                        )}
-                                    </FormItem>
+                                <Col span={24}>
+                                    <Row>
+                                        <Col span={12}>
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='标段'
+                                            >
+                                                {getFieldDecorator(
+                                                    'Section'
+                                                )(
+                                                    <Input readOnly />
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={12}>
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='开始日期'
+                                            >
+                                                {getFieldDecorator(
+                                                    'StartDate'
+                                                )(
+                                                    <Input readOnly />
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={12}>
+                                            <FormItem
+                                                {...FormItemLayout}
+                                                label='结束日期'
+                                            >
+                                                {getFieldDecorator(
+                                                    'EndDate'
+                                                )(
+                                                    <Input readOnly />
+                                                )}
+                                            </FormItem>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Table
+                                            columns={this.columns}
+                                            pagination={false}
+                                            dataSource={TableList}
+                                            rowKey='ID'
+                                        />
+                                    </Row>
                                 </Col>
-                                <Col span={12}>
-                                    <FormItem
-                                        {...FormItemLayout}
-                                        label='日期'
-                                    >
-                                        {getFieldDecorator(
-                                            'TodayDate'
-                                        )(
-                                            <Input readOnly />
-                                        )}
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Table
-                                    columns={this.columns}
-                                    dataSource={TableList}
-                                    bordered
-                                    rowKey='ID'
-                                    className='foresttable'
-                                    pagination={false}
-                                />
                             </Row>
                         </Form>
                         <Card title={'审批流程'} style={{ marginTop: 10 }}>
@@ -171,6 +186,7 @@ export default class ActualModal extends Component {
                             >
                                 {workFlow.map(item => {
                                     if (item.ExecuteState === 1) {
+                                        // 已执行
                                         if (item.CurrentNodeName === '结束') {
                                             return <Step key={item.ID} title={
                                                 <div>
@@ -196,7 +212,16 @@ export default class ActualModal extends Component {
                                                         })
                                                     })</span>
                                                 </div>
-                                            } description={
+                                            } description={<div>
+                                                {
+                                                    item.CurrentNodeName !== '施工填报' ? <div>
+                                                        {
+                                                            item.FormValues && item.FormValues.length ? <div>意见:{
+                                                                item.FormValues[0].FormParams && item.FormValues[0].FormParams.length && item.FormValues[0].FormParams[0].Val
+                                                            }</div> : ''
+                                                        }
+                                                    </div> : ''
+                                                }
                                                 <div>
                                                     <span>
                                                         {item.CurrentNodeName}人：
@@ -207,7 +232,7 @@ export default class ActualModal extends Component {
                                                         {item.RunTime}
                                                     </span>
                                                 </div>
-                                            } />;
+                                            </div>} />;
                                         }
                                     } else if (item.ExecuteState === 2) {
                                         // 退回
@@ -244,6 +269,7 @@ export default class ActualModal extends Component {
                                             </div>
                                         </div>} />;
                                     } else {
+                                        // 未执行
                                         if (item.ExecutorObj) {
                                             // 未结束
                                             return <Step key={item.ID} title={
@@ -305,47 +331,26 @@ export default class ActualModal extends Component {
     columns = [
         {
             title: '序号',
-            dataIndex: 'key',
-            key: 'key',
-            width: '10%',
+            dataIndex: 'index',
+            width: '33%',
             render: (text, record, index) => {
-                return <span>{record.ID + 1}</span>;
+                return <span>{index + 1}</span>;
             }
         },
         {
-            title: '类别',
-            dataIndex: 'type',
-            key: 'type',
+            title: '日期',
+            dataIndex: 'date',
+            key: 'date',
+            width: '33%'
+        },
+        {
+            title: '计划栽植量',
+            dataIndex: 'planTreeNum',
+            key: 'planTreeNum',
+            width: '34%',
             render: (text, record, index) => {
-                const obj = {
-                    children: text,
-                    props: {}
-                };
-                if (record.typeFirst) {
-                    obj.props.rowSpan = record.typeList;
-                } else {
-                    obj.props.rowSpan = 0;
-                }
-                return obj;
-            }
-        },
-        {
-            title: '项目',
-            dataIndex: 'project',
-            key: 'project'
-        },
-        {
-            title: '单位',
-            dataIndex: 'units',
-            key: 'units'
-        },
-        {
-            title: '数量',
-            dataIndex: 'actualNum',
-            key: 'actualNum',
-            render: (text, record, index) => {
-                if (record && record.actualNum) {
-                    return <span>{record.actualNum}</span>;
+                if (record && record.planTreeNum) {
+                    return <span>{record.planTreeNum}</span>;
                 } else {
                     return <span>0</span>;
                 }
@@ -353,5 +358,3 @@ export default class ActualModal extends Component {
         }
     ];
 }
-
-// export default Form.create()(ActualModal)

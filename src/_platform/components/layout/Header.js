@@ -130,8 +130,6 @@ export default class Header extends Component {
         let href = window.location.href;
         let reg = new RegExp(/(\w+):\/\/([^/:]+)(:\d*)?/);
         let result = href.match(reg);
-        console.log('href', href);
-        console.log('result', result);
 
         Header.menus = [
             {

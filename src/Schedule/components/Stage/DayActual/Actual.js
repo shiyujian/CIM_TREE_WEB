@@ -24,13 +24,13 @@ import {
     getUserIsManager
 } from '_platform/auth';
 import ActualModal from './ActualModal';
-import SearchFilter from './SearchFilter';
+import SearchFilter from '../SearchFilter';
 moment.locale('zh-cn');
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const dateFormat = 'YYYY-MM-DD';
-class ActualNew extends Component {
+class Actual extends Component {
     constructor (props) {
         super(props);
         this.state = {
@@ -576,7 +576,6 @@ class ActualNew extends Component {
                 <Table
                     columns={this.columns}
                     dataSource={this.state.workDataList}
-                    className='foresttable'
                     bordered
                     // rowKey='FlowID'
                 />
@@ -669,7 +668,6 @@ class ActualNew extends Component {
                                     columns={this.columnsModal}
                                     dataSource={TableList}
                                     bordered
-                                    className='foresttable'
                                     pagination={false}
                                 />
                             </Row>
@@ -714,4 +712,4 @@ class ActualNew extends Component {
         );
     }
 }
-export default Form.create()(ActualNew);
+export default Form.create()(Actual);

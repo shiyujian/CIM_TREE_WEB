@@ -21,8 +21,6 @@ export default class Schedule extends Component {
         const {
             Stage,
             NodeManage,
-            ScheduleAnalyze,
-            EnterAnalyze,
             ScheduleDisplay
         } =
             this.state || {};
@@ -48,18 +46,6 @@ export default class Schedule extends Component {
                             exact
                             path='/schedule/nodemanage'
                             component={NodeManage}
-                        />
-                    )}
-                    {EnterAnalyze && (
-                        <Route
-                            path='/schedule/enteranalyze'
-                            component={EnterAnalyze}
-                        />
-                    )}
-                    {ScheduleAnalyze && (
-                        <Route
-                            path='/schedule/scheduleanalyze'
-                            component={ScheduleAnalyze}
                         />
                     )}
                     {ScheduleDisplay && (

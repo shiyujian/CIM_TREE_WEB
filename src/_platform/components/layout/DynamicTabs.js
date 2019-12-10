@@ -34,7 +34,6 @@ export default class DynamicTabs extends Component {
             pathname === '/project/projectimage') {
             return null;
         }
-        console.log('tabs', tabs);
         let index = tabs.findIndex(tab => tab.path === pathname);
         if (index === -1) {
             index = 0;
