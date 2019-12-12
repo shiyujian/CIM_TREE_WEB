@@ -397,6 +397,11 @@ class DrawAreaAcceptModal extends Component {
                 };
                 let wkt = wellknown.stringify(data);
                 console.log('wkt', wkt);
+                coords.map((coord, index) => {
+                    console.log('coord', coord);
+                    let num = computeSignedArea(coord, 2);
+                    actualRegionArea = actualRegionArea + num;
+                });
                 // wkt = 'MULTIPOLYGON((';
                 // coords.map((coord, index) => {
                 //     console.log('coord', coord);
