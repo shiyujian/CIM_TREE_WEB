@@ -16,7 +16,8 @@ import {
     wktToJson
 } from './auth';
 import {
-    handleMULTIPOLYGONLatLngToLngLat
+    handleMULTIPOLYGONLatLngToLngLat,
+    handlePOLYGONWktData
 } from '_platform/gisAuth';
 import { lineString, buffer } from '@turf/turf';
 const { TabPane } = Tabs;
@@ -71,19 +72,43 @@ export default class ExportView10 extends Component {
         try {
             let wkt = itemDetail.Coords;
             // let wkt = 'MULTIPOLYGON(((115.83155564032495 39.08126609399915,115.83204799331725 39.081295765936375,115.83198085427284 39.08180505037308,115.83184431307018 39.08257031813264,115.8313353639096 39.08246353268623,115.83155564032495 39.08126609399915)),((115.83157064393163 39.08120423555374,115.83163233473897 39.0811650082469,115.83195294253528 39.08118311315775,115.83199535496533 39.08123390749097,115.83157064393163 39.08120423555374)),((115.83214203827083 39.081244468688965,115.8320972789079 39.081190656870604,115.83373493514955 39.081281181424856,115.83365849219263 39.0813515894115,115.83214203827083 39.081244468688965)))';
-            let coords = wellknown.parse(wkt);
-            if (coords.coordinates) {
-                let coordinates = handleMULTIPOLYGONLatLngToLngLat(coords.coordinates);
-                coords.coordinates = coordinates;
+            console.log('wkt', wkt);
+            if (wkt.indexOf('MULTIPOLYGON') !== -1) {
+                let coords = wellknown.parse(wkt);
+                console.log('coords', coords);
+                if (coords.coordinates) {
+                    let coordinates = handleMULTIPOLYGONLatLngToLngLat(coords.coordinates);
+                    coords.coordinates = coordinates;
+                }
+                let message = {
+                    key: 3,
+                    type: 'Feature',
+                    properties: {name: '', type: 'area'},
+                    geometry: coords
+                };
+                let layer = this._createMarker(message);
+                this.map.fitBounds(layer.getBounds());
+            } else {
+                let str = handlePOLYGONWktData(wkt);
+                let coords = [];
+                coords.push(str);
+                if (coords && coords instanceof Array && coords.length > 0) {
+                    for (let i = 0; i < coords.length; i++) {
+                        let str = coords[i];
+                        let treearea = handleCoordinates(str);
+                        let message = {
+                            key: 3,
+                            type: 'Feature',
+                            properties: {name: '', type: 'area'},
+                            geometry: { type: 'Polygon', coordinates: treearea }
+                        };
+                        let layer = this._createMarker(message);
+                        if (i === coords.length - 1) {
+                            this.map.fitBounds(layer.getBounds());
+                        }
+                    }
+                };
             }
-            let message = {
-                key: 3,
-                type: 'Feature',
-                properties: {name: '', type: 'area'},
-                geometry: coords
-            };
-            let layer = this._createMarker(message);
-            this.map.fitBounds(layer.getBounds());
         } catch (e) {
             console.log('加载细班图层', e);
         }
