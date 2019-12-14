@@ -407,6 +407,11 @@ export const getZZJQulityCheckList = forestFetchAction(
     `${TREE_API}/patrolevents`,
     []
 );
+// 获取苗木(栽植/支架/浇水)验收数量
+export const getAcceptAnceEventStat = forestFetchAction(
+    `${TREE_API}/acceptanceeventstat`,
+    []
+);
 // 大数据验收结果列表
 export const getBigDataCheckList = forestFetchAction(
     `${TREE_API}/trees`,
@@ -530,6 +535,7 @@ export const actions = {
     getSectionUserStat,
     getTQulityCheckList,
     getZZJQulityCheckList,
+    getAcceptAnceEventStat,
     getTreearea,
     getNurseryBaseStat,
     getNurseryEnterStat,

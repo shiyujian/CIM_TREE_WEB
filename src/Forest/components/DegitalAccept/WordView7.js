@@ -11,7 +11,8 @@ export default class WordView1 extends Component {
             leader: '',
             unitName: '',
             detail: '',
-            unQualifiedList: []
+            unQualifiedList: [],
+            eventStat: ''
         };
     }
 
@@ -21,12 +22,35 @@ export default class WordView1 extends Component {
         } = this.props;
         if (itemDetailList.length > 0) {
             let detail = itemDetailList[0];
+            await this.getEventStat(detail);
             await this.getUnqualifiedList(detail);
             await this.getUnitMessage(detail);
             this.setState({
                 detail
             });
         }
+    }
+    getEventStat = async (detail) => {
+        const {
+            actions: {
+                getAcceptAnceEventStat
+            }
+        } = this.props;
+        this.setState({
+            loading: true
+        });
+        let postdata = {
+            section: detail.Section,
+            thinclass: detail.ThinClass,
+            // treetype: detail.TreeType,
+            eventtype: 0,
+            problemtype: '苗木支撑不牢固,苗木支撑不及时,苗木撑杆为非硬木'
+        };
+        let result = await getAcceptAnceEventStat({}, postdata);
+        this.setState({
+            loading: false,
+            eventStat: (result) || ''
+        });
     }
     getUnqualifiedList = async (detail) => {
         const {
@@ -113,6 +137,9 @@ export default class WordView1 extends Component {
         });
     }
     handleDetailData = (detail) => {
+        const {
+            eventStat
+        } = this.state;
         let handleDetail = {};
         handleDetail.unit = (detail && detail.AcceptanceObj && detail.AcceptanceObj.Land) || '';
         handleDetail.jianli = (detail && detail.AcceptanceObj && detail.AcceptanceObj.SupervisorObj && detail.AcceptanceObj.SupervisorObj.Full_Name) || '';
@@ -126,8 +153,8 @@ export default class WordView1 extends Component {
         handleDetail.actualNum = (detail && detail.ActualNum) || 0;
         handleDetail.loftingNum = (detail && detail.LoftingNum) || 0;
         handleDetail.score = (detail && detail.Score && (detail.Score).toFixed(2)) || 0;
-        handleDetail.checkNum = (detail && detail.CheckNum) || 0;
-        handleDetail.failedNum = (detail && detail.FailedNum) || 0;
+        handleDetail.checkNum = (eventStat && eventStat.SurpervisorNum) || 0;
+        handleDetail.failedNum = (eventStat && eventStat.NoQualifiedNum) || 0;
         handleDetail.treetypename = (detail && detail.TreeTypeObj && detail.TreeTypeObj.TreeTypeName) || '';
 
         let hgl = handleDetail.checkNum - handleDetail.failedNum; // 合格量
