@@ -189,7 +189,7 @@ export default class WordView1 extends Component {
                                 </tr>
                                 <tr>
                                     <td height='60;' align='center'>整改不合格数量</td>
-                                    <td colSpan='3'>{`${handleDetail.hgl} (个)`}</td>
+                                    <td colSpan='3'>{`${handleDetail.failedNum} (个)`}</td>
                                     <td >合格率</td>
                                     <td>{`${handleDetail.score}%`}</td>
                                 </tr>
