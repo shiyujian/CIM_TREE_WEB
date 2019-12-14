@@ -1,7 +1,7 @@
 {
   "name": "CIM_WEB",
-  "description": "森林大数据建设管理平台5.00.36",
-  "version": "5.00.36",
+  "description": "森林大数据建设管理平台5.00.37",
+  "version": "5.00.37",
   "main": "src/index.js",
   "author": "ECIDI",
   "license": "GPL",
